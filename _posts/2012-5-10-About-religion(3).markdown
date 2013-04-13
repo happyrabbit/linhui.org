@@ -4,10 +4,11 @@ layout: post
 time: '14:28'
 ---
 
+<!--begin excerpt-->
 
 Anton, a nice and interesting friend, gave me a chance to sort out my thinking about Confucianism and Christianity. It is still vague. As I have said to him, I am really dumb and there are tons of tons of questions that I can not answer. There is an Chinese saying to describe those who are wise and knowledgeable that "explain the profound in simple terms". I am not able to do that. The only reason is that I am too dumb to understand those myself. I am in awe of the world.
 
-<!--excerpt-->
+<!--end excerpt-->
 
 Jesus and Martin Luther rarely appear in philosophical literature and Socrates, Plato, Aristotle, Kant, Hegel and Marx do not feature prominently in religion. Though Taoism and Confucianism are philosophy not religion, they both represent religious dimension. The religiousness make them different from philosophy of Socrates, Plato etc. By saying that, I made no judgement but illustrated personal understanding of the difference. What complicates the situation is that there are so many intersections.
  
