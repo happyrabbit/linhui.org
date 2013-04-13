@@ -6,7 +6,10 @@ time: '20:10'
 
 
 
+<!--begin excerpt-->
 The word "compassion" has been lingering in my mind for long. 
+
+<!--end excerpt-->
 
 Compassion is superior to sympathy; Co-feeling is superior to compassion. Being on the top of the hierarchy of sentiment, co-feeling is impossible for human but only owned by God. Compassion and sympathy are possible for human but impossible by animals which is the difference between us and the birds and the beasts. Mencius, an ancient Chinese philosopher. singled out symthy-and-empathy as the unique and defining characteristic of our nature. And the difference implies that the uniqueness of being human is not a static quality but a dynamic process. We can enrich our humanity by increasing our supply of sympathetic and empathic feeling. To appreciate the dynamic process, we can employ the metaphor of the stream. The sympathetic and empathic feeling is the source of our humanity. Unless the supply from the source is sufficient, our humanity will not flow very far.  
 
