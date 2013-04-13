@@ -1,0 +1,12 @@
+---
+title: The Analects of Confucius (1)
+layout: post
+time: '5:00'
+---
+It was the most authoritative of all laws in a long Chinese history over thousands of years. The philosophy of Confucius has been deeply rooted in the Chinese people's heart. I love to read about different schools of Ancient Chinese Philosophy. Among them, I personally like Taoism most. The translation of Chinese Classical culture can never be easy. I also feel it is way less than perfect. Exploring the English version helps me better understand the Ancient Chinese Philosophy. Even as a Chinese, I can't say I know it well. It could take all your life. None of the schools of Philosophy dominates all the other, that is none of them can be rigid golden guide for mind and behavior. You need your own judgment.
+<blockquote>Confucius said:"A superior man is dignified, but does not dispute. He is sociable, but does not party"</blockquote>
+<blockquote>Zi Gong asked his master,"Is there one word which we may follow as a life rule?"
+Confucius said:"The word is MERCY. It means that whatever you do not want to be done to you, do not do it to others."</blockquote>
+<span style="color: #0000ff;">Hui's comment: Comparing to what is above, it is more difficult to treat others as they want to be treated because more often we don't know how others want to be treated. We can share rooms, share office, share books ...... but how could we share emotion? Most of the time, sympathy is based on similar experience. Now I am in bio-chemistry course, which I have none background. Now, I understand Jie's feeling when she transfered to Statistics department from English department. I didn't mean that people are not able to be sympathetic at all if they don't have similar experience.  Comparing to those who are suffering, our feeling is just too weak. However, so called well educated people are very good at performing to be sympathetic. I am not blaming.  It won't hurt anyone to pretend that way. We are human beings.</span>
+<blockquote>Confucius said:"It is difficult for a poor person not to complain about his poverty, while it is easy for a rich person not to be proud of his wealth."</blockquote>
+<span style="color: #0000ff;">Hui's comment: You can only be low-key when you are successful/powerful (whatever). When you have nothing good, you can only be ignored. It is a fact, not happy but not sad either. </span> <span style="color: #0000ff;">When you are wealthy (or powerful), it is easy for you to earn respect and reputation.</span>
