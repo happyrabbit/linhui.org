@@ -25,6 +25,6 @@ sp <- ggplot(data, aes(x = Measurement, y = Diameter, color = Dog)) +
 sp + facet_grid(Reader ~ Location)
 ```
 
-![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2.png) 
+![plot of chunk unnamed-chunk-2](linhui.org/files/figure/unnamed-chunk-2.png) 
 
 
