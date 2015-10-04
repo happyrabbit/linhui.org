@@ -1,0 +1,110 @@
+---
+title: The Ecosystem of R Markdown
+layout: post
+time: '15:54'
+---
+
+[Central Iowa R User Group](http://www.cirug.com) held a workshop given by Yihui Xie about the ecosystem of R Markdown on July 14, 2015. Here is a quick tour on R Markdown and the series of R packages Yihui talked about that can be used to generate reproducible and interactive reports.
+
+### What is R Markdown?
+
+Markdown is a lightweight markup language designed to make authoring content easy for everyone. Rather than writing complex markup code (e.g. LyX, XML,  HTML or LaTeX), Markdown enables the use of a syntax much more like plain-text email.  It is young comparing to the other markup languages. What makes markdown distinct is that it is both machine-readble and human-readble.
+
+R Markdown combines the core syntax of markdown and embedded R code chunks that are run so their output can be included in the final document. R Markdown documents are fully _reproducible_ and the most important, it is _simple_!
+
+### How to Start?
+
+Please install R if you haven't. You can get R from the [Comprehensive R Archive Network (CRAN)](https://cran.r-project.org). After installing R, install [RStudio](https://www.rstudio.com). Once you have RStudio, launch it. After that, I encourage those who are new to R Markdown start from this introductory article [R Markdown — Dynamic Documents for R](http://rmarkdown.rstudio.com) which can get you started with R Markdown right away. Once you install R Markdown package and learn the most commonly used markdown constructs, you can go into more depth on customizing the behavior of embedded R code. The “Learning More” section on the bottom of the [introductory article](http://rmarkdown.rstudio.com) has a list of reference you can refer to learn more about R Markdown. 
+
+
+### Interactive R Markdown Document
+
+There are some packages that can be used to make interactive R Markdown documents. 
+
+1. **DT: A Wrapper of the JavaScript Library "DataTables"** <br>
+The R package **DT** provides an R interface to the JavaScript library DataTables. R data objects (matrices or data frames) can be displayed as tables on HTML pages, and DataTables provides filtering, pagination, sorting, and many other features in the tables. You can refer to [https://rstudio.github.io/DT/](https://rstudio.github.io/DT/) for more details.
+
+2. **Leaflet:Interactive Web-Maps Based on the Leaflet JavaScript Library** <br>
+R package 'leaflet' makes it easy to integrate and control Leaflet maps in R. The JaveScript library 'leaflet' is for interactive maps. You can embed maps in knitr/R Markdown documents and Shiny apps.  See [https://rstudio.github.io/leaflet/](https://rstudio.github.io/leaflet/) for more details.
+
+3. **dygraphs: interactive plot for time series data** <br>
+The dygraphs package is an R interface to the dygraphs JavaScript charting library. It provides rich facilities for charting time-series data in R, including highly configurable series and axis display and interactive features like zoom/pan and series/point highlighting.
+See [https://rstudio.github.io/dygraphs/](https://rstudio.github.io/dygraphs/) for more details.
+
+4. **networkD3: D3 JavaScript Network Graphs from R** <br>
+Package 'networkD3' provides tools for creating D3 JavaScript network graphs from R.
+
+5. **threejs: Interactive 3D Scatter Plots and Globes** <br>
+Package threejs provides interactive 3D scatterplots and globe plots. Here is a galary of examples from the package and also the source code [http://bwlewis.github.io/rthreejs/](http://bwlewis.github.io/rthreejs/).
+
+Here is an example of R Markdown ducument including interactive figure/table from the packages mentioned. Run the following and you can get this interactive webpage [http://linhui.org/Hui's_files/SampleForInteractiveReport.html](http://linhui.org/Hui's_files/SampleForInteractiveReport.html)
+
+<pre>
+---
+title: "Sample for Interative Report"
+author: "Rabbit"
+date: "July 18, 2015"
+output: html_document
+---
+
+# DataTables
+
+```{r}
+library(DT)
+datatable(iris)
+```
+
+# Leaflet Maps
+
+```{r}
+library(leaflet)
+library(leaflet)
+m = leaflet() %>% addTiles()
+m  # a map with the default OSM tile layer
+
+m = m %>% setView(-93.65, 42.0285, zoom = 17)
+# popup
+m %>% addPopups(-93.65, 42.0285, 'Here is the <b>Department of Statistics</b>, ISU')
+rand_lng = function(n = 10) rnorm(n, -93.65, .01)
+rand_lat = function(n = 10) rnorm(n, 42.0285, .01)
+
+# use automatic bounds derived from lng/lat data
+m = m %>% clearBounds()
+# marker
+m %>% addMarkers(rand_lng(), rand_lat())
+```
+
+# Dygraphs
+
+```{r}
+library(dygraphs)
+dygraph(sunspots) %>% dyRangeSelector()
+lungDeaths <- cbind(mdeaths, fdeaths)
+dygraph(lungDeaths)
+```
+
+# Network graphs
+
+```{r}
+library(networkD3)
+data(MisLinks, MisNodes)
+str(MisLinks)
+str(MisNodes)
+forceNetwork(Links = MisLinks, Nodes = MisNodes, Source = "source",
+             Target = "target", Value = "value", NodeID = "name",
+             Group = "group", opacity = 0.4)
+```
+
+# Three.js
+
+```{r}
+library(threejs)
+data(world.cities, package="maps")
+cities <- world.cities[order(world.cities$pop,decreasing=TRUE)[1:1000],]
+value  <- 100 * cities$pop / max(cities$pop)
+
+earth <- texture(system.file("images/world.jpg",package="threejs"))
+globejs(img=earth, lat=cities$lat, long=cities$long, value=value)
+```
+
+</pre>
