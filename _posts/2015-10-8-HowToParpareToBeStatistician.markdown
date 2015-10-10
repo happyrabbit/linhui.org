@@ -10,7 +10,7 @@ A first year PhD student in Statistics asked me some questions about how to prep
 
 I think “Big Data” has been overly used which created plenty bubbles. Everyone is talking about big data, but no one can explain what exactly it is. It is fun to look at trends for some words by google occasionally, but not helpful to solve problems in real life.  A lot of data, on its own is worthless. It isn’t the size of the data that’s important. It’s what you do with it. So I will instead talk about how to prepare to be a statistician.  
 
-Statistician is a very general word and we need to further define which sub-field of statistic a “Statistician” works on. You can refer to the information on American Statistical Association’s website about “Which Industries Employ Statisticians? [ http://www.amstat.org/careers/whichindustriesemploystatisticians.cfm ]” If you click the industry you are interested in, you will see a page with information about how statistics fit into the industry. By reading those, you should have an idea of what statistical skills are required for your aimed area. 
+Statistician is a very general word and we need to further define which sub-field of statistic a “Statistician” works on. You can refer to the information on American Statistical Association’s website about [“Which Industries Employ Statisticians?"](http://www.amstat.org/careers/whichindustriesemploystatisticians.cfm) If you click the industry you are interested in, you will see a page with information about how statistics fit into the industry. By reading those, you should have an idea of what statistical skills are required for your aimed area. 
 
 **Q2 What’s the direction of the development of statistics?**
 
