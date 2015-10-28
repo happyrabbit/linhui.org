@@ -4,7 +4,7 @@ layout: post
 time: '20:54'
 ---
   
-A first year PhD student in Statistics asked me some questions about how to prepare to be a “Big Data” era statistician. Since it is not the first time I was asked questions of this kind, I decide to put all of them together and hope it is helpful for some others who are interested in analytical work in the future. I started to work in industry right after my PhD, so the following are from industry point of view not academe. All of the questions are great and don’t have right/wrong answer. I just say my opinions based on personal experience.  
+A first year statistics PhD student asked me some questions about how to prepare to be a “Big Data” era statistician. Since it is not the first time I was asked questions of this kind, I decide to put all of them together and hope it is helpful for some others who are interested in analytical work in the future. I started to work in industry right after my PhD, so the following are from industry point of view not academe. All of the questions are great and don’t have right/wrong answer. I just say my opinions based on personal experience.  
 
 **Q1 How could I prepare myself to be a “Big Data” era statistician?**
 
