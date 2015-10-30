@@ -8,7 +8,7 @@ One statistics graduate student asked me some questions about how to prepare to 
 
 -	 David Jonoho wrote an AWESOME article “[50 years of Data Science](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=4&cad=rja&uact=8&ved=0CC8QFjADahUKEwjNqfmUw-jIAhUC2SYKHdz_Bgc&url=http%3A%2F%2Fpages.cs.wisc.edu%2F~anhai%2Fcourses%2F784-fall15%2F50YearsDataScience.pdf&usg=AFQjCNHEgxJDnYO49RinB83IbPPZnuAifQ)”. The article reviews the current “Data Science” and discusses how/whether Data Science is really different from Statistics. 
 
--	Statistics is the least important part of data science (Andrew Gelman)
+-	[Statistics is the least important part of data science](http://andrewgelman.com/2013/11/14/statistics-least-important-part-data-science/) (Andrew Gelman)
 
 -	Analyzing the Analyzers: An Introspective Survey of Data Scientists and Their Work (Harlan Harris, Sean Murphy, and Marck Vaisman)
 
