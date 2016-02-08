@@ -3,6 +3,7 @@ title: "从欧几里德到爱因斯坦[From Euclid to Einstein] ——读《几�
 author: "Hui Lin"
 date: "February 7, 2016"
 output: html_document
+layout: post
 ---
 
 
