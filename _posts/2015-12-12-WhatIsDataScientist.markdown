@@ -1,6 +1,5 @@
 ---
 title: "神马是数据科学家？"
-layout: post
 ---
 
 
