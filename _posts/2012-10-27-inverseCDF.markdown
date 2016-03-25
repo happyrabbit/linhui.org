@@ -51,7 +51,7 @@ img {
 
 
 <div id="header">
-<h4 class="title">  <a href="http://hui1987.com/">Back to Homepage</a> </h4>
+<h4 class="title">  <a href="http://scientistcafe.com/">Back to Homepage</a> </h4>
 <h1 class="title">Several properties of inverse CDF</h1>
 </div>
 

@@ -8,8 +8,8 @@ time: '15:54'
 
 还有其它几篇和本科同学一起写的论文。一并放上来，作为存档。 
 
-- [《师大附近东北菜馆的选择》](http://hui1987.com/works/chooserestaurant.pdf)
-- [《重点城市工业废弃排放情况调查分析》](http://hui1987.com/works/dataminingcourseBS.pdf)
-- [《重点城市工业废弃排放情况调查设计》](http://hui1987.com/works/survey.pdf)
+- [《师大附近东北菜馆的选择》](http://scientistcafe.com/works/chooserestaurant.pdf)
+- [《重点城市工业废弃排放情况调查分析》](http://scientistcafe.com/works/dataminingcourseBS.pdf)
+- [《重点城市工业废弃排放情况调查设计》](http://scientistcafe.com/works/survey.pdf)
 
 
