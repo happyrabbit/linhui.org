@@ -279,13 +279,13 @@ y_{n}
 <h3><span class="header-section-number">5.1.1</span> 划分训练集和测试集</h3>
 <p>关于数据划分大家可能主要会问这三个问题：（1）为什么要划分训练集和测试集？（2）多少比例的数据用于训练集？（3）具体如何划分？我们现在就对此逐一回答。</p>
 <p>刚接触数据科学的人常常会问<strong>为什么我们要预留一部分数据作为测试集而不是使用全部的数据用于训练</strong>。印象中传统商业智能声称的数据分析通常只是数据描述。通过从数据库中查询相关测量来回答简单的问题，如：2015年某产品每月销售量是多少？我们网站在过去一个月每天的访问量是多少？两种包装设计的同类产品在某大零售店上个月的销量差距多大？像这样的问题确实不用对数据进行划分，相反我们需要用尽可能完整的数据，然后对感兴趣的部分求和或者平均。假设数据观测准确，我们不需要怀疑问题的答案，因为这些问题本质上就是对数据进行某种描述总结，没有牵扯到任何分析推断。</p>
-<p>数据科学家需要解决的不会是这样的问题，常是预测问题，或者同时还需要从预测模型中得到相应能够指导决策的推断。在这些情况下，分析的重心在于找到自变量<span class="math">\(\mathbf{X}\)</span>和应变量<span class="math">\(\mathbf{y}\)</span>之间的系统关系。这时我们就必须非常小心，因为我们在用一个样本得到一般化的结论，进而对将来可能出现的观测进行预测，这远远超越了描述统计的界限。根据彭加莱的理论，在预测未来的过程中，预测的越远的未来要求模型越精确，因为你的错误率会迅速上升。每向前预测一步，噪声会随着以一种非线性的方式迅速增加，因此我很难相信对5年以后某事件的定量预测。我们能够处理定性的事物，能够讨论系统的某些特点，但能够计算的东西是很局限的。在《黑天鹅》那本书中，作者以数学家Michael Berry的弹子球计算为例说明了这种放大效应。该实验是预测弹子球在球桌上的运动轨迹。如果弹子球的基本参数已知，你能够计算出桌面阻力，测量撞击量，那么就可以预测第1次撞击的结果。要预测第2次撞击就更为复杂一些，你需要小心确定球的初始状态，但不是不可能。如果要计算第9次撞击的结果你需要考虑某个站在桌子旁边的人的体重和产生的引力。要计算第56次撞击结果你需要考虑宇宙中的每一个基本粒子。注意这还只是单独的弹子球而没有牵扯到有着自由意志的人，以及不同人之间相互的影响。对现实世界的复杂局面，人的预测能力有着本质上的局限性。因此在实际预测分析当中，你需要很小心的界定这个可预测的边界，好比在弹子球实验中，你能预测第1次撞击的结果或者咬咬牙，再多杀一大片脑细胞做第2次撞击预测，但不要试图再进一步，承认自己的局限需要知识和勇气。回到实际分析中，如何找到预测的边界？（注：随着你经验的增长，你会遇到很多你无法预测（有时是分析）的情况。）目前我知道的方法就是在仔细确保当前数据基本符合如上假设的情况下，严格划分训练集和测试集，尽可能对模型的预测情况进行评估，检测预测模型的精确度和稳定性。</p>
-<p>换句话说，我们想要知道如果我们用模型来对新样本进行预测时会发生什么。我们的预测和真实将观测到的值有多接近？预测值偏离真实值的误差大致是多少？模型的误差是不是单向的，即预测是不是总大于真实值？这些都是很自然的问题，但它们的答案并非那么容易获得。最简单的理解模型在将来数据集上表现的方法就是试图模拟这件事。虽然严格说来，在将来事件发生之前，我们不可能得到相应的数据，但是我们能够预留一部分当前的数据并将它们视为将来的观测。例如，如果我们要预测2016年哪些农民还会某品牌的种子，可以用之前到2015年的历史数据建立预测模型，然后预测2016年的购买情况。这是一个相当好的模拟，由于我们其实已经知道2016年实际购买情况，可以将预测和真实情况进行对比。</p>
-<p>在商业促销活动和信用风险的案例中，我们得到的数据通常和某个时间点相连（或者时间区间：一周，一个月，一个促销活动期间）。通常称这样的数据有代表性（用某时间点或者时间段的数据代表普遍情况）。在这样的情况下我们通常将数据集随机分成不同部分，然后用一部分（训练集）建立模型，另外一部分（测试集）来评估模型表现，可能的话对模型做出调整。这样划分背后隐含的假设是：</p>
+<p>数据科学家需要解决的不会是这样的问题，常是预测问题，或者同时还需要从预测模型中得到相应能够指导决策的推断。在这些情况下，分析的重心在于找到自变量<span class="math">\(\mathbf{X}\)</span>和应变量<span class="math">\(\mathbf{y}\)</span>之间的系统关系。这时我们就必须非常小心，因为我们在用一个样本得到一般化的结论，进而对将来可能出现的观测进行预测，这远远超越了描述统计的界限。根据彭加莱的理论，在预测未来的过程中，预测的越远的未来要求模型越精确，因为你的错误率会迅速上升。每向前预测一步，噪声会随着以一种非线性的方式迅速增加，因此我很难相信对5年以后某事件的定量预测。我们能够处理定性的事物，能够讨论系统的某些特点，但能够计算的东西是很局限的。在《黑天鹅》那本书中，作者以数学家Michael Berry的弹子球计算为例说明了这种放大效应。该实验是预测弹子球在球桌上的运动轨迹。如果弹子球的基本参数已知，你能够计算出桌面阻力，测量撞击量，那么就可以预测第1次撞击的结果。要预测第2次撞击就更为复杂一些，你需要小心确定球的初始状态，但不是不可能。如果要计算第9次撞击的结果你需要考虑某个站在桌子旁边的人的体重和产生的引力。要计算第56次撞击结果你需要考虑宇宙中的每一个基本粒子。注意这还只是单独的弹子球而没有牵扯到有着自由意志的人，以及不同人之间相互的影响。对现实世界的复杂局面，人的预测能力有着本质上的局限性。因此在实际预测分析当中，你需要很小心的界定这个可预测的边界，好比在弹子球实验中，你能预测第1次撞击的结果或者咬咬牙，再多杀一大片脑细胞做第2次撞击预测，但不要试图再进一步，承认自己的局限需要知识和勇气。回到实际分析中，如何找到预测的边界？（注：随着你经验的增长，你会遇到很多你无法预测（有时是分析）的情况。）目前我知道的方法就是在仔细确保当前情况基本符合假设的情况下，严格划分训练集和测试集，尽可能对模型的预测情况进行评估，检测预测模型的精确度和稳定性。划分背后隐含的假设是：</p>
 <ol style="list-style-type: decimal">
 <li>我们用于分析的数据展现的过程能够反应真实世界中事情的发展过程</li>
 <li>我们想要对其建模的真实世界中事情的发展过程随着时间变化是相对稳定的。如，用上个月的数据建立的表现良好的模型，在接下来的一个月的观测上依旧能够有类似的良好表现</li>
 </ol>
+<p>换句话说，我们想要知道如果我们用模型来对新样本进行预测时会发生什么。我们的预测和真实将观测到的值有多接近？预测值偏离真实值的误差大致是多少？模型的误差是不是单向的，即预测是不是总大于真实值？这些都是很自然的问题，但它们的答案并非那么容易获得。最简单的理解模型在将来数据集上表现的方法就是试图模拟这件事。虽然严格说来，在将来事件发生之前，我们不可能得到相应的数据，但是我们能够预留一部分当前的数据并将它们视为将来的观测。例如，如果我们要预测2016年哪些农民还会某品牌的种子，可以用之前到2015年的历史数据建立预测模型，然后预测2016年的购买情况。这是一个相当好的模拟，由于我们其实已经知道2016年实际购买情况，可以将预测和真实情况进行对比。</p>
+<p>在商业促销活动和信用风险的案例中，我们得到的数据通常和某个时间点相连（或者时间区间：一周，一个月，一个促销活动期间）。通常称这样的数据有代表性（用某时间点或者时间段的数据代表普遍情况）。在这样的情况下我们通常将数据集随机分成不同部分，然后用一部分（训练集）建立模型，另外一部分（测试集）来评估模型表现，可能的话对模型做出调整。</p>
 <p>如果这两条假设大致正确，那么当前数据就能够合理反映未来的情况。因此在这种情况下，预留一部分当前数据来估计模型在将来的表现是合理的。明确了预测模型的一些假设前提，以及划分训练集和测试集的必要性之后，下一个问题是<strong>我们该将多少比例的数据用于训练集</strong>。</p>
 <p>一般这需要视具体情况而定。通常需要考虑的两个因素是：（1）样本量；（2）计算速度。当样本量较大时，在考虑计算速度的条件下，我一般会尝试60%，70％和80%这三个比例，看哪个效果更好。如果样本量很小，那么测试集其评估模型效果的能力将非常有限，并且在原本样本量就不大的情况下再分出一部分数据会极大影响模型拟合。这种情况下，使用再抽样技术更加有效。常用的再抽样方法有交互校验和Bootstrap。</p>
 <p>我们可以用createResample函数生成简单bootstrap样本，createFolds函数可以生成平衡的交互校验样本集。</p>
@@ -336,25 +336,34 @@ datTest &lt;-<span class="st"> </span>sim.dat[-trainIndex,]</code></pre>
 <li>按照自变量划分</li>
 </ul>
 <p>还可以根据最大不相似方法(Willett, 1999)划分数据（maxDissim函数）。假设样本集A中含有m个样本，样本集B含有n个样本，n&gt;m，且我们要从B中选出一些样本加到A中，该子集中的样本要尽量和A中的不同。要实现这一点，对B中的一个样本，计算A中样本和该样本的差异度（距离，这里会算出m个值，因为A中有m个样本）。然后将和A中样本最不相同的B的样本抽取出来加入A，重复这个过程，直到A的样本量达到要求。关于这么权衡这m个差异度找到和A“最不相似”的样本，有不同的方法，比如以最小的值为准，将所有距离求和等等。这里没有什么黄金法则，建议大家尝试几种方法，查看比较得到的训练/测试样本自变量分布，选取其中一种。用这种方式可以得到自变量分布相似的不同样本集。R中有不同的计算样本间差异度（基于自变量观测）的函数。Caret包中调用的是proxy包中的函数。关于不同的差异度测量，见相关包的帮助文档。我们可以通过选项 obj设置和样本集A“最不相似”的样本的方式，其中minDiss表示以最小差异度为准， sumDiss表示使用差异度之和。</p>
-<p>As an example, the figure below shows a scatter plot of two chemical descriptors for the Cox2 data. Using an initial random sample of 5 compounds, we can select 20 more compounds from the data so that the new compounds are most dissimilar from the initial 5 that were specified. The panels in the figure show the results using several combinations of distance metrics and scoring functions. For these data, the distance measure has less of an impact than the scoring method for determining which compounds are most dissimilar.</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(mlbench)
-
- <span class="kw">data</span>(BostonHousing)
-
-testing &lt;-<span class="st"> </span><span class="kw">scale</span>(BostonHousing[, <span class="kw">c</span>(“age”, “nox”)]) <span class="kw">set.seed</span>(<span class="dv">5</span>)</code></pre>
-<p>A random sample of 5 data points</p>
-<pre class="sourceCode r"><code class="sourceCode r">
+<p>我们用服装数据的一个子集为例展示按照自变量抽样。这里选取年龄和收入这两个变量。As an example, the figure below shows a scatter plot of two chemical descriptors for the Cox2 data. Using an initial random sample of 5 compounds, we can select 20 more compounds from the data so that the new compounds are most dissimilar from the initial 5 that were specified. The panels in the figure show the results using several combinations of distance metrics and scoring functions. For these data, the distance measure has less of an impact than the scoring method for determining which compounds are most dissimilar.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(proxy)
+<span class="kw">library</span>(lattice)
+<span class="co"># 选取10个问卷调查变量</span>
+testing&lt;-<span class="kw">subset</span>(sim.dat,<span class="dt">select=</span><span class="kw">c</span>(<span class="st">&quot;age&quot;</span>,<span class="st">&quot;income&quot;</span> ))
+<span class="kw">set.seed</span>(<span class="dv">5</span>)
+<span class="co"># 随机选取5个样本</span>
 startSet &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">dim</span>(testing)[<span class="dv">1</span>], <span class="dv">5</span>)
-
 samplePool &lt;-<span class="st"> </span>testing[-startSet,]
-
 start &lt;-<span class="st"> </span>testing[startSet,]
+newSamp &lt;-<span class="st"> </span><span class="kw">maxDissim</span>(start, samplePool, <span class="dt">n =</span> <span class="dv">5</span>)
+new&lt;-testing[newSamp,]
 
-newSamp &lt;-<span class="st"> </span><span class="kw">maxDissim</span>(start, samplePool, <span class="dt">n =</span> <span class="dv">20</span>)
-
-<span class="kw">head</span>(newSamp)
-
-[<span class="dv">1</span>] <span class="dv">461</span> <span class="dv">406</span> <span class="dv">49</span> <span class="dv">308</span> <span class="dv">469</span> <span class="dv">76</span></code></pre>
+start$group&lt;-<span class="kw">rep</span>(<span class="st">&quot;begin&quot;</span>,<span class="kw">nrow</span>(start))
+new$group&lt;-<span class="kw">rep</span>(<span class="st">&quot;new_maxDissim&quot;</span>,<span class="kw">nrow</span>(new))
+newSet &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">dim</span>(samplePool)[<span class="dv">1</span>], <span class="dv">5</span>)
+new2&lt;-testing[newSet,]
+new2$group&lt;-<span class="kw">rep</span>(<span class="st">&quot;new_random&quot;</span>,<span class="kw">nrow</span>(new2))
+<span class="kw">xyplot</span>(age~income,<span class="dt">data=</span><span class="kw">rbind</span>(start,new,new2),<span class="dt">grid =</span> <span class="ot">TRUE</span>,
+       <span class="dt">group =</span> group, <span class="dt">auto.key =</span> <span class="ot">TRUE</span>
+)</code></pre>
+<div class="figure" style="text-align: center"><span id="fig:maxdis"></span>
+<img src="DS_R_files/figure-html/maxdis-1.png" alt="按自变量最大化差异抽样" width="80%" />
+<p class="caption">
+Figure 5.1: 按自变量最大化差异抽样
+</p>
+</div>
+<p>由图<a href="section-5.html#fig:maxdis">5.1</a>，通过最大化差异抽取的样本和初始样本点分布在图的不同位置。而随机抽取的新样本和原始样本更加接近。</p>
 </div>
 </div>
 <div id="section-5.2" class="section level2">
