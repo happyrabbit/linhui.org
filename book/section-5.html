@@ -308,7 +308,7 @@ trainIndex &lt;-<span class="st"> </span><span class="kw">createDataPartition</s
 ## [4,]         4
 ## [5,]         6
 ## [6,]         7</code></pre>
-<p>list = FALSE选项使得返回的值是数据框。该函数还有一个选项times，用于设置划分的次数，你可以一次返回多次划分的结果，函数会返回一个（或多个）整数向量（指针向量），指明归于训练集的行。下面我们通过返回的指针向量（<code>trainIndex</code>）得到训练集和测试集：</p>
+<p><code>list = FALSE</code>选项使得返回的值是数据框。该函数还有一个选项<code>times</code>，用于设置划分的次数，你可以一次返回多次划分的结果，函数会返回一个（或多个）整数向量（指针向量），指明归于训练集的行（你可以设置<code>times＝2</code>再运行一下上面的代码看看输出有什么不同）。下面我们通过返回的指针向量（<code>trainIndex</code>）得到训练集和测试集：</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 得到训练集</span>
 datTrain &lt;-<span class="st"> </span>sim.dat[ trainIndex,]
 <span class="co"># 得到测试集</span>
@@ -333,7 +333,7 @@ datTest &lt;-<span class="st"> </span>sim.dat[-trainIndex,]</code></pre>
 <ul>
 <li>按照自变量划分</li>
 </ul>
-<p>还可以使用最大差异度法 <span class="citation">(Willett 2004)</span>划分数据（maxDissim函数）。假设样本集A中含有m个样本，样本集B含有n个样本，n&gt;m，且我们要从B中选出一些样本加到A中，该子集中的样本要尽量和A中的不同。要实现这一点，对B中的一个样本，计算A中样本和该样本的差异度（距离，这里会算出m个值，因为A中有m个样本）。然后将和A中样本最不相同的B的样本抽取出来加入A，重复这个过程，直到A的样本量达到要求。关于这么权衡这m个差异度找到和A“最不相似”的样本，有不同的方法，比如以最小的值为准，将所有距离求和等等。这里没有什么黄金法则，建议大家尝试几种方法，查看比较得到的训练/测试样本自变量分布，选取其中一种。用这种方式可以得到自变量分布相似的不同样本集。R中有不同的计算样本间差异度（基于自变量观测）的函数。Caret包中调用的是proxy包中的函数。关于不同的差异度测量，见相关包的帮助文档。我们可以通过选项 obj设置和样本集A“最不相似”的样本的方式，其中minDiss表示以最小差异度为准， sumDiss表示使用差异度之和。</p>
+<p>还可以使用最大差异度法<span class="citation">(Willett 2004)</span>划分数据（<code>maxDissim()</code>函数）。假设样本集A中含有m个样本，样本集B含有n个样本，n&gt;m，且我们要从B中选出一些样本加到A中，该子集中的样本要尽量和A中的不同。要实现这一点，对B中的一个样本，计算A中样本和该样本的差异度（距离，这里会算出m个值，因为A中有m个样本）。然后将和A中样本最不相同的B的样本抽取出来加入A，重复这个过程，直到A的样本量达到要求。关于这么权衡这m个差异度找到和A“最不相似”的样本，有不同的方法，比如以最小的值为准，将所有距离求和等等。这里没有什么黄金法则，建议大家尝试几种方法，查看比较得到的训练/测试样本自变量分布，选取其中一种。用这种方式可以得到自变量分布相似的不同样本集。R中有不同的计算样本间差异度（基于自变量观测）的函数。<code>caret</code>包中调用的是<code>proxy</code>包中的函数。关于不同的差异度测量，见相关包的帮助文档。我们可以通过选项 <code>obj</code>设置和样本集A“最不相似”的样本的方式，其中<code>minDiss</code>表示以最小差异度为准，<code>sumDiss</code>表示使用差异度之和。</p>
 <p>我们用服装数据的一个子集为例展示按照自变量抽样。这里选取年龄和收入这两个变量。</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 最大差异度抽样用到proxy包</span>
 <span class="kw">library</span>(proxy)
@@ -348,16 +348,18 @@ startSet &lt;-<span class="st"> </span><span class="kw">sample</span>(<span clas
 start &lt;-<span class="st"> </span>testing[startSet,]
 <span class="co"># 剩下的样本存在对象samplePool中</span>
 samplePool &lt;-<span class="st"> </span>testing[-startSet,]</code></pre>
-<p>通过<code>maxDissim()</code>函数从<code>samplePool</code>中抽取5个样本，这5个样本尽量和<code>start</code>中已有的样本不同。通过最大化差异得到的样本存在数据框<code>new</code>内：</p>
-<pre class="sourceCode r"><code class="sourceCode r">newSamp &lt;-<span class="st"> </span><span class="kw">maxDissim</span>(start, samplePool, <span class="dt">n =</span> <span class="dv">5</span>)
+<p>通过<code>maxDissim()</code>函数从<code>samplePool</code>中抽取5个样本，这5个样本尽量和<code>start</code>中已有的样本不同。：</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 通过最大化差异得到的样本存在数据框new内</span>
+<span class="co"># obj = minDiss 表示总体差异度以最小差异度为准</span>
+newSamp &lt;-<span class="st"> </span><span class="kw">maxDissim</span>(start, samplePool,<span class="dt">obj =</span> minDiss, <span class="dt">n =</span> <span class="dv">5</span>)
 new&lt;-samplePool[newSamp,]</code></pre>
 <p>我们再从<code>samplePool</code>中不用最大差异法，而是随机抽取5个样本，将这5个样本存在数据框<code>new2</code>中：</p>
 <pre class="sourceCode r"><code class="sourceCode r">newSet &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">dim</span>(samplePool)[<span class="dv">1</span>], <span class="dv">5</span>)
 new2&lt;-testing[newSet,]</code></pre>
 <p>绘制散点图比较两种不同方法（<code>new</code>：用最大化差异法抽取的样本；<code>new2</code>：随机抽取的样本）抽取的样本和初始样本（<code>start</code>）有什么不同：</p>
-<pre class="sourceCode r"><code class="sourceCode r">start$group&lt;-<span class="kw">rep</span>(<span class="st">&quot;begin&quot;</span>,<span class="kw">nrow</span>(start))
-new$group&lt;-<span class="kw">rep</span>(<span class="st">&quot;new_maxDissim&quot;</span>,<span class="kw">nrow</span>(new))
-new2$group&lt;-<span class="kw">rep</span>(<span class="st">&quot;new_random&quot;</span>,<span class="kw">nrow</span>(new2))
+<pre class="sourceCode r"><code class="sourceCode r">start$group&lt;-<span class="kw">rep</span>(<span class="st">&quot;start&quot;</span>,<span class="kw">nrow</span>(start))
+new$group&lt;-<span class="kw">rep</span>(<span class="st">&quot;new&quot;</span>,<span class="kw">nrow</span>(new))
+new2$group&lt;-<span class="kw">rep</span>(<span class="st">&quot;new2&quot;</span>,<span class="kw">nrow</span>(new2))
 <span class="kw">xyplot</span>(age~income,<span class="dt">data=</span><span class="kw">rbind</span>(start,new,new2),<span class="dt">grid =</span> <span class="ot">TRUE</span>,
        <span class="dt">group =</span> group, <span class="dt">auto.key =</span> <span class="ot">TRUE</span>
 )</code></pre>
@@ -367,7 +369,31 @@ new2$group&lt;-<span class="kw">rep</span>(<span class="st">&quot;new_random&quo
 Figure 5.1: 按自变量最大化差异抽样
 </p>
 </div>
-<p>由图<a href="section-5.html#fig:maxdis">5.1</a>可见，通过最大化差异抽取的样本和初始样本点分布在图的不同位置。而随机抽取的新样本和原始样本更加接近。</p>
+<p>由图<a href="section-5.html#fig:maxdis">5.1</a>可见，通过最大化差异抽取的样本（<code>new</code>）和初始样本点（<code>start</code>）分布在图的不同位置。而随机抽取的新样本（<code>new2</code>）和原始样本更加接近。我们为什么希望每次抽取的样本和之前的不一样呢？因为我们希望最后得到的训练集和测试集覆盖的自变量观测区间相似。如果抽取的样本点都来自一个区域的话（比如全部都是年龄30以下，收入10万以下），如果讲这个样本用于训练的模型很可能不具有预测这个区域外样本的能力。反之要是用这个样本做为测试集，则无法检测模型在这个区域外样本上的表现。</p>
+<ul>
+<li>按时间序列划分</li>
+</ul>
+<p>对于时间序列数据，用简单随机抽样通常不是最好的方式。有一种按时间序列划分训练集和测试集的方法，关于该方法的讨论见<span class="citation">(Hyndman and Athanasopoulos 2013)</span>。可以使用<code>caret</code>实现该划分。其中有3个需要设置的参数：</p>
+<ul>
+<li>initialWindow: the initial number of consecutive values in each training set sample</li>
+<li>horizon: The number of consecutive values in test set sample</li>
+<li>fixedWindow: A logical: if FALSE, the training set always start at the first sample and the training set size will vary over data splits. As an example, suppose we have a time series with 20 data points. We can fix initialWindow = 5 and look at different settings of the other two arguments. In the plot below, rows in each panel correspond to different data splits (i.e. resamples) and the columns correspond to different data points. Also, red indicates samples that are in included in the training set and the blue indicates samples in the test set.</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">timeSlices &lt;-<span class="st"> </span><span class="kw">createTimeSlices</span>(<span class="dv">1</span>:<span class="kw">nrow</span>(economics), 
+                   <span class="dt">initialWindow =</span> <span class="dv">36</span>, <span class="dt">horizon =</span> <span class="dv">12</span>, <span class="dt">fixedWindow =</span> <span class="ot">TRUE</span>)
+&gt;<span class="st"> </span><span class="kw">str</span>(timeSlices,<span class="dt">max.level =</span> <span class="dv">1</span>)
+## List of 2
+## $ train:List of 431
+##   .. [list output truncated]
+## $ test :List of 431
+##   .. [list output truncated]
+trainSlices &lt;-<span class="st"> </span>timeSlices[[<span class="dv">1</span>]]
+testSlices &lt;-<span class="st"> </span>timeSlices[[<span class="dv">2</span>]]
+
+plsFitTime &lt;-<span class="st"> </span><span class="kw">train</span>(unemploy ~<span class="st"> </span>pce +<span class="st"> </span>pop +<span class="st"> </span>psavert,
+                    <span class="dt">data =</span> economics[trainSlices[[<span class="dv">1</span>]],],
+                    <span class="dt">method =</span> <span class="st">&quot;pls&quot;</span>,
+                    <span class="dt">preProc =</span> <span class="kw">c</span>(<span class="st">&quot;center&quot;</span>, <span class="st">&quot;scale&quot;</span>))</code></pre>
 </div>
 <div id="section-5.1.2" class="section level3">
 <h3><span class="header-section-number">5.1.2</span> 拟合模型</h3>
