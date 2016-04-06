@@ -19,7 +19,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-04-05">
+<meta name="date" content="2016-04-06">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -349,8 +349,16 @@ datTest &lt;-<span class="st"> </span>sim.dat[-trainIndex,]</code></pre>
 <p>还可以使用最大差异度法<span class="citation">(Willett 2004)</span>划分数据（<code>maxDissim()</code>函数）。假设样本集A中含有m个样本，样本集B含有n个样本，n&gt;m，且我们要从B中选出一些样本加到A中，该子集中的样本要尽量和A中的不同。要实现这一点，对B中的一个样本，计算A中样本和该样本的差异度（距离，这里会算出m个值，因为A中有m个样本）。然后将和A中样本最不相同的B的样本抽取出来加入A，重复这个过程，直到A的样本量达到要求。关于这么权衡这m个差异度找到和A“最不相似”的样本，有不同的方法，比如以最小的值为准，将所有距离求和等等。这里没有什么黄金法则，建议大家尝试几种方法，查看比较得到的训练/测试样本自变量分布，选取其中一种。用这种方式可以得到自变量分布相似的不同样本集。R中有不同的计算样本间差异度（基于自变量观测）的函数。<code>caret</code>包中调用的是<code>proxy</code>包中的函数。关于不同的差异度测量，见相关包的帮助文档。我们可以通过选项 <code>obj</code>设置和样本集A“最不相似”的样本的方式，其中<code>minDiss</code>表示以最小差异度为准，<code>sumDiss</code>表示使用差异度之和。</p>
 <p>我们用服装数据的一个子集为例展示按照自变量抽样。这里选取年龄和收入这两个变量。</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 最大差异度抽样用到proxy包</span>
-<span class="kw">library</span>(proxy)
-<span class="co"># 用lattice包绘制散点图</span>
+<span class="kw">library</span>(proxy)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;proxy&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     as.dist, dist</code></pre>
+<pre><code>## The following object is masked from &#39;package:base&#39;:
+## 
+##     as.matrix</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 用lattice包绘制散点图</span>
 <span class="kw">library</span>(lattice)
 <span class="co"># 选取年龄和收入这两个变量</span>
 testing&lt;-<span class="kw">subset</span>(sim.dat,<span class="dt">select=</span><span class="kw">c</span>(<span class="st">&quot;age&quot;</span>,<span class="st">&quot;income&quot;</span> ))</code></pre>
