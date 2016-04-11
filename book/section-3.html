@@ -19,7 +19,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-04-08">
+<meta name="date" content="2016-04-10">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -501,34 +501,34 @@ sim.dat$segment&lt;-<span class="kw">factor</span>(<span class="kw">rep</span>(g
 </div>
 <div id="section-3.2" class="section level2">
 <h2><span class="header-section-number">3.2</span> 航空公司满意度调查</h2>
-<p>这一小节我们模拟一个航空公司满意度调查数据。数据中包含N=1000个受访者，每个受访者基于最近一次航班体验对3个航空公司进行评分，问卷调查一共15项，每项评分从1-9，分值越大满意度越高。这15个调查项分为4类：</p>
+<p>这一小节我们模拟一个航空公司满意度调查数据。数据中包含N=1000个受访者，每个受访者基于最近一次航班体验对3个航空公司进行评分，问卷调查一共15项，每项评分从1-9，分值越大满意度越高。这15个调查项分为4类（括号中为相应数据集中的变量名）：</p>
 <ol style="list-style-type: decimal">
 <li>购票体验
 <ul>
-<li>购票容易度</li>
-<li>座椅选择</li>
-<li>航班选择</li>
-<li>票价</li>
+<li>购票容易度（Easy_Reservation）</li>
+<li>座椅选择（Preferred_Seats）</li>
+<li>航班选择（Flight_Options）</li>
+<li>票价（Ticket_Prices）</li>
 </ul></li>
 <li>机舱设施
 <ul>
-<li>座椅舒适度</li>
-<li>位置前后空间</li>
-<li>随机行李存放</li>
-<li>机舱清洁</li>
+<li>座椅舒适度（Seat_Comfort）</li>
+<li>位置前后空间（Seat_Roominess）</li>
+<li>随机行李存放（Overhead_Storage）</li>
+<li>机舱清洁（Clean_Aircraft）</li>
 </ul></li>
 <li>空航服务
 <ul>
-<li>礼貌</li>
-<li>友善</li>
-<li>能够提供需要的帮助</li>
-<li>食物饮料服务</li>
+<li>礼貌（Courtesy）</li>
+<li>友善（Friendliness）</li>
+<li>能够提供需要的帮助（Helpfulness）</li>
+<li>食物饮料服务（Service）</li>
 </ul></li>
-<li>推荐指数
+<li>总体指数
 <ul>
-<li>总体满意度</li>
-<li>再次选择次航空公司</li>
-<li>向朋友推荐此航空公司</li>
+<li>总体满意度（Satisfaction）</li>
+<li>再次选择次航空公司（Fly_Again）</li>
+<li>向朋友推荐此航空公司（Recommend）</li>
 </ul></li>
 </ol>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># R Code to Generate the Simulated Data and Run All Analyses</span>
@@ -545,22 +545,22 @@ sim.dat$segment&lt;-<span class="kw">factor</span>(<span class="kw">rep</span>(g
 <span class="co"># combinations of these general and specific factors.</span>
 
 loadings &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span> (
-  <span class="co"># ticketing</span>
+  <span class="co"># 购票体验</span>
   .<span class="dv">33</span>, .<span class="dv">58</span>, .<span class="dv">00</span>, .<span class="dv">00</span>,  <span class="co"># Ease of Making Reservation </span>
   .<span class="dv">35</span>, .<span class="dv">55</span>, .<span class="dv">00</span>, .<span class="dv">00</span>,  <span class="co"># Availability of Preferred Seats</span>
   .<span class="dv">30</span>, .<span class="dv">52</span>, .<span class="dv">00</span>, .<span class="dv">00</span>,  <span class="co"># Variety of Flight Options</span>
   .<span class="dv">40</span>, .<span class="dv">50</span>, .<span class="dv">00</span>, .<span class="dv">00</span>,  <span class="co"># Ticket Prices</span>
-  <span class="co"># aircraft</span>
+  <span class="co"># 机舱设施</span>
   .<span class="dv">50</span>, .<span class="dv">00</span>, .<span class="dv">55</span>, .<span class="dv">00</span>,  <span class="co"># Seat Comfort</span>
   .<span class="dv">41</span>, .<span class="dv">00</span>, .<span class="dv">51</span>, .<span class="dv">00</span>,  <span class="co"># Roominess of Seat Area</span>
   .<span class="dv">45</span>, .<span class="dv">00</span>, .<span class="dv">57</span>, .<span class="dv">00</span>,  <span class="co"># Availability of Overhead Storage</span>
   .<span class="dv">32</span>, .<span class="dv">00</span>, .<span class="dv">54</span>, .<span class="dv">00</span>,  <span class="co"># Cleanliness of Aircraft</span>
-  <span class="co"># customer service</span>
+  <span class="co"># 空航服务</span>
   .<span class="dv">35</span>, .<span class="dv">00</span>, .<span class="dv">00</span>, .<span class="dv">50</span>,  <span class="co"># Courtesy</span>
   .<span class="dv">38</span>, .<span class="dv">00</span>, .<span class="dv">00</span>, .<span class="dv">57</span>,  <span class="co"># Friendliness</span>
   .<span class="dv">60</span>, .<span class="dv">00</span>, .<span class="dv">00</span>, .<span class="dv">50</span>,  <span class="co"># Helpfulness</span>
   .<span class="dv">52</span>, .<span class="dv">00</span>, .<span class="dv">00</span>, .<span class="dv">58</span>,  <span class="co"># Service</span>
-  <span class="co"># overall satisfaction, recommendation and repurchase  </span>
+  <span class="co"># 总体指数  </span>
   .<span class="dv">43</span>, .<span class="dv">10</span>, .<span class="dv">20</span>, .<span class="dv">30</span>,  <span class="co"># Overall Satisfaction</span>
   .<span class="dv">35</span>, .<span class="dv">50</span>, .<span class="dv">40</span>, .<span class="dv">20</span>,  <span class="co"># Purchase Intention</span>
   .<span class="dv">25</span>, .<span class="dv">50</span>, .<span class="dv">50</span>, .<span class="dv">00</span>), <span class="co"># Willingness to Recommend</span>
@@ -623,6 +623,7 @@ ratings&lt;-<span class="kw">round</span>(ratings,<span class="dv">0</span>)
 ratingsA&lt;-ratings
 
 <span class="kw">summary</span>(ratingsA)</code></pre>
+
 </div>
 </div>
             </section>
@@ -658,7 +659,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/rstudio/bookdown-demo/edit/master/index.Rmd",
+"link": "https://github.com/rstudio/bookdown-demo/edit/master/03-shujuji.Rmd",
 "text": null
 },
 "download": null,
