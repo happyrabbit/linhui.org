@@ -19,7 +19,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-04-14">
+<meta name="date" content="2016-04-15">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -308,17 +308,42 @@ for (i in <span class="dv">1</span>:<span class="dv">1000</span>){
 noise[i,]&lt;-<span class="kw">rnorm</span>(<span class="dv">7</span>,<span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">7</span>),<span class="kw">summary</span>(fit)$sigma*<span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">3</span>,<span class="dt">by=</span><span class="fl">0.5</span>))
 }
 
-rsq&lt;-<span class="kw">rep</span>(<span class="dv">0</span>,<span class="kw">ncol</span>(noise))
+rsq_linear&lt;-<span class="kw">rep</span>(<span class="dv">0</span>,<span class="kw">ncol</span>(noise))
 
 for (i in <span class="dv">1</span>:<span class="dv">7</span>){
 withnoise&lt;-sim.dat$income+noise[,i]
 fit0&lt;-<span class="kw">lm</span>(withnoise~store_exp+online_exp+store_trans+online_trans,<span class="dt">data=</span>sim.dat)
-rsq[i]&lt;-<span class="kw">summary</span>(fit0)$adj.r.squared
+rsq_linear[i]&lt;-<span class="kw">summary</span>(fit0)$adj.r.squared
 }</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Map sex to color</span>
-<span class="kw">ggplot</span>(<span class="dt">data=</span>dat1, <span class="kw">aes</span>(<span class="dt">x=</span>time, <span class="dt">y=</span>total_bill, <span class="dt">group=</span>sex, <span class="dt">colour=</span>sex)) +
+<p>除了一般线性回归外，做为比较我们再拟合一个偏最小二乘回归（PLS）。</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># pls: 进行偏最小二乘回归和主成分回归</span>
+<span class="kw">library</span>(pls)
+rsq_pls&lt;-<span class="kw">rep</span>(<span class="dv">0</span>,<span class="kw">ncol</span>(noise))
+<span class="co"># 拟合PLS模型</span>
+for (i in <span class="dv">1</span>:<span class="dv">7</span>){
+withnoise&lt;-sim.dat$income+noise[,i]
+fit1&lt;-<span class="kw">plsr</span>(withnoise~store_exp+online_exp+store_trans+online_trans,<span class="dt">data=</span>sim.dat)
+<span class="co"># plsr函数结果是mvr对象，需要用特定函数提取模型解释的应变量方差</span>
+rsq_pls[i]&lt;-<span class="kw">max</span>(<span class="kw">drop</span>(<span class="kw">R2</span>(fit1, <span class="dt">estimate =</span> <span class="st">&quot;train&quot;</span>,<span class="dt">intercept =</span> <span class="ot">FALSE</span>)$val))
+}</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># reshape2在之前介绍过，用于数据整形</span>
+<span class="kw">library</span>(reshape2)
+<span class="co"># 功能强大的绘图包</span>
+<span class="kw">library</span>(ggplot2)
+rsq&lt;-<span class="kw">data.frame</span>(<span class="kw">cbind</span>(<span class="dt">Noise=</span><span class="kw">c</span>(<span class="fl">0.0</span>, <span class="fl">0.5</span>, <span class="fl">1.0</span>, <span class="fl">1.5</span>, <span class="fl">2.0</span>, <span class="fl">2.5</span>, <span class="fl">3.0</span>),rsq_linear,rsq_pls))
+<span class="co"># 将数据转化成长型</span>
+rsq&lt;-<span class="kw">melt</span>(rsq,<span class="dt">id.vars=</span><span class="st">&quot;Noise&quot;</span>,<span class="dt">measure.vars=</span><span class="kw">c</span>(<span class="st">&quot;rsq_linear&quot;</span>,<span class="st">&quot;rsq_pls&quot;</span>))
+<span class="kw">ggplot</span>(<span class="dt">data=</span>rsq, <span class="kw">aes</span>(<span class="dt">x=</span>Noise, <span class="dt">y=</span>value, <span class="dt">group=</span>variable, <span class="dt">colour=</span>variable)) +
 <span class="st">    </span><span class="kw">geom_line</span>() +
-<span class="st">    </span><span class="kw">geom_point</span>()</code></pre>
+<span class="st">    </span><span class="kw">geom_point</span>()+
+<span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;R2&quot;</span>) </code></pre>
+<div class="figure" style="text-align: center"><span id="fig:error"></span>
+<img src="DS_R_files/figure-html/error-1.png" alt="模型拟合表现随应变量噪音强度变化" width="80%" />
+<p class="caption">
+Figure 6.1: 模型拟合表现随应变量噪音强度变化
+</p>
+</div>
+<p>从图 <a href="section-6.html#fig:error">6.1</a> 可以清楚的看到模型拟合效果随着噪音强度的增加急剧下降。</p>
 <p>传统的统计模型通常假设自变量的测量无误差（或者随机性），这在实际中是不可能的，所以我们需要考虑自变量观测的随机性。自变量观测中的随机性产生的影响取决于如下几个因素：随机性的强度，相应因变量在模型中的重要性，使用模型的类别。</p>
 </div>
 <div id="section-6.3" class="section level2">
@@ -423,10 +448,10 @@ new2$group&lt;-<span class="kw">rep</span>(<span class="st">&quot;new2&quot;</sp
 <div class="figure" style="text-align: center"><span id="fig:maxdis"></span>
 <img src="DS_R_files/figure-html/maxdis-1.png" alt="按自变量最大化差异抽样" width="80%" />
 <p class="caption">
-Figure 6.1: 按自变量最大化差异抽样
+Figure 6.2: 按自变量最大化差异抽样
 </p>
 </div>
-<p>由图<a href="section-6.html#fig:maxdis">6.1</a>可见，通过最大化差异抽取的样本（<code>new</code>）和初始样本点（<code>start</code>）分布在图的不同位置。而随机抽取的新样本（<code>new2</code>）和原始样本更加接近。我们为什么希望每次抽取的样本和之前的不一样呢？因为我们希望最后得到的训练集和测试集覆盖的自变量观测区间相似。如果抽取的样本点都来自一个区域的话（比如全部都是年龄30以下，收入10万以下），如果讲这个样本用于训练的模型很可能不具有预测这个区域外样本的能力。反之要是用这个样本做为测试集，则无法检测模型在这个区域外样本上的表现。</p>
+<p>由图<a href="section-6.html#fig:maxdis">6.2</a>可见，通过最大化差异抽取的样本（<code>new</code>）和初始样本点（<code>start</code>）分布在图的不同位置。而随机抽取的新样本（<code>new2</code>）和原始样本更加接近。我们为什么希望每次抽取的样本和之前的不一样呢？因为我们希望最后得到的训练集和测试集覆盖的自变量观测区间相似。如果抽取的样本点都来自一个区域的话（比如全部都是年龄30以下，收入10万以下），如果讲这个样本用于训练的模型很可能不具有预测这个区域外样本的能力。反之要是用这个样本做为测试集，则无法检测模型在这个区域外样本上的表现。</p>
 <ul>
 <li>按时间序列划分</li>
 </ul>
