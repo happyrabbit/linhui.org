@@ -19,7 +19,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-04-13">
+<meta name="date" content="2016-04-14">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -396,10 +396,6 @@ sim.dat&lt;-<span class="ot">NULL</span>
   <span class="co"># 将该消费者类的数据依行添加到总数据集</span>
   sim.dat&lt;-<span class="kw">rbind</span>(sim.dat,seg)
  }</code></pre>
-<pre><code>## 1 Price 
-## 2 Conspicuous 
-## 3 Quality 
-## 4 Style</code></pre>
 <p>上面的代码是随机抽样的主要过程，其中<code>cat()</code>函数使得循环运行时会打印出正在抽取的样本类名，最后得到的<code>sim.dat</code>是初始描述客户的变量部分的数据，在对数据进行润色前，提醒大家注意两个关于R的技巧：</p>
 <p>第一、在i循环内，我们事先定义一个有着相应行数和列数的没有元素值的数据框<code>seg</code>，之后每迭代一次就将样本赋值到事先定义的<code>seg</code>的特定行。这么做的原因是由于只要R在某个对象上添加东西——如在数据框上增加一行——它都会将原对象拷贝一份。这将使用两倍的内存，减慢运行速度。通过这种方法可以避免对内存的浪费。对这里的小数据可能感觉不出差别，但对于大数据，运行速度会有极大不同。</p>
 <p>第二、对循环指针范围的设定用的是<code>seq_along()</code>而非<code>1:length()</code>。这是为了够避免一些常见的错误，如指针向量长度为0或者不经意将向量方向弄反了。</p>
@@ -476,27 +472,47 @@ sim.dat&lt;-<span class="kw">cbind</span>(sim.dat,sim.dat2)
 <span class="co"># 加上一个因子列表明每个观测的对应的消费者类别</span>
 sim.dat$segment&lt;-<span class="kw">factor</span>(<span class="kw">rep</span>(group_name,<span class="dt">times=</span>group_size))</code></pre>
 <p>至此为止我们得到了需要的数据集。让我们检查一下抽取的数据集：</p>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(sim.dat,<span class="dt">vec.len=</span><span class="dv">3</span>)</code></pre>
-<pre><code>## &#39;data.frame&#39;:    1000 obs. of  19 variables:
-##  $ age         : num  57 63 59 60 51 59 57 57 ...
-##  $ gender      : Factor w/ 2 levels &quot;Female&quot;,&quot;Male&quot;: 1 1 2 2 2 2 2 2 ...
-##  $ income      : num  120963 122008 114202 113616 ...
-##  $ house       : Factor w/ 2 levels &quot;No&quot;,&quot;Yes&quot;: 2 2 2 2 2 2 2 2 ...
-##  $ store_exp   : num  529 478 491 348 ...
-##  $ online_exp  : num  304 110 279 142 ...
-##  $ store_trans : num  2 4 7 10 4 4 5 11 ...
-##  $ online_trans: num  2 2 2 2 4 5 3 5 ...
-##  $ segment     : Factor w/ 4 levels &quot;Conspicuous&quot;,..: 2 2 2 2 2 2 2 2 ...
-##  $ Q1          : num  4 4 5 5 4 4 4 5 ...
-##  $ Q2          : num  2 1 2 2 1 2 1 2 ...
-##  $ Q3          : num  1 1 1 1 1 1 1 1 ...
-##  $ Q4          : num  2 2 2 3 3 2 2 3 ...
-##  $ Q5          : num  1 1 1 1 1 1 1 1 ...
-##  $ Q6          : num  4 4 4 4 4 3 3 3 ...
-##  $ Q7          : num  1 1 1 1 1 1 1 1 ...
-##  $ Q8          : num  4 3 3 4 4 3 3 4 ...
-##  $ Q9          : num  2 1 1 2 2 1 1 2 ...
-##  $ Q10         : num  4 4 3 3 4 3 4 3 ...</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(sim.dat,<span class="dt">vec.len=</span><span class="dv">3</span>)</code></pre>
+<pre><code>##       age            gender        income       house    
+##  Min.   : 16.00   Female:554   Min.   : 41776   No :432  
+##  1st Qu.: 25.00   Male  :446   1st Qu.: 85832   Yes:568  
+##  Median : 36.00                Median : 93869            
+##  Mean   : 38.84                Mean   :113543            
+##  3rd Qu.: 53.00                3rd Qu.:124572            
+##  Max.   :300.00                Max.   :319704            
+##                                NA&#39;s   :184               
+##    store_exp         online_exp       store_trans     online_trans  
+##  Min.   : -500.0   Min.   :  68.82   Min.   : 1.00   Min.   : 1.00  
+##  1st Qu.:  205.0   1st Qu.: 420.34   1st Qu.: 3.00   1st Qu.: 6.00  
+##  Median :  329.0   Median :1941.86   Median : 4.00   Median :14.00  
+##  Mean   : 1356.8   Mean   :2120.18   Mean   : 5.35   Mean   :13.55  
+##  3rd Qu.:  597.3   3rd Qu.:2440.78   3rd Qu.: 7.00   3rd Qu.:20.00  
+##  Max.   :50000.0   Max.   :9479.44   Max.   :20.00   Max.   :36.00  
+##                                                                     
+##        Q1              Q2              Q3              Q4       
+##  Min.   :1.000   Min.   :1.000   Min.   :1.000   Min.   :1.000  
+##  1st Qu.:2.000   1st Qu.:1.000   1st Qu.:1.000   1st Qu.:2.000  
+##  Median :3.000   Median :1.000   Median :1.000   Median :3.000  
+##  Mean   :3.101   Mean   :1.823   Mean   :1.992   Mean   :2.763  
+##  3rd Qu.:4.000   3rd Qu.:2.000   3rd Qu.:3.000   3rd Qu.:4.000  
+##  Max.   :5.000   Max.   :5.000   Max.   :5.000   Max.   :5.000  
+##                                                                 
+##        Q5              Q6              Q7              Q8       
+##  Min.   :1.000   Min.   :1.000   Min.   :1.000   Min.   :1.000  
+##  1st Qu.:1.750   1st Qu.:1.000   1st Qu.:2.500   1st Qu.:1.000  
+##  Median :4.000   Median :2.000   Median :4.000   Median :2.000  
+##  Mean   :2.945   Mean   :2.448   Mean   :3.434   Mean   :2.396  
+##  3rd Qu.:4.000   3rd Qu.:4.000   3rd Qu.:4.000   3rd Qu.:3.000  
+##  Max.   :5.000   Max.   :5.000   Max.   :5.000   Max.   :5.000  
+##                                                                 
+##        Q9             Q10              segment   
+##  Min.   :1.000   Min.   :1.00   Conspicuous:200  
+##  1st Qu.:2.000   1st Qu.:1.00   Price      :250  
+##  Median :4.000   Median :2.00   Quality    :200  
+##  Mean   :3.085   Mean   :2.32   Style      :350  
+##  3rd Qu.:4.000   3rd Qu.:3.00                    
+##  Max.   :5.000   Max.   :5.00                    
+## </code></pre>
 <p>可以看到，服装消费者数据有1000个观测，19个变量。前8个变量是关于样本的人口统计学和购买行为描述。Q1-Q10是关于消费者选择偏好的问卷调查回复，问卷分值量表为1-5分（最常见的市场调查设计）。最后一列是消费者类别，样本观测的模拟是根据消费者类别进行的，因此这些可以当作“真实”的消费者类别。使用随机模拟的一个重要优点就是能够通过这种方式验证模型的效果。而实际生活中的数据样本真正所属类别通常是未知的。我们在之后对聚类和判别分析进行介绍的时候会使用样本类别信息。下面我们会反复用该数据集为例。</p>
 </div>
 <div id="section-3.2" class="section level2">
@@ -531,80 +547,84 @@ sim.dat$segment&lt;-<span class="kw">factor</span>(<span class="kw">rep</span>(g
 <li>向朋友推荐此航空公司（Recommend）</li>
 </ul></li>
 </ol>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># R Code to Generate the Simulated Data and Run All Analyses</span>
-<span class="co"># The goal is to show all the R code that you would need</span>
-<span class="co"># to reproduce everything that has been reported.</span>
-<span class="co"># We will use the mvtnorm package in order to randomly </span>
-<span class="co"># generate a data set with a given correlation pattern.</span>
-
-<span class="co"># First, we create a matrix of factor loadings.</span>
-<span class="co"># This pattern is called bifactor because it has a </span>
-<span class="co"># general factor with loadings from all the items</span>
-<span class="co"># and specific factors for separate components.</span>
-<span class="co"># The outcome variables are also formed as </span>
-<span class="co"># combinations of these general and specific factors.</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 先建立因子载荷矩阵</span>
+<span class="co"># 其中前12项符合双因子结构，因为每项对应一个总体因子载荷和某特定因子的载荷</span>
+<span class="co"># 比如购票容易度对应总体因子载荷0.33，对因特定购票因子载荷0.58</span>
+<span class="co"># 我们可以将结果评分看成是总体因子和特定因子共同作用的结果</span>
 
 loadings &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span> (
   <span class="co"># 购票体验</span>
-  .<span class="dv">33</span>, .<span class="dv">58</span>, .<span class="dv">00</span>, .<span class="dv">00</span>,  <span class="co"># Ease of Making Reservation </span>
-  .<span class="dv">35</span>, .<span class="dv">55</span>, .<span class="dv">00</span>, .<span class="dv">00</span>,  <span class="co"># Availability of Preferred Seats</span>
-  .<span class="dv">30</span>, .<span class="dv">52</span>, .<span class="dv">00</span>, .<span class="dv">00</span>,  <span class="co"># Variety of Flight Options</span>
-  .<span class="dv">40</span>, .<span class="dv">50</span>, .<span class="dv">00</span>, .<span class="dv">00</span>,  <span class="co"># Ticket Prices</span>
+  .<span class="dv">33</span>, .<span class="dv">58</span>, .<span class="dv">00</span>, .<span class="dv">00</span>,  <span class="co"># 购票容易度 </span>
+  .<span class="dv">35</span>, .<span class="dv">55</span>, .<span class="dv">00</span>, .<span class="dv">00</span>,  <span class="co"># 座椅选择</span>
+  .<span class="dv">30</span>, .<span class="dv">52</span>, .<span class="dv">00</span>, .<span class="dv">00</span>,  <span class="co"># 航班选择</span>
+  .<span class="dv">40</span>, .<span class="dv">50</span>, .<span class="dv">00</span>, .<span class="dv">00</span>,  <span class="co"># 票价</span>
   <span class="co"># 机舱设施</span>
-  .<span class="dv">50</span>, .<span class="dv">00</span>, .<span class="dv">55</span>, .<span class="dv">00</span>,  <span class="co"># Seat Comfort</span>
-  .<span class="dv">41</span>, .<span class="dv">00</span>, .<span class="dv">51</span>, .<span class="dv">00</span>,  <span class="co"># Roominess of Seat Area</span>
-  .<span class="dv">45</span>, .<span class="dv">00</span>, .<span class="dv">57</span>, .<span class="dv">00</span>,  <span class="co"># Availability of Overhead Storage</span>
-  .<span class="dv">32</span>, .<span class="dv">00</span>, .<span class="dv">54</span>, .<span class="dv">00</span>,  <span class="co"># Cleanliness of Aircraft</span>
+  .<span class="dv">50</span>, .<span class="dv">00</span>, .<span class="dv">55</span>, .<span class="dv">00</span>,  <span class="co"># 座椅舒适度</span>
+  .<span class="dv">41</span>, .<span class="dv">00</span>, .<span class="dv">51</span>, .<span class="dv">00</span>,  <span class="co"># 位置前后空间</span>
+  .<span class="dv">45</span>, .<span class="dv">00</span>, .<span class="dv">57</span>, .<span class="dv">00</span>,  <span class="co"># 随机行李存放</span>
+  .<span class="dv">32</span>, .<span class="dv">00</span>, .<span class="dv">54</span>, .<span class="dv">00</span>,  <span class="co"># 机舱清洁</span>
   <span class="co"># 空航服务</span>
-  .<span class="dv">35</span>, .<span class="dv">00</span>, .<span class="dv">00</span>, .<span class="dv">50</span>,  <span class="co"># Courtesy</span>
-  .<span class="dv">38</span>, .<span class="dv">00</span>, .<span class="dv">00</span>, .<span class="dv">57</span>,  <span class="co"># Friendliness</span>
-  .<span class="dv">60</span>, .<span class="dv">00</span>, .<span class="dv">00</span>, .<span class="dv">50</span>,  <span class="co"># Helpfulness</span>
-  .<span class="dv">52</span>, .<span class="dv">00</span>, .<span class="dv">00</span>, .<span class="dv">58</span>,  <span class="co"># Service</span>
+  .<span class="dv">35</span>, .<span class="dv">00</span>, .<span class="dv">00</span>, .<span class="dv">50</span>,  <span class="co"># 礼貌</span>
+  .<span class="dv">38</span>, .<span class="dv">00</span>, .<span class="dv">00</span>, .<span class="dv">57</span>,  <span class="co"># 友善</span>
+  .<span class="dv">60</span>, .<span class="dv">00</span>, .<span class="dv">00</span>, .<span class="dv">50</span>,  <span class="co"># 能够提供需要的帮助</span>
+  .<span class="dv">52</span>, .<span class="dv">00</span>, .<span class="dv">00</span>, .<span class="dv">58</span>,  <span class="co"># 食物饮料服务</span>
   <span class="co"># 总体指数  </span>
-  .<span class="dv">43</span>, .<span class="dv">10</span>, .<span class="dv">20</span>, .<span class="dv">30</span>,  <span class="co"># Overall Satisfaction</span>
-  .<span class="dv">35</span>, .<span class="dv">50</span>, .<span class="dv">40</span>, .<span class="dv">20</span>,  <span class="co"># Purchase Intention</span>
-  .<span class="dv">25</span>, .<span class="dv">50</span>, .<span class="dv">50</span>, .<span class="dv">00</span>), <span class="co"># Willingness to Recommend</span>
+  .<span class="dv">43</span>, .<span class="dv">10</span>, .<span class="dv">30</span>, .<span class="dv">30</span>,  <span class="co"># 总体满意度</span>
+  .<span class="dv">35</span>, .<span class="dv">50</span>, .<span class="dv">40</span>, .<span class="dv">20</span>,  <span class="co"># 再次选择次航空公司</span>
+  .<span class="dv">25</span>, .<span class="dv">50</span>, .<span class="dv">50</span>, .<span class="dv">20</span>), <span class="co"># 向朋友推荐此航空公司</span>
   <span class="dt">nrow=</span><span class="dv">15</span>,<span class="dt">ncol=</span><span class="dv">4</span>, <span class="dt">byrow=</span><span class="ot">TRUE</span>)
-
-<span class="co"># Matrix multiplication produces the correlation matrix, </span>
-<span class="co"># except for the diagonal.</span>
+  
+<span class="co"># 将载荷矩阵乘以它的转秩，然后将对角线元素设置为1得到相关矩阵</span>
 cor_matrix&lt;-loadings %*%<span class="st"> </span><span class="kw">t</span>(loadings)
 <span class="co"># Diagonal set to ones.</span>
 <span class="kw">diag</span>(cor_matrix)&lt;-<span class="dv">1</span>
 
+<span class="co"># 我们通过mvtnorm包模拟有特定相关矩阵的数据集</span>
 <span class="kw">library</span>(mvtnorm)
-N=<span class="dv">1000</span>
-<span class="kw">set.seed</span>(<span class="dv">7654321</span>) <span class="co">#needed in order to reproduce the same data each time</span>
-std_ratings&lt;-<span class="kw">as.data.frame</span>(<span class="kw">rmvnorm</span>(N, <span class="dt">sigma=</span>cor_matrix))
+<span class="co"># 设置3个航空公司对应的评分均值向量</span>
+mu1=<span class="kw">c</span>(<span class="dv">5</span>,<span class="dv">6</span>,<span class="dv">5</span>,<span class="dv">6</span>, <span class="dv">7</span>,<span class="dv">8</span>,<span class="dv">6</span>,<span class="dv">7</span>, <span class="dv">5</span>,<span class="dv">5</span>,<span class="dv">5</span>,<span class="dv">5</span>, <span class="dv">6</span>,<span class="dv">6</span>,<span class="dv">6</span>)
+mu2=<span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">2</span>,<span class="dv">3</span>, <span class="dv">5</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>, <span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">8</span>, <span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">3</span>)
+mu3=<span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>, <span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">8</span>, <span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">8</span>, <span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">8</span>)
 
-ratings&lt;-<span class="kw">data.frame</span>(<span class="kw">matrix</span>(<span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">15000</span>),<span class="dt">nrow=</span><span class="dv">1000</span>))
-ratings[<span class="dv">1</span>:<span class="dv">1000</span>,]&lt;-std_ratings[<span class="dv">1</span>:<span class="dv">1000</span>,]*<span class="dv">2</span><span class="fl">+4.0</span>
+<span class="co">#设置随机种子</span>
+<span class="kw">set.seed</span>(<span class="dv">123456</span>) 
+<span class="co"># 受访者ID</span>
+resp.id &lt;-<span class="st"> </span><span class="dv">1</span>:<span class="dv">1000</span> 
 
-<span class="co"># Ratings given different means</span>
-ratings[<span class="dv">1</span>]&lt;-ratings[<span class="dv">1</span>]+<span class="fl">2.2</span>
-ratings[<span class="dv">2</span>]&lt;-ratings[<span class="dv">2</span>]+<span class="fl">0.6</span>
-ratings[<span class="dv">3</span>]&lt;-ratings[<span class="dv">3</span>]+<span class="fl">0.3</span>
-ratings[<span class="dv">4</span>]&lt;-ratings[<span class="dv">4</span>]+<span class="fl">0.0</span>
-ratings[<span class="dv">5</span>]&lt;-ratings[<span class="dv">5</span>]+<span class="fl">1.5</span>
-ratings[<span class="dv">6</span>]&lt;-ratings[<span class="dv">6</span>]+<span class="fl">1.0</span>
-ratings[<span class="dv">7</span>]&lt;-ratings[<span class="dv">7</span>]+<span class="fl">0.5</span>
-ratings[<span class="dv">8</span>]&lt;-ratings[<span class="dv">8</span>]+<span class="fl">1.5</span>
-ratings[<span class="dv">9</span>]&lt;-ratings[<span class="dv">9</span>]+<span class="fl">2.4</span>
-ratings[<span class="dv">10</span>]&lt;-ratings[<span class="dv">10</span>]+<span class="fl">2.2</span>
-ratings[<span class="dv">11</span>]&lt;-ratings[<span class="dv">11</span>]+<span class="fl">2.1</span>
-ratings[<span class="dv">12</span>]&lt;-ratings[<span class="dv">12</span>]+<span class="fl">2.0</span>
-ratings[<span class="dv">13</span>]&lt;-ratings[<span class="dv">13</span>]+<span class="fl">1.5</span>
-ratings[<span class="dv">14</span>]&lt;-ratings[<span class="dv">14</span>]+<span class="fl">1.0</span>
-ratings[<span class="dv">15</span>]&lt;-ratings[<span class="dv">15</span>]+<span class="fl">0.5</span>
+<span class="kw">library</span>(MASS) 
+rating1 &lt;-<span class="st"> </span><span class="kw">mvrnorm</span>(<span class="kw">length</span>(resp.id),
+                     <span class="dt">mu=</span>mu1,
+                     <span class="dt">Sigma=</span>cor_matrix)
+rating2 &lt;-<span class="st"> </span><span class="kw">mvrnorm</span>(<span class="kw">length</span>(resp.id),
+                   <span class="dt">mu=</span>mu2,
+                   <span class="dt">Sigma=</span>cor_matrix)
+rating3 &lt;-<span class="st"> </span><span class="kw">mvrnorm</span>(<span class="kw">length</span>(resp.id),
+                   <span class="dt">mu=</span>mu3,
+                   <span class="dt">Sigma=</span>cor_matrix)
 
-<span class="co"># Truncates Scale to be between 1 and 9</span>
-ratings[ratings&gt;<span class="dv">9</span>]&lt;-<span class="dv">9</span>
-ratings[ratings&lt;<span class="dv">1</span>]&lt;-<span class="dv">1</span>
-<span class="co"># Rounds to single digit.</span>
-ratings&lt;-<span class="kw">round</span>(ratings,<span class="dv">0</span>)
 
-<span class="co"># Assigns names to the variables in the data frame called ratings</span>
-<span class="kw">names</span>(ratings)=<span class="kw">c</span>(
+<span class="co"># 将分值限定在1到9之间</span>
+rating1[rating1&gt;<span class="dv">9</span>]&lt;-<span class="dv">9</span>
+rating1[rating1&lt;<span class="dv">1</span>]&lt;-<span class="dv">1</span>
+rating2[rating2&gt;<span class="dv">9</span>]&lt;-<span class="dv">9</span>
+rating2[rating2&lt;<span class="dv">1</span>]&lt;-<span class="dv">1</span>
+rating3[rating3&gt;<span class="dv">9</span>]&lt;-<span class="dv">9</span>
+rating3[rating3&lt;<span class="dv">1</span>]&lt;-<span class="dv">1</span>
+
+<span class="co"># 将分值转化为整数</span>
+rating1&lt;-<span class="kw">data.frame</span>(<span class="kw">round</span>(rating1,<span class="dv">0</span>))
+rating2&lt;-<span class="kw">data.frame</span>(<span class="kw">round</span>(rating2,<span class="dv">0</span>))
+rating3&lt;-<span class="kw">data.frame</span>(<span class="kw">round</span>(rating3,<span class="dv">0</span>))
+rating1$ID&lt;-resp.id
+rating2$ID&lt;-resp.id
+rating3$ID&lt;-resp.id
+rating1$Airline&lt;-<span class="kw">rep</span>(<span class="st">&quot;AirlineCo.1&quot;</span>,<span class="kw">length</span>(resp.id))
+rating2$Airline&lt;-<span class="kw">rep</span>(<span class="st">&quot;AirlineCo.2&quot;</span>,<span class="kw">length</span>(resp.id))
+rating3$Airline&lt;-<span class="kw">rep</span>(<span class="st">&quot;AirlineCo.3&quot;</span>,<span class="kw">length</span>(resp.id))
+rating&lt;-<span class="kw">rbind</span>(rating1,rating2,rating3)
+
+<span class="co"># 为数据集的各列命名</span>
+<span class="kw">names</span>(rating)&lt;-<span class="kw">c</span>(
   <span class="st">&quot;Easy_Reservation&quot;</span>,
   <span class="st">&quot;Preferred_Seats&quot;</span>,
   <span class="st">&quot;Flight_Options&quot;</span>,
@@ -619,10 +639,46 @@ ratings&lt;-<span class="kw">round</span>(ratings,<span class="dv">0</span>)
   <span class="st">&quot;Service&quot;</span>,
   <span class="st">&quot;Satisfaction&quot;</span>,
   <span class="st">&quot;Fly_Again&quot;</span>,
-  <span class="st">&quot;Recommend&quot;</span>)
-ratingsA&lt;-ratings
-
-<span class="kw">summary</span>(ratingsA)</code></pre>
+  <span class="st">&quot;Recommend&quot;</span>,
+  <span class="st">&quot;ID&quot;</span>,
+  <span class="st">&quot;Airline&quot;</span>)</code></pre>
+<p>让我们检查一下抽取的数据集：</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(rating,<span class="dt">vec.len=</span><span class="dv">3</span>)</code></pre>
+<pre><code>##  Easy_Reservation Preferred_Seats Flight_Options  Ticket_Prices 
+##  Min.   :1.000    Min.   :1.00    Min.   :1.000   Min.   :1.00  
+##  1st Qu.:2.000    1st Qu.:2.00    1st Qu.:2.000   1st Qu.:2.00  
+##  Median :3.000    Median :3.00    Median :3.000   Median :3.00  
+##  Mean   :3.336    Mean   :3.68    Mean   :3.032   Mean   :3.69  
+##  3rd Qu.:5.000    3rd Qu.:5.00    3rd Qu.:4.000   3rd Qu.:5.00  
+##  Max.   :8.000    Max.   :9.00    Max.   :8.000   Max.   :9.00  
+##   Seat_Comfort   Seat_Roominess  Overhead_Storage Clean_Aircraft
+##  Min.   :2.000   Min.   :1.000   Min.   :2.000    Min.   :3.00  
+##  1st Qu.:5.000   1st Qu.:5.000   1st Qu.:5.000    1st Qu.:6.00  
+##  Median :7.000   Median :7.000   Median :6.000    Median :7.00  
+##  Mean   :6.638   Mean   :6.591   Mean   :6.288    Mean   :6.96  
+##  3rd Qu.:8.000   3rd Qu.:8.000   3rd Qu.:8.000    3rd Qu.:8.00  
+##  Max.   :9.000   Max.   :9.000   Max.   :9.000    Max.   :9.00  
+##     Courtesy      Friendliness    Helpfulness       Service    
+##  Min.   :2.000   Min.   :2.000   Min.   :2.000   Min.   :2.00  
+##  1st Qu.:6.000   1st Qu.:6.000   1st Qu.:6.000   1st Qu.:6.00  
+##  Median :7.000   Median :7.000   Median :7.000   Median :7.00  
+##  Mean   :6.965   Mean   :6.952   Mean   :6.978   Mean   :6.96  
+##  3rd Qu.:8.000   3rd Qu.:8.000   3rd Qu.:8.000   3rd Qu.:8.00  
+##  Max.   :9.000   Max.   :9.000   Max.   :9.000   Max.   :9.00  
+##   Satisfaction     Fly_Again       Recommend           ID        
+##  Min.   :1.000   Min.   :1.000   Min.   :1.000   Min.   :   1.0  
+##  1st Qu.:4.000   1st Qu.:4.000   1st Qu.:4.000   1st Qu.: 250.8  
+##  Median :6.000   Median :6.000   Median :6.000   Median : 500.5  
+##  Mean   :5.619   Mean   :5.637   Mean   :5.645   Mean   : 500.5  
+##  3rd Qu.:7.000   3rd Qu.:7.000   3rd Qu.:8.000   3rd Qu.: 750.2  
+##  Max.   :9.000   Max.   :9.000   Max.   :9.000   Max.   :1000.0  
+##         Airline    
+##  AirlineCo.1:1000  
+##  AirlineCo.2:1000  
+##  AirlineCo.3:1000  
+##                    
+##                    
+## </code></pre>
 
 </div>
 </div>
