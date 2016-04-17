@@ -19,7 +19,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-04-15">
+<meta name="date" content="2016-04-17">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -98,6 +98,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <li class="chapter" data-level="3" data-path="section-3.html"><a href="section-3.html"><i class="fa fa-check"></i><b>3</b> 数据集模拟和背景介绍</a><ul>
 <li class="chapter" data-level="3.1" data-path="section-3.html"><a href="section-3.html#section-3.1"><i class="fa fa-check"></i><b>3.1</b> 服装消费者数据</a></li>
 <li class="chapter" data-level="3.2" data-path="section-3.html"><a href="section-3.html#section-3.2"><i class="fa fa-check"></i><b>3.2</b> 航空公司满意度调查</a></li>
+<li class="chapter" data-level="3.3" data-path="section-3.html"><a href="section-3.html#section-3.3"><i class="fa fa-check"></i><b>3.3</b> 生猪疫情风险预测数据</a></li>
 </ul></li>
 <li class="chapter" data-level="4" data-path="section-4.html"><a href="section-4.html"><i class="fa fa-check"></i><b>4</b> 数据分析一般流程</a><ul>
 <li class="chapter" data-level="4.1" data-path="section-4.html"><a href="section-4.html#section-4.1"><i class="fa fa-check"></i><b>4.1</b> 问题到数据</a></li>
@@ -171,7 +172,7 @@ code > span.er { color: #ff0000; font-weight: bold; }
 </ul></li>
 <li class="chapter" data-level="12" data-path="section-12.html"><a href="section-12.html"><i class="fa fa-check"></i><b>12</b> 数据可视化和结果展示</a><ul>
 <li class="chapter" data-level="12.1" data-path="section-12.html"><a href="section-12.html#r-markdown"><i class="fa fa-check"></i><b>12.1</b> R Markdown</a><ul>
-<li class="chapter" data-level="12.1.1" data-path="section-12.html"><a href="section-12.html#what-is-r-markdown"><i class="fa fa-check"></i><b>12.1.1</b> What is R Markdown?</a></li>
+<li class="chapter" data-level="12.1.1" data-path="section-12.html"><a href="section-12.html#r-markdown"><i class="fa fa-check"></i><b>12.1.1</b> 什么是R Markdown?</a></li>
 <li class="chapter" data-level="12.1.2" data-path="section-12.html"><a href="section-12.html#how-to-start"><i class="fa fa-check"></i><b>12.1.2</b> How to Start?</a></li>
 <li class="chapter" data-level="12.1.3" data-path="section-12.html"><a href="section-12.html#interactive-r-markdown-document"><i class="fa fa-check"></i><b>12.1.3</b> Interactive R Markdown Document</a></li>
 </ul></li>
@@ -272,78 +273,106 @@ E(\mathbf{y}-\hat{\mathbf{y}})^{2}=E[f(\mathbf{X})+\mathbf{\epsilon}-\hat{f}(\ma
 <p>其中（1）是系统误差， <span class="math">\(\hat{f}\)</span>通常不能彻底对<span class="math">\(\mathbf{X}\)</span>和<span class="math">\(\mathbf{y}\)</span>之间的“系统关系”建模，这里系统关系指的是在不同样本上存在的稳定关系。这一部分误差能通过改进模型得到提高；（2）是随机误差，这部分误差代表当前数据无法解释的部分，因此无法通过建立更复杂的模型来改进。那些拥有众多参数的复杂黑箱模型最大的问题就是试图通过自变量解释这部分误差，也就是过度拟合。随机误差的显著特点就是在不同的样本上是无法重复的，于是判断是否存在过度拟合的一个准则就是预留一部分样本作为测试集，然后检验训练出来的模型在测试集上的表现。这个我们随后会讲到。这里要澄清一点，过度拟合不只发生在这些黑箱模型上，其发生的根源在于参数个数太多（常超过观测个数），理论上说任何模型都可能过度拟合，只是因为黑箱模型的参数尤其多，其高灵活性和复杂度放大了过度拟合的问题。有些黑箱模型在训练的过程中会使用“袋外数据”（又称为Out of Bag [OOB]）来尽量避免过度拟合的影响。</p>
 <p>如果建模的目的也包含推断，那么这些“黑箱”模型就不合适，这就需要在模型可以解释的范围内使用尽量灵活的模型，比如Lasso回归，多元自适应回归样条等。有人可能不同意Lasso回归是灵活的。从其本质还是传统回归的角度看，它确实没有那么灵活，受到很多模型假设的限制。但由于Lasso的罚函数能同时起到变量选择的作用，这个变量的选择的过程可以不依赖于p值之类的参数（这些参数基于数据分布假设因此具有局限性），而可以通过优化模型预测值和真实值的差距来进行变量选择，从这个角度上看，该模型是灵活的。根据笔者的应用经验，Lasso作为收缩（或变量选择）方法在实际应用中的效果非常好。对于一些市场营销或者社会心理学相关的抽样调查数据分析，分层贝叶斯是一种灵活有效的方法。</p>
 <p>模型选择向来是非常困难的，这种困难不是数据分析行业特有的，很多专业领域都有类似的情况，比如医生判断病人所患的疾病，并在众多治疗方案中选择最合适的，这不是答案一目了然的选择题，决策的过程需要很多权衡和妥协。模型选择也类似，在选择过程中需要考虑具体的情况：项目目的，客户要求的精确度（这点很重要），计算量等等。这个选择的过程很难白纸黑字的像食谱一样写下来，这里我们只是尽己所能的介绍模型选择过程中需要考虑的点，以及评估不同模型的辅助性技术。具体的应用和“数据科学思维”还需要大家在从业过程中通过实践思考不断学习打磨。</p>
-<p>若应变量包含可观的测量误差，那么这部分误差将反映在随机误差（<span class="math">\(\mathbf{\epsilon}\)</span>）中。这部分误差使得均方根误差和<span class="math">\(R^2\)</span>有相应的上下限。因此，随机误差项不仅仅代表模型无法解释的波动，还含有测量误差。《应用预测模型（Applied Predictive Modeling）》<span class="citation">(Kjell Johnston 2013)</span>的第20.2小节有一个例子展示了因变量的测量误差对模型表现（RMSE和<span class="math">\(R^2\)</span>）的影响。作者在因变量上加入了不同强度的随机正态噪声，重复拟合不同的模型，研究模型均方根误差（RMSE）和<span class="math">\(R^2\)</span>的变化。这里我们用服装消费者数据进行类似的展示。假设我们面对这样一个问题，实际中消费者的收入并不是那么容易收集，很多人不愿透露这样的私人信息。于是我们希望利用在线消费记录变量建立关于消费者收入的预测模型，模型可以对那些数据库中缺失收入信息的记录进行填补。我们建立下面模型：</p>
+<ul>
+<li>应变量误差</li>
+</ul>
+<p>若应变量包含可观的测量误差，那么这部分误差将反映在随机误差（<span class="math">\(\mathbf{\epsilon}\)</span>）中。这部分误差使得均方根误差（RMSE）和<span class="math">\(R^2\)</span>有相应的上下限。RMSE和<span class="math">\(R^2\)</span>是回归模型常用的表现度量方法，我们在本章后面部分会进行介绍。因此，随机误差项不仅仅代表模型无法解释的波动，还含有测量误差。《应用预测模型（Applied Predictive Modeling）》<span class="citation">(Kjell Johnston 2013)</span>的第20.2小节有一个例子展示了因变量的测量误差对模型表现（RMSE和<span class="math">\(R^2\)</span>）的影响。作者在因变量上加入了不同强度的随机正态噪声，重复拟合不同的模型，研究模型均方根误差（RMSE）和<span class="math">\(R^2\)</span>的变化。这里我们用服装消费者数据进行类似的展示。假设我们面对这样一个问题，实际中消费者的收入并不是那么容易收集，很多人不愿透露这样的私人信息。于是我们希望利用在线消费记录变量建立关于消费者收入的预测模型，模型可以对那些数据库中缺失收入信息的记录进行填补。我们建立下面模型：</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 载入数据</span>
 sim.dat&lt;-<span class="kw">read.csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv&quot;</span>)
-fit&lt;-<span class="kw">lm</span>(income~store_exp+online_exp+store_trans+online_trans,<span class="dt">data=</span>sim.dat)
-<span class="kw">summary</span>(fit)</code></pre>
-<pre><code>## 
-## Call:
-## lm(formula = income ~ store_exp + online_exp + store_trans + 
-##     online_trans, data = sim.dat)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -128768  -15804     441   13375  150945 
-## 
-## Coefficients:
-##                Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  85711.6796  3651.5991  23.472  &lt; 2e-16 ***
-## store_exp        3.1977     0.4754   6.726 3.28e-11 ***
-## online_exp       8.9949     0.8943  10.058  &lt; 2e-16 ***
-## store_trans   4631.7507   436.4777  10.612  &lt; 2e-16 ***
-## online_trans -1451.1618   178.8355  -8.115 1.80e-15 ***
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Residual standard error: 31530 on 811 degrees of freedom
-##   (184 observations deleted due to missingness)
-## Multiple R-squared:  0.6018, Adjusted R-squared:  0.5998 
-## F-statistic: 306.4 on 4 and 811 DF,  p-value: &lt; 2.2e-16</code></pre>
-<p>由输出可见，在没有额外添加噪音时模型的均方根误差（RMSE）是 31530，<span class="math">\(R^2\)</span>是 0.6。下面我们在应变量年收入（<code>income</code>）上添加不同程度的噪音（均方根误差的0到3倍）：</p>
+ymad&lt;-<span class="kw">mad</span>(<span class="kw">na.omit</span>(sim.dat$income))
+<span class="co"># 计算Z分值</span>
+zs&lt;-(sim.dat$income-<span class="kw">mean</span>(<span class="kw">na.omit</span>(sim.dat$income)))/ymad
+<span class="co"># which(na.omit(zs&gt;3.5)) 找到利群点</span>
+<span class="co"># which(is.na(zs)) 找到缺失值</span>
+idex&lt;-<span class="kw">c</span>(<span class="kw">which</span>(<span class="kw">na.omit</span>(zs&gt;<span class="fl">3.5</span>)),<span class="kw">which</span>(<span class="kw">is.na</span>(zs)))
+<span class="co"># 删除含有离群点和缺失值的行</span>
+sim.dat&lt;-sim.dat[-idex,]
+fit&lt;-<span class="kw">lm</span>(income~store_exp+online_exp+store_trans+online_trans,<span class="dt">data=</span>sim.dat)</code></pre>
+<p>由输出可见，在没有额外添加噪音时模型的均方根误差（RMSE）是 29567，<span class="math">\(R^2\)</span>是 0.6。下面我们在应变量年收入（<code>income</code>）上添加不同程度的噪音（均方根误差的0到3倍）：</p>
 <p><span class="math">\[ RMSE \times (0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0) \]</span></p>
-<pre class="sourceCode r"><code class="sourceCode r">noise&lt;-<span class="kw">matrix</span>(<span class="kw">rep</span>(<span class="ot">NA</span>,<span class="dv">7000</span>),<span class="dt">nrow=</span><span class="dv">1000</span>,<span class="dt">ncol=</span><span class="dv">7</span>)
-
-for (i in <span class="dv">1</span>:<span class="dv">1000</span>){
+<pre class="sourceCode r"><code class="sourceCode r">noise&lt;-<span class="kw">matrix</span>(<span class="kw">rep</span>(<span class="ot">NA</span>,<span class="dv">7</span>*<span class="kw">nrow</span>(sim.dat)),<span class="dt">nrow=</span><span class="kw">nrow</span>(sim.dat),<span class="dt">ncol=</span><span class="dv">7</span>)
+for (i in <span class="dv">1</span>:<span class="kw">nrow</span>(sim.dat)){
 noise[i,]&lt;-<span class="kw">rnorm</span>(<span class="dv">7</span>,<span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">7</span>),<span class="kw">summary</span>(fit)$sigma*<span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">3</span>,<span class="dt">by=</span><span class="fl">0.5</span>))
-}
-
+}</code></pre>
+<p>我们接下来检查噪音强度对复杂度不同的模型拟合<span class="math">\(R^2\)</span>的影响。 拟合的模型复杂度从低到高依次为：一般线性回归，偏最小二乘回归，多元自适应回归样条，支持向量机（核函数是径向基函数），随机森林。</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 拟合一般线性回归模型</span>
 rsq_linear&lt;-<span class="kw">rep</span>(<span class="dv">0</span>,<span class="kw">ncol</span>(noise))
-
 for (i in <span class="dv">1</span>:<span class="dv">7</span>){
 withnoise&lt;-sim.dat$income+noise[,i]
 fit0&lt;-<span class="kw">lm</span>(withnoise~store_exp+online_exp+store_trans+online_trans,<span class="dt">data=</span>sim.dat)
 rsq_linear[i]&lt;-<span class="kw">summary</span>(fit0)$adj.r.squared
 }</code></pre>
-<p>除了一般线性回归外，做为比较我们再拟合一个偏最小二乘回归（PLS）。</p>
+<p>下面我们接着拟合偏最小二乘回归（PLS）。偏最小二乘源自于Herman Wold的非线性迭代偏最小二乘（NIPALS）算法 <span class="citation">(H 1966; H 1982)</span>，是一种通过隐层级将非线性关系线性化的方法。该方法和主成分回归类似，不同在于主成分回归在选择成分的时候没有考虑因变量的信息，只是简单追踪预测变量空间的变异情况（即，是无监督方法）。当自变量和因变量相关时，主成分回归能够很好的识别出它们之间的系统关系。然而，当存在和因变量不相关的自变量时，该方法的效果就会受到影响。推荐大家用PLS解决那些自变量之间存在相关性，但不确定所有自变量都和因变量有关，同时希望用线性回归来解决的问题。在当前情况下，更加复杂的PLS表现效果并不比简单线性好，因为这里几个自变量都和因变量有关的不同信息（从前面的拟合结果看到所有变量都是显著的）。</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># pls: 进行偏最小二乘回归和主成分回归</span>
 <span class="kw">library</span>(pls)
 rsq_pls&lt;-<span class="kw">rep</span>(<span class="dv">0</span>,<span class="kw">ncol</span>(noise))
 <span class="co"># 拟合PLS模型</span>
 for (i in <span class="dv">1</span>:<span class="dv">7</span>){
 withnoise&lt;-sim.dat$income+noise[,i]
-fit1&lt;-<span class="kw">plsr</span>(withnoise~store_exp+online_exp+store_trans+online_trans,<span class="dt">data=</span>sim.dat)
+fit0&lt;-<span class="kw">plsr</span>(withnoise~store_exp+online_exp+store_trans+online_trans,<span class="dt">data=</span>sim.dat)
 <span class="co"># plsr函数结果是mvr对象，需要用特定函数提取模型解释的应变量方差</span>
-rsq_pls[i]&lt;-<span class="kw">max</span>(<span class="kw">drop</span>(<span class="kw">R2</span>(fit1, <span class="dt">estimate =</span> <span class="st">&quot;train&quot;</span>,<span class="dt">intercept =</span> <span class="ot">FALSE</span>)$val))
+rsq_pls[i]&lt;-<span class="kw">max</span>(<span class="kw">drop</span>(<span class="kw">R2</span>(fit0, <span class="dt">estimate =</span> <span class="st">&quot;train&quot;</span>,<span class="dt">intercept =</span> <span class="ot">FALSE</span>)$val))
 }</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># reshape2在之前介绍过，用于数据整形</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># earth: 拟合多元自适应回归样条</span>
+<span class="kw">library</span>(earth)
+rsq_mars&lt;-<span class="kw">rep</span>(<span class="dv">0</span>,<span class="kw">ncol</span>(noise))
+<span class="co"># 拟合多元自适应回归样条</span>
+for (i in <span class="dv">1</span>:<span class="dv">7</span>){
+withnoise&lt;-sim.dat$income+noise[,i]
+fit0&lt;-<span class="kw">earth</span>(withnoise~store_exp+online_exp+store_trans+online_trans,<span class="dt">data=</span>sim.dat)
+<span class="co"># 提取模型解释的应变量方差</span>
+rsq_mars[i]&lt;-fit0$rsq
+}</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># caret: 用于建立预测模型的包，可以拟合多种模型</span>
+<span class="kw">library</span>(caret)
+rsq_svm&lt;-<span class="kw">rep</span>(<span class="dv">0</span>,<span class="kw">ncol</span>(noise))
+<span class="co"># 拟合支持向量机</span>
+<span class="co"># 注意：运行需要一些时间</span>
+for (i in <span class="dv">1</span>:<span class="dv">7</span>){
+idex&lt;-<span class="kw">which</span>(<span class="kw">is.na</span>(sim.dat$income))
+withnoise&lt;-sim.dat$income+noise[,i]
+trainX&lt;-sim.dat[,<span class="kw">c</span>(<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>,<span class="st">&quot;store_trans&quot;</span>,<span class="st">&quot;online_trans&quot;</span>)]
+trainY&lt;-withnoise
+fit0&lt;-<span class="kw">train</span>(trainX,trainY,<span class="dt">method=</span><span class="st">&quot;svmRadial&quot;</span>,
+            <span class="dt">tuneLength=</span><span class="dv">15</span>,
+            <span class="dt">trControl=</span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;cv&quot;</span>))
+<span class="co"># 提取模型解释的应变量方差</span>
+rsq_svm[i]&lt;-<span class="kw">max</span>(fit0$results$Rsquared)
+}</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># randomForest: 拟合随机森林模型</span>
+<span class="kw">library</span>(randomForest)
+rsq_rf&lt;-<span class="kw">rep</span>(<span class="dv">0</span>,<span class="kw">ncol</span>(noise))
+<span class="co"># 拟合随机森林模型</span>
+<span class="co"># ntree=500 用500棵树</span>
+<span class="co"># na.action = na.omit 忽略缺失值</span>
+for (i in <span class="dv">1</span>:<span class="dv">7</span>){
+withnoise&lt;-sim.dat$income+noise[,i]
+fit0&lt;-<span class="kw">randomForest</span>(withnoise~store_exp+online_exp+store_trans+online_trans,<span class="dt">data=</span>sim.dat,<span class="dt">ntree=</span><span class="dv">500</span>,<span class="dt">na.action =</span> na.omit)
+<span class="co"># 提取模型解释的应变量方差</span>
+rsq_rf[i]&lt;-<span class="kw">tail</span>(fit0$rsq,<span class="dv">1</span>)
+}
+<span class="co"># reshape2在之前介绍过，用于数据整形</span>
 <span class="kw">library</span>(reshape2)
-<span class="co"># 功能强大的绘图包</span>
-<span class="kw">library</span>(ggplot2)
-rsq&lt;-<span class="kw">data.frame</span>(<span class="kw">cbind</span>(<span class="dt">Noise=</span><span class="kw">c</span>(<span class="fl">0.0</span>, <span class="fl">0.5</span>, <span class="fl">1.0</span>, <span class="fl">1.5</span>, <span class="fl">2.0</span>, <span class="fl">2.5</span>, <span class="fl">3.0</span>),rsq_linear,rsq_pls))
+rsq&lt;-<span class="kw">data.frame</span>(<span class="kw">cbind</span>(<span class="dt">Noise=</span><span class="kw">c</span>(<span class="fl">0.0</span>, <span class="fl">0.5</span>, <span class="fl">1.0</span>, <span class="fl">1.5</span>, <span class="fl">2.0</span>, <span class="fl">2.5</span>, <span class="fl">3.0</span>),rsq_linear,rsq_pls,rsq_mars,rsq_svm,rsq_rf))
 <span class="co"># 将数据转化成长型</span>
-rsq&lt;-<span class="kw">melt</span>(rsq,<span class="dt">id.vars=</span><span class="st">&quot;Noise&quot;</span>,<span class="dt">measure.vars=</span><span class="kw">c</span>(<span class="st">&quot;rsq_linear&quot;</span>,<span class="st">&quot;rsq_pls&quot;</span>))
+rsq&lt;-<span class="kw">melt</span>(rsq,<span class="dt">id.vars=</span><span class="st">&quot;Noise&quot;</span>,<span class="dt">measure.vars=</span><span class="kw">c</span>(<span class="st">&quot;rsq_linear&quot;</span>,<span class="st">&quot;rsq_pls&quot;</span>,<span class="st">&quot;rsq_mars&quot;</span>,<span class="st">&quot;rsq_svm&quot;</span>,<span class="st">&quot;rsq_rf&quot;</span>))</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 功能强大的绘图包</span>
+<span class="kw">library</span>(ggplot2)
+<span class="co"># 用ggplot2包进行可视化</span>
 <span class="kw">ggplot</span>(<span class="dt">data=</span>rsq, <span class="kw">aes</span>(<span class="dt">x=</span>Noise, <span class="dt">y=</span>value, <span class="dt">group=</span>variable, <span class="dt">colour=</span>variable)) +
 <span class="st">    </span><span class="kw">geom_line</span>() +
 <span class="st">    </span><span class="kw">geom_point</span>()+
 <span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;R2&quot;</span>) </code></pre>
 <div class="figure" style="text-align: center"><span id="fig:error"></span>
-<img src="DS_R_files/figure-html/error-1.png" alt="模型拟合表现随应变量噪音强度变化" width="80%" />
+<img src="DS_R_files/figure-html/error-1.png" alt="模型$R^2$随应变量噪音强度变化" width="80%" />
 <p class="caption">
-Figure 6.1: 模型拟合表现随应变量噪音强度变化
+Figure 6.1: 模型<span class="math">\(R^2\)</span>随应变量噪音强度变化
 </p>
 </div>
 <p>从图 <a href="section-6.html#fig:error">6.1</a> 可以清楚的看到模型拟合效果随着噪音强度的增加急剧下降。</p>
+<ul>
+<li>自变量误差</li>
+</ul>
 <p>传统的统计模型通常假设自变量的测量无误差（或者随机性），这在实际中是不可能的，所以我们需要考虑自变量观测的随机性。自变量观测中的随机性产生的影响取决于如下几个因素：随机性的强度，相应因变量在模型中的重要性，使用模型的类别。</p>
 </div>
 <div id="section-6.3" class="section level2">
