@@ -128,7 +128,11 @@ code > span.er { color: #ff0000; font-weight: bold; }
 </ul></li>
 <li class="chapter" data-level="6" data-path="section-6.html"><a href="section-6.html"><i class="fa fa-check"></i><b>6</b> 建模技术简介</a><ul>
 <li class="chapter" data-level="6.1" data-path="section-6.html"><a href="section-6.html#section-6.1"><i class="fa fa-check"></i><b>6.1</b> 有监督和无监督</a></li>
-<li class="chapter" data-level="6.2" data-path="section-6.html"><a href="section-6.html#section-6.2"><i class="fa fa-check"></i><b>6.2</b> 误差及其来源</a></li>
+<li class="chapter" data-level="6.2" data-path="section-6.html"><a href="section-6.html#section-6.2"><i class="fa fa-check"></i><b>6.2</b> 误差及其来源</a><ul>
+<li class="chapter" data-level="6.2.1" data-path="section-6.html"><a href="section-6.html#section-6.2.1"><i class="fa fa-check"></i><b>6.2.1</b> 系统误差和随机误差</a></li>
+<li class="chapter" data-level="6.2.2" data-path="section-6.html"><a href="section-6.html#section-6.2.2"><i class="fa fa-check"></i><b>6.2.2</b> 应变量误差</a></li>
+<li class="chapter" data-level="6.2.3" data-path="section-6.html"><a href="section-6.html#section-6.2.3"><i class="fa fa-check"></i><b>6.2.3</b> 自变量误差</a></li>
+</ul></li>
 <li class="chapter" data-level="6.3" data-path="section-6.html"><a href="section-6.html#section-6.3"><i class="fa fa-check"></i><b>6.3</b> 数据划分和再抽样</a><ul>
 <li class="chapter" data-level="6.3.1" data-path="section-6.html"><a href="section-6.html#section-6.3.1"><i class="fa fa-check"></i><b>6.3.1</b> 划分训练集和测试集</a></li>
 <li class="chapter" data-level="6.3.2" data-path="section-6.html"><a href="section-6.html#section-6.3.2"><i class="fa fa-check"></i><b>6.3.2</b> 拟合模型</a></li>
@@ -266,6 +270,8 @@ y_{n}
 </div>
 <div id="section-6.2" class="section level2">
 <h2><span class="header-section-number">6.2</span> 误差及其来源</h2>
+<div id="section-6.2.1" class="section level3">
+<h3><span class="header-section-number">6.2.1</span> 系统误差和随机误差</h3>
 <p>假设我们对于<span class="math">\(\mathbf{X}\)</span>得到<span class="math">\(f\)</span>的估计<span class="math">\(\hat{f}\)</span>，进而得到<span class="math">\(\mathbf{y}\)</span>的预测 <span class="math">\(\hat{\mathbf{y}}=\hat{f}(\mathbf{X})\)</span>。预测的误差分成两部分，系统误差和随机误差：</p>
 <p><span class="math">\[
 E(\mathbf{y}-\hat{\mathbf{y}})^{2}=E[f(\mathbf{X})+\mathbf{\epsilon}-\hat{f}(\mathbf{X})]^{2}=\underset{\text{(1)}}{\underbrace{[f(\mathbf{X})-\hat{f}(\mathbf{X})]^{2}}}+\underset{\text{(2)}}{\underbrace{Var(\mathbf{\epsilon})}}
@@ -273,9 +279,9 @@ E(\mathbf{y}-\hat{\mathbf{y}})^{2}=E[f(\mathbf{X})+\mathbf{\epsilon}-\hat{f}(\ma
 <p>其中（1）是系统误差， <span class="math">\(\hat{f}\)</span>通常不能彻底对<span class="math">\(\mathbf{X}\)</span>和<span class="math">\(\mathbf{y}\)</span>之间的“系统关系”建模，这里系统关系指的是在不同样本上存在的稳定关系。这一部分误差能通过改进模型得到提高；（2）是随机误差，这部分误差代表当前数据无法解释的部分，因此无法通过建立更复杂的模型来改进。那些拥有众多参数的复杂黑箱模型最大的问题就是试图通过自变量解释这部分误差，也就是过度拟合。随机误差的显著特点就是在不同的样本上是无法重复的，于是判断是否存在过度拟合的一个准则就是预留一部分样本作为测试集，然后检验训练出来的模型在测试集上的表现。这个我们随后会讲到。这里要澄清一点，过度拟合不只发生在这些黑箱模型上，其发生的根源在于参数个数太多（常超过观测个数），理论上说任何模型都可能过度拟合，只是因为黑箱模型的参数尤其多，其高灵活性和复杂度放大了过度拟合的问题。有些黑箱模型在训练的过程中会使用“袋外数据”（又称为Out of Bag [OOB]）来尽量避免过度拟合的影响。</p>
 <p>如果建模的目的也包含推断，那么这些“黑箱”模型就不合适，这就需要在模型可以解释的范围内使用尽量灵活的模型，比如Lasso回归，多元自适应回归样条等。有人可能不同意Lasso回归是灵活的。从其本质还是传统回归的角度看，它确实没有那么灵活，受到很多模型假设的限制。但由于Lasso的罚函数能同时起到变量选择的作用，这个变量的选择的过程可以不依赖于p值之类的参数（这些参数基于数据分布假设因此具有局限性），而可以通过优化模型预测值和真实值的差距来进行变量选择，从这个角度上看，该模型是灵活的。根据笔者的应用经验，Lasso作为收缩（或变量选择）方法在实际应用中的效果非常好。对于一些市场营销或者社会心理学相关的抽样调查数据分析，分层贝叶斯是一种灵活有效的方法。</p>
 <p>模型选择向来是非常困难的，这种困难不是数据分析行业特有的，很多专业领域都有类似的情况，比如医生判断病人所患的疾病，并在众多治疗方案中选择最合适的，这不是答案一目了然的选择题，决策的过程需要很多权衡和妥协。模型选择也类似，在选择过程中需要考虑具体的情况：项目目的，客户要求的精确度（这点很重要），计算量等等。这个选择的过程很难白纸黑字的像食谱一样写下来，这里我们只是尽己所能的介绍模型选择过程中需要考虑的点，以及评估不同模型的辅助性技术。具体的应用和“数据科学思维”还需要大家在从业过程中通过实践思考不断学习打磨。</p>
-<ul>
-<li>应变量误差</li>
-</ul>
+</div>
+<div id="section-6.2.2" class="section level3">
+<h3><span class="header-section-number">6.2.2</span> 应变量误差</h3>
 <p>若应变量包含可观的测量误差，那么这部分误差将反映在随机误差（<span class="math">\(\mathbf{\epsilon}\)</span>）中。这部分误差使得均方根误差（RMSE）和<span class="math">\(R^2\)</span>有相应的上下限。RMSE和<span class="math">\(R^2\)</span>是回归模型常用的表现度量方法，我们在本章后面部分会进行介绍。因此，随机误差项不仅仅代表模型无法解释的波动，还含有测量误差。《应用预测模型（Applied Predictive Modeling）》<span class="citation">(Kjell Johnston 2013)</span>的第20.2小节有一个例子展示了因变量的测量误差对模型表现（RMSE和<span class="math">\(R^2\)</span>）的影响。作者在因变量上加入了不同强度的随机正态噪声，重复拟合不同的模型，研究模型均方根误差（RMSE）和<span class="math">\(R^2\)</span>的变化。这里我们用服装消费者数据进行类似的展示。假设我们面对这样一个问题，实际中消费者的收入并不是那么容易收集，很多人不愿透露这样的私人信息。于是我们希望利用在线消费记录变量建立关于消费者收入的预测模型，模型可以对那些数据库中缺失收入信息的记录进行填补。我们建立下面模型：</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 载入数据</span>
 sim.dat&lt;-<span class="kw">read.csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv&quot;</span>)
@@ -302,7 +308,7 @@ withnoise&lt;-sim.dat$income+noise[,i]
 fit0&lt;-<span class="kw">lm</span>(withnoise~store_exp+online_exp+store_trans+online_trans,<span class="dt">data=</span>sim.dat)
 rsq_linear[i]&lt;-<span class="kw">summary</span>(fit0)$adj.r.squared
 }</code></pre>
-<p>下面我们接着拟合偏最小二乘回归（PLS）。偏最小二乘源自于Herman Wold的非线性迭代偏最小二乘（NIPALS）算法 <span class="citation">(H 1966; H 1982)</span>，是一种通过隐层级将非线性关系线性化的方法。该方法和主成分回归类似，不同在于主成分回归在选择成分的时候没有考虑因变量的信息，只是简单追踪预测变量空间的变异情况（即，是无监督方法）。当自变量和因变量相关时，主成分回归能够很好的识别出它们之间的系统关系。然而，当存在和因变量不相关的自变量时，该方法的效果就会受到影响。推荐大家用PLS解决那些自变量之间存在相关性，但不确定所有自变量都和因变量有关，同时希望用线性回归来解决的问题。在当前情况下，更加复杂的PLS表现效果并不比简单线性好，因为这里几个自变量都和因变量有关的不同信息（从前面的拟合结果看到所有变量都是显著的）。</p>
+<p>下面我们接着拟合偏最小二乘回归（PLS）。偏最小二乘源自于Herman Wold的非线性迭代偏最小二乘（NIPALS）算法 <span class="citation">(H 1966; H 1982)</span>，是一种通过隐层级将非线性关系线性化的方法。该方法和主成分回归类似，不同在于主成分回归在选择成分的时候没有考虑因变量的信息，其目的是找到最大程度概括自变量空间变异性的线性组合（即，是无监督方法）。当自变量和因变量相关时，主成分回归能够很好的识别出它们之间的系统关系。然而，当存在和因变量不相关的自变量时，该方法的效果就会受到影响。而PLS最大程度概括与因变量相关性的线性组合。推荐大家用PLS解决那些自变量之间存在相关性，但不确定所有自变量都和因变量有关，同时希望用线性回归来解决的问题。在当前情况下，更加复杂的PLS表现效果并不比简单线性好，因为这里几个自变量都和因变量有关的不同信息（从前面的拟合结果看到所有变量都是显著的）。</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># pls: 进行偏最小二乘回归和主成分回归</span>
 <span class="kw">library</span>(pls)
 rsq_pls&lt;-<span class="kw">rep</span>(<span class="dv">0</span>,<span class="kw">ncol</span>(noise))
@@ -369,11 +375,13 @@ rsq&lt;-<span class="kw">melt</span>(rsq,<span class="dt">id.vars=</span><span c
 Figure 6.1: 模型<span class="math">\(R^2\)</span>随应变量噪音强度变化
 </p>
 </div>
-<p>从图 <a href="section-6.html#fig:error">6.1</a> 可以清楚的看到模型拟合效果随着噪音强度的增加急剧下降。</p>
-<ul>
-<li>自变量误差</li>
-</ul>
+<p>从图 <a href="section-6.html#fig:error">6.1</a> 可以清楚的看到所有模型拟合效果随着噪音强度的增加急剧下降。对变量测量系统的理解能够帮助我们更好的预期模型的表现。这是在之前“数据分析一般流程”中说过的从问题到数据这个环节需要弄清的问题。你应该清楚当前数据库中已有的数据的质量。如果客户提供给你额外的数据，或者需要你从其它地方获得数据，数据质量是必须交流清楚的问题，笔者就曾在这里栽过跟头，希望大家可以避免类似的错误。</p>
+<p>随着噪声的增加，对模型预测表现的评估越发困难。这意味着那些更复杂的模型（如组合模型）带来的好处只有当系统测量误差相对较低时才有利。这很容易理解，因为当噪音增加时，模型(如组合模型)能够发现的复杂潜在结构变得更加模糊。因此系统测量误差较大时，使用更简单的易于计算的模型的效果很可能一样好。</p>
+</div>
+<div id="section-6.2.3" class="section level3">
+<h3><span class="header-section-number">6.2.3</span> 自变量误差</h3>
 <p>传统的统计模型通常假设自变量的测量无误差（或者随机性），这在实际中是不可能的，所以我们需要考虑自变量观测的随机性。自变量观测中的随机性产生的影响取决于如下几个因素：随机性的强度，相应因变量在模型中的重要性，使用模型的类别。</p>
+</div>
 </div>
 <div id="section-6.3" class="section level2">
 <h2><span class="header-section-number">6.3</span> 数据划分和再抽样</h2>
@@ -447,8 +455,16 @@ datTest &lt;-<span class="st"> </span>sim.dat[-trainIndex,]</code></pre>
 <p>还可以使用最大差异度法<span class="citation">(Willett 2004)</span>划分数据（<code>maxDissim()</code>函数）。假设样本集A中含有m个样本，样本集B含有n个样本，n&gt;m，且我们要从B中选出一些样本加到A中，该子集中的样本要尽量和A中的不同。要实现这一点，对B中的一个样本，计算A中样本和该样本的差异度（距离，这里会算出m个值，因为A中有m个样本）。然后将和A中样本最不相同的B的样本抽取出来加入A，重复这个过程，直到A的样本量达到要求。关于这么权衡这m个差异度找到和A“最不相似”的样本，有不同的方法，比如以最小的值为准，将所有距离求和等等。这里没有什么黄金法则，建议大家尝试几种方法，查看比较得到的训练/测试样本自变量分布，选取其中一种。用这种方式可以得到自变量分布相似的不同样本集。R中有不同的计算样本间差异度（基于自变量观测）的函数。<code>caret</code>包中调用的是<code>proxy</code>包中的函数。关于不同的差异度测量，见相关包的帮助文档。我们可以通过选项 <code>obj</code>设置和样本集A“最不相似”的样本的方式，其中<code>minDiss</code>表示以最小差异度为准，<code>sumDiss</code>表示使用差异度之和。</p>
 <p>我们用服装数据的一个子集为例展示按照自变量抽样。这里选取年龄和收入这两个变量。</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 最大差异度抽样用到proxy包</span>
-<span class="kw">library</span>(proxy)
-<span class="co"># 用lattice包绘制散点图</span>
+<span class="kw">library</span>(proxy)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;proxy&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     as.dist, dist</code></pre>
+<pre><code>## The following object is masked from &#39;package:base&#39;:
+## 
+##     as.matrix</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 用lattice包绘制散点图</span>
 <span class="kw">library</span>(lattice)
 <span class="co"># 选取年龄和收入这两个变量</span>
 testing&lt;-<span class="kw">subset</span>(sim.dat,<span class="dt">select=</span><span class="kw">c</span>(<span class="st">&quot;age&quot;</span>,<span class="st">&quot;income&quot;</span> ))</code></pre>
