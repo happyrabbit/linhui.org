@@ -19,7 +19,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-04-19">
+<meta name="date" content="2016-04-23">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -384,7 +384,97 @@ Figure 6.1: 模型<span class="math">\(R^2\)</span>随应变量噪音强度变�
 </div>
 <div id="section-6.2.3" class="section level3">
 <h3><span class="header-section-number">6.2.3</span> 自变量误差</h3>
-<p>传统的统计模型通常假设自变量的测量无误差（或者随机性），这在实际中是不可能的，所以我们需要考虑自变量观测的随机性。自变量观测中的随机性产生的影响取决于如下几个因素：随机性的强度，相应因变量在模型中的重要性，使用模型的类别。我们选取自变量“在线消费”（<code>online_trans</code>）为例，用和上面相似的方法在该自变量上添加不同程度的噪音看其对模型拟合情况的影响。</p>
+<p>传统的统计模型通常假设自变量的测量无误差（或者随机性），这在实际中是不可能的，所以我们需要考虑自变量观测的随机性。自变量观测中的随机性产生的影响取决于如下几个因素：随机性的强度，相应因变量在模型中的重要性，使用模型的类别。我们选取自变量“在线消费”（<code>online_exp</code>）为例，用和上面相似的方法在该自变量上添加不同程度的噪音看其对模型拟合情况的影响。我们在自变量<code>online_exp</code>和上添加如下不同程度的噪音（标准差的0到3倍）：</p>
+<p><span class="math">\[ \sigma_{online_exp} \times (0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0) \]</span></p>
+<p>其中<span class="math">\(\sigma_{online_exp}\)</span>是在线消费观测的标准差。</p>
+<pre class="sourceCode r"><code class="sourceCode r">noise&lt;-<span class="kw">matrix</span>(<span class="kw">rep</span>(<span class="ot">NA</span>,<span class="dv">7</span>*<span class="kw">nrow</span>(sim.dat)),<span class="dt">nrow=</span><span class="kw">nrow</span>(sim.dat),<span class="dt">ncol=</span><span class="dv">7</span>)
+for (i in <span class="dv">1</span>:<span class="kw">nrow</span>(sim.dat)){
+noise[i,]&lt;-<span class="kw">rnorm</span>(<span class="dv">7</span>,<span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">7</span>),<span class="kw">sd</span>(sim.dat$online_exp)*<span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">3</span>,<span class="dt">by=</span><span class="fl">0.5</span>))
+}</code></pre>
+<p>同样的，我们检查噪音强度对复杂度不同的模型拟合<span class="math">\(R^2\)</span>的影响。拟合的模型复杂度从低到高依次为：一般线性回归，偏最小二乘回归，多元自适应回归样条，支持向量机（核函数是径向基函数），随机森林。这里的代码和之前类似，我们不重复展示。</p>
+<!--
+```r
+# 拟合一般线性回归模型
+rsq_linear<-rep(0,ncol(noise))
+for (i in 1:7){
+withnoise_online<-sim.dat$online_exp+noise[,i]
+fit0<-lm(income ~ store_exp + withnoise_online + store_trans + online_trans,data=sim.dat)
+rsq_linear[i]<-summary(fit0)$adj.r.squared
+}
+```
+
+
+```r
+# pls: 进行偏最小二乘回归和主成分回归
+library(pls)
+rsq_pls<-rep(0,ncol(noise))
+# 拟合PLS模型
+for (i in 1:7){
+withnoise_online<-sim.dat$online_exp+noise[,i]
+fit0<-plsr(income~store_exp+withnoise_online+store_trans+online_trans,data=sim.dat)
+# plsr函数结果是mvr对象，需要用特定函数提取模型解释的应变量方差
+rsq_pls[i]<-max(drop(R2(fit0, estimate = "train",intercept = FALSE)$val))
+}
+```
+
+```r
+# earth: 拟合多元自适应回归样条
+library(earth)
+rsq_mars<-rep(0,ncol(noise))
+# 拟合多元自适应回归样条
+for (i in 1:7){
+withnoise_online<-sim.dat$online_exp+noise[,i]
+fit0<-earth(income~store_exp+withnoise_online+store_trans+online_trans,data=sim.dat)
+# 提取模型解释的应变量方差
+rsq_mars[i]<-fit0$rsq
+}
+```
+
+```r
+# caret: 用于建立预测模型的包，可以拟合多种模型
+library(caret)
+rsq_svm<-rep(0,ncol(noise))
+# 拟合支持向量机
+# 注意：运行需要一些时间
+for (i in 1:7){
+idex<-which(is.na(sim.dat$income))
+withnoise_online<-sim.dat$online_exp+noise[,i]
+trainX<-cbind(sim.dat[,c("store_exp","store_trans","online_trans")],withnoise_online)
+trainY<-sim.dat$income
+fit0<-train(trainX,trainY,method="svmRadial",
+            tuneLength=15,
+            trControl=trainControl(method="cv"))
+# 提取模型解释的应变量方差
+rsq_svm[i]<-max(fit0$results$Rsquared)
+}
+```
+
+```r
+# randomForest: 拟合随机森林模型
+library(randomForest)
+rsq_rf<-rep(0,ncol(noise))
+# 拟合随机森林模型
+# ntree=500 用500棵树
+# na.action = na.omit 忽略缺失值
+for (i in 1:7){
+withnoise_online<-sim.dat$online_exp+noise[,i]
+fit0<-randomForest(income~store_exp+withnoise_online+store_trans+online_trans,data=sim.dat,ntree=500,na.action = na.omit)
+# 提取模型解释的应变量方差
+rsq_rf[i]<-tail(fit0$rsq,1)
+}
+# reshape2在之前介绍过，用于数据整形
+library(reshape2)
+rsq<-data.frame(cbind(Noise=c(0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0),rsq_linear,rsq_pls,rsq_mars,rsq_svm,rsq_rf))
+# 将数据转化成长型
+rsq<-melt(rsq,id.vars="Noise",measure.vars=c("rsq_linear","rsq_pls","rsq_mars","rsq_svm","rsq_rf"))
+```
+-->
+<div class="figure" style="text-align: center"><span id="fig:errorvariable"></span>
+<img src="DS_R_files/figure-html/errorvariable-1.png" alt="模型$R^2$随自变量(在线消费)噪音强度变化，rsq_linear是简单线性回归，rsq_pls是偏最小二乘回归，rsq_mars是多元自适应回归样条回归，rsq_svm是支持向量机，rsq_rf是随机森林。" width="80%" />
+<p class="caption">
+Figure 6.2: 模型<span class="math">\(R^2\)</span>随自变量(在线消费)噪音强度变化，rsq_linear是简单线性回归，rsq_pls是偏最小二乘回归，rsq_mars是多元自适应回归样条回归，rsq_svm是支持向量机，rsq_rf是随机森林。
+</p>
+</div>
 </div>
 </div>
 <div id="section-6.3" class="section level2">
@@ -459,16 +549,8 @@ datTest &lt;-<span class="st"> </span>sim.dat[-trainIndex,]</code></pre>
 <p>还可以使用最大差异度法<span class="citation">(Willett 2004)</span>划分数据（<code>maxDissim()</code>函数）。假设样本集A中含有m个样本，样本集B含有n个样本，n&gt;m，且我们要从B中选出一些样本加到A中，该子集中的样本要尽量和A中的不同。要实现这一点，对B中的一个样本，计算A中样本和该样本的差异度（距离，这里会算出m个值，因为A中有m个样本）。然后将和A中样本最不相同的B的样本抽取出来加入A，重复这个过程，直到A的样本量达到要求。关于这么权衡这m个差异度找到和A“最不相似”的样本，有不同的方法，比如以最小的值为准，将所有距离求和等等。这里没有什么黄金法则，建议大家尝试几种方法，查看比较得到的训练/测试样本自变量分布，选取其中一种。用这种方式可以得到自变量分布相似的不同样本集。R中有不同的计算样本间差异度（基于自变量观测）的函数。<code>caret</code>包中调用的是<code>proxy</code>包中的函数。关于不同的差异度测量，见相关包的帮助文档。我们可以通过选项 <code>obj</code>设置和样本集A“最不相似”的样本的方式，其中<code>minDiss</code>表示以最小差异度为准，<code>sumDiss</code>表示使用差异度之和。</p>
 <p>我们用服装数据的一个子集为例展示按照自变量抽样。这里选取年龄和收入这两个变量。</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 最大差异度抽样用到proxy包</span>
-<span class="kw">library</span>(proxy)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;proxy&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:stats&#39;:
-## 
-##     as.dist, dist</code></pre>
-<pre><code>## The following object is masked from &#39;package:base&#39;:
-## 
-##     as.matrix</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 用lattice包绘制散点图</span>
+<span class="kw">library</span>(proxy)
+<span class="co"># 用lattice包绘制散点图</span>
 <span class="kw">library</span>(lattice)
 <span class="co"># 选取年龄和收入这两个变量</span>
 testing&lt;-<span class="kw">subset</span>(sim.dat,<span class="dt">select=</span><span class="kw">c</span>(<span class="st">&quot;age&quot;</span>,<span class="st">&quot;income&quot;</span> ))</code></pre>
@@ -497,10 +579,10 @@ new2$group&lt;-<span class="kw">rep</span>(<span class="st">&quot;new2&quot;</sp
 <div class="figure" style="text-align: center"><span id="fig:maxdis"></span>
 <img src="DS_R_files/figure-html/maxdis-1.png" alt="按自变量最大化差异抽样" width="80%" />
 <p class="caption">
-Figure 6.2: 按自变量最大化差异抽样
+Figure 6.3: 按自变量最大化差异抽样
 </p>
 </div>
-<p>由图<a href="section-6.html#fig:maxdis">6.2</a>可见，通过最大化差异抽取的样本（<code>new</code>）和初始样本点（<code>start</code>）分布在图的不同位置。而随机抽取的新样本（<code>new2</code>）和原始样本更加接近。我们为什么希望每次抽取的样本和之前的不一样呢？因为我们希望最后得到的训练集和测试集覆盖的自变量观测区间相似。如果抽取的样本点都来自一个区域的话（比如全部都是年龄30以下，收入10万以下），如果讲这个样本用于训练的模型很可能不具有预测这个区域外样本的能力。反之要是用这个样本做为测试集，则无法检测模型在这个区域外样本上的表现。</p>
+<p>由图<a href="section-6.html#fig:maxdis">6.3</a>可见，通过最大化差异抽取的样本（<code>new</code>）和初始样本点（<code>start</code>）分布在图的不同位置。而随机抽取的新样本（<code>new2</code>）和原始样本更加接近。我们为什么希望每次抽取的样本和之前的不一样呢？因为我们希望最后得到的训练集和测试集覆盖的自变量观测区间相似。如果抽取的样本点都来自一个区域的话（比如全部都是年龄30以下，收入10万以下），如果讲这个样本用于训练的模型很可能不具有预测这个区域外样本的能力。反之要是用这个样本做为测试集，则无法检测模型在这个区域外样本上的表现。</p>
 <ul>
 <li>按时间序列划分</li>
 </ul>
