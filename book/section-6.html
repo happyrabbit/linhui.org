@@ -19,7 +19,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-04-23">
+<meta name="date" content="2016-04-26">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -137,7 +137,6 @@ code > span.er { color: #ff0000; font-weight: bold; }
 <li class="chapter" data-level="6.3.1" data-path="section-6.html"><a href="section-6.html#section-6.3.1"><i class="fa fa-check"></i><b>6.3.1</b> 划分训练集和测试集</a></li>
 <li class="chapter" data-level="6.3.2" data-path="section-6.html"><a href="section-6.html#section-6.3.2"><i class="fa fa-check"></i><b>6.3.2</b> 拟合模型</a></li>
 <li class="chapter" data-level="6.3.3" data-path="section-6.html"><a href="section-6.html#section-6.3.3"><i class="fa fa-check"></i><b>6.3.3</b> 评估模型表现</a></li>
-<li class="chapter" data-level="6.3.4" data-path="section-6.html"><a href="section-6.html#section-6.3.4"><i class="fa fa-check"></i><b>6.3.4</b> 失衡数据</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="7" data-path="section-7.html"><a href="section-7.html"><i class="fa fa-check"></i><b>7</b> 特征工程</a><ul>
@@ -385,8 +384,8 @@ Figure 6.1: 模型<span class="math">\(R^2\)</span>随应变量噪音强度变�
 <div id="section-6.2.3" class="section level3">
 <h3><span class="header-section-number">6.2.3</span> 自变量误差</h3>
 <p>传统的统计模型通常假设自变量的测量无误差（或者随机性），这在实际中是不可能的，所以我们需要考虑自变量观测的随机性。自变量观测中的随机性产生的影响取决于如下几个因素：随机性的强度，相应因变量在模型中的重要性，使用模型的类别。我们选取自变量“在线消费”（<code>online_exp</code>）为例，用和上面相似的方法在该自变量上添加不同程度的噪音看其对模型拟合情况的影响。我们在自变量<code>online_exp</code>和上添加如下不同程度的噪音（标准差的0到3倍）：</p>
-<p><span class="math">\[ \sigma_{online_exp} \times (0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0) \]</span></p>
-<p>其中<span class="math">\(\sigma_{online_exp}\)</span>是在线消费观测的标准差。</p>
+<p><span class="math">\[ \sigma_{0} \times (0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0) \]</span></p>
+<p>其中<span class="math">\(\sigma_{0}\)</span>是在线消费观测的标准差。</p>
 <pre class="sourceCode r"><code class="sourceCode r">noise&lt;-<span class="kw">matrix</span>(<span class="kw">rep</span>(<span class="ot">NA</span>,<span class="dv">7</span>*<span class="kw">nrow</span>(sim.dat)),<span class="dt">nrow=</span><span class="kw">nrow</span>(sim.dat),<span class="dt">ncol=</span><span class="dv">7</span>)
 for (i in <span class="dv">1</span>:<span class="kw">nrow</span>(sim.dat)){
 noise[i,]&lt;-<span class="kw">rnorm</span>(<span class="dv">7</span>,<span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">7</span>),<span class="kw">sd</span>(sim.dat$online_exp)*<span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">3</span>,<span class="dt">by=</span><span class="fl">0.5</span>))
@@ -479,7 +478,7 @@ rsq<-melt(rsq,id.vars="Noise",measure.vars=c("rsq_linear","rsq_pls","rsq_mars","
 Figure 6.2: 模型<span class="math">\(R^2\)</span>随自变量(在线消费)噪音强度变化，rsq_linear是简单线性回归，rsq_pls是偏最小二乘回归，rsq_mars是多元自适应回归样条回归，rsq_svm是支持向量机，rsq_rf是随机森林。
 </p>
 </div>
-<p>比较图<a href="section-6.html#fig:errorvariable">6.2</a>和图<a href="section-6.html#fig:error">6.1</a>，可以看到自变量的误差和应变量误差对模型拟合结果的影响很不相同。应变量误差是无法克服的，对任何模型来说都是个硬伤。而自变量误差确不一定。试想极端的情况，在线消费这个变量完全是随机噪音，也就是所说的无信息变量，随机森林和支持向量机受的影响并不太大。线性模型和偏最小二乘回归的结果依旧基本重合，而且随着噪音的增加拟合效果开始下降较快，到一定程度后趋于平稳，如果噪音不断增加，最后拟合的情况实际上会趋近于移除“在线消费”这个变量的结果。总体说来，如果某个自变量含有误差，其它与之相关较观测更为准确的变量可以适当弥补。线性模型对于自变量的观测误差的抗性普遍较差。</p>
+<p>比较图<a href="section-6.html#fig:errorvariable">6.2</a>和图<a href="section-6.html#fig:error">6.1</a>，可以看到自变量的误差和应变量误差对模型拟合结果的影响很不相同。应变量误差是无法克服的，对任何模型来说都是个硬伤。而自变量误差确不一定。试想极端的情况，在线消费这个变量完全是随机噪音，也就是所说的无信息变量，随机森林和支持向量机受的影响并不太大。线性模型和偏最小二乘回归的结果依旧基本重合，而且随着噪音的增加拟合效果开始下降较快，到一定程度后趋于平稳，如果噪音不断增加，最后拟合的情况实际上会趋近于移除“在线消费”这个变量的结果。总体说来，如果某个自变量含有误差，其它与之相关的变量在某种程度上可以进行弥补。线性模型对于自变量的观测误差的抗性普遍较差。</p>
 </div>
 </div>
 <div id="section-6.3" class="section level2">
@@ -554,8 +553,16 @@ datTest &lt;-<span class="st"> </span>sim.dat[-trainIndex,]</code></pre>
 <p>还可以使用最大差异度法<span class="citation">(Willett 2004)</span>划分数据（<code>maxDissim()</code>函数）。假设样本集A中含有m个样本，样本集B含有n个样本，n&gt;m，且我们要从B中选出一些样本加到A中，该子集中的样本要尽量和A中的不同。要实现这一点，对B中的一个样本，计算A中样本和该样本的差异度（距离，这里会算出m个值，因为A中有m个样本）。然后将和A中样本最不相同的B的样本抽取出来加入A，重复这个过程，直到A的样本量达到要求。关于这么权衡这m个差异度找到和A“最不相似”的样本，有不同的方法，比如以最小的值为准，将所有距离求和等等。这里没有什么黄金法则，建议大家尝试几种方法，查看比较得到的训练/测试样本自变量分布，选取其中一种。用这种方式可以得到自变量分布相似的不同样本集。R中有不同的计算样本间差异度（基于自变量观测）的函数。<code>caret</code>包中调用的是<code>proxy</code>包中的函数。关于不同的差异度测量，见相关包的帮助文档。我们可以通过选项 <code>obj</code>设置和样本集A“最不相似”的样本的方式，其中<code>minDiss</code>表示以最小差异度为准，<code>sumDiss</code>表示使用差异度之和。</p>
 <p>我们用服装数据的一个子集为例展示按照自变量抽样。这里选取年龄和收入这两个变量。</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 最大差异度抽样用到proxy包</span>
-<span class="kw">library</span>(proxy)
-<span class="co"># 用lattice包绘制散点图</span>
+<span class="kw">library</span>(proxy)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;proxy&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     as.dist, dist</code></pre>
+<pre><code>## The following object is masked from &#39;package:base&#39;:
+## 
+##     as.matrix</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 用lattice包绘制散点图</span>
 <span class="kw">library</span>(lattice)
 <span class="co"># 选取年龄和收入这两个变量</span>
 testing&lt;-<span class="kw">subset</span>(sim.dat,<span class="dt">select=</span><span class="kw">c</span>(<span class="st">&quot;age&quot;</span>,<span class="st">&quot;income&quot;</span> ))</code></pre>
@@ -688,11 +695,12 @@ plsFitTime &lt;-<span class="st"> </span><span class="kw">train</span>(unemploy 
 </div>
 <div id="section-6.3.3.2" class="section level4">
 <h4><span class="header-section-number">6.3.3.2</span> 分类模型表现度量</h4>
-</div>
-</div>
-<div id="section-6.3.4" class="section level3">
-<h3><span class="header-section-number">6.3.4</span> 失衡数据</h3>
-<p>判别分析中可能遇到一个最大问题就是数据失衡。比如贷款客户风险分析就是如此，真正违约不还贷款的客户可能只有千分之一，这意味只要闭着眼将所有的客户都判定为无风险就能的到99.9%的准确率。在这样的情况下，数据中关于低频率事件的信息很少，因此模型很难准确预测这些事件，而这些低频率事件通常有事我们关心的（如违约，疾病爆发）。对于统计学习模型来说，最理想当然是平衡的数据，但 很遗憾，现实生活很少满足理论假设。下面我们就介绍几种能够在某种程度上缓解类失衡的方法。这里要指出一点，你只能得到数据包含的的东西。记得之前讲到两部分误差，系统误差和随机误差。你能够该井的只是系统误差，你无法超于数据中关于小频率事件信息的极限。下面要讲的方法只是在原基础上对模型进行一些修正。这里我只介绍二分类的问题，因为绝大多数都是二分类。</p>
+<!--
+
+### 失衡数据
+
+判别分析中可能遇到一个最大问题就是数据失衡。比如贷款客户风险分析就是如此，真正违约不还贷款的客户可能只有千分之一，这意味只要闭着眼将所有的客户都判定为无风险就能的到99.9%的准确率。在这样的情况下，数据中关于低频率事件的信息很少，因此模型很难准确预测这些事件，而这些低频率事件通常有事我们关心的（如违约，疾病爆发）。对于统计学习模型来说，最理想当然是平衡的数据，但 很遗憾，现实生活很少满足理论假设。下面我们就介绍几种能够在某种程度上缓解类失衡的方法。这里要指出一点，你只能得到数据包含的的东西。记得之前讲到两部分误差，系统误差和随机误差。你能够该井的只是系统误差，你无法超于数据中关于小频率事件信息的极限。下面要讲的方法只是在原基础上对模型进行一些修正。这里我只介绍二分类的问题，因为绝大多数都是二分类。
+-->
 <ul>
 <li>尝试尽可能多的模型</li>
 </ul>
@@ -704,6 +712,7 @@ plsFitTime &lt;-<span class="st"> </span><span class="kw">train</span>(unemploy 
 <p>有目标的估计因果效应，而不是将其当作庞大回归模型的副产物</p>
 <p>不要想当然的假设回归系数能够解释成因果关系。</p>
 
+</div>
 </div>
 </div>
 </div>
