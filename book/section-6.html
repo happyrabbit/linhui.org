@@ -598,38 +598,56 @@ Figure 6.3: 按自变量最大化差异抽样
 <ul>
 <li>按时间序列划分</li>
 </ul>
-<p>对于时间序列数据，用简单随机抽样通常不是最好的方式。有一种按时间序列划分训练集和测试集的方法，关于该方法的讨论见<span class="citation">(Hyndman and Athanasopoulos 2013)</span>。可以使用<code>caret</code>实现该划分。其中有3个需要设置的参数：</p>
+<p>对于时间序列数据，用简单随机抽样通常不是最好的方式。有一种按时间序列划分训练集和测试集的方法，关于该方法的讨论见<span class="citation">(Hyndman and Athanasopoulos 2013)</span>。我们临时抽取一个长度为100的来自1阶自回归模型［AR(1)］的时间序列样本，用来展示<code>caret</code>包中对时间序列样本划分测试集和训练集的函数<code>createTimeSlices()</code>。由于时间序列话题不在本书范围之内，这里不会进行过多讨论。</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 抽取符合AR(1)的时间序列向量</span>
+timedata =<span class="st"> </span><span class="kw">arima.sim</span>(<span class="kw">list</span>(<span class="dt">order=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>), <span class="dt">ar=</span>-.<span class="dv">9</span>), <span class="dt">n=</span><span class="dv">100</span>)
+<span class="co"># 对时间序列作图</span>
+<span class="kw">plot</span>(timedata, <span class="dt">main=</span>(<span class="kw">expression</span>(<span class="kw">AR</span>(<span class="dv">1</span>)~<span class="er">~~</span>phi==-.<span class="dv">9</span>)))     </code></pre>
+<div class="figure" style="text-align: center"><span id="fig:times"></span>
+<img src="DS_R_files/figure-html/times-1.png" alt="时间序列样本图" width="80%" />
+<p class="caption">
+Figure 6.4: 时间序列样本图
+</p>
+</div>
+<p>图<a href="section-6.html#fig:maxdis">6.3</a>展示了100个模拟的时间序列观测。对这样的数据，我们希望训练集和测试集都能覆盖到不同时段的观测。下面用<code>createTimeSlices()</code>函数对数据进行划分。该函数中有3个需要设置的参数：</p>
 <ul>
 <li>initialWindow: 初始训练集样本中的连续观测数目</li>
 <li>horizon: 测试集中的观测数目</li>
-<li>fixedWindow: 逻辑值，取值为FALSE时，训练集从第一个样本开始划分区间长度不固定。 As an example, suppose we have a time series with 20 data points. We can fix initialWindow = 5 and look at different settings of the other two arguments. In the plot below, rows in each panel correspond to different data splits (i.e. resamples) and the columns correspond to different data points. Also, red indicates samples that are in included in the training set and the blue indicates samples in the test set.</li>
+<li>fixedWindow: 逻辑值，取值为FALSE时，训练集从第一个样本开始划分区间长度不固定。</li>
 </ul>
-<pre class="sourceCode r"><code class="sourceCode r">timeSlices &lt;-<span class="st"> </span><span class="kw">createTimeSlices</span>(<span class="dv">1</span>:<span class="kw">nrow</span>(economics), 
-                   <span class="dt">initialWindow =</span> <span class="dv">36</span>, <span class="dt">horizon =</span> <span class="dv">12</span>, <span class="dt">fixedWindow =</span> <span class="ot">TRUE</span>)
-&gt;<span class="st"> </span><span class="kw">str</span>(timeSlices,<span class="dt">max.level =</span> <span class="dv">1</span>)
-## List of 2
-## $ train:List of 431
-##   .. [list output truncated]
-## $ test :List of 431
-##   .. [list output truncated]
+<pre class="sourceCode r"><code class="sourceCode r">timeSlices &lt;-<span class="st"> </span><span class="kw">createTimeSlices</span>(<span class="dv">1</span>:<span class="kw">length</span>(timedata), 
+                   <span class="dt">initialWindow =</span> <span class="dv">36</span>, <span class="dt">horizon =</span> <span class="dv">12</span>, <span class="dt">fixedWindow =</span> T)
+<span class="kw">str</span>(timeSlices,<span class="dt">max.level =</span> <span class="dv">1</span>)</code></pre>
+<pre><code>## List of 2
+##  $ train:List of 53
+##  $ test :List of 53</code></pre>
+<p>可以看到函数结果返回2个列表，分别含有训练集和测试集的样本索引。我们查看第一个训练集和测试集样本。</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 将训练集索引信息存在trainSlices对象内</span>
 trainSlices &lt;-<span class="st"> </span>timeSlices[[<span class="dv">1</span>]]
+<span class="co"># 将测试集索引信息存在testSlices对象内</span>
 testSlices &lt;-<span class="st"> </span>timeSlices[[<span class="dv">2</span>]]
-
-plsFitTime &lt;-<span class="st"> </span><span class="kw">train</span>(unemploy ~<span class="st"> </span>pce +<span class="st"> </span>pop +<span class="st"> </span>psavert,
-                    <span class="dt">data =</span> economics[trainSlices[[<span class="dv">1</span>]],],
-                    <span class="dt">method =</span> <span class="st">&quot;pls&quot;</span>,
-                    <span class="dt">preProc =</span> <span class="kw">c</span>(<span class="st">&quot;center&quot;</span>, <span class="st">&quot;scale&quot;</span>))</code></pre>
+<span class="co"># 分别查看第一个训练集样本和测试集样本</span>
+trainSlices[[<span class="dv">1</span>]]</code></pre>
+<pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
+## [24] 24 25 26 27 28 29 30 31 32 33 34 35 36</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">testSlices[[<span class="dv">1</span>]]</code></pre>
+<pre><code>##  [1] 37 38 39 40 41 42 43 44 45 46 47 48</code></pre>
+<p>第一个训练集样本是原数据中第1个观测到第36个观测（因为<code>initialWindow = 36</code>），接下来从第37到48这12个观测被划分到第一个测试集（因为<code>horizon = 12</code>）。你可以通过<code>head(trainSlices)</code>查看后续的样本索引。尝试着改变<code>fixedWindow =</code>的设置，然后重复上面的代码得到新的<code>trainSlices</code>和<code>testSlices</code>，然后键入：</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(trainSlices)
+<span class="kw">head</span>(testSlices)</code></pre>
+<p>比较两种结果的不同就能够很容易理解该选项的作用了。</p>
 </div>
 <div id="section-6.3.2" class="section level3">
 <h3><span class="header-section-number">6.3.2</span> 拟合模型</h3>
+<p>了解训练集和测试集的划分方式之后，接下来就是使用训练集进行模型拟合。</p>
 </div>
 <div id="section-6.3.3" class="section level3">
 <h3><span class="header-section-number">6.3.3</span> 评估模型表现</h3>
-<p>模型选择的首要任务是决定一个模型表现的度量，即通过什么标准来决定两个模型谁更好。模型表现的度量方法有好几种，要想更加全面的了解模型的表现，有时需要结合多种度量方式。 为了了解模型是否适用于分析的目的，对模型的一些可视化方法，特别是残差图，将是至关重要的。 这些技术都将在本章进行讨论。</p>
+<p>当我们问哪个模型拟合效果好的时候我们到底在问什么？很多看似明确合理的问题一旦究其细节就会发现，其定义非常模糊以至于无法直接回答。这个问题的模糊之处在于没有指明用什么来衡量“拟合效果”？要比较模型首要任务是确定一个模型表现的度量，即通过什么标准来决定两个模型谁更好。模型表现的度量方法有好几种，要想更加全面的了解模型的表现，有时需要结合多种度量方式。本章会介绍一些模型表现的度量还有一些和模型表现相关的可视化方法，如残差图。</p>
 <div id="section-6.3.3.1" class="section level4">
 <h4><span class="header-section-number">6.3.3.1</span> 回归模型表现度量</h4>
 <ul>
-<li><strong><span class="math">\(C_{p}\)</span>，<span class="math">\(AIC\)</span>，<span class="math">\(BIC\)</span>， <span class="math">\(RMSE\)</span>和调整后的<span class="math">\(R^2\)</span></strong></li>
+<li><strong><span class="math">\(C_{p}\)</span>，<span class="math">\(AIC\)</span>，<span class="math">\(BIC\)</span>， <span class="math">\(RMSE\)</span>和<span class="math">\(R^2\)</span></strong></li>
 </ul>
 <p>当因变量是数值时，可以使用均方误差平方根（Root mean squared error, RMSE）为指标衡量模型的表现。 这个度量是模型残差的函数，其中残差即为观测值减去模型的预测值。 均方误差（Mean squared error, MSE）的计算方法是将残差平方然后取平均， 而RMSE则是取MSE的平方根，从而它与原始数据的单位相同。 得到的RMSE取值通常解释为（平均意义上）残差离0的远近，或者解释为观测值和模型预测值之间平均的距离。 另一个常用的度量是R-Squared，通常写作<span class="math">\(R^2\)</span>。这个值被解释成模型能够解释多大比例的应变量总变异。我们对服装消费者数据中的收入（<code>income</code>）建立线性模型，将问卷调查回复作为自变量（<code>Q1-Q10</code>），结果如下所示，其中R-squared＝0.75表示模型可以解释因变量总变异的四分之三。 计算这个值的方法有很多种（Kvalseth 1985）， 其中最简单的一个是先计算观测值和预测值的相关系数（通常用 表示），然后再将其平方。尽管这是一个易于解释的统计量，但实际工作者必须记住， 是一种相关性而不是准确性的度量。</p>
 <pre class="sourceCode r"><code class="sourceCode r">fit&lt;-<span class="kw">lm</span>(income~Q1+Q2+Q3+Q4+Q5+Q6+Q7+Q8+Q9+Q10,<span class="dt">data=</span>sim.dat)
