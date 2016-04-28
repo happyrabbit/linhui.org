@@ -19,7 +19,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-04-26">
+<meta name="date" content="2016-04-27">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -503,7 +503,7 @@ Figure 6.2: 模型<span class="math">\(R^2\)</span>随自变量(在线消费)噪
 <p>在商业促销活动和信用风险的案例中，我们得到的数据通常和某个时间点相连（或者时间区间：一周，一个月，一个促销活动期间）。通常称这样的数据有代表性（用某时间点或者时间段的数据代表普遍情况）。在这样的情况下我们通常将数据集随机分成不同部分，然后用一部分（训练集）建立模型，另外一部分（测试集）来评估模型表现，可能的话对模型做出调整。</p>
 <p>如果这两条假设大致正确，那么当前数据就能够合理反映未来的情况。因此在这种情况下，预留一部分当前数据来估计模型在将来的表现是合理的。明确了预测模型的一些假设前提，以及划分训练集和测试集的必要性之后，下一个问题是<strong>我们该将多少比例的数据用于训练集</strong>。</p>
 <p>一般这需要视具体情况而定。通常需要考虑的两个因素是：（1）样本量；（2）计算速度。当样本量较大时，在考虑计算速度的条件下，我一般会尝试60%，70％和80%这三个比例，看哪个效果更好。如果样本量很小，那么测试集其评估模型效果的能力将非常有限，并且在原本样本量就不大的情况下再分出一部分数据会极大影响模型拟合。这种情况下，使用再抽样技术更加有效。常用的再抽样方法有交互校验和Bootstrap。</p>
-<p>我们可以用createResample函数生成简单bootstrap样本，createFolds函数可以生成平衡的交互校验样本集。</p>
+<p>我们可以用<code>createResample()</code>函数生成简单bootstrap样本，createFolds函数可以生成平衡的交互校验样本集。</p>
 <p><strong>具体如何划分?</strong></p>
 <p>划分训练集和测试集时需要小心避免两个数据集有系统差别。例如，我们不能简单的把前半部分数据当作训练集，后半部分当作测试集。因为数据有可能是以某种方式排列的，如，按收入从大到小，按访问次数多少排列等等。有一种避免数据集间随机差别的方法是用简单的随机抽样，如对每个样本我们都抛下硬币，人头面就归于训练集，菊花面就归于测试集。有时还有一些其它因素需要考虑，但本质都是随机抽样。要想真正理解划分数据背后的逻辑需要实践。下面我们介绍经常使用的几种划分方法。</p>
 <ul>
@@ -553,16 +553,8 @@ datTest &lt;-<span class="st"> </span>sim.dat[-trainIndex,]</code></pre>
 <p>还可以使用最大差异度法<span class="citation">(Willett 2004)</span>划分数据（<code>maxDissim()</code>函数）。假设样本集A中含有m个样本，样本集B含有n个样本，n&gt;m，且我们要从B中选出一些样本加到A中，该子集中的样本要尽量和A中的不同。要实现这一点，对B中的一个样本，计算A中样本和该样本的差异度（距离，这里会算出m个值，因为A中有m个样本）。然后将和A中样本最不相同的B的样本抽取出来加入A，重复这个过程，直到A的样本量达到要求。关于这么权衡这m个差异度找到和A“最不相似”的样本，有不同的方法，比如以最小的值为准，将所有距离求和等等。这里没有什么黄金法则，建议大家尝试几种方法，查看比较得到的训练/测试样本自变量分布，选取其中一种。用这种方式可以得到自变量分布相似的不同样本集。R中有不同的计算样本间差异度（基于自变量观测）的函数。<code>caret</code>包中调用的是<code>proxy</code>包中的函数。关于不同的差异度测量，见相关包的帮助文档。我们可以通过选项 <code>obj</code>设置和样本集A“最不相似”的样本的方式，其中<code>minDiss</code>表示以最小差异度为准，<code>sumDiss</code>表示使用差异度之和。</p>
 <p>我们用服装数据的一个子集为例展示按照自变量抽样。这里选取年龄和收入这两个变量。</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 最大差异度抽样用到proxy包</span>
-<span class="kw">library</span>(proxy)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;proxy&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:stats&#39;:
-## 
-##     as.dist, dist</code></pre>
-<pre><code>## The following object is masked from &#39;package:base&#39;:
-## 
-##     as.matrix</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 用lattice包绘制散点图</span>
+<span class="kw">library</span>(proxy)
+<span class="co"># 用lattice包绘制散点图</span>
 <span class="kw">library</span>(lattice)
 <span class="co"># 选取年龄和收入这两个变量</span>
 testing&lt;-<span class="kw">subset</span>(sim.dat,<span class="dt">select=</span><span class="kw">c</span>(<span class="st">&quot;age&quot;</span>,<span class="st">&quot;income&quot;</span> ))</code></pre>
@@ -646,12 +638,11 @@ trainSlices[[<span class="dv">1</span>]]</code></pre>
 <p>当我们问哪个模型拟合效果好的时候我们到底在问什么？很多看似明确合理的问题一旦究其细节就会发现，其定义非常模糊以至于无法直接回答。这个问题的模糊之处在于没有指明用什么来衡量“拟合效果”？要比较模型首要任务是确定一个模型表现的度量，即通过什么标准来决定两个模型谁更好。模型表现的度量方法有好几种，要想更加全面的了解模型的表现，有时需要结合多种度量方式。本章会介绍一些模型表现的度量还有一些和模型表现相关的可视化方法，如残差图。</p>
 <div id="section-6.3.3.1" class="section level4">
 <h4><span class="header-section-number">6.3.3.1</span> 回归模型表现度量</h4>
-<ul>
-<li><strong><span class="math">\(C_{p}\)</span>，<span class="math">\(AIC\)</span>，<span class="math">\(BIC\)</span>， <span class="math">\(RMSE\)</span>和<span class="math">\(R^2\)</span></strong></li>
-</ul>
-<p>当因变量是数值时，可以使用均方误差平方根（Root mean squared error, RMSE）为指标衡量模型的表现。 这个度量是模型残差的函数，其中残差即为观测值减去模型的预测值。 均方误差（Mean squared error, MSE）的计算方法是将残差平方然后取平均， 而RMSE则是取MSE的平方根，从而它与原始数据的单位相同。 得到的RMSE取值通常解释为（平均意义上）残差离0的远近，或者解释为观测值和模型预测值之间平均的距离。 另一个常用的度量是R-Squared，通常写作<span class="math">\(R^2\)</span>。这个值被解释成模型能够解释多大比例的应变量总变异。我们对服装消费者数据中的收入（<code>income</code>）建立线性模型，将问卷调查回复作为自变量（<code>Q1-Q10</code>），结果如下所示，其中R-squared＝0.75表示模型可以解释因变量总变异的四分之三。 计算这个值的方法有很多种（Kvalseth 1985）， 其中最简单的一个是先计算观测值和预测值的相关系数（通常用 表示），然后再将其平方。尽管这是一个易于解释的统计量，但实际工作者必须记住， 是一种相关性而不是准确性的度量。</p>
-<pre class="sourceCode r"><code class="sourceCode r">fit&lt;-<span class="kw">lm</span>(income~Q1+Q2+Q3+Q4+Q5+Q6+Q7+Q8+Q9+Q10,<span class="dt">data=</span>sim.dat)
-<span class="kw">summary</span>(fit)</code></pre>
+<p>当因变量是数值时，可以使用均方误差平方根（Root mean squared error, RMSE）为指标衡量模型的表现。 这个度量是模型残差的函数，其中残差即为观测值减去模型的预测值。 均方误差（Mean squared error, MSE）的计算方法是将残差平方然后取平均， 而RMSE则是取MSE的平方根，从而它与原始数据的单位相同。</p>
+<p><span class="math">\[MSE=\frac{1}{n}\sum_{i=1}^{n}(y_{i}-\hat{y}_{i})^{2}\]</span> <span class="math">\[RMSE=\sqrt{\frac{1}{n}\sum_{i=1}^{n}(y_{i}-\hat{y}_{i})^{2}}\]</span></p>
+<p>得到的RMSE取值通常解释为残差离0的平均距离，或者解释为观测值和模型预测值之间平均的距离。我们对服装消费者数据中的收入（<code>income</code>）建立线性模型，将问卷调查回复作为自变量（<code>Q1-Q10</code>），结果如下所示：</p>
+<pre class="sourceCode r"><code class="sourceCode r">fitlinear&lt;-<span class="kw">lm</span>(income~Q1+Q2+Q3+Q4+Q5+Q6+Q7+Q8+Q9+Q10,<span class="dt">data=</span>sim.dat)
+<span class="kw">summary</span>(fitlinear)</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = income ~ Q1 + Q2 + Q3 + Q4 + Q5 + Q6 + Q7 + Q8 + 
@@ -681,6 +672,8 @@ trainSlices[[<span class="dv">1</span>]]</code></pre>
 ##   (184 observations deleted due to missingness)
 ## Multiple R-squared:  0.7527, Adjusted R-squared:  0.7496 
 ## F-statistic:   245 on 10 and 805 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>拟合的线性模型<code>fitlinear</code>的RMSE为24940（输出底部“Residual standard error:”后面的值）。</p>
+<p>另一个常用的度量是R-Squared，通常写作<span class="math">\(R^2\)</span>。它实际上是观测值和预测值的相关系数的平方。大家可能对线性回归中的<span class="math">\(R^2\)</span>很熟悉，但它可以用于任何回归模型。通常解释成模型能够解释的应变量总变异的比例其中R-squared＝0.75表示模型可以解释因变量总变异的四分之三。尽管这是一个易于解释的统计量，但要注意它是一种相关性而不是准确性的度量，它依赖于应变量方差。比如虽然<code>fitlinear</code>的<span class="math">\(R^2\)</span>不低，但是RMSE为24940，说明预测的收入和真实收入之间的平均差距为24940，这样的精确度并不高。在应变量的取值很大时，即使&gt;90%的<span class="math">\(R^2\)</span>也不一定代表足够的精确度，在对公司的销售总额进行建模就常是这样的情况。</p>
 <p>我们用stepAIC进行变量选择。</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(MASS)
 <span class="kw">stepAIC</span>(fit)</code></pre>
