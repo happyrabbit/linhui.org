@@ -19,7 +19,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-04-27">
+<meta name="date" content="2016-04-28">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -649,6 +649,91 @@ rating&lt;-<span class="kw">rbind</span>(rating1,rating2,rating3)
 </div>
 <div id="section-3.3" class="section level2">
 <h2><span class="header-section-number">3.3</span> 生猪疫情风险预测数据</h2>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># pre_link1.csv predicted link function values for cross-validation</span>
+<span class="co"># sim1_da1.csv  data for cross validation in simulation 1</span>
+<span class="co"># similar sim1_da2 and sim1_da3</span>
+<span class="co"># sim1.csv  simulated data, the first simulation</span>
+<span class="co"># dummy.sim1.csv dummy variables for the first simulated data with all the baseline in</span>
+<span class="co">#code for simulation</span>
+
+<span class="kw">setwd</span>(<span class="kw">dirname</span>(<span class="kw">file.choose</span>()))
+<span class="kw">library</span>(grplasso)
+nf&lt;-<span class="dv">800</span>
+<span class="kw">timestamp</span>()-&gt;t1
+for (j in <span class="dv">1</span>:<span class="dv">20</span>){
+<span class="kw">set.seed</span>(<span class="dv">19870</span>+j)
+x&lt;-<span class="kw">c</span>(<span class="st">&#39;A&#39;</span>,<span class="st">&#39;B&#39;</span>,<span class="st">&#39;C&#39;</span>)
+sim.da1&lt;-<span class="ot">NULL</span>
+for (i in <span class="dv">1</span>:nf){
+<span class="co"># sample(x, 120, replace=TRUE)-&gt;sam</span>
+sim.da1&lt;-<span class="kw">rbind</span>(sim.da1,<span class="kw">sample</span>(x, <span class="dv">120</span>, <span class="dt">replace=</span><span class="ot">TRUE</span>))
+}
+
+<span class="kw">data.frame</span>(sim.da1)-&gt;sim.da1
+<span class="co">#str(sim.da1)</span>
+<span class="kw">paste</span>(<span class="st">&quot;Q&quot;</span>, <span class="dv">1</span>:<span class="dv">120</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)-&gt;col
+<span class="kw">paste</span>(<span class="st">&quot;Farm&quot;</span>, <span class="dv">1</span>:nf, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)-&gt;row
+<span class="kw">colnames</span>(sim.da1)&lt;-col
+<span class="kw">rownames</span>(sim.da1)&lt;-row
+<span class="co">#edit(sim.da1)-&gt;sim.da1</span>
+<span class="co">#get dummy variables</span>
+
+<span class="kw">library</span>(nnet)
+dummy.sim1&lt;-<span class="ot">NULL</span>
+for (k in <span class="dv">1</span>:<span class="kw">ncol</span>(sim.da1)) {
+tmp=<span class="kw">class.ind</span>(sim.da1[,k])
+<span class="kw">colnames</span>(tmp)=<span class="kw">paste</span>(col[k],<span class="kw">colnames</span>(tmp))
+dummy.sim1=<span class="kw">cbind</span>(dummy.sim1,tmp)
+}
+
+<span class="co">#dim(dummy.sim1)</span>
+<span class="co">#edit(dummy.sim1)-&gt;dummy.sim1</span>
+
+<span class="kw">data.frame</span>(dummy.sim1)-&gt;dummy.sim1
+
+<span class="co">#get estimated probability</span>
+<span class="co">#c(rep(c(1/4,0,-1/4),40),rep(c(1/4,0,0),40),rep(c(0,0,0),40))-&gt;s1</span>
+<span class="co">#as.matrix(dummy.sim1)%*%s1-40/3/4-&gt;link1</span>
+<span class="co">#Mar2,2012, use another setting of parameters</span>
+<span class="co">#c(rep(c(1/2,0,-1/2),40),rep(c(1/2,0,0),40),rep(c(0,0,0),40))-&gt;s1</span>
+<span class="co">#as.matrix(dummy.sim1)%*%s1-40/3/2-&gt;link1</span>
+
+<span class="co">#Mar3,2012, use another setting of parameters</span>
+<span class="kw">c</span>(<span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">0</span>,-<span class="dv">1</span>),<span class="dv">40</span>),<span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>),<span class="dv">40</span>),<span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>),<span class="dv">40</span>))-&gt;s1
+<span class="kw">as.matrix</span>(dummy.sim1)%*%s1<span class="dv">-40</span>/<span class="dv">3</span>-&gt;link1
+<span class="kw">exp</span>(link1)/(<span class="kw">exp</span>(link1)+<span class="dv">1</span>)-&gt;hp1
+res&lt;-<span class="kw">rep</span>(<span class="dv">9</span>,nf)
+for (i in <span class="dv">1</span>:nf){
+<span class="kw">sample</span>( <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">0</span>),<span class="dv">1</span>,<span class="dt">prob=</span><span class="kw">c</span>(hp1[i],<span class="dv">1</span>-hp1[i]))-&gt;res[i]
+}
+<span class="co">#table(res)</span>
+<span class="co">#delete baseline variables</span>
+
+base.idx&lt;-<span class="dv">3</span>*<span class="kw">c</span>(<span class="dv">1</span>:<span class="dv">120</span>)
+dummy1&lt;-dummy.sim1[,-base.idx]
+<span class="co">#str(dummy1)</span>
+
+<span class="co">#da1 is the data set WITH response variables WITHOUT category indicators</span>
+<span class="co">#da2 is the data set WITHOUT response variable WITH question indicator in the last row</span>
+<span class="co">#da3 is the data WITHOUT response variable and question indicator</span>
+dummy1$y&lt;-res
+da1&lt;-dummy1
+y&lt;-da1$y
+ind&lt;-<span class="ot">NULL</span>
+for (i in <span class="dv">1</span>:<span class="dv">120</span>){
+<span class="kw">c</span>(ind,<span class="kw">rep</span>(i,<span class="dv">2</span>))-&gt;ind
+}
+da2&lt;-<span class="kw">rbind</span>(da1[,<span class="dv">1</span>:<span class="dv">240</span>],ind)
+da3&lt;-da1[,<span class="dv">1</span>:<span class="dv">240</span>]
+
+<span class="co">#write.csv(pre,paste(&#39;pre_link&#39;,j,&#39;,csv&#39;,sep=&#39;&#39;),row.names=F)</span>
+<span class="kw">write.csv</span>(da1,<span class="kw">paste</span>(<span class="st">&#39;sim&#39;</span>,j,<span class="st">&#39;_da&#39;</span>,<span class="dv">1</span>,<span class="st">&#39;.csv&#39;</span>,<span class="dt">sep=</span><span class="st">&#39;&#39;</span>),<span class="dt">row.names=</span>F)
+<span class="kw">write.csv</span>(da2,<span class="kw">paste</span>(<span class="st">&#39;sim&#39;</span>,j,<span class="st">&#39;_da&#39;</span>,<span class="dv">2</span>,<span class="st">&#39;.csv&#39;</span>,<span class="dt">sep=</span><span class="st">&#39;&#39;</span>),<span class="dt">row.names=</span>F)
+<span class="kw">write.csv</span>(da3,<span class="kw">paste</span>(<span class="st">&#39;sim&#39;</span>,j,<span class="st">&#39;_da&#39;</span>,<span class="dv">3</span>,<span class="st">&#39;.csv&#39;</span>,<span class="dt">sep=</span><span class="st">&#39;&#39;</span>),<span class="dt">row.names=</span>F)
+<span class="kw">write.csv</span>(sim.da1,<span class="kw">paste</span>(<span class="st">&#39;sim&#39;</span>,j,<span class="st">&#39;.csv&#39;</span>,<span class="dt">sep=</span><span class="st">&#39;&#39;</span>),<span class="dt">row.names=</span>F)
+<span class="kw">write.csv</span>(dummy.sim1,<span class="kw">paste</span>(<span class="st">&#39;dummy.sim&#39;</span>,j,<span class="st">&#39;.csv&#39;</span>,<span class="dt">sep=</span><span class="st">&#39;&#39;</span>),<span class="dt">row.names=</span>F)
+}
+<span class="kw">timestamp</span>()-&gt;t2</code></pre>
 
 </div>
 </div>
