@@ -165,7 +165,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 <li class="chapter" data-level="8" data-path="section-8.html"><a href="section-8.html"><i class="fa fa-check"></i><b>8</b> 线性回归极其衍生</a><ul>
 <li class="chapter" data-level="8.1" data-path="section-8.html"><a href="section-8.html#section-8.1"><i class="fa fa-check"></i><b>8.1</b> 普通线性回归</a><ul>
-<li class="chapter" data-level="8.1.1" data-path="section-8.html"><a href="section-8.html#section-8.1.1"><i class="fa fa-check"></i><b>8.1.1</b> 拟合最小二乘线性模型</a></li>
+<li class="chapter" data-level="8.1.1" data-path="section-8.html"><a href="section-8.html#section-8.1.1"><i class="fa fa-check"></i><b>8.1.1</b> 最小二乘线性模型</a></li>
 </ul></li>
 <li class="chapter" data-level="8.2" data-path="section-8.html"><a href="section-8.html#section-8.2"><i class="fa fa-check"></i><b>8.2</b> 收缩方法</a></li>
 <li class="chapter" data-level="8.3" data-path="section-8.html"><a href="section-8.html#section-8.3"><i class="fa fa-check"></i><b>8.3</b> 分层线性回归</a></li>
@@ -230,7 +230,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h2><span class="header-section-number">8.1</span> 普通线性回归</h2>
 <p>虽然最小二乘线性回归看起来太过简单粗暴，但现在很多更复杂的模型其基本形式也是线性的。比如逻辑回归，就是对因变量的均值进行逻辑变换后再拟合线性模型。通常我们都将神经网络模型归于非线性模型，但神经网络中的每个潜变量都是某些预测变量的线性组合。日光之下，并无新事。在大量新技术不断涌入更新换代的今天，人的思维更加容易见树不见林。很多事物本质上是有相似性的，找到光怪陆离的表象下的实质是一种重要的能力。在学习了很多不同的方法之后应该退后一步，看看这些方法的演变联系，对背后的知识进行提取抽象，触及本质，时不时停下来问自己：这些模型背后的根本思想是什么？ 在R实现这些模型也类似，不同的模型在R中的表达方法都是模仿线性模型的拟合语句。因此，只要理解了如何使用R拟合，解释和诊断线性模型，你能够举一反三的应用其它更加复杂的模型。本节主要介绍用R中<code>lm()</code>拟合最小二乘线性模型，以及该函数中的不同选项。然后我们将会讲到线性模型的诊断方法，它们用于检测模型的假设是否成立，或者我们拟合的结果是否充分。</p>
 <div id="section-8.1.1" class="section level3">
-<h3><span class="header-section-number">8.1.1</span> 拟合最小二乘线性模型</h3>
+<h3><span class="header-section-number">8.1.1</span> 最小二乘线性模型</h3>
+<p>在线性模型中，</p>
+<p><span class="math display">\[f(\mathbf{X})=\mathbf{X}\mathbf{\beta}=\beta_{0}+\sum_{j=1}^{p}\mathbf{x_{.j}}\beta_{j}\]</span></p>
+<p>其中<span class="math inline">\(\mathbf{\beta}\)</span>是长度为<span class="math inline">\(p+1\)</span>的参数向量。这里的数学公式表达和之前6.1中介绍的一致。最小二乘估计就是选择<span class="math inline">\(\mathbf{\beta^{T}}=(\beta_{0},\beta_{1},...,\beta_{p})\)</span>最小化下面残差平方和：</p>
+<p><span class="math display">\[RSS(\beta)=\sum_{i=1}^{N}(y_{i}-f(\mathbf{x_{i.}}))^{2}=\sum_{i=1}^{N}(y_{i}-\beta_{0}-\sum_{j=1}^{p}x_{ij}\beta_{j})^{2}\]</span></p>
 <p>我们还是从载入数据开始。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat&lt;-<span class="kw">read.csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv&quot;</span>)</code></pre></div>
 <p>在我们开始之前，还需要对数据进行一些清理，删除错误的样本观测，消费金额不能为负数。</p>
