@@ -19,7 +19,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-05-29">
+<meta name="date" content="2016-05-31">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -245,36 +245,79 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>将实体店消费量和在线消费之和当作应变量。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 得到总消费量=实体店消费+在线消费</span>
 modeldat$total_exp&lt;-dat$store_exp+dat$online_exp</code></pre></div>
-<p>现在我们可以拟合线性模型。标准的模型公式表达是在”<sub>”号的左边指定因变量，右边指定自变量。”.”表示数据集<code>modeldat</code>中除了因变量之外的所有变量都被当作自变量。这里我们没有考虑交互效应，如果要添加<code>Q1</code>和<code>Q2</code>的交互效应，只要在”</sub>”右边加上”Q1*Q2”即可。</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lmfit&lt;-<span class="kw">lm</span>(total_exp~.,<span class="dt">data=</span>modeldat)
+<p>我们先检查一下数据，看是不是有缺失值或者离群点：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(modeldat)</code></pre></div>
+<pre><code>##        Q1              Q2              Q3              Q4       
+##  Min.   :1.000   Min.   :1.000   Min.   :1.000   Min.   :1.000  
+##  1st Qu.:2.000   1st Qu.:1.000   1st Qu.:1.000   1st Qu.:2.000  
+##  Median :3.000   Median :1.000   Median :1.000   Median :3.000  
+##  Mean   :3.102   Mean   :1.824   Mean   :1.993   Mean   :2.765  
+##  3rd Qu.:4.000   3rd Qu.:2.000   3rd Qu.:3.000   3rd Qu.:4.000  
+##  Max.   :5.000   Max.   :5.000   Max.   :5.000   Max.   :5.000  
+##        Q5              Q6              Q7              Q8       
+##  Min.   :1.000   Min.   :1.000   Min.   :1.000   Min.   :1.000  
+##  1st Qu.:1.500   1st Qu.:1.000   1st Qu.:2.000   1st Qu.:1.000  
+##  Median :4.000   Median :2.000   Median :4.000   Median :2.000  
+##  Mean   :2.944   Mean   :2.449   Mean   :3.432   Mean   :2.396  
+##  3rd Qu.:4.000   3rd Qu.:4.000   3rd Qu.:4.000   3rd Qu.:3.000  
+##  Max.   :5.000   Max.   :5.000   Max.   :5.000   Max.   :5.000  
+##        Q9             Q10          total_exp      
+##  Min.   :1.000   Min.   :1.000   Min.   :  351.9  
+##  1st Qu.:2.000   1st Qu.:1.000   1st Qu.:  958.9  
+##  Median :4.000   Median :2.000   Median : 2213.7  
+##  Mean   :3.084   Mean   :2.321   Mean   : 3479.1  
+##  3rd Qu.:4.000   3rd Qu.:3.000   3rd Qu.: 2708.4  
+##  Max.   :5.000   Max.   :5.000   Max.   :53172.3</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))
+<span class="kw">hist</span>(modeldat$total_exp)
+<span class="kw">boxplot</span>(modeldat$total_exp)</code></pre></div>
+<p><img src="DS_R_files/figure-html/checkplot-1.png" title="" alt="" width="80%" style="display: block; margin: auto;" /></p>
+<p>数据集<code>modeldat</code>中没有缺失值，但是明显有离群点，而且应变量<code>total_exp</code>分布明显偏离正态。我们删除离群点，然后对应变量进行对数变换。</p>
+<p>我们用之前数据预处理章节介绍的Z分值的方法查找并删除离群点。这里不重复解释，不明白的读者可以返回复习相应的章节。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">y&lt;-modeldat$total_exp
+<span class="co"># 求Z分值</span>
+zs&lt;-(y-<span class="kw">mean</span>(y))/<span class="kw">mad</span>(y)
+<span class="co"># 找到Z分值大于3.5的离群点，删除这些观测</span>
+modeldat&lt;-modeldat[-<span class="kw">which</span>(zs&gt;<span class="fl">3.5</span>),]</code></pre></div>
+<p>这里我们先不对应变量进行对数变换，之后在回归函数的公式里对应变量进行变换。接下来检查变量的共线性：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(corrplot)
+correlation&lt;-<span class="kw">cor</span>(modeldat[,<span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>,<span class="kw">names</span>(modeldat))])
+<span class="kw">corrplot.mixed</span>(correlation,<span class="dt">order=</span><span class="st">&quot;hclust&quot;</span>,<span class="dt">tl.pos=</span><span class="st">&quot;lt&quot;</span>,<span class="dt">upper=</span><span class="st">&quot;ellipse&quot;</span>)</code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:corplotlm"></span>
+<img src="DS_R_files/figure-html/corplotlm-1.png" alt="自变量相关矩阵图" width="80%" />
+<p class="caption">
+Figure 8.1: 自变量相关矩阵图
+</p>
+</div>
+<p>由图<a href="section-8.html#fig:corplotlm">8.1</a> 可以看到，变量之间有很强的相关性。我们用之前在预处理章节中提到的删除高度相关变量的算法，设置阈值为0.75：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(caret)
+highcor&lt;-<span class="kw">findCorrelation</span>(correlation,<span class="dt">cutoff=</span>.<span class="dv">75</span>)
+modeldat&lt;-modeldat[,-highcor]</code></pre></div>
+<p>现在我们可以拟合线性模型。标准的模型公式表达是在”<sub>”号的左边指定因变量，右边指定自变量。”.”表示数据集<code>modeldat</code>中除了因变量之外的所有变量都被当作自变量。这里我们没有考虑交互效应，如果要添加<code>Q1</code>和<code>Q2</code>的交互效应，只要在”</sub>”右边加上”Q1*Q2”即可。注意下面的代码中我们对原始变量进行了对数变换（<code>log(total_exp)</code>）。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lmfit&lt;-<span class="kw">lm</span>(<span class="kw">log</span>(total_exp)~.,<span class="dt">data=</span>modeldat)
 <span class="kw">summary</span>(lmfit)</code></pre></div>
 <pre><code>## 
 ## Call:
-## lm(formula = total_exp ~ ., data = modeldat)
+## lm(formula = log(total_exp) ~ ., data = modeldat)
 ## 
 ## Residuals:
-##    Min     1Q Median     3Q    Max 
-##  -5068   -573    -85    339  43361 
+##      Min       1Q   Median       3Q      Max 
+## -1.17494 -0.13719  0.01284  0.14163  0.56227 
 ## 
 ## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept) -2724.64    1489.15  -1.830 0.067602 .  
-## Q1           -278.40     129.93  -2.143 0.032386 *  
-## Q2            646.31     179.92   3.592 0.000344 ***
-## Q3            654.18     171.33   3.818 0.000143 ***
-## Q4            248.35     145.70   1.704 0.088608 .  
-## Q5            642.34     227.55   2.823 0.004855 ** 
-## Q6            733.64     178.77   4.104  4.4e-05 ***
-## Q7             10.05     190.40   0.053 0.957903    
-## Q8           -101.82     158.91  -0.641 0.521832    
-## Q9            372.93     183.14   2.036 0.041991 *  
-## Q10          -314.67     151.73  -2.074 0.038351 *  
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  8.098314   0.054286 149.177  &lt; 2e-16 ***
+## Q1          -0.145340   0.008823 -16.474  &lt; 2e-16 ***
+## Q2           0.102275   0.019492   5.247 1.98e-07 ***
+## Q3           0.254450   0.018348  13.868  &lt; 2e-16 ***
+## Q6          -0.227684   0.011520 -19.764  &lt; 2e-16 ***
+## Q8          -0.090706   0.016497  -5.498 5.15e-08 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 2156 on 988 degrees of freedom
-## Multiple R-squared:  0.7097, Adjusted R-squared:  0.7067 
-## F-statistic: 241.5 on 10 and 988 DF,  p-value: &lt; 2.2e-16</code></pre>
+## Residual standard error: 0.2262 on 805 degrees of freedom
+## Multiple R-squared:  0.8542, Adjusted R-squared:  0.8533 
+## F-statistic: 943.4 on 5 and 805 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>从模型结果总结中我们可以看到各个自变量的参数估计（<code>Estimate</code>列）、标准差（<code>Std. Error</code>），t统计量（<code>t value</code>）和p值（<code>Pr(&gt;|t|)</code>）。在输出的底部包含了残差标准误，即RMSE（<code>Residual standard error</code>），<span class="math inline">\(R^2\)</span>（<code>Multiple R-squared</code>）和调整后的<span class="math inline">\(R^2\)</span>（<code>Adjusted R-squared</code>），模型的F统计量（<code>F-statistic</code>）以及相应F检验的显著性p值（<code>p-value</code>）。</p>
 <ul>
 <li><strong>关于p值的讨论</strong></li>
@@ -299,18 +342,13 @@ modeldat$total_exp&lt;-dat$store_exp+dat$online_exp</code></pre></div>
 </blockquote>
 <p>在文章末尾列举了一些其他替代手段，其中之一就是报告置信区间而非p值。 回到当前的例子，这里我们不去讨论参数估计的对应p值，而是使用各个参数估计的置信区间。在R中可以用下面代码得到置信区间：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">confint</span>(lmfit,<span class="dt">level=</span><span class="fl">0.9</span>)</code></pre></div>
-<pre><code>##                      5 %       95 %
-## (Intercept) -5176.363419 -272.90933
-## Q1           -492.323156  -64.47823
-## Q2            350.091735  942.52198
-## Q3            372.102337  936.25264
-## Q4              8.461168  488.23091
-## Q5            267.703753 1016.98168
-## Q6            439.319423 1027.96892
-## Q7           -303.423365  323.52943
-## Q8           -363.440200  159.80232
-## Q9             71.400398  674.45287
-## Q10          -564.482021  -64.86001</code></pre>
+<pre><code>##                     5 %        95 %
+## (Intercept)  8.00891811  8.18771037
+## Q1          -0.15986889 -0.13081186
+## Q2           0.07017625  0.13437445
+## Q3           0.22423576  0.28466333
+## Q6          -0.24665434 -0.20871330
+## Q8          -0.11787330 -0.06353905</code></pre>
 <p>上面的输出就是参数的90%置信区间。其中<code>level=0.9</code>将置信度设置为0.9。</p>
 <p>拟合线性模型是非常容易的，以致于很多分析师拟合了模型之后不考虑模型是否合理，直接撰写结果报告。其实我们可以很容易用R从不同方面检查模型的拟合情况和假设条件。下面的几个小节中我们将介绍一些常用的线性模型诊断方法。</p>
 </div>
@@ -318,7 +356,19 @@ modeldat$total_exp&lt;-dat$store_exp+dat$online_exp</code></pre></div>
 <h3><span class="header-section-number">8.1.2</span> 线性关系检测</h3>
 <p>使用线性模型自然假设自变量和因变量的关系是线性的，但到底是不是这样呢？核查这点通常用到残差图，即残差对拟合值散点图。</p>
 <p>我们要检查残差图的如下几个方面： 1. 残差是否在0附近分布 1. 残差分布是否随机，如果呈现出某种特定分布模式的话，说明当前模型关系的假设不充分 1. 残差是否存在异方差性，比如随着拟合值增大残差分布方差增加，这就说明残差分布有异方差性</p>
-<p>残差对各个自变量的散点图也很有效。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">2</span>))
+<span class="kw">plot</span>(lmfit,<span class="dt">which=</span><span class="dv">1</span>)
+<span class="kw">plot</span>(lmfit,<span class="dt">which=</span><span class="dv">2</span>)
+<span class="kw">plot</span>(lmfit,<span class="dt">which=</span><span class="dv">3</span>)
+<span class="kw">plot</span>(lmfit,<span class="dt">which=</span><span class="dv">4</span>)
+<span class="kw">plot</span>(lmfit,<span class="dt">which=</span><span class="dv">5</span>)
+<span class="kw">plot</span>(lmfit,<span class="dt">which=</span><span class="dv">6</span>)</code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:errorplot"></span>
+<img src="DS_R_files/figure-html/errorplot-1.png" alt="一般线性回归残差图" width="80%" />
+<p class="caption">
+Figure 8.2: 一般线性回归残差图
+</p>
+</div>
 </div>
 </div>
 <div id="section-8.2" class="section level2">
