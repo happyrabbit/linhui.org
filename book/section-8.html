@@ -8,7 +8,7 @@
   <title>数据科学家：R语言</title>
   <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
   <meta name="description" content="This is a minimal example of using the bookdown package to write a book. The output format for this example is bookdown::gitbook.">
-  <meta name="generator" content="bookdown 0.0.60 and GitBook 2.6.7">
+  <meta name="generator" content="bookdown 0.0.72 and GitBook 2.6.7">
 
   <meta property="og:title" content="数据科学家：R语言" />
   <meta property="og:type" content="book" />
@@ -17,16 +17,21 @@
   <meta property="og:description" content="This is a minimal example of using the bookdown package to write a book. The output format for this example is bookdown::gitbook." />
   
 
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="数据科学家：R语言" />
+  
+  <meta name="twitter:description" content="This is a minimal example of using the bookdown package to write a book. The output format for this example is bookdown::gitbook." />
+  
+
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-05-31">
+<meta name="date" content="2016-06-04">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   TeX: { equationNumbers: { autoNumber: "AMS" } }
 });
 </script>
-  <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -36,6 +41,7 @@ MathJax.Hub.Config({
 <link rel="prev" href="section-7.html">
 <link rel="next" href="section-9.html">
 
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
@@ -166,7 +172,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="8" data-path="section-8.html"><a href="section-8.html"><i class="fa fa-check"></i><b>8</b> 线性回归极其衍生</a><ul>
 <li class="chapter" data-level="8.1" data-path="section-8.html"><a href="section-8.html#section-8.1"><i class="fa fa-check"></i><b>8.1</b> 普通线性回归</a><ul>
 <li class="chapter" data-level="8.1.1" data-path="section-8.html"><a href="section-8.html#section-8.1.1"><i class="fa fa-check"></i><b>8.1.1</b> 最小二乘线性模型</a></li>
-<li class="chapter" data-level="8.1.2" data-path="section-8.html"><a href="section-8.html#section-8.1.2"><i class="fa fa-check"></i><b>8.1.2</b> 线性关系检测</a></li>
+<li class="chapter" data-level="8.1.2" data-path="section-8.html"><a href="section-8.html#section-8.1.2"><i class="fa fa-check"></i><b>8.1.2</b> 回归诊断</a></li>
 </ul></li>
 <li class="chapter" data-level="8.2" data-path="section-8.html"><a href="section-8.html#section-8.2"><i class="fa fa-check"></i><b>8.2</b> 收缩方法</a></li>
 <li class="chapter" data-level="8.3" data-path="section-8.html"><a href="section-8.html#section-8.3"><i class="fa fa-check"></i><b>8.3</b> 分层线性回归</a></li>
@@ -246,32 +252,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 得到总消费量=实体店消费+在线消费</span>
 modeldat$total_exp&lt;-dat$store_exp+dat$online_exp</code></pre></div>
 <p>我们先检查一下数据，看是不是有缺失值或者离群点：</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(modeldat)</code></pre></div>
-<pre><code>##        Q1              Q2              Q3              Q4       
-##  Min.   :1.000   Min.   :1.000   Min.   :1.000   Min.   :1.000  
-##  1st Qu.:2.000   1st Qu.:1.000   1st Qu.:1.000   1st Qu.:2.000  
-##  Median :3.000   Median :1.000   Median :1.000   Median :3.000  
-##  Mean   :3.102   Mean   :1.824   Mean   :1.993   Mean   :2.765  
-##  3rd Qu.:4.000   3rd Qu.:2.000   3rd Qu.:3.000   3rd Qu.:4.000  
-##  Max.   :5.000   Max.   :5.000   Max.   :5.000   Max.   :5.000  
-##        Q5              Q6              Q7              Q8       
-##  Min.   :1.000   Min.   :1.000   Min.   :1.000   Min.   :1.000  
-##  1st Qu.:1.500   1st Qu.:1.000   1st Qu.:2.000   1st Qu.:1.000  
-##  Median :4.000   Median :2.000   Median :4.000   Median :2.000  
-##  Mean   :2.944   Mean   :2.449   Mean   :3.432   Mean   :2.396  
-##  3rd Qu.:4.000   3rd Qu.:4.000   3rd Qu.:4.000   3rd Qu.:3.000  
-##  Max.   :5.000   Max.   :5.000   Max.   :5.000   Max.   :5.000  
-##        Q9             Q10          total_exp      
-##  Min.   :1.000   Min.   :1.000   Min.   :  351.9  
-##  1st Qu.:2.000   1st Qu.:1.000   1st Qu.:  958.9  
-##  Median :4.000   Median :2.000   Median : 2213.7  
-##  Mean   :3.084   Mean   :2.321   Mean   : 3479.1  
-##  3rd Qu.:4.000   3rd Qu.:3.000   3rd Qu.: 2708.4  
-##  Max.   :5.000   Max.   :5.000   Max.   :53172.3</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 这里没有展示输出结果</span>
+<span class="kw">summary</span>(modeldat)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))
 <span class="kw">hist</span>(modeldat$total_exp,<span class="dt">main=</span><span class="st">&quot;&quot;</span>,<span class="dt">xlab=</span><span class="st">&quot;total_exp&quot;</span>)
 <span class="kw">boxplot</span>(modeldat$total_exp)</code></pre></div>
-<p><img src="DS_R_files/figure-html/checkplot-1.png" title="" alt="" width="80%" style="display: block; margin: auto;" /></p>
+<p><img src="DS_R_files/figure-html/checkplot-1.png" width="80%" style="display: block; margin: auto;" /></p>
 <p>数据集<code>modeldat</code>中没有缺失值，但是明显有离群点，而且应变量<code>total_exp</code>分布明显偏离正态。我们删除离群点，然后对应变量进行对数变换。</p>
 <p>我们用之前数据预处理章节介绍的Z分值的方法查找并删除离群点。这里不重复解释，不明白的读者可以返回复习相应的章节。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">y&lt;-modeldat$total_exp
@@ -293,7 +279,7 @@ Figure 8.1: 自变量相关矩阵图
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(caret)
 highcor&lt;-<span class="kw">findCorrelation</span>(correlation,<span class="dt">cutoff=</span>.<span class="dv">75</span>)
 modeldat&lt;-modeldat[,-highcor]</code></pre></div>
-<p>现在我们可以拟合线性模型。标准的模型公式表达是在”<sub>”号的左边指定因变量，右边指定自变量。”.”表示数据集<code>modeldat</code>中除了因变量之外的所有变量都被当作自变量。这里我们没有考虑交互效应，如果要添加<code>Q1</code>和<code>Q2</code>的交互效应，只要在”</sub>”右边加上”Q1*Q2”即可。注意下面的代码中我们对原始变量进行了对数变换（<code>log(total_exp)</code>）。</p>
+<p>现在我们可以拟合线性模型。标准的模型公式表达是在“~”号的左边指定因变量，右边指定自变量。“.”表示数据集<code>modeldat</code>中除了因变量之外的所有变量都被当作自变量。这里我们没有考虑交互效应，如果要添加<code>Q1</code>和<code>Q2</code>的交互效应，只要在“~”右边加上“Q1*Q2”即可。注意下面的代码中我们对原始变量进行了对数变换（<code>log(total_exp)</code>）。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lmfit&lt;-<span class="kw">lm</span>(<span class="kw">log</span>(total_exp)~.,<span class="dt">data=</span>modeldat)
 <span class="kw">summary</span>(lmfit)</code></pre></div>
 <pre><code>## 
@@ -322,7 +308,7 @@ modeldat&lt;-modeldat[,-highcor]</code></pre></div>
 <ul>
 <li><strong>关于p值的讨论</strong></li>
 </ul>
-<p>谈到p值，不能不提美国统计协会在2016年2月发表的关于P值的声明 “Position on p-values: context, process, and purpose” <a href="http://amstat.tandfonline.com/doi/abs/10.1080/00031305.2016.1154108，统计之都有一篇对该声明的中文总结" class="uri">http://amstat.tandfonline.com/doi/abs/10.1080/00031305.2016.1154108，统计之都有一篇对该声明的中文总结</a> <a href="http://cos.name/2016/03/asa-statement-on-p-value/。关于p值弊端的讨论在统计学领域已经不是新鲜事。其中一些抨击言辞比较激烈的是" class="uri">http://cos.name/2016/03/asa-statement-on-p-value/。关于p值弊端的讨论在统计学领域已经不是新鲜事。其中一些抨击言辞比较激烈的是</a> Siegfried：</p>
+<p>谈到p值，不能不提美国统计协会在2016年2月发表的关于P值的声明 “Position on p-values: context, process, and purpose” <span class="citation">(Ronald L. Wassersteina <a href="#ref-ASA_P">2016</a>)</span> ，统计之都有一篇对该声明的中文总结<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>。关于p值弊端的讨论在统计学领域已经不是新鲜事。其中一些抨击言辞比较激烈的是 Siegfried：</p>
 <blockquote>
 <p>这是科学中最肮脏的秘密：使用统计假设检验的“科学方法”建立在一个脆弱的基础之上。——ScienceNews（Siegfried, 2010）</p>
 </blockquote>
@@ -353,22 +339,48 @@ modeldat&lt;-modeldat[,-highcor]</code></pre></div>
 <p>拟合线性模型是非常容易的，以致于很多分析师拟合了模型之后不考虑模型是否合理，直接撰写结果报告。其实我们可以很容易用R从不同方面检查模型的拟合情况和假设条件。下面的几个小节中我们将介绍一些常用的线性模型诊断方法。</p>
 </div>
 <div id="section-8.1.2" class="section level3">
-<h3><span class="header-section-number">8.1.2</span> 线性关系检测</h3>
-<p>使用线性模型自然假设自变量和因变量的关系是线性的，但到底是不是这样呢？核查这点通常用到残差图，即残差对拟合值散点图。</p>
-<p>我们要检查残差图的如下几个方面： 1. 残差是否在0附近分布 1. 残差分布是否随机，如果呈现出某种特定分布模式的话，说明当前模型关系的假设不充分 1. 残差是否存在异方差性，比如随着拟合值增大残差分布方差增加，这就说明残差分布有异方差性</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">2</span>))
+<h3><span class="header-section-number">8.1.2</span> 回归诊断</h3>
+<p>拟合线性模型是非常容易的，以致于很多分析师拟合了模型之后不考虑模型是否合理，直接撰写结果报告。其实我们可以很容易用R从不同方面检查模型的拟合情况和假设条件。下面的几个小节中我们将介绍一些常用的线性模型诊断方法。我们希望需要最小二乘估计（OLS）同时也是最优线性无偏估计（BLUE）。换句话说，我们希望得到的估计的期望即为真实值（无偏），且最小化残差方差（最优）。根据高斯-马尔可夫定理（Gauss-Markov theorem），OLS在下面条件满足时是BLUE:</p>
+<ol style="list-style-type: decimal">
+<li>自变量（<span class="math inline">\(\mathbf{x_{.j}}\)</span>）和随机误差（<span class="math inline">\(\mathbf{\epsilon}\)</span>）不相关，即：<span class="math inline">\(cov(\mathbf{x_{.j},\epsilon})=0\)</span> 对 <span class="math inline">\(\forall j=j\in1...p\)</span></li>
+<li>随机误差均值为0：<span class="math inline">\(E(\mathbf{\epsilon|X})=0\)</span></li>
+<li>随机误差方差一致且相互独立：<span class="math inline">\(Var(\mathbf{\epsilon})=\sigma^{2}I\)</span>，其中<span class="math inline">\(\sigma\)</span>是正实数，<span class="math inline">\(I\)</span>是<span class="math inline">\(n\times n\)</span>的单位矩阵</li>
+</ol>
+<p>下面介绍4种图形诊断。</p>
+<ol style="list-style-type: decimal">
+<li><p>残差图（Residuals vs Fitted）</p>
+残差图分析法是一种直观、方便的分析方法。它以残差<span class="math inline">\(\epsilon_{i}\)</span>为纵坐标，以样本拟合值为横坐标画散点图（也可以绘制横坐标为任意自变量的残差散点图）。正常情况下残差分布应该是随机的。我们要检查残差图的如下几个方面：
+<ul>
+<li>残差是否在0附近分布</li>
+<li>残差分布是否随机，如果呈现出某种特定分布模式（如：随横坐标的增大而增大或减小）的话，说明当前模型关系的假设不充分</li>
+<li>残差是否存在异方差性，比如随着拟合值增大残差分布方差增加，这就说明残差分布有异方差性。如前所述，当存在异方差时，参数估计值虽然是无偏的，但不是最小方差线性无偏估计。由于参数的显著性检验是基于残差分布假设的，所以在该假设不成立的情况下该检验也将失效。如果你用该回归方程来预测新样本，效果很可能极不理想。</li>
+</ul></li>
+<li><p>Q-Q图（Norm Q-Q）</p>
+<p>Q-Q图是一种正态分布检测。对于标准状态分布，Q-Q图上的点分布在Y=X直线上，点偏离直线越远说明样本偏离正态分布越远。</p></li>
+<li><p>标准化残差方根散点图（Scale-Location）</p>
+<p>和残差图类似，横坐标依旧是样本拟合值，纵坐标变为了标准化残差的绝对值开方。</p></li>
+<li><p>Cook距离图（Cook’s distance）</p>
+<p>该图用于判断观测值是否有异常点。一般认为 当D&lt;0.5时认为不是异常值点；当D&gt;0.5时认为是异常值点。</p></li>
+</ol>
+<p>对回归结果应用<code>plot()</code>函数可以得到不同的图形诊断。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))
 <span class="kw">plot</span>(lmfit,<span class="dt">which=</span><span class="dv">1</span>)
 <span class="kw">plot</span>(lmfit,<span class="dt">which=</span><span class="dv">2</span>)
 <span class="kw">plot</span>(lmfit,<span class="dt">which=</span><span class="dv">3</span>)
-<span class="kw">plot</span>(lmfit,<span class="dt">which=</span><span class="dv">4</span>)
-<span class="kw">plot</span>(lmfit,<span class="dt">which=</span><span class="dv">5</span>)
-<span class="kw">plot</span>(lmfit,<span class="dt">which=</span><span class="dv">6</span>)</code></pre></div>
+<span class="kw">plot</span>(lmfit,<span class="dt">which=</span><span class="dv">4</span>)</code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:errorplot"></span>
 <img src="DS_R_files/figure-html/errorplot-1.png" alt="一般线性回归残差图" width="80%" />
 <p class="caption">
 Figure 8.2: 一般线性回归残差图
 </p>
 </div>
+<p>从回归的四个图形结果（图<a href="section-8.html#fig:errorplot">8.2</a>）来看：</p>
+<ul>
+<li>残差图：数据点都基本均匀地分布在直线y=0的两侧, 无明显趋势，满足线性假设。</li>
+<li>标准Q-Q图：图上的点基本都在y=x直线附件，可认为残差近似服从正态分布；</li>
+<li>标准化残差方根散点图：若满足不变方差假设，则在该图中水平线周围的点应随机分布，最高点为残差最大值点。该图显示基本符合方差齐性的要求。</li>
+<li>库克距离图：最大的库克距离为0.05左右，可以认为没有异常值点。</li>
+</ul>
 </div>
 </div>
 <div id="section-8.2" class="section level2">
@@ -386,6 +398,18 @@ Figure 8.2: 一般线性回归残差图
 
 </div>
 </div>
+<h3> References</h3>
+<div id="refs" class="references">
+<div id="ref-ASA_P">
+<p>Ronald L. Wassersteina, Nicole A. Lazara. 2016. “Position on P-Values: Context, Process, and Purpose.”</p>
+</div>
+</div>
+<div class="footnotes">
+<hr />
+<ol start="1">
+<li id="fn1"><p><a href="http://cos.name/2016/03/asa-statement-on-p-value/" class="uri">http://cos.name/2016/03/asa-statement-on-p-value/</a><a href="section-8.html#fnref1">↩</a></p></li>
+</ol>
+</div>
             </section>
 
           </div>
@@ -394,7 +418,7 @@ Figure 8.2: 一般线性回归残差图
 <a href="section-7.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
 <a href="section-9.html" class="navigation navigation-next " aria-label="Next page""><i class="fa fa-angle-right"></i></a>
 
-<script src="libs/gitbook-2.6.7/js/app.js"></script>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
 <script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
@@ -430,7 +454,17 @@ gitbook.start({
 });
 </script>
 
-
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    if (location.protocol !== "file:" && /^https?:/.test(script.src))
+      script.src  = script.src.replace(/^https?:/, '');
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
 </body>
 
 </html>
