@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-06-04">
+<meta name="date" content="2016-06-05">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -164,15 +164,20 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="7" data-path="section-7.html"><a href="section-7.html"><i class="fa fa-check"></i><b>7</b> 特征工程</a><ul>
-<li class="chapter" data-level="7.1" data-path="section-7.html"><a href="section-7.html#section-7.1"><i class="fa fa-check"></i><b>7.1</b> 变量选择</a></li>
-<li class="chapter" data-level="7.2" data-path="section-7.html"><a href="section-7.html#section-7.2"><i class="fa fa-check"></i><b>7.2</b> 主成分分析</a></li>
-<li class="chapter" data-level="7.3" data-path="section-7.html"><a href="section-7.html#section-7.3"><i class="fa fa-check"></i><b>7.3</b> 因子分析</a></li>
-<li class="chapter" data-level="7.4" data-path="section-7.html"><a href="section-7.html#section-7.4"><i class="fa fa-check"></i><b>7.4</b> 高维标度化</a></li>
+<li class="chapter" data-level="7.1" data-path="section-7.html"><a href="section-7.html#section-7.1"><i class="fa fa-check"></i><b>7.1</b> 特征构建</a></li>
+<li class="chapter" data-level="7.2" data-path="section-7.html"><a href="section-7.html#section-7.2"><i class="fa fa-check"></i><b>7.2</b> 特征提取</a></li>
+<li class="chapter" data-level="7.3" data-path="section-7.html"><a href="section-7.html#-1"><i class="fa fa-check"></i><b>7.3</b> 特征提取</a><ul>
+<li class="chapter" data-level="7.3.1" data-path="section-7.html"><a href="section-7.html#section-7.3.1"><i class="fa fa-check"></i><b>7.3.1</b> 主成分分析</a></li>
+<li class="chapter" data-level="7.3.2" data-path="section-7.html"><a href="section-7.html#section-7.3.2"><i class="fa fa-check"></i><b>7.3.2</b> 因子分析</a></li>
+<li class="chapter" data-level="7.3.3" data-path="section-7.html"><a href="section-7.html#section-7.3.3"><i class="fa fa-check"></i><b>7.3.3</b> 高维标度化</a></li>
+</ul></li>
+<li class="chapter" data-level="7.4" data-path="section-7.html"><a href="section-7.html#section-7.4"><i class="fa fa-check"></i><b>7.4</b> 变量选择</a></li>
 </ul></li>
 <li class="chapter" data-level="8" data-path="section-8.html"><a href="section-8.html"><i class="fa fa-check"></i><b>8</b> 线性回归极其衍生</a><ul>
 <li class="chapter" data-level="8.1" data-path="section-8.html"><a href="section-8.html#section-8.1"><i class="fa fa-check"></i><b>8.1</b> 普通线性回归</a><ul>
 <li class="chapter" data-level="8.1.1" data-path="section-8.html"><a href="section-8.html#section-8.1.1"><i class="fa fa-check"></i><b>8.1.1</b> 最小二乘线性模型</a></li>
 <li class="chapter" data-level="8.1.2" data-path="section-8.html"><a href="section-8.html#section-8.1.2"><i class="fa fa-check"></i><b>8.1.2</b> 回归诊断</a></li>
+<li class="chapter" data-level="8.1.3" data-path="section-8.html"><a href="section-8.html#section-8.1.3"><i class="fa fa-check"></i><b>8.1.3</b> 离群点，高杠杆点和强影响点</a></li>
 </ul></li>
 <li class="chapter" data-level="8.2" data-path="section-8.html"><a href="section-8.html#section-8.2"><i class="fa fa-check"></i><b>8.2</b> 收缩方法</a></li>
 <li class="chapter" data-level="8.3" data-path="section-8.html"><a href="section-8.html#section-8.3"><i class="fa fa-check"></i><b>8.3</b> 分层线性回归</a></li>
@@ -379,8 +384,65 @@ Figure 8.2: 一般线性回归残差图
 <li>残差图：数据点都基本均匀地分布在直线y=0的两侧, 无明显趋势，满足线性假设。</li>
 <li>标准Q-Q图：图上的点基本都在y=x直线附件，可认为残差近似服从正态分布；</li>
 <li>标准化残差方根散点图：若满足不变方差假设，则在该图中水平线周围的点应随机分布，最高点为残差最大值点。该图显示基本符合方差齐性的要求。</li>
-<li>库克距离图：最大的库克距离为0.05左右，可以认为没有异常值点。</li>
+<li>Cook距离图：最大的Cook距离为0.05左右，可以认为没有异常值点。</li>
 </ul>
+</div>
+<div id="section-8.1.3" class="section level3">
+<h3><span class="header-section-number">8.1.3</span> 离群点，高杠杆点和强影响点</h3>
+<p>关于一般线性回归，最好检查下是否有观测会强烈影响线性模型拟合结果。如果一个或者几个观测对模型结果有决定性的影响，那么用这些观测得到的模型是具有误导性的。这里我们介绍这三类观测点的检测：离群点，高杠杆点和强影响点。刚才介绍的Cook距离图，以及之前讲到的Z分值都可以用来检测线性模型中的异常点。注意，Z分值仅仅是针对应变量观测而言，和使用的模型无关，即其并未考虑模型的拟合情况。下面我们用<code>car</code>包<span class="citation">(John Fox and Weisberg <a href="#ref-car">2011</a>)</span>中的<code>outlierTest()</code>函数对拟合模型对象检测是否存在离群点，和Z分值方法鉴别的离群点不同，这里的离群点指的是那些模型预测效果不佳的观测点，通常有很大的、或正或负的残差，正残差说明模型低估了响应值，负残差说明高佑了响应值。这里使用的是Bonferroni离群点检验，该检验也可作用于广义线性模型。对于一般线性模型使用的是t检验，对于广义线性模型使用的是正态检验。关于该检验相关知识见 <span class="citation">(Williams <a href="#ref-Williams1987">1987</a>; J. Fox <a href="#ref-fox2008">2008</a>; Cook and Weisberg <a href="#ref-cookd">1982</a>; S. Weisberg <a href="#ref-weisberg14">2014</a>)</span>。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(car)
+<span class="kw">outlierTest</span>(lmfit) <span class="co">#Bonferroni离群点检验</span></code></pre></div>
+<pre><code>##      rstudent unadjusted p-value Bonferonni p
+## 960 -5.295504          1.533e-07   0.00012432</code></pre>
+<p><code>outlierTest()</code>函数是根据单个最大（或正或负）残差值的显著性来判断是否有离群点，若不显著，则说明数据集中没有离群点，若显著，则建议删除该离群点，然后再检验是否还有其他离群点存在。这里我们删除第960个被认为是离群点的观测。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">outlierTest</span>(lmfit)</code></pre></div>
+<pre><code>##      rstudent unadjusted p-value Bonferonni p
+## 960 -5.295504          1.533e-07   0.00012432</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 这里数据modeldat的行名是原数据集的行号，所以是字符类型</span>
+<span class="co"># 找到相应的观测</span>
+idex&lt;-<span class="kw">which</span>(<span class="kw">row.names</span>(modeldat)==<span class="st">&quot;960&quot;</span>)
+<span class="co"># 删除离群观测</span>
+modeldat=modeldat[-idex,]</code></pre></div>
+<p>接下来我们再拟合一次模型然后检测看看是否还有离群点：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lmfit&lt;-<span class="kw">lm</span>(<span class="kw">log</span>(total_exp)~.,<span class="dt">data=</span>modeldat)
+<span class="kw">outlierTest</span>(lmfit)</code></pre></div>
+<pre><code>## 
+## No Studentized residuals with Bonferonni p &lt; 0.05
+## Largest |rstudent|:
+##      rstudent unadjusted p-value Bonferonni p
+## 155 -3.818112         0.00014483      0.11731</code></pre>
+<p>可以看到现在没有检测出显著离群点。</p>
+<p>高杠杆值点是与其他预测变量有关的离群点，即它们是由许多异常的预测变量组合起来的，与响应变量值没有关系。 高杠杆值的观测点可通过帽子矩阵的值（hat statistic）判断。对于一个给定的数据集，帽子均值为p/n，其中p是模型估计的参数数目（包含截距项），n是样本量。一般来说，若观测点的帽子值大于帽子均值的2或3倍，则可认定为高杠杆值点。</p>
+<!--
+
+
+
+
+ hat.plot<-function(fit){  
+  p<-length(coefficients(fit))  
+  n<-length(fitted(fit))  
+  plot(hatvalues(fit),main="Index Plot of Hat Values")  
+  abline(h=c(2,3)*p/n,col="red",lty=2)  
+  identify(1:n,hatvalues(fit),names(hatvalues(fit)))  
+}  
+hat.plot(model) 
+
+此图中可以看到1号点是高杠杆值点。
+
+强影响点
+
+强影响点，即对模型参数估计值影响有些比例失衡的点。例如，当移除 模型的一个观测点时模型会发生巨大的改变，那么需要检测一下数据中是否存在强影响点。Cook距离，或称为D统计量。Cook’s D值大于4/(n-k-1)，则表明它是强影响点，其中n为样本量大小，k是预测变量数目（有助于鉴别强影响点，但并不提供关于这些点如何影响模型的信息）。
+对回归的影响点。根据Cook距离，13号点可能是个强影响点。
+
+帽子统计量、DFFITS准测、Cook统计量和COVRATIO准则在R软件可分别通过hatvalues(),dffits(),cooks.distance()和covration()函数计算。influence.measures()可对一次获得这四个统计量的结果。 影响分析综合分析
+
+influencePlot(model) 
+#car包中的influencePlot（）函数，可将离群点、
+#杠杆点和强影响点的信息整合到一幅图形中
+influence.measures(model)
+
+纵坐标超过2或小于-2的州可被认为是离群点，水平轴超过0.2或0.3的州有高杠杆值（通常为预测值的组合）。圆圈大小与影响成比例，圆圈很大的点可能是对模型估计造成的不成比例影响的强影响点。influence.measures()的inf用×标注异常值。
+-->
 </div>
 </div>
 <div id="section-8.2" class="section level2">
@@ -402,6 +464,21 @@ Figure 8.2: 一般线性回归残差图
 <div id="refs" class="references">
 <div id="ref-ASA_P">
 <p>Ronald L. Wassersteina, Nicole A. Lazara. 2016. “Position on P-Values: Context, Process, and Purpose.”</p>
+</div>
+<div id="ref-car">
+<p>Fox, John, and Sanford Weisberg. 2011. “An R Companion to Applied Regression.” <em>Sage</em>.</p>
+</div>
+<div id="ref-Williams1987">
+<p>Williams, D. A. 1987. “Generalized Linear Model Diagnostics Using the Deviance and Single Case Deletions.” <em>Applied Statistics</em> 36: 181–191.</p>
+</div>
+<div id="ref-fox2008">
+<p>Fox, J. 2008. “Applied Regression Analysis and Generalized Linear Models.” <em>Sage</em>.</p>
+</div>
+<div id="ref-cookd">
+<p>Cook, R. D., and S Weisberg. 1982. <em>Residuals and Influence in Regression</em>. Chapman; Hall.</p>
+</div>
+<div id="ref-weisberg14">
+<p>Weisberg, S. 2014. <em>Applied Linear Regression</em>. <em>Applied Linear Regression</em>. Fourth Edition. Wiley.</p>
 </div>
 </div>
 <div class="footnotes">
