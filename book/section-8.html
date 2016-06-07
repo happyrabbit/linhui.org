@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-06-05">
+<meta name="date" content="2016-06-06">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -388,7 +388,11 @@ Figure 8.2: 一般线性回归残差图
 </div>
 <div id="section-8.1.3" class="section level3">
 <h3><span class="header-section-number">8.1.3</span> 离群点，高杠杆点和强影响点</h3>
-<p>关于一般线性回归，最好检查下是否有观测会强烈影响线性模型拟合结果。如果一个或者几个观测对模型结果有决定性的影响，那么用这些观测得到的模型是具有误导性的。这里我们介绍这三类观测点的检测：离群点，高杠杆点和强影响点。刚才介绍的Cook距离图，以及之前讲到的Z分值都可以用来检测线性模型中的异常点。注意，Z分值仅仅是针对应变量观测而言，和使用的模型无关，即其并未考虑模型的拟合情况。下面我们用<code>car</code>包<span class="citation">(John Fox and Weisberg <a href="#ref-car">2011</a>)</span>中的<code>outlierTest()</code>函数对拟合模型对象检测是否存在离群点，和Z分值方法鉴别的离群点不同，这里的离群点指的是那些模型预测效果不佳的观测点，通常有很大的、或正或负的残差，正残差说明模型低估了响应值，负残差说明高佑了响应值。这里使用的是Bonferroni离群点检验，该检验也可作用于广义线性模型。对于一般线性模型使用的是t检验，对于广义线性模型使用的是正态检验。关于该检验相关知识见 <span class="citation">(Williams <a href="#ref-Williams1987">1987</a>; J. Fox <a href="#ref-fox2008">2008</a>; Cook and Weisberg <a href="#ref-cookd">1982</a>; S. Weisberg <a href="#ref-weisberg14">2014</a>)</span>。</p>
+<p>关于一般线性回归，最好检查下是否有观测会强烈影响线性模型拟合结果。如果一个或者几个观测对模型结果有决定性的影响，那么用这些观测得到的模型是具有误导性的。这里我们介绍这三类观测点的检测：离群点，高杠杆点和强影响点。</p>
+<ul>
+<li>离群点</li>
+</ul>
+<p>刚才介绍的Cook距离图，以及之前讲到的Z分值都可以用来检测线性模型中的离群点。注意，Z分值仅仅是针对应变量观测而言，和使用的模型无关，即其并未考虑模型的拟合情况。下面我们用<code>car</code>包<span class="citation">(John Fox and Weisberg <a href="#ref-car">2011</a>)</span>中的<code>outlierTest()</code>函数对拟合模型对象检测是否存在离群点，和Z分值方法鉴别的离群点不同，这里的离群点指的是<strong>那些模型预测效果不佳的观测点</strong>，通常有很大的、或正或负的残差，正残差说明模型低估了响应值，负残差说明高佑了响应值。这里使用的是Bonferroni离群点检验，该检验也可作用于广义线性模型。对于一般线性模型使用的是t检验，对于广义线性模型使用的是正态检验。关于该检验相关知识见 <span class="citation">(Williams <a href="#ref-Williams1987">1987</a>; J. Fox <a href="#ref-fox2008">2008</a>; Cook and Weisberg <a href="#ref-cookd">1982</a>; S. Weisberg <a href="#ref-weisberg14">2014</a>)</span>。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(car)
 <span class="kw">outlierTest</span>(lmfit) <span class="co">#Bonferroni离群点检验</span></code></pre></div>
 <pre><code>##      rstudent unadjusted p-value Bonferonni p
@@ -411,13 +415,12 @@ modeldat=modeldat[-idex,]</code></pre></div>
 ##      rstudent unadjusted p-value Bonferonni p
 ## 155 -3.818112         0.00014483      0.11731</code></pre>
 <p>可以看到现在没有检测出显著离群点。</p>
-<p>高杠杆值点是与其他预测变量有关的离群点，即它们是由许多异常的预测变量组合起来的，与响应变量值没有关系。 高杠杆值的观测点可通过帽子矩阵的值（hat statistic）判断。对于一个给定的数据集，帽子均值为p/n，其中p是模型估计的参数数目（包含截距项），n是样本量。一般来说，若观测点的帽子值大于帽子均值的2或3倍，则可认定为高杠杆值点。</p>
+<ul>
+<li></li>
+</ul>
+<p>高杠杆值点是与其他预测变量有关的离群点，即它们是由许多异常的预测变量组合起来的，与响应变量值没有关系。 高杠杆值的观测点可通过帽子矩阵的值（hat statistic）判断。对于一个给定的数据集，帽子均值为<span class="math inline">\(p/n\)</span>，其中p是模型估计的参数数目（包含截距项），n是样本量。一般来说，若观测点的帽子值大于帽子均值的2或3倍，则可认定为高杠杆值点。</p>
 <!--
-
-
-
-
- hat.plot<-function(fit){  
+hat.plot<-function(fit){  
   p<-length(coefficients(fit))  
   n<-length(fitted(fit))  
   plot(hatvalues(fit),main="Index Plot of Hat Values")  
