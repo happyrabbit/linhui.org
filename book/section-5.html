@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-06-07">
+<meta name="date" content="2016-06-08">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -1036,6 +1036,63 @@ dplyr::<span class="kw">slice</span>(sim.dat, <span class="dv">10</span>:<span c
 <p><code>top_n()</code>可以选取某变量取值最高的若干观测。如果有指定组的话，可以对每组选择相应变量取值最高的观测。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 选取收入最高的两个观测</span>
 dplyr::<span class="kw">top_n</span>(sim.dat,<span class="dv">2</span>,income)</code></pre></div>
+<p>对列变量的选择使用的是<code>select()</code>函数。下面我展示一些代码，并在相应的注释中指出该代码的功能。大家自己运行下看看结果。更多信息，键入<code>?select</code>查阅该函数的帮助文档。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 通过列名选取变量</span>
+<span class="co"># 选取 sim.dat数据框中的income，age和store_exp列</span>
+dplyr::<span class="kw">select</span>(sim.dat,income,age,store_exp)
+<span class="co"># 选取列名中含有某字符串（_）的列</span>
+<span class="co"># 该命令将选取store_exp，online_exp，store_trans和online_trans</span>
+dplyr::<span class="kw">select</span>(sim.dat, <span class="kw">contains</span>(<span class="st">&quot;_&quot;</span>))
+<span class="co"># 选取以某字符串（e）结尾的列</span>
+<span class="co"># 结果选取了age，income和house</span>
+<span class="co"># 类似的starts_with指以某字符串开始的列</span>
+dplyr::<span class="kw">select</span>(sim.dat, <span class="kw">ends_with</span>(<span class="st">&quot;e&quot;</span>))
+<span class="co"># 选取列Q1，Q2，Q3，Q4和Q5</span>
+<span class="kw">select</span>(sim.dat, <span class="kw">num_range</span>(<span class="st">&quot;Q&quot;</span>, <span class="dv">1</span>:<span class="dv">5</span>)) 
+<span class="co"># 选取列名在某字符串中的列</span>
+dplyr::<span class="kw">select</span>(sim.dat, <span class="kw">one_of</span>(<span class="kw">c</span>(<span class="st">&quot;age&quot;</span>, <span class="st">&quot;income&quot;</span>)))
+<span class="co"># 选取两个列名之间的列，包含头尾两列</span>
+dplyr::<span class="kw">select</span>(sim.dat, age:online_exp)
+<span class="co"># 选出出了某列（age）以外的其它列</span>
+dplyr::<span class="kw">select</span>(sim.dat, -age)</code></pre></div>
+</div>
+<div id="section-5.10.3.3" class="section level4">
+<h4><span class="header-section-number">5.10.3.3</span> 数据总结</h4>
+<p>这里的操作类似于<code>apply()</code>和<code>ddply()</code>， 可以对数据框的每一列进行某个函数操作；或者按照某个分类变量将观测分组，然后对每组观测按列进行函数操作。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 对列online_trans取均值，返回的是一个单一值</span>
+dplyr::<span class="kw">summarise</span>(sim.dat, <span class="dt">avg_online =</span> <span class="kw">mean</span>(online_trans)) </code></pre></div>
+<pre><code>##   avg_online
+## 1     13.546</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 对数据框中的每一列应用函数anyNA()</span>
+<span class="co"># 这里可以指定一个函数向量，如c(&quot;anyNA&quot;,&quot;is.factor&quot;)</span>
+dplyr::<span class="kw">summarise_each</span>(sim.dat, <span class="kw">funs_</span>(<span class="kw">c</span>(<span class="st">&quot;anyNA&quot;</span>)))</code></pre></div>
+<pre><code>##     age gender income house store_exp online_exp store_trans online_trans
+## 1 FALSE  FALSE   TRUE FALSE     FALSE      FALSE       FALSE        FALSE
+##      Q1    Q2    Q3    Q4    Q5    Q6    Q7    Q8    Q9   Q10 segment
+## 1 FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE   FALSE</code></pre>
+<p>若要根据某分类变量对观测进行分组总结，可以使用<code>group_by()</code>函数。比如：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 对每个消费者类别对应变量应用anyNA()函数</span>
+sim.dat %&gt;%<span class="st"> </span><span class="kw">group_by</span>(segment) %&gt;%<span class="st"> </span><span class="kw">summarise_each</span>(<span class="kw">funs_</span>(<span class="kw">c</span>(<span class="st">&quot;anyNA&quot;</span>)))</code></pre></div>
+<pre><code>## Source: local data frame [4 x 19]
+## 
+##       segment   age gender income house store_exp online_exp store_trans
+##        (fctr) (lgl)  (lgl)  (lgl) (lgl)     (lgl)      (lgl)       (lgl)
+## 1 Conspicuous FALSE  FALSE   TRUE FALSE     FALSE      FALSE       FALSE
+## 2       Price FALSE  FALSE   TRUE FALSE     FALSE      FALSE       FALSE
+## 3     Quality FALSE  FALSE   TRUE FALSE     FALSE      FALSE       FALSE
+## 4       Style FALSE  FALSE   TRUE FALSE     FALSE      FALSE       FALSE
+## Variables not shown: online_trans (lgl), Q1 (lgl), Q2 (lgl), Q3 (lgl), Q4
+##   (lgl), Q5 (lgl), Q6 (lgl), Q7 (lgl), Q8 (lgl), Q9 (lgl), Q10 (lgl)</code></pre>
+<p>你在数据总结操作中赋予各种总结函数，如<code>mean()</code>，<code>sd()</code>等。但注意这里的总结函数是作用于向量，返回单一值。比如函数<code>is.na()</code>，作用于向量，但返回的也是向量，就不可以在此使用。</p>
+</div>
+<div id="section-5.10.3.4" class="section level4">
+<h4><span class="header-section-number">5.10.3.4</span> 生成新变量</h4>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dplyr::<span class="kw">mutate</span>(iris, <span class="dt">sepal =</span> Sepal.Length +<span class="st"> </span>Sepal. Width) Compute and append one or more new columns.
+dplyr::<span class="kw">mutate_each</span>(iris, <span class="kw">funs</span>(min_rank)) Apply window function to each column.
+dplyr::<span class="kw">transmute</span>(iris, <span class="dt">sepal =</span> Sepal.Length +<span class="st"> </span>Sepal. Width) Compute one or more new columns. Drop original columns.</code></pre></div>
+</div>
+<div id="section-5.10.3.5" class="section level4">
+<h4><span class="header-section-number">5.10.3.5</span> 合并数据集</h4>
 </div>
 </div>
 <div id="section-5.10.4" class="section level3">
