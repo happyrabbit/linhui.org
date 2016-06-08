@@ -976,7 +976,27 @@ dplyr::<span class="kw">glimpse</span>(sim.dat)</code></pre></div>
 <h4><span class="header-section-number">5.10.3.2</span> 数据截选（按行／列）</h4>
 <p>先介绍按行截选。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 提取出满足条件的行：收入大于30万的样本</span>
-dplyr::<span class="kw">filter</span>(sim.dat, income &gt;<span class="dv">300000</span>) %&gt;%
+<span class="kw">library</span>(magrittr)
+<span class="kw">library</span>(dplyr)</code></pre></div>
+<pre><code>## 
+## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:plyr&#39;:
+## 
+##     arrange, count, desc, failwith, id, mutate, rename, summarise,
+##     summarize</code></pre>
+<pre><code>## The following object is masked from &#39;package:imputeMissings&#39;:
+## 
+##     compute</code></pre>
+<pre><code>## The following object is masked from &#39;package:gridExtra&#39;:
+## 
+##     combine</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dplyr::<span class="kw">filter</span>(sim.dat, income &gt;<span class="dv">300000</span>) %&gt;%
 dplyr::<span class="kw">tbl_df</span>()</code></pre></div>
 <pre><code>## Source: local data frame [4 x 19]
 ## 
@@ -1087,12 +1107,70 @@ sim.dat %&gt;%<span class="st"> </span><span class="kw">group_by</span>(segment)
 </div>
 <div id="section-5.10.3.4" class="section level4">
 <h4><span class="header-section-number">5.10.3.4</span> 生成新变量</h4>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dplyr::<span class="kw">mutate</span>(iris, <span class="dt">sepal =</span> Sepal.Length +<span class="st"> </span>Sepal. Width) Compute and append one or more new columns.
-dplyr::<span class="kw">mutate_each</span>(iris, <span class="kw">funs</span>(min_rank)) Apply window function to each column.
-dplyr::<span class="kw">transmute</span>(iris, <span class="dt">sepal =</span> Sepal.Length +<span class="st"> </span>Sepal. Width) Compute one or more new columns. Drop original columns.</code></pre></div>
+<p><code>dplyr</code>包中的<code>mutate()</code>函数可以进行列计算，然后将结果添加到原数据集上。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dplyr::<span class="kw">mutate</span>(sim.dat, <span class="dt">total_exp =</span> store_exp +<span class="st"> </span>online_exp)</code></pre></div>
+<p>对每列应用窗口函数，它们作用于一个向量然后返回一个向量。回顾刚才介绍<code>dplyr</code>的总结功能时讲到总结函数作用于一个向量返回一个数值。注意理解这两者的不同。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 这里的min_rank等价于rank(ties.method = &quot;min&quot;)</span>
+<span class="co"># mutate_each()对每列应用指定的窗口函数</span>
+dplyr::<span class="kw">mutate_each</span>(sim.dat, <span class="kw">funs</span>(min_rank)) </code></pre></div>
+<p><code>transmute()</code>函数和<code>mutate()</code>类似，区别在于它只返回新生成的列，删除原始列。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dplyr::<span class="kw">transmute</span>(sim.dat, <span class="dt">total_exp =</span> store_exp +<span class="st"> </span>online_exp) </code></pre></div>
+<p>这里没有显示代码的结果，大家需要自己操作看看结果，这样对理解学习这些函数很有帮助。关于R中的窗口函数，大家可以自己查找相关资料。熟悉这些常见的函数及其功能，可以提高用R做数据变换的效率（不用总查帮助）。这个过程没有什么技巧可言，纯粹是熟能生巧。</p>
 </div>
 <div id="section-5.10.3.5" class="section level4">
 <h4><span class="header-section-number">5.10.3.5</span> 合并数据集</h4>
+<p>这里先随机抽取两个小数据集来展示数据集合并。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x&lt;-<span class="kw">data.frame</span>(<span class="kw">cbind</span>(<span class="dt">ID=</span><span class="kw">c</span>(<span class="st">&quot;A&quot;</span>,<span class="st">&quot;B&quot;</span>,<span class="st">&quot;C&quot;</span>),<span class="dt">x1=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>)))
+y&lt;-<span class="kw">data.frame</span>(<span class="kw">cbind</span>(<span class="dt">ID=</span><span class="kw">c</span>(<span class="st">&quot;B&quot;</span>,<span class="st">&quot;C&quot;</span>,<span class="st">&quot;D&quot;</span>),<span class="dt">y1=</span><span class="kw">c</span>(T,T,F)))
+x</code></pre></div>
+<pre><code>##   ID x1
+## 1  A  1
+## 2  B  2
+## 3  C  3</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">y</code></pre></div>
+<pre><code>##   ID    y1
+## 1  B  TRUE
+## 2  C  TRUE
+## 3  D FALSE</code></pre>
+<p>这里数据框<code>x</code>和<code>y</code>都非常简单，由一个<code>ID</code>变量和各自的观测变量组成。下面我们来介绍各种合并操作。</p>
+<ul>
+<li><code>left_join()</code>从<code>y</code>到<code>x</code>合并数据。结果保留了数据框<code>x</code>的3行。类似大家可以自行尝试<code>right_join()</code>。</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">left_join</span>(x,y,<span class="dt">by=</span><span class="st">&quot;ID&quot;</span>)</code></pre></div>
+<pre><code>##   ID x1   y1
+## 1  A  1 &lt;NA&gt;
+## 2  B  2 TRUE
+## 3  C  3 TRUE</code></pre>
+<ul>
+<li><code>inner_join()</code>返回的是<code>y</code>和<code>x</code>中都可以匹配的观测。</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">inner_join</span>(x,y,<span class="dt">by=</span><span class="st">&quot;ID&quot;</span>)</code></pre></div>
+<pre><code>##   ID x1   y1
+## 1  B  2 TRUE
+## 2  C  3 TRUE</code></pre>
+<ul>
+<li><code>full_join()</code>返回的是<code>y</code>或者<code>x</code>中含有的观测。</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">full_join</span>(x,y,<span class="dt">by=</span><span class="st">&quot;ID&quot;</span>)</code></pre></div>
+<pre><code>##   ID   x1    y1
+## 1  A    1  &lt;NA&gt;
+## 2  B    2  TRUE
+## 3  C    3  TRUE
+## 4  D &lt;NA&gt; FALSE</code></pre>
+<ul>
+<li><code>semi_join()</code>对<code>x</code>中的观测进行筛选，找到那些同时在<code>y</code>中<strong>可以匹配</strong>的观测，但并没有将<code>y</code>的变量<code>y1</code>合并进来。</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">semi_join</span>(x,y,<span class="dt">by=</span><span class="st">&quot;ID&quot;</span>)</code></pre></div>
+<pre><code>##   ID x1
+## 1  B  2
+## 2  C  3</code></pre>
+<ul>
+<li><code>anti_join()</code>同样对<code>x</code>中的观测进行筛选，找到那些在<code>y</code>中<strong>无法匹配</strong>的观测。</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">anti_join</span>(x,y,<span class="dt">by=</span><span class="st">&quot;ID&quot;</span>)</code></pre></div>
+<pre><code>##   ID x1
+## 1  A  1</code></pre>
+<p>此外，<code>dplyr</code>包中还有各种针对数据框的交（<code>intersect()</code>）、并（<code>union()</code>）和补（<code>setdiff()</code>）运算，以及将一个数据框按照行或者列添加到另一个数据框上的操作（<code>bind_rows()</code>，<code>bind_cols()</code>）。这里就不一一介绍，大家自己用一个简单的数据框尝试下。</p>
 </div>
 </div>
 <div id="section-5.10.4" class="section level3">
