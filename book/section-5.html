@@ -975,7 +975,7 @@ dplyr::<span class="kw">glimpse</span>(sim.dat)</code></pre></div>
 <div id="section-5.10.3.2" class="section level4">
 <h4><span class="header-section-number">5.10.3.2</span> 数据截选（按行／列）</h4>
 <p>先介绍按行截选。</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 提取出满足条件的行</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 提取出满足条件的行：收入大于30万的样本</span>
 dplyr::<span class="kw">filter</span>(sim.dat, income &gt;<span class="dv">300000</span>) %&gt;%
 dplyr::<span class="kw">tbl_df</span>()</code></pre></div>
 <pre><code>## Source: local data frame [4 x 19]
@@ -989,23 +989,53 @@ dplyr::<span class="kw">tbl_df</span>()</code></pre></div>
 ## Variables not shown: online_trans (int), Q1 (int), Q2 (int), Q3 (int), Q4
 ##   (int), Q5 (int), Q6 (int), Q7 (int), Q8 (int), Q9 (int), Q10 (int),
 ##   segment (fctr)</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dplyr::<span class="kw">distinct</span>(iris) Remove duplicate rows.
-dplyr::<span class="kw">sample_frac</span>(iris, <span class="fl">0.5</span>, <span class="dt">replace =</span> <span class="ot">TRUE</span>) Randomly select fraction of rows.
-dplyr::<span class="kw">sample_n</span>(iris, <span class="dv">10</span>, <span class="dt">replace =</span> <span class="ot">TRUE</span>) Randomly select n rows.
-dplyr::<span class="kw">slice</span>(iris, <span class="dv">10</span>:<span class="dv">15</span>) Select rows by position.
-dplyr::<span class="kw">top_n</span>(storms, <span class="dv">2</span>, date)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sim.dat %&gt;%
-<span class="st">  </span><span class="kw">group_by</span>(segment) %&gt;%
-<span class="st">  </span><span class="kw">summarise</span>(<span class="dt">avg_online =</span> <span class="kw">mean</span>(online_trans)) %&gt;%
-<span class="st">  </span>dplyr::<span class="kw">arrange</span>(avg_online)</code></pre></div>
-<pre><code>## Source: local data frame [4 x 2]
-## 
-##       segment avg_online
-##        (fctr)      (dbl)
-## 1       Price    2.96400
-## 2 Conspicuous   11.07500
-## 3     Quality   15.97000
-## 4       Style   21.13143</code></pre>
+<p>这里用到了一个可能大家之间没有见过的操作符号<code>%&gt;%</code>，这是管道操作，其意思是将<code>%&gt;%</code>左边的对象传递给右边的函数，作为第一个选项的设置（或剩下唯一一个选项的设置）。比如：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x %&gt;%<span class="st"> </span><span class="kw">f</span>(y) 等同于 <span class="kw">f</span>(x, y)
+y %&gt;%<span class="st"> </span><span class="kw">f</span>(x, ., z) 等同于 <span class="kw">f</span>(x, y, z )</code></pre></div>
+<p>管道操作来自于<code>magrittr</code>包，它能够极大简化代码，增加代码可读性。尤其对于<code>dplyr</code>包中的函数操作。大家看下面这段代码，能够知道都干了什么么？</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ave_exp &lt;-<span class="st"> </span><span class="kw">filter</span>( 
+  <span class="kw">summarise</span>(
+    <span class="kw">group_by</span>( 
+      <span class="kw">filter</span>(
+        sim.dat, 
+        !<span class="kw">is.na</span>(income)
+      ), 
+      segment
+    ), 
+    <span class="dt">ave_online_exp =</span> <span class="kw">mean</span>(online_exp), 
+    <span class="dt">n =</span> <span class="kw">n</span>()
+  ), 
+  n &gt;<span class="st"> </span><span class="dv">200</span>
+) </code></pre></div>
+<p>再看看用管道操作符进行相同操作的代码：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">avg_exp &lt;-<span class="st"> </span>sim.dat %&gt;%<span class="st"> </span>
+<span class="st"> </span><span class="kw">filter</span>(!<span class="kw">is.na</span>(income)) %&gt;%<span class="st"> </span>
+<span class="st"> </span><span class="kw">group_by</span>(segment) %&gt;%<span class="st"> </span>
+<span class="st"> </span><span class="kw">summarise</span>( 
+   <span class="dt">ave_online_exp =</span> <span class="kw">mean</span>(online_exp), 
+   <span class="dt">n =</span> <span class="kw">n</span>() ) %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">filter</span>(n &gt;<span class="st"> </span><span class="dv">200</span>)</code></pre></div>
+<p>用<code>%&gt;%</code>的代码是不是简洁清晰的多？我们从上掉下依次读下代码都干了什么：</p>
+<ol style="list-style-type: decimal">
+<li>选出数据框<code>sim.dat</code>中收入未缺失的观测</li>
+<li>按照<code>segment</code>变量对观测分组</li>
+<li>对每组数据求在线消费额的平均值，并赋予新的变量<code>ave_online_exp</code></li>
+<li>对每组计算观测个数，赋值为<code>n</code></li>
+<li>选出结果中观测个数大于200的行</li>
+</ol>
+<p>上面代码中用到的一些没有讲到的函数马上就会介绍。 <code>distinct()</code>函数可以删除数据框中重复的行。可以说是<code>unique()</code>函数在数据框上的扩展。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## 删除重复的行
+## 这里没有重复的行
+dplyr::<span class="kw">distinct</span>(sim.dat)</code></pre></div>
+<p><code>sample_frac()</code>函数可以随机选取一定比例的行。<code>sample_n()</code>函数可以随机选取一定数目的行。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dplyr::<span class="kw">sample_frac</span>(sim.dat, <span class="fl">0.5</span>, <span class="dt">replace =</span> <span class="ot">TRUE</span>) 
+dplyr::<span class="kw">sample_n</span>(sim.dat, <span class="dv">10</span>, <span class="dt">replace =</span> <span class="ot">TRUE</span>) </code></pre></div>
+<p><code>slice()</code>可以选取指定位置的行。和<code>sim.dat[10:15,]</code>类似。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 选取sim.dat的10到15行</span>
+dplyr::<span class="kw">slice</span>(sim.dat, <span class="dv">10</span>:<span class="dv">15</span>) </code></pre></div>
+<p><code>top_n()</code>可以选取某变量取值最高的若干观测。如果有指定组的话，可以对每组选择相应变量取值最高的观测。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 选取收入最高的两个观测</span>
+dplyr::<span class="kw">top_n</span>(sim.dat,<span class="dv">2</span>,income)</code></pre></div>
 </div>
 </div>
 <div id="section-5.10.4" class="section level3">
