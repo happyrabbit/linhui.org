@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-06-06">
+<meta name="date" content="2016-06-07">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -144,9 +144,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="5.8" data-path="section-5.html"><a href="section-5.html#section-5.8"><i class="fa fa-check"></i><b>5.8</b> 稀疏变量</a></li>
 <li class="chapter" data-level="5.9" data-path="section-5.html"><a href="section-5.html#section-5.9"><i class="fa fa-check"></i><b>5.9</b> 编码名义变量</a></li>
 <li class="chapter" data-level="5.10" data-path="section-5.html"><a href="section-5.html#section-5.10"><i class="fa fa-check"></i><b>5.10</b> 数据整合和整形</a><ul>
-<li class="chapter" data-level="5.10.1" data-path="section-5.html"><a href="section-5.html#apply"><i class="fa fa-check"></i><b>5.10.1</b> apply()函数</a></li>
-<li class="chapter" data-level="5.10.2" data-path="section-5.html"><a href="section-5.html#ddply"><i class="fa fa-check"></i><b>5.10.2</b> ddply()函数</a></li>
-<li class="chapter" data-level="5.10.3" data-path="section-5.html"><a href="section-5.html#section-5.10.3"><i class="fa fa-check"></i><b>5.10.3</b> 数据整形</a></li>
+<li class="chapter" data-level="5.10.1" data-path="section-5.html"><a href="section-5.html#baseapply"><i class="fa fa-check"></i><b>5.10.1</b> base包：apply()</a></li>
+<li class="chapter" data-level="5.10.2" data-path="section-5.html"><a href="section-5.html#plyrddply"><i class="fa fa-check"></i><b>5.10.2</b> plyr包：ddply()函数</a></li>
+<li class="chapter" data-level="5.10.3" data-path="section-5.html"><a href="section-5.html#dplyr"><i class="fa fa-check"></i><b>5.10.3</b> dplyr包</a></li>
+<li class="chapter" data-level="5.10.4" data-path="section-5.html"><a href="section-5.html#section-5.10.4"><i class="fa fa-check"></i><b>5.10.4</b> 数据整形</a></li>
 </ul></li>
 <li class="chapter" data-level="5.11" data-path="section-5.html"><a href="section-5.html#section-5.11"><i class="fa fa-check"></i><b>5.11</b> 本章总结</a></li>
 </ul></li>
@@ -845,11 +846,11 @@ zero_demo$zero2&lt;-<span class="kw">c</span>(<span class="dv">1</span>,<span cl
 <div id="section-5.10" class="section level2">
 <h2><span class="header-section-number">5.10</span> 数据整合和整形</h2>
 <p>这一小节将介绍一些经常用到的有效数据整合方法，和R中可以实现这些整合的函数。在进行分析之前用描述统计量（均值，标准差等等）和数据可视化总结探索数据集很重要，在分析之后对结果进行总结也很重要，此外我们还经常需要对数据的格式和排列方式进行变换，使得数据结构符合模型的要求。</p>
-<p>这一节我们主要介绍常用的数据整合和整形的方式，以及如何用R实现这些操作。我们会跳过一些基础的变量水平的描述，比如对于离散变量，我们通常会用频数表格稍微在需要时查看变量各个层级观测的频数（table()），或者两个变量的交叉表格。还可以通过对离散变量绘制条形图。对于连续变量，我们时不时需要查看某个变量的均值（<code>mean()</code>），标准差（<code>sd()</code>）,分位数（<code>quantile()</code>）之类的。此外还有一些像<code>summary()</code>，<code>str()</code>和<code>describe()</code>（这个函数是’psych’包里的，之前有用过）这样的函数能给出关于一个数据框的总结。以上提到的这些都是一些最基础的探索各个阶段数据（包括模型结果）的方法。但仅仅这些是不够的，这些方法的灵活性不高，输出的信息是固定的。我们可能不想要<code>summary()</code>函数输出的全部信息，而有些我们想要的信息它却没有。比如如果我们想要知道每个类别的客户收入，在线花销等的均值；或者我们想要在每个类别中找到收入最高的人，然后将他们提取出来集合在一起；又或者我们希望有一个新的变量指示购买的渠道（是在线还是实体店），并且将这个变量用于建模，这时就需要对数据进行整形，将在线购买的记录和实体店购买的记录逐行排列而非现在的逐列。这些操作如果仅仅使用初级函数会非常繁琐，且运算效率也不高。R中有一些其它包可以非常高效简洁的完成这些看似复杂的任务。初次接触这些函数的小伙伴会觉得它们不太好使，那是自然，功能强的东西选项自然多些，灵活性越强的工具，你学习掌握的时间自然长些，但这就是一个<strong>熟能生巧</strong>的事情，又一次，老古人的话放在那里闪闪发光。</p>
-<div id="apply" class="section level3">
-<h3><span class="header-section-number">5.10.1</span> apply()函数</h3>
+<p>这一节我们主要介绍常用的数据整合和整形的方式，以及如何用R实现这些操作。我们会跳过一些基础的变量水平的描述，比如对于离散变量，我们通常会用频数表格稍微在需要时查看变量各个层级观测的频数（<code>table()</code>），或者两个变量的交叉表格。还可以通过对离散变量绘制条形图。对于连续变量，我们时不时需要查看某个变量的均值（<code>mean()</code>），标准差（<code>sd()</code>）,分位数（<code>quantile()</code>）之类的。此外还有一些像<code>summary()</code>，<code>str()</code>和<code>describe()</code>（这个函数是’psych’包里的，之前有用过）这样的函数能给出关于一个数据框的总结。以上提到的这些都是一些最基础的探索各个阶段数据（包括模型结果）的方法。但仅仅这些是不够的，这些方法的灵活性不高，输出的信息是固定的。我们可能不想要<code>summary()</code>函数输出的全部信息，而有些我们想要的信息它却没有。比如如果我们想要知道每个类别的客户收入，在线花销等的均值；或者我们想要在每个类别中找到收入最高的人，然后将他们提取出来集合在一起；又或者我们希望有一个新的变量指示购买的渠道（是在线还是实体店），并且将这个变量用于建模，这时就需要对数据进行整形，将在线购买的记录和实体店购买的记录逐行排列而非现在的逐列。这些操作如果仅仅使用初级函数会非常繁琐，且运算效率也不高。R中有一些其它包可以非常高效简洁的完成这些看似复杂的任务。初次接触这些函数的小伙伴会觉得它们不太好使，那是自然，功能强的东西选项自然多些，灵活性越强的工具，你学习掌握的时间自然长些，但这就是一个<strong>熟能生巧</strong>的事情，又一次，老古人的话放在那里闪闪发光。</p>
+<div id="baseapply" class="section level3">
+<h3><span class="header-section-number">5.10.1</span> base包：apply()</h3>
 <p>R基础包中有几个强大的函数，<code>apply()</code>、<code>lapply()</code>和<code>sapply()</code>等。它们做的事情类似，只是对应的对象，或返回对象的格式不同。这些函数对于R的初学者来说可能有些难，但一旦熟悉以后会发现它们非常有效。它们是干什么的？简单来说就是依次对某一对象的某一部分重复应用一个指定的函数。它们的不同在于，<code>apply()</code>将你指定的函数作用于<strong>数据框</strong>对象的行或列，返回一个<strong>向量</strong>。‘lapply()’ 将指定的函数作用于<strong>列表</strong>或者<strong>数据框</strong>对象，返回一个长度相同的<strong>列表</strong>。<code>sapply()</code>更加便捷，且算是对<code>lapply()</code>进行了包装，若<code>sapply()</code>中参数<code>simplify=FALSE</code>，那么其返回的值和<code>lapply()</code>是一样的。若<code>simplify=TRUE</code>，则<code>sapply()</code>的返回值不是一个列表，而是一个矩阵。因为在平常工作中通常处理的都是数据框，所以这里主要介绍函数<code>apply()</code>的用法。大家可能会觉得很抽象，觉得抽象很正常，因为这几兄弟确实不太接地气，我现在用这些函数几乎每次都得去查帮助文档。回到我们的服装消费者数据。如果我想知道样本中所有数值变量的均值和标准差该怎么办？这在建模前检查数据和建模后展示数据时都经常用到。</p>
-<p>记得我们之前通过<code>preProcess()</code>函数对数据进行KNN填补时，需要找到数据框中所有的数值变量用到的是<code>lapply()</code>函数。这里不能用<code>apply()</code>函数是因为<code>apply()</code>函数自动将对象转化成矩阵，这样就会丢失每列的类别信息，而<code>lapply()</code>不会对对象进行转化（这样细微的差别需要常用R渐渐熟悉了才会慢慢了解，我也是写书的时候发现这个，方才请教了一位R高人才明白个中缘由：））。我们再次用该函数选取其中数值型的变量：</p>
+<p>记得我们之前通过<code>preProcess()</code>函数对数据进行KNN填补时，需要提取数据框中所有的数值变量用到的是<code>lapply()</code>函数。这里不能用<code>apply()</code>函数是因为<code>apply()</code>函数自动将对象转化成矩阵，这样就会丢失每列的类别信息，而<code>lapply()</code>不会对对象进行转化（这样细微的差别需要常用R渐渐熟悉了才会慢慢了解，我也是写书的时候发现这个，方才请教了一位R高人才明白个中缘由：））。我们再次用该函数选取其中数值型的变量：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sdat&lt;-sim.dat[,!<span class="kw">lapply</span>(sim.dat,class)==<span class="st">&quot;factor&quot;</span>]</code></pre></div>
 <p>现在的数据框<code>sdat</code>中只包括数值型的变量。这样我们就可以用<code>apply()</code>函数对每列求均值和标准差了：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">apply</span>(sdat, <span class="dt">MARGIN=</span><span class="dv">2</span>,function(x) <span class="kw">mean</span>(<span class="kw">na.omit</span>(x)))</code></pre></div>
@@ -873,8 +874,8 @@ zero_demo$zero2&lt;-<span class="kw">c</span>(<span class="dv">1</span>,<span cl
 ##     1.136174</code></pre>
 <p>让我们再来看看标准差，代码和计算均值几乎是一样的，只是将均值函数<code>mean()</code>换成标准差函数<code>sd()</code>。虽然在线花费的均值高过实体店花费，但是实体店花费的标准差比在线花费高很多，认真看过本章开头的读者应该知道，这是由于个把土豪在实体店买了上万的衣服。还有问卷调查的第二个问题，虽然之前看到的均值很小，但是标准差也很小，这说明了什么？说明总体对该问题的评分都偏低，如果用于客户分组的话该问题可能不具有太高的区分度。关于这点，我们可以在客户分组那个章节以该数据集为例进行核实。虽然这都是一些简单的统计量，但能够使你在建模前了解更多的关于数据的信息，这对于模型选择和结果解释都有无形的帮助。</p>
 </div>
-<div id="ddply" class="section level3">
-<h3><span class="header-section-number">5.10.2</span> ddply()函数</h3>
+<div id="plyrddply" class="section level3">
+<h3><span class="header-section-number">5.10.2</span> plyr包：ddply()函数</h3>
 <p>之前讲过一个居家旅行必备神器是<code>caret</code>包，希望大家还记得，这个包实在是太强大了，我们之后会反复用到里面的各个函数，但这里不会详细介绍这个包的所有功能，因为具体介绍R中函数的用法不是本书主要目的，而且关于各种包网上有很多文档材料，如果你真的知道你要对数据做什么，找到相应的R包并在网上查看相应帮助资料学会如何使用并不困难（对于有一定经验的R用来说），但很多时候，我们的问题在于即使不知道该如何解决实际问题，本书的重点是给大家展示数据科学家是如何通过这些技术手段解决问题的，R是一个功能强大的工具，但是手段不是目的。回归主题，现在要再讲第二个必备神器，<code>plyr</code>包。同样我不会详细介绍这个包的用法，而是展示如何用这个包中的ddply()函数帮助我们进行数据分析。还是服装消费者的数据（我知道这很没有创意，但太有创意了老换数据集对你们理解模型方法没有什么好处：）），之前我们都没有用到数据框中的最后一列指明消费者类别的变量<code>segment</code>。已经忘记了消费者类别定义的小伙伴们请回到生成数据的那小节，复习下。有客户分组项目经验的人都知道，在通过聚类（在聚类的章节会说到）得到分组以后，下一件事情就是看看每组客户都是些什么样的人，也就是建立各组客户档案。下面我们就来看看各组客户的人口统计学和消费行为档案吧：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ddply</span>(sim.dat,<span class="st">&quot;segment&quot;</span>,summarize, <span class="dt">Age=</span><span class="kw">round</span>(<span class="kw">mean</span>(<span class="kw">na.omit</span>(age)),<span class="dv">0</span>),
       <span class="dt">FemalePct=</span><span class="kw">round</span>(<span class="kw">mean</span>(gender==<span class="st">&quot;Female&quot;</span>),<span class="dv">2</span>),
@@ -918,10 +919,97 @@ zero_demo$zero2&lt;-<span class="kw">c</span>(<span class="dv">1</span>,<span cl
 ## 2       Price      69.28     81.30
 ## 3     Quality     126.05    105.12
 ## 4       Style      92.83    121.07</code></pre>
-<p>结果显示价格敏感的人群果然买的价位最低，其次是风格类人群，这些人不一定是对价格敏感，但或许钱包不允许他们买太贵的。注重质量的买的东西价格比风格类的高些，但远不及土豪组，物美价廉的东西毕竟少，这些人可能更看重性价比，不会炫耀性消费但也不会买低质廉价的东西。我们在之后客户分组的时候还会进行类似的总结，那时我们会加上关于问卷调查的回复。大家看到了么，短短的几行代码就可以得到这么有信息量的总结。你可能会说这样的总结通过excel的数据透视表（pivot table）也能完成，但是用R代码要快得多，而且这只是其中一部分功能，如果之前说的，你可以设置其它功能比如<code>transform</code>（在组内进行数据变换）和<code>subset</code>（在组内进行数据选择），并且计算的东西也是可以自己定义，熟练以后是相当方便强大的。觉得R太难有些犹豫需不需要学习的小伙伴们，<strong>磨刀不误砍柴工</strong>，再一次中国的老古话放在那里闪闪发光的有木有？</p>
+<p>结果显示价格敏感的人群果然买的价位最低，其次是风格类人群，这些人不一定是对价格敏感，但或许钱包不允许他们买太贵的。注重质量的买的东西价格比风格类的高些，但远不及土豪组，物美价廉的东西毕竟少，这些人可能更看重性价比，不会炫耀性消费但也不会买低质廉价的东西。我们在之后客户分组的时候还会进行类似的总结，那时我们会加上关于问卷调查的回复。大家看到了么，短短的几行代码就可以得到这么有信息量的总结。你可能会说这样的总结通过excel的数据透视表（pivot table）也能完成，但是用R代码要快得多，而且这只是其中一部分功能，如果之前说的，你可以设置其它功能比如<code>transform</code>（在组内进行数据变换）和<code>subset</code>（在组内进行数据选择），并且计算的东西也是可以自己定义。</p>
+<p>为了方便，我们按照消费者类别比例随机抽取11个样本，选择3个变量（<code>age</code>，<code>store_exp</code>和<code>segment</code>）用于展示（数据框：<code>examp</code>）。这里用于分层抽样的函数在之后介绍建模辅助技术时会讲到，所以这里不做介绍。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(caret)
+<span class="kw">set.seed</span>(<span class="dv">2016</span>)
+trainIndex&lt;-<span class="kw">createDataPartition</span>(sim.dat$segment,<span class="dt">p=</span><span class="fl">0.01</span>,<span class="dt">list=</span>F,<span class="dt">times=</span><span class="dv">1</span>)
+examp&lt;-sim.dat[trainIndex,<span class="kw">c</span>(<span class="st">&quot;age&quot;</span>,<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;segment&quot;</span>)]</code></pre></div>
+<p><code>examp</code>数据集只有11行3列。我们先看看<code>transform</code>设置的作用：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ddply</span>(examp,<span class="st">&quot;segment&quot;</span>,transform,<span class="dt">store_pct=</span><span class="kw">round</span>(store_exp/<span class="kw">sum</span>(store_exp),<span class="dv">2</span>))</code></pre></div>
+<pre><code>##    age store_exp     segment store_pct
+## 1   42 6319.0718 Conspicuous      0.55
+## 2   42 5106.4816 Conspicuous      0.45
+## 3   55  595.2520       Price      0.42
+## 4   64  399.3550       Price      0.28
+## 5   64  426.6653       Price      0.30
+## 6   39  362.4795     Quality      0.58
+## 7   35  260.5065     Quality      0.42
+## 8   23  205.6099       Style      0.25
+## 9   24  212.3040       Style      0.26
+## 10  24  202.1017       Style      0.25
+## 11  28  200.1906       Style      0.24</code></pre>
+<p>可以看到，设置<code>transform</code>使得函数对数据集按照指定分类变量（<code>segment</code>）在组内进行数据变换，并将变换后得到的新变量添加到原数据集后。再来看看<code>subset</code>设置：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ddply</span>(examp,<span class="st">&quot;segment&quot;</span>,subset,store_exp&gt;<span class="kw">median</span>(store_exp))</code></pre></div>
+<pre><code>##   age store_exp     segment
+## 1  42 6319.0718 Conspicuous
+## 2  55  595.2520       Price
+## 3  39  362.4795     Quality
+## 4  23  205.6099       Style
+## 5  24  212.3040       Style</code></pre>
+<p>上面代码可以获取每个消费者类别（<code>segment</code>）中实体店消费（<code>store_exp</code>）大于该类别中位数的样本。</p>
 </div>
-<div id="section-5.10.3" class="section level3">
-<h3><span class="header-section-number">5.10.3</span> 数据整形</h3>
+<div id="dplyr" class="section level3">
+<h3><span class="header-section-number">5.10.3</span> dplyr包</h3>
+<p><code>dplyr</code>包是<code>plyr</code>包中的<code>ddply()</code>等函数的强化版，专门处理数据框（dataframe）对象，大幅提高了速度, 并且提供了更稳健的与其它数据库对象间的接口。由于分析中绝大多数是处理数据框，这个包尤其好用。这里我对这个包进行比较详细的介绍。接下来会按顺序介绍该包的几块重要功能：</p>
+<ol style="list-style-type: decimal">
+<li>数据框显示</li>
+<li>数据截选（按行／列）</li>
+<li>数据总结</li>
+<li>生成新变量</li>
+<li>合并数据集</li>
+</ol>
+<div id="section-5.10.3.1" class="section level4">
+<h4><span class="header-section-number">5.10.3.1</span> 数据框显示</h4>
+<ul>
+<li><code>tbl_df()</code>函数: 能将数据转化成<code>tbl</code>类，这样查看起来更加方便，输出会调整适应当前窗口</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 这里不展示输出</span>
+dplyr::<span class="kw">tbl_df</span>(sim.dat)</code></pre></div>
+<ul>
+<li><code>glimpse()</code>函数：类似之前的<code>tbl_df()</code>函数，只是转了方向。变量由列变成行。输出结果同样可以自动调整以适应窗口。</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 这里不展示输出</span>
+dplyr::<span class="kw">glimpse</span>(sim.dat)</code></pre></div>
+</div>
+<div id="section-5.10.3.2" class="section level4">
+<h4><span class="header-section-number">5.10.3.2</span> 数据截选（按行／列）</h4>
+<p>先介绍按行截选。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 提取出满足条件的行</span>
+dplyr::<span class="kw">filter</span>(sim.dat, income &gt;<span class="dv">300000</span>) %&gt;%
+dplyr::<span class="kw">tbl_df</span>()</code></pre></div>
+<pre><code>## Source: local data frame [4 x 19]
+## 
+##     age gender   income  house store_exp online_exp store_trans
+##   (int) (fctr)    (dbl) (fctr)     (dbl)      (dbl)       (int)
+## 1    40   Male 301398.0    Yes  4840.461   3618.212          10
+## 2    33   Male 319704.3    Yes  5998.305   4395.923           9
+## 3    41   Male 317476.2    Yes  3029.844   4179.671          11
+## 4    37 Female 315697.2    Yes  6548.970   4284.065          13
+## Variables not shown: online_trans (int), Q1 (int), Q2 (int), Q3 (int), Q4
+##   (int), Q5 (int), Q6 (int), Q7 (int), Q8 (int), Q9 (int), Q10 (int),
+##   segment (fctr)</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dplyr::<span class="kw">distinct</span>(iris) Remove duplicate rows.
+dplyr::<span class="kw">sample_frac</span>(iris, <span class="fl">0.5</span>, <span class="dt">replace =</span> <span class="ot">TRUE</span>) Randomly select fraction of rows.
+dplyr::<span class="kw">sample_n</span>(iris, <span class="dv">10</span>, <span class="dt">replace =</span> <span class="ot">TRUE</span>) Randomly select n rows.
+dplyr::<span class="kw">slice</span>(iris, <span class="dv">10</span>:<span class="dv">15</span>) Select rows by position.
+dplyr::<span class="kw">top_n</span>(storms, <span class="dv">2</span>, date)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sim.dat %&gt;%
+<span class="st">  </span><span class="kw">group_by</span>(segment) %&gt;%
+<span class="st">  </span><span class="kw">summarise</span>(<span class="dt">avg_online =</span> <span class="kw">mean</span>(online_trans)) %&gt;%
+<span class="st">  </span>dplyr::<span class="kw">arrange</span>(avg_online)</code></pre></div>
+<pre><code>## Source: local data frame [4 x 2]
+## 
+##       segment avg_online
+##        (fctr)      (dbl)
+## 1       Price    2.96400
+## 2 Conspicuous   11.07500
+## 3     Quality   15.97000
+## 4       Style   21.13143</code></pre>
+</div>
+</div>
+<div id="section-5.10.4" class="section level3">
+<h3><span class="header-section-number">5.10.4</span> 数据整形</h3>
 <p>终于到本章末尾了。之前提到过，如果我们希望有一个新的变量指示购买的渠道（是在线还是实体店），并且将这个变量用于建模，这时就需要对数据进行整形（也称作数据整理，或者揉数据），将在线购买的记录和实体店购买的记录逐行排列而非现在的逐列。我们可以用<code>reshape2</code>包中的相关函数实现这些操作。可能有的读者知道有个包叫做<code>reshape</code>，这是初版，后面的<code>reshape2</code>是重写升级版。这个数据整形的过程确实和揉面团有些类似，先将数据通过<code>melt()</code>函数将数据揉开，然后再通过<code>dcast()</code>函数将数据重塑成想要的形状，为了更清晰的展示函数对数据结构的影响，我们选取其中小部分列，和前5行：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(sdat&lt;-sim.dat[<span class="dv">1</span>:<span class="dv">5</span>,<span class="dv">1</span>:<span class="dv">6</span>])</code></pre></div>
 <pre><code>##   age gender   income house store_exp online_exp
@@ -993,7 +1081,7 @@ mdat &lt;-<span class="st"> </span><span class="kw">melt</span>(demo_imp, <span 
 ## 2    No   Male  133130.8   332499.9
 ## 3   Yes Female  355320.2   500856.9
 ## 4   Yes   Male  697297.3   703332.0</code></pre>
-<p>上面代码中<code>~</code>左边是你用来划分数据框的id变量，这里是<code>house</code>和<code>gender</code>，右边是你计算根据的变量（也必须是分类变量），真正用于计算的数值是你之前揉合过程中生成的<code>value</code>那列值。这两个函数确实非常抽象，我现在也还要翻阅帮助文件。大家需要对一个数据框自己实际操作才能真正理解。</p>
+<p>上面代码中<code>~</code>左边是你用来划分数据框的id变量，这里是<code>house</code>和<code>gender</code>，右边是你计算根据的变量（也必须是分类变量），真正用于计算的数值是你之前揉合过程中生成的<code>value</code>那列值。这两个函数确实非常抽象，我现在也还要翻阅帮助文件。大家需要对一个数据框自己实际操作才能真正理解。觉得R太难有些犹豫需不需要学习的小伙伴们，<strong>磨刀不误砍柴工</strong>，再一次中国的老古话放在那里闪闪发光的有木有？</p>
 </div>
 </div>
 <div id="section-5.11" class="section level2">
