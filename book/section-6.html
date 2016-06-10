@@ -741,10 +741,11 @@ dplyr::<span class="kw">glimpse</span>(trainIndex)</code></pre></div>
 </div>
 <div id="section-6.3.3" class="section level3">
 <h3><span class="header-section-number">6.3.3</span> 评估模型表现</h3>
-<p>当我们问哪个模型拟合效果好的时候我们到底在问什么？很多看似明确合理的问题一旦究其细节就会发现，其定义非常模糊以至于无法直接回答。这个问题的模糊之处在于没有指明用什么来衡量“拟合效果”？要比较模型首要任务是确定一个模型表现的度量，即通过什么标准来决定两个模型谁更好。模型表现的度量方法有好几种，要想更加全面的了解模型的表现，有时需要结合多种度量方式。</p>
+<p>当我们问哪个模型拟合效果好的时候我们到底在问什么？很多看似明确合理的问题一旦究其细节就会发现，其定义非常模糊以至于无法直接回答。这个问题的模糊之处在于没有指明用什么来衡量“拟合效果”？要比较模型首要任务是确定一个模型表现的度量，即通过什么标准来决定两个模型谁更好。模型表现的度量方法有好几种，要想更加全面的了解模型的表现，有时需要结合多种度量方式。这里我们只是单独介绍模型表现评估的度量，真正对度量的使用是建立在<strong>数据划分和再抽样</strong>的基础上的，也就是拟合模型和评估模型使用的数据集应该不同，否则得到的度量估计将过度乐观。</p>
 <div id="section-6.3.3.1" class="section level4">
 <h4><span class="header-section-number">6.3.3.1</span> 回归模型表现度量</h4>
-<p>当因变量是数值时，可以使用均方误差平方根（Root mean squared error, RMSE）为指标衡量模型的表现。 这个度量是模型残差的函数，其中残差即为观测值减去模型的预测值。 均方误差（Mean squared error, MSE）的计算方法是将残差平方然后取平均， 而RMSE则是取MSE的平方根，从而它与原始数据的单位相同。</p>
+<p>接下来我们会依次介绍下面几种回归模型的表现度量方式：RMSE、校正<span class="math inline">\(R^2\)</span>、<span class="math inline">\(C_{p}\)</span>、AIC和BIC。</p>
+<p>当因变量是数值时，我们可以使用均方误差平方根（Root mean squared error, RMSE）为指标衡量模型的表现。 这个度量是模型残差的函数，其中残差即为观测值减去模型的预测值。 均方误差（Mean squared error, MSE）的计算方法是将残差平方然后取平均， 而RMSE则是取MSE的平方根，从而它与原始数据的单位相同。</p>
 <p><span class="math display">\[MSE=\frac{1}{n}\sum_{i=1}^{n}(y_{i}-\hat{y}_{i})^{2}\]</span> <span class="math display">\[RMSE=\sqrt{\frac{1}{n}\sum_{i=1}^{n}(y_{i}-\hat{y}_{i})^{2}}\]</span></p>
 <p>得到的RMSE取值通常解释为残差离0的平均距离，或者解释为观测值和模型预测值之间平均的距离。我们对服装消费者数据中的收入（<code>income</code>）建立一般线性模型，将问卷调查回复作为自变量（<code>Q1-Q10</code>），结果如下所示：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fitlinear&lt;-<span class="kw">lm</span>(income~Q1+Q2+Q3+Q4+Q5+Q6+Q7+Q8+Q9+Q10,<span class="dt">data=</span>sim.dat)
@@ -779,7 +780,10 @@ dplyr::<span class="kw">glimpse</span>(trainIndex)</code></pre></div>
 ## Multiple R-squared:  0.7527, Adjusted R-squared:  0.7496 
 ## F-statistic:   245 on 10 and 805 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>拟合的线性模型<code>fitlinear</code>的RMSE为24940（输出底部“Residual standard error:”后面的值）。</p>
-<p>另一个常用的度量是R-Squared，通常写作<span class="math inline">\(R^2\)</span>。它实际上是观测值和预测值的相关系数的平方。大家可能对线性回归中的<span class="math inline">\(R^2\)</span>很熟悉，但它可以用于任何回归模型。通常解释成模型能够解释的应变量总变异的比例其中R-squared＝0.75表示模型可以解释因变量总变异的四分之三。尽管这是一个易于解释的统计量，但要注意它是一种相关性而不是准确性的度量，它依赖于应变量方差。比如虽然<code>fitlinear</code>的<span class="math inline">\(R^2\)</span>不低，但是RMSE为24940，说明预测的收入和真实收入之间的平均差距为24940，这样的精确度并不高。在应变量的取值很大时，即使&gt;90%的<span class="math inline">\(R^2\)</span>也不一定代表足够的精确度，在对公司的销售总额进行建模就常是这样的情况。</p>
+<p>另一个常用的度量是R-Squared，通常写作<span class="math inline">\(R^2\)</span>。它实际上是观测值和预测值的相关系数的平方。大家可能对线性回归中的<span class="math inline">\(R^2\)</span>很熟悉，但它可以用于任何回归模型。通常解释成模型能够解释的应变量总变异的比例其中R-squared＝0.75表示模型可以解释因变量总变异的四分之三。尽管这是一个易于解释的统计量，但要注意它是一种相关性而不是准确性的度量，它依赖于应变量方差。比如虽然<code>fitlinear</code>的<span class="math inline">\(R^2\)</span>不低，但是RMSE为24940，说明预测的收入和真实收入之间的平均差距为24940，这样的精确度并不高。在应变量的取值很大时，即使&gt;90%的<span class="math inline">\(R^2\)</span>也不一定代表足够的精确度，在对公司的销售总额进行建模就常是这样的情况。之前我们在展示自变量和应变量误差对模型表现影响的时候有用过<span class="math inline">\(R^2\)</span>，那时并没有考虑变量个数对<span class="math inline">\(R^2\)</span>的影响（因为变量个数和观测个数相比并不多）。但事实上<span class="math inline">\(R^2\)</span>会随着变量个数的增加而增大。校正<span class="math inline">\(R^2\)</span>就是针对该问题对原<span class="math inline">\(R^2\)</span>进行改进。原始<span class="math inline">\(R^2\)</span>的定义为：</p>
+<p><span class="math display">\[R^{2}=1-\frac{RSS}{TSS}\]</span></p>
+<p>其中<span class="math inline">\(RSS=\sum_{i=1}^{n}(y_{i}-\hat{y_{i}})^{2}\)</span>，<span class="math inline">\(TSS=\sum_{i=1}^{n}(y_{i}-\bar{y})^{2}\)</span>。</p>
+<p>由于RSS总是随着变量个数的增加而降低的，<span class="math inline">\(R^2\)</span>也就相应随着变量个数增加而增加。</p>
 <p>我们用stepAIC进行变量选择。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(MASS)
 <span class="kw">stepAIC</span>(fit)</code></pre></div>
