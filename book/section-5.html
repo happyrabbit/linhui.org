@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-06-08">
+<meta name="date" content="2016-06-10">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -147,7 +147,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="5.10.1" data-path="section-5.html"><a href="section-5.html#baseapply"><i class="fa fa-check"></i><b>5.10.1</b> base包：apply()</a></li>
 <li class="chapter" data-level="5.10.2" data-path="section-5.html"><a href="section-5.html#plyrddply"><i class="fa fa-check"></i><b>5.10.2</b> plyr包：ddply()函数</a></li>
 <li class="chapter" data-level="5.10.3" data-path="section-5.html"><a href="section-5.html#dplyr"><i class="fa fa-check"></i><b>5.10.3</b> dplyr包</a></li>
-<li class="chapter" data-level="5.10.4" data-path="section-5.html"><a href="section-5.html#section-5.10.4"><i class="fa fa-check"></i><b>5.10.4</b> 数据整形</a></li>
+<li class="chapter" data-level="5.10.4" data-path="section-5.html"><a href="section-5.html#reshape2"><i class="fa fa-check"></i><b>5.10.4</b> 数据整形：<code>reshape2</code>包</a></li>
+<li class="chapter" data-level="5.10.5" data-path="section-5.html"><a href="section-5.html#tidyr"><i class="fa fa-check"></i><b>5.10.5</b> 数据整形：<code>tidyr</code>包</a></li>
 </ul></li>
 <li class="chapter" data-level="5.11" data-path="section-5.html"><a href="section-5.html#section-5.11"><i class="fa fa-check"></i><b>5.11</b> 本章总结</a></li>
 </ul></li>
@@ -289,7 +290,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <span class="co"># 我们会使用包中的describe()函数</span>
 <span class="kw">library</span>(psych)
 <span class="co"># plyr: 可以将数据分割成更小的数据，然后对分割后的数据进行些操作，最后把操作的结果汇总</span>
-<span class="kw">library</span>(plyr)</code></pre></div>
+<span class="kw">library</span>(plyr)
+<span class="co"># tidyr: 清理揉合数据的包，主要函数是spread()和gather()</span>
+<span class="kw">library</span>(tidyr)</code></pre></div>
 </div>
 <div id="section-5.2" class="section level2">
 <h2><span class="header-section-number">5.2</span> 数据清理</h2>
@@ -1155,8 +1158,8 @@ x</code></pre></div>
 <p>此外，<code>dplyr</code>包中还有各种针对数据框的交（<code>intersect()</code>）、并（<code>union()</code>）和补（<code>setdiff()</code>）运算，以及将一个数据框按照行或者列添加到另一个数据框上的操作（<code>bind_rows()</code>，<code>bind_cols()</code>）。这里就不一一介绍，大家自己用一个简单的数据框尝试下。</p>
 </div>
 </div>
-<div id="section-5.10.4" class="section level3">
-<h3><span class="header-section-number">5.10.4</span> 数据整形</h3>
+<div id="reshape2" class="section level3">
+<h3><span class="header-section-number">5.10.4</span> 数据整形：<code>reshape2</code>包</h3>
 <p>终于到本章末尾了。之前提到过，如果我们希望有一个新的变量指示购买的渠道（是在线还是实体店），并且将这个变量用于建模，这时就需要对数据进行整形（也称作数据整理，或者揉数据），将在线购买的记录和实体店购买的记录逐行排列而非现在的逐列。我们可以用<code>reshape2</code>包中的相关函数实现这些操作。可能有的读者知道有个包叫做<code>reshape</code>，这是初版，后面的<code>reshape2</code>是重写升级版。这个数据整形的过程确实和揉面团有些类似，先将数据通过<code>melt()</code>函数将数据揉开，然后再通过<code>dcast()</code>函数将数据重塑成想要的形状，为了更清晰的展示函数对数据结构的影响，我们选取其中小部分列，和前5行：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(sdat&lt;-sim.dat[<span class="dv">1</span>:<span class="dv">5</span>,<span class="dv">1</span>:<span class="dv">6</span>])</code></pre></div>
 <pre><code>##   age gender   income house store_exp online_exp
@@ -1228,7 +1231,84 @@ mdat &lt;-<span class="st"> </span><span class="kw">melt</span>(demo_imp, <span 
 ## 2    No   Male  133130.8   332499.9
 ## 3   Yes Female  355320.2   500856.9
 ## 4   Yes   Male  697297.3   703332.0</code></pre>
-<p>上面代码中<code>~</code>左边是你用来划分数据框的id变量，这里是<code>house</code>和<code>gender</code>，右边是你计算根据的变量（也必须是分类变量），真正用于计算的数值是你之前揉合过程中生成的<code>value</code>那列值。这两个函数确实非常抽象，我现在也还要翻阅帮助文件。大家需要对一个数据框自己实际操作才能真正理解。觉得R太难有些犹豫需不需要学习的小伙伴们，<strong>磨刀不误砍柴工</strong>，再一次中国的老古话放在那里闪闪发光的有木有？</p>
+<p>上面代码中<code>~</code>左边是你用来划分数据框的id变量，这里是<code>house</code>和<code>gender</code>，右边是你计算根据的变量（也必须是分类变量），真正用于计算的数值是你之前揉合过程中生成的<code>value</code>那列值。这两个函数确实不太好理解，大家需要对一个数据框自己实际操作才能真正理解。</p>
+</div>
+<div id="tidyr" class="section level3">
+<h3><span class="header-section-number">5.10.5</span> 数据整形：<code>tidyr</code>包</h3>
+<p>R中还有一个能够用于数据整形的包<code>tidyr</code>。下面我们截取一个小数据框(<code>sdat</code>)展示包中一些主要函数的功能。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sdat&lt;-sim.dat[<span class="dv">1</span>:<span class="dv">5</span>,]%&gt;%
+<span class="st">  </span>dplyr::<span class="kw">select</span>(age,gender,store_exp,store_trans)
+sdat %&gt;%<span class="st"> </span><span class="kw">tbl_df</span>()</code></pre></div>
+<pre><code>## Source: local data frame [5 x 4]
+## 
+##     age gender store_exp store_trans
+##   (int) (fctr)     (dbl)       (int)
+## 1    57 Female  529.1344           2
+## 2    63 Female  478.0058           4
+## 3    59   Male  490.8107           7
+## 4    60   Male  347.8090          10
+## 5    51   Male  379.6259           4</code></pre>
+<p>首先是<code>gather()</code>函数。它的作用类似于<code>reshape2</code>中的<code>melt()</code>。下面这条命令的结果和<code>melt(sdat, measure.vars=c(&quot;store_exp&quot;,&quot;store_trans&quot;))</code>是一样的。其中<code>variable</code>和<code>value</code>是自定义的揉合生成的两列新变量的名字。<code>variable</code>列对应原数据中参与揉合的变量名，<code>value</code>列是参与揉合的变量的取值。<code>store_exp,store_trans</code>告诉R对那些变量进行揉合。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">msdat&lt;-tidyr::<span class="kw">gather</span>(sdat,<span class="st">&quot;variable&quot;</span>,<span class="st">&quot;value&quot;</span>,store_exp,store_trans)
+msdat %&gt;%<span class="st"> </span><span class="kw">tbl_df</span>()</code></pre></div>
+<pre><code>## Source: local data frame [10 x 4]
+## 
+##      age gender    variable    value
+##    (int) (fctr)       (chr)    (dbl)
+## 1     57 Female   store_exp 529.1344
+## 2     63 Female   store_exp 478.0058
+## 3     59   Male   store_exp 490.8107
+## 4     60   Male   store_exp 347.8090
+## 5     51   Male   store_exp 379.6259
+## 6     57 Female store_trans   2.0000
+## 7     63 Female store_trans   4.0000
+## 8     59   Male store_trans   7.0000
+## 9     60   Male store_trans  10.0000
+## 10    51   Male store_trans   4.0000</code></pre>
+<p>如果用我们之前讲到的管道操作，上面代码可以等价的写成：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 这里不显示输出结果</span>
+sdat%&gt;%<span class="kw">gather</span>(<span class="st">&quot;variable&quot;</span>,<span class="st">&quot;value&quot;</span>,store_exp,store_trans)</code></pre></div>
+<p>和<code>gather()</code>相反的是<code>spread()</code>，前者将不同的列堆叠起来，后者将同一列分开。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">msdat %&gt;%<span class="st"> </span><span class="kw">spread</span>(variable,value)</code></pre></div>
+<pre><code>##   age gender store_exp store_trans
+## 1  51   Male  379.6259           4
+## 2  57 Female  529.1344           2
+## 3  59   Male  490.8107           7
+## 4  60   Male  347.8090          10
+## 5  63 Female  478.0058           4</code></pre>
+<p><code>tidyr</code>包中还有另外两个互补的函数，<code>separate()</code>和<code>unite()</code>。<code>separate()</code>函数可以将不同列分开成为多列。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sepdat&lt;-<span class="st"> </span>msdat %&gt;%<span class="st"> </span><span class="kw">separate</span>(variable,<span class="kw">c</span>(<span class="st">&quot;Source&quot;</span>,<span class="st">&quot;Type&quot;</span>))
+sepdat %&gt;%<span class="st"> </span><span class="kw">tbl_df</span>()</code></pre></div>
+<pre><code>## Source: local data frame [10 x 5]
+## 
+##      age gender Source  Type    value
+##    (int) (fctr)  (chr) (chr)    (dbl)
+## 1     57 Female  store   exp 529.1344
+## 2     63 Female  store   exp 478.0058
+## 3     59   Male  store   exp 490.8107
+## 4     60   Male  store   exp 347.8090
+## 5     51   Male  store   exp 379.6259
+## 6     57 Female  store trans   2.0000
+## 7     63 Female  store trans   4.0000
+## 8     59   Male  store trans   7.0000
+## 9     60   Male  store trans  10.0000
+## 10    51   Male  store trans   4.0000</code></pre>
+<p>可以看到，原来的变量<code>variable</code>被分成了两部分：<code>Source</code>和<code>Type</code>。你可以通过设置<code>sep=</code>来自定义用于划分字符的正则表达，默认是所有非字母和数字的字符。比如这里的“_”。</p>
+<p>与<code>separate()</code>相反的函数是<code>unite()</code>， 它能将不同的列合并在一起。类似于<code>paste()</code>函数的数据框版本。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sepdat %&gt;%<span class="st"> </span><span class="kw">unite</span>(<span class="st">&quot;variable&quot;</span>,Source,Type,<span class="dt">sep=</span><span class="st">&quot;_&quot;</span>)</code></pre></div>
+<pre><code>##    age gender    variable    value
+## 1   57 Female   store_exp 529.1344
+## 2   63 Female   store_exp 478.0058
+## 3   59   Male   store_exp 490.8107
+## 4   60   Male   store_exp 347.8090
+## 5   51   Male   store_exp 379.6259
+## 6   57 Female store_trans   2.0000
+## 7   63 Female store_trans   4.0000
+## 8   59   Male store_trans   7.0000
+## 9   60   Male store_trans  10.0000
+## 10  51   Male store_trans   4.0000</code></pre>
+<p>上面的代码将原先分开的两列又合并回去了，并赋予的和之前一样的列名<code>&quot;variable&quot;</code>。</p>
+<p>整形这部分可能是数据处理变换中最复杂的，这种复杂和证明数学定理不同，主要是需要时间熟悉。更像一门手艺，所以大家要发扬手艺人精神，多使用这些函数，把数据当面团一样揉来揉去的，也挺好玩的，不是么？觉得R太难有些犹豫需不需要学习的小伙伴们，<strong>磨刀不误砍柴工</strong>，再一次中国的老古话放在那里闪闪发光的有木有？</p>
 </div>
 </div>
 <div id="section-5.11" class="section level2">
@@ -1243,7 +1323,7 @@ mdat &lt;-<span class="st"> </span><span class="kw">melt</span>(demo_imp, <span 
 <li>稀疏变量：查找并且删除稀疏变量</li>
 <li>编码名义变量：对于不能作用于分类变量的模型，将分类变量转化成0/1名义变量</li>
 </ol>
-<p>最后我们介绍了一些基本的数据整合和整形的方法，整合方法类似于excel中的透视表格，R中有一些功能强大的函数能够有效的进行各种数据整合。我们介绍了其中两个函数，初级的<code>apply()</code>函数，和更加高级灵活的<code>ddply()</code>函数。对于数据的整形（长型数据和宽型数据的转换），我们举例说明了由于模型需要将数据从宽型转化成长型的情况，并且用<code>reshape2</code>包实现了该过程。得到可以用于模型的数据后，接下来就该进入建模阶段了。</p>
+<p>最后我们介绍了一些数据整合和整形的方法，整合方法类似于excel中的透视表格，R中有一些功能强大的函数能够有效的进行各种数据整合。我们介绍了<code>base</code>包中的<code>apply()</code>函数，还有更加高级灵活的<code>plyr</code>包中<code>ddply()</code>函数的各种用法。由于实际工作中大部分时间是处理数据框，所以这里我们介绍了<code>plyr</code>包的一个专门针对数据框的强化包<code>dplyr</code>。该包对于数据的整合非常高效。对于数据的整形（长型数据和宽型数据的转换），我们举例说明了由于模型需要将数据从宽型转化成长型的情况，并且用<code>reshape2</code>包实现了该过程。此外我们还介绍了另外一个数据整形的包<code>tidyr</code>。这两个包相较于数据整合的那几个包而言更难理解，大家需要多花些时间熟悉其中的操作。得到可以用于模型的数据后，接下来就该进入建模阶段了。</p>
 
 </div>
 </div>
