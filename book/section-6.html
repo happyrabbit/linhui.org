@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-06-10">
+<meta name="date" content="2016-06-15">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -783,7 +783,9 @@ dplyr::<span class="kw">glimpse</span>(trainIndex)</code></pre></div>
 <p>另一个常用的度量是R-Squared，通常写作<span class="math inline">\(R^2\)</span>。它实际上是观测值和预测值的相关系数的平方。大家可能对线性回归中的<span class="math inline">\(R^2\)</span>很熟悉，但它可以用于任何回归模型。通常解释成模型能够解释的应变量总变异的比例其中R-squared＝0.75表示模型可以解释因变量总变异的四分之三。尽管这是一个易于解释的统计量，但要注意它是一种相关性而不是准确性的度量，它依赖于应变量方差。比如虽然<code>fitlinear</code>的<span class="math inline">\(R^2\)</span>不低，但是RMSE为24940，说明预测的收入和真实收入之间的平均差距为24940，这样的精确度并不高。在应变量的取值很大时，即使&gt;90%的<span class="math inline">\(R^2\)</span>也不一定代表足够的精确度，在对公司的销售总额进行建模就常是这样的情况。之前我们在展示自变量和应变量误差对模型表现影响的时候有用过<span class="math inline">\(R^2\)</span>，那时并没有考虑变量个数对<span class="math inline">\(R^2\)</span>的影响（因为变量个数和观测个数相比并不多）。但事实上<span class="math inline">\(R^2\)</span>会随着变量个数的增加而增大。校正<span class="math inline">\(R^2\)</span>就是针对该问题对原<span class="math inline">\(R^2\)</span>进行改进。原始<span class="math inline">\(R^2\)</span>的定义为：</p>
 <p><span class="math display">\[R^{2}=1-\frac{RSS}{TSS}\]</span></p>
 <p>其中<span class="math inline">\(RSS=\sum_{i=1}^{n}(y_{i}-\hat{y_{i}})^{2}\)</span>，<span class="math inline">\(TSS=\sum_{i=1}^{n}(y_{i}-\bar{y})^{2}\)</span>。</p>
-<p>由于RSS总是随着变量个数的增加而降低的，<span class="math inline">\(R^2\)</span>也就相应随着变量个数增加而增加。</p>
+<p>由于RSS总是随着变量个数的增加而降低，<span class="math inline">\(R^2\)</span>也就相应随着变量个数增加而增加。对于有<span class="math inline">\(p\)</span>个变量的最小二乘模型，校正<span class="math inline">\(R^2\)</span>定义为：</p>
+<p><span class="math display">\[校正R^{2}=1-\frac{RSS/(n-p-1)}{TSS/(n-1)}\]</span></p>
+<p>最大化<span class="math inline">\(校正R^{2}\)</span>等同于最小化<span class="math inline">\(RSS/(n-p-1)\)</span>。由于考虑了变量个数<span class="math inline">\(p\)</span>，<span class="math inline">\(RSS/(n-p-1)\)</span>随着变量个数的增加可能增加或者减少。<span class="math inline">\(校正R^{2}\)</span>的直观想法是当模型中已经包含所有有用的变量后继续加入噪音变量只能略微降低<span class="math inline">\(RSS\)</span>，由于变量个数增加，<span class="math inline">\(n-p-1\)</span>增加进而整体<span class="math inline">\(RSS/(n-p-1)\)</span>反而增加了，于是<span class="math inline">\(校正R^{2}\)</span>会降低。因此，从理论上讲对应最大<span class="math inline">\(校正R^{2}\)</span>的模型只包含有效变量而没有噪音变量。模型每加入一个噪音变量都会受到“惩罚”。</p>
 <p>我们用stepAIC进行变量选择。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(MASS)
 <span class="kw">stepAIC</span>(fit)</code></pre></div>
