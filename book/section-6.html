@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-06-15">
+<meta name="date" content="2016-06-16">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -786,7 +786,14 @@ dplyr::<span class="kw">glimpse</span>(trainIndex)</code></pre></div>
 <p>由于RSS总是随着变量个数的增加而降低，<span class="math inline">\(R^2\)</span>也就相应随着变量个数增加而增加。对于有<span class="math inline">\(p\)</span>个变量的最小二乘模型，校正<span class="math inline">\(R^2\)</span>定义为：</p>
 <p><span class="math display">\[校正R^{2}=1-\frac{RSS/(n-p-1)}{TSS/(n-1)}\]</span></p>
 <p>最大化<span class="math inline">\(校正R^{2}\)</span>等同于最小化<span class="math inline">\(RSS/(n-p-1)\)</span>。由于考虑了变量个数<span class="math inline">\(p\)</span>，<span class="math inline">\(RSS/(n-p-1)\)</span>随着变量个数的增加可能增加或者减少。<span class="math inline">\(校正R^{2}\)</span>的直观想法是当模型中已经包含所有有用的变量后继续加入噪音变量只能略微降低<span class="math inline">\(RSS\)</span>，由于变量个数增加，<span class="math inline">\(n-p-1\)</span>增加进而整体<span class="math inline">\(RSS/(n-p-1)\)</span>反而增加了，于是<span class="math inline">\(校正R^{2}\)</span>会降低。因此，从理论上讲对应最大<span class="math inline">\(校正R^{2}\)</span>的模型只包含有效变量而没有噪音变量。模型每加入一个噪音变量都会受到“惩罚”。</p>
-<p>我们用stepAIC进行变量选择。</p>
+<p>对于含有<span class="math inline">\(p\)</span>个变量的最小二乘拟合模型，<span class="math inline">\(C_{p}\)</span>的定义如下：</p>
+<p><span class="math display">\[C_{p}=\frac{1}{n}(RSS+2p\hat{\sigma}^{2})\]</span></p>
+<p>其中<span class="math inline">\(\hat{\sigma}^{2}\)</span>是对模型随机项<span class="math inline">\(\epsilon\)</span>的方差的估计。本质上<span class="math inline">\(C_{p}\)</span>统计量就是在训练集的<span class="math inline">\(RSS\)</span>上加上惩罚<span class="math inline">\(2p\hat{\sigma}^{2}\)</span>，对基于训练集过度乐观的误差估计做出调整。很明显，当变量个数增加时，惩罚也随之加重，这可以抵消变量个数增加导致的<span class="math inline">\(RSS\)</span>减小。用于模型选择时，我们选择对应<span class="math inline">\(C_{p}\)</span>更小的模型。</p>
+<p>AIC可以用于评估很多模型，它是基于最大似然值的。在线性回归的例子里，最大似然估计和最小二乘估计是一样的： <span class="math display">\[AIC=n+nlog(2\pi)+nlog(RSS/n)+2(p+1)\]</span></p>
+<p>BIC 也是基于最大似然值：</p>
+<p><span class="math display">\[BIC=n+nlog(2\pi)+nlog(RSS/n)+log(n)(p+1)\]</span></p>
+<p>R中的函数<code>AIC()</code>和<code>BIC()</code>就是按上面的公式分别计算AIC和BIC的。在很多教科书里通常会省略常数项<span class="math inline">\(n+nlog(2\pi)\)</span>，且用<span class="math inline">\(p\)</span>代替<span class="math inline">\(p+1\)</span>。但不同的公式效果相同，因为使用时只考虑相对大小。和AIC相比，BIC对参数个数进行了更加严厉的惩罚。所以通过BIC选出的模型通常参数个数比AIC少。</p>
+<p>作为展示，下面我们用stepAIC进行变量选择。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(MASS)
 <span class="kw">stepAIC</span>(fit)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit2&lt;-<span class="kw">lm</span>(<span class="dt">formula =</span> income ~<span class="st"> </span>Q1 +<span class="st"> </span>Q2 +<span class="st"> </span>Q4 +<span class="st"> </span>Q5 +<span class="st"> </span>Q6 +<span class="st"> </span>Q9, <span class="dt">data =</span> sim.dat)
