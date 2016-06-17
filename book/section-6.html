@@ -162,7 +162,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="6.3" data-path="section-6.html"><a href="section-6.html#section-6.3"><i class="fa fa-check"></i><b>6.3</b> 数据划分和再抽样</a><ul>
 <li class="chapter" data-level="6.3.1" data-path="section-6.html"><a href="section-6.html#section-6.3.1"><i class="fa fa-check"></i><b>6.3.1</b> 划分训练集和测试集</a></li>
 <li class="chapter" data-level="6.3.2" data-path="section-6.html"><a href="section-6.html#section-6.3.2"><i class="fa fa-check"></i><b>6.3.2</b> 重抽样</a></li>
-<li class="chapter" data-level="6.3.3" data-path="section-6.html"><a href="section-6.html#section-6.3.3"><i class="fa fa-check"></i><b>6.3.3</b> 评估模型表现</a></li>
+</ul></li>
+<li class="chapter" data-level="6.4" data-path="section-6.html"><a href="section-6.html#section-6.4"><i class="fa fa-check"></i><b>6.4</b> 评估模型表现</a><ul>
+<li class="chapter" data-level="6.4.1" data-path="section-6.html"><a href="section-6.html#section-6.4.1"><i class="fa fa-check"></i><b>6.4.1</b> 回归模型表现度量</a></li>
+<li class="chapter" data-level="6.4.2" data-path="section-6.html"><a href="section-6.html#section-6.4.2"><i class="fa fa-check"></i><b>6.4.2</b> 分类模型表现度量</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="7" data-path="section-7.html"><a href="section-7.html"><i class="fa fa-check"></i><b>7</b> 特征工程</a><ul>
@@ -739,11 +742,12 @@ dplyr::<span class="kw">glimpse</span>(trainIndex)</code></pre></div>
 <p>其中显性错误率就是用所有样本进行建模，然后再作用于相同的样本集得到的模型错误率，该估计显然过度乐观。这一改进虽然在某种程度上降低了偏差，但在样本量小的时候依旧表现不佳。试想严重过度拟合的情况下显性错误率几乎是0，那么上面公式中的第二项也就不存在了，这个时候，632方法给出的错误率估计可能过度乐观。Efron 和 Tibshirani之后进一步改进了632方法，得到“632+ 方法”，进一步调整了Bootstrap 估计<span class="citation">(Efron and Tibshirani <a href="#ref-b632plus">1997</a>)</span>。</p>
 </div>
 </div>
-<div id="section-6.3.3" class="section level3">
-<h3><span class="header-section-number">6.3.3</span> 评估模型表现</h3>
+</div>
+<div id="section-6.4" class="section level2">
+<h2><span class="header-section-number">6.4</span> 评估模型表现</h2>
 <p>当我们问哪个模型拟合效果好的时候我们到底在问什么？很多看似明确合理的问题一旦究其细节就会发现，其定义非常模糊以至于无法直接回答。这个问题的模糊之处在于没有指明用什么来衡量“拟合效果”？要比较模型首要任务是确定一个模型表现的度量，即通过什么标准来决定两个模型谁更好。模型表现的度量方法有好几种，要想更加全面的了解模型的表现，有时需要结合多种度量方式。这里我们只是单独介绍模型表现评估的度量，真正对度量的使用是建立在<strong>数据划分和再抽样</strong>的基础上的，也就是拟合模型和评估模型使用的数据集应该不同，否则得到的度量估计将过度乐观。</p>
-<div id="section-6.3.3.1" class="section level4">
-<h4><span class="header-section-number">6.3.3.1</span> 回归模型表现度量</h4>
+<div id="section-6.4.1" class="section level3">
+<h3><span class="header-section-number">6.4.1</span> 回归模型表现度量</h3>
 <p>接下来我们会依次介绍下面几种回归模型的表现度量方式：RMSE、校正<span class="math inline">\(R^2\)</span>、<span class="math inline">\(C_{p}\)</span>、AIC和BIC。</p>
 <p>当因变量是数值时，我们可以使用均方误差平方根（Root mean squared error, RMSE）为指标衡量模型的表现。 这个度量是模型残差的函数，其中残差即为观测值减去模型的预测值。 均方误差（Mean squared error, MSE）的计算方法是将残差平方然后取平均， 而RMSE则是取MSE的平方根，从而它与原始数据的单位相同。</p>
 <p><span class="math display">\[MSE=\frac{1}{n}\sum_{i=1}^{n}(y_{i}-\hat{y}_{i})^{2}\]</span> <span class="math display">\[RMSE=\sqrt{\frac{1}{n}\sum_{i=1}^{n}(y_{i}-\hat{y}_{i})^{2}}\]</span></p>
@@ -824,8 +828,8 @@ dplyr::<span class="kw">glimpse</span>(trainIndex)</code></pre></div>
 ## F-statistic: 408.1 on 6 and 809 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>注意，虽然这里以一般线性模型为例，本小节中介绍的模型表现度量不仅仅限于一般线性模型，而是所有应变量为连续性的模型。</p>
 </div>
-<div id="section-6.3.3.2" class="section level4">
-<h4><span class="header-section-number">6.3.3.2</span> 分类模型表现度量</h4>
+<div id="section-6.4.2" class="section level3">
+<h3><span class="header-section-number">6.4.2</span> 分类模型表现度量</h3>
 <p>本小节关注判别模型（即，应变量为分类变量）的表现度量。之前对连续型变量适用的RMSE和<span class="math inline">\(R^2\)</span>不适用于分类模型。</p>
 <!--
 
@@ -844,7 +848,6 @@ dplyr::<span class="kw">glimpse</span>(trainIndex)</code></pre></div>
 <p>有目标的估计因果效应，而不是将其当作庞大回归模型的副产物</p>
 <p>不要想当然的假设回归系数能够解释成因果关系。</p>
 
-</div>
 </div>
 </div>
 </div>
