@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-06-16">
+<meta name="date" content="2016-06-20">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -751,40 +751,36 @@ dplyr::<span class="kw">glimpse</span>(trainIndex)</code></pre></div>
 <p>接下来我们会依次介绍下面几种回归模型的表现度量方式：RMSE、校正<span class="math inline">\(R^2\)</span>、<span class="math inline">\(C_{p}\)</span>、AIC和BIC。</p>
 <p>当因变量是数值时，我们可以使用均方误差平方根（Root mean squared error, RMSE）为指标衡量模型的表现。 这个度量是模型残差的函数，其中残差即为观测值减去模型的预测值。 均方误差（Mean squared error, MSE）的计算方法是将残差平方然后取平均， 而RMSE则是取MSE的平方根，从而它与原始数据的单位相同。</p>
 <p><span class="math display">\[MSE=\frac{1}{n}\sum_{i=1}^{n}(y_{i}-\hat{y}_{i})^{2}\]</span> <span class="math display">\[RMSE=\sqrt{\frac{1}{n}\sum_{i=1}^{n}(y_{i}-\hat{y}_{i})^{2}}\]</span></p>
-<p>得到的RMSE取值通常解释为残差离0的平均距离，或者解释为观测值和模型预测值之间平均的距离。我们对服装消费者数据中的收入（<code>income</code>）建立一般线性模型，将问卷调查回复作为自变量（<code>Q1-Q10</code>），结果如下所示：</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fitlinear&lt;-<span class="kw">lm</span>(income~Q1+Q2+Q3+Q4+Q5+Q6+Q7+Q8+Q9+Q10,<span class="dt">data=</span>sim.dat)
-<span class="kw">summary</span>(fitlinear)</code></pre></div>
+<p>得到的RMSE取值通常解释为残差离0的平均距离，或者解释为观测值和模型预测值之间平均的距离。我们对服装消费者数据中的收入（<code>income</code>）建立一般线性模型，将消费记录变量和人口统计变量作为自变量，结果如下所示：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit&lt;-<span class="kw">lm</span>(income~store_exp+online_exp+store_trans+online_trans+age+gender,<span class="dt">data=</span>sim.dat)
+<span class="kw">summary</span>(fit)</code></pre></div>
 <pre><code>## 
 ## Call:
-## lm(formula = income ~ Q1 + Q2 + Q3 + Q4 + Q5 + Q6 + Q7 + Q8 + 
-##     Q9 + Q10, data = sim.dat)
+## lm(formula = income ~ store_exp + online_exp + store_trans + 
+##     online_trans + age + gender, data = sim.dat)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -118725   -7466    -218    7372  127717 
+## -123032  -15227     927   13112  153348 
 ## 
 ## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)    29685      18676   1.589  0.11235    
-## Q1             -6649       1672  -3.978 7.58e-05 ***
-## Q2              9632       2383   4.042 5.80e-05 ***
-## Q3              2434       2205   1.104  0.27006    
-## Q4             -2083       1870  -1.114  0.26572    
-## Q5              5541       2904   1.908  0.05675 .  
-## Q6             20222       2269   8.913  &lt; 2e-16 ***
-## Q7             -2277       2354  -0.967  0.33367    
-## Q8              1444       1965   0.735  0.46263    
-## Q9              7535       2426   3.106  0.00196 ** 
-## Q10             1744       1903   0.917  0.35959    
+##                Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  68150.7687  6482.3209  10.513  &lt; 2e-16 ***
+## store_exp        3.1959     0.4720   6.770 2.47e-11 ***
+## online_exp       9.6470     0.9058  10.650  &lt; 2e-16 ***
+## store_trans   4453.0573   438.4221  10.157  &lt; 2e-16 ***
+## online_trans -1056.5770   217.0803  -4.867 1.36e-06 ***
+## age            339.8377    95.2519   3.568 0.000381 ***
+## genderMale   -3041.5300  2344.9118  -1.297 0.194975    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 24940 on 805 degrees of freedom
+## Residual standard error: 31310 on 809 degrees of freedom
 ##   (184 observations deleted due to missingness)
-## Multiple R-squared:  0.7527, Adjusted R-squared:  0.7496 
-## F-statistic:   245 on 10 and 805 DF,  p-value: &lt; 2.2e-16</code></pre>
-<p>拟合的线性模型<code>fitlinear</code>的RMSE为24940（输出底部“Residual standard error:”后面的值）。</p>
-<p>另一个常用的度量是R-Squared，通常写作<span class="math inline">\(R^2\)</span>。它实际上是观测值和预测值的相关系数的平方。大家可能对线性回归中的<span class="math inline">\(R^2\)</span>很熟悉，但它可以用于任何回归模型。通常解释成模型能够解释的应变量总变异的比例其中R-squared＝0.75表示模型可以解释因变量总变异的四分之三。尽管这是一个易于解释的统计量，但要注意它是一种相关性而不是准确性的度量，它依赖于应变量方差。比如虽然<code>fitlinear</code>的<span class="math inline">\(R^2\)</span>不低，但是RMSE为24940，说明预测的收入和真实收入之间的平均差距为24940，这样的精确度并不高。在应变量的取值很大时，即使&gt;90%的<span class="math inline">\(R^2\)</span>也不一定代表足够的精确度，在对公司的销售总额进行建模就常是这样的情况。之前我们在展示自变量和应变量误差对模型表现影响的时候有用过<span class="math inline">\(R^2\)</span>，那时并没有考虑变量个数对<span class="math inline">\(R^2\)</span>的影响（因为变量个数和观测个数相比并不多）。但事实上<span class="math inline">\(R^2\)</span>会随着变量个数的增加而增大。校正<span class="math inline">\(R^2\)</span>就是针对该问题对原<span class="math inline">\(R^2\)</span>进行改进。原始<span class="math inline">\(R^2\)</span>的定义为：</p>
+## Multiple R-squared:  0.6084, Adjusted R-squared:  0.6055 
+## F-statistic: 209.5 on 6 and 809 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>拟合的线性模型<code>fitlinear</code>的RMSE为3.130610^{4}（输出底部“Residual standard error:”后面的值）。</p>
+<p>另一个常用的度量是R-Squared，通常写作<span class="math inline">\(R^2\)</span>。它实际上是观测值和预测值的相关系数的平方。大家可能对线性回归中的<span class="math inline">\(R^2\)</span>很熟悉，但它可以用于任何回归模型。通常解释成模型能够解释的应变量总变异的比例其中R-squared＝0.61 表示模型可以解释因变量总变异的四分之三。尽管这是一个易于解释的统计量，但要注意它是一种相关性而不是准确性的度量，它依赖于应变量方差。比如虽然<code>fitlinear</code>的<span class="math inline">\(R^2\)</span>不低，但是RMSE为0.61，说明预测的收入和真实收入之间的平均差距为3.130610^{4}，这样的精确度并不高。在应变量的取值很大时，即使&gt;90%的<span class="math inline">\(R^2\)</span>也不一定代表足够的精确度，在对公司的销售总额进行建模就常是这样的情况。之前我们在展示自变量和应变量误差对模型表现影响的时候有用过<span class="math inline">\(R^2\)</span>，那时并没有考虑变量个数对<span class="math inline">\(R^2\)</span>的影响（因为变量个数和观测个数相比并不多）。但事实上<span class="math inline">\(R^2\)</span>会随着变量个数的增加而增大。校正<span class="math inline">\(R^2\)</span>就是针对该问题对原<span class="math inline">\(R^2\)</span>进行改进。原始<span class="math inline">\(R^2\)</span>的定义为：</p>
 <p><span class="math display">\[R^{2}=1-\frac{RSS}{TSS}\]</span></p>
 <p>其中<span class="math inline">\(RSS=\sum_{i=1}^{n}(y_{i}-\hat{y_{i}})^{2}\)</span>，<span class="math inline">\(TSS=\sum_{i=1}^{n}(y_{i}-\bar{y})^{2}\)</span>。</p>
 <p>由于RSS总是随着变量个数的增加而降低，<span class="math inline">\(R^2\)</span>也就相应随着变量个数增加而增加。对于有<span class="math inline">\(p\)</span>个变量的最小二乘模型，校正<span class="math inline">\(R^2\)</span>定义为：</p>
@@ -797,35 +793,35 @@ dplyr::<span class="kw">glimpse</span>(trainIndex)</code></pre></div>
 <p>BIC 也是基于最大似然值：</p>
 <p><span class="math display">\[BIC=n+nlog(2\pi)+nlog(RSS/n)+log(n)(p+1)\]</span></p>
 <p>R中的函数<code>AIC()</code>和<code>BIC()</code>就是按上面的公式分别计算AIC和BIC的。在很多教科书里通常会省略常数项<span class="math inline">\(n+nlog(2\pi)\)</span>，且用<span class="math inline">\(p\)</span>代替<span class="math inline">\(p+1\)</span>。但不同的公式效果相同，因为使用时只考虑相对大小。和AIC相比，BIC对参数个数进行了更加严厉的惩罚。所以通过BIC选出的模型通常参数个数比AIC少。</p>
-<p>作为展示，下面我们用stepAIC进行变量选择。</p>
+<p>作为展示，下面我们基于刚才建立的线性模型用<code>stepAIC()</code>进行变量选择。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(MASS)
 <span class="kw">stepAIC</span>(fit)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit2&lt;-<span class="kw">lm</span>(<span class="dt">formula =</span> income ~<span class="st"> </span>Q1 +<span class="st"> </span>Q2 +<span class="st"> </span>Q4 +<span class="st"> </span>Q5 +<span class="st"> </span>Q6 +<span class="st"> </span>Q9, <span class="dt">data =</span> sim.dat)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit2&lt;-<span class="kw">lm</span>(<span class="dt">formula =</span> income ~<span class="st"> </span>store_exp +<span class="st"> </span>online_exp +<span class="st"> </span>store_trans +<span class="st"> </span>online_trans +<span class="st"> </span>age, <span class="dt">data =</span> sim.dat)
 <span class="kw">summary</span>(fit2)</code></pre></div>
 <pre><code>## 
 ## Call:
-## lm(formula = income ~ Q1 + Q2 + Q4 + Q5 + Q6 + Q9, data = sim.dat)
+## lm(formula = income ~ store_exp + online_exp + store_trans + 
+##     online_trans + age, data = sim.dat)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -118207   -7492    -276    7092  127546 
+## -124039  -15317     967   12917  152086 
 ## 
 ## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)    32346      14100   2.294 0.022046 *  
-## Q1             -6144       1637  -3.752 0.000188 ***
-## Q2              9876       2177   4.537 6.58e-06 ***
-## Q4             -2157       1279  -1.687 0.092068 .  
-## Q5              4147       2563   1.618 0.106104    
-## Q6             22718       1672  13.587  &lt; 2e-16 ***
-## Q9              6906       2383   2.898 0.003860 ** 
+##                Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  67274.7949  6449.7606  10.431  &lt; 2e-16 ***
+## store_exp        3.1906     0.4722   6.757 2.70e-11 ***
+## online_exp       9.5312     0.9018  10.570  &lt; 2e-16 ***
+## store_trans   4420.0094   437.8654  10.094  &lt; 2e-16 ***
+## online_trans -1026.6919   215.9450  -4.754 2.36e-06 ***
+## age            327.8788    94.8446   3.457 0.000575 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 24930 on 809 degrees of freedom
+## Residual standard error: 31320 on 810 degrees of freedom
 ##   (184 observations deleted due to missingness)
-## Multiple R-squared:  0.7517, Adjusted R-squared:  0.7498 
-## F-statistic: 408.1 on 6 and 809 DF,  p-value: &lt; 2.2e-16</code></pre>
+## Multiple R-squared:  0.6076, Adjusted R-squared:  0.6052 
+## F-statistic: 250.8 on 5 and 810 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>注意，虽然这里以一般线性模型为例，本小节中介绍的模型表现度量不仅仅限于一般线性模型，而是所有应变量为连续性的模型。</p>
 </div>
 <div id="section-6.4.2" class="section level3">
