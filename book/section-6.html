@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-06-21">
+<meta name="date" content="2016-06-22">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -751,36 +751,34 @@ dplyr::<span class="kw">glimpse</span>(trainIndex)</code></pre></div>
 <p>接下来我们会依次介绍下面几种回归模型的表现度量方式：RMSE、校正<span class="math inline">\(R^2\)</span>、<span class="math inline">\(C_{p}\)</span>、AIC和BIC。</p>
 <p>当因变量是数值时，我们可以使用均方误差平方根（Root mean squared error, RMSE）为指标衡量模型的表现。 这个度量是模型残差的函数，其中残差即为观测值减去模型的预测值。 均方误差（Mean squared error, MSE）的计算方法是将残差平方然后取平均， 而RMSE则是取MSE的平方根，从而它与原始数据的单位相同。</p>
 <p><span class="math display">\[MSE=\frac{1}{n}\sum_{i=1}^{n}(y_{i}-\hat{y}_{i})^{2}\]</span> <span class="math display">\[RMSE=\sqrt{\frac{1}{n}\sum_{i=1}^{n}(y_{i}-\hat{y}_{i})^{2}}\]</span></p>
-<p>得到的RMSE取值通常解释为残差离0的平均距离，或者解释为观测值和模型预测值之间平均的距离。我们对服装消费者数据中的收入（<code>income</code>）建立一般线性模型，将消费记录变量和人口统计变量作为自变量，结果如下所示：</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit&lt;-<span class="kw">lm</span>(income~store_exp+online_exp+store_trans+online_trans+age+gender,<span class="dt">data=</span>sim.dat)
+<p>得到的RMSE取值通常解释为残差离0的平均距离，或者解释为观测值和模型预测值之间平均的距离。回到之前介绍误差来源时用过的例子，对服装消费者数据中的收入（<code>income</code>）建立一般线性模型，将消费记录变量作为自变量，结果如下所示：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit&lt;-<span class="kw">lm</span>(income~store_exp+online_exp+store_trans+online_trans,<span class="dt">data=</span>sim.dat)
 <span class="kw">summary</span>(fit)</code></pre></div>
 <pre><code>## 
 ## Call:
 ## lm(formula = income ~ store_exp + online_exp + store_trans + 
-##     online_trans + age + gender, data = sim.dat)
+##     online_trans, data = sim.dat)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -123032  -15227     927   13112  153348 
+## -128768  -15804     441   13375  150945 
 ## 
 ## Coefficients:
 ##                Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  68150.7687  6482.3209  10.513  &lt; 2e-16 ***
-## store_exp        3.1959     0.4720   6.770 2.47e-11 ***
-## online_exp       9.6470     0.9058  10.650  &lt; 2e-16 ***
-## store_trans   4453.0573   438.4221  10.157  &lt; 2e-16 ***
-## online_trans -1056.5770   217.0803  -4.867 1.36e-06 ***
-## age            339.8377    95.2519   3.568 0.000381 ***
-## genderMale   -3041.5300  2344.9118  -1.297 0.194975    
+## (Intercept)  85711.6796  3651.5991  23.472  &lt; 2e-16 ***
+## store_exp        3.1977     0.4754   6.726 3.28e-11 ***
+## online_exp       8.9949     0.8943  10.058  &lt; 2e-16 ***
+## store_trans   4631.7507   436.4777  10.612  &lt; 2e-16 ***
+## online_trans -1451.1618   178.8355  -8.115 1.80e-15 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 31310 on 809 degrees of freedom
+## Residual standard error: 31530 on 811 degrees of freedom
 ##   (184 observations deleted due to missingness)
-## Multiple R-squared:  0.6084, Adjusted R-squared:  0.6055 
-## F-statistic: 209.5 on 6 and 809 DF,  p-value: &lt; 2.2e-16</code></pre>
-<p>拟合的线性模型<code>fit</code>的RMSE为3.130610^{4}（输出底部“Residual standard error:”后面的值）。</p>
-<p>另一个常用的度量是R-Squared，通常写作<span class="math inline">\(R^2\)</span>。它实际上是观测值和预测值的相关系数的平方。大家可能对线性回归中的<span class="math inline">\(R^2\)</span>很熟悉，但它可以用于任何回归模型。通常解释成模型能够解释的应变量总变异的比例其中R-squared＝0.61 表示模型可以解释因变量总变异的四分之三。尽管这是一个易于解释的统计量，但要注意它是一种相关性而不是准确性的度量，它依赖于应变量方差。比如虽然<code>fit</code>的<span class="math inline">\(R^2\)</span>不低，但是RMSE为0.61，说明预测的收入和真实收入之间的平均差距为3.130610^{4}，这样的精确度并不高。在应变量的取值很大时，即使&gt;90%的<span class="math inline">\(R^2\)</span>也不一定代表足够的精确度，在对公司的销售总额进行建模就常是这样的情况。之前我们在展示自变量和应变量误差对模型表现影响的时候有用过<span class="math inline">\(R^2\)</span>，那时并没有考虑变量个数对<span class="math inline">\(R^2\)</span>的影响（因为变量个数和观测个数相比并不多）。但事实上<span class="math inline">\(R^2\)</span>会随着变量个数的增加而增大。校正<span class="math inline">\(R^2\)</span>就是针对该问题对原<span class="math inline">\(R^2\)</span>进行改进。原始<span class="math inline">\(R^2\)</span>的定义为：</p>
+## Multiple R-squared:  0.6018, Adjusted R-squared:  0.5998 
+## F-statistic: 306.4 on 4 and 811 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>拟合的线性模型<code>fit</code>的RMSE为3.15310^{4}（输出底部“Residual standard error:”后面的值）。</p>
+<p>另一个常用的度量是R-Squared，通常写作<span class="math inline">\(R^2\)</span>。它实际上是观测值和预测值的相关系数的平方。大家可能对线性回归中的<span class="math inline">\(R^2\)</span>很熟悉，但它可以用于任何回归模型。通常解释成模型能够解释的应变量总变异的比例其中R-squared＝0.6 表示模型可以解释因变量总变异的四分之三。尽管这是一个易于解释的统计量，但要注意它是一种相关性而不是准确性的度量，它依赖于应变量方差。比如虽然<code>fit</code>的<span class="math inline">\(R^2\)</span>不低，但是RMSE为0.6，说明预测的收入和真实收入之间的平均差距为3.15310^{4}，这样的精确度并不高。在应变量的取值很大时，即使&gt;90%的<span class="math inline">\(R^2\)</span>也不一定代表足够的精确度，在对公司的销售总额进行建模就常是这样的情况。之前我们在展示自变量和应变量误差对模型表现影响的时候有用过<span class="math inline">\(R^2\)</span>，那时并没有考虑变量个数对<span class="math inline">\(R^2\)</span>的影响（因为变量个数和观测个数相比并不多）。但事实上<span class="math inline">\(R^2\)</span>会随着变量个数的增加而增大。校正<span class="math inline">\(R^2\)</span>就是针对该问题对原<span class="math inline">\(R^2\)</span>进行改进。原始<span class="math inline">\(R^2\)</span>的定义为：</p>
 <p><span class="math display">\[R^{2}=1-\frac{RSS}{TSS}\]</span></p>
 <p>其中<span class="math inline">\(RSS=\sum_{i=1}^{n}(y_{i}-\hat{y_{i}})^{2}\)</span>，<span class="math inline">\(TSS=\sum_{i=1}^{n}(y_{i}-\bar{y})^{2}\)</span>。</p>
 <p>由于RSS总是随着变量个数的增加而降低，<span class="math inline">\(R^2\)</span>也就相应随着变量个数增加而增加。对于有<span class="math inline">\(p\)</span>个变量的最小二乘模型，校正<span class="math inline">\(R^2\)</span>定义为：</p>
@@ -793,42 +791,74 @@ dplyr::<span class="kw">glimpse</span>(trainIndex)</code></pre></div>
 <p>BIC 也是基于最大似然值：</p>
 <p><span class="math display">\[BIC=n+nlog(2\pi)+nlog(RSS/n)+log(n)(p+1)\]</span></p>
 <p>R中的函数<code>AIC()</code>和<code>BIC()</code>就是按上面的公式分别计算AIC和BIC的。在很多教科书里通常会省略常数项<span class="math inline">\(n+nlog(2\pi)\)</span>，且用<span class="math inline">\(p\)</span>代替<span class="math inline">\(p+1\)</span>。但不同的公式效果相同，因为使用时只考虑相对大小。和AIC相比，BIC对参数个数进行了更加严厉的惩罚。所以通过BIC选出的模型通常参数个数比AIC少。</p>
-<p>作为展示，下面我们基于刚才建立的线性模型用<code>stepAIC()</code>进行变量选择（这里省略了模型选择过程的输出）。</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(MASS)
-<span class="kw">stepAIC</span>(fit)</code></pre></div>
-<p>最后模型选出的模型如下：</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit2&lt;-<span class="kw">lm</span>(<span class="dt">formula =</span> income ~<span class="st"> </span>store_exp +<span class="st"> </span>online_exp +<span class="st"> </span>store_trans +<span class="st"> </span>online_trans +<span class="st"> </span>age, <span class="dt">data =</span> sim.dat)
-<span class="kw">summary</span>(fit2)</code></pre></div>
-<pre><code>## 
-## Call:
-## lm(formula = income ~ store_exp + online_exp + store_trans + 
-##     online_trans + age, data = sim.dat)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -124039  -15317     967   12917  152086 
-## 
-## Coefficients:
-##                Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  67274.7949  6449.7606  10.431  &lt; 2e-16 ***
-## store_exp        3.1906     0.4722   6.757 2.70e-11 ***
-## online_exp       9.5312     0.9018  10.570  &lt; 2e-16 ***
-## store_trans   4420.0094   437.8654  10.094  &lt; 2e-16 ***
-## online_trans -1026.6919   215.9450  -4.754 2.36e-06 ***
-## age            327.8788    94.8446   3.457 0.000575 ***
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Residual standard error: 31320 on 810 degrees of freedom
-##   (184 observations deleted due to missingness)
-## Multiple R-squared:  0.6076, Adjusted R-squared:  0.6052 
-## F-statistic: 250.8 on 5 and 810 DF,  p-value: &lt; 2.2e-16</code></pre>
-<p>和原模型相比，</p>
+<p>模型评估和变量选择要求选取一个相应的选择标准，关于变量选择，在特征工程的章节中会详细介绍。</p>
 <!--注意，虽然这里以一般线性模型为例，本小节中介绍的模型表现度量不仅仅限于一般线性模型，而是所有应变量为连续性的模型。-->
 </div>
 <div id="section-6.4.2" class="section level3">
 <h3><span class="header-section-number">6.4.2</span> 分类模型表现度量</h3>
-<p>本小节关注判别模型（即，应变量为分类变量）的表现度量。之前对连续型变量适用的RMSE和<span class="math inline">\(R^2\)</span>不适用于分类模型。</p>
+<p>本小节关注判别模型（即，应变量为分类变量）的表现度量。之前对连续型变量适用的RMSE和<span class="math inline">\(R^2\)</span>不适用于分类模型。分类指对给定观测样本预测其所属类别，而且类别空间已知，所以是有监督学习。这个和聚类不同，聚类分析的目的是得到类别空间，是无监督学习，这在之后聚类和判别的部分还会更详细的介绍。通常遇到的问题是二分类，比如是否有某种疾病，垃圾邮件分类器等。也有多分类问题，比如服装消费数据中的消费者类别。这里我们还是以服装消费者数据为例。一个重要的市场调查研究目的是消费者分组，通常先基于一个初始调查研究结果，通过聚类方法得到消费者类别。然后建立判别模型对新样本进行分类。这里我们只考虑分类问题，假设类别已知，我们需要用消费者系统中的数据来判定样本类别。这里我们训练一个随机森林模型，之后在树模型的章节中会对模型本身进行更详细的介绍。为了简便，将多分类问题转化为二分类问题，假设该服装厂想知道现有消费者中哪些是风格类的。先对数据进行预处理，创建一个新的类别变量：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)
+<span class="kw">library</span>(randomForest)
+<span class="kw">library</span>(caret)
+sim.dat&lt;-<span class="kw">read_csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv&quot;</span>)
+<span class="co"># 数据预处理</span>
+<span class="co"># 将错误的年龄观测设置为缺失值</span>
+sim.dat$age[<span class="kw">which</span>(sim.dat$age&gt;<span class="dv">100</span>)]&lt;-<span class="ot">NA</span>
+<span class="co"># 将错误的实体店购买观测设置为缺失值</span>
+sim.dat$store_exp[<span class="kw">which</span>(sim.dat$store_exp&lt;<span class="dv">0</span>)]&lt;-<span class="ot">NA</span>
+<span class="co"># 中位数缺失值填补</span>
+imp&lt;-<span class="kw">preProcess</span>(sim.dat,<span class="dt">method=</span><span class="st">&quot;medianImpute&quot;</span>)
+sim.dat&lt;-<span class="kw">predict</span>(imp,sim.dat)
+<span class="co"># 编码名义变量</span>
+sim.dat&lt;-<span class="kw">cbind</span>(sim.dat,<span class="kw">class.ind</span>(sim.dat$gender))
+<span class="co"># 创建关于风格（style）类的新二分类变量</span>
+sim.dat$style&lt;-<span class="kw">as.numeric</span>(sim.dat$segment==<span class="st">&quot;Style&quot;</span>)</code></pre></div>
+<p>划分训练集和测试集，在训练集上得到模型，然后在测试集上评估模型表现。70%的样本用于训练，剩下30%用于模型评估：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 划分训练集和测试集</span>
+trainIndex&lt;-<span class="kw">createDataPartition</span>(sim.dat$style,<span class="dt">p=</span><span class="fl">0.7</span>,<span class="dt">list=</span>F,<span class="dt">times=</span><span class="dv">1</span>)
+<span class="co"># 记得之前介绍dplyr包时讲到num_range()的使用么？</span>
+<span class="co"># 选取问卷调查变量作为自变量</span>
+xTrain&lt;-sim.dat[trainIndex,]%&gt;%<span class="kw">select</span>(Female,store_exp,online_exp,store_trans,online_trans)
+xTest&lt;-sim.dat[-trainIndex,]%&gt;%<span class="kw">select</span>(Female,store_exp,online_exp,store_trans,online_trans)
+<span class="co"># 选取消费者类别变量作为因变量</span>
+<span class="co"># 这里需要转化为因子变量</span>
+yTrain&lt;-sim.dat$style[trainIndex]%&gt;%<span class="kw">as.factor</span>()
+yTest&lt;-sim.dat$style[-trainIndex]%&gt;%<span class="kw">as.factor</span>()
+train_rf&lt;-<span class="kw">randomForest</span>(yTrain~.,<span class="dt">data=</span>xTrain,<span class="dt">mtry=</span><span class="kw">trunc</span>(<span class="kw">sqrt</span>(<span class="kw">ncol</span>(xTrain)-<span class="dv">1</span>)),<span class="dt">ntree=</span><span class="dv">50</span>,<span class="dt">importance=</span>T)</code></pre></div>
+<p>为了展示不同的模型评估法则，我们将训练得到的随机森林模型应用到测试集，得到两种预测：</p>
+<ol style="list-style-type: decimal">
+<li>每个类别的概率预测（代码中添加选项：<code>prob</code>，结果存在<code>yhatprob</code>对象中）</li>
+<li>离散类别预测（结果存在<code>yhat</code>对象中）</li>
+</ol>
+<p>我们分别看看这两个预测结果：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">yhatprob&lt;-<span class="kw">predict</span>(train_rf,xTest,<span class="st">&quot;prob&quot;</span>)
+<span class="kw">set.seed</span>(<span class="dv">100</span>)
+<span class="kw">some</span>(yhatprob)</code></pre></div>
+<pre><code>##        0    1
+## 63  1.00 0.00
+## 137 1.00 0.00
+## 243 1.00 0.00
+## 301 1.00 0.00
+## 371 1.00 0.00
+## 466 0.76 0.24
+## 486 1.00 0.00
+## 546 0.92 0.08
+## 563 1.00 0.00
+## 819 0.00 1.00</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">yhat&lt;-<span class="kw">predict</span>(train_rf,xTest)
+<span class="kw">some</span>(yhat)</code></pre></div>
+<pre><code>## 172 262 349 413 636 657 663 750 892 979 
+##   0   0   0   0   0   1   1   1   1   1 
+## Levels: 0 1</code></pre>
+<p>现在我们就用上面的两种预测结果为例介绍不同的预测类评估方法。</p>
+<p><strong>混淆矩阵（Confusion Matrix）</strong></p>
+<p>混淆矩阵是对分类结果进行详细描述的一个表，是简单的观测类和预测类的交叉表。在此例中，观测类是<code>yTest</code>，预测类是<code>yhat</code>，相应的混淆矩阵为：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(yhat,yTest)</code></pre></div>
+<pre><code>##     yTest
+## yhat   0   1
+##    0 188   1
+##    1   6 105</code></pre>
+<p>表格中左上角和右下角分别代表预测正确的样本数目，左下角和右上角代表错误预测的样本数目。更一般的混淆矩阵如下：</p>
 <!--
 
 ### 失衡数据

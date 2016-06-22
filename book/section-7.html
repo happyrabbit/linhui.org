@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-06-21">
+<meta name="date" content="2016-06-22">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -251,7 +251,35 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="section-7.1" class="section level2">
 <h2><span class="header-section-number">7.1</span> 特征构建</h2>
 <p>在实际应用中，显然是不可能凭空而来的，需要我们手工去构建特征。关于特征构建的定义，可以这么说：特征构建指的是从原始数据中人工的构建新的特征。我们需要人工的创建它们。这需要我们花大量的时间去研究真实的数据样本，思考问题的潜在形式和数据结构，同时能够更好地应用到预测模型中。</p>
-<p>特征构建需要很强的洞察力和分析能力，要求我们能够从原始数据中找出一些具有物理意义的特征。假设原始数据是表格数据，一般你可以使用混合属性或者组合属性来创建新的特征，或是分解或切分原有的特征来创建新的特征。</p>
+<p>特征构建需要很强的洞察力和分析能力，要求我们能够从原始数据中找出一些具有物理意义的特征。假设原始数据是表格数据，一般你可以使用混合属性或者组合属性来创建新的特征，或是分解或切分原有的特征来创建新的特征。比如之前在数据预处理那章中讲编码名义变量时，我们将分类变量<code>gender</code>(性别)转化为两个名义变量：<code>Female</code>和<code>Male</code>。之后考虑收入和性别的交互效应(<code>income:gender</code>)也是一种特征构建。另外再举一个例子，假设你有一个日期时间 (2006-04-01 02:26:00)该如何转换呢？对于这种时间的数据，我们可以根据需求提取出多种属性。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(readr)
+topic&lt;-<span class="kw">read_csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/Hui/Project/NLP/RawData/newagtalk-20150607/topic.csv&quot;</span>)
+<span class="kw">glimpse</span>(topic)</code></pre></div>
+<pre><code>## Observations: 209,607
+## Variables: 6
+## $ tid           (int) 242, 259, 270, 281, 301, 312, 333, 367, 386, 387...
+## $ fid           (int) 5, 5, 5, 5, 5, 5, 5, 7, 5, 5, 5, 5, 5, 5, 5, 7, ...
+## $ title         (chr) &quot;0&quot;, &quot;Adobe Reader&quot;, &quot;? about this forum veiw?&quot;,...
+## $ posted_at     (time) 2006-04-01 02:26:00, 2006-04-01 08:39:00, 2006-...
+## $ user_name     (chr) &quot;Rich&quot;, &quot;Larry NCKS&quot;, &quot;Hay Hud Ohio&quot;, &quot;jakescia&quot;...
+## $ user_location (chr) &quot;Kansas&quot;, &quot;Washington, Kansas  &amp; Lincoln, Nebras...</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">posted_at2&lt;-topic$posted_at
+
+<span class="co">#head(posted_at2)</span>
+<span class="co">#table(posted_at2)</span>
+topic$year&lt;-<span class="kw">substr</span>(posted_at2,<span class="dv">1</span>,<span class="dv">4</span>)
+topic$month&lt;-<span class="kw">substr</span>(posted_at2,<span class="dv">6</span>,<span class="dv">7</span>)
+topic$date&lt;-<span class="kw">substr</span>(posted_at2,<span class="dv">9</span>,<span class="dv">10</span>)
+topic$time&lt;-<span class="kw">substr</span>(posted_at2,<span class="dv">12</span>,<span class="dv">13</span>)
+
+<span class="kw">barplot</span>(<span class="kw">table</span>(topic$year),<span class="dt">main=</span><span class="st">&quot;Topic Counts Year Distribution&quot;</span>)</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-84-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">barplot</span>(<span class="kw">table</span>(topic$month),<span class="dt">main=</span><span class="st">&quot;Topic Counts Month Distribution &quot;</span>)</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-84-2.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">barplot</span>(<span class="kw">table</span>(topic$time),<span class="dt">main=</span><span class="st">&quot;Topic Counts Time Distribution&quot;</span>)</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-84-3.png" width="672" /></p>
+<p>这里稍微插播介绍下<code>readr</code>包。这是RStudio在2015年推出的包，可以取代传统的<code>read.csv()</code>和<code>read.table()</code>函数。使用该包中对应的<code>read_csv()</code>和<code>write_csv()</code>函数读写数据的速度大幅度提高。<code>readr</code>包基于 C++ 的SourceFile，SourceString，SourceRaw的文件API接口，避免了数据的复制和分配，能更加快速读取格式化数据。此外，<code>readr</code>不会将字符串转化成因子变量，能够解析时间观测，不会修改列名。</p>
+<p>此外，你还可以按星期或季度来构建属性，等等等等……</p>
 </div>
 <div id="section-7.2" class="section level2">
 <h2><span class="header-section-number">7.2</span> 特征提取</h2>
@@ -316,15 +344,9 @@ By the way, 在做feature selection的时候，会涉及到特征学习（Featur
 
 下面举个例子来简单了解下特征工程的处理。
 
-首先是来说下特征提取，假设你的数据里现在有一个颜色类别的属性，比如是“item_Color”,它的取值有三个，分别是：red，blue，unknown。从特征提取的角度来看，你可以将其转化成一个二值特征“has_color”，取值为1或0。其中1表示有颜色，0表示没颜色。你还可以将其转换成三个二值属性：Is_Red, Is_Blue and Is_Unknown。这样构建特征之后，你就可以使用简单的线性模型进行训练了。
+首先是来说下特征提取，假设你的数据里现在有一个颜色类别的属性，比如是“item_Color”,它的取值有三个，分别是：red，blue，unknown。从特征提取的角度来看，
 
-另外再举一个例子，假设你有一个日期时间 (i.e. 2014-09-20T20:45:40Z)，这个该如何转换呢？
-
-对于这种时间的数据，我们可以根据需求提取出多种属性。比如，如果你想知道某一天的时间段跟其它属性的关系，你可以创建一个数字特征“Hour_Of_Day”来帮你建立一个回归模型，或者你可以建立一个序数特征，“Part_Of_Day”,取值“Morning,Midday,Afternoon,Night”来关联你的数据。
-
-此外，你还可以按星期或季度来构建属性，等等等等……
-
-关于特征构建，主要是尽可能的从原始数据中构建特征，而特征选择，经过上面的分析，想必大家也知道了，其实就是达到一个降维的效果。
+，而特征选择，经过上面的分析，想必大家也知道了，其实就是达到一个降维的效果。
 
 只要分析能力和实践能力够强，那么特征构建和特征提取对你而言就会显得相对比较简单，所以抓紧时间好好实践吧！
 
@@ -359,6 +381,48 @@ Feature engineering is a super-set of activities which include feature extractio
 <li>所有的自变量都有助于解释应变量（<span class="math inline">\(\mathbf{y}\)</span>），还是只有其中部分重要的自变量？</li>
 </ol>
 <p>回答这三个问题的共同前提是得先有一个评判模型“好”和“坏”的标准。前两个问题在建模技术那章已经给出了一般性的解答，通常使用数据划分和再抽样的方式，根据建模目的不同选择不同的评判标准，在此基础上检验模型拟合和预测情况。这章我们主要回答第3个问题。虽然所有自变量对于解释因变量来说都是重要的这样的情况可能发生，但更常见的是因变量只和一部分自变量有关。</p>
+<!--作为展示，下面我们基于刚才建立的线性模型用`stepAIC()`进行变量选择（这里省略了模型选择过程的输出）。
+
+```r
+library(MASS)
+stepAIC(fit)
+```
+
+最后模型选出的模型如下：
+
+
+```r
+fit2<-lm(formula = income ~ store_exp + online_exp + store_trans + online_trans + age, data = sim.dat)
+summary(fit2)
+```
+
+```
+## 
+## Call:
+## lm(formula = income ~ store_exp + online_exp + store_trans + 
+##     online_trans + age, data = sim.dat)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -115217  -15410    1653   12042  164324 
+## 
+## Coefficients:
+##                Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  51156.9446  9064.1081   5.644 2.17e-08 ***
+## store_exp        3.1628     0.4768   6.634 5.37e-11 ***
+## online_exp       9.2132     0.8797  10.474  < 2e-16 ***
+## store_trans   3307.9682   413.0877   8.008 3.24e-15 ***
+## online_trans  -393.4408   254.7242  -1.545    0.123    
+## age            585.0831   146.4393   3.995 6.94e-05 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 32220 on 994 degrees of freedom
+## Multiple R-squared:  0.5046, Adjusted R-squared:  0.5021 
+## F-statistic: 202.5 on 5 and 994 DF,  p-value: < 2.2e-16
+```
+
+和原模型相比，该过程 -->
 
 </div>
 </div>
