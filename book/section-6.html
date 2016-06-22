@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-06-20">
+<meta name="date" content="2016-06-21">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -779,8 +779,8 @@ dplyr::<span class="kw">glimpse</span>(trainIndex)</code></pre></div>
 ##   (184 observations deleted due to missingness)
 ## Multiple R-squared:  0.6084, Adjusted R-squared:  0.6055 
 ## F-statistic: 209.5 on 6 and 809 DF,  p-value: &lt; 2.2e-16</code></pre>
-<p>拟合的线性模型<code>fitlinear</code>的RMSE为3.130610^{4}（输出底部“Residual standard error:”后面的值）。</p>
-<p>另一个常用的度量是R-Squared，通常写作<span class="math inline">\(R^2\)</span>。它实际上是观测值和预测值的相关系数的平方。大家可能对线性回归中的<span class="math inline">\(R^2\)</span>很熟悉，但它可以用于任何回归模型。通常解释成模型能够解释的应变量总变异的比例其中R-squared＝0.61 表示模型可以解释因变量总变异的四分之三。尽管这是一个易于解释的统计量，但要注意它是一种相关性而不是准确性的度量，它依赖于应变量方差。比如虽然<code>fitlinear</code>的<span class="math inline">\(R^2\)</span>不低，但是RMSE为0.61，说明预测的收入和真实收入之间的平均差距为3.130610^{4}，这样的精确度并不高。在应变量的取值很大时，即使&gt;90%的<span class="math inline">\(R^2\)</span>也不一定代表足够的精确度，在对公司的销售总额进行建模就常是这样的情况。之前我们在展示自变量和应变量误差对模型表现影响的时候有用过<span class="math inline">\(R^2\)</span>，那时并没有考虑变量个数对<span class="math inline">\(R^2\)</span>的影响（因为变量个数和观测个数相比并不多）。但事实上<span class="math inline">\(R^2\)</span>会随着变量个数的增加而增大。校正<span class="math inline">\(R^2\)</span>就是针对该问题对原<span class="math inline">\(R^2\)</span>进行改进。原始<span class="math inline">\(R^2\)</span>的定义为：</p>
+<p>拟合的线性模型<code>fit</code>的RMSE为3.130610^{4}（输出底部“Residual standard error:”后面的值）。</p>
+<p>另一个常用的度量是R-Squared，通常写作<span class="math inline">\(R^2\)</span>。它实际上是观测值和预测值的相关系数的平方。大家可能对线性回归中的<span class="math inline">\(R^2\)</span>很熟悉，但它可以用于任何回归模型。通常解释成模型能够解释的应变量总变异的比例其中R-squared＝0.61 表示模型可以解释因变量总变异的四分之三。尽管这是一个易于解释的统计量，但要注意它是一种相关性而不是准确性的度量，它依赖于应变量方差。比如虽然<code>fit</code>的<span class="math inline">\(R^2\)</span>不低，但是RMSE为0.61，说明预测的收入和真实收入之间的平均差距为3.130610^{4}，这样的精确度并不高。在应变量的取值很大时，即使&gt;90%的<span class="math inline">\(R^2\)</span>也不一定代表足够的精确度，在对公司的销售总额进行建模就常是这样的情况。之前我们在展示自变量和应变量误差对模型表现影响的时候有用过<span class="math inline">\(R^2\)</span>，那时并没有考虑变量个数对<span class="math inline">\(R^2\)</span>的影响（因为变量个数和观测个数相比并不多）。但事实上<span class="math inline">\(R^2\)</span>会随着变量个数的增加而增大。校正<span class="math inline">\(R^2\)</span>就是针对该问题对原<span class="math inline">\(R^2\)</span>进行改进。原始<span class="math inline">\(R^2\)</span>的定义为：</p>
 <p><span class="math display">\[R^{2}=1-\frac{RSS}{TSS}\]</span></p>
 <p>其中<span class="math inline">\(RSS=\sum_{i=1}^{n}(y_{i}-\hat{y_{i}})^{2}\)</span>，<span class="math inline">\(TSS=\sum_{i=1}^{n}(y_{i}-\bar{y})^{2}\)</span>。</p>
 <p>由于RSS总是随着变量个数的增加而降低，<span class="math inline">\(R^2\)</span>也就相应随着变量个数增加而增加。对于有<span class="math inline">\(p\)</span>个变量的最小二乘模型，校正<span class="math inline">\(R^2\)</span>定义为：</p>
@@ -793,9 +793,10 @@ dplyr::<span class="kw">glimpse</span>(trainIndex)</code></pre></div>
 <p>BIC 也是基于最大似然值：</p>
 <p><span class="math display">\[BIC=n+nlog(2\pi)+nlog(RSS/n)+log(n)(p+1)\]</span></p>
 <p>R中的函数<code>AIC()</code>和<code>BIC()</code>就是按上面的公式分别计算AIC和BIC的。在很多教科书里通常会省略常数项<span class="math inline">\(n+nlog(2\pi)\)</span>，且用<span class="math inline">\(p\)</span>代替<span class="math inline">\(p+1\)</span>。但不同的公式效果相同，因为使用时只考虑相对大小。和AIC相比，BIC对参数个数进行了更加严厉的惩罚。所以通过BIC选出的模型通常参数个数比AIC少。</p>
-<p>作为展示，下面我们基于刚才建立的线性模型用<code>stepAIC()</code>进行变量选择。</p>
+<p>作为展示，下面我们基于刚才建立的线性模型用<code>stepAIC()</code>进行变量选择（这里省略了模型选择过程的输出）。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(MASS)
 <span class="kw">stepAIC</span>(fit)</code></pre></div>
+<p>最后模型选出的模型如下：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit2&lt;-<span class="kw">lm</span>(<span class="dt">formula =</span> income ~<span class="st"> </span>store_exp +<span class="st"> </span>online_exp +<span class="st"> </span>store_trans +<span class="st"> </span>online_trans +<span class="st"> </span>age, <span class="dt">data =</span> sim.dat)
 <span class="kw">summary</span>(fit2)</code></pre></div>
 <pre><code>## 
@@ -822,7 +823,8 @@ dplyr::<span class="kw">glimpse</span>(trainIndex)</code></pre></div>
 ##   (184 observations deleted due to missingness)
 ## Multiple R-squared:  0.6076, Adjusted R-squared:  0.6052 
 ## F-statistic: 250.8 on 5 and 810 DF,  p-value: &lt; 2.2e-16</code></pre>
-<p>注意，虽然这里以一般线性模型为例，本小节中介绍的模型表现度量不仅仅限于一般线性模型，而是所有应变量为连续性的模型。</p>
+<p>和原模型相比，</p>
+<!--注意，虽然这里以一般线性模型为例，本小节中介绍的模型表现度量不仅仅限于一般线性模型，而是所有应变量为连续性的模型。-->
 </div>
 <div id="section-6.4.2" class="section level3">
 <h3><span class="header-section-number">6.4.2</span> 分类模型表现度量</h3>
