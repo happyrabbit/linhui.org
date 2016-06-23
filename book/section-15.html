@@ -38,8 +38,8 @@ MathJax.Hub.Config({
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="section-10.html">
-<link rel="next" href="section-12.html">
+<link rel="prev" href="section-14.html">
+<link rel="next" href="references.html">
 
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -244,52 +244,17 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="section-11" class="section level1">
-<h1><span class="header-section-number">第11章</span> 树模型</h1>
-<p>本章讲介绍基于树的模型。树模型可以用于回归和判别。这类模型常被称为决策树（或分类回归树），是经典的机器学习算法，也是最广泛使用的工具。不太大的决策树简洁明了，容易解释。但是简单的树表现不一定好，复杂的树（比如之后会讲到的集成方法）效果大为提高，但过程如同黑箱，无法解释。所以建模者需要在解释性和精确性之间进行权衡。之所以称其为“树”当然因为结构有类似之处，只是决策树的方向和真实的树相反，根在上，叶在下。一棵决策树从单个根节点开始划分为几个不同的枝桠，从⽽产生更多的节点,在每个节点都可以决定是不是要继续划分，如果停止则该节点就是叶节点，若继续就是枝节点接着分裂产生下一层新节点。每个⾮叶节点都牵扯到决定接下来选择哪根树枝。叶节点包含 最终“决定”，讲该样本归于哪个最终类或者取值。</p>
-<div id="section-11.1" class="section level2">
-<h2><span class="header-section-number">11.1</span> 基本树模型</h2>
-</div>
-<div id="section-11.2" class="section level2">
-<h2><span class="header-section-number">11.2</span> 装袋树</h2>
-<p>Bootstrap 样本是对数据进行有放回随机抽样得到的样本（Efron 和 Tibshirani 1986）。这意味着，当一个样本点被选中时，它有可能会在将来的抽取中继续被选中。Bootstrap 样本和原数据的样本量一样。因此，一些样本可能被抽到过很多次，而另一些则可能没有被选到。没有被选到的样本被称为“袋外样本“（out-of-bag）。在一次 Bootstrap 重抽样迭代中，选中的样本点被用来建立模型，而袋外样本则被用于预测。 在20世纪90年代，集成方法（即将许多模型组合起来进行预测的模型）开始出现。 装袋法（Bagging，bootstrap aggregation 的缩写）最初由 Leo Breiman 提出，它是最早发展起来的集成方法之一（Breiman 1996a）。 装袋法是一种利用 bootstrap的通用方法，可用于任何回归（或分类）模型来构建集成组合。这种方法的构建非常简单，它包含算法 8.1 中所述的步骤。 集成组合中的每一个模型都对新样本进行一次预测，然后这 个预测将进行平均， 来给出装袋法模型的预测值。</p>
-<blockquote>
-<p><strong>算法：装袋法</strong></p>
-<ol style="list-style-type: decimal">
-<li>对 i=1 到 m 执行</li>
-<li>从原数据中生成bootstrap样本</li>
-<li>在生成的bootstrap样本上建立未修剪的树</li>
-<li>终止</li>
-</ol>
-</blockquote>
-<p>装袋法模型相对于没有装袋的模型具有若干优势。首先， 装袋法通过模型的聚集过程有效地降低了预测的方差（参见之前关于偏差-方差权衡的讨论）。对于那些预测值不稳定的模型，例如回归树，将不同版本的训练集进行聚集，可以减小预测的方差，从而使得预测值更加稳定。假设我们有10个 bootstrap 样本各自生成了一棵最大深度的树。这些树在结构上有所差异，每棵树对新样本的预测都有所不同。 如果将这10棵树的预测结果进行平均作为新样本的预测， 那么这一平均值将比单棵树的预测方差更小。这意味着， 如果我们产生另一组 bootstrap 样本，在其中每一个样本上建立一个模型， 然后对所有模型的预测值进行平均，那么得到的结果将与前一个装袋模型的结果相类似。这一特性还使得装袋模型比未装袋的模型具有更好的预测效能。 如果建模的目标是得到最优的估计而不是解释树的结构，那么装袋法更有优势。</p>
-<p>另一方面，对稳定、方差小的模型（如回归，MARS）进行装袋则只会对其预测效能带来较小的改进。 在预测结果具有内在的不稳定性的情况下，可以用装袋法进行改进。</p>
-<p>装袋法模型的另一个优势是它可以提供内在的预测效能估计， 而且这一估计可以与交叉验证估计或测试集估计很好地对应上。原因如下： 构建集成组合中的每个 bootstrap 样本时，会有部分的观测被排除在外。 这部分样本称为袋外样本，它们扮演着测试集的角色，可以用来评估模型的预测效能， 因为这批样本并没有参与建模。因此，集成组合中的每个模型都可以通过袋外样本计算得到一个预测效能的估计， 而对所有袋外效能估计进行平均就能计算出整个集成组合的预测效能。 这一结果通常与交叉验证或测试集验证的结果非常吻合， 该误差估计称为袋外估计。</p>
-<p>对于基本的装袋法，用户可以选择bootstrap样本的数目。 通常模型的预测效能与迭代次数之间会出现指数递减的关系； 大部分预测效能的提升是由少数几棵树实现的。 ［加一个例子，］。《应用预测模型（Applied Predictive Modeling）》<span class="citation">(Kjell Johnston <a href="#ref-APM">2013</a>)</span>的作者指出，根据他们的经验，一直到50个bootstrap样本，模型都可能还会有微小的改进， 如果迭代了50次代后模型的表现还是不令人满意，那就需要尝试使用其他更强大的集成预测方法，如随机森林和 boosting。</p>
-<p>尽管装袋法通常都能改进不稳定模型的预测效能，但它同样有一些缺陷。 首先，是计算量。随着 bootstrap 样本数目的增多，计算成本和内存需求也会相应增加。这一劣势可以通过并行计算来得到大部分的消减，原因是装袋的过程是非常容易并行化的。 回顾之前的介绍可以发现，每一个 boostrap 样本和相应的模型都是独立于其他样本和模型的。 这意味着每个模型都可以单独进行建模， 而只需在最后将所有模型的结果组合起来以生成最终的预测。</p>
-<p>装袋法的另一个劣势在于解释性差， 我们无法在装袋法中得到之前单棵回归树给出的简洁的规则。然而，变量重要性依旧可以通过将单个模型的重要性得分组合起来进行构建。 下一节介绍的随机森林将进一步讨论变量重要性。</p>
-</div>
-<div id="section-11.3" class="section level2">
-<h2><span class="header-section-number">11.3</span> 随机森林</h2>
-</div>
-<div id="section-11.4" class="section level2">
-<h2><span class="header-section-number">11.4</span> 其它树话题</h2>
+<div id="section-15" class="section level1">
+<h1><span class="header-section-number">第15章</span> 数据科学的科学</h1>
 
-</div>
-</div>
-<h3> References</h3>
-<div id="refs" class="references">
-<div id="ref-APM">
-<p>Kjell Johnston, Max Kuhn &amp;. 2013. <em>Applied Predictive Modeling</em>. Springer.</p>
-</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="section-10.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="section-12.html" class="navigation navigation-next " aria-label="Next page""><i class="fa fa-angle-right"></i></a>
+<a href="section-14.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="references.html" class="navigation navigation-next " aria-label="Next page""><i class="fa fa-angle-right"></i></a>
 
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
@@ -316,7 +281,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/rstudio/bookdown-demo/edit/master/11-shumoxing.Rmd",
+"link": "https://github.com/rstudio/bookdown-demo/edit/master/15-shujukexuedekexue.Rmd",
 "text": null
 },
 "download": null,

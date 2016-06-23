@@ -38,8 +38,8 @@ MathJax.Hub.Config({
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="section-10.html">
-<link rel="next" href="section-12.html">
+<link rel="prev" href="section-13.html">
+<link rel="next" href="section-15.html">
 
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -244,43 +244,40 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="section-11" class="section level1">
-<h1><span class="header-section-number">第11章</span> 树模型</h1>
-<p>本章讲介绍基于树的模型。树模型可以用于回归和判别。这类模型常被称为决策树（或分类回归树），是经典的机器学习算法，也是最广泛使用的工具。不太大的决策树简洁明了，容易解释。但是简单的树表现不一定好，复杂的树（比如之后会讲到的集成方法）效果大为提高，但过程如同黑箱，无法解释。所以建模者需要在解释性和精确性之间进行权衡。之所以称其为“树”当然因为结构有类似之处，只是决策树的方向和真实的树相反，根在上，叶在下。一棵决策树从单个根节点开始划分为几个不同的枝桠，从⽽产生更多的节点,在每个节点都可以决定是不是要继续划分，如果停止则该节点就是叶节点，若继续就是枝节点接着分裂产生下一层新节点。每个⾮叶节点都牵扯到决定接下来选择哪根树枝。叶节点包含 最终“决定”，讲该样本归于哪个最终类或者取值。</p>
-<div id="section-11.1" class="section level2">
-<h2><span class="header-section-number">11.1</span> 基本树模型</h2>
-</div>
-<div id="section-11.2" class="section level2">
-<h2><span class="header-section-number">11.2</span> 装袋树</h2>
-<p>Bootstrap 样本是对数据进行有放回随机抽样得到的样本（Efron 和 Tibshirani 1986）。这意味着，当一个样本点被选中时，它有可能会在将来的抽取中继续被选中。Bootstrap 样本和原数据的样本量一样。因此，一些样本可能被抽到过很多次，而另一些则可能没有被选到。没有被选到的样本被称为“袋外样本“（out-of-bag）。在一次 Bootstrap 重抽样迭代中，选中的样本点被用来建立模型，而袋外样本则被用于预测。 在20世纪90年代，集成方法（即将许多模型组合起来进行预测的模型）开始出现。 装袋法（Bagging，bootstrap aggregation 的缩写）最初由 Leo Breiman 提出，它是最早发展起来的集成方法之一（Breiman 1996a）。 装袋法是一种利用 bootstrap的通用方法，可用于任何回归（或分类）模型来构建集成组合。这种方法的构建非常简单，它包含算法 8.1 中所述的步骤。 集成组合中的每一个模型都对新样本进行一次预测，然后这 个预测将进行平均， 来给出装袋法模型的预测值。</p>
-<blockquote>
-<p><strong>算法：装袋法</strong></p>
+<div id="section-14" class="section level1">
+<h1><span class="header-section-number">第14章</span> 数据可视化和结果展示</h1>
+<p>你不需要太久就能够发现，分析行业不仅仅是脑力活，你在一个公司呆了一年之后就会发现，很多脑力活慢慢的转变为体力活，第二年有很大一部分的工作是重复第一年的分析，相似的方法，只是换了新的数据。这个世界上没有完美的职业，就像没有完美的人一样，至少我还没有发现。我们能够做的，就是将这不完美的部分尽力降至最低。</p>
+<p>主要介绍可重复报告</p>
 <ol style="list-style-type: decimal">
-<li>对 i=1 到 m 执行</li>
-<li>从原数据中生成bootstrap样本</li>
-<li>在生成的bootstrap样本上建立未修剪的树</li>
-<li>终止</li>
+<li>清晰的展现从数据到代码到最后的结果报告这整个过程，便于日后查询，与其他分析师合作，以及项目交接</li>
+<li>如果数据有变化，可以很容易重新分析并得出类似报告，省去无数琐碎的复制，黏贴，修改工作。</li>
+<li>你可以自行定义报告格式，选择显示哪些代码，哪些输出，建立完善自己的工作流程。有一定分析经验的人会知道，很多项目具有相似性，比如一般都会从基本的数据检查开始，看看变量的分布。然后对数据进行类似的可视化。此外，某一类问题（比如判别分析）使用的模型比较固定，因此建模过程的代码也很相似，使用可重复报告让你处理相似的问题时能最大的发挥协同效应，尽可能减少重复性的工作。</li>
 </ol>
-</blockquote>
-<p>装袋法模型相对于没有装袋的模型具有若干优势。首先， 装袋法通过模型的聚集过程有效地降低了预测的方差（参见之前关于偏差-方差权衡的讨论）。对于那些预测值不稳定的模型，例如回归树，将不同版本的训练集进行聚集，可以减小预测的方差，从而使得预测值更加稳定。假设我们有10个 bootstrap 样本各自生成了一棵最大深度的树。这些树在结构上有所差异，每棵树对新样本的预测都有所不同。 如果将这10棵树的预测结果进行平均作为新样本的预测， 那么这一平均值将比单棵树的预测方差更小。这意味着， 如果我们产生另一组 bootstrap 样本，在其中每一个样本上建立一个模型， 然后对所有模型的预测值进行平均，那么得到的结果将与前一个装袋模型的结果相类似。这一特性还使得装袋模型比未装袋的模型具有更好的预测效能。 如果建模的目标是得到最优的估计而不是解释树的结构，那么装袋法更有优势。</p>
-<p>另一方面，对稳定、方差小的模型（如回归，MARS）进行装袋则只会对其预测效能带来较小的改进。 在预测结果具有内在的不稳定性的情况下，可以用装袋法进行改进。</p>
-<p>装袋法模型的另一个优势是它可以提供内在的预测效能估计， 而且这一估计可以与交叉验证估计或测试集估计很好地对应上。原因如下： 构建集成组合中的每个 bootstrap 样本时，会有部分的观测被排除在外。 这部分样本称为袋外样本，它们扮演着测试集的角色，可以用来评估模型的预测效能， 因为这批样本并没有参与建模。因此，集成组合中的每个模型都可以通过袋外样本计算得到一个预测效能的估计， 而对所有袋外效能估计进行平均就能计算出整个集成组合的预测效能。 这一结果通常与交叉验证或测试集验证的结果非常吻合， 该误差估计称为袋外估计。</p>
-<p>对于基本的装袋法，用户可以选择bootstrap样本的数目。 通常模型的预测效能与迭代次数之间会出现指数递减的关系； 大部分预测效能的提升是由少数几棵树实现的。 ［加一个例子，］。《应用预测模型（Applied Predictive Modeling）》<span class="citation">(Kjell Johnston <a href="#ref-APM">2013</a>)</span>的作者指出，根据他们的经验，一直到50个bootstrap样本，模型都可能还会有微小的改进， 如果迭代了50次代后模型的表现还是不令人满意，那就需要尝试使用其他更强大的集成预测方法，如随机森林和 boosting。</p>
-<p>尽管装袋法通常都能改进不稳定模型的预测效能，但它同样有一些缺陷。 首先，是计算量。随着 bootstrap 样本数目的增多，计算成本和内存需求也会相应增加。这一劣势可以通过并行计算来得到大部分的消减，原因是装袋的过程是非常容易并行化的。 回顾之前的介绍可以发现，每一个 boostrap 样本和相应的模型都是独立于其他样本和模型的。 这意味着每个模型都可以单独进行建模， 而只需在最后将所有模型的结果组合起来以生成最终的预测。</p>
-<p>装袋法的另一个劣势在于解释性差， 我们无法在装袋法中得到之前单棵回归树给出的简洁的规则。然而，变量重要性依旧可以通过将单个模型的重要性得分组合起来进行构建。 下一节介绍的随机森林将进一步讨论变量重要性。</p>
+<p>knitr is ideal for this effort. It’s a system for combining code and text into a single document. Process the document, and the code is replaced with the results and figures that it generates.</p>
+<div id="r-markdown" class="section level2">
+<h2><span class="header-section-number">14.1</span> R Markdown</h2>
+<div id="r-markdown" class="section level3">
+<h3><span class="header-section-number">14.1.1</span> 什么是R Markdown?</h3>
+<p>Markdown是一种轻量级的标记语言，意在使书写更加方便。它最早由<a href="http://daringfireball.net">John Gruber</a> 于2004年12月推出1.0.1版本。和一些更加复杂的标记语言（如LyX，XML，HTML和LaTeX）不同，Markdown中的语法非常简单，标准的Markdown中只是定义了10多种格式，这些格式定义都很简单以至于不需要特别的记忆，使用一段时间自然就上手了。 Markdown看上去就像简单的邮件文本。和其它标记语言相比，Markdown还很年轻。它的优势就在于简洁优美，不仅机器能读，人也能轻松的阅读。</p>
+<p>有的人可能会怀疑格式这么少的标记语言是不是太过简化了？单纯的Markdown确实很局限，但后来Markdown的几种扩展大大增加了其功能。目前比较流行的扩展有pandoc和GitHub扩展。如我的个人网页就是用Markdown通过GitHub建立的。许多GitHub的用户都使用这样的方式生成简洁，可控性强的个人网页。pandoc是一个强大的格式转换工具，基本上支持各类常见格式之间的转换，其中就包括有markdown。而markdown的格式超级简单，这就使得人们能够用超级简单的markdown来生成看起来复杂的其他格式，比如word、html、pdf等。这样，因为pandoc使得人们能够使用markdown来生成doc和pdf文档，因此受到广泛的欢迎。随着pandoc的流行，出现了很多以pandoc为基础的外围工具，以此来方便人们对pandoc的使用，比如在R语言中的几个软件包Rmarkdown，knitr等就使用pandoc作为底层的支持来实现从markdown到各种其他格式的转换。这里我们主要介绍R Markdown。</p>
+<p>R Markdown combines the core syntax of markdown and embedded R code chunks that are run so their output can be included in the final document. R Markdown documents are fully <em>reproducible</em> and the most important, it is <em>simple</em>!</p>
 </div>
-<div id="section-11.3" class="section level2">
-<h2><span class="header-section-number">11.3</span> 随机森林</h2>
+<div id="how-to-start" class="section level3">
+<h3><span class="header-section-number">14.1.2</span> How to Start?</h3>
+<p>Please install R if you haven’t. You can get R from the <a href="https://cran.r-project.org">Comprehensive R Archive Network (CRAN)</a>. After installing R, install <a href="https://www.rstudio.com">RStudio</a>. Once you have RStudio, launch it. After that, I encourage those who are new to R Markdown start from this introductory article <a href="http://rmarkdown.rstudio.com">R Markdown — Dynamic Documents for R</a> which can get you started with R Markdown right away. Once you install R Markdown package and learn the most commonly used markdown constructs, you can go into more depth on customizing the behavior of embedded R code. The “Learning More” section on the bottom of the <a href="http://rmarkdown.rstudio.com">introductory article</a> has a list of reference you can refer to learn more about R Markdown.</p>
 </div>
-<div id="section-11.4" class="section level2">
-<h2><span class="header-section-number">11.4</span> 其它树话题</h2>
+<div id="interactive-r-markdown-document" class="section level3">
+<h3><span class="header-section-number">14.1.3</span> Interactive R Markdown Document</h3>
+<p>There are some packages that can be used to make interactive R Markdown documents.</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>DT: A Wrapper of the JavaScript Library “DataTables”</strong> <br> The R package <strong>DT</strong> provides an R interface to the JavaScript library DataTables. R data objects (matrices or data frames) can be displayed as tables on HTML pages, and DataTables provides filtering, pagination, sorting, and many other features in the tables. You can refer to <a href="https://rstudio.github.io/DT/" class="uri">https://rstudio.github.io/DT/</a> for more details.</p></li>
+<li><p><strong>Leaflet:Interactive Web-Maps Based on the Leaflet JavaScript Library</strong> <br> R package ‘leaflet’ makes it easy to integrate and control Leaflet maps in R. The JaveScript library ‘leaflet’ is for interactive maps. You can embed maps in knitr/R Markdown documents and Shiny apps. See <a href="https://rstudio.github.io/leaflet/" class="uri">https://rstudio.github.io/leaflet/</a> for more details.</p></li>
+<li><p><strong>dygraphs: interactive plot for time series data</strong> <br> The dygraphs package is an R interface to the dygraphs JavaScript charting library. It provides rich facilities for charting time-series data in R, including highly configurable series and axis display and interactive features like zoom/pan and series/point highlighting. See <a href="https://rstudio.github.io/dygraphs/" class="uri">https://rstudio.github.io/dygraphs/</a> for more details.</p></li>
+<li><p><strong>networkD3: D3 JavaScript Network Graphs from R</strong> <br> Package ‘networkD3’ provides tools for creating D3 JavaScript network graphs from R.</p></li>
+<li><p><strong>threejs: Interactive 3D Scatter Plots and Globes</strong> <br> Package threejs provides interactive 3D scatterplots and globe plots. Here is a galary of examples from the package and also the source code <a href="http://bwlewis.github.io/rthreejs/" class="uri">http://bwlewis.github.io/rthreejs/</a>.</p></li>
+</ol>
 
 </div>
-</div>
-<h3> References</h3>
-<div id="refs" class="references">
-<div id="ref-APM">
-<p>Kjell Johnston, Max Kuhn &amp;. 2013. <em>Applied Predictive Modeling</em>. Springer.</p>
 </div>
 </div>
             </section>
@@ -288,8 +285,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
           </div>
         </div>
       </div>
-<a href="section-10.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="section-12.html" class="navigation navigation-next " aria-label="Next page""><i class="fa fa-angle-right"></i></a>
+<a href="section-13.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="section-15.html" class="navigation navigation-next " aria-label="Next page""><i class="fa fa-angle-right"></i></a>
 
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
 <script src="libs/gitbook-2.6.7/js/lunr.js"></script>
@@ -316,7 +313,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/rstudio/bookdown-demo/edit/master/11-shumoxing.Rmd",
+"link": "https://github.com/rstudio/bookdown-demo/edit/master/14-keshihua.Rmd",
 "text": null
 },
 "download": null,
