@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-06-26">
+<meta name="date" content="2016-06-27">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -698,16 +698,17 @@ rating&lt;-<span class="kw">rbind</span>(rating1,rating2,rating3)
 <p>我们在这里考虑3类问题。第1类（问题1到问题40）问题中有两个选项对应变量有预测能力。第2类（问题41到问题80）问题中只有一个选项对结果有预测能力。第3类（问题81到问题120）对结果预测没有帮助，也就是我们希望能够去除的变量。模拟数据的参数设置如下：</p>
 <p><span class="math display">\[\mathbf{\beta^{T}}=\left(\underset{question\ 1}{\frac{40}{3},\underbrace{1,0,-1}},...,\underset{question\ 40}{\underbrace{1,0,-1}},\underset{question\ 41}{\underbrace{1,0,0}},...,\underset{question\ 80}{\underbrace{1,0,0}},\underset{question\ 81}{\underbrace{0,0,0}},...,\underset{question\ 120}{\underbrace{0,0,0}}\right)*\gamma\]</span></p>
 <p>这里我们通过设置5个<span class="math inline">\(\gamma\)</span>值（<span class="math inline">\(\gamma \in \{0.1,0.25,0.5,1,2\}\)</span> ）模拟了5种参数情况下的数据。 <span class="math inline">\(\gamma\)</span>越大，参数值越大，也就意味着有效问题对结果的预测性越强。对于每个参数设定模拟了20个数据集，之后我们会以这些数据为例展示不同模型变量选择的效果。模拟多个数据集是为了研究一些估值的稳定性。</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># sim1_da1.csv  模拟的第一个数据集</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="co"># sim1_da1.csv  模拟的第一个数据集</span>
 <span class="co"># similar sim1_da2 and sim1_da3</span>
 <span class="co"># sim1.csv  simulated data, the first simulation</span>
 <span class="co"># dummy.sim1.csv dummy variables for the first simulated data with all the baseline in</span>
 <span class="co">#code for simulation</span>
 
-<span class="kw">setwd</span>(<span class="kw">dirname</span>(<span class="kw">file.choose</span>()))
-<span class="kw">library</span>(grplasso)
+<span class="co"># setwd(dirname(file.choose()))</span>
+<span class="co"># library(grplasso)</span>
+
 nf&lt;-<span class="dv">800</span>
-<span class="kw">timestamp</span>()-&gt;t1
 for (j in <span class="dv">1</span>:<span class="dv">20</span>){
 <span class="kw">set.seed</span>(<span class="dv">19870</span>+j)
 x&lt;-<span class="kw">c</span>(<span class="st">&#39;A&#39;</span>,<span class="st">&#39;B&#39;</span>,<span class="st">&#39;C&#39;</span>)
@@ -718,14 +719,12 @@ sim.da1&lt;-<span class="kw">rbind</span>(sim.da1,<span class="kw">sample</span>
 }
 
 <span class="kw">data.frame</span>(sim.da1)-&gt;sim.da1
-<span class="co">#str(sim.da1)</span>
 <span class="kw">paste</span>(<span class="st">&quot;Q&quot;</span>, <span class="dv">1</span>:<span class="dv">120</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)-&gt;col
 <span class="kw">paste</span>(<span class="st">&quot;Farm&quot;</span>, <span class="dv">1</span>:nf, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)-&gt;row
 <span class="kw">colnames</span>(sim.da1)&lt;-col
 <span class="kw">rownames</span>(sim.da1)&lt;-row
-<span class="co">#edit(sim.da1)-&gt;sim.da1</span>
-<span class="co">#get dummy variables</span>
 
+<span class="co"># 用nnet包中的class.ind()函数将问题回复编码为名义变量</span>
 <span class="kw">library</span>(nnet)
 dummy.sim1&lt;-<span class="ot">NULL</span>
 for (k in <span class="dv">1</span>:<span class="kw">ncol</span>(sim.da1)) {
@@ -733,37 +732,54 @@ tmp=<span class="kw">class.ind</span>(sim.da1[,k])
 <span class="kw">colnames</span>(tmp)=<span class="kw">paste</span>(col[k],<span class="kw">colnames</span>(tmp))
 dummy.sim1=<span class="kw">cbind</span>(dummy.sim1,tmp)
 }
-
-<span class="co">#dim(dummy.sim1)</span>
-<span class="co">#edit(dummy.sim1)-&gt;dummy.sim1</span>
-
 <span class="kw">data.frame</span>(dummy.sim1)-&gt;dummy.sim1
 
-<span class="co">#get estimated probability</span>
-<span class="co">#c(rep(c(1/4,0,-1/4),40),rep(c(1/4,0,0),40),rep(c(0,0,0),40))-&gt;s1</span>
-<span class="co">#as.matrix(dummy.sim1)%*%s1-40/3/4-&gt;link1</span>
-<span class="co">#Mar2,2012, use another setting of parameters</span>
-<span class="co">#c(rep(c(1/2,0,-1/2),40),rep(c(1/2,0,0),40),rep(c(0,0,0),40))-&gt;s1</span>
-<span class="co">#as.matrix(dummy.sim1)%*%s1-40/3/2-&gt;link1</span>
+<span class="co"># 每个问题对应的3个名义变量中有重复信息</span>
+<span class="co"># 将C选项设置为基线回复</span>
+<span class="co"># 删除基线名义变量</span>
 
-<span class="co">#Mar3,2012, use another setting of parameters</span>
-<span class="kw">c</span>(<span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">0</span>,-<span class="dv">1</span>),<span class="dv">40</span>),<span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>),<span class="dv">40</span>),<span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>),<span class="dv">40</span>))-&gt;s1
-<span class="kw">as.matrix</span>(dummy.sim1)%*%s1<span class="dv">-40</span>/<span class="dv">3</span>-&gt;link1
+base.idx&lt;-<span class="dv">3</span>*<span class="kw">c</span>(<span class="dv">1</span>:<span class="dv">120</span>)
+dummy1&lt;-dummy.sim1[,-base.idx]
+
+<span class="co"># 对每个r设置依次抽取相应的因变量</span>
+<span class="co"># 每次只对一个r值抽取，将其余代码注释掉</span>
+<span class="co"># 得到r=0.1 时每个农场对应的连接函数值</span>
+<span class="kw">c</span>(<span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">1</span>/<span class="dv">10</span>,<span class="dv">0</span>,-<span class="dv">1</span>/<span class="dv">10</span>),<span class="dv">40</span>),<span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">1</span>/<span class="dv">10</span>,<span class="dv">0</span>,<span class="dv">0</span>),<span class="dv">40</span>),<span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>),<span class="dv">40</span>))-&gt;s1
+<span class="kw">as.matrix</span>(dummy.sim1)%*%s1<span class="dv">-40</span>/<span class="dv">3</span>/<span class="dv">10</span>-&gt;link1
+
+<span class="co"># r=0.25 </span>
+<span class="co"># c(rep(c(1/4,0,-1/4),40),rep(c(1/4,0,0),40),rep(c(0,0,0),40))-&gt;s1</span>
+<span class="co"># as.matrix(dummy.sim1)%*%s1-40/3/4-&gt;link1</span>
+
+<span class="co"># r=0.5 </span>
+<span class="co"># c(rep(c(1/2,0,-1/2),40),rep(c(1/2,0,0),40),rep(c(0,0,0),40))-&gt;s1</span>
+<span class="co"># as.matrix(dummy.sim1)%*%s1-40/3/2-&gt;link1</span>
+
+<span class="co"># r=1</span>
+<span class="co"># c(rep(c(1,0,-1),40),rep(c(1,0,0),40),rep(c(0,0,0),40))-&gt;s1</span>
+<span class="co"># as.matrix(dummy.sim1)%*%s1-40/3-&gt;link1</span>
+
+<span class="co"># r=2</span>
+<span class="co"># c(rep(c(2,0,-2),40),rep(c(2,0,0),40),rep(c(0,0,0),40))-&gt;s1</span>
+<span class="co"># as.matrix(dummy.sim1)%*%s1-40/3/0.5-&gt;link1</span>
+
+
+<span class="co"># 在连接函数的基础上计算每个农场对应的爆发概率</span>
 <span class="kw">exp</span>(link1)/(<span class="kw">exp</span>(link1)+<span class="dv">1</span>)-&gt;hp1
+
+<span class="co"># 基于爆发概率hp1，抽取相应的因变量res</span>
 res&lt;-<span class="kw">rep</span>(<span class="dv">9</span>,nf)
 for (i in <span class="dv">1</span>:nf){
 <span class="kw">sample</span>( <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">0</span>),<span class="dv">1</span>,<span class="dt">prob=</span><span class="kw">c</span>(hp1[i],<span class="dv">1</span>-hp1[i]))-&gt;res[i]
 }
-<span class="co">#table(res)</span>
-<span class="co">#delete baseline variables</span>
 
-base.idx&lt;-<span class="dv">3</span>*<span class="kw">c</span>(<span class="dv">1</span>:<span class="dv">120</span>)
-dummy1&lt;-dummy.sim1[,-base.idx]
-<span class="co">#str(dummy1)</span>
+<span class="co"># 这里将数据存成3个不同的版本，只是为了之后不同模型使用方便</span>
+<span class="co"># 3个数据集都含有所有120个问题的回复，但彼此稍微有不同</span>
 
-<span class="co">#da1 is the data set WITH response variables WITHOUT category indicators</span>
-<span class="co">#da2 is the data set WITHOUT response variable WITH question indicator in the last row</span>
-<span class="co">#da3 is the data WITHOUT response variable and question indicator</span>
+<span class="co"># da1 含有因变量，但没有名义变量所属问题的信息</span>
+<span class="co"># da2 没有因变量，但最后一行包括的名义变量所属的问题</span>
+<span class="co"># da3 没有因变量，没有名义变量所属问题的信息</span>
+
 dummy1$y&lt;-res
 da1&lt;-dummy1
 y&lt;-da1$y
@@ -771,17 +787,18 @@ ind&lt;-<span class="ot">NULL</span>
 for (i in <span class="dv">1</span>:<span class="dv">120</span>){
 <span class="kw">c</span>(ind,<span class="kw">rep</span>(i,<span class="dv">2</span>))-&gt;ind
 }
+
 da2&lt;-<span class="kw">rbind</span>(da1[,<span class="dv">1</span>:<span class="dv">240</span>],ind)
 da3&lt;-da1[,<span class="dv">1</span>:<span class="dv">240</span>]
 
-<span class="co">#write.csv(pre,paste(&#39;pre_link&#39;,j,&#39;,csv&#39;,sep=&#39;&#39;),row.names=F)</span>
+<span class="co"># 将数据集储存起来</span>
 <span class="kw">write.csv</span>(da1,<span class="kw">paste</span>(<span class="st">&#39;sim&#39;</span>,j,<span class="st">&#39;_da&#39;</span>,<span class="dv">1</span>,<span class="st">&#39;.csv&#39;</span>,<span class="dt">sep=</span><span class="st">&#39;&#39;</span>),<span class="dt">row.names=</span>F)
 <span class="kw">write.csv</span>(da2,<span class="kw">paste</span>(<span class="st">&#39;sim&#39;</span>,j,<span class="st">&#39;_da&#39;</span>,<span class="dv">2</span>,<span class="st">&#39;.csv&#39;</span>,<span class="dt">sep=</span><span class="st">&#39;&#39;</span>),<span class="dt">row.names=</span>F)
 <span class="kw">write.csv</span>(da3,<span class="kw">paste</span>(<span class="st">&#39;sim&#39;</span>,j,<span class="st">&#39;_da&#39;</span>,<span class="dv">3</span>,<span class="st">&#39;.csv&#39;</span>,<span class="dt">sep=</span><span class="st">&#39;&#39;</span>),<span class="dt">row.names=</span>F)
 <span class="kw">write.csv</span>(sim.da1,<span class="kw">paste</span>(<span class="st">&#39;sim&#39;</span>,j,<span class="st">&#39;.csv&#39;</span>,<span class="dt">sep=</span><span class="st">&#39;&#39;</span>),<span class="dt">row.names=</span>F)
 <span class="kw">write.csv</span>(dummy.sim1,<span class="kw">paste</span>(<span class="st">&#39;dummy.sim&#39;</span>,j,<span class="st">&#39;.csv&#39;</span>,<span class="dt">sep=</span><span class="st">&#39;&#39;</span>),<span class="dt">row.names=</span>F)
-}
-<span class="kw">timestamp</span>()-&gt;t2</code></pre></div>
+}</code></pre></div>
+<p>要理解这里数据模拟的代码，读者需要了解逻辑回归和分组lasso的理论知识，这超出了本书的范围。这里的代码仅供大家参考。可以重复上面的代码生成相应的数据集。因为这里生成的数据量较大，在网上只有<span class="math inline">\(\gamma=2\)</span>对应的一次模拟的数据集。之后我会用这个数据集展示一些相关的模型。</p>
 
 </div>
 </div>
