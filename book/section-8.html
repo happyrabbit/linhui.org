@@ -301,36 +301,24 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </div>
 <div id="section-8.2" class="section level2">
 <h2><span class="header-section-number">8.2</span> 分类模型评估度量</h2>
-<p>本小节关注判别模型（即，应变量为分类变量）的表现度量。之前对连续型变量适用的RMSE和<span class="math inline">\(R^2\)</span>不适用于分类模型。分类指对给定观测样本预测其所属类别，而且类别空间已知，所以是有监督学习。这个和聚类不同，聚类分析的目的是得到类别空间，是无监督学习，这在之后聚类和判别的部分还会更详细的介绍。通常遇到的问题是二分类，比如是否有某种疾病，垃圾邮件分类器等。也有多分类问题，比如服装消费数据中的消费者类别。这里我们还是以服装消费者数据为例。一个重要的市场调查研究目的是消费者分组，通常先基于一个初始调查研究结果，通过聚类方法得到消费者类别。然后建立判别模型对新样本进行分类。这里我们只考虑分类问题，假设类别已知，我们需要用消费者系统中的数据来判定样本类别。这里我们训练一个随机森林模型，之后在树模型的章节中会对模型本身进行更详细的介绍。为了简便，将多分类问题转化为二分类问题，假设该服装厂想知道现有消费者中哪些是风格类的。先对数据进行预处理，创建一个新的类别变量：</p>
+<p>本小节关注判别模型（即，应变量为分类变量）的表现度量。之前对连续型变量适用的RMSE和<span class="math inline">\(R^2\)</span>不适用于分类模型。分类指对给定观测样本预测其所属类别，而且类别空间已知，所以是有监督学习。这个和聚类不同，聚类分析的目的是得到类别空间，是无监督学习，这在之后聚类和判别的部分还会更详细的介绍。通常遇到的问题是二分类，比如是否有某种疾病，垃圾邮件分类器等。也有多分类问题，比如服装消费数据中的消费者类别。这里我们用生猪疫情风险预测数据为例展示分类模型的评估度量。 这里我们只考虑分类问题，假设类别已知，我们需要用消费者系统中的数据来判定样本类别。这里我们训练一个随机森林模型，之后在树模型的章节中会对模型本身进行更详细的介绍。为了简便，将多分类问题转化为二分类问题，假设该服装厂想知道现有消费者中哪些是风格类的。先对数据进行预处理，创建一个新的类别变量：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)
 <span class="kw">library</span>(randomForest)
 <span class="kw">library</span>(caret)
 <span class="kw">library</span>(readr)
-sim.dat&lt;-<span class="kw">read_csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv&quot;</span>)
-<span class="co"># 数据预处理</span>
-<span class="co"># 将错误的年龄观测设置为缺失值</span>
-sim.dat$age[<span class="kw">which</span>(sim.dat$age&gt;<span class="dv">100</span>)]&lt;-<span class="ot">NA</span>
-<span class="co"># 将错误的实体店购买观测设置为缺失值</span>
-sim.dat$store_exp[<span class="kw">which</span>(sim.dat$store_exp&lt;<span class="dv">0</span>)]&lt;-<span class="ot">NA</span>
-<span class="co"># 中位数缺失值填补</span>
-imp&lt;-<span class="kw">preProcess</span>(sim.dat,<span class="dt">method=</span><span class="st">&quot;medianImpute&quot;</span>)
-sim.dat&lt;-<span class="kw">predict</span>(imp,sim.dat)
-<span class="co"># 编码名义变量</span>
-sim.dat&lt;-<span class="kw">cbind</span>(sim.dat,nnet::<span class="kw">class.ind</span>(sim.dat$gender))
-<span class="co"># 创建关于风格（style）类的新二分类变量</span>
-sim.dat$style&lt;-<span class="kw">as.numeric</span>(sim.dat$segment==<span class="st">&quot;Style&quot;</span>)</code></pre></div>
+disease_dat&lt;-<span class="kw">read_csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/sim1_da1.csv&quot;</span>)
+<span class="co"># 可以用glimpse()函数查看数据</span>
+<span class="co"># glimpse(disease_dat)</span></code></pre></div>
 <p>划分训练集和测试集，在训练集上得到模型，然后在测试集上评估模型表现。70%的样本用于训练，剩下30%用于模型评估：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 划分训练集和测试集</span>
-trainIndex&lt;-<span class="kw">createDataPartition</span>(sim.dat$style,<span class="dt">p=</span><span class="fl">0.7</span>,<span class="dt">list=</span>F,<span class="dt">times=</span><span class="dv">1</span>)
-<span class="co"># 记得之前介绍dplyr包时讲到num_range()的使用么？</span>
-<span class="co"># 选取问卷调查变量作为自变量</span>
-xTrain&lt;-sim.dat[trainIndex,]%&gt;%<span class="kw">select</span>(Female,store_exp,online_exp,store_trans,online_trans)
-xTest&lt;-sim.dat[-trainIndex,]%&gt;%<span class="kw">select</span>(Female,store_exp,online_exp,store_trans,online_trans)
-<span class="co"># 选取消费者类别变量作为因变量</span>
-<span class="co"># 这里需要转化为因子变量</span>
-yTrain&lt;-sim.dat$style[trainIndex]%&gt;%<span class="kw">as.factor</span>()
-yTest&lt;-sim.dat$style[-trainIndex]%&gt;%<span class="kw">as.factor</span>()
-train_rf&lt;-<span class="kw">randomForest</span>(yTrain~.,<span class="dt">data=</span>xTrain,<span class="dt">mtry=</span><span class="kw">trunc</span>(<span class="kw">sqrt</span>(<span class="kw">ncol</span>(xTrain)-<span class="dv">1</span>)),<span class="dt">ntree=</span><span class="dv">50</span>,<span class="dt">importance=</span>T)</code></pre></div>
+trainIndex&lt;-<span class="kw">createDataPartition</span>(disease_dat$y,<span class="dt">p=</span><span class="fl">0.8</span>,<span class="dt">list=</span>F,<span class="dt">times=</span><span class="dv">1</span>)
+xTrain&lt;-disease_dat[trainIndex,]%&gt;%<span class="kw">select</span>(-y)
+xTest&lt;-disease_dat[-trainIndex,]%&gt;%<span class="kw">select</span>(-y)
+<span class="co"># 需要将应变量转化成因子类型</span>
+yTrain&lt;-disease_dat$y[trainIndex]%&gt;%<span class="kw">as.factor</span>()
+yTest&lt;-disease_dat$y[-trainIndex]%&gt;%<span class="kw">as.factor</span>()</code></pre></div>
+<p>训练随机森林模型：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">train_rf&lt;-<span class="kw">randomForest</span>(yTrain~.,<span class="dt">data=</span>xTrain,<span class="dt">mtry=</span><span class="kw">trunc</span>(<span class="kw">sqrt</span>(<span class="kw">ncol</span>(xTrain)-<span class="dv">1</span>)),<span class="dt">ntree=</span><span class="dv">10000</span>,<span class="dt">importance=</span>T)</code></pre></div>
 <p>为了展示不同的模型评估法则，我们将训练得到的随机森林模型应用到测试集，得到两种预测：</p>
 <ol style="list-style-type: decimal">
 <li>每个类别的概率预测（结果为0到1之间的连续值，可以通过在代码中添加选项<code>prob</code>得到预测，结果存在<code>yhatprob</code>对象中）</li>
@@ -340,21 +328,21 @@ train_rf&lt;-<span class="kw">randomForest</span>(yTrain~.,<span class="dt">data
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">yhatprob&lt;-<span class="kw">predict</span>(train_rf,xTest,<span class="st">&quot;prob&quot;</span>)
 <span class="kw">set.seed</span>(<span class="dv">100</span>)
 car::<span class="kw">some</span>(yhatprob)</code></pre></div>
-<pre><code>##        0    1
-## 63  1.00 0.00
-## 137 1.00 0.00
-## 243 1.00 0.00
-## 301 1.00 0.00
-## 371 1.00 0.00
-## 466 0.76 0.24
-## 486 1.00 0.00
-## 546 0.92 0.08
-## 563 1.00 0.00
-## 819 0.00 1.00</code></pre>
+<pre><code>##          0      1
+## 9   0.1774 0.8226
+## 26  0.1674 0.8326
+## 41  0.8088 0.1912
+## 50  0.8545 0.1455
+## 57  0.1883 0.8117
+## 74  0.1821 0.8179
+## 75  0.8226 0.1774
+## 84  0.1614 0.8386
+## 88  0.8478 0.1522
+## 126 0.1949 0.8051</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">yhat&lt;-<span class="kw">predict</span>(train_rf,xTest)
 car::<span class="kw">some</span>(yhat)</code></pre></div>
-<pre><code>## 172 262 349 413 636 657 663 750 892 979 
-##   0   0   0   0   0   1   1   1   1   1 
+<pre><code>##  32  45  55  63 100 104 105 119 141 153 
+##   0   1   1   0   1   1   0   1   1   1 
 ## Levels: 0 1</code></pre>
 <p>现在我们就用上面的两种预测结果为例介绍不同的预测类评估方法。</p>
 <div id="kappa" class="section level3">
@@ -362,9 +350,9 @@ car::<span class="kw">some</span>(yhat)</code></pre></div>
 <p><strong>混淆矩阵（Confusion Matrix）</strong>是对分类结果进行详细描述的一个表，是简单的观测类和预测类的交叉表。在此例中，观测类是<code>yTest</code>，预测类是<code>yhat</code>，相应的混淆矩阵为：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(yhat,yTest)</code></pre></div>
 <pre><code>##     yTest
-## yhat   0   1
-##    0 188   1
-##    1   6 105</code></pre>
+## yhat  0  1
+##    0 83  1
+##    1  2 74</code></pre>
 <p>表格中左上角和右下角分别代表预测正确的样本数目，左下角和右上角代表错误预测的样本数目。更一般的二分类混淆矩阵如下：</p>
 <table>
 <thead>
@@ -402,7 +390,7 @@ car::<span class="kw">some</span>(yhat)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">kt&lt;-fmsb::<span class="kw">Kappa.test</span>(<span class="kw">table</span>(yhat,yTest))
 <span class="co"># 统计量估值在函数返回值的Result对象中</span>
 kt$Result$estimate</code></pre></div>
-<pre><code>## [1] 0.9494804</code></pre>
+<pre><code>## [1] 0.9623824</code></pre>
 <p>上面函数返回结果中包含一个<code>Judgement</code>对象:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">kt$Judgement</code></pre></div>
 <pre><code>## [1] &quot;Almost perfect agreement&quot;</code></pre>
@@ -418,7 +406,22 @@ kt$Result$estimate</code></pre></div>
 </div>
 <div id="roc" class="section level3">
 <h3><span class="header-section-number">8.2.2</span> ROC曲线</h3>
-<p>相对与简单的类取值，类概率中含有更多的模型预测信息，比如之前得到的<code>yhatprob</code>就是连续的预测值。对于这样的预测结果，ROC曲线是一个通用评估方法。该方法确定一个有效的阈值，超过这个阈值的观测被标注为某类。比如所有<code>yhatprob</code>&gt;0.9的样本都判定为风格类。</p>
+<p>相对与简单的类取值，类概率中含有更多的模型预测信息，比如之前得到的<code>yhatprob</code>就是连续的预测值。对于这样的预测结果，ROC曲线是一个通用评估方法。该方法确定一个有效的阈值，超过这个阈值的观测被标注为某类。比如所有<code>yhatprob</code>&gt;0.9的样本都判定为风格类。ROC曲线是基于灵敏度和特异度这两个统计量。考虑之前展示的二分类情况的混淆矩阵。模型的灵敏度为在所有真实观测到“发生”的样本中被准确预测为“发生”的比率：</p>
+<p><span class="math display">\[灵敏度=\frac{正确预测为“发生”的样本数目}{观测到发生的样本数目}=\frac{TP}{TP+FN}\]</span></p>
+<p>特异度指的是观测到“不发生”的样本中准确预测为“不发生”的比率：</p>
+<p><span class="math display">\[特异度=\frac{正确预测为“不发生”的样本数目}{观测到不发生的样本数目}=\frac{TN}{TN+FP}\]</span></p>
+<p>灵敏度也称为真阳性率，特异度也称为真阴性率。“1-特异度”为假阳性率。灵敏度和特异度对应的分母是固定的，当模型将更多样本判定为“发生”时，对应的灵敏度会增加，特异度会降低。根据不同错误类型导致的损失，通常需要建模者在灵敏度和特异度之间做出权衡。ROC曲线是权衡这二者的一个有效工具。ROC曲线是通过设定一系列预测结果阈值，得到相应的真阳性率（灵敏度）和假阳性率（1-特异度）绘制成的曲线。我们得到的关于农场疫情爆发预测概率结果<code>yhatprob</code>为例，展示如何用<code>rROC</code>包中的相应函数得到ROC曲线和相关统计量。<code>yhatprob</code>中的第2列代表将样本判定为疫情爆发的概率，其两列相加和为1。我们可以使用函数<code>roc()</code>得到相应的ROC对象<code>rocCurve</code>。然后将不同的函数应用在该对象上得到相应的图形结果或者统计量。下面的代码可以用来得到ROC曲线：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(pROC)
+rocCurve&lt;-<span class="kw">roc</span>(<span class="dt">response=</span>yTest,<span class="dt">predictor=</span>yhatprob[,<span class="dv">2</span>])
+<span class="kw">plot</span>(rocCurve,<span class="dt">legacy.axes=</span>T)</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-88-1.png" width="672" /></p>
+<pre><code>## 
+## Call:
+## roc.default(response = yTest, predictor = yhatprob[, 2])
+## 
+## Data: yhatprob[, 2] in 85 controls (yTest 0) &lt; 75 cases (yTest 1).
+## Area under the curve: 0.9984</code></pre>
+<p>其中<code>roc()</code>函数中的第一个参数<code>response</code>是真实观测值，<code>predictor</code>是连续预测结果，这里赋予的是判定为爆发的预测概率。ROC曲线的横坐标是1-特异度，纵坐标是灵敏度。</p>
 <!--
 
 ### 失衡数据
