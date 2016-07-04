@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-07-03">
+<meta name="date" content="2016-07-04">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -173,7 +173,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 <li class="chapter" data-level="8" data-path="section-8.html"><a href="section-8.html"><i class="fa fa-check"></i><b>8</b> 模型评估度量</a><ul>
 <li class="chapter" data-level="8.1" data-path="section-8.html"><a href="section-8.html#section-8.1"><i class="fa fa-check"></i><b>8.1</b> 回归模型评估度量</a></li>
-<li class="chapter" data-level="8.2" data-path="section-8.html"><a href="section-8.html#section-8.2"><i class="fa fa-check"></i><b>8.2</b> 分类模型评估度量</a></li>
+<li class="chapter" data-level="8.2" data-path="section-8.html"><a href="section-8.html#section-8.2"><i class="fa fa-check"></i><b>8.2</b> 分类模型评估度量</a><ul>
+<li class="chapter" data-level="8.2.1" data-path="section-8.html"><a href="section-8.html#kappa"><i class="fa fa-check"></i><b>8.2.1</b> Kappa统计量</a></li>
+<li class="chapter" data-level="8.2.2" data-path="section-8.html"><a href="section-8.html#roc"><i class="fa fa-check"></i><b>8.2.2</b> ROC曲线</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="9" data-path="section-9.html"><a href="section-9.html"><i class="fa fa-check"></i><b>9</b> 特征工程</a><ul>
 <li class="chapter" data-level="9.1" data-path="section-9.html"><a href="section-9.html#section-9.1"><i class="fa fa-check"></i><b>9.1</b> 特征构建</a></li>
@@ -326,7 +329,7 @@ E(\mathbf{y}-\hat{\mathbf{y}})^{2}=E[f(\mathbf{X})+\mathbf{\epsilon}-\hat{f}(\ma
 </div>
 <div id="section-7.2.2" class="section level3">
 <h3><span class="header-section-number">7.2.2</span> 应变量误差</h3>
-<p>若应变量包含可观的测量误差，那么这部分误差将反映在随机误差（<span class="math inline">\(\mathbf{\epsilon}\)</span>）中。这部分误差使得均方根误差（RMSE）和<span class="math inline">\(R^2\)</span>有相应的上下限。RMSE和<span class="math inline">\(R^2\)</span>是回归模型常用的表现度量方法，我们在本章后面部分会进行介绍。因此，随机误差项不仅仅代表模型无法解释的波动，还含有测量误差。《应用预测模型（Applied Predictive Modeling）》<span class="citation">(Kjell Johnston <a href="#ref-APM">2013</a>)</span>的第20.2小节有一个例子展示了因变量的测量误差对模型表现（RMSE和<span class="math inline">\(R^2\)</span>）的影响。作者在因变量上加入了不同强度的随机正态噪声，重复拟合不同的模型，研究模型均方根误差（RMSE）和<span class="math inline">\(R^2\)</span>的变化。这里我们用服装消费者数据进行类似的展示。假设我们面对这样一个问题，实际中消费者的收入并不是那么容易收集，很多人不愿透露这样的私人信息。于是我们希望利用消费记录变量建立关于消费者收入的预测模型，模型可以对那些数据库中缺失收入信息的记录进行填补。我们建立下面模型：</p>
+<p>若应变量包含可观的测量误差，那么这部分误差将反映在随机误差（<span class="math inline">\(\mathbf{\epsilon}\)</span>）中。这部分误差使得均方根误差（RMSE）和<span class="math inline">\(R^2\)</span>有相应的上下限。RMSE和<span class="math inline">\(R^2\)</span>是回归模型常用的表现度量方法，我们在本章后面部分会进行介绍。因此，随机误差项不仅仅代表模型无法解释的波动，还含有测量误差。《应用预测模型（Applied Predictive Modeling）》<span class="citation">(Max Kuhn <a href="#ref-APM">2013</a>)</span>的第20.2小节有一个例子展示了因变量的测量误差对模型表现（RMSE和<span class="math inline">\(R^2\)</span>）的影响。作者在因变量上加入了不同强度的随机正态噪声，重复拟合不同的模型，研究模型均方根误差（RMSE）和<span class="math inline">\(R^2\)</span>的变化。这里我们用服装消费者数据进行类似的展示。假设我们面对这样一个问题，实际中消费者的收入并不是那么容易收集，很多人不愿透露这样的私人信息。于是我们希望利用消费记录变量建立关于消费者收入的预测模型，模型可以对那些数据库中缺失收入信息的记录进行填补。我们建立下面模型：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 载入数据</span>
 sim.dat&lt;-<span class="kw">read.csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv&quot;</span>)
 ymad&lt;-<span class="kw">mad</span>(<span class="kw">na.omit</span>(sim.dat$income))
@@ -773,7 +776,7 @@ dplyr::<span class="kw">glimpse</span>(trainIndex)</code></pre></div>
 <h3> References</h3>
 <div id="refs" class="references">
 <div id="ref-APM">
-<p>Kjell Johnston, Max Kuhn &amp;. 2013. <em>Applied Predictive Modeling</em>. Springer.</p>
+<p>Max Kuhn, Kjell Johnston. 2013. <em>Applied Predictive Modeling</em>. Springer.</p>
 </div>
 <div id="ref-woldh1">
 <p>H, Wold. 1966. <em>Estimation of Principal Components and Related Models by Iterative Least Squares.</em> pp. 391-420. Academic Press, New York.: In P Krishnaiah (ed.), Journal of Multivariate Analysis ,</p>

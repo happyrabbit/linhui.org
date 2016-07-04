@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-07-03">
+<meta name="date" content="2016-07-04">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -173,7 +173,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 <li class="chapter" data-level="8" data-path="section-8.html"><a href="section-8.html"><i class="fa fa-check"></i><b>8</b> 模型评估度量</a><ul>
 <li class="chapter" data-level="8.1" data-path="section-8.html"><a href="section-8.html#section-8.1"><i class="fa fa-check"></i><b>8.1</b> 回归模型评估度量</a></li>
-<li class="chapter" data-level="8.2" data-path="section-8.html"><a href="section-8.html#section-8.2"><i class="fa fa-check"></i><b>8.2</b> 分类模型评估度量</a></li>
+<li class="chapter" data-level="8.2" data-path="section-8.html"><a href="section-8.html#section-8.2"><i class="fa fa-check"></i><b>8.2</b> 分类模型评估度量</a><ul>
+<li class="chapter" data-level="8.2.1" data-path="section-8.html"><a href="section-8.html#kappa"><i class="fa fa-check"></i><b>8.2.1</b> Kappa统计量</a></li>
+<li class="chapter" data-level="8.2.2" data-path="section-8.html"><a href="section-8.html#roc"><i class="fa fa-check"></i><b>8.2.2</b> ROC曲线</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="9" data-path="section-9.html"><a href="section-9.html"><i class="fa fa-check"></i><b>9</b> 特征工程</a><ul>
 <li class="chapter" data-level="9.1" data-path="section-9.html"><a href="section-9.html#section-9.1"><i class="fa fa-check"></i><b>9.1</b> 特征构建</a></li>
@@ -267,7 +270,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>装袋法模型相对于没有装袋的模型具有若干优势。首先， 装袋法通过模型的聚集过程有效地降低了预测的方差（参见之前关于偏差-方差权衡的讨论）。对于那些预测值不稳定的模型，例如回归树，将不同版本的训练集进行聚集，可以减小预测的方差，从而使得预测值更加稳定。假设我们有10个 bootstrap 样本各自生成了一棵最大深度的树。这些树在结构上有所差异，每棵树对新样本的预测都有所不同。 如果将这10棵树的预测结果进行平均作为新样本的预测， 那么这一平均值将比单棵树的预测方差更小。这意味着， 如果我们产生另一组 bootstrap 样本，在其中每一个样本上建立一个模型， 然后对所有模型的预测值进行平均，那么得到的结果将与前一个装袋模型的结果相类似。这一特性还使得装袋模型比未装袋的模型具有更好的预测效能。 如果建模的目标是得到最优的估计而不是解释树的结构，那么装袋法更有优势。</p>
 <p>另一方面，对稳定、方差小的模型（如回归，MARS）进行装袋则只会对其预测效能带来较小的改进。 在预测结果具有内在的不稳定性的情况下，可以用装袋法进行改进。</p>
 <p>装袋法模型的另一个优势是它可以提供内在的预测效能估计， 而且这一估计可以与交叉验证估计或测试集估计很好地对应上。原因如下： 构建集成组合中的每个 bootstrap 样本时，会有部分的观测被排除在外。 这部分样本称为袋外样本，它们扮演着测试集的角色，可以用来评估模型的预测效能， 因为这批样本并没有参与建模。因此，集成组合中的每个模型都可以通过袋外样本计算得到一个预测效能的估计， 而对所有袋外效能估计进行平均就能计算出整个集成组合的预测效能。 这一结果通常与交叉验证或测试集验证的结果非常吻合， 该误差估计称为袋外估计。</p>
-<p>对于基本的装袋法，用户可以选择bootstrap样本的数目。 通常模型的预测效能与迭代次数之间会出现指数递减的关系； 大部分预测效能的提升是由少数几棵树实现的。 ［加一个例子，］。《应用预测模型（Applied Predictive Modeling）》<span class="citation">(Kjell Johnston <a href="#ref-APM">2013</a>)</span>的作者指出，根据他们的经验，一直到50个bootstrap样本，模型都可能还会有微小的改进， 如果迭代了50次代后模型的表现还是不令人满意，那就需要尝试使用其他更强大的集成预测方法，如随机森林和 boosting。</p>
+<p>对于基本的装袋法，用户可以选择bootstrap样本的数目。 通常模型的预测效能与迭代次数之间会出现指数递减的关系； 大部分预测效能的提升是由少数几棵树实现的。 ［加一个例子，］。《应用预测模型（Applied Predictive Modeling）》<span class="citation">(Max Kuhn <a href="#ref-APM">2013</a>)</span>的作者指出，根据他们的经验，一直到50个bootstrap样本，模型都可能还会有微小的改进， 如果迭代了50次代后模型的表现还是不令人满意，那就需要尝试使用其他更强大的集成预测方法，如随机森林和 boosting。</p>
 <p>尽管装袋法通常都能改进不稳定模型的预测效能，但它同样有一些缺陷。 首先，是计算量。随着 bootstrap 样本数目的增多，计算成本和内存需求也会相应增加。这一劣势可以通过并行计算来得到大部分的消减，原因是装袋的过程是非常容易并行化的。 回顾之前的介绍可以发现，每一个 boostrap 样本和相应的模型都是独立于其他样本和模型的。 这意味着每个模型都可以单独进行建模， 而只需在最后将所有模型的结果组合起来以生成最终的预测。</p>
 <p>装袋法的另一个劣势在于解释性差， 我们无法在装袋法中得到之前单棵回归树给出的简洁的规则。然而，变量重要性依旧可以通过将单个模型的重要性得分组合起来进行构建。 下一节介绍的随机森林将进一步讨论变量重要性。</p>
 </div>
@@ -282,7 +285,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h3> References</h3>
 <div id="refs" class="references">
 <div id="ref-APM">
-<p>Kjell Johnston, Max Kuhn &amp;. 2013. <em>Applied Predictive Modeling</em>. Springer.</p>
+<p>Max Kuhn, Kjell Johnston. 2013. <em>Applied Predictive Modeling</em>. Springer.</p>
 </div>
 </div>
             </section>
