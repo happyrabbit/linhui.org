@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-06-27">
+<meta name="date" content="2016-07-03">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -330,8 +330,8 @@ yTest&lt;-sim.dat$style[-trainIndex]%&gt;%<span class="kw">as.factor</span>()
 train_rf&lt;-<span class="kw">randomForest</span>(yTrain~.,<span class="dt">data=</span>xTrain,<span class="dt">mtry=</span><span class="kw">trunc</span>(<span class="kw">sqrt</span>(<span class="kw">ncol</span>(xTrain)-<span class="dv">1</span>)),<span class="dt">ntree=</span><span class="dv">50</span>,<span class="dt">importance=</span>T)</code></pre></div>
 <p>为了展示不同的模型评估法则，我们将训练得到的随机森林模型应用到测试集，得到两种预测：</p>
 <ol style="list-style-type: decimal">
-<li>每个类别的概率预测（代码中添加选项：<code>prob</code>，结果存在<code>yhatprob</code>对象中）</li>
-<li>离散类别预测（结果存在<code>yhat</code>对象中）</li>
+<li>每个类别的概率预测（结果为0到1之间的连续值，可以通过在代码中添加选项<code>prob</code>得到预测，结果存在<code>yhatprob</code>对象中）</li>
+<li>离散类别预测（结果为0/1形式，存在<code>yhat</code>对象中）</li>
 </ol>
 <p>我们分别看看这两个预测结果：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">yhatprob&lt;-<span class="kw">predict</span>(train_rf,xTest,<span class="st">&quot;prob&quot;</span>)
@@ -361,7 +361,31 @@ train_rf&lt;-<span class="kw">randomForest</span>(yTrain~.,<span class="dt">data
 ## yhat   0   1
 ##    0 188   1
 ##    1   6 105</code></pre>
-<p>表格中左上角和右下角分别代表预测正确的样本数目，左下角和右上角代表错误预测的样本数目。更一般的混淆矩阵如下：</p>
+<p>表格中左上角和右下角分别代表预测正确的样本数目，左下角和右上角代表错误预测的样本数目。更一般的二分类混淆矩阵如下：</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="left">观测发生</th>
+<th align="left">观测不发生</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">预测发生</td>
+<td align="left">TP</td>
+<td align="left">FP</td>
+</tr>
+<tr class="even">
+<td align="left">预测不发生</td>
+<td align="left">FN</td>
+<td align="left">TN</td>
+</tr>
+</tbody>
+</table>
+<p>其中TP代表真阳性，FP代表假阳性，TN代表真阴性，FN代表假阴性。表格左上到右下对角线上的元素表示正确预测的样本数目，另一个方向的对角线上的元素代表误判的样本数。评估类预测最简单的指标是总体精确率，即预测正确的总体样本比例:</p>
+<p><span class="math display">\[总体精确率=\frac{TP+TN}{TP+TN+FP+FN}\]</span></p>
+<p>对类别数目大于2的情况，可以类似计算总体精确率。该统计量很直观，但有一些缺点，首先总体精确率没有区分错误类型。实际应用中，不同错误对应的损失可能不同，这时就无法用总体精确率衡量模型。 比如过滤垃圾邮件，误删一封重要的邮件带来的损失要高于收到一封垃圾邮件的损失。Provost等人<span class="citation">(Provost F <a href="#ref-provost1998">1998</a>)</span>深入讨论了用精确率来比较不同的分类器存在的问题。其次总体精确率没有考虑真实频率。比如在保险风险分析中，有风险的概率可能只有千分之一或者更小，模型只要讲所有样本都清一色判定为无风险就能达到几乎完美的精确率。</p>
 <!--
 
 ### 失衡数据
@@ -379,6 +403,12 @@ train_rf&lt;-<span class="kw">randomForest</span>(yTrain~.,<span class="dt">data
 <p>有目标的估计因果效应，而不是将其当作庞大回归模型的副产物</p>
 <p>不要想当然的假设回归系数能够解释成因果关系。</p>
 
+</div>
+</div>
+<h3> References</h3>
+<div id="refs" class="references">
+<div id="ref-provost1998">
+<p>Provost F, Kohavi R, Fawcett T. 1998. “The Case Against Accuracy Esti- Mation for Comparing Induction Algorithms.” <em>Proceedings of the Fifteenth International Conference on Machine Learning</em>, 445–53.</p>
 </div>
 </div>
             </section>
