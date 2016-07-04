@@ -311,6 +311,7 @@ disease_dat&lt;-<span class="kw">read_csv</span>(<span class="st">&quot;/Users/h
 <span class="co"># glimpse(disease_dat)</span></code></pre></div>
 <p>划分训练集和测试集，在训练集上得到模型，然后在测试集上评估模型表现。70%的样本用于训练，剩下30%用于模型评估：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 划分训练集和测试集</span>
+<span class="kw">set.seed</span>(<span class="dv">2016</span>)
 trainIndex&lt;-<span class="kw">createDataPartition</span>(disease_dat$y,<span class="dt">p=</span><span class="fl">0.8</span>,<span class="dt">list=</span>F,<span class="dt">times=</span><span class="dv">1</span>)
 xTrain&lt;-disease_dat[trainIndex,]%&gt;%<span class="kw">select</span>(-y)
 xTest&lt;-disease_dat[-trainIndex,]%&gt;%<span class="kw">select</span>(-y)
@@ -318,7 +319,7 @@ xTest&lt;-disease_dat[-trainIndex,]%&gt;%<span class="kw">select</span>(-y)
 yTrain&lt;-disease_dat$y[trainIndex]%&gt;%<span class="kw">as.factor</span>()
 yTest&lt;-disease_dat$y[-trainIndex]%&gt;%<span class="kw">as.factor</span>()</code></pre></div>
 <p>训练随机森林模型：</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">train_rf&lt;-<span class="kw">randomForest</span>(yTrain~.,<span class="dt">data=</span>xTrain,<span class="dt">mtry=</span><span class="kw">trunc</span>(<span class="kw">sqrt</span>(<span class="kw">ncol</span>(xTrain)-<span class="dv">1</span>)),<span class="dt">ntree=</span><span class="dv">10000</span>,<span class="dt">importance=</span>T)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">train_rf&lt;-<span class="kw">randomForest</span>(yTrain~.,<span class="dt">data=</span>xTrain,<span class="dt">mtry=</span><span class="kw">trunc</span>(<span class="kw">sqrt</span>(<span class="kw">ncol</span>(xTrain)-<span class="dv">1</span>)),<span class="dt">ntree=</span><span class="dv">1000</span>,<span class="dt">importance=</span>T)</code></pre></div>
 <p>为了展示不同的模型评估法则，我们将训练得到的随机森林模型应用到测试集，得到两种预测：</p>
 <ol style="list-style-type: decimal">
 <li>每个类别的概率预测（结果为0到1之间的连续值，可以通过在代码中添加选项<code>prob</code>得到预测，结果存在<code>yhatprob</code>对象中）</li>
@@ -328,21 +329,21 @@ yTest&lt;-disease_dat$y[-trainIndex]%&gt;%<span class="kw">as.factor</span>()</c
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">yhatprob&lt;-<span class="kw">predict</span>(train_rf,xTest,<span class="st">&quot;prob&quot;</span>)
 <span class="kw">set.seed</span>(<span class="dv">100</span>)
 car::<span class="kw">some</span>(yhatprob)</code></pre></div>
-<pre><code>##          0      1
-## 9   0.1774 0.8226
-## 26  0.1674 0.8326
-## 41  0.8088 0.1912
-## 50  0.8545 0.1455
-## 57  0.1883 0.8117
-## 74  0.1821 0.8179
-## 75  0.8226 0.1774
-## 84  0.1614 0.8386
-## 88  0.8478 0.1522
-## 126 0.1949 0.8051</code></pre>
+<pre><code>##         0     1
+## 9   0.592 0.408
+## 26  0.455 0.545
+## 41  0.575 0.425
+## 50  0.513 0.487
+## 57  0.620 0.380
+## 74  0.538 0.462
+## 75  0.472 0.528
+## 84  0.542 0.458
+## 88  0.620 0.380
+## 126 0.586 0.414</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">yhat&lt;-<span class="kw">predict</span>(train_rf,xTest)
 car::<span class="kw">some</span>(yhat)</code></pre></div>
 <pre><code>##  32  45  55  63 100 104 105 119 141 153 
-##   0   1   1   0   1   1   0   1   1   1 
+##   1   0   0   0   0   0   0   0   1   0 
 ## Levels: 0 1</code></pre>
 <p>现在我们就用上面的两种预测结果为例介绍不同的预测类评估方法。</p>
 <div id="kappa" class="section level3">
@@ -351,8 +352,8 @@ car::<span class="kw">some</span>(yhat)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(yhat,yTest)</code></pre></div>
 <pre><code>##     yTest
 ## yhat  0  1
-##    0 83  1
-##    1  2 74</code></pre>
+##    0 68 56
+##    1  3 33</code></pre>
 <p>表格中左上角和右下角分别代表预测正确的样本数目，左下角和右上角代表错误预测的样本数目。更一般的二分类混淆矩阵如下：</p>
 <table>
 <thead>
@@ -390,10 +391,10 @@ car::<span class="kw">some</span>(yhat)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">kt&lt;-fmsb::<span class="kw">Kappa.test</span>(<span class="kw">table</span>(yhat,yTest))
 <span class="co"># 统计量估值在函数返回值的Result对象中</span>
 kt$Result$estimate</code></pre></div>
-<pre><code>## [1] 0.9623824</code></pre>
+<pre><code>## [1] 0.3054738</code></pre>
 <p>上面函数返回结果中包含一个<code>Judgement</code>对象:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">kt$Judgement</code></pre></div>
-<pre><code>## [1] &quot;Almost perfect agreement&quot;</code></pre>
+<pre><code>## [1] &quot;Fair agreement&quot;</code></pre>
 <p>这是基于Landis和Koch提出的Kappa统计量的一般性解释方法<span class="citation">(Landis JR <a href="#ref-landis1977">1977</a>)</span>：</p>
 <ul>
 <li>Kappa&lt; 0：无一致性（No agreement）</li>
@@ -419,8 +420,8 @@ rocCurve&lt;-<span class="kw">roc</span>(<span class="dt">response=</span>yTest,
 ## Call:
 ## roc.default(response = yTest, predictor = yhatprob[, 2])
 ## 
-## Data: yhatprob[, 2] in 85 controls (yTest 0) &lt; 75 cases (yTest 1).
-## Area under the curve: 0.9984</code></pre>
+## Data: yhatprob[, 2] in 71 controls (yTest 0) &lt; 89 cases (yTest 1).
+## Area under the curve: 0.8083</code></pre>
 <p>其中<code>roc()</code>函数中的第一个参数<code>response</code>是真实观测值，<code>predictor</code>是连续预测结果，这里赋予的是判定为爆发的预测概率。ROC曲线的横坐标是1-特异度，纵坐标是灵敏度。</p>
 <!--
 
