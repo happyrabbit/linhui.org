@@ -378,7 +378,7 @@ car::<span class="kw">some</span>(yhat)</code></pre></div>
 </table>
 <p>其中TP代表真阳性，FP代表假阳性，TN代表真阴性，FN代表假阴性。表格左上到右下对角线上的元素表示正确预测的样本数目，另一个方向的对角线上的元素代表误判的样本数。评估类预测最简单的指标是<strong>总体精确率</strong>，即预测正确的总体样本比例:</p>
 <p><span class="math display">\[总体精确率=\frac{TP+TN}{TP+TN+FP+FN}\]</span></p>
-<p>对类别数目大于2的情况，可以类似计算总体精确率。该统计量很直观，但有一些缺点，首先总体精确率没有区分错误类型。实际应用中，不同错误对应的损失可能不同，这时就无法用总体精确率衡量模型。 比如过滤垃圾邮件，误删一封重要的邮件带来的损失要高于收到一封垃圾邮件的损失。Provost等人<span class="citation">(Provost F <a href="#ref-provost1998">1998</a>)</span>深入讨论了用精确率来比较不同的分类器存在的问题。其次总体精确率没有考虑真实频率。比如在保险风险分析中，有风险的概率可能只有千分之一或者更小，模型只要将所有样本都清一色判定为无风险就能达到几乎完美的精确率。有时我们将不用模型也能得到的精确率称为<strong>无信息率</strong>。这里将所有样本判定为无风险得到的无信息率至少是99.9%。在这种情况下模型的精确率需要高于无信息率才算合理。</p>
+<p>对类别数目大于2的情况，可以类似计算总体精确率。该统计量很直观，但有一些缺点，首先总体精确率没有区分错误类型。实际应用中，不同错误对应的损失可能不同，这时就无法用总体精确率衡量模型。 比如过滤垃圾邮件，误删一封重要的邮件带来的损失要高于收到一封垃圾邮件的损失。Provost等人<span class="citation">(Provost F <a href="#ref-provost1998">1998</a><a href="#ref-provost1998">a</a>)</span>深入讨论了用精确率来比较不同的分类器存在的问题。其次总体精确率没有考虑真实频率。比如在保险风险分析中，有风险的概率可能只有千分之一或者更小，模型只要将所有样本都清一色判定为无风险就能达到几乎完美的精确率。有时我们将不用模型也能得到的精确率称为<strong>无信息率</strong>。这里将所有样本判定为无风险得到的无信息率至少是99.9%。在这种情况下模型的精确率需要高于无信息率才算合理。</p>
 <p>还有一种一致性检验方法叫做Kappa统计量，最早由Cohen等人在1960年提出用于考察两个不同的诊断方法在结果上是否具有一致性<span class="citation">(J <a href="#ref-Cohen1960">1960</a>)</span>。Kappa考虑到简单由偶然情况产生的准确性。具体公式如下：</p>
 <p><span class="math display">\[Kappa=\frac{P_{0}+P_{e}}{1-P_{e}}\]</span></p>
 <p>假设<span class="math inline">\(n=TP+TN+FP+FN\)</span>为总体样本数，其中<span class="math inline">\(P_{0}=\frac{TP+TN}{n}\)</span>为实际预测一致率，<span class="math inline">\(P_{e}=\frac{(TP+FP)(TP+FN)+(FN+TN)(FP+TN)}{n^{2}}\)</span>为由简单偶然情况产生的一致率。Kappa取值从-1到1，值越高一致性越强。</p>
@@ -408,9 +408,9 @@ kt$Result$estimate</code></pre></div>
 <div id="roc" class="section level3">
 <h3><span class="header-section-number">8.2.2</span> ROC曲线</h3>
 <p>相对与简单的类取值，类概率中含有更多的模型预测信息，比如之前得到的<code>yhatprob</code>就是连续的预测值。对于这样的预测结果，ROC曲线是一个通用评估方法。该方法确定一个有效的阈值，超过这个阈值的观测被标注为某类。比如所有<code>yhatprob</code>&gt;0.9的样本都判定为风格类。ROC曲线是基于灵敏度和特异度这两个统计量。考虑之前展示的二分类情况的混淆矩阵。模型的灵敏度为在所有真实观测到“发生”的样本中被准确预测为“发生”的比率：</p>
-<p><span class="math display">\[灵敏度=\frac{正确预测为“发生”的样本数目}{观测到发生的样本数目}=\frac{TP}{TP+FN}\]</span></p>
+<p><span class="math display">\[灵敏度=\frac{正确预测为“发生”的样本数目}{观测到“发生”的样本数目}=\frac{TP}{TP+FN}\]</span></p>
 <p>特异度指的是观测到“不发生”的样本中准确预测为“不发生”的比率：</p>
-<p><span class="math display">\[特异度=\frac{正确预测为“不发生”的样本数目}{观测到不发生的样本数目}=\frac{TN}{TN+FP}\]</span></p>
+<p><span class="math display">\[特异度=\frac{正确预测为“不发生”的样本数目}{观测到“不发生”的样本数目}=\frac{TN}{TN+FP}\]</span></p>
 <p>灵敏度也称为真阳性率，特异度也称为真阴性率。“1-特异度”为假阳性率。灵敏度和特异度对应的分母是固定的，当模型将更多样本判定为“发生”时，对应的灵敏度会增加，特异度会降低。根据不同错误类型导致的损失，通常需要建模者在灵敏度和特异度之间做出权衡。ROC曲线是权衡这二者的一个有效工具。ROC曲线是通过设定一系列预测结果阈值，得到相应的真阳性率（灵敏度）和假阳性率（1-特异度）绘制成的曲线。我们得到的关于农场疫情爆发预测概率结果<code>yhatprob</code>为例，展示如何用<code>rROC</code>包中的相应函数得到ROC曲线和相关统计量。<code>yhatprob</code>中的第2列代表将样本判定为疫情爆发的概率，其两列相加和为1。我们可以使用函数<code>roc()</code>得到相应的ROC对象<code>rocCurve</code>。然后将不同的函数应用在该对象上得到相应的图形结果或者统计量。下面的代码可以用来得到ROC曲线：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(pROC)
 rocCurve&lt;-<span class="kw">roc</span>(<span class="dt">response=</span>yTest,<span class="dt">predictor=</span>yhatprob[,<span class="dv">2</span>])
@@ -422,7 +422,14 @@ rocCurve&lt;-<span class="kw">roc</span>(<span class="dt">response=</span>yTest,
 ## 
 ## Data: yhatprob[, 2] in 71 controls (yTest 0) &lt; 89 cases (yTest 1).
 ## Area under the curve: 0.8083</code></pre>
-<p>其中<code>roc()</code>函数中的第一个参数<code>response</code>是真实观测值，<code>predictor</code>是连续预测结果，这里赋予的是判定为爆发的预测概率。ROC曲线的横坐标是1-特异度，纵坐标是灵敏度。</p>
+<p>其中<code>roc()</code>函数中的第一个参数<code>response</code>是真实观测值，<code>predictor</code>是连续预测结果，这里赋予的是判定为爆发的预测概率。ROC曲线的横坐标是1-特异度，纵坐标是灵敏度。一个完美的模型能完全区分两个类，灵敏度和特异度均为100%。从图形上看，ROC曲线为通过(0,0)和(1,1)的曲线。完美模型对应的曲线还通过(0,1)点，对应的曲线下面积为1。完全无效的模型对应的曲线趋近于45度对角线，曲线下面积为0.5。可以将不同模型结果对应的ROC曲线放在一张图中，直观对比模型效果。或者通过曲线下面积（AUC）量化比较模型，对应面积越大的模型越有效。DeLong等提出了基于U统计量的估计和比较AUC的方法<span class="citation">(E.R. DeLong <a href="#ref-delong1988">1988</a>)</span>，也可以通过bootstrap得到AUC的置信区间<span class="citation">(Hall P <a href="#ref-hall2004">2004</a>)</span>。 在R中，我们可以通过如下代码得到基于DeLong提出的非参方法得到的AUC的估计和置信区间：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 得到AUC的估计</span>
+<span class="kw">auc</span>(rocCurve)</code></pre></div>
+<pre><code>## Area under the curve: 0.8083</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 得到DeLong方法得到的AUC置信区间</span>
+<span class="kw">ci.auc</span>(rocCurve)</code></pre></div>
+<pre><code>## 95% CI: 0.7419-0.8746 (DeLong)</code></pre>
+<p>ROC曲线和线下面积AUC是我最常用的评估分类模型的方式，由于它是灵敏度和特异度的函数，对类失衡有抗性<span class="citation">(Provost F <a href="#ref-Provost1998">1998</a><a href="#ref-Provost1998">b</a>; T <a href="#ref-Fawcett2006">2006</a>)</span>。</p>
 <!--
 
 ### 失衡数据
@@ -446,13 +453,25 @@ rocCurve&lt;-<span class="kw">roc</span>(<span class="dt">response=</span>yTest,
 <h3> References</h3>
 <div id="refs" class="references">
 <div id="ref-provost1998">
-<p>Provost F, Kohavi R, Fawcett T. 1998. “The Case Against Accuracy Esti- Mation for Comparing Induction Algorithms.” <em>Proceedings of the Fifteenth International Conference on Machine Learning</em>, 445–53.</p>
+<p>Provost F, Kohavi R, Fawcett T. 1998a. “The Case Against Accuracy Esti- Mation for Comparing Induction Algorithms.” <em>Proceedings of the Fifteenth International Conference on Machine Learning</em>, 445–53.</p>
 </div>
 <div id="ref-Cohen1960">
 <p>J, Cohen. 1960. “A Coefficient of Agreement for Nominal Data.” <em>Educational and Psychological Measurement</em> 20: 37–46.</p>
 </div>
 <div id="ref-landis1977">
 <p>Landis JR, Koch GG. 1977. “The Measurement of Observer Agreement for Categorical Data.” <em>Biometrics</em> 33: 159–74.</p>
+</div>
+<div id="ref-delong1988">
+<p>E.R. DeLong, D.L. Clarke-Pearson, D.M. DeLong. 1988. “Comparing the Areas Under Two or More Correlated Receiver Operating Characteristics Curves: A Nonparametric Approach.” <em>Biometrics</em> 44: 837–45.</p>
+</div>
+<div id="ref-hall2004">
+<p>Hall P, Fan Y, Hyndman R. 2004. “Nonparametric Confidence Intervals for Receiver Operating Characteristic Curves.” <em>Biometrika</em> 91: 743–50.</p>
+</div>
+<div id="ref-Provost1998">
+<p>Provost F, Kohavi R, Fawcett T. 1998b. “The Case Against Accuracy Esti- Mation for Comparing Induction Algorithms.” <em>Proceedings of the Fifteenth International Conference on Machine Learning</em>, 445–53.</p>
+</div>
+<div id="ref-Fawcett2006">
+<p>T, Fawcett. 2006. “An Introduction to ROC Analysis.” <em>Pattern Recognition Letters</em> 27 (8): 861–74.</p>
 </div>
 </div>
             </section>
