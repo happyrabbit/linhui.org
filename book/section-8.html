@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-07-04">
+<meta name="date" content="2016-07-05">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -176,6 +176,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="8.2" data-path="section-8.html"><a href="section-8.html#section-8.2"><i class="fa fa-check"></i><b>8.2</b> 分类模型评估度量</a><ul>
 <li class="chapter" data-level="8.2.1" data-path="section-8.html"><a href="section-8.html#kappa"><i class="fa fa-check"></i><b>8.2.1</b> Kappa统计量</a></li>
 <li class="chapter" data-level="8.2.2" data-path="section-8.html"><a href="section-8.html#roc"><i class="fa fa-check"></i><b>8.2.2</b> ROC曲线</a></li>
+<li class="chapter" data-level="8.2.3" data-path="section-8.html"><a href="section-8.html#section-8.2.3"><i class="fa fa-check"></i><b>8.2.3</b> 提升图</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="9" data-path="section-9.html"><a href="section-9.html"><i class="fa fa-check"></i><b>9</b> 特征工程</a><ul>
@@ -301,15 +302,16 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </div>
 <div id="section-8.2" class="section level2">
 <h2><span class="header-section-number">8.2</span> 分类模型评估度量</h2>
-<p>本小节关注判别模型（即，应变量为分类变量）的表现度量。之前对连续型变量适用的RMSE和<span class="math inline">\(R^2\)</span>不适用于分类模型。分类指对给定观测样本预测其所属类别，而且类别空间已知，所以是有监督学习。这个和聚类不同，聚类分析的目的是得到类别空间，是无监督学习，这在之后聚类和判别的部分还会更详细的介绍。通常遇到的问题是二分类，比如是否有某种疾病，垃圾邮件分类器等。也有多分类问题，比如服装消费数据中的消费者类别。这里我们用生猪疫情风险预测数据为例展示分类模型的评估度量。 这里我们只考虑分类问题，假设类别已知，我们需要用消费者系统中的数据来判定样本类别。这里我们训练一个随机森林模型，之后在树模型的章节中会对模型本身进行更详细的介绍。为了简便，将多分类问题转化为二分类问题，假设该服装厂想知道现有消费者中哪些是风格类的。先对数据进行预处理，创建一个新的类别变量：</p>
+<p>本小节关注判别模型（即，应变量为分类变量）的表现度量。之前对连续型变量适用的RMSE和<span class="math inline">\(R^2\)</span>不适用于分类模型。分类指对给定观测样本预测其所属类别，而且类别空间已知，所以是有监督学习。这个和聚类不同，聚类分析的目的是得到类别空间，是无监督学习，这在之后聚类和判别的部分还会更详细的介绍。通常遇到的问题是二分类，比如是否有某种疾病，垃圾邮件分类器等。也有多分类问题，比如服装消费数据中的消费者类别。这里我们用生猪疫情风险预测数据为例展示分类模型的评估度量。这里我们训练一个随机森林模型对农场疫情爆发概率进行评估，之后在树模型的章节中会对模型本身进行更详细的介绍。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)
 <span class="kw">library</span>(randomForest)
 <span class="kw">library</span>(caret)
 <span class="kw">library</span>(readr)
+<span class="co"># 读取数据</span>
 disease_dat&lt;-<span class="kw">read_csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/sim1_da1.csv&quot;</span>)
 <span class="co"># 可以用glimpse()函数查看数据</span>
 <span class="co"># glimpse(disease_dat)</span></code></pre></div>
-<p>划分训练集和测试集，在训练集上得到模型，然后在测试集上评估模型表现。70%的样本用于训练，剩下30%用于模型评估：</p>
+<p>划分训练集和测试集，在训练集（<code>xTrain</code>和<code>yTrain</code>）上得到模型，然后在测试集（<code>xTest</code>和<code>yTest</code>）上评估模型表现。70%的样本用于训练，剩下30%用于模型评估：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 划分训练集和测试集</span>
 <span class="kw">set.seed</span>(<span class="dv">2016</span>)
 trainIndex&lt;-<span class="kw">createDataPartition</span>(disease_dat$y,<span class="dt">p=</span><span class="fl">0.8</span>,<span class="dt">list=</span>F,<span class="dt">times=</span><span class="dv">1</span>)
@@ -378,7 +380,7 @@ car::<span class="kw">some</span>(yhat)</code></pre></div>
 </table>
 <p>其中TP代表真阳性，FP代表假阳性，TN代表真阴性，FN代表假阴性。表格左上到右下对角线上的元素表示正确预测的样本数目，另一个方向的对角线上的元素代表误判的样本数。评估类预测最简单的指标是<strong>总体精确率</strong>，即预测正确的总体样本比例:</p>
 <p><span class="math display">\[总体精确率=\frac{TP+TN}{TP+TN+FP+FN}\]</span></p>
-<p>对类别数目大于2的情况，可以类似计算总体精确率。该统计量很直观，但有一些缺点，首先总体精确率没有区分错误类型。实际应用中，不同错误对应的损失可能不同，这时就无法用总体精确率衡量模型。 比如过滤垃圾邮件，误删一封重要的邮件带来的损失要高于收到一封垃圾邮件的损失。Provost等人<span class="citation">(Provost F <a href="#ref-provost1998">1998</a><a href="#ref-provost1998">a</a>)</span>深入讨论了用精确率来比较不同的分类器存在的问题。其次总体精确率没有考虑真实频率。比如在保险风险分析中，有风险的概率可能只有千分之一或者更小，模型只要将所有样本都清一色判定为无风险就能达到几乎完美的精确率。有时我们将不用模型也能得到的精确率称为<strong>无信息率</strong>。这里将所有样本判定为无风险得到的无信息率至少是99.9%。在这种情况下模型的精确率需要高于无信息率才算合理。</p>
+<p>对类别数目大于2的情况，可以类似计算总体精确率。该统计量很直观，但有一些缺点，首先总体精确率没有区分错误类型。实际应用中，不同错误对应的损失可能不同，这时就无法用总体精确率衡量模型。 比如过滤垃圾邮件，误删一封重要的邮件带来的损失要高于收到一封垃圾邮件的损失。Provost等人<span class="citation">(<span class="citeproc-not-found" data-reference-id="provost1998"><strong>???</strong></span>)</span>深入讨论了用精确率来比较不同的分类器存在的问题。其次总体精确率没有考虑真实频率。比如在保险风险分析中，有风险的概率可能只有千分之一或者更小，模型只要将所有样本都清一色判定为无风险就能达到几乎完美的精确率。有时我们将不用模型也能得到的精确率称为<strong>无信息率</strong>。这里将所有样本判定为无风险得到的无信息率至少是99.9%。在这种情况下模型的精确率需要高于无信息率才算合理。</p>
 <p>还有一种一致性检验方法叫做Kappa统计量，最早由Cohen等人在1960年提出用于考察两个不同的诊断方法在结果上是否具有一致性<span class="citation">(J <a href="#ref-Cohen1960">1960</a>)</span>。Kappa考虑到简单由偶然情况产生的准确性。具体公式如下：</p>
 <p><span class="math display">\[Kappa=\frac{P_{0}+P_{e}}{1-P_{e}}\]</span></p>
 <p>假设<span class="math inline">\(n=TP+TN+FP+FN\)</span>为总体样本数，其中<span class="math inline">\(P_{0}=\frac{TP+TN}{n}\)</span>为实际预测一致率，<span class="math inline">\(P_{e}=\frac{(TP+FP)(TP+FN)+(FN+TN)(FP+TN)}{n^{2}}\)</span>为由简单偶然情况产生的一致率。Kappa取值从-1到1，值越高一致性越强。</p>
@@ -422,14 +424,31 @@ rocCurve&lt;-<span class="kw">roc</span>(<span class="dt">response=</span>yTest,
 ## 
 ## Data: yhatprob[, 2] in 71 controls (yTest 0) &lt; 89 cases (yTest 1).
 ## Area under the curve: 0.8083</code></pre>
-<p>其中<code>roc()</code>函数中的第一个参数<code>response</code>是真实观测值，<code>predictor</code>是连续预测结果，这里赋予的是判定为爆发的预测概率。ROC曲线的横坐标是1-特异度，纵坐标是灵敏度。一个完美的模型能完全区分两个类，灵敏度和特异度均为100%。从图形上看，ROC曲线为通过(0,0)和(1,1)的曲线。完美模型对应的曲线还通过(0,1)点，对应的曲线下面积为1。完全无效的模型对应的曲线趋近于45度对角线，曲线下面积为0.5。可以将不同模型结果对应的ROC曲线放在一张图中，直观对比模型效果。或者通过曲线下面积（AUC）量化比较模型，对应面积越大的模型越有效。DeLong等提出了基于U统计量的估计和比较AUC的方法<span class="citation">(E.R. DeLong <a href="#ref-delong1988">1988</a>)</span>，也可以通过bootstrap得到AUC的置信区间<span class="citation">(Hall P <a href="#ref-hall2004">2004</a>)</span>。 在R中，我们可以通过如下代码得到基于DeLong提出的非参方法得到的AUC的估计和置信区间：</p>
+<p>其中<code>roc()</code>函数中的第一个参数<code>response</code>是真实观测值，<code>predictor</code>是连续预测结果，这里赋予的是判定为爆发的预测概率。ROC曲线的横坐标是1-特异度，纵坐标是灵敏度。一个完美的模型能完全区分两个类，灵敏度和特异度均为100%。从图形上看，ROC曲线为通过(0,0)和(1,1)的曲线。完美模型对应的曲线还通过(0,1)点，对应的曲线下面积为1。完全无效的模型对应的曲线趋近于45度对角线，曲线下面积为0.5。可以将不同模型结果对应的ROC曲线放在一张图中，直观对比模型效果。或者通过曲线下面积（AUC）量化比较模型，对应面积越大的模型越有效。DeLong等提出了基于U统计量的估计和比较AUC的方法<span class="citation">(E.R. DeLong <a href="#ref-delong1988">1988</a>)</span>，也可以通过bootstrap得到AUC的置信区间<span class="citation">(Hall P <a href="#ref-hall2004">2004</a>)</span>。</p>
+<p>在R中，我们可以通过如下代码得到基于DeLong提出的非参方法得到的AUC的估计和置信区间：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 得到AUC的估计</span>
 <span class="kw">auc</span>(rocCurve)</code></pre></div>
 <pre><code>## Area under the curve: 0.8083</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 得到DeLong方法得到的AUC置信区间</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># DeLong方法得到的AUC置信区间</span>
 <span class="kw">ci.auc</span>(rocCurve)</code></pre></div>
 <pre><code>## 95% CI: 0.7419-0.8746 (DeLong)</code></pre>
-<p>ROC曲线和线下面积AUC是我最常用的评估分类模型的方式，由于它是灵敏度和特异度的函数，对类失衡有抗性<span class="citation">(Provost F <a href="#ref-Provost1998">1998</a><a href="#ref-Provost1998">b</a>; T <a href="#ref-Fawcett2006">2006</a>)</span>。</p>
+<p>ROC曲线和线下面积AUC是我最常用的评估分类模型的方式，由于它是灵敏度和特异度的函数，对类失衡有抗性<span class="citation">(Provost F <a href="#ref-Provost1998">1998</a>; T <a href="#ref-Fawcett2006">2006</a>)</span>。用AUC和其它单一度量类似，在用某个量总结曲线时会带来信息的损失，因为很可能没有某条曲线一致好于其它的曲线（曲线交叉）。如果我们对曲线特定的区域感兴趣，可以直接比较曲线。如果我们关心的是ROC曲线低的一端，可以使用ROC曲线下局部面积度量<span class="citation">(D <a href="#ref-McClish1989">1989</a>)</span>，该度量关注曲线特定部分。ROC曲线主要针对二分类定义，但之后不同人将其扩展到多分类的情况<span class="citation">(Hand D <a href="#ref-Hand2001">2001</a>; Lachiche N <a href="#ref-Lachiche2003">2003</a>; Li J <a href="#ref-Li2008">2008</a>)</span>。</p>
+</div>
+<div id="section-8.2.3" class="section level3">
+<h3><span class="header-section-number">8.2.3</span> 提升图</h3>
+<p>除了数值度量以外，还有一些对分类结果评估的可视化工具，如提升图。提升图以图形的形式表示模型预测比随机预测相比带来的改进，根据“提升”分数来选择模型，或者确定应该将数据中多大比例的样本视为目标群体可以从模型预测结果中获益。这样抽象的描述很难让大家理解提升图。因此我们将其放在应用的语境下。我们用猪场疫情数据为例。之前我们在训练集上训练随机森林模型，然后将模型应用在含有160个样本的测试集（<code>xTest</code>）上。我们对测试集样本的预测<code>yhatprob</code>来解释提升图。由于我们感兴趣的是疫情爆发的事件——<code>yhatprob</code>第二列（第一列是无疫情的概率）——我们将针对疫情爆发的连续概率预测存在一个新对象<code>modelscore</code>中。真实情况是有89个样本有疫情。如果我们将这160个样本按照模型预测分值<code>modelscore</code>从高到低排序，对于完美的模型，排序后的前89个样本应该正好就是那些疫情爆发的样本。当预测完全随机时，排序后前x％的样本中根据随机概率也该正好含有89个发生疫情的样本中的x％。提升图展示了通过模型预测排序筛选出的样本比随机样本对应目标类命中率的差别。</p>
+<p>下面我们抽取了一些随机分值（<code>randomscore</code>），对其和模型预测结果（<code>modelscore</code>）绘制提升图，比较它们。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">modelscore&lt;-yhatprob[,<span class="dv">2</span>]
+<span class="co"># 随机抽取一些分值</span>
+randomscore&lt;-<span class="kw">rnorm</span>(<span class="kw">length</span>(yTest))
+labs&lt;-<span class="kw">c</span>(<span class="dt">modelscore=</span><span class="st">&quot;Random Forest&quot;</span>,
+        <span class="dt">randomscore=</span><span class="st">&quot;Random Number&quot;</span>)</code></pre></div>
+<p>我们可以使用<code>caret</code>包中的<code>lift()</code>函数来绘制提升曲线。该函数用一个公式作为输入选项，公式左侧是真实类别，公式右侧是多个预测值。这里公式右侧是模型分值和随机分值：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">liftCurve&lt;-<span class="kw">lift</span>(yTest~modelscore+randomscore,<span class="dt">class=</span><span class="st">&quot;1&quot;</span>,<span class="dt">labels=</span>labs)</code></pre></div>
+<p>为了绘制多条提升图，使用lattice包中的xyplot()函数：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">xyplot</span>(liftCurve,<span class="dt">auto.key=</span><span class="kw">list</span>(<span class="dt">columns=</span><span class="dv">2</span>,<span class="dt">lines=</span>T,<span class="dt">points=</span>T))</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-92-1.png" width="672" /></p>
+<p>提升图的横轴是累计样本百分比，纵轴是累计获取的目标类样本百分比。比如随机森林模型提升曲线上的点(0.0625,0.1123596)表示：按照模型预测分值从高到低排序后的前0.0625个样本中含有160个疫情爆发样本中的0.1123596。和ROC曲线类似，我们可以通过比较不同模型的提升图来选择模型，曲线下面积也可作为模型效果的度量。此外我们也可能对曲线的某一部分特别感兴趣。比如在当前的例子中，如果判定一个农场在未来5年内可能爆发疫情，那么通常的措施是对该农场进行大规模的清洗消毒，这样的措施花费很高。假设我们只能对50%的农场进行清理，那么就该选择对应横坐标为50%时，疫情爆发样本命中率最高的模型。</p>
 <!--
 
 ### 失衡数据
@@ -452,9 +471,6 @@ rocCurve&lt;-<span class="kw">roc</span>(<span class="dt">response=</span>yTest,
 </div>
 <h3> References</h3>
 <div id="refs" class="references">
-<div id="ref-provost1998">
-<p>Provost F, Kohavi R, Fawcett T. 1998a. “The Case Against Accuracy Esti- Mation for Comparing Induction Algorithms.” <em>Proceedings of the Fifteenth International Conference on Machine Learning</em>, 445–53.</p>
-</div>
 <div id="ref-Cohen1960">
 <p>J, Cohen. 1960. “A Coefficient of Agreement for Nominal Data.” <em>Educational and Psychological Measurement</em> 20: 37–46.</p>
 </div>
@@ -468,10 +484,22 @@ rocCurve&lt;-<span class="kw">roc</span>(<span class="dt">response=</span>yTest,
 <p>Hall P, Fan Y, Hyndman R. 2004. “Nonparametric Confidence Intervals for Receiver Operating Characteristic Curves.” <em>Biometrika</em> 91: 743–50.</p>
 </div>
 <div id="ref-Provost1998">
-<p>Provost F, Kohavi R, Fawcett T. 1998b. “The Case Against Accuracy Esti- Mation for Comparing Induction Algorithms.” <em>Proceedings of the Fifteenth International Conference on Machine Learning</em>, 445–53.</p>
+<p>Provost F, Kohavi R, Fawcett T. 1998. “The Case Against Accuracy Esti- Mation for Comparing Induction Algorithms.” <em>Proceedings of the Fifteenth International Conference on Machine Learning</em>, 445–53.</p>
 </div>
 <div id="ref-Fawcett2006">
 <p>T, Fawcett. 2006. “An Introduction to ROC Analysis.” <em>Pattern Recognition Letters</em> 27 (8): 861–74.</p>
+</div>
+<div id="ref-McClish1989">
+<p>D, McClish. 1989. “Analyzing a Portion of the ROC Curve.” <em>Medical Decision Making</em> 9: 190–95.</p>
+</div>
+<div id="ref-Hand2001">
+<p>Hand D, Till R. 2001. “A Simple Generalisation of the Area Under the ROC Curve for Multiple Class Classification Problems.” <em>Machine Learning</em> 45 (2): 171–86.</p>
+</div>
+<div id="ref-Lachiche2003">
+<p>Lachiche N, Flach P. 2003. “Improving Accuracy and Cost of Two–Class and Multi–Class Probabilistic Classifiers Using ROC Curves.” <em>In ``Proceed- Ings of the Twentieth International Conference on Machine Learning</em> 20 (416–424).</p>
+</div>
+<div id="ref-Li2008">
+<p>Li J, Fine JP. 2008. “ROC Analysis with Multiple Classes and Multiple Tests: Methodology and Its Application in Microarray Studies.” <em>Biostatistics</em> 9 (3): 566–76.</p>
 </div>
 </div>
             </section>
