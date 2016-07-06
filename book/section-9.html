@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-07-05">
+<meta name="date" content="2016-07-06">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -177,6 +177,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="8.2.1" data-path="section-8.html"><a href="section-8.html#kappa"><i class="fa fa-check"></i><b>8.2.1</b> Kappa统计量</a></li>
 <li class="chapter" data-level="8.2.2" data-path="section-8.html"><a href="section-8.html#roc"><i class="fa fa-check"></i><b>8.2.2</b> ROC曲线</a></li>
 <li class="chapter" data-level="8.2.3" data-path="section-8.html"><a href="section-8.html#section-8.2.3"><i class="fa fa-check"></i><b>8.2.3</b> 提升图</a></li>
+<li class="chapter" data-level="8.2.4" data-path="section-8.html"><a href="section-8.html#-3"><i class="fa fa-check"></i><b>8.2.4</b> 本章总结</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="9" data-path="section-9.html"><a href="section-9.html"><i class="fa fa-check"></i><b>9</b> 特征工程</a><ul>
@@ -262,10 +263,17 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="section-9.1" class="section level2">
 <h2><span class="header-section-number">9.1</span> 特征构建</h2>
 <p>在实际应用中，显然是不可能凭空而来的，需要我们手工去构建特征。关于特征构建的定义，可以这么说：特征构建指的是从原始数据中人工的构建新的特征。我们需要人工的创建它们。这需要我们花大量的时间去研究真实的数据样本，思考问题的潜在形式和数据结构，同时能够更好地应用到预测模型中。</p>
-<p>特征构建需要很强的洞察力和分析能力，要求我们能够从原始数据中找出一些具有物理意义的特征。假设原始数据是表格数据，一般你可以使用混合属性或者组合属性来创建新的特征，或是分解或切分原有的特征来创建新的特征。比如之前在数据预处理那章中讲编码名义变量时，我们将分类变量<code>gender</code>(性别)转化为两个名义变量：<code>Female</code>和<code>Male</code>。之后考虑收入和性别的交互效应(<code>income:gender</code>)也是一种特征构建。另外再举一个例子，假设你有一个日期时间 (2006-04-01 02:26:00)该如何转换呢？对于这种时间的数据，我们可以根据需求提取出多种属性。</p>
+<p>特征构建需要很强的洞察力和分析能力，要求我们能够从原始数据中找出一些具有物理意义的特征。假设原始数据是表格数据，一般你可以使用混合属性或者组合属性来创建新的特征，或是分解或切分原有的特征来创建新的特征。比如之前在数据预处理那章中讲编码名义变量时，我们将分类变量<code>gender</code>(性别)转化为两个名义变量：<code>Female</code>和<code>Male</code>。之后考虑收入和性别的交互效应(<code>income:gender</code>)也是一种特征构建。另外再举一个例子，假设你有一个日期时间 (2006-04-01 02:26:00)该如何转换呢？对于这种时间的数据，我们可以根据需求提取出多种属性。比如下面这个从农业论坛爬取的文本数据。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(readr)
-topic&lt;-<span class="kw">read_csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/Hui/Project/NLP/RawData/newagtalk-20150607/topic.csv&quot;</span>)
-<span class="kw">glimpse</span>(topic)</code></pre></div>
+topic&lt;-<span class="kw">read_csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/Hui/Project/NLP/RawData/newagtalk-20150607/topic.csv&quot;</span>)</code></pre></div>
+<pre><code>## 
+|===============                                                                |  19%    3 MB
+|===============================                                                |  39%    6 MB
+|===============================================                                |  59%    9 MB
+|===============================================================                |  79%   12 MB
+|===============================================================================|  99%   16 MB
+|================================================================================| 100%   16 MB</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glimpse</span>(topic)</code></pre></div>
 <pre><code>## Observations: 209,607
 ## Variables: 6
 ## $ tid           (int) 242, 259, 270, 281, 301, 312, 333, 367, 386, 387...
@@ -274,25 +282,32 @@ topic&lt;-<span class="kw">read_csv</span>(<span class="st">&quot;/Users/happyra
 ## $ posted_at     (time) 2006-04-01 02:26:00, 2006-04-01 08:39:00, 2006-...
 ## $ user_name     (chr) &quot;Rich&quot;, &quot;Larry NCKS&quot;, &quot;Hay Hud Ohio&quot;, &quot;jakescia&quot;...
 ## $ user_location (chr) &quot;Kansas&quot;, &quot;Washington, Kansas  &amp; Lincoln, Nebras...</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">posted_at2&lt;-topic$posted_at
-
-<span class="co">#head(posted_at2)</span>
-<span class="co">#table(posted_at2)</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 将发帖时间提取出来，存在posted_at2对象中</span>
+posted_at2&lt;-topic$posted_at</code></pre></div>
+<p>数据由6列，这里只解释其中2列。<code>posted_at</code>是发帖时间，<code>user_name</code>是论坛用户名。对于发帖时间，我们可以将其拆分成不同的变量，这个过程类似于探索性数据分析。这里时间观测是按照年、月、日、时、分、秒的顺序，以这样的格式<code>2006-04-01 02:26:00</code>排列的。在具体分析中，我们通常希望知道用户的发帖规律。在事先不知道怎样划分能够看到规律的情况下该怎么办？尝试不同的划分方法。比如我们可以研究每年的发帖量，可以通过<code>substr()</code>函数截取字符串的固定位置得到年份：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 将截取的年份存在名为year的列中</span>
 topic$year&lt;-<span class="kw">substr</span>(posted_at2,<span class="dv">1</span>,<span class="dv">4</span>)
-topic$month&lt;-<span class="kw">substr</span>(posted_at2,<span class="dv">6</span>,<span class="dv">7</span>)
-topic$date&lt;-<span class="kw">substr</span>(posted_at2,<span class="dv">9</span>,<span class="dv">10</span>)
-topic$time&lt;-<span class="kw">substr</span>(posted_at2,<span class="dv">12</span>,<span class="dv">13</span>)
-
-<span class="kw">barplot</span>(<span class="kw">table</span>(topic$year),<span class="dt">main=</span><span class="st">&quot;Topic Counts Year Distribution&quot;</span>)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-93-1.png" width="672" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">barplot</span>(<span class="kw">table</span>(topic$month),<span class="dt">main=</span><span class="st">&quot;Topic Counts Month Distribution &quot;</span>)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-93-2.png" width="672" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">barplot</span>(<span class="kw">table</span>(topic$time),<span class="dt">main=</span><span class="st">&quot;Topic Counts Time Distribution&quot;</span>)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-93-3.png" width="672" /></p>
+<span class="co"># 看下结果如何</span>
+car::<span class="kw">some</span>(topic$year)</code></pre></div>
+<pre><code>##  [1] &quot;2011&quot; &quot;2012&quot; &quot;2013&quot; &quot;2013&quot; &quot;2013&quot; &quot;2013&quot; &quot;2014&quot; &quot;2014&quot; &quot;2014&quot; &quot;2015&quot;</code></pre>
+<p>接下来我们可以查看下每年发帖数目的变化情况：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">barplot</span>(<span class="kw">table</span>(topic$year),<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>, <span class="dt">main=</span><span class="st">&quot;年度发帖数目频数直方图&quot;</span>)</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-95-1.png" width="672" /></p>
+<p>图中我们可以看到，从2006年论坛创建以来，帖子的数目几乎呈指数上升，2015年貌似不符合规律，其实是因为当前数据中只饱含到2015年5月的论坛数据，也就是说如果我们由所有2015年的数据，最后的直方条应该会超过2014年。这么简单的统计能够告诉我们什么呢？这样的统计量对于公司的市场预算是很重要的。假如某农业公司要决定是否投入人力和财力去挖掘这个农业论坛数据，首先需要明确的就是这些数据是不是有代表性，该论坛是不是活跃。上图就表明该论坛是处在高速发展阶段的，而且考虑到论坛的用户是农民，这样的活跃度是非常高的。所以相关决策人员或许可以将该论坛当作一个消费者评论信息的来源。只考虑年是不够的，我们可能还想类似的检查下月度发帖分布，我们可以类似的截取时间字符串中的月份，绘制直方图：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">topic$month&lt;-<span class="kw">substr</span>(posted_at2,<span class="dv">6</span>,<span class="dv">7</span>)
+<span class="kw">barplot</span>(<span class="kw">table</span>(topic$month),<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>, <span class="dt">main=</span><span class="st">&quot;月度发帖数目频数直方图&quot;</span>)</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-96-1.png" width="672" /></p>
+<p>大家可以看到明显的季节效应。通常北半球12-4月是农闲时节，这个时候发帖数远高于开春（5月）之后。基于此，我们可以假设12-4月的帖子或许更多的是关于去年购买的种子收获情况以及一些下一年的耕种计划的信息，5月到11月间或许更多的是当下遇到的问题，比如播种时种子发芽情况，生长中雨水，作物抗旱性能等等。这些为农业公司提供了消费者对其产品的体验信息。这样简单的统计能够给我们之后的分析指引放下。再次强调，分析的整个流程是个渐进且协同的过程，前一步中获得的信息可能有助于我们明确之后要如何进行分析，下一步分析的结果可能又让我们返回之前的步骤，比如收集构建新变量等等。</p>
+<p>再看看每天发帖的规律：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">topic$time&lt;-<span class="kw">substr</span>(posted_at2,<span class="dv">12</span>,<span class="dv">13</span>)
+<span class="kw">barplot</span>(<span class="kw">table</span>(topic$time),<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>,<span class="dt">main=</span><span class="st">&quot;每日不同时间段发帖频数直方图&quot;</span>)</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-97-1.png" width="672" /></p>
+<p>可以看到，每天有两个发帖高峰，中午一阵，晚上一阵（这里不考虑北美不同纬度的时差影响）。这能给我们什么信息呢？很有可能农民习惯于在这两个时间段上网查询信息等。如果农业公司想要发营销广告，这或许是最佳的时间。</p>
+<p>上面是一个简单的关于构建特征的例子，在具体应用中特征构建的方法可以非常灵活，没有一个黄金标准。随着分析经验的增长，以及对相关领域的了解加深，构建有意义特征的能力也会随之提高。特征构建是特征工程中艺术成分最高的部分，接下来我们要介绍的特征提取和特征选择就有更强的技术性。</p>
 </div>
 <div id="section-9.2" class="section level2">
 <h2><span class="header-section-number">9.2</span> 特征提取</h2>
-<p>特征提取是一项用不同变量的组合代替原变量的技术。我们考虑3个常用的通过对数据降维来降低数据复杂度的方法。主成分分析（PCA）试图找到原变量的不相关线性组合，这些线性组合能够最大限度的解释原数据中变量方差。解释性因子分析（EFA）同样试图在尽量小的维度上解释原数据中尽可能多的方差。高维标度化（MDS）将观测见的相似度映射到低维度上，如2维平面。MDS能够作用于非数值型变量，如分类变量或者有序数据预测变量。</p>
+<p>特征提取是一项用不同变量的组合代替原变量的技术。我们考虑3个常用的通过对数据降维来降低数据复杂度的方法。主成分分析（PCA）试图找到原变量的不相关线性组合，这些线性组合能够最大限度的解释原数据中变量方差。解释性因子分析（EFA）同样试图在尽量小的维度上解释原数据中尽可能多的方差。高维标度化（MDS）将观测见的相似度映射到低维度上，如2维平面。MDS能够作用于非数值型变量，如分类变量或者有序数据预测变量。接下来我们通过模拟的航空公司数据集来展示不同的特征提取方法。</p>
 <!-- 
 3.1 特征选择Feature Selection
 

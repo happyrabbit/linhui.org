@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-07-05">
+<meta name="date" content="2016-07-06">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -177,6 +177,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="8.2.1" data-path="section-8.html"><a href="section-8.html#kappa"><i class="fa fa-check"></i><b>8.2.1</b> Kappa统计量</a></li>
 <li class="chapter" data-level="8.2.2" data-path="section-8.html"><a href="section-8.html#roc"><i class="fa fa-check"></i><b>8.2.2</b> ROC曲线</a></li>
 <li class="chapter" data-level="8.2.3" data-path="section-8.html"><a href="section-8.html#section-8.2.3"><i class="fa fa-check"></i><b>8.2.3</b> 提升图</a></li>
+<li class="chapter" data-level="8.2.4" data-path="section-8.html"><a href="section-8.html#-3"><i class="fa fa-check"></i><b>8.2.4</b> 本章总结</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="9" data-path="section-9.html"><a href="section-9.html"><i class="fa fa-check"></i><b>9</b> 特征工程</a><ul>
@@ -448,23 +449,29 @@ labs&lt;-<span class="kw">c</span>(<span class="dt">modelscore=</span><span clas
 <p>为了绘制多条提升图，使用lattice包中的xyplot()函数：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">xyplot</span>(liftCurve,<span class="dt">auto.key=</span><span class="kw">list</span>(<span class="dt">columns=</span><span class="dv">2</span>,<span class="dt">lines=</span>T,<span class="dt">points=</span>F))</code></pre></div>
 <p><img src="DS_R_files/figure-html/unnamed-chunk-92-1.png" width="672" /></p>
-<p>提升图的横轴是累计样本百分比，纵轴是累计获取的目标类样本百分比。比如随机森林模型提升曲线上的点(0.0625,0.1123596)表示：按照模型预测分值从高到低排序后的前0.0625个样本中含有160个疫情爆发样本中的0.1123596。和ROC曲线类似，我们可以通过比较不同模型的提升图来选择模型，曲线下面积也可作为模型效果的度量。此外我们也可能对曲线的某一部分特别感兴趣。比如在当前的例子中，如果判定一个农场在未来5年内可能爆发疫情，那么通常的措施是对该农场进行大规模的清洗消毒，这样的措施花费很高。假设我们只能对50%的农场进行清理，那么就该选择对应横坐标为50%，疫情爆发样本命中率最高的模型。在这个应用场景下，在支出预算一定时，我们可以最大化效率。</p>
+<p>提升图的横轴是累计样本百分比，纵轴是累计获取的目标类样本百分比。比如随机森林模型提升曲线上的点(0.0625,0.1123596)表示：按照模型预测分值从高到低排序后的前0.0625个样本中含有160个疫情爆发样本中的0.1123596。和ROC曲线类似，我们可以通过比较不同模型的提升图来选择模型，曲线下面积也可作为模型效果的度量。此外我们也可能对曲线的某一部分特别感兴趣。比如在当前的例子中，如果判定一个农场在未来5年内可能爆发疫情，那么通常的措施是对该农场进行大规模的清洗消毒，这样的措施花费很高。假设我们只能对50%的农场进行清理，那么就该选择对应横坐标为50%，疫情爆发样本命中率最高的模型。在这个应用场景下，在支出预算一定时最大化效率。</p>
 <!--
 
 ### 失衡数据
 
 判别分析中可能遇到一个最大问题就是数据失衡。比如贷款客户风险分析就是如此，真正违约不还贷款的客户可能只有千分之一，这意味只要闭着眼将所有的客户都判定为无风险就能的到99.9%的准确率。在这样的情况下，数据中关于低频率事件的信息很少，因此模型很难准确预测这些事件，而这些低频率事件通常有事我们关心的（如违约，疾病爆发）。对于统计学习模型来说，最理想当然是平衡的数据，但 很遗憾，现实生活很少满足理论假设。下面我们就介绍几种能够在某种程度上缓解类失衡的方法。这里要指出一点，你只能得到数据包含的的东西。记得之前讲到两部分误差，系统误差和随机误差。你能够该井的只是系统误差，你无法超于数据中关于小频率事件信息的极限。下面要讲的方法只是在原基础上对模型进行一些修正。这里我只介绍二分类的问题，因为绝大多数都是二分类。
 -->
-<ul>
+</div>
+<div id="-3" class="section level3">
+<h3><span class="header-section-number">8.2.4</span> 本章总结</h3>
+<p>本章探讨了模型评估的度量。在数据分析项目中，评估模型是非常重要的。掌握本章和上一章介绍的数据划分和再抽样技术就具备评估模型的技术能力了。这里关于分类模型评估有一个重要话题由于篇幅所限没有介绍，就是预测概率校准和处理类失衡的问题。对此话题感兴趣的读者可以参考Max Kuhn 和 Kjell Johnston的书《Applied Predictive Modeling》中的第11章<span class="citation">(Max Kuhn <a href="#ref-APM">2013</a>)</span>，这本书的中文版已于2016年5月由电子工业出版社出版。模型选择和评估要求分析师将模型放在具体项目语境下。这是体现科学和艺术结合的典型环节。我们在本书之后讲具体模型的时候会给出几个完整的案例分析，其中包括用之前讲到的这些建模技术进行模型选择。关于模型评估还要提两点：</p>
+<ol style="list-style-type: decimal">
 <li>尝试尽可能多的模型</li>
-</ul>
-<p>当考虑该用什么模型解决一个具体的问题时，应该考虑多个可能的模型。从最简单的模型开始直到你能达到的难度上限。真正尝试拟合模型时，根据个人喜好，你可以从最简单的模型开始，每拟合一次模型，对数据中变量关系的理解会有所加深，慢慢过渡到更加复杂的模型。或者从最复杂的模型开始，但要做好简化模型的准备，使得模型具有更强的解释性。实际应用中，你不知道什么模型对当前问题最有效，所以比较不同的模型对于一个合格的数据科学家来说是必须的。当然，这有一个隐藏的前提条件是你能够快速有效的拟合不同模型。如果你需要让计算机跑1个晚上的程序来拟合一个模型，尝试这样的模型不是一个好主意。</p>
-<ul>
+</ol>
+<p>当考虑该用什么模型解决某具体的问题时，应该考虑多个可能的模型。从最简单的模型开始直到你能达到的难度上限。真正尝试拟合模型时，根据个人喜好，你可以从最简单的模型开始，每拟合一次模型，对数据中变量关系的理解会有所加深，慢慢过渡到更加复杂的模型。或者从最复杂的模型开始，但要做好简化模型的准备，使得模型具有更强的解释性。实际应用中，你不知道什么模型对当前问题最有效，所以比较不同的模型对于一个合格的数据科学家来说是必须的。当然，这有一个隐藏的前提条件是你能够快速有效的拟合不同模型。如果你需要让计算机跑1个晚上的程序来拟合一个模型，尝试这样的模型不是一个好主意。</p>
+<ol style="list-style-type: decimal">
 <li>检查模型的稳定性</li>
-</ul>
+</ol>
 <p>提高模型稳定性有各种可能的方法，收集更多的观测，除去冗余变量，如之前提到的近0方差变量和高度相关变量。检查模型拟合的稳定程度最常用的方法是再抽样。通过抽取不同的样本拟合相同的模型，然后查看拟合参数的变化范围。要是需要检查模型在某假设条件不满足的情况下的表现，可以通过模拟数据进行考察。</p>
-<p>有目标的估计因果效应，而不是将其当作庞大回归模型的副产物</p>
-<p>不要想当然的假设回归系数能够解释成因果关系。</p>
+<p>最后我想用George Box的那句统计学界家喻户晓的名言结束这一章：</p>
+<blockquote>
+<p>所有模型都是错的，但其中有一些是有用的。(All models are wrong, but some are useful.)</p>
+</blockquote>
 
 </div>
 </div>
@@ -500,6 +507,9 @@ labs&lt;-<span class="kw">c</span>(<span class="dt">modelscore=</span><span clas
 </div>
 <div id="ref-Li2008">
 <p>Li J, Fine JP. 2008. “ROC Analysis with Multiple Classes and Multiple Tests: Methodology and Its Application in Microarray Studies.” <em>Biostatistics</em> 9 (3): 566–76.</p>
+</div>
+<div id="ref-APM">
+<p>Max Kuhn, Kjell Johnston. 2013. <em>Applied Predictive Modeling</em>. Springer.</p>
 </div>
 </div>
             </section>
