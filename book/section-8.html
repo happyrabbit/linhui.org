@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-07-06">
+<meta name="date" content="2016-07-07">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -183,9 +183,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="9" data-path="section-9.html"><a href="section-9.html"><i class="fa fa-check"></i><b>9</b> 特征工程</a><ul>
 <li class="chapter" data-level="9.1" data-path="section-9.html"><a href="section-9.html#section-9.1"><i class="fa fa-check"></i><b>9.1</b> 特征构建</a></li>
 <li class="chapter" data-level="9.2" data-path="section-9.html"><a href="section-9.html#section-9.2"><i class="fa fa-check"></i><b>9.2</b> 特征提取</a><ul>
-<li class="chapter" data-level="9.2.1" data-path="section-9.html"><a href="section-9.html#section-9.2.1"><i class="fa fa-check"></i><b>9.2.1</b> 主成分分析</a></li>
-<li class="chapter" data-level="9.2.2" data-path="section-9.html"><a href="section-9.html#section-9.2.2"><i class="fa fa-check"></i><b>9.2.2</b> 因子分析</a></li>
-<li class="chapter" data-level="9.2.3" data-path="section-9.html"><a href="section-9.html#section-9.2.3"><i class="fa fa-check"></i><b>9.2.3</b> 高维标度化</a></li>
+<li class="chapter" data-level="9.2.1" data-path="section-9.html"><a href="section-9.html#section-9.2.1"><i class="fa fa-check"></i><b>9.2.1</b> 初步探索数据</a></li>
+<li class="chapter" data-level="9.2.2" data-path="section-9.html"><a href="section-9.html#section-9.2.2"><i class="fa fa-check"></i><b>9.2.2</b> 主成分分析</a></li>
+<li class="chapter" data-level="9.2.3" data-path="section-9.html"><a href="section-9.html#section-9.2.3"><i class="fa fa-check"></i><b>9.2.3</b> 因子分析</a></li>
+<li class="chapter" data-level="9.2.4" data-path="section-9.html"><a href="section-9.html#section-9.2.4"><i class="fa fa-check"></i><b>9.2.4</b> 高维标度化</a></li>
 </ul></li>
 <li class="chapter" data-level="9.3" data-path="section-9.html"><a href="section-9.html#section-9.3"><i class="fa fa-check"></i><b>9.3</b> 变量选择</a></li>
 </ul></li>
@@ -259,7 +260,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>当因变量是数值时，我们可以使用均方误差平方根（Root mean squared error, RMSE）为指标衡量模型的表现。 这个度量是模型残差的函数，其中残差即为观测值减去模型的预测值。 均方误差（Mean squared error, MSE）的计算方法是将残差平方然后取平均， 而RMSE则是取MSE的平方根，从而它与原始数据的单位相同。</p>
 <p><span class="math display">\[MSE=\frac{1}{n}\sum_{i=1}^{n}(y_{i}-\hat{y}_{i})^{2}\]</span> <span class="math display">\[RMSE=\sqrt{\frac{1}{n}\sum_{i=1}^{n}(y_{i}-\hat{y}_{i})^{2}}\]</span></p>
 <p>得到的RMSE取值通常解释为残差离0的平均距离，或者解释为观测值和模型预测值之间平均的距离。回到之前介绍误差来源时用过的例子，对服装消费者数据中的收入（<code>income</code>）建立一般线性模型，将消费记录变量作为自变量，结果如下所示：</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit&lt;-<span class="kw">lm</span>(income~store_exp+online_exp+store_trans+online_trans,<span class="dt">data=</span>sim.dat)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 载入服装消费者数据</span>
+sim.dat&lt;-<span class="kw">read.csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/SegData.csv&quot;</span>)
+fit&lt;-<span class="kw">lm</span>(income~store_exp+online_exp+store_trans+online_trans,<span class="dt">data=</span>sim.dat)
 <span class="kw">summary</span>(fit)</code></pre></div>
 <pre><code>## 
 ## Call:
@@ -309,9 +312,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <span class="kw">library</span>(caret)
 <span class="kw">library</span>(readr)
 <span class="co"># 读取数据</span>
-disease_dat&lt;-<span class="kw">read_csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/sim1_da1.csv&quot;</span>)
+<span class="co"># 载入数据</span>
+disease_dat&lt;-<span class="kw">read.csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/sim1_da1.csv&quot;</span>)
 <span class="co"># 可以用glimpse()函数查看数据</span>
 <span class="co"># glimpse(disease_dat)</span></code></pre></div>
+<p>AirlineRating</p>
 <p>划分训练集和测试集，在训练集（<code>xTrain</code>和<code>yTrain</code>）上得到模型，然后在测试集（<code>xTest</code>和<code>yTest</code>）上评估模型表现。70%的样本用于训练，剩下30%用于模型评估：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 划分训练集和测试集</span>
 <span class="kw">set.seed</span>(<span class="dv">2016</span>)
@@ -333,19 +338,19 @@ yTest&lt;-disease_dat$y[-trainIndex]%&gt;%<span class="kw">as.factor</span>()</c
 <span class="kw">set.seed</span>(<span class="dv">100</span>)
 car::<span class="kw">some</span>(yhatprob)</code></pre></div>
 <pre><code>##         0     1
-## 9   0.592 0.408
-## 26  0.455 0.545
-## 41  0.575 0.425
-## 50  0.513 0.487
-## 57  0.620 0.380
-## 74  0.538 0.462
-## 75  0.472 0.528
-## 84  0.542 0.458
-## 88  0.620 0.380
-## 126 0.586 0.414</code></pre>
+## 45  0.592 0.408
+## 158 0.455 0.545
+## 255 0.575 0.425
+## 291 0.513 0.487
+## 314 0.620 0.380
+## 392 0.538 0.462
+## 402 0.472 0.528
+## 443 0.542 0.458
+## 462 0.620 0.380
+## 626 0.586 0.414</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">yhat&lt;-<span class="kw">predict</span>(train_rf,xTest)
 car::<span class="kw">some</span>(yhat)</code></pre></div>
-<pre><code>##  32  45  55  63 100 104 105 119 141 153 
+<pre><code>## 206 273 305 348 519 524 525 599 701 780 
 ##   1   0   0   0   0   0   0   0   1   0 
 ## Levels: 0 1</code></pre>
 <p>现在我们就用上面的两种预测结果为例介绍不同的预测类评估方法。</p>
@@ -381,7 +386,7 @@ car::<span class="kw">some</span>(yhat)</code></pre></div>
 </table>
 <p>其中TP代表真阳性，FP代表假阳性，TN代表真阴性，FN代表假阴性。表格左上到右下对角线上的元素表示正确预测的样本数目，另一个方向的对角线上的元素代表误判的样本数。评估类预测最简单的指标是<strong>总体精确率</strong>，即预测正确的总体样本比例:</p>
 <p><span class="math display">\[总体精确率=\frac{TP+TN}{TP+TN+FP+FN}\]</span></p>
-<p>对类别数目大于2的情况，可以类似计算总体精确率。该统计量很直观，但有一些缺点，首先总体精确率没有区分错误类型。实际应用中，不同错误对应的损失可能不同，这时就无法用总体精确率衡量模型。 比如过滤垃圾邮件，误删一封重要的邮件带来的损失要高于收到一封垃圾邮件的损失。Provost等人<span class="citation">(<span class="citeproc-not-found" data-reference-id="provost1998"><strong>???</strong></span>)</span>深入讨论了用精确率来比较不同的分类器存在的问题。其次总体精确率没有考虑真实频率。比如在保险风险分析中，有风险的概率可能只有千分之一或者更小，模型只要将所有样本都清一色判定为无风险就能达到几乎完美的精确率。有时我们将不用模型也能得到的精确率称为<strong>无信息率</strong>。这里将所有样本判定为无风险得到的无信息率至少是99.9%。在这种情况下模型的精确率需要高于无信息率才算合理。</p>
+<p>对类别数目大于2的情况，可以类似计算总体精确率。该统计量很直观，但有一些缺点，首先总体精确率没有区分错误类型。实际应用中，不同错误对应的损失可能不同，这时就无法用总体精确率衡量模型。 比如过滤垃圾邮件，误删一封重要的邮件带来的损失要高于收到一封垃圾邮件的损失。Provost等人<span class="citation">(Provost F <a href="#ref-Provost1998">1998</a>)</span>深入讨论了用精确率来比较不同的分类器存在的问题。其次总体精确率没有考虑真实频率。比如在保险风险分析中，有风险的概率可能只有千分之一或者更小，模型只要将所有样本都清一色判定为无风险就能达到几乎完美的精确率。有时我们将不用模型也能得到的精确率称为<strong>无信息率</strong>。这里将所有样本判定为无风险得到的无信息率至少是99.9%。在这种情况下模型的精确率需要高于无信息率才算合理。</p>
 <p>还有一种一致性检验方法叫做Kappa统计量，最早由Cohen等人在1960年提出用于考察两个不同的诊断方法在结果上是否具有一致性<span class="citation">(J <a href="#ref-Cohen1960">1960</a>)</span>。Kappa考虑到简单由偶然情况产生的准确性。具体公式如下：</p>
 <p><span class="math display">\[Kappa=\frac{P_{0}+P_{e}}{1-P_{e}}\]</span></p>
 <p>假设<span class="math inline">\(n=TP+TN+FP+FN\)</span>为总体样本数，其中<span class="math inline">\(P_{0}=\frac{TP+TN}{n}\)</span>为实际预测一致率，<span class="math inline">\(P_{e}=\frac{(TP+FP)(TP+FN)+(FN+TN)(FP+TN)}{n^{2}}\)</span>为由简单偶然情况产生的一致率。Kappa取值从-1到1，值越高一致性越强。</p>
@@ -449,7 +454,7 @@ labs&lt;-<span class="kw">c</span>(<span class="dt">modelscore=</span><span clas
 <p>为了绘制多条提升图，使用lattice包中的xyplot()函数：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">xyplot</span>(liftCurve,<span class="dt">auto.key=</span><span class="kw">list</span>(<span class="dt">columns=</span><span class="dv">2</span>,<span class="dt">lines=</span>T,<span class="dt">points=</span>F))</code></pre></div>
 <p><img src="DS_R_files/figure-html/unnamed-chunk-92-1.png" width="672" /></p>
-<p>提升图的横轴是累计样本百分比，纵轴是累计获取的目标类样本百分比。比如随机森林模型提升曲线上的点(0.0625,0.1123596)表示：按照模型预测分值从高到低排序后的前0.0625个样本中含有160个疫情爆发样本中的0.1123596。和ROC曲线类似，我们可以通过比较不同模型的提升图来选择模型，曲线下面积也可作为模型效果的度量。此外我们也可能对曲线的某一部分特别感兴趣。比如在当前的例子中，如果判定一个农场在未来5年内可能爆发疫情，那么通常的措施是对该农场进行大规模的清洗消毒，这样的措施花费很高。假设我们只能对50%的农场进行清理，那么就该选择对应横坐标为50%，疫情爆发样本命中率最高的模型。在这个应用场景下，在支出预算一定时最大化效率。</p>
+<p>提升图的横轴是累计样本百分比，纵轴是累计获取的目标类样本百分比。比如随机森林模型提升曲线上的点(6.25,11.24)表示：按照模型预测分值从高到低排序后的前6.25%的样本中含有160个疫情爆发样本中的0.1123596。和ROC曲线类似，我们可以通过比较不同模型的提升图来选择模型，曲线下面积也可作为模型效果的度量。此外我们也可能对曲线的某一部分特别感兴趣。比如在当前的例子中，如果判定一个农场在未来5年内可能爆发疫情，那么通常的措施是对该农场进行大规模的清洗消毒，这样的措施花费很高。假设我们只能对50%的农场进行清理，那么就该选择对应横坐标为50%，疫情爆发样本命中率最高的模型。在这个应用场景下，在支出预算一定时最大化效率。</p>
 <!--
 
 ### 失衡数据
@@ -476,6 +481,9 @@ labs&lt;-<span class="kw">c</span>(<span class="dt">modelscore=</span><span clas
 </div>
 <h3> References</h3>
 <div id="refs" class="references">
+<div id="ref-Provost1998">
+<p>Provost F, Kohavi R, Fawcett T. 1998. “The Case Against Accuracy Esti- Mation for Comparing Induction Algorithms.” <em>Proceedings of the Fifteenth International Conference on Machine Learning</em>, 445–53.</p>
+</div>
 <div id="ref-Cohen1960">
 <p>J, Cohen. 1960. “A Coefficient of Agreement for Nominal Data.” <em>Educational and Psychological Measurement</em> 20: 37–46.</p>
 </div>
@@ -487,9 +495,6 @@ labs&lt;-<span class="kw">c</span>(<span class="dt">modelscore=</span><span clas
 </div>
 <div id="ref-hall2004">
 <p>Hall P, Fan Y, Hyndman R. 2004. “Nonparametric Confidence Intervals for Receiver Operating Characteristic Curves.” <em>Biometrika</em> 91: 743–50.</p>
-</div>
-<div id="ref-Provost1998">
-<p>Provost F, Kohavi R, Fawcett T. 1998. “The Case Against Accuracy Esti- Mation for Comparing Induction Algorithms.” <em>Proceedings of the Fifteenth International Conference on Machine Learning</em>, 445–53.</p>
 </div>
 <div id="ref-Fawcett2006">
 <p>T, Fawcett. 2006. “An Introduction to ROC Analysis.” <em>Pattern Recognition Letters</em> 27 (8): 861–74.</p>

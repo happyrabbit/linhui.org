@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-07-06">
+<meta name="date" content="2016-07-07">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -183,9 +183,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="9" data-path="section-9.html"><a href="section-9.html"><i class="fa fa-check"></i><b>9</b> 特征工程</a><ul>
 <li class="chapter" data-level="9.1" data-path="section-9.html"><a href="section-9.html#section-9.1"><i class="fa fa-check"></i><b>9.1</b> 特征构建</a></li>
 <li class="chapter" data-level="9.2" data-path="section-9.html"><a href="section-9.html#section-9.2"><i class="fa fa-check"></i><b>9.2</b> 特征提取</a><ul>
-<li class="chapter" data-level="9.2.1" data-path="section-9.html"><a href="section-9.html#section-9.2.1"><i class="fa fa-check"></i><b>9.2.1</b> 主成分分析</a></li>
-<li class="chapter" data-level="9.2.2" data-path="section-9.html"><a href="section-9.html#section-9.2.2"><i class="fa fa-check"></i><b>9.2.2</b> 因子分析</a></li>
-<li class="chapter" data-level="9.2.3" data-path="section-9.html"><a href="section-9.html#section-9.2.3"><i class="fa fa-check"></i><b>9.2.3</b> 高维标度化</a></li>
+<li class="chapter" data-level="9.2.1" data-path="section-9.html"><a href="section-9.html#section-9.2.1"><i class="fa fa-check"></i><b>9.2.1</b> 初步探索数据</a></li>
+<li class="chapter" data-level="9.2.2" data-path="section-9.html"><a href="section-9.html#section-9.2.2"><i class="fa fa-check"></i><b>9.2.2</b> 主成分分析</a></li>
+<li class="chapter" data-level="9.2.3" data-path="section-9.html"><a href="section-9.html#section-9.2.3"><i class="fa fa-check"></i><b>9.2.3</b> 因子分析</a></li>
+<li class="chapter" data-level="9.2.4" data-path="section-9.html"><a href="section-9.html#section-9.2.4"><i class="fa fa-check"></i><b>9.2.4</b> 高维标度化</a></li>
 </ul></li>
 <li class="chapter" data-level="9.3" data-path="section-9.html"><a href="section-9.html#section-9.3"><i class="fa fa-check"></i><b>9.3</b> 变量选择</a></li>
 </ul></li>
@@ -300,7 +301,107 @@ car::<span class="kw">some</span>(topic$year)</code></pre></div>
 </div>
 <div id="section-9.2" class="section level2">
 <h2><span class="header-section-number">9.2</span> 特征提取</h2>
-<p>特征提取是一项用不同变量的组合代替原变量的技术。我们考虑3个常用的通过对数据降维来降低数据复杂度的方法。主成分分析（PCA）试图找到原变量的不相关线性组合，这些线性组合能够最大限度的解释原数据中变量方差。解释性因子分析（EFA）同样试图在尽量小的维度上解释原数据中尽可能多的方差。高维标度化（MDS）将观测见的相似度映射到低维度上，如2维平面。MDS能够作用于非数值型变量，如分类变量或者有序数据预测变量。接下来我们通过模拟的航空公司数据集来展示不同的特征提取方法。</p>
+<p>特征提取是一项用不同变量的组合代替原变量的技术。它的目的是自动地构建新的特征，将原始特征转换为一组具有明显物理意义或者统计意义的特征。比如通过变换特征取值来减少原始数据中某个特征的取值个数等。我们考虑3个常用的可以对数据降维的特征提取方法。主成分分析（PCA）试图找到原变量的不相关线性组合，这些线性组合能够最大限度的解释原数据中变量方差。解释性因子分析（EFA）同样试图在尽量小的维度上解释原数据中尽可能多的方差。高维标度化（MDS）将观测见的相似度映射到低维度上，如2维平面。MDS能够作用于非数值型变量，如分类变量或者有序数据预测变量。接下来我们通过模拟的航空公司数据集来展示不同的特征提取方法。在市场营销中这类消费者调查问卷中，虽然初始问题很多，但通常存在多个调查项共同反应少数几个潜在因子。比如航空公司满意度调查数据中下面四个问题：购票容易度（<code>Easy_Reservation</code>）、座椅选择（<code>Preferred_Seats</code>）、航班选择（<code>Flight_Options</code>）和票价（<code>Ticket_Prices</code>）都和购票体验有关。</p>
+<div id="section-9.2.1" class="section level3">
+<h3><span class="header-section-number">9.2.1</span> 初步探索数据</h3>
+<p>我们先读入该数据：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 可以从网站下载该数据</span>
+airline&lt;-<span class="kw">read_csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/AirlineRating.csv&quot;</span>)</code></pre></div>
+<p>可以用<code>glimpse()</code>函数检查该数据：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glimpse</span>(airline)</code></pre></div>
+<pre><code>## Observations: 3,000
+## Variables: 17
+## $ Easy_Reservation (int) 6, 5, 6, 5, 4, 5, 6, 4, 6, 4, 5, 5, 6, 5, 5, ...
+## $ Preferred_Seats  (int) 5, 7, 6, 6, 5, 6, 6, 6, 5, 4, 7, 5, 7, 6, 6, ...
+## $ Flight_Options   (int) 4, 7, 5, 5, 3, 4, 6, 3, 4, 5, 6, 6, 6, 5, 6, ...
+## $ Ticket_Prices    (int) 5, 6, 6, 5, 6, 5, 5, 5, 5, 6, 7, 7, 6, 7, 7, ...
+## $ Seat_Comfort     (int) 5, 6, 7, 7, 6, 6, 6, 4, 6, 9, 7, 7, 6, 6, 6, ...
+## $ Seat_Roominess   (int) 7, 8, 6, 8, 7, 8, 6, 5, 7, 8, 8, 9, 7, 8, 6, ...
+## $ Overhead_Storage (int) 5, 5, 7, 6, 5, 4, 4, 4, 5, 7, 6, 6, 7, 5, 4, ...
+## $ Clean_Aircraft   (int) 7, 6, 7, 7, 7, 7, 6, 4, 6, 7, 7, 7, 7, 7, 6, ...
+## $ Courtesy         (int) 5, 6, 6, 4, 2, 5, 5, 4, 5, 6, 4, 6, 4, 5, 5, ...
+## $ Friendliness     (int) 4, 6, 6, 6, 3, 4, 5, 5, 4, 5, 6, 7, 5, 4, 4, ...
+## $ Helpfulness      (int) 6, 5, 6, 4, 4, 5, 5, 4, 3, 5, 5, 6, 5, 4, 5, ...
+## $ Service          (int) 6, 5, 6, 5, 3, 5, 5, 5, 3, 5, 6, 6, 5, 5, 4, ...
+## $ Satisfaction     (int) 6, 7, 7, 5, 4, 6, 5, 5, 4, 7, 6, 7, 6, 4, 4, ...
+## $ Fly_Again        (int) 6, 6, 6, 7, 4, 5, 3, 4, 7, 6, 8, 6, 5, 4, 6, ...
+## $ Recommend        (int) 3, 6, 5, 5, 4, 5, 6, 5, 8, 6, 8, 7, 6, 5, 6, ...
+## $ ID               (int) 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14...
+## $ Airline          (chr) &quot;AirlineCo.1&quot;, &quot;AirlineCo.1&quot;, &quot;AirlineCo.1&quot;, ...</code></pre>
+<p>数据的前15列都是问卷调查的各种问题，问题格式如下：对该航空公司的<问卷项>你的满意度是？从1到9，分值越大满意度越高。可以看到前15列评分在1-9之间，是整数型了。<code>ID</code>代表受访者编号，不同编号代表不同受访者。每个受访者需要评估3家航空公司，列<code>Airline</code>指出相应的航空公司。一共有1000名受访者，因此观测的总行数为1000x3=3000。关于数据各列变量的解释，大家可以参考“数据集模拟和背景介绍”中相关小节。</p>
+<p>我们用<code>corrplot()</code>函数检查问卷调查问题的相关性：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(corrplot)
+<span class="co"># 选取其中的问卷调查项</span>
+<span class="kw">select</span>(airline,Easy_Reservation:Recommend)%&gt;%
+<span class="st">  </span><span class="co"># 得到相关矩阵</span>
+<span class="st">  </span><span class="kw">cor</span>()%&gt;%
+<span class="st">  </span><span class="co"># 用corrplot()绘制相关图</span>
+<span class="st">  </span><span class="co"># 选项order=&quot;hclust&quot;按照变量的相似度，基于系统聚类的结果对行列进行重新排列</span>
+<span class="st">  </span><span class="kw">corrplot</span>(,<span class="dt">order=</span><span class="st">&quot;hclust&quot;</span>)</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-100-1.png" width="672" /></p>
+<p>由相关矩阵图可以看到，这些问卷项大致分成3类：</p>
+<ol style="list-style-type: decimal">
+<li>空航服务相关
+<ul>
+<li>礼貌（Courtesy）</li>
+<li>友善（Friendliness）</li>
+<li>能够提供需要的帮助（Helpfulness）</li>
+<li>食物饮料服务（Service）</li>
+</ul></li>
+<li>购票体验相关
+<ul>
+<li>购票容易度（Easy_Reservation）</li>
+<li>座椅选择（Preferred_Seats）</li>
+<li>航班选择（Flight_Options）</li>
+<li>票价（Ticket_Prices）</li>
+</ul></li>
+<li>机舱设施和总体评估指数
+<ul>
+<li>座椅舒适度（Seat_Comfort）</li>
+<li>位置前后空间（Seat_Roominess）</li>
+<li>随机行李存放（Overhead_Storage）</li>
+<li>机舱清洁（Clean_Aircraft）</li>
+<li>总体满意度（Satisfaction）</li>
+<li>再次选择次航空公司（Fly_Again）</li>
+<li>向朋友推荐此航空公司（Recommend）</li>
+</ul></li>
+</ol>
+<p>而且机舱设施和总体满意度相关性较高。空航服务和购票体验貌似负相关，也就是说航空公司目前没有做到让乘客对这两类体验都感到满意，这也可能是潜在需要提高的地方。这里简单的检查数据能够给我们一些基本的信息，让我们能够做出一些假设，然后在之后的分析中尝试证实这些假设。</p>
+<p>对于这样的数据初步探索，一个非常自然的问题是：每个航空公司对应的各项评分均值是多少？我们可以用之前介绍的<code>dplyr</code>包中的各种函数，以及使用之前讲到的管道操作<code>%&gt;%</code>让代码更易读：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 选取其中的问卷调查项和航空公司因子信息</span>
+<span class="co"># 即删除ID项</span>
+<span class="kw">select</span>(airline,-ID)%&gt;%
+<span class="st">  </span><span class="co"># 按Airline对数据进行分组总结</span>
+<span class="st">  </span><span class="kw">group_by</span>(Airline)%&gt;%
+<span class="st">  </span><span class="co"># 对每个数值</span>
+<span class="st">  </span><span class="kw">summarise_each</span>(<span class="kw">funs</span>(mean))%&gt;%
+<span class="st">  </span><span class="co"># 显示数据</span>
+<span class="st">  </span><span class="kw">glimpse</span>()</code></pre></div>
+<pre><code>## Observations: 3
+## Variables: 16
+## $ Airline          (chr) &quot;AirlineCo.1&quot;, &quot;AirlineCo.2&quot;, &quot;AirlineCo.3&quot;
+## $ Easy_Reservation (dbl) 5.031, 2.939, 2.038
+## $ Preferred_Seats  (dbl) 6.025, 2.995, 2.019
+## $ Flight_Options   (dbl) 4.996, 2.033, 2.067
+## $ Ticket_Prices    (dbl) 5.997, 3.016, 2.058
+## $ Seat_Comfort     (dbl) 6.988, 5.009, 7.918
+## $ Seat_Roominess   (dbl) 7.895, 3.970, 7.908
+## $ Overhead_Storage (dbl) 5.967, 4.974, 7.924
+## $ Clean_Aircraft   (dbl) 6.947, 6.050, 7.882
+## $ Courtesy         (dbl) 5.016, 7.937, 7.942
+## $ Friendliness     (dbl) 4.997, 7.946, 7.914
+## $ Helpfulness      (dbl) 5.017, 7.962, 7.954
+## $ Service          (dbl) 5.019, 7.956, 7.906
+## $ Satisfaction     (dbl) 5.944, 3.011, 7.903
+## $ Fly_Again        (dbl) 5.983, 3.008, 7.920
+## $ Recommend        (dbl) 6.008, 2.997, 7.929</code></pre>
+<p>上面的数值结果可以看到乘客对各个航空公司的满意度情况有明显的区别。总的来说购票体验相关的项满意度偏低（购票容易度（<code>Easy_Reservation</code>）、座椅选择（<code>Preferred_Seats</code>）、航班选择（<code>Flight_Options</code>）和票价（<code>Ticket_Prices</code>）），相较而言第1个航空公司在购票体验方面优于竞争对手，但在其它方面并没有优势。第2个航空公司在空航服务方面做的比较好，在其它方面也没有优势。第3个航空公司除了购票体验较差以外，在其它方面都至少和竞争对手相当，或者优于竞争对手。这里的数据分类和之前相关矩阵图展示出的信息有一致性，但也提醒我们各个航空公司对应的问卷回复项之间的关系可能不一样。对于上面各航空公司评分均值结果使用热图进行可视化是很好的方式。我们用<code>gplots</code>包中的<code>heatmap.2()</code>函数绘制热图：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(gplots)</code></pre></div>
+<pre><code>## 
+## Attaching package: &#39;gplots&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:stats&#39;:
+## 
+##     lowess</code></pre>
 <!-- 
 3.1 特征选择Feature Selection
 
@@ -329,19 +430,6 @@ Pearson相关系数的取值在0到1之间，如果你使用这个评价指标�
 
 特征提取的子问题之二——特征提取。
 
-原则上来讲，特征提取应该在特征选择之前。特征提取的对象是原始数据（raw data），它的目的是自动地构建新的特征，将原始特征转换为一组具有明显物理意义（Gabor、几何特征[角点、不变量]、纹理[LBP HOG]）或者统计意义或核的特征。比如通过变换特征取值来减少原始数据中某个特征的取值个数等。对于表格数据，你可以在你设计的特征矩阵上使用主要成分分析（Principal Component Analysis，PCA)来进行特征提取从而创建新的特征。对于图像数据，可能还包括了线或边缘检测。
-
-常用的方法有：
-
-PCA (Principal component analysis，主成分分析)
-ICA (Independent component analysis，独立成分分析)
-LDA （Linear Discriminant Analysis，线性判别分析）
-对于图像识别中，还有SIFT方法。
-
-3.3 特征构建 Feature Construction
-
-特征提取的子问题之二——特征构建。
-
 
 
 4、特征工程处理过程
@@ -359,34 +447,18 @@ LDA （Linear Discriminant Analysis，线性判别分析）
 4.评估模型：使用你选择的特征进行建模，同时使用未知的数据来评估你的模型精度。
 By the way, 在做feature selection的时候，会涉及到特征学习（Feature Learning），这里说下特征学习的概念，一般而言，特征学习（Feature Learning）是指学习输入特征和一个训练实例真是类别之间的关系。
 
-下面举个例子来简单了解下特征工程的处理。
 
-首先是来说下特征提取，假设你的数据里现在有一个颜色类别的属性，比如是“item_Color”,它的取值有三个，分别是：red，blue，unknown。从特征提取的角度来看，
-
-，而特征选择，经过上面的分析，想必大家也知道了，其实就是达到一个降维的效果。
-
-只要分析能力和实践能力够强，那么特征构建和特征提取对你而言就会显得相对比较简单，所以抓紧时间好好实践吧！
-
-Conclusion
-
-
-了解这几个术语的意思后，我们来看看他们之间的关系。
-
-在Quora中有人这么说：
-
-Feature engineering is a super-set of activities which include feature extraction, feature construction and feature selection. Each of the three are important steps and none should be ignored. We could make a generalization of the importance though, from my experience the relative importance of the steps would be feature construction > feature extraction > feature selection.
-
-用中文来说就是：特征工程是一个超集，它包括特征提取、特征构建和特征选择这三个子模块。在实践当中，每一个子模块都非常重要，忽略不得。根据答主的经验，他将这三个子模块的重要性进行了一个排名，即：
 
 -->
-<div id="section-9.2.1" class="section level3">
-<h3><span class="header-section-number">9.2.1</span> 主成分分析</h3>
 </div>
 <div id="section-9.2.2" class="section level3">
-<h3><span class="header-section-number">9.2.2</span> 因子分析</h3>
+<h3><span class="header-section-number">9.2.2</span> 主成分分析</h3>
 </div>
 <div id="section-9.2.3" class="section level3">
-<h3><span class="header-section-number">9.2.3</span> 高维标度化</h3>
+<h3><span class="header-section-number">9.2.3</span> 因子分析</h3>
+</div>
+<div id="section-9.2.4" class="section level3">
+<h3><span class="header-section-number">9.2.4</span> 高维标度化</h3>
 </div>
 </div>
 <div id="section-9.3" class="section level2">
