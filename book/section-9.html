@@ -185,8 +185,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="9.2" data-path="section-9.html"><a href="section-9.html#section-9.2"><i class="fa fa-check"></i><b>9.2</b> 特征提取</a><ul>
 <li class="chapter" data-level="9.2.1" data-path="section-9.html"><a href="section-9.html#section-9.2.1"><i class="fa fa-check"></i><b>9.2.1</b> 初步探索数据</a></li>
 <li class="chapter" data-level="9.2.2" data-path="section-9.html"><a href="section-9.html#section-9.2.2"><i class="fa fa-check"></i><b>9.2.2</b> 主成分分析</a></li>
-<li class="chapter" data-level="9.2.3" data-path="section-9.html"><a href="section-9.html#section-9.2.3"><i class="fa fa-check"></i><b>9.2.3</b> 因子分析</a></li>
-<li class="chapter" data-level="9.2.4" data-path="section-9.html"><a href="section-9.html#section-9.2.4"><i class="fa fa-check"></i><b>9.2.4</b> 高维标度化</a></li>
+<li class="chapter" data-level="9.2.3" data-path="section-6.html"><a href="section-6.html#-1"><i class="fa fa-check"></i><b>9.2.3</b> 主成分分析</a></li>
+<li class="chapter" data-level="9.2.4" data-path="section-9.html"><a href="section-9.html#section-9.2.4"><i class="fa fa-check"></i><b>9.2.4</b> 因子分析</a></li>
+<li class="chapter" data-level="9.2.5" data-path="section-9.html"><a href="section-9.html#section-9.2.5"><i class="fa fa-check"></i><b>9.2.5</b> 高维标度化</a></li>
 </ul></li>
 <li class="chapter" data-level="9.3" data-path="section-9.html"><a href="section-9.html#section-9.3"><i class="fa fa-check"></i><b>9.3</b> 变量选择</a></li>
 </ul></li>
@@ -370,7 +371,7 @@ airline&lt;-<span class="kw">read_csv</span>(<span class="st">&quot;/Users/happy
 <p>对于这样的数据初步探索，一个非常自然的问题是：每个航空公司对应的各项评分均值是多少？我们可以用之前介绍的<code>dplyr</code>包中的各种函数，以及使用之前讲到的管道操作<code>%&gt;%</code>让代码更易读：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 选取其中的问卷调查项和航空公司因子信息</span>
 <span class="co"># 即删除ID项</span>
-<span class="kw">select</span>(airline,-ID)%&gt;%
+airline.mean&lt;-<span class="kw">select</span>(airline,-ID)%&gt;%
 <span class="st">  </span><span class="co"># 按Airline对数据进行分组总结</span>
 <span class="st">  </span><span class="kw">group_by</span>(Airline)%&gt;%
 <span class="st">  </span><span class="co"># 对每个数值</span>
@@ -395,13 +396,49 @@ airline&lt;-<span class="kw">read_csv</span>(<span class="st">&quot;/Users/happy
 ## $ Satisfaction     (dbl) 5.944, 3.011, 7.903
 ## $ Fly_Again        (dbl) 5.983, 3.008, 7.920
 ## $ Recommend        (dbl) 6.008, 2.997, 7.929</code></pre>
-<p>上面的数值结果可以看到乘客对各个航空公司的满意度情况有明显的区别。总的来说购票体验相关的项满意度偏低（购票容易度（<code>Easy_Reservation</code>）、座椅选择（<code>Preferred_Seats</code>）、航班选择（<code>Flight_Options</code>）和票价（<code>Ticket_Prices</code>）），相较而言第1个航空公司在购票体验方面优于竞争对手，但在其它方面并没有优势。第2个航空公司在空航服务方面做的比较好，在其它方面也没有优势。第3个航空公司除了购票体验较差以外，在其它方面都至少和竞争对手相当，或者优于竞争对手。这里的数据分类和之前相关矩阵图展示出的信息有一致性，但也提醒我们各个航空公司对应的问卷回复项之间的关系可能不一样。对于上面各航空公司评分均值结果使用热图进行可视化是很好的方式。我们用<code>gplots</code>包中的<code>heatmap.2()</code>函数绘制热图：</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(gplots)</code></pre></div>
-<pre><code>## 
-## Attaching package: &#39;gplots&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:stats&#39;:
-## 
-##     lowess</code></pre>
+<p>上面的数值结果可以看到乘客对各个航空公司的满意度情况有明显的区别。总的来说购票体验相关的项满意度偏低（购票容易度（<code>Easy_Reservation</code>）、座椅选择（<code>Preferred_Seats</code>）、航班选择（<code>Flight_Options</code>）和票价（<code>Ticket_Prices</code>）），相较而言第1个航空公司在购票体验方面优于竞争对手，但在其它方面并没有优势。第2个航空公司在空航服务方面做的比较好，在其它方面也没有优势。第3个航空公司除了购票体验较差以外，在其它方面都至少和竞争对手相当，或者优于竞争对手。这里的数据分类和之前相关矩阵图展示出的信息有一致性，但也提醒我们各个航空公司对应的问卷回复项之间的关系可能不一样。对于上面各航空公司评分均值结果使用热图进行可视化是很好的方式。我们用<code>gplots</code>包中的<code>heatmap.2()</code>函数绘制热图，用<code>RColorBrewer</code>包对图形着色：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># gplots是可视化包</span>
+<span class="kw">library</span>(gplots)
+<span class="co"># RColorBrewer包用于设计图形的调色盘</span>
+<span class="co"># 相关信息见：http://colorbrewer2.org</span>
+<span class="kw">library</span>(RColorBrewer)
+<span class="co"># 将航空公司设置成行名称然后将对应的字符列删除</span>
+<span class="kw">row.names</span>(airline.mean)&lt;-airline.mean$Airline
+airline.mean&lt;-<span class="kw">select</span>(airline.mean,-Airline)
+<span class="co"># 绘制热图</span>
+<span class="kw">heatmap.2</span>(<span class="kw">as.matrix</span>(airline.mean),
+          <span class="dt">col=</span><span class="kw">brewer.pal</span>(<span class="dv">9</span>,<span class="st">&quot;YlGn&quot;</span>),<span class="dt">trace=</span><span class="st">&quot;none&quot;</span>,<span class="dt">key=</span><span class="ot">FALSE</span>,<span class="dt">dend=</span><span class="st">&quot;none&quot;</span>,<span class="dt">cexCol=</span><span class="dv">1</span>,<span class="dt">cexRow =</span> <span class="dv">1</span>)
+<span class="kw">title</span>(<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>,
+          <span class="dt">main=</span><span class="st">&quot;航空公司问卷调查均值热图&quot;</span>)</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-102-1.png" width="672" /></p>
+<p>在上面代码中，我们将数据框<code>airline.mean</code>转化成矩阵传递给<code>heatmap.2()</code>，因为函数要求。我们通过<code>RColorBrewer</code>包中的<code>YlGn</code>调色盘，用黄色和绿色对热图着色，并且取消了一些将热图变得复杂的选项（<code>trace</code>、<code>key</code>和<code>dend</code>）。在结果图中，绿色表示高观测值，黄色表示低观测值，处于中间的值对应的颜色较浅。乘客对不同航空公司的满意度分值分布很显然有区别。航空公司3和2有明显让人满意和不满意的地方，而公司1总体来说比较平均，除了乘客对其位置前后空间（Seat_Roominess）特别满意。如果考虑和竞争对手的差距，1和2需要改进的地方显然比3要多。</p>
+<p>通过观测目前得到的一些探索性结果，我们可以猜测各个问题可能的聚类情况，以及它们之间的关系。但我们最好使用更严格正规的统计模型验证这些猜测。接下来我们就开始介绍模型。</p>
+</div>
+<div id="section-9.2.2" class="section level3">
+<h3><span class="header-section-number">9.2.2</span> 主成分分析</h3>
+<p>主成分分析（PCA）是寻找变量的线性组合，得到新的组合变量叫做“成分”，其指导思想是尽量捕捉原数据中方差。在统计学中，方差通常也被认为是信息。第一个成分捕捉的方差最大。第二个成分尽可能多的捕捉前一个成分没有解释的方差。依次类推，直到成分的数目和原变量数目一样多。我们通过使用前几个成分取代原变量来达到降维的目的，同时要保证这些成分能够解释大部分原始数据集中的方差。这里要提醒一点，如果数据观测不在一个标度上时需要对数据进行标准化，因为PCA是基于变量方差矩阵。这里因为各个变量的观测分布没有很大差异，是不是标准化没有太大的影响。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">airline.pc&lt;-<span class="kw">select</span>(airline,Easy_Reservation:Recommend)%&gt;%
+<span class="st">  </span><span class="kw">prcomp</span>()
+<span class="kw">summary</span>(airline.pc)</code></pre></div>
+<pre><code>## Importance of components:
+##                          PC1    PC2     PC3     PC4     PC5     PC6
+## Standard deviation     4.693 4.2836 1.68335 1.03625 0.88896 0.82333
+## Proportion of Variance 0.435 0.3624 0.05596 0.02121 0.01561 0.01339
+## Cumulative Proportion  0.435 0.7974 0.85338 0.87458 0.89019 0.90358
+##                            PC7     PC8     PC9    PC10    PC11    PC12
+## Standard deviation     0.80349 0.78694 0.77536 0.77020 0.74612 0.71831
+## Proportion of Variance 0.01275 0.01223 0.01187 0.01172 0.01099 0.01019
+## Cumulative Proportion  0.91633 0.92856 0.94043 0.95215 0.96314 0.97333
+##                           PC13    PC14    PC15
+## Standard deviation     0.69417 0.66650 0.65131
+## Proportion of Variance 0.00952 0.00877 0.00838
+## Cumulative Proportion  0.98285 0.99162 1.00000</code></pre>
+<p>由上面输出结果的第一行是主成分的标准差，第二行对应成分单独解释方差的比例，第三行是累计解释方差。可见，前两个主成分解释的大部分原变量方差（80%）。<code>plot()</code>函数作用在PCA结果上默认绘制陡坡图，该图展示每个成分额外解释的方差。我们可用累计解释方差比例或者陡坡图来判断需要的主成分。我们通过下面代码绘制图形：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(airline.pc,<span class="dt">type=</span><span class="st">&quot;l&quot;</span>)</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-104-1.png" width="672" /></p>
+<p>图中由陡到缓的转折点能告诉我们从哪个主成分开始，继续添加更多的成分对解释更多方差没有太大帮助，反而增加模型复杂度。关于拐点的判断是主观的。图中显示拐点大约在2或者3。这表明前2到3个主成分解释了大部分方差。将各个原始变量映射到前两个主成分张成的平面上能够揭示这些变量之间的关系。这样的图称为“双标图”，可以用<code>biplot()</code>函数绘制：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">biplot</span>(airline.pc)</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-105-1.png" width="672" /></p>
 <!-- 
 3.1 特征选择Feature Selection
 
@@ -451,14 +488,14 @@ By the way, 在做feature selection的时候，会涉及到特征学习（Featur
 
 -->
 </div>
-<div id="section-9.2.2" class="section level3">
-<h3><span class="header-section-number">9.2.2</span> 主成分分析</h3>
-</div>
-<div id="section-9.2.3" class="section level3">
-<h3><span class="header-section-number">9.2.3</span> 因子分析</h3>
+<div id="-1" class="section level3">
+<h3><span class="header-section-number">9.2.3</span> 主成分分析</h3>
 </div>
 <div id="section-9.2.4" class="section level3">
-<h3><span class="header-section-number">9.2.4</span> 高维标度化</h3>
+<h3><span class="header-section-number">9.2.4</span> 因子分析</h3>
+</div>
+<div id="section-9.2.5" class="section level3">
+<h3><span class="header-section-number">9.2.5</span> 高维标度化</h3>
 </div>
 </div>
 <div id="section-9.3" class="section level2">
