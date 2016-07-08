@@ -267,6 +267,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>在实际应用中，显然是不可能凭空而来的，需要我们手工去构建特征。关于特征构建的定义，可以这么说：特征构建指的是从原始数据中人工的构建新的特征。我们需要人工的创建它们。这需要我们花大量的时间去研究真实的数据样本，思考问题的潜在形式和数据结构，同时能够更好地应用到预测模型中。</p>
 <p>特征构建需要很强的洞察力和分析能力，要求我们能够从原始数据中找出一些具有物理意义的特征。假设原始数据是表格数据，一般你可以使用混合属性或者组合属性来创建新的特征，或是分解或切分原有的特征来创建新的特征。比如之前在数据预处理那章中讲编码名义变量时，我们将分类变量<code>gender</code>(性别)转化为两个名义变量：<code>Female</code>和<code>Male</code>。之后考虑收入和性别的交互效应(<code>income:gender</code>)也是一种特征构建。另外再举一个例子，假设你有一个日期时间 (2006-04-01 02:26:00)该如何转换呢？对于这种时间的数据，我们可以根据需求提取出多种属性。比如下面这个从农业论坛爬取的文本数据。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(readr)
+<span class="kw">library</span>(dplyr)
 topic&lt;-<span class="kw">read_csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/Hui/Project/NLP/RawData/newagtalk-20150607/topic.csv&quot;</span>)
 <span class="kw">glimpse</span>(topic)</code></pre></div>
 <pre><code>## Observations: 209,607
@@ -434,11 +435,17 @@ airline.mean&lt;-<span class="kw">select</span>(airline.mean,-Airline)
 ## Proportion of Variance 0.00952 0.00877 0.00838
 ## Cumulative Proportion  0.98285 0.99162 1.00000</code></pre>
 <p>由上面输出结果的第一行是主成分的标准差，第二行对应成分单独解释方差的比例，第三行是累计解释方差。可见，前两个主成分解释的大部分原变量方差（80%）。<code>plot()</code>函数作用在PCA结果上默认绘制陡坡图，该图展示每个成分额外解释的方差。我们可用累计解释方差比例或者陡坡图来判断需要的主成分。我们通过下面代码绘制图形：</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(airline.pc,<span class="dt">type=</span><span class="st">&quot;l&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(airline.pc,<span class="dt">type=</span><span class="st">&quot;l&quot;</span>,<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>,<span class="dt">main=</span><span class="st">&quot;主成分分析陡坡图&quot;</span>)</code></pre></div>
 <p><img src="DS_R_files/figure-html/unnamed-chunk-104-1.png" width="672" /></p>
 <p>图中由陡到缓的转折点能告诉我们从哪个主成分开始，继续添加更多的成分对解释更多方差没有太大帮助，反而增加模型复杂度。关于拐点的判断是主观的。图中显示拐点大约在2或者3。这表明前2到3个主成分解释了大部分方差。将各个原始变量映射到前两个主成分张成的平面上能够揭示这些变量之间的关系。这样的图称为“双标图”，可以用<code>biplot()</code>函数绘制：</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">biplot</span>(airline.pc)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">biplot</span>(airline.pc,<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>,<span class="dt">main=</span><span class="st">&quot;PCA结果双标图&quot;</span>)</code></pre></div>
 <p><img src="DS_R_files/figure-html/unnamed-chunk-105-1.png" width="672" /></p>
+<p>满意度评分PCA结果的双标图中红色的箭头中看到不同调查问题的聚类情况，并且可以大致感觉样本的聚类情况，大致成为3类，一个合理的猜测是针对3个不同的航空公司。从之前的热图可以看到，3个公司有各自的优势和劣势，评分分布显然是不同的。但这样的图有个问题：基于所有评分样本导致图形非常稠密，难以识别。如果是基于各个公司聚合后的数据，得到的图或许会更清晰。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">airline.mean.pc&lt;-<span class="kw">select</span>(airline.mean,Easy_Reservation:Recommend)%&gt;%
+<span class="st">  </span><span class="kw">prcomp</span>()
+<span class="kw">biplot</span>(airline.mean.pc,<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>,<span class="dt">main=</span><span class="st">&quot;聚合后PCA结果双标图&quot;</span>,
+       <span class="dt">cex=</span><span class="fl">0.7</span>, <span class="dt">expand=</span><span class="dv">2</span>,<span class="dt">xlim=</span><span class="kw">c</span>(-<span class="fl">0.75</span>, <span class="dv">1</span>),<span class="dt">ylim=</span><span class="kw">c</span>(-<span class="fl">0.7</span>,<span class="fl">0.8</span>))</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-106-1.png" width="672" /></p>
 <!-- 
 3.1 特征选择Feature Selection
 
