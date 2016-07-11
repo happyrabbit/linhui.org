@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-07-09">
+<meta name="date" content="2016-07-10">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -185,7 +185,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="9.2" data-path="section-9.html"><a href="section-9.html#section-9.2"><i class="fa fa-check"></i><b>9.2</b> 特征提取</a><ul>
 <li class="chapter" data-level="9.2.1" data-path="section-9.html"><a href="section-9.html#section-9.2.1"><i class="fa fa-check"></i><b>9.2.1</b> 初步探索数据</a></li>
 <li class="chapter" data-level="9.2.2" data-path="section-9.html"><a href="section-9.html#section-9.2.2"><i class="fa fa-check"></i><b>9.2.2</b> 主成分分析</a></li>
-<li class="chapter" data-level="9.2.3" data-path="section-9.html"><a href="section-9.html#section-9.2.3"><i class="fa fa-check"></i><b>9.2.3</b> 因子分析</a></li>
+<li class="chapter" data-level="9.2.3" data-path="section-9.html"><a href="section-9.html#section-9.2.3"><i class="fa fa-check"></i><b>9.2.3</b> 探索性因子分析</a></li>
 <li class="chapter" data-level="9.2.4" data-path="section-9.html"><a href="section-9.html#section-9.2.4"><i class="fa fa-check"></i><b>9.2.4</b> 高维标度化</a></li>
 </ul></li>
 <li class="chapter" data-level="9.3" data-path="section-9.html"><a href="section-9.html#section-9.3"><i class="fa fa-check"></i><b>9.3</b> 变量选择</a></li>
@@ -468,7 +468,14 @@ airline.mean&lt;-<span class="kw">select</span>(airline.mean,-Airline)
 <li><p>这里得到的各项相对分布位置和你考虑的公司，还有问卷调查项有关。如果对另外3个不同的公司进行同样的问卷调查，可能结果会不同，或者添加新的调查项也可能改变原来调查项的相对位置。一个评估模型敏感性的方法是抽取一个样本子集进行类似分析，或者删除一些问卷调查项，看看结果是不是有很大变化。如果这些随机干扰下得到的双标图中各项的相对位置相似的话，你对在该项目中使用这个模型就更加自信。</p></li>
 <li><p>最后一点和建模没有直接关系，但是在应用中很重要。问题出现在问卷调查上不代表问题就重要。取决于不同公司对定义“重要”的定义。通常情况下，在有限的市场研究经费下我们希望问和用户购买行为最相关的问题。比如在购票体验方面，对购买决定影响最大的可能是票价，而了解乘客是否对座椅选择满意本身当然没有坏处，但是考虑到进行调查研究的成本，我们不得不问：是不是需要问这个问题？有没有更好的问题取代当前问题？这需要你首先定义一个衡量“重要性”的标准（如，总体满意度，购买行为），然后据此尽量寻找对该标准影响最大的问题。</p></li>
 </ol>
-<p>从上面的例子中我们可以看到调查项大致分成几个类，每类问题对应一个可能的潜在变量。比如购票容易度（<code>Easy_Reservation</code>）、座椅选择（<code>Preferred_Seats</code>）、航班选择（<code>Flight_Options</code>）和票价（<code>Ticket_Prices</code>）就和购票体验有关。接下来我们可能会想知道如何用更科学的方式分析出调查项背后的潜变量，以及衡量受访者对某公司或品牌针对某个潜变量的总体得分（比如对总体购票体验），如果需要提高消费者对某方面的认知，商家需要关注哪些具体问题（比如，提高价格竞争力可能对购票体验的提高帮助最大）。</p>
+<p>从上面的例子中我们可以看到调查项大致分成几个类，每类问题对应一个可能的潜在变量。比如购票容易度（<code>Easy_Reservation</code>）、座椅选择（<code>Preferred_Seats</code>）、航班选择（<code>Flight_Options</code>）和票价（<code>Ticket_Prices</code>）就和购票体验有关。接下来我们可能会想知道如何用更科学的方式分析出调查项背后的潜变量，以及衡量受访者对某公司或品牌针对某个潜变量的总体得分（比如对总体购票体验），如果需要提高消费者对某方面的认知，商家需要关注哪些具体问题（比如，提高价格竞争力可能对购票体验的提高帮助最大）。下面我们要讲的探索性因子分析就可以帮助我们实现这一点。</p>
+</div>
+<div id="section-9.2.3" class="section level3">
+<h3><span class="header-section-number">9.2.3</span> 探索性因子分析</h3>
+<p>探索性因子分析（EFA）可以用来获取抽样调查中问题之间的构造。这里的因子就是无法观测到的<strong>潜变量</strong>，或者隐变量。关于因子分析的经典案例是心理学和教育学中的测试。例如“智力”，人格依恋类型（安全型，焦虑－矛盾型和回避型），人格特点（外倾性，宜人性，尽责性，神经质和开放性），这些都是抽象的概念或者说构造，它们都是无法直接观测到的。取而代之的，我们可以用不同的行为反映这些变量。这些观测到的行为变量称为<strong>显变量</strong>，比如测试分数，问卷调查回复以及其它观测到的行为。EFA的目标是找到能最大限度解释显变量方差的隐因子（即潜变量）。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#library(nFactors)</span>
+<span class="co">#subset(airline,select=Easy_Reservation:Recommend)%&gt;%</span>
+<span class="co">#  nScree()</span></code></pre></div>
 <!-- 
 3.1 特征选择Feature Selection
 
@@ -517,9 +524,6 @@ By the way, 在做feature selection的时候，会涉及到特征学习（Featur
 
 
 -->
-</div>
-<div id="section-9.2.3" class="section level3">
-<h3><span class="header-section-number">9.2.3</span> 因子分析</h3>
 </div>
 <div id="section-9.2.4" class="section level3">
 <h3><span class="header-section-number">9.2.4</span> 高维标度化</h3>
