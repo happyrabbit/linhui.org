@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-07-10">
+<meta name="date" content="2016-07-11">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -177,8 +177,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="8.2.1" data-path="section-8.html"><a href="section-8.html#kappa"><i class="fa fa-check"></i><b>8.2.1</b> Kappa统计量</a></li>
 <li class="chapter" data-level="8.2.2" data-path="section-8.html"><a href="section-8.html#roc"><i class="fa fa-check"></i><b>8.2.2</b> ROC曲线</a></li>
 <li class="chapter" data-level="8.2.3" data-path="section-8.html"><a href="section-8.html#section-8.2.3"><i class="fa fa-check"></i><b>8.2.3</b> 提升图</a></li>
-<li class="chapter" data-level="8.2.4" data-path="section-8.html"><a href="section-8.html#-3"><i class="fa fa-check"></i><b>8.2.4</b> 本章总结</a></li>
 </ul></li>
+<li class="chapter" data-level="8.3" data-path="section-8.html"><a href="section-8.html#-3"><i class="fa fa-check"></i><b>8.3</b> 本章总结</a></li>
 </ul></li>
 <li class="chapter" data-level="9" data-path="section-9.html"><a href="section-9.html"><i class="fa fa-check"></i><b>9</b> 特征工程</a><ul>
 <li class="chapter" data-level="9.1" data-path="section-9.html"><a href="section-9.html#section-9.1"><i class="fa fa-check"></i><b>9.1</b> 特征构建</a></li>
@@ -473,9 +473,64 @@ airline.mean&lt;-<span class="kw">select</span>(airline.mean,-Airline)
 <div id="section-9.2.3" class="section level3">
 <h3><span class="header-section-number">9.2.3</span> 探索性因子分析</h3>
 <p>探索性因子分析（EFA）可以用来获取抽样调查中问题之间的构造。这里的因子就是无法观测到的<strong>潜变量</strong>，或者隐变量。关于因子分析的经典案例是心理学和教育学中的测试。例如“智力”，人格依恋类型（安全型，焦虑－矛盾型和回避型），人格特点（外倾性，宜人性，尽责性，神经质和开放性），这些都是抽象的概念或者说构造，它们都是无法直接观测到的。取而代之的，我们可以用不同的行为反映这些变量。这些观测到的行为变量称为<strong>显变量</strong>，比如测试分数，问卷调查回复以及其它观测到的行为。EFA的目标是找到能最大限度解释显变量方差的隐因子（即潜变量）。</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#library(nFactors)</span>
-<span class="co">#subset(airline,select=Easy_Reservation:Recommend)%&gt;%</span>
-<span class="co">#  nScree()</span></code></pre></div>
+<p>比如在此例中，我们不能直接观测到客户总体满意度的构成，但我们可以通过问卷获知客户对各项具体活动的满意度，然后通过数据分析，尽可能的揭示导致客户总体印象背后的原因，这样可以将资金投入到能最有效改善客户满意度的项目。在本小节中，我们通过EFA进一步探索评分数据下的潜在机制，然后根据得到的隐因子估计比较不同的公司。</p>
+<p>EFA的结果是一个因子矩阵试图寻找这样的隐因子：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(nFactors)
+<span class="co"># 得到变量相关矩阵的特征值</span>
+eigenvalue&lt;-<span class="kw">subset</span>(airline,<span class="dt">select=</span>Easy_Reservation:Recommend)%&gt;%
+<span class="st">  </span><span class="kw">cor</span>()%&gt;%
+<span class="st">  </span><span class="kw">eigen</span>()
+<span class="co"># 将特征值向量传递给nScree函数</span>
+<span class="kw">nScree</span>(eigenvalue$values)</code></pre></div>
+<pre><code>##   noc naf nparallel nkaiser
+## 1   2   2         2       2</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">subset</span>(airline,<span class="dt">select=</span>Easy_Reservation:Recommend)%&gt;%
+<span class="st">  </span><span class="kw">factanal</span>(<span class="dt">factors=</span><span class="dv">4</span>)</code></pre></div>
+<pre><code>## 
+## Call:
+## factanal(x = ., factors = 4)
+## 
+## Uniquenesses:
+## Easy_Reservation  Preferred_Seats   Flight_Options    Ticket_Prices 
+##            0.231            0.158            0.222            0.170 
+##     Seat_Comfort   Seat_Roominess Overhead_Storage   Clean_Aircraft 
+##            0.193            0.151            0.216            0.445 
+##         Courtesy     Friendliness      Helpfulness          Service 
+##            0.219            0.189            0.151            0.161 
+##     Satisfaction        Fly_Again        Recommend 
+##            0.157            0.082            0.093 
+## 
+## Loadings:
+##                  Factor1 Factor2 Factor3 Factor4
+## Easy_Reservation         -0.319   0.814         
+## Preferred_Seats          -0.423   0.814         
+## Flight_Options    0.160  -0.420   0.758         
+## Ticket_Prices            -0.406   0.814         
+## Seat_Comfort      0.884                  -0.152 
+## Seat_Roominess    0.853  -0.289   0.189         
+## Overhead_Storage  0.846   0.160  -0.173  -0.112 
+## Clean_Aircraft    0.724                  -0.159 
+## Courtesy                  0.786  -0.403         
+## Friendliness              0.814  -0.384         
+## Helpfulness               0.855  -0.341         
+## Service                   0.841  -0.361         
+## Satisfaction      0.913                         
+## Fly_Again         0.933                   0.214 
+## Recommend         0.931                   0.199 
+## 
+##                Factor1 Factor2 Factor3 Factor4
+## SS loadings      5.351   3.458   3.189   0.163
+## Proportion Var   0.357   0.231   0.213   0.011
+## Cumulative Var   0.357   0.587   0.800   0.811
+## 
+## Test of the hypothesis that 4 factors are sufficient.
+## The chi square statistic is 123.09 on 51 degrees of freedom.
+## The p-value is 6.76e-08</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">&quot;GPArotation&quot;</span>)</code></pre></div>
+<pre><code>## 
+## The downloaded binary packages are in
+##  /var/folders/6n/2lstnlmj2qb9ryxm8_wt_cn80000gn/T//RtmpGSh1jx/downloaded_packages</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(GPArotation)</code></pre></div>
 <!-- 
 3.1 特征选择Feature Selection
 
