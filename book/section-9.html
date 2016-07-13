@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-07-11">
+<meta name="date" content="2016-07-12">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -474,63 +474,73 @@ airline.mean&lt;-<span class="kw">select</span>(airline.mean,-Airline)
 <h3><span class="header-section-number">9.2.3</span> 探索性因子分析</h3>
 <p>探索性因子分析（EFA）可以用来获取抽样调查中问题之间的构造。这里的因子就是无法观测到的<strong>潜变量</strong>，或者隐变量。关于因子分析的经典案例是心理学和教育学中的测试。例如“智力”，人格依恋类型（安全型，焦虑－矛盾型和回避型），人格特点（外倾性，宜人性，尽责性，神经质和开放性），这些都是抽象的概念或者说构造，它们都是无法直接观测到的。取而代之的，我们可以用不同的行为反映这些变量。这些观测到的行为变量称为<strong>显变量</strong>，比如测试分数，问卷调查回复以及其它观测到的行为。EFA的目标是找到能最大限度解释显变量方差的隐因子（即潜变量）。</p>
 <p>比如在此例中，我们不能直接观测到客户总体满意度的构成，但我们可以通过问卷获知客户对各项具体活动的满意度，然后通过数据分析，尽可能的揭示导致客户总体印象背后的原因，这样可以将资金投入到能最有效改善客户满意度的项目。在本小节中，我们通过EFA进一步探索评分数据下的潜在机制，然后根据得到的隐因子估计比较不同的公司。</p>
-<p>EFA的结果是一个因子矩阵试图寻找这样的隐因子：</p>
+<p>EFA的结果是一个因子矩阵，其目标是使一小部分变量对应较高的因子载荷，其余的因子载荷都很低。这样的因子能由少数几个变量解释。其通过旋转正交矩阵改变变量对应的因子载荷，在旋转过程中不改变解释方差。好比小时候切生日蛋糕，总想尽量保持蛋糕上图样的完整，坚决不要把奶油塑成的花对半切开，当然还有生肖图案，每次不得不切开的时候都无比纠结。这个纠结权衡的过程就喝EFA类似，这样旋转切分后得到的结果比随机切分要让强迫症患者舒服的多。其中一些每块蛋糕上面一朵完整的花，有一大块表面是完整的的生肖图案，有的上面是水果等等。这一块块蛋糕就好比隐因子，这些因子的定义不是唯一的，没有一种切分方式严格优于另外一种，但是总有一些比另外一些让你更舒服。对于EFA的结果，总有一些因子结果比另外一些更有用，能更好的解释实际现状。</p>
+<p>和PCA相比，能产生可解释和实践的结果是EFA的一大优势。如果我们只对EFA得出的某因子感兴趣，可以保留该因子对应载荷高的问题，舍去其它问题，优化问卷调查。之后在例子中我们会展示EFA还能用来探索调查项相互联系的方式是不是符合我们的期待。可能真实的维度比我们想的少，也可能因子分析结果反映了一些我们不知道的维度。由于EFA是探索性的，没有非黑即白的标准答案，这里一定要特别关注结果的可解释性。如果结果难以解释，得到的因子对实际工作也没有作用。</p>
+<p>下面我们还是以航空公司满意度调查的数据为例展示如何应用EFA。其中第一步就是决定要估计的因子数目。通常的方法是通过之前提到的陡坡图，或者根据对应特征值来决定因子数目（大于1的特征值数目）。R包<code>nFactors</code>中的函数<code>nScree()</code>能够应用几种方法通过陡坡检验估计因子数目。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(nFactors)
-<span class="co"># 得到变量相关矩阵的特征值</span>
-eigenvalue&lt;-<span class="kw">subset</span>(airline,<span class="dt">select=</span>Easy_Reservation:Recommend)%&gt;%
-<span class="st">  </span><span class="kw">cor</span>()%&gt;%
-<span class="st">  </span><span class="kw">eigen</span>()
-<span class="co"># 将特征值向量传递给nScree函数</span>
-<span class="kw">nScree</span>(eigenvalue$values)</code></pre></div>
+<span class="kw">subset</span>(airline,<span class="dt">select=</span>Easy_Reservation:Recommend)%&gt;%
+<span class="st">  </span><span class="co"># 转化成数据框格式传递给nScree()函数</span>
+<span class="st">  </span><span class="kw">data.frame</span>()%&gt;%
+<span class="kw">nScree</span>()</code></pre></div>
 <pre><code>##   noc naf nparallel nkaiser
 ## 1   2   2         2       2</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">subset</span>(airline,<span class="dt">select=</span>Easy_Reservation:Recommend)%&gt;%
-<span class="st">  </span><span class="kw">factanal</span>(<span class="dt">factors=</span><span class="dv">4</span>)</code></pre></div>
+<p>结果显示，当前的4个方法建议的因子数目都是2。我们也可以通过特征值来决定因子数目。<code>eigen()</code>函数可以用来得到特征值：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 得到变量相关矩阵的特征值</span>
+eigenvalue&lt;-<span class="kw">subset</span>(airline,<span class="dt">select=</span>Easy_Reservation:Recommend)%&gt;%
+<span class="st">  </span><span class="kw">cor</span>()%&gt;%
+<span class="st">  </span><span class="kw">eigen</span>()</code></pre></div>
+<p>可以看到开始2个特征值都大于1，因此，这里给出的因子数目建议还是2。再次强调，最后模型是不是有效取决于其可解释性。在实际应用中，最好检测多个因子数目。比如，2个或者3个。这里我们使用2个因子。接下来通过<code>factanal()</code>函数拟合EFA模型：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">airline%&gt;%
+<span class="st">  </span><span class="kw">subset</span>(<span class="dt">select=</span>Easy_Reservation:Recommend)%&gt;%
+<span class="st">  </span><span class="kw">factanal</span>(<span class="dt">factors=</span><span class="dv">2</span>)</code></pre></div>
 <pre><code>## 
 ## Call:
-## factanal(x = ., factors = 4)
+## factanal(x = ., factors = 2)
 ## 
 ## Uniquenesses:
 ## Easy_Reservation  Preferred_Seats   Flight_Options    Ticket_Prices 
-##            0.231            0.158            0.222            0.170 
+##            0.428            0.307            0.335            0.327 
 ##     Seat_Comfort   Seat_Roominess Overhead_Storage   Clean_Aircraft 
-##            0.193            0.151            0.216            0.445 
+##            0.251            0.164            0.252            0.495 
 ##         Courtesy     Friendliness      Helpfulness          Service 
-##            0.219            0.189            0.151            0.161 
+##            0.253            0.244            0.248            0.240 
 ##     Satisfaction        Fly_Again        Recommend 
-##            0.157            0.082            0.093 
+##            0.152            0.112            0.113 
 ## 
 ## Loadings:
-##                  Factor1 Factor2 Factor3 Factor4
-## Easy_Reservation         -0.319   0.814         
-## Preferred_Seats          -0.423   0.814         
-## Flight_Options    0.160  -0.420   0.758         
-## Ticket_Prices            -0.406   0.814         
-## Seat_Comfort      0.884                  -0.152 
-## Seat_Roominess    0.853  -0.289   0.189         
-## Overhead_Storage  0.846   0.160  -0.173  -0.112 
-## Clean_Aircraft    0.724                  -0.159 
-## Courtesy                  0.786  -0.403         
-## Friendliness              0.814  -0.384         
-## Helpfulness               0.855  -0.341         
-## Service                   0.841  -0.361         
-## Satisfaction      0.913                         
-## Fly_Again         0.933                   0.214 
-## Recommend         0.931                   0.199 
+##                  Factor1 Factor2
+## Easy_Reservation -0.754         
+## Preferred_Seats  -0.831         
+## Flight_Options   -0.801   0.155 
+## Ticket_Prices    -0.819         
+## Seat_Comfort              0.863 
+## Seat_Roominess   -0.346   0.846 
+## Overhead_Storage  0.233   0.833 
+## Clean_Aircraft            0.707 
+## Courtesy          0.864         
+## Friendliness      0.869         
+## Helpfulness       0.867         
+## Service           0.872         
+## Satisfaction              0.921 
+## Fly_Again                 0.942 
+## Recommend                 0.941 
 ## 
-##                Factor1 Factor2 Factor3 Factor4
-## SS loadings      5.351   3.458   3.189   0.163
-## Proportion Var   0.357   0.231   0.213   0.011
-## Cumulative Var   0.357   0.587   0.800   0.811
+##                Factor1 Factor2
+## SS loadings      5.769   5.309
+## Proportion Var   0.385   0.354
+## Cumulative Var   0.385   0.739
 ## 
-## Test of the hypothesis that 4 factors are sufficient.
-## The chi square statistic is 123.09 on 51 degrees of freedom.
-## The p-value is 6.76e-08</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">install.packages</span>(<span class="st">&quot;GPArotation&quot;</span>)</code></pre></div>
-<pre><code>## 
-## The downloaded binary packages are in
-##  /var/folders/6n/2lstnlmj2qb9ryxm8_wt_cn80000gn/T//RtmpGSh1jx/downloaded_packages</code></pre>
+## Test of the hypothesis that 2 factors are sufficient.
+## The chi square statistic is 5416.28 on 76 degrees of freedom.
+## The p-value is 0</code></pre>
+<p>其中<code>factors=2</code>设置因子数目为2.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(GPArotation)</code></pre></div>
+<p>因子分析的特征提取的优势体现在下面3个方面：</p>
+<ol style="list-style-type: decimal">
+<li>我们可以用维度更低的因子分值取代大量原始调查问题</li>
+<li>将反映相同认知维度的问卷分值联合起来比使用其中任何一项含有更多的信息。也在某种程度上缓解单个变量评分中的不确定性。从人脑认知的角度看，我们的购买决策常取决于一个总体的印象，而我们自己也无法解释其中具体的组成成分。所以在比较不同的公司或品牌时，应该关注总体感知。</li>
+<li>通常人们会有一些感兴趣的因子，通过因子载荷，我们可以删除贡献小的变量从而简化收集过程。</li>
+</ol>
 <!-- 
 3.1 特征选择Feature Selection
 
