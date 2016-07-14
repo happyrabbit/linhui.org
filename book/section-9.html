@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-07-12">
+<meta name="date" content="2016-07-13">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -488,7 +488,11 @@ airline.mean&lt;-<span class="kw">select</span>(airline.mean,-Airline)
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 得到变量相关矩阵的特征值</span>
 eigenvalue&lt;-<span class="kw">subset</span>(airline,<span class="dt">select=</span>Easy_Reservation:Recommend)%&gt;%
 <span class="st">  </span><span class="kw">cor</span>()%&gt;%
-<span class="st">  </span><span class="kw">eigen</span>()</code></pre></div>
+<span class="st">  </span><span class="kw">eigen</span>()
+eigenvalue$values</code></pre></div>
+<pre><code>##  [1] 6.13519681 5.47501966 0.94251965 0.46623604 0.26506447 0.22711198
+##  [7] 0.21221230 0.21044797 0.19462556 0.17989084 0.16075997 0.15678382
+## [13] 0.15513097 0.13273209 0.08626788</code></pre>
 <p>可以看到开始2个特征值都大于1，因此，这里给出的因子数目建议还是2。再次强调，最后模型是不是有效取决于其可解释性。在实际应用中，最好检测多个因子数目。比如，2个或者3个。这里我们使用2个因子。接下来通过<code>factanal()</code>函数拟合EFA模型：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">airline%&gt;%
 <span class="st">  </span><span class="kw">subset</span>(<span class="dt">select=</span>Easy_Reservation:Recommend)%&gt;%
@@ -533,8 +537,111 @@ eigenvalue&lt;-<span class="kw">subset</span>(airline,<span class="dt">select=</
 ## Test of the hypothesis that 2 factors are sufficient.
 ## The chi square statistic is 5416.28 on 76 degrees of freedom.
 ## The p-value is 0</code></pre>
-<p>其中<code>factors=2</code>设置因子数目为2.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(GPArotation)</code></pre></div>
+<p>其中<code>factors=2</code>设置因子数目为2. 我们看看结果输出的载荷<code>Loadings</code>，这是最需要解释的部分。结果中没有显示接近0的因子载荷。在此方案中，因子1对应载荷高的变量为：</p>
+<ul>
+<li>购票体验相关变量：<code>Easy_Reservation</code>，<code>Preferred_Seats</code>，<code>Flight_Options</code>，<code>Ticket_Prices</code></li>
+<li>机舱服务相关变量：<code>Courtesy</code>，<code>Friendliness</code>，<code>Helpfulness</code>，<code>Service</code></li>
+</ul>
+<p>因子2对应载荷高的变量为：</p>
+<ul>
+<li>机舱设施相关变量：<code>Seat_Comfort</code>，<code>Seat_Roominess</code>，<code>Overhead_Storage</code>，<code>Clean_Aircraft</code></li>
+<li>总体满意度相关变量：<code>Satisfaction</code>，<code>Fly_Again</code>，<code>Recommend</code></li>
+</ul>
+<p>也就是说这些结果大致反映出两类因子，其中一类和购票体验和机舱服务相关，另外一类和机舱设施和总体满意度相关。回忆之前得到的相关矩阵图，购票体验和机舱服务在图像强烈负相关，这里因子分析将它们看作受同一个因子影响，但载荷符号相反。这里很自然的提出一个实际问题，为什么对购票体验满意度高时对机舱服务满意度就低？这是需要和营销人员沟通的地方。同时，从统计的角度，我们可能会想，如果我们设置3个因子，是否会将购票体验和机舱服务分开呢？下面我们试着将因子个数设置成3个：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">airline%&gt;%
+<span class="st">  </span><span class="kw">subset</span>(<span class="dt">select=</span>Easy_Reservation:Recommend)%&gt;%
+<span class="st">  </span><span class="kw">factanal</span>(<span class="dt">factors=</span><span class="dv">3</span>)</code></pre></div>
+<pre><code>## 
+## Call:
+## factanal(x = ., factors = 3)
+## 
+## Uniquenesses:
+## Easy_Reservation  Preferred_Seats   Flight_Options    Ticket_Prices 
+##            0.233            0.157            0.222            0.173 
+##     Seat_Comfort   Seat_Roominess Overhead_Storage   Clean_Aircraft 
+##            0.251            0.165            0.253            0.495 
+##         Courtesy     Friendliness      Helpfulness          Service 
+##            0.219            0.191            0.153            0.161 
+##     Satisfaction        Fly_Again        Recommend 
+##            0.151            0.111            0.113 
+## 
+## Loadings:
+##                  Factor1 Factor2 Factor3
+## Easy_Reservation         -0.318   0.814 
+## Preferred_Seats          -0.422   0.815 
+## Flight_Options    0.163  -0.419   0.759 
+## Ticket_Prices            -0.406   0.813 
+## Seat_Comfort      0.864                 
+## Seat_Roominess    0.847  -0.286   0.189 
+## Overhead_Storage  0.832   0.160  -0.172 
+## Clean_Aircraft    0.706                 
+## Courtesy                  0.786  -0.403 
+## Friendliness              0.813  -0.385 
+## Helpfulness               0.854  -0.342 
+## Service                   0.842  -0.362 
+## Satisfaction      0.921                 
+## Fly_Again         0.942                 
+## Recommend         0.941                 
+## 
+##                Factor1 Factor2 Factor3
+## SS loadings      5.309   3.452   3.192
+## Proportion Var   0.354   0.230   0.213
+## Cumulative Var   0.354   0.584   0.797
+## 
+## Test of the hypothesis that 3 factors are sufficient.
+## The chi square statistic is 769.65 on 63 degrees of freedom.
+## The p-value is 3.9e-122</code></pre>
+<p>结果如我们所料，将之前机舱服务和购票体验对应的因子进一步分开成为两个因子。这个结果和之间基于主成分分析得到的双标图中问题对应箭头方向的聚类情况一致。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(GPArotation)
+airline%&gt;%
+<span class="st">  </span><span class="kw">subset</span>(<span class="dt">select=</span>Easy_Reservation:Recommend)%&gt;%
+<span class="st">  </span><span class="kw">factanal</span>(<span class="dt">factors=</span><span class="dv">3</span>,<span class="dt">rotation=</span><span class="st">&quot;oblimin&quot;</span>)</code></pre></div>
+<pre><code>## 
+## Call:
+## factanal(x = ., factors = 3, rotation = &quot;oblimin&quot;)
+## 
+## Uniquenesses:
+## Easy_Reservation  Preferred_Seats   Flight_Options    Ticket_Prices 
+##            0.233            0.157            0.222            0.173 
+##     Seat_Comfort   Seat_Roominess Overhead_Storage   Clean_Aircraft 
+##            0.251            0.165            0.253            0.495 
+##         Courtesy     Friendliness      Helpfulness          Service 
+##            0.219            0.191            0.153            0.161 
+##     Satisfaction        Fly_Again        Recommend 
+##            0.151            0.111            0.113 
+## 
+## Loadings:
+##                  Factor1 Factor2 Factor3
+## Easy_Reservation                  0.941 
+## Preferred_Seats                   0.880 
+## Flight_Options    0.167           0.803 
+## Ticket_Prices                     0.887 
+## Seat_Comfort      0.865                 
+## Seat_Roominess    0.844  -0.242         
+## Overhead_Storage  0.833   0.137  -0.142 
+## Clean_Aircraft    0.708                 
+## Courtesy                  0.818         
+## Friendliness              0.868         
+## Helpfulness               0.953         
+## Service                   0.922         
+## Satisfaction      0.921                 
+## Fly_Again         0.943                 
+## Recommend         0.942                 
+## 
+##                Factor1 Factor2 Factor3
+## SS loadings      5.316   3.285   3.135
+## Proportion Var   0.354   0.219   0.209
+## Cumulative Var   0.354   0.573   0.782
+## 
+## Factor Correlations:
+##         Factor1 Factor2 Factor3
+## Factor1  1.0000 -0.0494  0.0188
+## Factor2 -0.0494  1.0000 -0.7535
+## Factor3  0.0188 -0.7535  1.0000
+## 
+## Test of the hypothesis that 3 factors are sufficient.
+## The chi square statistic is 769.65 on 63 degrees of freedom.
+## The p-value is 3.9e-122</code></pre>
 <p>因子分析的特征提取的优势体现在下面3个方面：</p>
 <ol style="list-style-type: decimal">
 <li>我们可以用维度更低的因子分值取代大量原始调查问题</li>
