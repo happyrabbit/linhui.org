@@ -440,6 +440,14 @@ airline.mean&lt;-<span class="kw">select</span>(airline.mean,-Airline)
 <p>图中由陡到缓的转折点能告诉我们从哪个主成分开始，继续添加更多的成分对解释更多方差没有太大帮助，反而增加模型复杂度。关于拐点的判断是主观的。图中显示拐点大约在2或者3。这表明前2到3个主成分解释了大部分方差。将各个原始变量映射到前两个主成分张成的平面上能够揭示这些变量之间的关系。这样的图称为“双标图”，可以用<code>biplot()</code>函数绘制：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">biplot</span>(airline.pc,<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>,<span class="dt">main=</span><span class="st">&quot;PCA结果双标图&quot;</span>,<span class="dt">cex=</span><span class="kw">c</span>(<span class="fl">0.5</span>,<span class="dv">1</span>),<span class="dt">xlim=</span><span class="kw">c</span>(-<span class="fl">0.06</span>,<span class="fl">0.04</span>))</code></pre></div>
 <p><img src="DS_R_files/figure-html/unnamed-chunk-105-1.png" width="672" /></p>
+<p>双标图的横坐标是第一个主成分（PC1），纵坐标是第二个主成分（PC2）。</p>
+<p>A biplot uses points to represent the scores of the observations on the principal components, and it uses vectors to represent the coefficients of the variables on the principal components. In this example, the points represent automobiles, and the vectors represents judges.</p>
+<p>Interpreting Points: The relative location of the points can be interpreted. Points that are close together correspond to observations that have similar scores on the components displayed in the plot. To the extent that these components fit the data well, the points also correspond to observations that have similar values on the variables.</p>
+<p>In this example, cars that are close together are ones that have similar profiles of preference judgements: Most judges have the same kind of preference ratings for Cadillac and Lincoln Whether or not they like them we don’t know, its just that is a judge likes one s/he tends to like the other, and if a judge dislikes one, then the othe is likely to be disliked. The same is true for Pinto and Chevette, although the judgments about Pinto and Chevette are likely to be rather different then those about Cadillac and Lincoln, since the two pairs of points are relatively far apart.</p>
+<p>Interpreting Vectors: Both the direction and length of the vectors can be interpreted. Vectors point away from the origin in some direction.</p>
+<p>A vector points in the direction which is most like the variable represented by the vector. This is the direction which has the highest squared multiple correlation with the principal components. The length of the vector is proportional to the squared multiple correlation between the fitted values for the variable and the variable itself.</p>
+<p>The fitted values for a variable are the result of projecting the points in the space orthogonally onto the variable’s vector (to do this, you must imagine extending the vector in both directions). The observations whose points project furthest in the direction in which the vector points are the observations that have the most of whatever the variable measures. Those points that project at the other end have the least. Those projecting in the middle have an average ammount. then the</p>
+<p>Thus, vectors that point in the same direction correspond to variables that have similar response profiles, and can be interpreted as having similar meaning in the context set by the data.</p>
 <p>满意度评分PCA结果的双标图中红色的箭头中看到不同调查问题的聚类情况，并且可以大致感觉样本的聚类情况，大致成为3类，一个合理的猜测是针对3个不同的航空公司。从之前的热图可以看到，3个公司有各自的优势和劣势，评分分布显然是不同的。但这样的图有个问题：基于所有评分样本导致图形非常稠密，难以识别。如果是基于各个公司聚合后的数据，得到的图或许会更清晰。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">airline.mean.pc&lt;-<span class="kw">select</span>(airline.mean,Easy_Reservation:Recommend)%&gt;%
 <span class="st">  </span><span class="kw">prcomp</span>()
@@ -473,7 +481,7 @@ airline.mean&lt;-<span class="kw">select</span>(airline.mean,-Airline)
 </div>
 <div id="section-9.2.3" class="section level3">
 <h3><span class="header-section-number">9.2.3</span> 探索性因子分析</h3>
-<p>探索性因子分析（EFA）可以用来获取抽样调查中问题之间的构造。这里的因子就是无法观测到的<strong>潜变量</strong>，或者隐变量。关于因子分析的经典案例是心理学和教育学中的测试。例如“智力”，人格依恋类型（安全型，焦虑－矛盾型和回避型），人格特点（外倾性，宜人性，尽责性，神经质和开放性），这些都是抽象的概念或者说构造，它们都是无法直接观测到的。取而代之的，我们可以用不同的行为反映这些变量。这些观测到的行为变量称为<strong>显变量</strong>，比如测试分数，问卷调查回复以及其它观测到的行为。EFA的目标是找到能最大限度解释显变量方差的隐因子（即潜变量）。</p>
+<p>探索性因子分析（EFA）可以用来获取抽样调查中问题之间的构造。这里的因子就是无法观测到的<strong>潜变量</strong>，或者隐变量。因子分析的形成和早期发展一般认为是从Charles Spearman在1904年发表的文章开始<span class="citation">(Spearman <a href="#ref-spearman1904">1904</a>)</span>。关于因子分析的经典案例是心理学和教育学中的测试。例如“智力”，人格依恋类型（安全型，焦虑－矛盾型和回避型），人格特点（外倾性，宜人性，尽责性，神经质和开放性），这些都是抽象的概念或者说构造，它们都是无法直接观测到的。取而代之的，我们可以用不同的行为反映这些变量。这些观测到的行为变量称为<strong>显变量</strong>，比如测试分数，问卷调查回复以及其它观测到的行为。EFA的目标是找到能最大限度解释显变量方差的隐因子（即潜变量）。</p>
 <p>比如在此例中，我们不能直接观测到客户总体满意度的构成，但我们可以通过问卷获知客户对各项具体活动的满意度，然后通过数据分析，尽可能的揭示导致客户总体印象背后的原因，这样可以将资金投入到能最有效改善客户满意度的项目。在本小节中，我们通过EFA进一步探索评分数据下的潜在机制，然后根据得到的隐因子估计比较不同的公司。</p>
 <p>EFA的结果是一个因子矩阵，其目标是使一小部分变量对应较高的因子载荷，其余的因子载荷都很低。这样的因子能由少数几个变量解释。其通过旋转正交矩阵改变变量对应的因子载荷，在旋转过程中不改变解释方差。好比小时候切生日蛋糕，总想尽量保持蛋糕上图样的完整，坚决不要把奶油塑成的花对半切开，当然还有生肖图案，每次不得不切开的时候都无比纠结。这个纠结权衡的过程就喝EFA类似，这样旋转切分后得到的结果比随机切分要让强迫症患者舒服的多。其中一些每块蛋糕上面一朵完整的花，有一大块表面是完整的的生肖图案，有的上面是水果等等。这一块块蛋糕就好比隐因子，这些因子的定义不是唯一的，没有一种切分方式严格优于另外一种，但是总有一些比另外一些让你更舒服。对于EFA的结果，总有一些因子结果比另外一些更有用，能更好的解释实际现状。</p>
 <p>和PCA相比，能产生可解释和实践的结果是EFA的一大优势。如果我们只对EFA得出的某因子感兴趣，可以保留该因子对应载荷高的问题，舍去其它问题，优化问卷调查。之后在例子中我们会展示EFA还能用来探索调查项相互联系的方式是不是符合我们的期待。可能真实的维度比我们想的少，也可能因子分析结果反映了一些我们不知道的维度。由于EFA是探索性的，没有非黑即白的标准答案，这里一定要特别关注结果的可解释性。如果结果难以解释，得到的因子对实际工作也没有作用。</p>
@@ -655,47 +663,46 @@ airline%&gt;%
 <div id="section-9.2.4" class="section level3">
 <h3><span class="header-section-number">9.2.4</span> 理论背景</h3>
 <p>之前只介绍如何应用主成分分析和因子分析。虽然我尽量用非技术的语言解释模型背后的思想，但要很好的解释模型结果，还是需要对理论背景有所了解。本小节主要介绍这两种方法背后的数学理论，建议有一定数学基础的读者能够花些时间理解这些知识。</p>
-<p>这里沿用之前在基础建模技术那个章节开头定义的数学公式表达。观测矩阵<span class="math inline">\(\mathbf{X}\)</span>：</p>
+<div id="-1" class="section level4">
+<h4><span class="header-section-number">9.2.4.1</span> 主成分分析</h4>
+<p>假设我们有随机变量组成的向量<span class="math inline">\(X=X_{1},X_{2},...,X_{p}\)</span>，其对应的协方差矩阵为<span class="math inline">\(\Sigma\)</span>。</p>
+<p>主成分分析的目的就是通过对原变量进行线性组合找到<strong>彼此不相关</strong>的新变量 <span class="math inline">\((\mathbf{Z_{1}} , \mathbf{Z_{2}} , \ldots , \mathbf{Z_{p}})\)</span>，依次最大化每个变量的方差:</p>
 <p><span class="math display">\[
-\mathbf{X}=\left[\begin{array}{cccc}
-x_{11} &amp; x_{12} &amp; \cdots &amp; x_{1p}\\
-x_{21} &amp; x_{22} &amp; \cdots &amp; x_{2p}\\
-\vdots &amp; \vdots &amp; \ddots &amp; \vdots\\
-x_{n1} &amp; x_{n2} &amp; \cdots &amp; x_{np}
-\end{array}\right]=\left[\begin{array}{c}
-\mathbf{x_{1.}^{T}}\\
-\mathbf{x_{2.}^{T}}\\
-\vdots\\
-\mathbf{x_{n.}^{T}}
-\end{array}\right]=\left[\begin{array}{cccc}
-\mathbf{x_{.1}} &amp; \mathbf{x_{.2}} &amp; \ldots &amp; \mathbf{x_{.p}}\end{array}\right]
-\]</span></p>
-<p>其中，<span class="math inline">\(\mathbf{x_{.j}}\)</span>代表第j个变量的所有样本观测组成的向量：</p>
-<p><span class="math display">\[
-\mathbf{x_{.j}}=\left[\begin{array}{c}
-x_{1j}\\
-x_{2j}\\
-\vdots\\
-x_{nj}
-\end{array}\right]
-\]</span></p>
-<p>主成分分析的目的就是通过对原变量进行线性组合找到<strong>彼此不相关</strong>的新变量 <span class="math inline">\((\mathbf{z_{1}} , \mathbf{z_{2}} , \ldots , \mathbf{z_{p}})\)</span>，依次最大化每个变量的方差:</p>
-<p><span class="math display">\[
-\begin{array}{ccccc}
-\mathbf{z_{1}}  &amp; = &amp; a_{11}\mathbf{x_{.1}}+a_{12}\mathbf{x_{.2}}+\ldots+a_{1p}\mathbf{x_{.p}}\\
-\mathbf{z_{2}} &amp; = &amp; a_{21}\mathbf{x_{.1}}+a_{22}\mathbf{x_{.2}}+\ldots+a_{2p}\mathbf{x_{.p}}\\
-\vdots &amp; \vdots &amp; \vdots &amp; \vdots\\
-\mathbf{z_{p}} &amp; = &amp; a_{n1}\mathbf{x_{.1}}+a_{n2}\mathbf{x_{.2}}+\ldots+a_{np}\mathbf{x_{.p}}
+\begin{array}{ccc}
+Z_{1} &amp; = &amp; a_{11}X_{1}+a_{12}X_{2}+\ldots+a_{1p}X_{.p}\\
+Z_{2} &amp; = &amp; a_{21}X_{.1}+a_{22}X_{2}+\ldots+a_{2p}X_{p}\\
+\vdots &amp; \vdots &amp; \vdots\\
+Z_{p} &amp; = &amp; a_{n1}X_{1}}+a_{n2}X_{2}}+\ldots+a_{np}X_{p}
 \end{array}
 \]</span></p>
 <p>其中：</p>
-<p><span class="math display">\[Var(\mathbf{z_{i}})=\mathbf{a_{i}^{T}\Sigma a_{i}},\ \ \ \ \ \ \ \ \ i=1...p\]</span> <span class="math display">\[Cov(\mathbf{z_{i}},\mathbf{z_{k}})=\mathbf{a_{i}^{T}\Sigma a_{k}},\ \ \ \ \ \ \ \ \ i,k=1...p\]</span></p>
-<p>从几何学上讲，主成分分析中生成各个主成分的过程可以看成是将<span class="math inline">\((\mathbf{x_{.1}} , \mathbf{x_{.2}} , \ldots , \mathbf{x_{.p}})\)</span>定义的坐标系旋转成新坐标系。新坐标的坐标轴代表了观测方差最大的方向。主成分的推导依赖于 <span class="math inline">\((\mathbf{x_{1}} , \mathbf{x_{2}} , \ldots , \mathbf{x_{p}})\)</span>的相关矩阵<span class="math inline">\(\Sigma\)</span>，这是典型的无监督学习，并且不要求变量服从多元正态分布。PCA过程按如下依次寻找主成分：</p>
-<ul>
-<li>在控制条件<span class="math inline">\(\mathbf{a_{1}^{T}a_{1}}=1\)</span>下，通过最大化方差<span class="math inline">\(Var(\mathbf{z_{1}})=\mathbf{a_{1}^{T}\Sigma a_{1}}\)</span>得到第一个主成分<span class="math inline">\(\mathbf{z_{1}}\)</span></li>
-<li>在控制条件<span class="math inline">\(\mathbf{a_{2}^{T}a_{2}}=1\)</span>和<span class="math inline">\(Cov(\mathbf{z_{1},z_{2}})=0\)</span>下，通过最大化<span class="math inline">\(Var(\mathbf{z_{1}})=\mathbf{a_{1}^{T}\Sigma a_{1}}\)</span>得到第二个主成分<span class="math inline">\(\mathbf{z_{2}}\)</span></li>
-<li>依次类推，对第i个主成分，在控制条件<span class="math inline">\(\mathbf{a_{i}^{T}a_{i}}=1\)</span>和<span class="math inline">\(Cov(\mathbf{z_{i},z_{k}})=0\)</span>（任意<span class="math inline">\(k&lt;i\)</span>）下，通过最大化<span class="math inline">\(Var(\mathbf{z_{i}})=\mathbf{a_{i}^{T}\Sigma a_{i}}\)</span>得到第二个主成分<span class="math inline">\(\mathbf{z_{i}}\)</span></li>
-</ul>
+<p><span class="math display">\[Var(Z_{i})=\mathbf{a_{i}^{T}\Sigma a_{i}},\ \ \ \ \ \ \ \ \ i=1...p\]</span> <span class="math display">\[Cov(Z_{i},Z_{k})=\mathbf{a_{i}^{T}\Sigma a_{k}},\ \ \ \ \ \ \ \ \ i,k=1...p\]</span></p>
+<p>从几何学上讲，主成分分析中生成各个主成分的过程可以看成是将<span class="math inline">\((X_{1}} , X_{2} , \ldots ,X_{p})\)</span>定义的坐标系旋转成新坐标系。新坐标的坐标轴代表了观测方差最大的方向。主成分的推导依赖于 <span class="math inline">\((X_{1} , X_{2} , \ldots , X_{p})\)</span>的相关矩阵<span class="math inline">\(\Sigma\)</span>，这是典型的无监督学习，并且不要求变量服从多元正态分布。PCA过程按如下依次寻找主成分：</p>
+<ol style="list-style-type: decimal">
+<li>在控制条件<span class="math inline">\(\mathbf{a_{1}^{T}a_{1}}=1\)</span>下，通过最大化方差<span class="math inline">\(Var(Z_{1})=\mathbf{a_{1}^{T}\Sigma a_{1}}\)</span>得到第一个主成分<span class="math inline">\(\Z{1}\)</span></li>
+<li>在控制条件<span class="math inline">\(\mathbf{a_{2}^{T}a_{2}}=1\)</span>和<span class="math inline">\(Cov(Z_{1},Z_{2})=0\)</span>下，通过最大化<span class="math inline">\(Var(Z_{1})=\mathbf{a_{1}^{T}\Sigma a_{1}}\)</span>得到第二个主成分<span class="math inline">\(Z_{2}\)</span></li>
+<li>依次类推，对第i个主成分，在控制条件<span class="math inline">\(\mathbf{a_{i}^{T}a_{i}}=1\)</span>和<span class="math inline">\(Cov(Z_{i},Z_{k})=0\)</span>（任意<span class="math inline">\(k&lt;i\)</span>）下，通过最大化<span class="math inline">\(Var(Z_{i})=\mathbf{a_{i}^{T}\Sigma a_{i}}\)</span>得到第二个主成分<span class="math inline">\(Z_{i}\)</span></li>
+</ol>
+<p>对于上面第1条，可以证明 <span class="math display">\[Var(Z_{1})=\mathbf{a_{1}^{T}\Sigma a_{1}}=\underset{\mathbf{e^{T}e=1}}{max}\mathbf{e^{T}\Sigma e}=\lambda_{1}\]</span></p>
+<p>其中，<span class="math inline">\(\lambda_{1}\geqslant\lambda_{2}\geqslant...\geqslant\lambda_{p}\)</span>是<span class="math inline">\(\Sigma\)</span>的特征值， <span class="math inline">\(\mathbf{a_{1},a_{2},...,a_{p}}\)</span>是相应的单位正交特征向量。证明需要用到谱分解定理，但并不复杂。</p>
+<p>由于主成分分析基于变量方差矩阵<span class="math inline">\(\Sigma\)</span>，我们需要特别注意各个变量的标度，如果差别很大（比如年龄和收入），那需要将观测标准化后再进行分析。关于如何用R进行数据标准化，我们在之前数据预处理的部分已经详细介绍过了。当前例子中所有问题的回复都在1-9分的量表上，所以是不是标准化差别不太大。</p>
+</div>
+<div id="section-9.2.4.2" class="section level4">
+<h4><span class="header-section-number">9.2.4.2</span> 因子分析</h4>
+<p>因子分析是研究相关阵或者协方差矩阵的内部关系，它将多个变量综合为少数几个因子，以再现原始变量和因子之间的相关关系。因子分析和主成分分析有联系，是其推广和发展。1904年Charles Spearman指出，如果第i个变量（第i门功课）上的分数由两部分组成的：</p>
+<p><span class="math display">\[x_{i}=l_{i}F+\epsilon_{i}\]</span></p>
+<p>其中F是对所有变量都起作用的公因子，那么就可以说明各门功课相关的“效应”。每门课程的考试成绩可以看作由一个公因子（智力因子）和一个特殊因子之和组成。这是最早的最简单的因子模型。可以将这个因子模型进一步推广到多个因子的情况，即全体科目所共有的因子有m个，如数学推导因子、记忆因子、计算因子等，分别记为<span class="math inline">\(F_{1},...,F_{m}\)</span>：</p>
+<p><span class="math display">\[
+\begin{array}{ccc}
+x_{1}-\mu_{1} &amp; = &amp; l_{11}F_{1}+l_{12}F_{2}+\ldots+l_{1p}F_{m}+\epsilon_{1}\\
+x_{2}-\mu_{2} &amp; = &amp; l_{21}F_{1}+l_{22}F_{2}+\ldots+l_{2p}F_{m}+\epsilon_{2}\\
+\vdots &amp; \vdots &amp; \vdots\\
+x_{p}_\mu_{p} &amp; = &amp; l_{n1}F_{1}+l_{n2}F_{2}+\ldots+l_{np}F_{m}+\epsilon_{p}
+\end{array}
+\]</span></p>
+<p>其中<span class="math inline">\(l_{ij}\)</span>就是因子载荷，第i个变量在第j个因子上的载荷。<span class="math inline">\(\mathbf{x}=[x_{1},...,x_{p}]^{T}\)</span>是p个观测属性组成的向量，均值向量为<span class="math inline">\(\mathbf{\mu}\)</span>，协方差矩阵为<span class="math inline">\(\Sigma\)</span>。用矩阵标记表示就是：</p>
+<p><span class="math display">\[\mathbf{(x}-\mathbf{\mu)_{p\times1}}=L_{p\times m}\mathbf{F}_{m\times1}+\mathbf{\epsilon_{p\times1}}\]</span></p>
+<p>其中<span class="math inline">\(L\)</span>是因子载荷矩阵，<span class="math inline">\(\mathbf{F}\)</span>是<span class="math inline">\(m\)</span>个无法观测到的潜因子组成的向量。这里模型看上去有点像一般线性回归。由于在这里</p>
 <!-- 
 3.1 特征选择Feature Selection
 
@@ -744,6 +751,7 @@ By the way, 在做feature selection的时候，会涉及到特征学习（Featur
 
 
 -->
+</div>
 </div>
 <div id="section-9.2.5" class="section level3">
 <h3><span class="header-section-number">9.2.5</span> 高维标度化</h3>
@@ -802,6 +810,12 @@ summary(fit2)
 
 和原模型相比，该过程 -->
 
+</div>
+</div>
+<h3> References</h3>
+<div id="refs" class="references">
+<div id="ref-spearman1904">
+<p>Spearman, C. 1904. “‘General Intelligence,’ Objectively Determined and Measured.” <em>The American Journal of Psychology</em> 15 (2): 201–92.</p>
 </div>
 </div>
             </section>
