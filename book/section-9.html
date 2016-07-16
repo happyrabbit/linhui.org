@@ -7,25 +7,25 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>数据科学家：R语言</title>
   <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
-  <meta name="description" content="This is a minimal example of using the bookdown package to write a book. The output format for this example is bookdown::gitbook.">
+  <meta name="description" content="This is my first book on data science">
   <meta name="generator" content="bookdown 0.0.72 and GitBook 2.6.7">
 
   <meta property="og:title" content="数据科学家：R语言" />
   <meta property="og:type" content="book" />
   
   
-  <meta property="og:description" content="This is a minimal example of using the bookdown package to write a book. The output format for this example is bookdown::gitbook." />
+  <meta property="og:description" content="This is my first book on data science" />
   
 
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="数据科学家：R语言" />
   
-  <meta name="twitter:description" content="This is a minimal example of using the bookdown package to write a book. The output format for this example is bookdown::gitbook." />
+  <meta name="twitter:description" content="This is my first book on data science" />
   
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-07-13">
+<meta name="date" content="2016-07-15">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -186,7 +186,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="9.2.1" data-path="section-9.html"><a href="section-9.html#section-9.2.1"><i class="fa fa-check"></i><b>9.2.1</b> 初步探索数据</a></li>
 <li class="chapter" data-level="9.2.2" data-path="section-9.html"><a href="section-9.html#section-9.2.2"><i class="fa fa-check"></i><b>9.2.2</b> 主成分分析</a></li>
 <li class="chapter" data-level="9.2.3" data-path="section-9.html"><a href="section-9.html#section-9.2.3"><i class="fa fa-check"></i><b>9.2.3</b> 探索性因子分析</a></li>
-<li class="chapter" data-level="9.2.4" data-path="section-9.html"><a href="section-9.html#section-9.2.4"><i class="fa fa-check"></i><b>9.2.4</b> 高维标度化</a></li>
+<li class="chapter" data-level="9.2.4" data-path="section-9.html"><a href="section-9.html#section-9.2.4"><i class="fa fa-check"></i><b>9.2.4</b> 理论背景</a></li>
+<li class="chapter" data-level="9.2.5" data-path="section-9.html"><a href="section-9.html#section-9.2.5"><i class="fa fa-check"></i><b>9.2.5</b> 高维标度化</a></li>
 </ul></li>
 <li class="chapter" data-level="9.3" data-path="section-9.html"><a href="section-9.html#section-9.3"><i class="fa fa-check"></i><b>9.3</b> 变量选择</a></li>
 </ul></li>
@@ -591,7 +592,8 @@ eigenvalue$values</code></pre></div>
 ## Test of the hypothesis that 3 factors are sufficient.
 ## The chi square statistic is 769.65 on 63 degrees of freedom.
 ## The p-value is 3.9e-122</code></pre>
-<p>结果如我们所料，将之前机舱服务和购票体验对应的因子进一步分开成为两个因子。这个结果和之间基于主成分分析得到的双标图中问题对应箭头方向的聚类情况一致。</p>
+<p>结果如我们所料，将之前机舱服务和购票体验对应的因子进一步分开成为两个因子。这个结果和之前基于主成分分析得到的双标图中问题对应箭头方向的聚类情况一致。</p>
+<p>了解一些关于EFA背后理论的读者应该知道，因子载荷估计并不是唯一的，我们可以通过旋转产生新的载荷，所谓旋转，就是只用一个矩阵右乘因子载荷矩阵。当你使用的是正交矩阵时，就是正交旋转，否者是斜交旋转。比如有一种常用的正交旋转叫做方差最大正交旋转（varimax rotation），其目的是使得旋转后的各因子载荷的平方按列向0和1两级分化，以便每个因子具有实际的解释，该方法寻找的是不相关的因子。斜交旋转的方法允许因子之间相关。基于之前的讨论可知，购票体验和机舱服务是负相关的，更合理的方法是允许各因子间相关。下面我们用一种常见的斜交变换（<code>oblimin</code>）重复3因子模型：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(GPArotation)
 airline%&gt;%
 <span class="st">  </span><span class="kw">subset</span>(<span class="dt">select=</span>Easy_Reservation:Recommend)%&gt;%
@@ -642,12 +644,58 @@ airline%&gt;%
 ## Test of the hypothesis that 3 factors are sufficient.
 ## The chi square statistic is 769.65 on 63 degrees of freedom.
 ## The p-value is 3.9e-122</code></pre>
-<p>因子分析的特征提取的优势体现在下面3个方面：</p>
+<p>从载荷中可以看到，允许因子之间相关更好的区分了购票体验和机舱服务，这样能够更加清晰的解释这两个感知项。这里就牵扯到一个问题，我们如何决定因子是该独立还是相关呢？你可能觉得这是数据决定的。但其实各因子间的相关性不是一个数据问题，而是你对潜因子的构想，或者假设。从认知概念的角度，你觉得在当前语境下因子独立有意义还是相关有意义？</p>
+<p>因子分析在特征提取方面的优势体现在下面3个方面：</p>
 <ol style="list-style-type: decimal">
 <li>我们可以用维度更低的因子分值取代大量原始调查问题</li>
 <li>将反映相同认知维度的问卷分值联合起来比使用其中任何一项含有更多的信息。也在某种程度上缓解单个变量评分中的不确定性。从人脑认知的角度看，我们的购买决策常取决于一个总体的印象，而我们自己也无法解释其中具体的组成成分。所以在比较不同的公司或品牌时，应该关注总体感知。</li>
 <li>通常人们会有一些感兴趣的因子，通过因子载荷，我们可以删除贡献小的变量从而简化收集过程。</li>
 </ol>
+</div>
+<div id="section-9.2.4" class="section level3">
+<h3><span class="header-section-number">9.2.4</span> 理论背景</h3>
+<p>之前只介绍如何应用主成分分析和因子分析。虽然我尽量用非技术的语言解释模型背后的思想，但要很好的解释模型结果，还是需要对理论背景有所了解。本小节主要介绍这两种方法背后的数学理论，建议有一定数学基础的读者能够花些时间理解这些知识。</p>
+<p>这里沿用之前在基础建模技术那个章节开头定义的数学公式表达。观测矩阵<span class="math inline">\(\mathbf{X}\)</span>：</p>
+<p><span class="math display">\[
+\mathbf{X}=\left[\begin{array}{cccc}
+x_{11} &amp; x_{12} &amp; \cdots &amp; x_{1p}\\
+x_{21} &amp; x_{22} &amp; \cdots &amp; x_{2p}\\
+\vdots &amp; \vdots &amp; \ddots &amp; \vdots\\
+x_{n1} &amp; x_{n2} &amp; \cdots &amp; x_{np}
+\end{array}\right]=\left[\begin{array}{c}
+\mathbf{x_{1.}^{T}}\\
+\mathbf{x_{2.}^{T}}\\
+\vdots\\
+\mathbf{x_{n.}^{T}}
+\end{array}\right]=\left[\begin{array}{cccc}
+\mathbf{x_{.1}} &amp; \mathbf{x_{.2}} &amp; \ldots &amp; \mathbf{x_{.p}}\end{array}\right]
+\]</span></p>
+<p>其中，<span class="math inline">\(\mathbf{x_{.j}}\)</span>代表第j个变量的所有样本观测组成的向量：</p>
+<p><span class="math display">\[
+\mathbf{x_{.j}}=\left[\begin{array}{c}
+x_{1j}\\
+x_{2j}\\
+\vdots\\
+x_{nj}
+\end{array}\right]
+\]</span></p>
+<p>主成分分析的目的就是通过对原变量进行线性组合找到<strong>彼此不相关</strong>的新变量 <span class="math inline">\((\mathbf{z_{1}} , \mathbf{z_{2}} , \ldots , \mathbf{z_{p}})\)</span>，依次最大化每个变量的方差:</p>
+<p><span class="math display">\[
+$\begin{array}{ccccc}
+\mathbf{z_{1}} &amp; = &amp; \mathbf{a_{1}^{T}} &amp; = &amp; a_{11}\mathbf{x_{.1}}+a_{12}\mathbf{x_{.2}}+\ldots+a_{1p}\mathbf{x_{.p}}\\
+\mathbf{z_{2}} &amp; = &amp; \mathbf{a_{2}^{T}} &amp; = &amp; a_{21}\mathbf{x_{.1}}+a_{22}\mathbf{x_{.2}}+\ldots+a_{2p}\mathbf{x_{.p}}\\
+\vdots &amp; \vdots &amp; \vdots &amp; \vdots &amp; \vdots\\
+\mathbf{z_{p}} &amp; = &amp; \mathbf{a_{p}^{T}} &amp; = &amp; a_{n1}\mathbf{x_{.1}}+a_{n2}\mathbf{x_{.2}}+\ldots+a_{np}\mathbf{x_{.p}}
+\end{array}$
+\]</span></p>
+<p>其中：</p>
+<p><span class="math display">\[Var(\mathbf{z_{i}})=\mathbf{a_{i}^{T}\Sigma a_{i}},\ \ \ \ \ \ \ \ \ i=1...p\]</span> <span class="math display">\[Cov(\mathbf{z_{i}},\mathbf{z_{k}})=\mathbf{a_{i}^{T}\Sigma a_{k}},\ \ \ \ \ \ \ \ \ i,k=1...p\]</span></p>
+<p>从几何学上讲，主成分分析中生成各个主成分的过程可以看成是将<span class="math inline">\((\mathbf{x_{.1}} , \mathbf{x_{.2}} , \ldots , \mathbf{x_{.p}})\)</span>定义的坐标系旋转成新坐标系。新坐标的坐标轴代表了观测方差最大的方向。主成分的推导依赖于 <span class="math inline">\((\mathbf{x_{1}} , \mathbf{x_{2}} , \ldots , \mathbf{x_{p}})\)</span>的相关矩阵<span class="math inline">\(\Sigma\)</span>，这是典型的无监督学习，并且不要求变量服从多元正态分布。PCA过程按如下依次寻找主成分：</p>
+<ul>
+<li>在控制条件<span class="math inline">\(\mathbf{a_{1}^{T}a_{1}}=1\)</span>下，通过最大化方差<span class="math inline">\(Var(\mathbf{z_{1}})=\mathbf{a_{1}^{T}\Sigma a_{1}}\)</span>得到第一个主成分<span class="math inline">\(\mathbf{z_{1}}\)</span></li>
+<li>在控制条件<span class="math inline">\(\mathbf{a_{2}^{T}a_{2}}=1\)</span>和<span class="math inline">\(Cov(\mathbf{z_{1},z_{2}})=0\)</span>下，通过最大化<span class="math inline">\(Var(\mathbf{z_{1}})=\mathbf{a_{1}^{T}\Sigma a_{1}}\)</span>得到第二个主成分<span class="math inline">\(\mathbf{z_{2}}\)</span></li>
+<li>依次类推，对第i个主成分，在控制条件<span class="math inline">\(\mathbf{a_{i}^{T}a_{i}}=1\)</span>和<span class="math inline">\(Cov(\mathbf{z_{i},z_{k}})=0\)</span>（任意<span class="math inline">\(k&lt;i\)</span>）下，通过最大化<span class="math inline">\(Var(\mathbf{z_{i}})=\mathbf{a_{i}^{T}\Sigma a_{i}}\)</span>得到第二个主成分<span class="math inline">\(\mathbf{z_{i}}\)</span></li>
+</ul>
 <!-- 
 3.1 特征选择Feature Selection
 
@@ -697,8 +745,8 @@ By the way, 在做feature selection的时候，会涉及到特征学习（Featur
 
 -->
 </div>
-<div id="section-9.2.4" class="section level3">
-<h3><span class="header-section-number">9.2.4</span> 高维标度化</h3>
+<div id="section-9.2.5" class="section level3">
+<h3><span class="header-section-number">9.2.5</span> 高维标度化</h3>
 </div>
 </div>
 <div id="section-9.3" class="section level2">
