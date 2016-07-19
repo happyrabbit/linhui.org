@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-07-16">
+<meta name="date" content="2016-07-18">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -306,7 +306,7 @@ car::<span class="kw">some</span>(topic$year)</code></pre></div>
 <h3><span class="header-section-number">9.2.1</span> 初步探索数据</h3>
 <p>我们先读入该数据：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 可以从网站下载该数据</span>
-airline&lt;-<span class="kw">read_csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/AirlineRating.csv&quot;</span>)</code></pre></div>
+airline&lt;-<span class="kw">read.csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/AirlineRating.csv&quot;</span>)</code></pre></div>
 <p>可以用<code>glimpse()</code>函数检查该数据：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glimpse</span>(airline)</code></pre></div>
 <pre><code>## Observations: 3,000
@@ -327,7 +327,7 @@ airline&lt;-<span class="kw">read_csv</span>(<span class="st">&quot;/Users/happy
 ## $ Fly_Again        &lt;int&gt; 6, 6, 6, 7, 4, 5, 3, 4, 7, 6, 8, 6, 5, 4, 6, ...
 ## $ Recommend        &lt;int&gt; 3, 6, 5, 5, 4, 5, 6, 5, 8, 6, 8, 7, 6, 5, 6, ...
 ## $ ID               &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14...
-## $ Airline          &lt;chr&gt; &quot;AirlineCo.1&quot;, &quot;AirlineCo.1&quot;, &quot;AirlineCo.1&quot;, ...</code></pre>
+## $ Airline          &lt;fctr&gt; AirlineCo.1, AirlineCo.1, AirlineCo.1, Airli...</code></pre>
 <p>数据的前15列都是问卷调查的各种问题，问题格式如下：对该航空公司的<问卷项>你的满意度是？从1到9，分值越大满意度越高。可以看到前15列评分在1-9之间，是整数型了。<code>ID</code>代表受访者编号，不同编号代表不同受访者。每个受访者需要评估3家航空公司，列<code>Airline</code>指出相应的航空公司。一共有1000名受访者，因此观测的总行数为1000x3=3000。关于数据各列变量的解释，大家可以参考“数据集模拟和背景介绍”中相关小节。</p>
 <p>我们用<code>corrplot()</code>函数检查问卷调查问题的相关性：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(corrplot)
@@ -379,7 +379,7 @@ airline.mean&lt;-<span class="kw">select</span>(airline,-ID)%&gt;%
 <span class="st">  </span><span class="kw">glimpse</span>()</code></pre></div>
 <pre><code>## Observations: 3
 ## Variables: 16
-## $ Airline          &lt;chr&gt; &quot;AirlineCo.1&quot;, &quot;AirlineCo.2&quot;, &quot;AirlineCo.3&quot;
+## $ Airline          &lt;fctr&gt; AirlineCo.1, AirlineCo.2, AirlineCo.3
 ## $ Easy_Reservation &lt;dbl&gt; 5.031, 2.939, 2.038
 ## $ Preferred_Seats  &lt;dbl&gt; 6.025, 2.995, 2.019
 ## $ Flight_Options   &lt;dbl&gt; 4.996, 2.033, 2.067
@@ -433,19 +433,25 @@ airline.mean&lt;-<span class="kw">select</span>(airline.mean,-Airline)
 ## Proportion of Variance 0.00952 0.00877 0.00838
 ## Cumulative Proportion  0.98285 0.99162 1.00000</code></pre>
 <p>由上面输出结果的第一行是主成分的标准差，第二行对应成分单独解释方差的比例，第三行是累计解释方差。可见，前两个主成分解释的大部分原变量方差（80%）。<code>plot()</code>函数作用在PCA结果上默认绘制陡坡图，该图展示每个成分额外解释的方差。我们可用累计解释方差比例或者陡坡图来判断需要的主成分。我们通过下面代码绘制图形：</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(airline.pc,<span class="dt">type=</span><span class="st">&quot;l&quot;</span>,<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>,<span class="dt">main=</span><span class="st">&quot;主成分分析陡坡图&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(airline.pc,<span class="dt">type=</span><span class="st">&quot;l&quot;</span>,<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>,<span class="dt">main=</span><span class="st">&quot;PCA陡坡图&quot;</span>)</code></pre></div>
 <p><img src="DS_R_files/figure-html/unnamed-chunk-104-1.png" width="672" /></p>
 <p>图中由陡到缓的转折点能告诉我们从哪个主成分开始，继续添加更多的成分对解释更多方差没有太大帮助，反而增加模型复杂度。关于拐点的判断是主观的。图中显示拐点大约在2或者3。这表明前2到3个主成分解释了大部分方差。将各个原始变量映射到前两个主成分张成的平面上能够揭示这些变量之间的关系。这样的图称为“双标图”，可以用<code>biplot()</code>函数绘制：</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">biplot</span>(airline.pc,<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>,<span class="dt">main=</span><span class="st">&quot;PCA结果双标图&quot;</span>,<span class="dt">cex=</span><span class="kw">c</span>(<span class="fl">0.5</span>,<span class="dv">1</span>),<span class="dt">xlim=</span><span class="kw">c</span>(-<span class="fl">0.06</span>,<span class="fl">0.04</span>))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">biplot</span>(airline.pc,<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>,<span class="dt">main=</span><span class="st">&quot;PCA双标图&quot;</span>,<span class="dt">cex=</span><span class="kw">c</span>(<span class="fl">0.5</span>,<span class="dv">1</span>),<span class="dt">xlim=</span><span class="kw">c</span>(-<span class="fl">0.06</span>,<span class="fl">0.04</span>))</code></pre></div>
 <p><img src="DS_R_files/figure-html/unnamed-chunk-105-1.png" width="672" /></p>
-<p>双标图的横坐标是第一个主成分（PC1），纵坐标是第二个主成分（PC2）。</p>
-<p>A biplot uses points to represent the scores of the observations on the principal components, and it uses vectors to represent the coefficients of the variables on the principal components. In this example, the points represent automobiles, and the vectors represents judges.</p>
-<p>Interpreting Points: The relative location of the points can be interpreted. Points that are close together correspond to observations that have similar scores on the components displayed in the plot. To the extent that these components fit the data well, the points also correspond to observations that have similar values on the variables.</p>
-<p>In this example, cars that are close together are ones that have similar profiles of preference judgements: Most judges have the same kind of preference ratings for Cadillac and Lincoln Whether or not they like them we don’t know, its just that is a judge likes one s/he tends to like the other, and if a judge dislikes one, then the othe is likely to be disliked. The same is true for Pinto and Chevette, although the judgments about Pinto and Chevette are likely to be rather different then those about Cadillac and Lincoln, since the two pairs of points are relatively far apart.</p>
-<p>Interpreting Vectors: Both the direction and length of the vectors can be interpreted. Vectors point away from the origin in some direction.</p>
-<p>A vector points in the direction which is most like the variable represented by the vector. This is the direction which has the highest squared multiple correlation with the principal components. The length of the vector is proportional to the squared multiple correlation between the fitted values for the variable and the variable itself.</p>
-<p>The fitted values for a variable are the result of projecting the points in the space orthogonally onto the variable’s vector (to do this, you must imagine extending the vector in both directions). The observations whose points project furthest in the direction in which the vector points are the observations that have the most of whatever the variable measures. Those points that project at the other end have the least. Those projecting in the middle have an average ammount. then the</p>
-<p>Thus, vectors that point in the same direction correspond to variables that have similar response profiles, and can be interpreted as having similar meaning in the context set by the data.</p>
+<p>双标图的横坐标是第一个主成分（PC1），纵坐标是第二个主成分（PC2）。图中的点代表各个观测评分投影在这两个主成分张成的平面上。图中的箭头代表每个变量对应这两个主成分的载荷系数决定的方向。</p>
+<!--
+Interpreting Points: The relative location of the points can be interpreted. Points that are close together correspond to observations that have similar scores on the components displayed in the plot. To the extent that these components fit the data well, the points also correspond to observations that have similar values on the variables.
+
+In this example, cars that are close together are ones that have similar profiles of preference judgements: Most judges have the same kind of preference ratings for Cadillac and Lincoln Whether or not they like them we don't know, its just that is a judge likes one s/he tends to like the other, and if a judge dislikes one, then the othe is likely to be disliked. The same is true for Pinto and Chevette, although the judgments about Pinto and Chevette are likely to be rather different then those about Cadillac and Lincoln, since the two pairs of points are relatively far apart.
+
+Interpreting Vectors: Both the direction and length of the vectors can be interpreted. Vectors point away from the origin in some direction.
+
+A vector points in the direction which is most like the variable represented by the vector. This is the direction which has the highest squared multiple correlation with the principal components. The length of the vector is proportional to the squared multiple correlation between the fitted values for the variable and the variable itself.
+
+The fitted values for a variable are the result of projecting the points in the space orthogonally onto the variable's vector (to do this, you must imagine extending the vector in both directions). The observations whose points project furthest in the direction in which the vector points are the observations that have the most of whatever the variable measures. Those points that project at the other end have the least. Those projecting in the middle have an average ammount. then the
+
+Thus, vectors that point in the same direction correspond to variables that have similar response profiles, and can be interpreted as having similar meaning in the context set by the data.
+-->
 <p>满意度评分PCA结果的双标图中红色的箭头中看到不同调查问题的聚类情况，并且可以大致感觉样本的聚类情况，大致成为3类，一个合理的猜测是针对3个不同的航空公司。从之前的热图可以看到，3个公司有各自的优势和劣势，评分分布显然是不同的。但这样的图有个问题：基于所有评分样本导致图形非常稠密，难以识别。如果是基于各个公司聚合后的数据，得到的图或许会更清晰。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">airline.mean.pc&lt;-<span class="kw">select</span>(airline.mean,Easy_Reservation:Recommend)%&gt;%
 <span class="st">  </span><span class="kw">prcomp</span>()
@@ -455,11 +461,11 @@ airline.mean&lt;-<span class="kw">select</span>(airline.mean,-Airline)
 <p>按航空公司聚合后的结果双标图提供了可解释的乘客<strong>感知图</strong>，该图展示了各个航空公司在前两个主成分上的定位。我们先和聚合前后的感知图进行比较。注意，感知图的空间旋转是任意的，重要的是箭头的相对位置。比如，在两个感知图中，<code>Courtesy</code>、<code>Friendliness</code>、<code>Service</code>和<code>Helpfulness</code>都几乎重叠。 <code>Seat_Comfort</code>、<code>Seat_Roominess</code>、<code>Overhead_Storage</code>、<code>Clean_Aircraft</code>、<code>Satisfaction</code>、<code>Fly_Again</code>和<code>Recommend</code>大致指向相同的方向。剩下的<code>Easy_Reservation</code>、<code>Preferred_Seats</code>、<code>Flight_Options</code>和<code>Ticket_Prices</code>紧密相连。因此聚合后变量在主成分纬度上的分布位置和用原始观测得到的一致，但基于公司平均分值的结果更清晰的展示了公司相对定位情况。航空公司3在机舱设施、总体满意度和空航服务上得分都较高。航空公司2在空航服务方面得分较高。航空公司1在购票体验上表现较好。且在购票体验上满意度高的乘客更不满空航服务。如果你是航空公司3的商业数据分析师，看到这样的结果你可以得到什么结果？</p>
 <ul>
 <li>公司在很多方面具有竞争优势，客户满意度总体高于竞争对手</li>
-<li>公司在购票体验上有明显劣势，这是需要努力改进的地方</li>
-<li>我们什么在购票体验上满意度高的乘客更不满空航服务？是因为乘客本身的特质，或是由于某种原因重视空航服务的公司容易忽视购票体验？</li>
+<li>公司在购票体验上有明显劣势，<strong>这是需要努力改进的地方</strong></li>
+<li>我们为什么在购票体验上满意度高的乘客更不满空航服务？是因为乘客本身的特质，或是由于某种原因重视空航服务的公司容易忽视购票体验？</li>
 <li>需要进一步研究购票体验差的原因，以及评估其可能带来的影响：如果购票体验差并不会影响当前总体满意度以及票的销售情况，那我们需要投入多少改进该问题？</li>
 </ul>
-<p>如果航空公司1只是一个很小的公司，并不是主要竞争对手。你的主要竞争对手是航空公司3，那你可以进一步检查你们公司和航空公司2的得分差别：</p>
+<p>如果航空公司1只是一个很小的公司，并不是主要竞争对手。你的主要竞争对手是航空公司2，那你可以进一步检查你们公司和航空公司2的得分差别：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">airline.mean[<span class="dv">3</span>,]-airline.mean[<span class="dv">1</span>,]</code></pre></div>
 <pre><code>##   Easy_Reservation Preferred_Seats Flight_Options Ticket_Prices
 ## 1           -2.993          -4.006         -2.929        -3.939
@@ -727,10 +733,11 @@ $\begin{array}{ccc}
 <p>我们将方差<span class="math inline">\(\sigma_{i}\)</span>分解成两部分：</p>
 <p><span class="math display">\[\sigma_{ii}=l_{i1}^{2}+l_{i2}^{2}+\cdots+l_{im}^{2}+\psi_{i}=h_{i}^{2}+\psi_{i}\]</span></p>
 <ol style="list-style-type: decimal">
-<li><span class="math inline">\(h_{i}^{2}\)</span>是全部公因子对变量<span class="math inline">\(X_{i}\)</span>的总方差所作出的贡献，称为共因子方差（共同度）</li>
+<li><span class="math inline">\(h_{i}^{2}\)</span>是全部公因子对变量<span class="math inline">\(X_{i}\)</span>的总方差所作出的贡献，称为公因子方差（共同度）</li>
 <li><span class="math inline">\(\psi_{i}\)</span>由特殊因子<span class="math inline">\(\epsilon_{i}\)</span>产生的方差，它仅与变量<span class="math inline">\(X_{i}\)</span>，也称为剩余方差</li>
 </ol>
-<p><span class="math inline">\(h_{i}^{2}\)</span>反映了变量<span class="math inline">\(X_{i}\)</span>对公因子F依赖程度。</p>
+<p><span class="math inline">\(h_{i}^{2}\)</span>反映了变量<span class="math inline">\(X_{i}\)</span>对公因子F的依赖程度。拟合模型的目标就是是的公因子增大，剩余方差减小。</p>
+<p>模型假设<span class="math inline">\(\mathbf{X}\)</span>的<span class="math inline">\(\frac{p(p+1)}{2}\)</span>个方差和协方差参数可以通过<span class="math inline">\(p(m+1)\)</span>个因子载荷和<span class="math inline">\(p\)</span>个特殊因子方差得到。理想的情况是用尽可能少的公因子表示原变量（比如之前的例子中<span class="math inline">\(p=12\)</span>，<span class="math inline">\(m=3\)</span>）。</p>
 <!-- 
 3.1 特征选择Feature Selection
 
