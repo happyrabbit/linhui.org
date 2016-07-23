@@ -668,8 +668,25 @@ X_{p}-\mu_{p} &amp; = &amp; l_{p1}F_{1}+l_{p2}F_{2}+\cdots+l_{pm}F_{m}+\epsilon_
 1 &amp; 0.9 &amp; 0.7\\
 0.9 &amp; 1 &amp; 0.4\\
 0.7 &amp; 0.4 &amp; 1
-\end{array}\right]\]</span></p>
+\end{array}\right]\]</span> 正交因子模型要求<span class="math inline">\(\Sigma=\mathbf{LL^{T}+\Psi}\)</span>。加上其它因子模型的条件，我们可以得到下面方程组： <span class="math display">\[\begin{array}{ccc}
+1=l_{11}^{2}+\psi_{1} &amp; 0.9=l_{11}l_{21} &amp; 0.7=l_{11}l_{31}\\
+ &amp; 1=l_{21}^{2}+\psi_{2} &amp; 0.4=l_{21}l_{31}\\
+ &amp;  &amp; 1=l_{31}^{2}+\psi_{3}
+\end{array}\]</span> 由上面方程组可得：<span class="math inline">\(l_{21}=(0.4/0.7)l_{11}\)</span>。又因为<span class="math inline">\(0.9=l_{11}l_{21}\)</span>，我们可以得到<span class="math inline">\(l_{11}^{2}=1.575\)</span>，也就是<span class="math inline">\(l_{11}=\pm1.255\)</span>。这里就有问题了。根据假设条件，<span class="math inline">\(Var(F_{1})=1\)</span>且<span class="math inline">\(Var(X_{1})=1\)</span>，于是<span class="math inline">\(Cov(X_{1},F_{1})=Corr(X_{1},F_{1})=l_{11}\)</span>。 而相关系数的绝对值是不能大于1的。此外： <span class="math display">\[1=l_{11}^{2}+\psi_{1}\Longrightarrow\psi_{1}=1-l_{11}^{2}=-0.575\]</span> 这也不可能，因为<span class="math inline">\(\psi=Var(\epsilon_{1})\)</span>，因此不能小于0。因此，在这个例子中，我们无法得到有意义的单因子模型的参数估计。 当<span class="math inline">\(m&gt;1\)</span>时，未知数个数大于等式个数，因子模型的没有唯一的解。</p>
 </blockquote>
+<p>如何解决因子模型解的不唯一问题呢？通过因子载荷旋转。我们先得到一个可能的因子载荷解（不唯一），然后对该载荷进行旋转直到旋转后的载荷满足一定附加条件。这里又牵扯到两个问题：1. 什么是载荷旋转？2.什么是附加条件。下面我们逐一回答这两个问题：</p>
+<p>载荷旋转其实就是用载荷矩阵乘一个正交矩阵。假设<span class="math inline">\(\mathbf{U}\)</span>是一个<span class="math inline">\(m \times m\)</span>的正交矩阵，即<span class="math inline">\(\mathbf{UU^{T}=U^{T}U=I}\)</span>。我们可以将模型写成下面形式：</p>
+<p><span class="math display">\[\mathbf{X-\mu=LF+\epsilon=LUU^{T}F+\epsilon=L^{*}F^{*}+\epsilon}\]</span></p>
+<p>其中<span class="math inline">\(\mathbf{L^{*}=LU,\ F^{*}=U^{T}F}\)</span>。这里只要<span class="math inline">\(\mathbf{U}\)</span>是正交矩阵就有： <span class="math display">\[E\mathbf{(F^{*})=U^{T}}E(\mathbf{F})=\mathbf{0}\]</span> <span class="math display">\[Var(\mathbf{F^{*}})=\mathbf{U^{T}}Var(\mathbf{F})\mathbf{U=I}\]</span></p>
+<p>因此，<span class="math inline">\(\mathbf{L}\)</span>和<span class="math inline">\(\mathbf{L^{*}}\)</span>是等价的，当前的条件无法区分两者，这两个载荷矩阵对应相同的协方差矩阵。之前也提到，如果我们认为因子相关，也就是说<span class="math inline">\(\mathbf{FF^{T}}\)</span>不是单位矩阵，可以对原载荷进行斜交变换（注意这里不是旋转）。也就是用载荷矩阵乘斜交矩阵。</p>
+<p>而因子载荷不唯一的情况通过添加额外的标准来解决。比如方差最大旋转（varimax rotation）旋转的目的是通过坐标变换使各个因子载荷的方差之和最大。通俗地说就是，</p>
+<ol style="list-style-type: decimal">
+<li>任何一个变量只在一个因子上有高贡献率，而在其它因子上的载荷几乎为0</li>
+<li>任何一个因子只在少数变量上有高载荷, 而在其它变量上的载荷几乎为0</li>
+</ol>
+<p>果满足这个条件的因子载荷矩阵称为具有“简单结构”。方差最大化旋转<span class="citation">(Kaiser <a href="#ref-henry1958">1958</a>)</span>就是用来将载荷矩阵旋转到尽量接近简单结构的方法。从这组变量代表的样本看来，方差最大化旋转找到了一种表示样本的最简单的方法，即每个样本可以用少数变量的函数的线性组合表示。</p>
+<p><span class="math display">\[U_{varmax}=\underset{U}{argmax}\left(\Sigma_{j=1}^{m}\Sigma_{i=1}^{p}(LU)^{4}-\frac{1}{p}\Sigma_{j=1}^{m}\left(\Sigma_{i=1}^{p}(LU)_{ij}^{2}\right)^{2}\right)\]</span></p>
+<p>斜交变换更加复杂，感兴趣的读者可以参考Edward Jackson书中的<span class="citation">(Jackson <a href="#ref-edward2003">2003</a>)</span>的第8章。</p>
 <!-- 
 3.1 特征选择Feature Selection
 
@@ -777,6 +794,12 @@ summary(fit2)
 <div id="refs" class="references">
 <div id="ref-spearman1904">
 <p>Spearman, C. 1904. “‘General Intelligence,’ Objectively Determined and Measured.” <em>The American Journal of Psychology</em> 15 (2): 201–92.</p>
+</div>
+<div id="ref-henry1958">
+<p>Kaiser, Henry F. 1958. “The Varimax Criterion for Analytic Rotation in Factor Analysis.” <em>Psychometrika</em> 23 (3).</p>
+</div>
+<div id="ref-edward2003">
+<p>Jackson, Edward. 2003. <em>A User’s Guide to Principal Components</em>. John Wiley &amp; Sons.</p>
 </div>
 </div>
             </section>
