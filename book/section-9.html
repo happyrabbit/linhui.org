@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-07-18">
+<meta name="date" content="2016-07-22">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -186,8 +186,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="9.2.1" data-path="section-9.html"><a href="section-9.html#section-9.2.1"><i class="fa fa-check"></i><b>9.2.1</b> 初步探索数据</a></li>
 <li class="chapter" data-level="9.2.2" data-path="section-9.html"><a href="section-9.html#section-9.2.2"><i class="fa fa-check"></i><b>9.2.2</b> 主成分分析</a></li>
 <li class="chapter" data-level="9.2.3" data-path="section-9.html"><a href="section-9.html#section-9.2.3"><i class="fa fa-check"></i><b>9.2.3</b> 探索性因子分析</a></li>
-<li class="chapter" data-level="9.2.4" data-path="section-9.html"><a href="section-9.html#section-9.2.4"><i class="fa fa-check"></i><b>9.2.4</b> 理论背景</a></li>
-<li class="chapter" data-level="9.2.5" data-path="section-9.html"><a href="section-9.html#section-9.2.5"><i class="fa fa-check"></i><b>9.2.5</b> 高维标度化</a></li>
+<li class="chapter" data-level="9.2.4" data-path="section-9.html"><a href="section-9.html#section-9.2.4"><i class="fa fa-check"></i><b>9.2.4</b> 高维标度化</a></li>
+<li class="chapter" data-level="9.2.5" data-path="section-9.html"><a href="section-9.html#section-9.2.5"><i class="fa fa-check"></i><b>9.2.5</b> 知识扩展</a></li>
 </ul></li>
 <li class="chapter" data-level="9.3" data-path="section-9.html"><a href="section-9.html#section-9.3"><i class="fa fa-check"></i><b>9.3</b> 变量选择</a></li>
 </ul></li>
@@ -301,7 +301,7 @@ car::<span class="kw">some</span>(topic$year)</code></pre></div>
 </div>
 <div id="section-9.2" class="section level2">
 <h2><span class="header-section-number">9.2</span> 特征提取</h2>
-<p>特征提取是一项用不同变量的组合代替原变量的技术。它的目的是自动地构建新的特征，将原始特征转换为一组具有明显物理意义或者统计意义的特征。比如通过变换特征取值来减少原始数据中某个特征的取值个数等。我们考虑3个常用的可以对数据降维的特征提取方法。主成分分析（PCA）试图找到原变量的不相关线性组合，这些线性组合能够最大限度的解释原数据中变量方差。解释性因子分析（EFA）同样试图在尽量小的维度上解释原数据中尽可能多的方差。高维标度化（MDS）将观测见的相似度映射到低维度上，如2维平面。MDS能够作用于非数值型变量，如分类变量或者有序数据预测变量。接下来我们通过模拟的航空公司数据集来展示不同的特征提取方法。在市场营销中这类消费者调查问卷中，虽然初始问题很多，但通常存在多个调查项共同反应少数几个潜在因子。比如航空公司满意度调查数据中下面四个问题：购票容易度（<code>Easy_Reservation</code>）、座椅选择（<code>Preferred_Seats</code>）、航班选择（<code>Flight_Options</code>）和票价（<code>Ticket_Prices</code>）都和购票体验有关。</p>
+<p>特征提取是一项用不同变量的组合代替原变量的技术。它的目的是自动地构建新的特征，将原始特征转换为一组具有明显物理意义或者统计意义的特征。比如通过变换特征取值来减少原始数据中某个特征的取值个数等。我们考虑3个常用的可以对数据降维的特征提取方法。主成分分析（PCA）试图找到原变量的不相关线性组合，这些线性组合能够最大限度的解释原数据中变量方差。探索性因子分析（EFA）同样试图在尽量小的维度上解释原数据中尽可能多的方差。高维标度化（MDS）将观测见的相似度映射到低维度上，如2维平面。MDS能够作用于非数值型变量，如分类变量或者有序数据预测变量。接下来我们通过模拟的航空公司数据集来展示不同的特征提取方法。在市场营销中这类消费者调查问卷中，虽然初始问题很多，但通常存在多个调查项共同反应少数几个潜在因子。比如航空公司满意度调查数据中下面四个问题：购票容易度（<code>Easy_Reservation</code>）、座椅选择（<code>Preferred_Seats</code>）、航班选择（<code>Flight_Options</code>）和票价（<code>Ticket_Prices</code>）都和购票体验有关。</p>
 <div id="section-9.2.1" class="section level3">
 <h3><span class="header-section-number">9.2.1</span> 初步探索数据</h3>
 <p>我们先读入该数据：</p>
@@ -435,15 +435,11 @@ airline.mean&lt;-<span class="kw">select</span>(airline.mean,-Airline)
 <p>由上面输出结果的第一行是主成分的标准差，第二行对应成分单独解释方差的比例，第三行是累计解释方差。可见，前两个主成分解释的大部分原变量方差（80%）。<code>plot()</code>函数作用在PCA结果上默认绘制陡坡图，该图展示每个成分额外解释的方差。我们可用累计解释方差比例或者陡坡图来判断需要的主成分。我们通过下面代码绘制图形：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(airline.pc,<span class="dt">type=</span><span class="st">&quot;l&quot;</span>,<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>,<span class="dt">main=</span><span class="st">&quot;PCA陡坡图&quot;</span>)</code></pre></div>
 <p><img src="DS_R_files/figure-html/unnamed-chunk-104-1.png" width="672" /></p>
-<p>图中由陡到缓的转折点能告诉我们从哪个主成分开始，继续添加更多的成分对解释更多方差没有太大帮助，反而增加模型复杂度。关于拐点的判断是主观的。图中显示拐点大约在2或者3。这表明前2到3个主成分解释了大部分方差。将各个原始变量映射到前两个主成分张成的平面上能够揭示这些变量之间的关系。这样的图称为“双标图”，可以用<code>biplot()</code>函数绘制：</p>
+<p>图的横坐标是主成分编号，纵坐标是该主成分解释的方差，即变量协方差矩阵单位正交特征向量对应的特征值。图中由陡到缓的转折点能告诉我们从哪个主成分开始，继续添加更多的成分对解释更多方差没有太大帮助，反而增加模型复杂度。关于拐点的判断是主观的。从第3个主成分开始，新的主成分解释的方差相对较小，因此我们可以取头2个主成分。将各个原始变量映射到前两个主成分张成的平面上能够揭示这些变量之间的关系。这样的图称为“双标图”，可以用<code>biplot()</code>函数绘制：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">biplot</span>(airline.pc,<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>,<span class="dt">main=</span><span class="st">&quot;PCA双标图&quot;</span>,<span class="dt">cex=</span><span class="kw">c</span>(<span class="fl">0.5</span>,<span class="dv">1</span>),<span class="dt">xlim=</span><span class="kw">c</span>(-<span class="fl">0.06</span>,<span class="fl">0.04</span>))</code></pre></div>
 <p><img src="DS_R_files/figure-html/unnamed-chunk-105-1.png" width="672" /></p>
-<p>双标图的横坐标是第一个主成分（PC1），纵坐标是第二个主成分（PC2）。图中的点代表各个观测评分投影在这两个主成分张成的平面上。图中的箭头代表每个变量对应这两个主成分的载荷系数决定的方向。</p>
+<p>双标图的横坐标是第一个主成分（PC1），纵坐标是第二个主成分（PC2）。图中的点代表各个观测评分投影在这两个主成分张成的平面上。图中的箭头代表每个变量对应这两个主成分的载荷系数决定的方向。由于这两个主成分能够解释原始观测大部分的方差，在双标图中距离较近的点有相似的观测。</p>
 <!--
-Interpreting Points: The relative location of the points can be interpreted. Points that are close together correspond to observations that have similar scores on the components displayed in the plot. To the extent that these components fit the data well, the points also correspond to observations that have similar values on the variables.
-
-In this example, cars that are close together are ones that have similar profiles of preference judgements: Most judges have the same kind of preference ratings for Cadillac and Lincoln Whether or not they like them we don't know, its just that is a judge likes one s/he tends to like the other, and if a judge dislikes one, then the othe is likely to be disliked. The same is true for Pinto and Chevette, although the judgments about Pinto and Chevette are likely to be rather different then those about Cadillac and Lincoln, since the two pairs of points are relatively far apart.
-
 Interpreting Vectors: Both the direction and length of the vectors can be interpreted. Vectors point away from the origin in some direction.
 
 A vector points in the direction which is most like the variable represented by the vector. This is the direction which has the highest squared multiple correlation with the principal components. The length of the vector is proportional to the squared multiple correlation between the fitted values for the variable and the variable itself.
@@ -510,46 +506,24 @@ eigenvalue$values</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">airline%&gt;%
 <span class="st">  </span><span class="kw">subset</span>(<span class="dt">select=</span>Easy_Reservation:Recommend)%&gt;%
 <span class="st">  </span><span class="kw">factanal</span>(<span class="dt">factors=</span><span class="dv">2</span>)</code></pre></div>
-<pre><code>## 
-## Call:
-## factanal(x = ., factors = 2)
-## 
-## Uniquenesses:
-## Easy_Reservation  Preferred_Seats   Flight_Options    Ticket_Prices 
-##            0.428            0.307            0.335            0.327 
-##     Seat_Comfort   Seat_Roominess Overhead_Storage   Clean_Aircraft 
-##            0.251            0.164            0.252            0.495 
-##         Courtesy     Friendliness      Helpfulness          Service 
-##            0.253            0.244            0.248            0.240 
-##     Satisfaction        Fly_Again        Recommend 
-##            0.152            0.112            0.113 
-## 
-## Loadings:
-##                  Factor1 Factor2
-## Easy_Reservation -0.754         
-## Preferred_Seats  -0.831         
-## Flight_Options   -0.801   0.155 
-## Ticket_Prices    -0.819         
-## Seat_Comfort              0.863 
-## Seat_Roominess   -0.346   0.846 
-## Overhead_Storage  0.233   0.833 
-## Clean_Aircraft            0.707 
-## Courtesy          0.864         
-## Friendliness      0.869         
-## Helpfulness       0.867         
-## Service           0.872         
-## Satisfaction              0.921 
-## Fly_Again                 0.942 
-## Recommend                 0.941 
-## 
-##                Factor1 Factor2
-## SS loadings      5.769   5.309
-## Proportion Var   0.385   0.354
-## Cumulative Var   0.385   0.739
-## 
-## Test of the hypothesis that 2 factors are sufficient.
-## The chi square statistic is 5416.28 on 76 degrees of freedom.
-## The p-value is 0</code></pre>
+<p>这里只截取输出的载荷部分：</p>
+<div class="sourceCode"><pre class="sourceCode html"><code class="sourceCode html">Loadings:
+                 Factor1 Factor2
+Easy_Reservation -0.754         
+Preferred_Seats  -0.831         
+Flight_Options   -0.801   0.155 
+Ticket_Prices    -0.819         
+Seat_Comfort              0.863 
+Seat_Roominess   -0.346   0.846 
+Overhead_Storage  0.233   0.833 
+Clean_Aircraft            0.707 
+Courtesy          0.864         
+Friendliness      0.869         
+Helpfulness       0.867         
+Service           0.872         
+Satisfaction              0.921 
+Fly_Again                 0.942 
+Recommend                 0.941 </code></pre></div>
 <p>其中<code>factors=2</code>设置因子数目为2. 我们看看结果输出的载荷<code>Loadings</code>，这是最需要解释的部分。结果中没有显示接近0的因子载荷。在此方案中，因子1对应载荷高的变量为：</p>
 <ul>
 <li>购票体验相关变量：<code>Easy_Reservation</code>，<code>Preferred_Seats</code>，<code>Flight_Options</code>，<code>Ticket_Prices</code></li>
@@ -560,50 +534,27 @@ eigenvalue$values</code></pre></div>
 <li>机舱设施相关变量：<code>Seat_Comfort</code>，<code>Seat_Roominess</code>，<code>Overhead_Storage</code>，<code>Clean_Aircraft</code></li>
 <li>总体满意度相关变量：<code>Satisfaction</code>，<code>Fly_Again</code>，<code>Recommend</code></li>
 </ul>
-<p>也就是说这些结果大致反映出两类因子，其中一类和购票体验和机舱服务相关，另外一类和机舱设施和总体满意度相关。回忆之前得到的相关矩阵图，购票体验和机舱服务在图像强烈负相关，这里因子分析将它们看作受同一个因子影响，但载荷符号相反。这里很自然的提出一个实际问题，为什么对购票体验满意度高时对机舱服务满意度就低？这是需要和营销人员沟通的地方。同时，从统计的角度，我们可能会想，如果我们设置3个因子，是否会将购票体验和机舱服务分开呢？下面我们试着将因子个数设置成3个：</p>
+<p>也就是说这些结果大致反映出两类因子，其中一类和购票体验和机舱服务相关，另外一类和机舱设施和总体满意度相关。回忆之前得到的相关矩阵图，购票体验和机舱服务在图上强烈负相关，这里因子分析将它们看作受同一个因子影响，但载荷符号相反。这里很自然的提出一个实际问题，为什么对购票体验满意度高时对机舱服务满意度就低？这是需要和营销人员沟通的地方。同时，从统计的角度，我们可能会想，如果我们设置3个因子，是否会将购票体验和机舱服务分开呢？下面我们试着将因子个数设置成3个：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">airline%&gt;%
 <span class="st">  </span><span class="kw">subset</span>(<span class="dt">select=</span>Easy_Reservation:Recommend)%&gt;%
 <span class="st">  </span><span class="kw">factanal</span>(<span class="dt">factors=</span><span class="dv">3</span>)</code></pre></div>
-<pre><code>## 
-## Call:
-## factanal(x = ., factors = 3)
-## 
-## Uniquenesses:
-## Easy_Reservation  Preferred_Seats   Flight_Options    Ticket_Prices 
-##            0.233            0.157            0.222            0.173 
-##     Seat_Comfort   Seat_Roominess Overhead_Storage   Clean_Aircraft 
-##            0.251            0.165            0.253            0.495 
-##         Courtesy     Friendliness      Helpfulness          Service 
-##            0.219            0.191            0.153            0.161 
-##     Satisfaction        Fly_Again        Recommend 
-##            0.151            0.111            0.113 
-## 
-## Loadings:
-##                  Factor1 Factor2 Factor3
-## Easy_Reservation         -0.318   0.814 
-## Preferred_Seats          -0.422   0.815 
-## Flight_Options    0.163  -0.419   0.759 
-## Ticket_Prices            -0.406   0.813 
-## Seat_Comfort      0.864                 
-## Seat_Roominess    0.847  -0.286   0.189 
-## Overhead_Storage  0.832   0.160  -0.172 
-## Clean_Aircraft    0.706                 
-## Courtesy                  0.786  -0.403 
-## Friendliness              0.813  -0.385 
-## Helpfulness               0.854  -0.342 
-## Service                   0.842  -0.362 
-## Satisfaction      0.921                 
-## Fly_Again         0.942                 
-## Recommend         0.941                 
-## 
-##                Factor1 Factor2 Factor3
-## SS loadings      5.309   3.452   3.192
-## Proportion Var   0.354   0.230   0.213
-## Cumulative Var   0.354   0.584   0.797
-## 
-## Test of the hypothesis that 3 factors are sufficient.
-## The chi square statistic is 769.65 on 63 degrees of freedom.
-## The p-value is 3.9e-122</code></pre>
+<div class="sourceCode"><pre class="sourceCode html"><code class="sourceCode html">Loadings:
+                 Factor1 Factor2 Factor3
+Easy_Reservation         -0.318   0.814 
+Preferred_Seats          -0.422   0.815 
+Flight_Options    0.163  -0.419   0.759 
+Ticket_Prices            -0.406   0.813 
+Seat_Comfort      0.864                 
+Seat_Roominess    0.847  -0.286   0.189 
+Overhead_Storage  0.832   0.160  -0.172 
+Clean_Aircraft    0.706                 
+Courtesy                  0.786  -0.403 
+Friendliness              0.813  -0.385 
+Helpfulness               0.854  -0.342 
+Service                   0.842  -0.362 
+Satisfaction      0.921                 
+Fly_Again         0.942                 
+Recommend         0.941                 </code></pre></div>
 <p>结果如我们所料，将之前机舱服务和购票体验对应的因子进一步分开成为两个因子。这个结果和之前基于主成分分析得到的双标图中问题对应箭头方向的聚类情况一致。</p>
 <p>了解一些关于EFA背后理论的读者应该知道，因子载荷估计并不是唯一的，我们可以通过旋转产生新的载荷，所谓旋转，就是只用一个矩阵右乘因子载荷矩阵。当你使用的是正交矩阵时，就是正交旋转，否者是斜交旋转。比如有一种常用的正交旋转叫做方差最大正交旋转（varimax rotation），其目的是使得旋转后的各因子载荷的平方按列向0和1两级分化，以便每个因子具有实际的解释，该方法寻找的是不相关的因子。斜交旋转的方法允许因子之间相关。基于之前的讨论可知，购票体验和机舱服务是负相关的，更合理的方法是允许各因子间相关。下面我们用一种常见的斜交变换（<code>oblimin</code>）重复3因子模型：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(GPArotation)
@@ -665,10 +616,13 @@ airline%&gt;%
 </ol>
 </div>
 <div id="section-9.2.4" class="section level3">
-<h3><span class="header-section-number">9.2.4</span> 理论背景</h3>
+<h3><span class="header-section-number">9.2.4</span> 高维标度化</h3>
+</div>
+<div id="section-9.2.5" class="section level3">
+<h3><span class="header-section-number">9.2.5</span> 知识扩展</h3>
 <p>之前只介绍如何应用主成分分析和因子分析。虽然我尽量用非技术的语言解释模型背后的思想，但要很好的解释模型结果，还是需要对理论背景有所了解。本小节主要介绍这两种方法背后的数学理论，建议有一定数学基础的读者能够花些时间理解这些知识。</p>
 <div id="-1" class="section level4">
-<h4><span class="header-section-number">9.2.4.1</span> 主成分分析</h4>
+<h4><span class="header-section-number">9.2.5.1</span> 主成分分析</h4>
 <p>假设我们有随机变量组成的向量<span class="math inline">\(\mathbf{X}=[X_{1},X_{2},...,X_{p}]^{T}\)</span>，其对应的协方差矩阵为<span class="math inline">\(\Sigma\)</span>。</p>
 <p>主成分分析的目的就是通过对原变量进行线性组合找到<strong>彼此不相关</strong>的新变量 <span class="math inline">\((Z_{1} , Z_{2} , \ldots , Z_{p})\)</span>，依次最大化每个变量的方差:</p>
 <p><span class="math display">\[
@@ -687,12 +641,13 @@ Z_{P} &amp; = &amp; \mathbf{a_{p}^{T}X} &amp; = &amp; a_{p1}X_{1}+a_{p2}X_{2}+\c
 <li>在控制条件<span class="math inline">\(\mathbf{a_{2}^{T}a_{2}}=1\)</span>和<span class="math inline">\(Cov(Z_{1},Z_{2})=0\)</span>下，通过最大化<span class="math inline">\(Var(Z_{1})=\mathbf{a_{1}^{T}\Sigma a_{1}}\)</span>得到第二个主成分<span class="math inline">\(Z_{2}\)</span></li>
 <li>依次类推，对第i个主成分，在控制条件<span class="math inline">\(\mathbf{a_{i}^{T}a_{i}}=1\)</span>和<span class="math inline">\(Cov(Z_{i},Z_{k})=0\)</span>（任意<span class="math inline">\(k&lt;i\)</span>）下，通过最大化<span class="math inline">\(Var(Z_{i})=\mathbf{a_{i}^{T}\Sigma a_{i}}\)</span>得到第二个主成分<span class="math inline">\(Z_{i}\)</span></li>
 </ol>
-<p>对于上面第1条，可以证明 <span class="math display">\[Var(Z_{1})=\mathbf{a_{1}^{T}\Sigma a_{1}}=\underset{\mathbf{e^{T}e=1}}{max}\mathbf{e^{T}\Sigma e}=\lambda_{1}\]</span></p>
+<p>对于上面第1条，可以证明</p>
+<p><span class="math display">\[Var(Z_{1})=\mathbf{a_{1}^{T}\Sigma a_{1}}=\underset{\mathbf{e^{T}e=1}}{max} \mathbf{e^{T}\Sigma e}=\lambda_{1}\]</span></p>
 <p>其中，<span class="math inline">\(\lambda_{1}\geqslant\lambda_{2}\geqslant...\geqslant\lambda_{p}\)</span>是<span class="math inline">\(\Sigma\)</span>的特征值， <span class="math inline">\(\mathbf{a_{1},a_{2},...,a_{p}}\)</span>是相应的单位正交特征向量。证明需要用到谱分解定理，但并不复杂。</p>
 <p>由于主成分分析基于变量方差矩阵<span class="math inline">\(\Sigma\)</span>，我们需要特别注意各个变量的标度，如果差别很大（比如年龄和收入），那需要将观测标准化后再进行分析。关于如何用R进行数据标准化，我们在之前数据预处理的部分已经详细介绍过了。当前例子中所有问题的回复都在1-9分的量表上，所以是不是标准化差别不太大。</p>
 </div>
-<div id="section-9.2.4.2" class="section level4">
-<h4><span class="header-section-number">9.2.4.2</span> 因子分析</h4>
+<div id="section-9.2.5.2" class="section level4">
+<h4><span class="header-section-number">9.2.5.2</span> 因子分析</h4>
 <p>因子分析是研究相关阵或者协方差矩阵的内部关系，它将多个变量综合为少数几个因子，以再现原始变量和因子之间的相关关系。因子分析和主成分分析有联系，是其推广和发展。1904年Charles Spearman指出，如果第i个变量（第i门功课）上的分数由两部分组成的：</p>
 <p><span class="math display">\[X_{i}=l_{i}F+\epsilon_{i}\]</span></p>
 <p>其中F是对所有变量都起作用的公因子，那么就可以说明各门功课相关的“效应”。每门课程的考试成绩可以看作由一个公因子（智力因子）和一个特殊因子之和组成。这是最早的最简单的因子模型。可以将这个因子模型进一步推广到多个因子的情况，即全体科目所共有的因子有m个，如数学推导因子、记忆因子、计算因子等，分别记为<span class="math inline">\(F_{1},...,F_{m}\)</span>：</p>
@@ -720,13 +675,13 @@ X_{p}-\mu_{p} &amp; = &amp; l_{p1}F_{1}+l_{p2}F_{2}+\cdots+l_{pm}F_{m}+\epsilon_
 \]</span></p>
 <p>对上述等式两边取期望可以得到：</p>
 <p><span class="math display">\[
-$\begin{array}{ccc}
+\begin{array}{ccc}
 \Sigma &amp; = &amp; E\{\mathbf{(X}-\mathbf{\mu)\mathbf{(X}-\mathbf{\mu)^{T}}}\}\\
  &amp; = &amp; E\{LFF^{T}L^{T}+LF\epsilon^{T}+\epsilon F^{T}L^{T}+\epsilon\epsilon^{T}\}\\
  &amp; = &amp; \mathbf{LL^{T}+\Psi}
-\end{array}$
+\end{array}
 \]</span></p>
-<p>因为 <span class="math inline">\(E(\mathbf{FF^{T}})\text{＝Var(\mathbf{F})}=I\)</span>并且<span class="math inline">\(E(\mathbf{\epsilon^{T}F})=cov(\mathbf{F},\mathbf{\epsilon})=0\)</span>。此外还有：</p>
+<p>因为 <span class="math inline">\(E(\mathbf{FF^{T}})＝Var(\mathbf{F})=I\)</span>并且<span class="math inline">\(E(\mathbf{\epsilon^{T}F})=cov(\mathbf{F},\mathbf{\epsilon})=0\)</span>。此外还有：</p>
 <p><span class="math display">\[\mathbf{(X-\mu)F^{T}=LFF^{T}+\epsilon F^{T}}\]</span> <span class="math display">\[cov(\mathbf{X,F})=E[(\mathbf{X-\mu})F^{T}]=L\]</span></p>
 <p>因此在正交因子模型中，进一步有：</p>
 <p><span class="math display">\[Var(X_{i})=\sigma_{ii}=l_{i1}^{2}+l_{i2}^{2}+\cdots+l_{im}^{2}+\psi_{i}\]</span> <span class="math display">\[Cov(X_{i},X_{K})=\sigma_{ik}=l_{i1}l_{k1}+l_{i2}l_{k2}+l_{im}l_{km}\]</span></p>
@@ -737,7 +692,7 @@ $\begin{array}{ccc}
 <li><span class="math inline">\(\psi_{i}\)</span>由特殊因子<span class="math inline">\(\epsilon_{i}\)</span>产生的方差，它仅与变量<span class="math inline">\(X_{i}\)</span>，也称为剩余方差</li>
 </ol>
 <p><span class="math inline">\(h_{i}^{2}\)</span>反映了变量<span class="math inline">\(X_{i}\)</span>对公因子F的依赖程度。拟合模型的目标就是是的公因子增大，剩余方差减小。</p>
-<p>模型假设<span class="math inline">\(\mathbf{X}\)</span>的<span class="math inline">\(\frac{p(p+1)}{2}\)</span>个方差和协方差参数可以通过<span class="math inline">\(p(m+1)\)</span>个因子载荷和<span class="math inline">\(p\)</span>个特殊因子方差得到。理想的情况是用尽可能少的公因子表示原变量（比如之前的例子中<span class="math inline">\(p=12\)</span>，<span class="math inline">\(m=3\)</span>）。</p>
+<p>模型假设<span class="math inline">\(\mathbf{X}\)</span>的<span class="math inline">\(\frac{p(p+1)}{2}\)</span>个方差和协方差参数可以通过<span class="math inline">\(p(m+1)\)</span>个因子载荷和<span class="math inline">\(p\)</span>个特殊因子方差得到。理想的情况是用尽可能少的公因子表示原变量。在之前的例子中<span class="math inline">\(p=12\)</span>，<span class="math inline">\(m=3\)</span>，原来协方差矩阵中的78个元素可以用有<span class="math inline">\(12\times(3+1)=48\)</span>个未知数的因子模型表示。这里要注意，并非所有的协方差矩阵都能用<span class="math inline">\(\mathbf{\mathbf{LL^{T}+\Psi}}\)</span>的因子模型表示。</p>
 <!-- 
 3.1 特征选择Feature Selection
 
@@ -787,9 +742,6 @@ By the way, 在做feature selection的时候，会涉及到特征学习（Featur
 
 -->
 </div>
-</div>
-<div id="section-9.2.5" class="section level3">
-<h3><span class="header-section-number">9.2.5</span> 高维标度化</h3>
 </div>
 </div>
 <div id="section-9.3" class="section level2">
