@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-07-23">
+<meta name="date" content="2016-07-24">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -414,7 +414,7 @@ airline.mean&lt;-<span class="kw">select</span>(airline.mean,-Airline)
 </div>
 <div id="section-9.2.2" class="section level3">
 <h3><span class="header-section-number">9.2.2</span> 主成分分析</h3>
-<p>主成分分析（PCA）是寻找变量的线性组合，得到新的组合变量叫做“成分”，其指导思想是尽量捕捉原数据中方差。在统计学中，方差通常也被认为是信息。第一个成分捕捉的方差最大。第二个成分尽可能多的捕捉前一个成分没有解释的方差。依次类推，直到成分的数目和原变量数目一样多。我们通过使用前几个成分取代原变量来达到降维的目的，同时要保证这些成分能够解释大部分原始数据集中的方差。这里要提醒一点，如果数据观测不在一个标度上时需要对数据进行标准化，因为PCA是基于变量方差矩阵。这里因为各个变量的观测分布没有很大差异，是不是标准化没有太大的影响。</p>
+<p>主成分分析（PCA）是寻找变量的线性组合，得到新的组合变量叫做“成分”，其指导思想是尽量捕捉原数据中方差。在统计学中，方差通常也被认为是信息。第一个成分捕捉的方差最大。第二个成分尽可能多的捕捉前一个成分没有解释的方差。依次类推，直到成分的数目和原变量数目一样多。我们通过使用前几个成分取代原变量来达到降维的目的，同时要保证这些成分能够解释大部分原始数据集中的方差。这里要提醒一点，如果数据观测不在一个标度上时需要对数据进行标准化，因为PCA是基于变量协方差矩阵。这里因为各个变量的观测分布没有很大差异，是不是标准化没有太大的影响。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">airline.pc&lt;-<span class="kw">select</span>(airline,Easy_Reservation:Recommend)%&gt;%
 <span class="st">  </span><span class="kw">prcomp</span>()
 <span class="kw">summary</span>(airline.pc)</code></pre></div>
@@ -587,7 +587,72 @@ Recommend         0.942                 </code></pre></div>
 </div>
 <div id="section-9.2.4" class="section level3">
 <h3><span class="header-section-number">9.2.4</span> 高维标度化</h3>
-<p>高维标度化（Multi-Dimensional Scaling）是一类用来寻找原书低维表达的方法。MSD没有提取潜在成分或者潜因子，而是试图将原数据投影到一个更低的维度，同时保持各项之间的距离。对于航空公司评分数据，你在使用MSD之前需要先计算出各个观测之间的距离。这里是数值型的观测，可以用<code>dist()</code>函数计算欧几里德距离，如果是排序，分类观测，可以使用不同的方法计算距离。</p>
+<p>高维标度化（Multi-Dimensional Scaling）是一类用来寻找原数据低维表达的方法。其目标和主成分双标图以及因子分析类似，但达成目标的方法不同。MDS没有提取潜在成分或者潜因子，而是试图将原数据投影到一个更低的维度，同时保持各项之间的距离。对于航空公司评分数据，你在使用MDS之前需要先计算出各个观测之间的距离。这里是数值型的观测，可以用<code>dist()</code>函数计算欧几里德距离，如果是排序，分类观测，可以使用不同的方法计算距离。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">var.dist&lt;-airline%&gt;%
+<span class="st">  </span><span class="kw">subset</span>(<span class="dt">select=</span>Easy_Reservation:Recommend)%&gt;%
+<span class="st">  </span><span class="co"># 用dist()函数计算评分之间的距离</span>
+<span class="st">  </span><span class="kw">dist</span>()</code></pre></div>
+<p>接下来我们通过<code>cmdscale()</code>函数对得到的距离矩阵寻找MDS方案：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">var.mds&lt;-<span class="kw">cmdscale</span>(var.dist)%&gt;%
+<span class="st">  </span><span class="kw">data.frame</span>()
+<span class="co"># 重新为列命名</span>
+<span class="kw">names</span>(var.mds)&lt;-<span class="kw">c</span>(<span class="st">&quot;Score1&quot;</span>,<span class="st">&quot;Score2&quot;</span>)</code></pre></div>
+<p>我们可以看下得到的结果：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(var.mds)</code></pre></div>
+<pre><code>##        Score1    Score2
+## 1 -0.04272332 -4.919362
+## 2  2.81785655 -5.743754
+## 3  1.91700905 -3.993620
+## 4  2.46725348 -5.297467
+## 5 -0.23900139 -7.659147
+## 6  1.10832836 -5.605850</code></pre>
+<p>函数<code>cmdscale()</code>返回的是一个2列的数据框，分别对应不同样本两个坐标的取值。也就是将原本15列的数据降到2维平面上，和之前在头两个主成分张成的平面投影很类似。我们可以按照这些坐标值，用<code>plot()</code>函数进行基础可视化：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(var.mds)</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-112-1.png" width="672" /></p>
+<p>这些点聚类的情况和我们在之前没有聚合的双标图类似。下面我们同样将观测按照不同航空公司聚合后重复相同的分析，看看结果如何：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mean.dist&lt;-airline.mean%&gt;%
+<span class="st">    </span><span class="kw">dist</span>()
+mean.mds&lt;-<span class="kw">cmdscale</span>(mean.dist)%&gt;%
+<span class="st">  </span><span class="kw">data.frame</span>()
+<span class="co"># 重新为列命名</span>
+<span class="kw">names</span>(mean.mds)&lt;-<span class="kw">c</span>(<span class="st">&quot;Score1&quot;</span>,<span class="st">&quot;Score2&quot;</span>)
+<span class="kw">plot</span>(mean.mds,<span class="dt">type=</span><span class="st">&quot;n&quot;</span>,<span class="dt">xlim=</span><span class="kw">c</span>(-<span class="dv">8</span>,<span class="dv">6</span>),<span class="dt">ylim=</span><span class="kw">c</span>(-<span class="dv">5</span>,<span class="dv">6</span>))
+<span class="kw">text</span>(mean.mds,<span class="kw">row.names</span>(mean.mds),<span class="dt">cex=</span><span class="dv">1</span>)</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-113-1.png" width="672" /></p>
+<p>上面代码中，<code>plot(..., type=&quot;n&quot;,...)</code>是告诉R不要用任何符号绘制数据点，然后用<code>text()</code>函数将航空公司名作为数据点绘制在图上。这里的结果类似于之前聚合后的双标图。</p>
+<p>对于分类或者排序变量，你可以使用不同的方法计算距离，比如<code>cluster</code>包中的<code>daisy()</code>可以用来计算排序变量之间的距离。我们们将聚合后的数据转换为排序来展示MDS在这种情况下的使用。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mean.rank&lt;-<span class="kw">lapply</span>(airline.mean,function(x) <span class="kw">factor</span>(<span class="kw">rank</span>(x),<span class="dt">ordered=</span>T))%&gt;%
+<span class="st">  </span><span class="kw">data.frame</span>()
+<span class="kw">glimpse</span>(mean.rank)</code></pre></div>
+<pre><code>## Observations: 3
+## Variables: 15
+## $ Easy_Reservation &lt;ord&gt; 3, 2, 1
+## $ Preferred_Seats  &lt;ord&gt; 3, 2, 1
+## $ Flight_Options   &lt;ord&gt; 3, 1, 2
+## $ Ticket_Prices    &lt;ord&gt; 3, 2, 1
+## $ Seat_Comfort     &lt;ord&gt; 2, 1, 3
+## $ Seat_Roominess   &lt;ord&gt; 2, 1, 3
+## $ Overhead_Storage &lt;ord&gt; 2, 1, 3
+## $ Clean_Aircraft   &lt;ord&gt; 2, 1, 3
+## $ Courtesy         &lt;ord&gt; 1, 2, 3
+## $ Friendliness     &lt;ord&gt; 1, 3, 2
+## $ Helpfulness      &lt;ord&gt; 1, 3, 2
+## $ Service          &lt;ord&gt; 1, 3, 2
+## $ Satisfaction     &lt;ord&gt; 2, 1, 3
+## $ Fly_Again        &lt;ord&gt; 2, 1, 3
+## $ Recommend        &lt;ord&gt; 2, 1, 3</code></pre>
+<p>我们接下来用<code>daisy()</code>中的<code>gower</code>度量<span class="citation">(Gower <a href="#ref-gower1971">1971</a>)</span>，它可以用于虚拟变量，非对称二项变量，以及排序变量。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(cluster)
+mean.rank.gower&lt;-<span class="kw">daisy</span>(mean.rank,<span class="dt">metric=</span><span class="st">&quot;gower&quot;</span>)</code></pre></div>
+<p>然后用<code>MASS</code>包中的<code>isoMDS()</code>来标度化数据，对结果绘制基本图形：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(MASS)
+mean.mds.gower&lt;-<span class="kw">isoMDS</span>(mean.rank.gower)</code></pre></div>
+<pre><code>## initial  value 0.000000 
+## final  value 0.000000 
+## converged</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(mean.mds.gower$points,<span class="dt">type=</span><span class="st">&quot;n&quot;</span>,<span class="dt">xlim=</span><span class="kw">c</span>(-<span class="fl">0.5</span>,<span class="fl">0.5</span>),<span class="dt">ylim=</span><span class="kw">c</span>(-<span class="fl">0.2</span>,<span class="fl">0.4</span>))
+<span class="kw">text</span>(mean.mds.gower$points,<span class="kw">row.names</span>(mean.mds),<span class="dt">cex=</span><span class="dv">1</span>)</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-116-1.png" width="672" /></p>
 </div>
 <div id="section-9.2.5" class="section level3">
 <h3><span class="header-section-number">9.2.5</span> 知识扩展</h3>
@@ -615,7 +680,7 @@ Z_{P} &amp; = &amp; \mathbf{a_{p}^{T}X} &amp; = &amp; a_{p1}X_{1}+a_{p2}X_{2}+\c
 <p>对于上面第1条，可以证明</p>
 <p><span class="math display">\[Var(Z_{1})=\mathbf{a_{1}^{T}\Sigma a_{1}}=\underset{\mathbf{e^{T}e=1}}{max} \mathbf{e^{T}\Sigma e}=\lambda_{1}\]</span></p>
 <p>其中，<span class="math inline">\(\lambda_{1}\geqslant\lambda_{2}\geqslant...\geqslant\lambda_{p}\)</span>是<span class="math inline">\(\Sigma\)</span>的特征值， <span class="math inline">\(\mathbf{a_{1},a_{2},...,a_{p}}\)</span>是相应的单位正交特征向量。证明需要用到谱分解定理，但并不复杂。</p>
-<p>由于主成分分析基于变量方差矩阵<span class="math inline">\(\Sigma\)</span>，我们需要特别注意各个变量的标度，如果差别很大（比如年龄和收入），那需要将观测标准化后再进行分析。关于如何用R进行数据标准化，我们在之前数据预处理的部分已经详细介绍过了。当前例子中所有问题的回复都在1-9分的量表上，所以是不是标准化差别不太大。</p>
+<p>由于主成分分析基于变量协方差矩阵<span class="math inline">\(\Sigma\)</span>，我们需要特别注意各个变量的标度，如果差别很大（比如年龄和收入），那需要将观测标准化后再进行分析。关于如何用R进行数据标准化，我们在之前数据预处理的部分已经详细介绍过了。当前例子中所有问题的回复都在1-9分的量表上，所以是不是标准化差别不太大。<strong>注意，这里我们说所的<span class="math inline">\(\mathbf{X}=[X_{1},X_{2},...,X_{p}]^{T}\)</span>是随机变量组成的向量，这是一个理论设定。在具体应用中，我们有的是对每个变量的观测，然后用观测的样本协方差矩阵来估计变量协方差矩阵。</strong>之所以这里用理论上的随机变量的表达方式是为了简便，不然用真实的样本观测矩阵解释会有很多矩阵转秩，即使背后的理论简单，这样的数学表达也能让人看晕。要想把这样的数理知识解释的有趣实在超出我的能力范围，这里我只是尽量使得讲解清晰，减少不必要的混淆。但我知道这部分终归是让人抓狂的，小伙伴们忍忍吧！</p>
 </div>
 <div id="section-9.2.5.2" class="section level4">
 <h4><span class="header-section-number">9.2.5.2</span> 因子分析</h4>
@@ -688,6 +753,38 @@ X_{p}-\mu_{p} &amp; = &amp; l_{p1}F_{1}+l_{p2}F_{2}+\cdots+l_{pm}F_{m}+\epsilon_
 <p>果满足这个条件的因子载荷矩阵称为具有“简单结构”。方差最大化旋转<span class="citation">(Kaiser <a href="#ref-henry1958">1958</a>)</span>就是用来将载荷矩阵旋转到尽量接近简单结构的方法。从这组变量代表的样本看来，方差最大化旋转找到了一种表示样本的最简单的方法，即每个样本可以用少数变量的函数的线性组合表示。</p>
 <p><span class="math display">\[U_{varmax}=\underset{U}{argmax}\left(\Sigma_{j=1}^{m}\Sigma_{i=1}^{p}(LU)^{4}-\frac{1}{p}\Sigma_{j=1}^{m}\left(\Sigma_{i=1}^{p}(LU)_{ij}^{2}\right)^{2}\right)\]</span></p>
 <p>斜交变换更加复杂，感兴趣的读者可以参考Edward Jackson书中的<span class="citation">(Jackson <a href="#ref-edward2003">2003</a>)</span>的第8章。</p>
+</div>
+<div id="-1" class="section level4">
+<h4><span class="header-section-number">9.2.5.3</span> 高维标度化</h4>
+<p>这里我们回到之前样本观测矩阵的数学表达方式。用<span class="math inline">\(n\)</span>表示样本量（或者观测数目）。<span class="math inline">\(p\)</span>代表自变量数目。我们用<span class="math inline">\(\mathbf{X}\)</span>表示<span class="math inline">\(n\times p\)</span>观测矩阵：</p>
+<p><span class="math display">\[
+\mathbf{X}=\left[\begin{array}{cccc}
+x_{11} &amp; x_{12} &amp; \cdots &amp; x_{1p}\\
+x_{21} &amp; x_{22} &amp; \cdots &amp; x_{2p}\\
+\vdots &amp; \vdots &amp; \ddots &amp; \vdots\\
+x_{n1} &amp; x_{n2} &amp; \cdots &amp; x_{np}
+\end{array}\right]=\left[\begin{array}{c}
+\mathbf{x_{1.}^{T}}\\
+\mathbf{x_{2.}^{T}}\\
+\vdots\\
+\mathbf{x_{n.}^{T}}
+\end{array}\right]=\left[\begin{array}{cccc}
+\mathbf{x_{.1}} &amp; \mathbf{x_{.2}} &amp; \ldots &amp; \mathbf{x_{.p}}\end{array}\right]
+\]</span></p>
+<p>其中<span class="math inline">\(x_{ij}\)</span>代表第i个样本第j个变量的观测，<span class="math inline">\(i=1, \ldots, n\)</span>，<span class="math inline">\(j=1, \ldots, p\)</span>。<span class="math inline">\(\mathbf{x_{i.}}\in\mathbb{R}^{p}\)</span>代表第i个样本的所有变量观测组成的向量，向量统一按列排：</p>
+<p><span class="math display">\[
+\mathbf{x_{i.}}=\left[\begin{array}{c}
+x_{i1}\\
+x_{i2}\\
+\vdots\\
+x_{ip}
+\end{array}\right]
+\]</span></p>
+<p>假设第i和第j个观测之间的距离是<span class="math inline">\(d_{ij}=\Vert\mathbf{x_{i.}-x_{j.}}\Vert\)</span>。通常情况下使用欧几里德距离，有的时候也会用其它距离。此外，在有些情况下，我们并没有直接的样本观测，而是一些差异度测量。比如让每个人品尝不同的酒，然后用<span class="math inline">\(d_{ij}\)</span>表示红酒品牌<span class="math inline">\(i\)</span>和品牌<span class="math inline">\(j\)</span>之间的差别，受访者对不同的品牌组合<span class="math inline">\(ij\)</span>进行差异度评定。MDS只要求差异度<span class="math inline">\(d_{ij}\)</span>，如果直接拿到这样的信息，就不需要计算距离矩阵了，这和PCA和EFA很不一样。MDS寻找能最小化下面“压力函数”的新变量<span class="math inline">\(\mathbf{z_{1},z_{2},...,z_{n}}\in\mathbb{R}^{k}\)</span>：</p>
+<p><span class="math display">\[S_{M}(\mathbf{z_{1},z_{2},...,z_{n}})=\Sigma_{i\neq j}(d_{ij}-\Vert\mathbf{z_{i}-z_{j}}\Vert)^{2}\]</span></p>
+<p>该方法叫做最小二乘标度化。其主导思想是寻找原数据的低维表示，同时尽量保存各对观测之间的距离。通过一种梯度下降算法最小化<span class="math inline">\(S_{M}\)</span>。最小二乘标度化的一个变体是塞曼映射（Sammon mapping），它最小化下面这个方程：</p>
+<p><span class="math display">\[S_{Sm}(\mathbf{z_{1},z_{2},...,z_{n}})=\Sigma_{i\neq j}\frac{(d_{ij}-\Vert\mathbf{z_{i}-z_{j}}\Vert)^{2}}{d_{ij}}\]</span></p>
+<p>通过除以<span class="math inline">\(d_{ij}\)</span>，该方法提高了距离较短的观测对的权重。<code>cmdscale()</code>函数是按照Mardia论文中的分析方法得到的新标度<span class="citation">(Mardia <a href="#ref-Mardia1978">1978</a>)</span>。关于各种其它标度化的方法，可以参考Borg等所著的入门教材《Applied multidimensional scaling》<span class="citation">(G. Borg I. <a href="#ref-Borg2012">2012</a>)</span>。更多的统计学知识细节可以参考Borg和Groenen的《Modern Multidimensional Scaling》<span class="citation">(&amp;. G. Borg I. <a href="#ref-Borg2005">2005</a>)</span>。</p>
 <!-- 
 3.1 特征选择Feature Selection
 
@@ -796,11 +893,23 @@ summary(fit2)
 <div id="ref-spearman1904">
 <p>Spearman, C. 1904. “‘General Intelligence,’ Objectively Determined and Measured.” <em>The American Journal of Psychology</em> 15 (2): 201–92.</p>
 </div>
+<div id="ref-gower1971">
+<p>Gower, J. C. 1971. “A General Coefficient of Similarity and Some of Its Properties.” <em>Biometrics</em> 27 (857–874).</p>
+</div>
 <div id="ref-henry1958">
 <p>Kaiser, Henry F. 1958. “The Varimax Criterion for Analytic Rotation in Factor Analysis.” <em>Psychometrika</em> 23 (3).</p>
 </div>
 <div id="ref-edward2003">
 <p>Jackson, Edward. 2003. <em>A User’s Guide to Principal Components</em>. John Wiley &amp; Sons.</p>
+</div>
+<div id="ref-Mardia1978">
+<p>Mardia, K.V. 1978. “Some Properties of Classical Multidimensional Scaling.” <em>Communications on Statistics – Theory and Methods</em> A7 (1233–1241).</p>
+</div>
+<div id="ref-Borg2012">
+<p>Borg, Groenen, I. 2012. <em>Applied Multidimensional Scaling</em>. Springer.</p>
+</div>
+<div id="ref-Borg2005">
+<p>Borg, &amp; Groenen, I. 2005. <em>Modern Multidimensional Scaling: Theory and Applications</em>. Springer.</p>
 </div>
 </div>
             </section>
