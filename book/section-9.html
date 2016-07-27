@@ -191,6 +191,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="9.3" data-path="section-9.html"><a href="section-9.html#section-9.3"><i class="fa fa-check"></i><b>9.3</b> 特征选择</a><ul>
 <li class="chapter" data-level="9.3.1" data-path="section-9.html"><a href="section-9.html#section-9.3.1"><i class="fa fa-check"></i><b>9.3.1</b> 过滤法</a></li>
 <li class="chapter" data-level="9.3.2" data-path="section-9.html"><a href="section-9.html#section-9.3.2"><i class="fa fa-check"></i><b>9.3.2</b> 绕封法</a></li>
+<li class="chapter" data-level="9.3.3" data-path="section-9.html"><a href="section-9.html#section-9.3.3"><i class="fa fa-check"></i><b>9.3.3</b> 总结</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="10" data-path="section-10.html"><a href="section-10.html"><i class="fa fa-check"></i><b>10</b> 线性回归极其衍生</a><ul>
@@ -813,40 +814,89 @@ x_{ip}
 <div id="section-9.3.1" class="section level3">
 <h3><span class="header-section-number">9.3.1</span> 过滤法</h3>
 <p>它主要侧重于单个特征跟目标变量的关系，在建模前对每个特征（或者自变量）进行评估，选择“重要”的变量进行建模。这里自然有一个问题就是:怎么定义变量重要性？这里所说的重要性指的是一个量化预测变量和结果变量之间关系的<strong>粗略</strong>度量。注意这里的“粗略”这个词，因为这样的重要性衡量并无法给出如“某变量增加会导致结果变量减少”这样细节的关系，这样的关系只能通过更复杂，严格控制，评估后的建模过程得到，如各种回归模型。下面要介绍的重要性衡量方法是通过逐一变化特征，然后测量该特征在与不在时模型表现的差别。如果缺失某特征导致模型表现大幅度下降，表明变量重要性大。这在有时是一个有效的方式，尤其当一开始变量数目太多时，这些测量能够指导建模者关注一些特别的特征，或对某些特征进行可视化，否者在一开始变量太多的时候是无从着手的。</p>
-<p>优点是计算时间上较高效,对于过拟合问题也具有较高的。缺点就是倾向于选择冗余的特征,因为他们不考虑特征之间的相关性,如果某一个特征重要性较高，所有和该特征高相关的特征重要性都会很高，。Guyon 和Elisseeff (2003) 讨论了过滤过程中的冗余变量问题。当然也有可能错过重要的特征，比如某一个特征的分类能力很差，但是它和某些其它特征组合起来会得到不错的效果。</p>
-<!--有监督的变量筛选可以是数据驱动的。筛选结果加上相关学科专家的意见能使我们朝建立有效预测模型的目标前进一大步。我们会在下个章节中看到，很多变量筛选算法基于定量相关性得分。之前的章节曾提到过，很多预测模型本身就能够测量预测变量的重要性，如MARS以及许多基于树的模型会监测每加入一个预测变量时模型表现的提升。其它模型，如线性回归或者逻辑回归通过模型参数或则统计量（如t统计量）对量化模型结果。本章讨论的方法并不限定于一个具体的预测模型。如果已经建立了有效的模型，基于模型得出的评分比本章将要提到的通用方法或许更可靠，因为其直接针对该模型。
-
-
-很多变量重要性分值是针对特定某类型数据而言的。例如用于数值结果变量的技术或许不适合用于分类变量。本章划分为不同的部分，分别针对不同结果变量属性进行讨论。18.1节介绍针对数值型变量的方法；18.2节着重于分类变量。最后，18.3节讨论针对此问题更一般的方法。我们将使用之前几个章节的例子讲解这些技术。
-
-18.1 数值结果变量
-
-对数值型预测变量，传统的量化每个预测变量和结果变量之间关系方式是使用简单相关性统计量。这个统计量是用来衡量线性相关性的。如果变量之间近线性或者曲线相关，那么使用Spearman相关系数（5.1节）更加有效。这些量只是估计变量时间关系的粗略方法，对于复杂的关系并不适用。
-
-例如，之前回归章节用到由一系列数值预测变量组成的QSAR数据集。图18-1是两个预测变量和结果变量的散点图。溶解性（solubility）和碳原子的个数（number of carbon atoms）之间很明显是大致线性的关系。其简单相关系数是-0.61，秩相关系数是-0.67。而预测变量“表面面积（surface area）”的情况就更复杂。部分化合物的表面面积小，且溶解度同样低。剩下的化合物有更高的溶解度，高到一定程度之上有一个边缘化的趋势。这对于建模者来说是很有用的信息但是从相关统计量上看不出来。对于该变量，简单的相关系数是0.27，秩相关系数是0.14。这些相关系数值较低，因此相应变量重要性排序也低（在20个预测变量中排17位）。
-一个候选的方法是使用更加灵活的能够对一般非线性关系建模的方法。其中之一是Cleveland
-和Devlin (1988)提出的局部加权回归模型（LOESS）。 该技术采用一系列多项式回归分别对一系列的小区域数据建模（和滑动平均相似）。该方法自适性极强，能有效得到平滑的回归趋势。图18-1中的红线代表LOESS平滑器拟合结果。基于该拟合结果，通过残差计算伪R2 统计量。对图18-1中的溶解性数据，表面面积对应的LOESS伪R2 值是0.22, 其排序（在20个预测变量中排第7）高于使用相关性排序。
-
-原书P465
-图18-1: 溶解度数据中两个数值型预测变量散点图（尺度变换之后）。红线是平滑模型拟合
-
-图18-2展示了所有连续型预测变量之间的关系。第三个矩阵——最高信息系数（MIC），将会在18.3节讲到。除了两个表面面积预测变量外，对其它变量秩相关和LOESS 伪R2 给出的结果相似。两种方法都表明，基于变量排名有三类不同的预测变量：一类含有4个高分值的预测变量（其中两个在图上显著重合）；一类重要性分值适中；还有一类是低分值变量。唯一不一致的地方在于两个表面面积变量的LOESS分值比其它方法得到的分值高。这些变量在图中用红点标出。
-
-上述每种方法逐个评估每个预测变量时并没有考虑其它变量的影响。这可能导致两方面的误解。 首先，如果两个预测变量之间高度相关，同时它们又都和结果变量高度相关，那么单变量分析结果会认定这两个变量都重要。我们已经看到，这样的累赘信息会影响一些模型表现。数据预处理，如移除高度相关的预测变量，能够缓解该问题。其次，单变量分析得到的重要性不能够鉴定出某组变量在一起对结果变量的强烈作用。例如，两个预测变量单独考虑是可能和结果变量的相关性都不高，然而它们之间的交互效应可能很强烈。单变量的相关性分析无法捕捉到这样的预测关系。一个明智的策略是进一步的探索预测变量这些方面的信息，而不是仅仅用单一的排序方法试图理解潜在的趋势。要想知道该探索什么样的数据间关系通常需要与特定数据相关的专业背景知识。
-
-原书P466
-图18-2：溶解度数据中20个连续预测变量重要性的分的散点图矩阵。两个表面面积预测变量用红色方框标出
-
-当预测变量是分类变量时，我们需要使用其它方法。在溶解度数据中有208个指纹预测变量，这些是指针变量，用于表示化合物的特定原子结构。决定每个二进制预测变量于反应变量关联的最直接的方法是检测每类中反应变量均值是否有差异。以指纹FP175为例，有该原子结构和没有该原子结构的样本平均溶解度的差别是−0.002。考虑到溶解度观测分布在−11.6 到1.6 范围内，这个差别貌似是可以忽略的。另外指纹FP044对应的溶解度不同是−4.1。这个值更大，但单纯看这一个数字不一定有信息量。数据的波动性也应该纳入考虑。
-
-比较两组均值最自然的方法是标准t统计量，其本质上就是一个信号和噪音的比例（均值的不同除以两组方法的函数）。检验p值对应的零假设是“两组间没有显著差异”。该统计量建立在数据是正态分布的假设上。如果数据分布不符合该假设，或许可以使用其它更合适的方法（如Wilcoxon秩和检验）。
-
-原书P467
-图18-3： t检验应用于指纹预测变量结果火山图。红方框是指纹FP044 (对应最大的均值差异) 蓝色三角是指纹FP076 （统计上最显著的点）
-
-我们对208个指纹预测变量逐一进行t检验。不仅仅是依靠p值，图18-3是一个火山图，该图y轴是变换后的p值，x轴是溶解度均值差。纵轴值越大表明统计显著性越强（即：低p值）。大部分均值差异都是负数， 表明没有该原子结构的情况下溶解度偏高。FP044 对应的差异最大（图中红色方框）。然而这个差异并不是最显著的。指纹FP076 对应最显著的差异（图中蓝色三角）其均值差是 −2.3 对数单位。如前所述，t统计量是一个信号噪声比例。指纹FP044有最强的信号，同时其也有可观的方差，因此显著性不是最高的。关于这点可以从均值差别95%置信区间上看出：FP044置信区间(3.6, 4.7)，FP076置信区间(2.1, 2.6)。哪个预测变量更重要取决于具体环境和数据。如果信号足够大，模型可能可以克服噪声的干扰。在其它情况下，更小但是更精确的差别可能给出更好的表现。
-
-当预测变量对应类大于2时，可以用方法分析（ANOVA）的方法探索预测变量的显著性。然而，如果检测结果表明各类别对应的均值存在不同，下一步要做的是探索哪里不同。出于此原因，我们需要将该分类变量转化为几个0-1虚拟变量然后用前面的方法决定每一类和结果变量的关联。
+<p>该方法的优点是计算时间上较高效。缺点就是倾向于选择冗余的特征,因为他们不考虑特征之间的相关性,如果某一个特征重要性较高，所有和该特征高相关的特征重要性都会很高，。Guyon 和Elisseeff讨论了过滤过程中的冗余变量问题<span class="citation">(Guyon I <a href="#ref-Guyon2003">2003</a>)</span>。当然也有可能错过重要的特征，比如某一个特征的分类能力很差，但是它和某些其它特征组合起来会得到不错的效果。</p>
+<div id="section-9.3.1.1" class="section level4">
+<h4><span class="header-section-number">9.3.1.1</span> 特征重要性度量</h4>
+<p>特征重要性度量的方式和其类型有关，分类型和连续型特征度量差别很大，这和之间讲模型表现评估度量类似。这里我们按照不同的特征和应变量类型来介绍相应的常用度量。</p>
+<div id="section-9.3.1.1.1" class="section level5">
+<h5><span class="header-section-number">9.3.1.1.1</span> 数值型应变量</h5>
+<p>对于数值特征，最常用的就是简单相关性统计量。我们可以通过Pearson相关系数衡量线性相关，用Spearman相关系数衡量曲线相关。Kendall相关系数用来衡量两个变量观测排序的一致性。关于这些相关性的定义以及其它的相关性，大家可以很容易在网上找到。基于相关性过滤变量非常主观，你可以自己决定一个阈值，比如你重点研究哪些相关性大于0.5的变量，或者对相关性大于0.8的变量进一步可视化，这可以指导我们进行探索性数据分析。用基础包中的<code>cor()</code>函数可以很容易计算这些相关性：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat&lt;-<span class="kw">read.csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/SegData.csv&quot;</span>)
+<span class="co"># 对数据进行一些清理，删除错误的样本观测，消费金额不能为负数</span>
+dat&lt;-<span class="kw">subset</span>(dat,store_exp&gt;<span class="dv">0</span> &amp;<span class="st"> </span>online_exp&gt;<span class="dv">0</span> &amp;<span class="st"> </span>age&lt;<span class="dv">100</span>)
+<span class="co"># 计算Pearson相关性</span>
+<span class="kw">cor</span>(dat$age,dat$store_exp)</code></pre></div>
+<pre><code>## [1] 0.05760738</code></pre>
+<p>上面的代码并没有明确指定某种相关系数，这是<code>cor()</code>函数默认设置是计算年龄和在线消费量的Pearson相关性。如果要计算Pearson相关系数只要添加<code>method=</code>设置就可以：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cor</span>(dat$age,dat$online_exp,<span class="dt">method=</span><span class="st">&quot;spearman&quot;</span>)</code></pre></div>
+<pre><code>## [1] -0.3682889</code></pre>
+<p>类似的可以计算Kendall相关系数：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cor</span>(dat$age,dat$online_exp,<span class="dt">method=</span><span class="st">&quot;kendall&quot;</span>)</code></pre></div>
+<pre><code>## [1] -0.2019283</code></pre>
+<p>大家可以看到，这里Pearson相关系数和另外两个很不一样，因为年龄和在线消费量并不是线性的，而Pearson衡量的是线性关系，另外两个都没有线性的要求，所以更加接近。在这种情况下用非线性的相关系数更加合理。这里也可以很清楚的看到，这样过滤变量的方式非常粗糙，只能作为探索性的方法，对于复杂的关系并不适用。</p>
+<p>用一个相关性度量丢失了太多的信息，还有一个方法是适用局部加权回归模型（LOESS），该方法和滑动平均类似，对一系列局部区域样本应用多项式回归<span class="citation">(Cleveland W <a href="#ref-Cleveland1988">1988</a>)</span>。这类局部回归的方法有极强的适应性，可以有效得到平滑的回归趋势。基础包中的<code>loess()</code>函数可以进行LOESS平滑。用如下语句指定模型：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 建立loess模型</span>
+smoother &lt;-<span class="st"> </span><span class="kw">loess</span>(dat$online_exp ~<span class="st"> </span>dat$age)
+<span class="co"># 计算loess估值</span>
+pred.smoother&lt;-<span class="kw">predict</span>(smoother, dat$age)
+<span class="co"># 计算loess对应的RSS</span>
+rss&lt;-<span class="kw">sum</span>((dat$online_exp-pred.smoother)^<span class="dv">2</span>)
+<span class="co"># 计算因变量的TSS</span>
+tss&lt;-<span class="kw">sum</span>((dat$online_exp-<span class="kw">mean</span>(dat$online_exp))^<span class="dv">2</span>)
+<span class="co"># 通过RSS和TSS计算R-squared</span>
+(r2&lt;-<span class="dv">1</span>-rss/tss)</code></pre></div>
+<pre><code>## [1] 0.5126091</code></pre>
+<p>基于该拟合结果(<code>pred.smoother</code>)，通过残差可以计算<span class="math inline">\(R^{2}\)</span>统计量，我们可以用其作为相应变量重要性的度量。年龄变量对应的LOESS的<span class="math inline">\(R^{2}\)</span> 值是0.51。<code>lattice</code> 包中的函数 <code>xyplot()</code> 可以很方便的用来对LOESS结果进行可视化：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(lattice)
+<span class="kw">xyplot</span>(dat$online_exp ~<span class="st"> </span>dat$age,
+<span class="dt">type =</span> <span class="kw">c</span>(<span class="st">&quot;p&quot;</span>, <span class="st">&quot;smooth&quot;</span>),
+<span class="dt">xlab =</span> <span class="st">&quot;age&quot;</span>,
+<span class="dt">ylab =</span> <span class="st">&quot;online_exp&quot;</span>)</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-121-1.png" width="672" /></p>
+<p>此外，ggplot2包也可以很方便的对多种平滑方法进行可视化：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ggplot2)
+<span class="kw">ggplot</span>(dat,<span class="kw">aes</span>(age,online_exp))+<span class="kw">geom_smooth</span>()</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-122-1.png" width="672" /></p>
+<p>其中<code>geom_smooth()</code>默认设置是使用LOESS平滑，所以你不用进行额外的设置。其中蓝色的线代表LOESS平滑器拟合结果。</p>
+<p>可以通过<code>caret</code>包中的函数<code>filterVarImp</code>对每个预测变量建立LOESS模型，并且定量分析其与结果变量之间的关系。这里我们将10个问卷调查变量当作自变量，将实体店消费量和在线消费之和当作应变量，重新得到一个数据框，然后用其进行展示：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">TrainXtrans&lt;-dat[,<span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>,<span class="kw">names</span>(dat))]
+TrainY&lt;-dat$store_exp+dat$online_exp</code></pre></div>
+<p>然后用<code>filterVarImp()</code>函数：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 选项设置`nonpara = TRUE` (对于非参数回归)</span>
+loessResults &lt;-<span class="st"> </span><span class="kw">filterVarImp</span>(<span class="dt">x =</span> TrainXtrans, <span class="dt">y =</span> TrainY, <span class="dt">nonpara =</span> <span class="ot">TRUE</span>)
+<span class="kw">head</span>(loessResults)</code></pre></div>
+<pre><code>##       Overall
+## Q1 0.43921457
+## Q2 0.58319421
+## Q3 0.57849504
+## Q4 0.19425985
+## Q5 0.22560965
+## Q6 0.09568796</code></pre>
+<p>该函数返回每个特征用LOESS方法得到的重要性度量。上面这些评估特征的方法只是单独考虑每一个特征，而没有考虑特征之间的关系。这里考虑的是特征和应变量都是数值型的情况。如果特征是分类变量时该怎么办呢（比如服装消费者数据中的性别（<code>gender</code>）变量）？这种情况很自然的会想到t检验，寻找p&lt;0.05的变量：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">t.test</span>(online_exp~gender,<span class="dt">data=</span>dat)</code></pre></div>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  online_exp by gender
+## t = -3.1471, df = 784.02, p-value = 0.001711
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##  -579.1784 -134.2047
+## sample estimates:
+## mean in group Female   mean in group Male 
+##             1957.417             2314.109</code></pre>
+<p>当预测变量大于2时，可以使用方差分析（ANOVA）。我们用客户分组变量为例展示代码：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">anova</span>(<span class="kw">lm</span>(online_exp~segment,<span class="dt">data=</span>dat))</code></pre></div>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: online_exp
+##            Df     Sum Sq   Mean Sq F value    Pr(&gt;F)    
+## segment     3 2457017793 819005931  1560.8 &lt; 2.2e-16 ***
+## Residuals 994  521588437    524737                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>这里要注意，如之前所说，p值并不是一个很好的筛选变量的标准。但是有时我们需要对大量的变量进行筛选，找到需要进一步重点研究的候选变量，用p&lt;0.05作为一个标准确实是一个快速的方法。这里个人不建议大家在需要高精确度的模型中使用这样的变量筛选方式，但是在市场调查问卷中，可以用p值来大致判断那些问题在不同受访者群体中有显著差别。另外需要注意的是，p值小于0.05这个阈值不是不可改变的，事实上，你很可能会遇到重复检验的问题，我们需要对p值进行调整来缓解该问题。</p>
+<!--
 
 18.2 分类结果变量
 
@@ -948,9 +998,15 @@ Reshef和(2011) 介绍了一种新的定量分析两个变量之间关系的方�
 在前面的图18-2中展示了溶解度数据中连续预测变量的MIC统计量。由图可见，MIC值和其它度量方式间有强相关性。对图18-6中的细胞分割数据， MIC统计量和绝对t-统计量，ROC曲线下面积和随机森林分值高度相关，和ReliefF分值相关性更低。
 -->
 </div>
+</div>
+</div>
 <div id="section-9.3.2" class="section level3">
 <h3><span class="header-section-number">9.3.2</span> 绕封法</h3>
 <p>wrapper方法实质上是一个分类器，封装器用选取的特征子集对样本集进行分类，分类的精度作为衡量特征子集好坏的标准,经过比较选出最好的特征子集。常用的有逐步回归（Stepwise regression）、向前选择（Forward selection）和向后选择（Backward selection）。它的优点是考虑了特征与特征之间的关联性，缺点是：当观测数据较少时容易过拟合，而当特征数量较多时,计算时间又会增长。</p>
+</div>
+<div id="section-9.3.3" class="section level3">
+<h3><span class="header-section-number">9.3.3</span> 总结</h3>
+<p>有监督的变量筛选可以是数据驱动的。筛选结果加上相关学科专家的意见能使我们朝建立有效预测模型的目标前进一大步。我们会在下个章节中看到，很多变量筛选算法基于定量相关性得分。之前的章节曾提到过，很多预测模型本身就能够测量预测变量的重要性，如MARS以及许多基于树的模型会监测每加入一个预测变量时模型表现的提升。其它模型，如线性回归或者逻辑回归通过模型参数或则统计量（如t统计量）对量化模型结果。本章讨论的方法并不限定于一个具体的预测模型。如果已经建立了有效的模型，基于模型得出的评分比本章将要提到的通用方法或许更可靠，因为其直接针对该模型。</p>
 <!--
 ```r
 library(MASS)
@@ -1025,6 +1081,12 @@ summary(fit2)
 </div>
 <div id="ref-APM">
 <p>Max Kuhn, Kjell Johnston. 2013. <em>Applied Predictive Modeling</em>. Springer.</p>
+</div>
+<div id="ref-Guyon2003">
+<p>Guyon I, Elisseeff A. 2003. “An Introduction to Variable and Feature Selec- Tion.” <em>The Journal of Machine Learning Research</em> 3: 1157–82.</p>
+</div>
+<div id="ref-Cleveland1988">
+<p>Cleveland W, Devlin S. 1988. “Locally Weighted Regression: An Approach to Regression Analysis by Local Fitting.” <em>Journal of the American Statistical Association</em>, 596–610.</p>
 </div>
 </div>
             </section>
