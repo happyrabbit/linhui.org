@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-07-24">
+<meta name="date" content="2016-07-27">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -188,7 +188,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="9.2.4" data-path="section-9.html"><a href="section-9.html#section-9.2.4"><i class="fa fa-check"></i><b>9.2.4</b> 高维标度化</a></li>
 <li class="chapter" data-level="9.2.5" data-path="section-9.html"><a href="section-9.html#section-9.2.5"><i class="fa fa-check"></i><b>9.2.5</b> 知识扩展</a></li>
 </ul></li>
-<li class="chapter" data-level="9.3" data-path="section-9.html"><a href="section-9.html#section-9.3"><i class="fa fa-check"></i><b>9.3</b> 变量选择</a></li>
+<li class="chapter" data-level="9.3" data-path="section-9.html"><a href="section-9.html#section-9.3"><i class="fa fa-check"></i><b>9.3</b> 特征选择</a><ul>
+<li class="chapter" data-level="9.3.1" data-path="section-9.html"><a href="section-9.html#section-9.3.1"><i class="fa fa-check"></i><b>9.3.1</b> 过滤法</a></li>
+<li class="chapter" data-level="9.3.2" data-path="section-9.html"><a href="section-9.html#section-9.3.2"><i class="fa fa-check"></i><b>9.3.2</b> 绕封法</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="10" data-path="section-10.html"><a href="section-10.html"><i class="fa fa-check"></i><b>10</b> 线性回归极其衍生</a><ul>
 <li class="chapter" data-level="10.1" data-path="section-10.html"><a href="section-10.html#section-10.1"><i class="fa fa-check"></i><b>10.1</b> 普通线性回归</a><ul>
@@ -324,12 +327,12 @@ y_{n}
 E(\mathbf{y}-\hat{\mathbf{y}})^{2}=E[f(\mathbf{X})+\mathbf{\epsilon}-\hat{f}(\mathbf{X})]^{2}=\underset{\text{(1)}}{\underbrace{[f(\mathbf{X})-\hat{f}(\mathbf{X})]^{2}}}+\underset{\text{(2)}}{\underbrace{Var(\mathbf{\epsilon})}}
   \label{eq:error}\]</span></p>
 <p>其中（1）是系统误差， <span class="math inline">\(\hat{f}\)</span>通常不能彻底对<span class="math inline">\(\mathbf{X}\)</span>和<span class="math inline">\(\mathbf{y}\)</span>之间的“系统关系”建模，这里系统关系指的是在不同样本上存在的稳定关系。这一部分误差能通过改进模型得到提高；（2）是随机误差，这部分误差代表当前数据无法解释的部分，因此无法通过建立更复杂的模型来改进。那些拥有众多参数的复杂黑箱模型最大的问题就是试图通过自变量解释这部分误差，也就是过度拟合。随机误差的显著特点就是在不同的样本上是无法重复的，于是判断是否存在过度拟合的一个准则就是预留一部分样本作为测试集，然后检验训练出来的模型在测试集上的表现。这个我们随后会讲到。这里要澄清一点，过度拟合不只发生在这些黑箱模型上，其发生的根源在于参数个数太多（常超过观测个数），理论上说任何模型都可能过度拟合，只是因为黑箱模型的参数尤其多，其高灵活性和复杂度放大了过度拟合的问题。有些黑箱模型在训练的过程中会使用“袋外数据”（又称为Out of Bag [OOB]）来尽量避免过度拟合的影响。</p>
-<p>如果建模的目的也包含推断，那么这些“黑箱”模型就不合适，这就需要在模型可以解释的范围内使用尽量灵活的模型，比如Lasso回归，多元自适应回归样条等。有人可能不同意Lasso回归是灵活的。从其本质还是传统回归的角度看，它确实没有那么灵活，受到很多模型假设的限制。但由于Lasso的罚函数能同时起到变量选择的作用，这个变量的选择的过程可以不依赖于p值之类的参数（这些参数基于数据分布假设因此具有局限性），而可以通过优化模型预测值和真实值的差距来进行变量选择，从这个角度上看，该模型是灵活的。根据笔者的应用经验，Lasso作为收缩（或变量选择）方法在实际应用中的效果非常好。对于一些市场营销或者社会心理学相关的抽样调查数据分析，分层贝叶斯是一种灵活有效的方法。</p>
+<p>如果建模的目的也包含推断，那么这些“黑箱”模型就不合适，这就需要在模型可以解释的范围内使用尽量灵活的模型，比如Lasso回归，多元自适应回归样条等。有人可能不同意Lasso回归是灵活的。从其本质还是传统回归的角度看，它确实没有那么灵活，受到很多模型假设的限制。但由于Lasso的罚函数能同时起到变量选择的作用，这个变量的选择的过程可以不依赖于p值之类的参数（这些参数基于数据分布假设因此具有局限性），而可以通过优化模型预测值和真实值的差距来进行变量选择，从这个角度上看，该模型是灵活的。根据笔者的应用经验，Lasso作为收缩（或变量选择）方法在实际应用中的效果非常好。对于一些市场营销或者社会心理学相关的抽样调查数据分析，分层贝叶斯可能是一种灵活有效的方法，但拟合所需的计算时间更长。</p>
 <p>模型选择向来是非常困难的，这种困难不是数据分析行业特有的，很多专业领域都有类似的情况，比如医生判断病人所患的疾病，并在众多治疗方案中选择最合适的，这不是答案一目了然的选择题，决策的过程需要很多权衡和妥协。模型选择也类似，在选择过程中需要考虑具体的情况：项目目的，客户要求的精确度（这点很重要），计算量等等。这个选择的过程很难白纸黑字的像食谱一样写下来，这里我们只是尽己所能的介绍模型选择过程中需要考虑的点，以及评估不同模型的辅助性技术。具体的应用和“数据科学思维”还需要大家在从业过程中通过实践思考不断学习打磨。</p>
 </div>
 <div id="section-7.2.2" class="section level3">
 <h3><span class="header-section-number">7.2.2</span> 应变量误差</h3>
-<p>若应变量包含可观的测量误差，那么这部分误差将反映在随机误差（<span class="math inline">\(\mathbf{\epsilon}\)</span>）中。这部分误差使得均方根误差（RMSE）和<span class="math inline">\(R^2\)</span>有相应的上下限。RMSE和<span class="math inline">\(R^2\)</span>是回归模型常用的表现度量方法，我们在本章后面部分会进行介绍。因此，随机误差项不仅仅代表模型无法解释的波动，还含有测量误差。《应用预测模型（Applied Predictive Modeling）》<span class="citation">(Max Kuhn <a href="#ref-APM">2013</a>)</span>的第20.2小节有一个例子展示了因变量的测量误差对模型表现（RMSE和<span class="math inline">\(R^2\)</span>）的影响。作者在因变量上加入了不同强度的随机正态噪声，重复拟合不同的模型，研究模型均方根误差（RMSE）和<span class="math inline">\(R^2\)</span>的变化。这里我们用服装消费者数据进行类似的展示。假设我们面对这样一个问题，实际中消费者的收入并不是那么容易收集，很多人不愿透露这样的私人信息。于是我们希望利用消费记录变量建立关于消费者收入的预测模型，模型可以对那些数据库中缺失收入信息的记录进行填补。我们建立下面模型：</p>
+<p>若应变量包含可观的测量误差，那么这部分误差将反映在随机误差（<span class="math inline">\(\mathbf{\epsilon}\)</span>）中。这部分误差使得均方根误差（RMSE）和<span class="math inline">\(R^2\)</span>有相应的上下限。RMSE和<span class="math inline">\(R^2\)</span>是回归模型常用的表现度量方法，我们在本章后面部分会进行介绍。因此，随机误差项不仅仅代表模型无法解释的波动，还含有测量误差。《应用预测建模（Applied Predictive Modeling）》<span class="citation">(Max Kuhn <a href="#ref-APM">2013</a>)</span>的第20.2小节有一个例子展示了因变量的测量误差对模型表现（RMSE和<span class="math inline">\(R^2\)</span>）的影响。作者在因变量上加入了不同强度的随机正态噪声，重复拟合不同的模型，研究模型均方根误差（RMSE）和<span class="math inline">\(R^2\)</span>的变化。这里我们用服装消费者数据进行类似的展示。假设我们面对这样一个问题，实际中消费者的收入并不是那么容易收集，很多人不愿透露这样的私人信息。于是我们希望利用消费记录变量建立关于消费者收入的预测模型，模型可以对那些数据库中缺失收入信息的记录进行填补。我们建立下面模型：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 载入数据</span>
 sim.dat&lt;-<span class="kw">read.csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/SegData.csv&quot;</span>)
 ymad&lt;-<span class="kw">mad</span>(<span class="kw">na.omit</span>(sim.dat$income))
