@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-07-27">
+<meta name="date" content="2016-08-09">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -269,7 +269,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>特征构建需要很强的洞察力和分析能力，要求我们能够从原始数据中找出一些具有物理意义的特征。假设原始数据是表格数据，一般你可以使用混合属性或者组合属性来创建新的特征，或是分解或切分原有的特征来创建新的特征。比如之前在数据预处理那章中讲编码名义变量时，我们将分类变量<code>gender</code>(性别)转化为两个名义变量：<code>Female</code>和<code>Male</code>。之后考虑收入和性别的交互效应(<code>income:gender</code>)也是一种特征构建。另外再举一个例子，假设你有一个日期时间 (2006-04-01 02:26:00)该如何转换呢？对于这种时间的数据，我们可以根据需求提取出多种属性。比如下面这个从农业论坛爬取的文本数据。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(readr)
 <span class="kw">library</span>(dplyr)
-topic&lt;-<span class="kw">read_csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/Hui/Project/NLP/RawData/newagtalk-20150607/topic.csv&quot;</span>)
+topic&lt;-<span class="kw">read_csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/NLP/RawData/newagtalk-20150607/topic.csv&quot;</span>)
 <span class="kw">glimpse</span>(topic)</code></pre></div>
 <pre><code>## Observations: 209,607
 ## Variables: 6
@@ -895,23 +895,37 @@ loessResults &lt;-<span class="st"> </span><span class="kw">filterVarImp</span>(
 ## Residuals 994  521588437    524737                      
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<p>这里要注意，如之前所说，p值并不是一个很好的筛选变量的标准。但是有时我们需要对大量的变量进行筛选，找到需要进一步重点研究的候选变量，用p&lt;0.05作为一个标准确实是一个快速的方法。这里个人不建议大家在需要高精确度的模型中使用这样的变量筛选方式，但是在市场调查问卷中，可以用p值来大致判断那些问题在不同受访者群体中有显著差别。另外需要注意的是，p值小于0.05这个阈值不是不可改变的，事实上，你很可能会遇到重复检验的问题，我们需要对p值进行调整来缓解该问题。</p>
+<p>这里要注意，如之前所说，p值并不是一个很好的筛选变量的标准。但是有时我们需要对大量的变量进行筛选，找到需要进一步重点研究的候选变量，用p&lt;0.05作为一个标准确实是一个快速的方法。这里个人不建议大家在需要高精确度的模型中使用这样的变量筛选方式，但是在市场调查问卷中，可以用p值来大致判断那些问题在不同受访者群体中有显著差别。另外需要注意的是，p值小于0.05这个阈值不是不可改变的，事实上，你很可能会遇到重复检验的问题，我们需要对p值进行调整来缓解该问题，比如Bonferroni校正<span class="citation">(Bland J <a href="#ref-Bland1995">1995</a>)</span>。如果要做k次统计检验，定义统计显著性p值的原始阈值为a，那么将该值调整为<span class="math inline">\(\frac{a}{k}\)</span>能提高检验的可信度。但该校正方法可能过度保守。</p>
+</div>
+<div id="section-9.3.1.1.2" class="section level5">
+<h5><span class="header-section-number">9.3.1.1.2</span> 分类应变量</h5>
+<p>对于特征是数值型，应变量是分类型的情况，我们可以使用ROC曲线下面积量化特征和应变量的相关性。之前在模型评估的部分中我们已经讲过ROC曲线下面积。这里我们将服装消费者数据中的是否有房的指示变量当作应变量，其它一些数值特征当作自变量展示如何使用<code>filterVarImp()</code>函数实现重要性分值的计算：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vars&lt;-<span class="kw">c</span>(<span class="st">&quot;age&quot;</span>,<span class="st">&quot;income&quot;</span>,<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>)
+x&lt;-<span class="kw">subset</span>(dat,<span class="dt">select=</span>vars)
+y&lt;-dat$house
+rocValues &lt;-<span class="st"> </span><span class="kw">filterVarImp</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y)
+rocValues</code></pre></div>
+<pre><code>##                   No       Yes
+## age        0.7968303 0.7968303
+## income     0.7590159 0.7590159
+## store_exp  0.7985940 0.7985940
+## online_exp 0.4339279 0.4339279</code></pre>
+<p>如果某特征能够完美的将两类样本分离，那么存在一个阈值能够给出100%的敏感度和特异度，这时曲线下面积是1。如前所述，一个和结果变量全不相关的预测变量对应的曲线下面积大概是0.5。上面结果显示在线消费量（<code>online_exp</code>）对区分有房和无房的人没有帮助。</p>
+<p>当有三个或三个以上类别的时候，我们可以使用ROC曲线的推广<span class="citation">(H. J and B <a href="#ref-hanley1982">1982</a>; E.R. DeLong <a href="#ref-delong1988">1988</a>; E <a href="#ref-venk2000">2000</a>)</span>。或则我们可以将除某一类外的其它类合并在一起,这样对每一类我们都会得到相应的AUC（曲线下面积）值。总体区分度可以量化为这些类AUC的平均。<code>filterVarImp()</code>函数能够分别计算其中任何两类之间的ROC曲线然后给出最大的线下面积:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">y&lt;-dat$segment
+rocValues &lt;-<span class="st"> </span><span class="kw">filterVarImp</span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y)
+rocValues</code></pre></div>
+<pre><code>##            Conspicuous      Price   Quality      Style
+## age        0.999457286 0.99945729 0.2787940 0.05644699
+## income     0.079660533 0.07966053 0.9637399 0.96373994
+## store_exp  0.005701862 0.05052000 0.0505200 0.03369628
+## online_exp 0.028566903 1.00000000 1.0000000 1.00000000</code></pre>
+<p>一个更简单的方法是检测不同类样本对应某预测变量的观测平均值是否有差别。这和前一小节提到的方法类似，不同的是在这里预测变量的观测被当作“结果”。</p>
 <!--
-
-18.2 分类结果变量
-
-对于分类结果变量和数值预测变量的情况，有几种方法能够量化分析预测变量的重要性。
-我们在这里将以第三章里提到的图像分割数据为例讲解这些方法。图18-4展示了两个预测变量的直方图（通道1的纤维宽度（fiber width）和通道4的点纤维个数（spot fiber count））。由图可见两类样本对应的纤维宽度观测分布有水平漂移，然而两个类的点纤维个数的分布情况相似。
-
-原书P468
-图18-4： 细胞分割数据中两个预测变量直方图。上下按结果变量的类别划分
-
-对于结果变量有两个类的情况，可以使用ROC线下面积量化预测变量和结果变量的相关性。11.3和16.4节中的ROC曲线针对预测的类概率。这里的ROC曲线是针对预测变量。如果该预测变量能够完美的将两类样本分离，那么存在一个阈值能够给出100%的敏感度和特异度，这是曲线下面积是1。如前所述，一个和结果变量全不相关的预测变量对应的曲线下面积大概是0.5。图18-5展示了纤维宽度和点纤维个数分别对应的曲线下面积。纤维宽度对应的线下面积是0.836，点纤维个数对应的线下面积是0.538。这个图18-4展示的情况一致，纤维宽度更能区分两个类别。
-
 原书P469
 图18-5： 细胞分割数据中两个预测变量对应的ROC曲线
 
-当类的个数多于2时，我们可以使用ROC曲线的推广（Hanley和McNeil (1982), DeLong等 (1988), Venkatraman (2000),Pepe等 (2009)）。或则我们可以使用“一对多”ROC曲线，将除某一类外的其它类合并在一起。这样，对每一类我们都会得到相应的AUC（曲线下面积）值。总体区分度可以量化为这些类AUC的平均。
+当类的个数多于2时，
 
 此外，一个更简单的方法是检测不同类样本对应某预测变量的观测平均值是否有差别。这和前一小节提到的方法类似，不同的是在这里预测变量的观测被当作“结果”。这里不能用火山图因为不同变量的刻度可能不一样。然而即使预测变量的刻度不同，我们也可以使用t统计量比较它们的不同。对于纤维宽度，t统计量为-19，有强烈的信号表明不同类样本的纤维宽度有显著的不同，这些差异不仅来源于随机噪声。对于点纤维数目来说，这样的信号就弱的多，t 统计量是3。
 
@@ -1087,6 +1101,18 @@ summary(fit2)
 </div>
 <div id="ref-Cleveland1988">
 <p>Cleveland W, Devlin S. 1988. “Locally Weighted Regression: An Approach to Regression Analysis by Local Fitting.” <em>Journal of the American Statistical Association</em>, 596–610.</p>
+</div>
+<div id="ref-Bland1995">
+<p>Bland J, Altman D. 1995. “Statistics Notes: Multiple Significance Tests: The Bonferroni Method.” <em>British Medical Journal</em> 310 (6973): 170–70.</p>
+</div>
+<div id="ref-hanley1982">
+<p>J, Hanley, and McNeil B. 1982. “The Meaning and Use of the Area Under a Receiver Operating (ROC) Curvel Characteristic.” <em>Radiology</em> 143 (1).</p>
+</div>
+<div id="ref-delong1988">
+<p>E.R. DeLong, D.L. Clarke-Pearson, D.M. DeLong. 1988. “Comparing the Areas Under Two or More Correlated Receiver Operating Characteristics Curves: A Nonparametric Approach.” <em>Biometrics</em> 44: 837–45.</p>
+</div>
+<div id="ref-venk2000">
+<p>E, Venkatraman. 2000. “A Permutation Test to Compare Receiver Operating Characteristic Curves.” <em>Biometrics</em> 56 (4): 1134–8.</p>
 </div>
 </div>
             </section>
