@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-08-09">
+<meta name="date" content="2016-08-13">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -335,7 +335,7 @@ airline&lt;-<span class="kw">read.csv</span>(<span class="st">&quot;/Users/happy
 <p>我们用<code>corrplot()</code>函数检查问卷调查问题的相关性：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(corrplot)
 <span class="co"># 选取其中的问卷调查项</span>
-<span class="kw">select</span>(airline,Easy_Reservation:Recommend)%&gt;%
+dplyr::<span class="kw">select</span>(airline,Easy_Reservation:Recommend)%&gt;%
 <span class="st">  </span><span class="co"># 得到相关矩阵</span>
 <span class="st">  </span><span class="kw">cor</span>()%&gt;%
 <span class="st">  </span><span class="co"># 用corrplot()绘制相关图</span>
@@ -373,7 +373,7 @@ airline&lt;-<span class="kw">read.csv</span>(<span class="st">&quot;/Users/happy
 <p>对于这样的数据初步探索，一个非常自然的问题是：每个航空公司对应的各项评分均值是多少？我们可以用之前介绍的<code>dplyr</code>包中的各种函数，以及使用之前讲到的管道操作<code>%&gt;%</code>让代码更易读：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 选取其中的问卷调查项和航空公司因子信息</span>
 <span class="co"># 即删除ID项</span>
-airline.mean&lt;-<span class="kw">select</span>(airline,-ID)%&gt;%
+airline.mean&lt;-dplyr::<span class="kw">select</span>(airline,-ID)%&gt;%
 <span class="st">  </span><span class="co"># 按Airline对数据进行分组总结</span>
 <span class="st">  </span><span class="kw">group_by</span>(Airline)%&gt;%
 <span class="st">  </span><span class="co"># 对每个数值</span>
@@ -406,7 +406,7 @@ airline.mean&lt;-<span class="kw">select</span>(airline,-ID)%&gt;%
 <span class="kw">library</span>(RColorBrewer)
 <span class="co"># 将航空公司设置成行名称然后将对应的字符列删除</span>
 <span class="kw">row.names</span>(airline.mean)&lt;-airline.mean$Airline
-airline.mean&lt;-<span class="kw">select</span>(airline.mean,-Airline)
+airline.mean&lt;-dplyr::<span class="kw">select</span>(airline.mean,-Airline)
 <span class="co"># 绘制热图</span>
 <span class="kw">heatmap.2</span>(<span class="kw">as.matrix</span>(airline.mean),
           <span class="dt">col=</span><span class="kw">brewer.pal</span>(<span class="dv">9</span>,<span class="st">&quot;YlGn&quot;</span>),<span class="dt">trace=</span><span class="st">&quot;none&quot;</span>,<span class="dt">key=</span><span class="ot">FALSE</span>,<span class="dt">dend=</span><span class="st">&quot;none&quot;</span>,<span class="dt">cexCol=</span><span class="fl">0.6</span>,<span class="dt">cexRow =</span><span class="dv">1</span>)
@@ -419,7 +419,7 @@ airline.mean&lt;-<span class="kw">select</span>(airline.mean,-Airline)
 <div id="section-9.2.2" class="section level3">
 <h3><span class="header-section-number">9.2.2</span> 主成分分析</h3>
 <p>主成分分析（PCA）是寻找变量的线性组合，得到新的组合变量叫做“成分”，其指导思想是尽量捕捉原数据中方差。在统计学中，方差通常也被认为是信息。第一个成分捕捉的方差最大。第二个成分尽可能多的捕捉前一个成分没有解释的方差。依次类推，直到成分的数目和原变量数目一样多。我们通过使用前几个成分取代原变量来达到降维的目的，同时要保证这些成分能够解释大部分原始数据集中的方差。这里要提醒一点，如果数据观测不在一个标度上时需要对数据进行标准化，因为PCA是基于变量协方差矩阵。这里因为各个变量的观测分布没有很大差异，是不是标准化没有太大的影响。</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">airline.pc&lt;-<span class="kw">select</span>(airline,Easy_Reservation:Recommend)%&gt;%
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">airline.pc&lt;-dplyr::<span class="kw">select</span>(airline,Easy_Reservation:Recommend)%&gt;%
 <span class="st">  </span><span class="kw">prcomp</span>()
 <span class="kw">summary</span>(airline.pc)</code></pre></div>
 <pre><code>## Importance of components:
@@ -452,7 +452,7 @@ The fitted values for a variable are the result of projecting the points in the 
 Thus, vectors that point in the same direction correspond to variables that have similar response profiles, and can be interpreted as having similar meaning in the context set by the data.
 -->
 <p>满意度评分PCA结果的双标图中红色的箭头中看到不同调查问题的聚类情况，并且可以大致感觉样本的聚类情况，大致成为3类，一个合理的猜测是针对3个不同的航空公司。从之前的热图可以看到，3个公司有各自的优势和劣势，评分分布显然是不同的。但这样的图有个问题：基于所有评分样本导致图形非常稠密，难以识别。如果是基于各个公司聚合后的数据，得到的图或许会更清晰。</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">airline.mean.pc&lt;-<span class="kw">select</span>(airline.mean,Easy_Reservation:Recommend)%&gt;%
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">airline.mean.pc&lt;-dplyr::<span class="kw">select</span>(airline.mean,Easy_Reservation:Recommend)%&gt;%
 <span class="st">  </span><span class="kw">prcomp</span>()
 <span class="kw">biplot</span>(airline.mean.pc,<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>,<span class="dt">main=</span><span class="st">&quot;聚合后PCA结果双标图&quot;</span>,
        <span class="dt">cex=</span><span class="fl">0.7</span>, <span class="dt">expand=</span><span class="dv">2</span>,<span class="dt">xlim=</span><span class="kw">c</span>(-<span class="fl">0.8</span>, <span class="dv">1</span>),<span class="dt">ylim=</span><span class="kw">c</span>(-<span class="fl">0.7</span>,<span class="fl">0.8</span>))</code></pre></div>
@@ -804,6 +804,7 @@ x_{ip}
 </ol>
 <p>回答这三个问题的共同前提是得先有一个评判模型“好”和“坏”的标准。前两个问题在建模技术那章已经给出了一般性的解答，通常使用数据划分和再抽样的方式，根据建模目的不同，选择不同的评判标准，在此基础上检验模型拟合和预测情况。这章我们主要回答第3个问题。虽然所有自变量对于解释因变量来说都是重要的这样的情况可能发生，但更常见的是因变量只和一部分自变量有关。特征选择的主要目的是删除无信息变量或冗余变量，从而达到降维的效果。</p>
 <p>《应用预测建模》书中<span class="citation">(Max Kuhn <a href="#ref-APM">2013</a>)</span>第19章的第1小节以一个化学物质溶解度的数据为例，研究了冗余预测变量产生的影响。其中比较了下面模型：线性回归、偏最小二乘、单一回归树、多元自适性样条回归、随机森林、神经网络、径向基函数的支持向量机。结果显示，回归树和MARS模型由于自带的特征选择功能不受（额外无信息变量的）影响。随机森林虽然效果随着无信息变量个数的增加略有下降，但影响并不大，这是因为该算法随机选择预测变量作为分裂点会强制模型使用一些不重要的预测变量。受无信息影响最大的是线性回归、偏最小二乘和神经网络。问题最严重的是神经网络，这可能是因为模型中加入了过多的无信息变量。特征选择不仅仅对模型预测效果有好处，也使得模型更加简单且易于解释。</p>
+<p>其实寻找全局最优解的方法理论上很简单，但是实际操作是不可能的。就是在所有可能的变量子集上拟合模型，找到最优的子集。所有特征选择的方法严格上说都是在一定条件下的局部最优解。</p>
 <p>特征选择的方法主要可以分成3类：</p>
 <ol style="list-style-type: decimal">
 <li>过滤法（filter）</li>
@@ -818,9 +819,7 @@ x_{ip}
 <div id="section-9.3.1.1" class="section level4">
 <h4><span class="header-section-number">9.3.1.1</span> 特征重要性度量</h4>
 <p>特征重要性度量的方式和其类型有关，分类型和连续型特征度量差别很大，这和之间讲模型表现评估度量类似。这里我们按照不同的特征和应变量类型来介绍相应的常用度量。</p>
-<div id="section-9.3.1.1.1" class="section level5">
-<h5><span class="header-section-number">9.3.1.1.1</span> 数值型应变量</h5>
-<p>对于数值特征，最常用的就是简单相关性统计量。我们可以通过Pearson相关系数衡量线性相关，用Spearman相关系数衡量曲线相关。Kendall相关系数用来衡量两个变量观测排序的一致性。关于这些相关性的定义以及其它的相关性，大家可以很容易在网上找到。基于相关性过滤变量非常主观，你可以自己决定一个阈值，比如你重点研究哪些相关性大于0.5的变量，或者对相关性大于0.8的变量进一步可视化，这可以指导我们进行探索性数据分析。用基础包中的<code>cor()</code>函数可以很容易计算这些相关性：</p>
+<p><strong>当应变量和特征都是数值型时</strong>，最常用的就是简单相关性统计量。我们可以通过Pearson相关系数衡量线性相关，用Spearman相关系数衡量曲线相关。Kendall相关系数用来衡量两个变量观测排序的一致性。关于这些相关性的定义以及其它的相关性，大家可以很容易在网上找到。基于相关性过滤变量非常主观，你可以自己决定一个阈值，比如你重点研究哪些相关性大于0.5的变量，或者对相关性大于0.8的变量进一步可视化，这可以指导我们进行探索性数据分析。用基础包中的<code>cor()</code>函数可以很容易计算这些相关性：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat&lt;-<span class="kw">read.csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/SegData.csv&quot;</span>)
 <span class="co"># 对数据进行一些清理，删除错误的样本观测，消费金额不能为负数</span>
 dat&lt;-<span class="kw">subset</span>(dat,store_exp&gt;<span class="dv">0</span> &amp;<span class="st"> </span>online_exp&gt;<span class="dv">0</span> &amp;<span class="st"> </span>age&lt;<span class="dv">100</span>)
@@ -872,7 +871,7 @@ loessResults &lt;-<span class="st"> </span><span class="kw">filterVarImp</span>(
 ## Q4 0.19425985
 ## Q5 0.22560965
 ## Q6 0.09568796</code></pre>
-<p>该函数返回每个特征用LOESS方法得到的重要性度量。上面这些评估特征的方法只是单独考虑每一个特征，而没有考虑特征之间的关系。这里考虑的是特征和应变量都是数值型的情况。如果特征是分类变量时该怎么办呢（比如服装消费者数据中的性别（<code>gender</code>）变量）？这种情况很自然的会想到t检验，寻找p&lt;0.05的变量：</p>
+<p>该函数返回每个特征用LOESS方法得到的重要性度量。上面这些评估特征的方法只是单独考虑每一个特征，而没有考虑特征之间的关系。这里考虑的是特征和应变量都是数值型的情况。<strong>如果特征是分类变量时该怎么办呢</strong>（比如服装消费者数据中的性别（<code>gender</code>）变量）？这种情况很自然的会想到t检验，寻找p&lt;0.05的变量：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">t.test</span>(online_exp~gender,<span class="dt">data=</span>dat)</code></pre></div>
 <pre><code>## 
 ##  Welch Two Sample t-test
@@ -896,10 +895,7 @@ loessResults &lt;-<span class="st"> </span><span class="kw">filterVarImp</span>(
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>这里要注意，如之前所说，p值并不是一个很好的筛选变量的标准。但是有时我们需要对大量的变量进行筛选，找到需要进一步重点研究的候选变量，用p&lt;0.05作为一个标准确实是一个快速的方法。这里个人不建议大家在需要高精确度的模型中使用这样的变量筛选方式，但是在市场调查问卷中，可以用p值来大致判断那些问题在不同受访者群体中有显著差别。另外需要注意的是，p值小于0.05这个阈值不是不可改变的，事实上，你很可能会遇到重复检验的问题，我们需要对p值进行调整来缓解该问题，比如Bonferroni校正<span class="citation">(Bland J <a href="#ref-Bland1995">1995</a>)</span>。如果要做k次统计检验，定义统计显著性p值的原始阈值为a，那么将该值调整为<span class="math inline">\(\frac{a}{k}\)</span>能提高检验的可信度。但该校正方法可能过度保守。</p>
-</div>
-<div id="section-9.3.1.1.2" class="section level5">
-<h5><span class="header-section-number">9.3.1.1.2</span> 分类应变量</h5>
-<p>对于特征是数值型，应变量是分类型的情况，我们可以使用ROC曲线下面积量化特征和应变量的相关性。之前在模型评估的部分中我们已经讲过ROC曲线下面积。这里我们将服装消费者数据中的是否有房的指示变量当作应变量，其它一些数值特征当作自变量展示如何使用<code>filterVarImp()</code>函数实现重要性分值的计算：</p>
+<p><strong>对于特征是数值型，应变量是分类型的情况</strong>，我们可以使用ROC曲线下面积量化特征和应变量的相关性。之前在模型评估的部分中我们已经讲过ROC曲线下面积。这里我们将服装消费者数据中的是否有房的指示变量当作应变量，其它一些数值特征当作自变量展示如何使用<code>filterVarImp()</code>函数实现重要性分值的计算：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">vars&lt;-<span class="kw">c</span>(<span class="st">&quot;age&quot;</span>,<span class="st">&quot;income&quot;</span>,<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>)
 x&lt;-<span class="kw">subset</span>(dat,<span class="dt">select=</span>vars)
 y&lt;-dat$house
@@ -921,97 +917,97 @@ rocValues</code></pre></div>
 ## store_exp  0.005701862 0.05052000 0.0505200 0.03369628
 ## online_exp 0.028566903 1.00000000 1.0000000 1.00000000</code></pre>
 <p>一个更简单的方法是检测不同类样本对应某预测变量的观测平均值是否有差别。这和前一小节提到的方法类似，不同的是在这里预测变量的观测被当作“结果”。</p>
-<!--
-原书P469
-图18-5： 细胞分割数据中两个预测变量对应的ROC曲线
-
-当类的个数多于2时，
-
-此外，一个更简单的方法是检测不同类样本对应某预测变量的观测平均值是否有差别。这和前一小节提到的方法类似，不同的是在这里预测变量的观测被当作“结果”。这里不能用火山图因为不同变量的刻度可能不一样。然而即使预测变量的刻度不同，我们也可以使用t统计量比较它们的不同。对于纤维宽度，t统计量为-19，有强烈的信号表明不同类样本的纤维宽度有显著的不同，这些差异不仅来源于随机噪声。对于点纤维数目来说，这样的信号就弱的多，t 统计量是3。
-
-对于细胞分割数据，我们逐一尝试上述各种方法评估了58个连续型预测变量，此外我们用了随机森林算法给出的预测变量重要性分值和18.3节提到的两种方法(MIC 和 Relief算法)。这些方法给出的结果比较 一致（图18-6）。ROC线下面积和随机森林重要性分值之间明显曲线相关，和t统计量线性相关。 t统计量和随机森林指出的重要性较低的变量相似，但两种方法给出的最重要的变量排序有些不同。总的来说3个变量的重要性排序靠前：平均强度（通道2），纤维宽度（通道1）和总体强度（通道2） 。
-
-原书P470
-图18-6：图像分割数据中不同预测变量重要性量化值散点图矩阵
-
-当预测变量是分类变量时，有几种用于测量变量重要性的方法。对于二分类预测变量，一个 有效的方式是是使用让步比。 一个概率为p的事件的发生比是p/(1-p) （是该事件发生和不发生的比率）。预测变量每个类对应一个概率，如果将其记为p1和p2，那么让步比(Bland和Altman 2000; Agresti 2002)是：
-
-
-
-让步比表明从预测变量第一类到预测变量第二类，对应事件发生比的变化。
-
-原书P471
-表18-1：经费申请数据中3个二分类预测变量
-
-我们将用前一章节提到的经费申请数据为例讲解这个方法。在这个数据集里，有226个二分类预测变量和结果变量的2 × 2列链表中的频数都超过25。表18-1展示了经费申请数据中3个预测变量分别和结果变量的列链表。对于变量“合同价格区间（contract value band）” ，在价格区间已知和未知的情况下经费申请成功的概率分别为 p1 = 0.661 和 p2 = 0.237。相应的让步比是 6.3，意味着价格区间已知时申请成功的发生比是价格区间未知时的六倍多。如之前讨论均值不同时提到的，让步比也仅反应了信号而非噪音。虽然有计算让步比置信区间的公式，但更常用的方法是使用统计假设检验，零假设为“让步比等于1”（即，相应预测变量两个类的让步比相同）。在预测变量只有两个取值且结果变量只有两个类别的情况下（2 × 2）可以使用Fisher确切概率法(Agresti 2002)检验该零假设得到相应的p值。对该预测变量，p值为0表明合同价格区间情况和经费申请成功相关。表18-1显示对于另外一个关于赞助者的预测变量，62B对应相似的让步比 (OR = 6), 但是这里成功的申请频数很小。这种情况下p值也很小，但是其基于统计显著性的排名会靠后的多。图18-7左边是让步比和经费申请数据中226个预测变量对应p值的火山图。
-
-原书P472
-图18-7： 对数让步比对应两个统计量图。左：Fisher检验得出p值的函数。其中最大值为263；为了便于展示，此图只包含50以内的值。右：每个预测变量对应的增益比。红方块指代预测变量“赞助者（sponsor）”中的类62B，蓝三角指代“合同价格区间未知”。
-
-当类的个数超过2或者预测变量有2个以上层级时，可以使用其它方法。在这种情况下依旧可以使用Fisher确切检验来测量预测变量和相应结果类别的联系。或者可以使用C4.5中的增益比来量化两个变量之间的相关性，其值越大越好。注意增益比能够根据预测变量的层级个数自动调节，从而去除对层级个数小的属性变量的估计偏差。因此，该方法可以用于所有的分类预测变量，无论其有什么特征。表18-1展示了三个预测变量对应的增益比。图18-7 比较了增益统计量和让步比。类似于Fisher确切检验得到的p值，相较于“赞助者”变量增益统计量同样青睐“合同价格区间”变量，尽管它们计算的是不同的比值。
-
-18.3 其它方法
-
-Relief 算法(Kira和Rendell 1992) 是量化预测变量重要性的一般方法。其最初用于二分类判别分析，之后被扩展到更多邻域。该算法适用于连续预测变量和虚拟变量，且能够识别预测变量和结果变量之间的非线性关系。它通过随机选取样本点以及其邻近样本来单独估计每个预测变量。
-
-原书P473
-1 将预测变量分值Sj初始值设为0
-2 对 i=1…m 随机抽取训练集样本（） 执行
-3         找到最近的同类（hits）和不同类（misses）的样本
-4         对 预测变量 j=1…p 执行
-5               基于与最近的同类和不同类样本的距离，按如下方式调整分值：
-6                      
-7              结束
-8  结束
-算法18-1：用于二分类判别分析问题中对预测变量排序的原始Relief算法
-
-对于特定的预测变量，该分值试图刻画单独某部分样本中类之间差别。算法18-1展示了该过程。
-
-在训练集中随机抽取一个样本，分别找到和抽取随机样本距离最近的同类与不同类的样本（分别称作“hits”和“misses”）。对每个预测变量，计算出随机抽取的点分别和“hits”与“misses”的差别。对连续型预测变量，Kira和Rendell (1992)建议用两点之间的距离除以该预测变量观测的极差:
-diff(x, y) = (x − y)/C
-这里常数C 将差别标准化至 [0,1] 区间。对于二项数据 (即, 0/1)， 可以简单使用绝对值：
-diff(x, y) = |x − y|
-这样值域即为[0,1]。
-
-总分值(Sj)是这些差别的累加。如果“hit”离随机选样本很远，那么该分值下降；如果“miss”离随机样本很远，那么该分值上升。直观的考虑一个分离能力强的预测变量附近该有很多同类样本，而与不同类样本距离较远。由此可知，分值越大说明预测变量越重要。
-
-
-例如，图18-8展示了一个数据集中的几个预测变量。上图的预测变量完全分割两类样本。假设随机抽取的是左边倒数第二个样本（预测变量A=-1.1）。最近的同类点是左右两边的任何一个，差别大约为0.2（这里我们先不考虑标准化常数）。最近的不同类样本很远（A=0.5），相应的差别为-1.61。如果这是第一次抽取到的样本点那么相应的分值为：
-
-
-这个值要除以m，依次累加新值。于此相反的是图18.8中的预测变量B，其完全不含信息。每个随机选取的点都和一个同类点和一个不同类点相邻。故差别总是相互抵消， SB = 0.
-
-之后Kononenko (1994)改进了该过程。改进后的算法称为ReliefF， 其使用多个邻近点，修改过的差别计算方式并且能在类数目大于2和缺失发生的情况下使用。此外Robnik-Sikonja和Kononenko (1997)进一步改进该方法使之适于回归（即，数值型结果变量）。
-
-原书P474
-图18-8：用3个数据集阐明Relief 算法。 上图中预测变量A完全分离两类样本，对应ReliefF分值0.19。下图展示的是一个彻底无信息的预测变量，对应ReliefF分值为0 
-
-原书P475
-图18-9：上图：两个预测变量散点图，类边界明显。该例子中，预测变量C和D的 ReliefF 分值为0.17和0.25。下图：当两个预测变量和样本类无关时对应分值的的置换分布。虚线表明实际观测到的ReliefF分值
-
-
-图18-9展示了一个随机抽取的有两个预测变量（记为C和D）的二分类数据集。这里使用简单逻辑回归公式作为类边界法则，其中有两个强主效应和一个中等交互效应：
- 
-
-
-图18-9的数据便是依据如上边界抽取出来的。对该模拟数据，使用逻辑回归模型就可以得到交互检验下
-90.6% 的准确率。由于真正的模型公式已知，分析结果应该表明两个预测变量都是重要的。由于存在交互效应， 可想而知相对于其它每次只考虑一个预测变量的方法而言， ReliefF算法能揭示出更强的信号。该例子中，ReliefF算法使用m = 50 个随机样本以及k = 10个近邻样本。这两个预测变量在执行算法前事先被标准化了。预测变量C 和D 的分值分别为 0.17和0.25。预测变量C和D的ROC曲线下面积大小适中，分别为
-0.65和0.69。
-
-如何选择截断点呢？ Kira和Rendell (1992) 建议门槛可以“远小于”，这里α is是目标假阳性率。 (即，一个和结果不相关的预测变量为判定为重要变量的几率)。使用5%假阳性率为尺码，任何分值大于0.63的变量被判定为重要。或则使用现存的统计学方法 “置换检验” (Good 2000)来评估得分。这里打乱样本真实的类别且多次重复计算ReliefF分值。这样能够在某种程度上了解当预测变量和结果类别无关时分值分布。由此，将观测到的分值同该分布比较得出，在不相关的假设下该观测分值的极端性。通过500此置换，预测变量C和D的分值大致呈正态分布(图18-9)。对于预测变量C，分值范围从 −0.05 到0.11。对预测变量D，分值范围是−0.05 到0.11。在此情况下，图18-9上显示的两个从数据中观测到的分值表明它们是重要变量。由随机置换得到的对称正态分布可知，预测变量C和D的观测分值离零假设下期望分值距离分别为4.5和11.6个标准差。知道这样的观测分值在零假设条件下的极端性，我们可以判定这两个变量对于分离不同类样本非常重要。
-
-对细胞分割数据，图18-6展示了每个预测变量的ReliefF分值。该分值和其它方法得出的分值有一定相关性，但相关情况波动较大。例如，ROC曲线下面积和其它方法得出的分值相关情况相对稳定。这种不稳定性或许源于不同方法描述的是数据不同的方面，亦或由于ReliefF算法中用到随机抽样增加了其波动性。
-
-Reshef和(2011) 介绍了一种新的定量分析两个变量之间关系的方法，名为MIC。此方法将由目标预测变变量和结果变量定义的二维平面划分成一系列二维的小格子。图18-10是关于溶解度数据中预测变量“碳原子个数”的散点图，其被划分为4×3 网格。在每个格子里，计算出样本点的个数用来进一步得出相互信息（mutual information）统计量(Brillinger 2004), 该量和14章提到的C4.5 、C5.0决策树信息标准有关。这里对不同等面积网格划分方法做出了评估，平且得到最大相互信息值。对于不同的网格面积(如 2×2, 10×3)重复该过程。所有网格的相互信息值统一标准化。在不同划分网格方式中得到的最大值作为该预测变量和结果变量的强度。
-
-原书P477
-图18-10：最大信息准则建立过程。以溶解度数据中某预测变量为例，每个小图展示了一个4 × 3 网格的随机划分以及对应的相互信息统计量。
-
-作者指出该方法能够检测到很多不同类型的变量关系，如正弦波，椭圆曲线及其它高度非线性模式。该度量方式和简单相关系数相似，0表示没有相关性，1表示强烈相关。这个一般性的方法潜在的问题是在某些情况下效果逊于其它更具针对性的方法。例如，如果预测变量和结果变量之间真正是线性相关的，简单相关系数的效果更好因为其专门针对的就是线性趋势。
-
-在前面的图18-2中展示了溶解度数据中连续预测变量的MIC统计量。由图可见，MIC值和其它度量方式间有强相关性。对图18-6中的细胞分割数据， MIC统计量和绝对t-统计量，ROC曲线下面积和随机森林分值高度相关，和ReliefF分值相关性更低。
--->
+<p>如果<strong>特征和应变量都是分类型</strong>，有几种用于测量变量重要性的方法。对于二分类预测变量，一个 有效的方式是是使用让步比。 一个概率为p的事件的发生比是<span class="math inline">\(\pi=\frac{p}{1-p}\)</span> （是该事件发生和不发生的比率）。预测变量每个类对应一个概率，如果将其记为<span class="math inline">\(p_{1}\)</span>和<span class="math inline">\(p{2}\)</span>，对应的发生比为<span class="math inline">\(\pi_{1}\)</span>和<span class="math inline">\(\pi_{2}\)</span>，那么让步比<span class="citation">(B. J and D <a href="#ref-bland2000">2000</a>; A <a href="#ref-Agresti2002">2002</a>)</span>：</p>
+<p><span class="math display">\[让步比＝\frac{\pi_{1}}{\pi_{2}}\]</span></p>
+<p>让步比表明从预测变量的第一类到预测变量第二类，对应事件发生比的变化。 当类的个数超过2或者预测变量有2个以上层级时，可以使用其它方法。在这种情况下依旧可以使用Fisher确切检验来测量预测变量和相应结果类别的联系。</p>
 </div>
+<div id="relief-" class="section level4">
+<h4><span class="header-section-number">9.3.1.2</span> Relief 算法</h4>
+<p>Relief为一系列算法，最早由Kira和Rendell<span class="citation">(K and L <a href="#ref-kira1992">1992</a>)</span>提出。和其它重要性衡量的方法类似，算法给出的是一个重要性分值，将分值低于某个阈值的特征移除。这里可以将阈值当作调优参数通过划分测试集和训练集，基于一个模型表现的度量进行选择。该算法最初用于二分类判别分析，适用于连续预测变量和虚拟变量，能够识别预测变量和结果变量之间的非线性关系。之后被扩展到应变量为连续值的情况。</p>
+<p>原始的Relief算法的基本原理是通过特征对近距离样本的区分能力来估计重要性。沿用之前高维标度化中的公式表达，假设有n个样本观测和p个变量，对应应变量为<span class="math inline">\(\mathbf{y}\)</span>（或者目标变量），观测矩阵为<span class="math inline">\(\mathbf{X}_{n\times p}\)</span>。特征向量为：</p>
+<p><span class="math display">\[\mathbf{x_{.1}} &amp; \mathbf{x_{.2}} &amp; \ldots &amp; \mathbf{x_{.p}}\]</span></p>
+<p>算法从训练集中随机选择一个样本R，然后从和R同类的样本中寻找最近的同类（称为“hit”，之后用H表示）和不同类的样本（称为“miss”，之后用M表示），然后根据以下规则更新每个特征的权重：如果R和H在某个特征上的距离小于R和M的距离，则说明该特征对区分R附近同类和不同类样本是有益的，因此增加该特征的权重；反之，如果R和H在某个特征的距离大于R和M的距离，说明该特征对区分附近同类和不同类样本起负面作用，随即降低该特征的权重。将上面过程重复m次，最后得到各特征的平均权重。特征的权重越大，表示该特征的分类能力越强，反之，表示该特征分类能力越弱。对连续型特征的距离，Kira和Rendell建议用两点之间的距离除以该特征的观测极差:</p>
+<p><span class="math display">\[diff(x_{ij}, x{kj}) = \frac{x_{ij} − x_{kj}}{C}\]</span></p>
+<p>这里常数<span class="math inline">\(C=max(\mathbf{x_{.j}})-min(\mathbf{x_{.j}})\)</span>将差别标准化到<span class="math inline">\([0,1]\)</span> 区间。对于二项数据 (即, 0/1)， 可以简单使用绝对值： <span class="math display">\[diff(x_{ij}, x{kj}) = |x_{ij} − x_{kj}|\]</span></p>
+<p>这样值域即为[0,1]。对于二分类问题具体算法如下所示：</p>
+<ol style="list-style-type: decimal">
+<li>将预测变量分值<span class="math inline">\(S_{j}\)</span>初始值设为0 （j=1,…,p）</li>
+<li>对 i=1…m随机抽取训练集样本<span class="math inline">\(R_{i}\)</span>执行</li>
+<li><pre><code>   找到最近的同类（H）和不同类（M）样本</code></pre></li>
+<li><pre><code>   对 预测变量 j=1…p 执行</code></pre></li>
+<li><pre><code>        基于$R_{i}$与最近的同类和不同类样本的距离，按如下方式调整分值：</code></pre></li>
+<li><pre><code>        $S_{j}=S_{j}-diff_{j}(R_{j},H)^{2}/m + diff_{j}(R_{j},M)^{2}/m$       </code></pre></li>
+<li><pre><code>        结束</code></pre></li>
+<li>结束</li>
+</ol>
+<p>Relief算法的运行时间随着样本的抽样次数m和原始特征个数p的增加线性增加，因而运行效率非常高。之后Kononenko改进了该算法，改进后的算法称为ReliefF<span class="citation">(I <a href="#ref-Kononenko1994">1994</a>)</span>，其使用多个邻近点和不同的差别计算方式，并且能用于类数目大于2和有观测缺失的情况。之后Robnik-Sikonja和Kononenko进一步改进该方法使之适于回归（即，数值型结果变量）<span class="citation">(M and I <a href="#ref-Robnik1997">1997</a>)</span>。关于这几种Relief算法的一个比较完整的介绍可以参考Marko Robnik-Sˇikonja和Igor Kononenko的文章<span class="citation">(Robnik-Sˇikonja and Kononenko <a href="#ref-Marko2003">2003</a>)</span>。</p>
+<p>Relief 统计量的计算可以使用<code>CORElearn</code>包。其中函数<code>attrEval()</code>能计算几个不同版本的Relief值(使用<code>estimator</code>选项)。回归模型对应的<code>estimator</code>的参数设置可以通过下面代码查看：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 需要事先安装CORElearn包</span>
+<span class="kw">library</span>(CORElearn)
+<span class="kw">infoCore</span>(<span class="dt">what=</span><span class="st">&quot;attrEvalReg&quot;</span>)</code></pre></div>
+<pre><code>## [1] &quot;RReliefFequalK&quot;      &quot;RReliefFexpRank&quot;     &quot;RReliefFbestK&quot;      
+## [4] &quot;RReliefFwithMSE&quot;     &quot;MSEofMean&quot;           &quot;MSEofModel&quot;         
+## [7] &quot;MAEofModel&quot;          &quot;RReliefFdistance&quot;    &quot;RReliefFsqrDistance&quot;</code></pre>
+<p>类似的，分类模型对应的<code>estimator</code>的参数设置为：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">infoCore</span>(<span class="dt">what=</span><span class="st">&quot;attrEval&quot;</span>)</code></pre></div>
+<pre><code>##  [1] &quot;ReliefFequalK&quot;      &quot;ReliefFexpRank&quot;     &quot;ReliefFbestK&quot;      
+##  [4] &quot;Relief&quot;             &quot;InfGain&quot;            &quot;GainRatio&quot;         
+##  [7] &quot;MDL&quot;                &quot;Gini&quot;               &quot;MyopicReliefF&quot;     
+## [10] &quot;Accuracy&quot;           &quot;ReliefFmerit&quot;       &quot;ReliefFdistance&quot;   
+## [13] &quot;ReliefFsqrDistance&quot; &quot;DKM&quot;                &quot;ReliefFexpC&quot;       
+## [16] &quot;ReliefFavgC&quot;        &quot;ReliefFpe&quot;          &quot;ReliefFpa&quot;         
+## [19] &quot;ReliefFsmp&quot;         &quot;GainRatioCost&quot;      &quot;DKMcost&quot;           
+## [22] &quot;ReliefKukar&quot;        &quot;MDLsmp&quot;             &quot;ImpurityEuclid&quot;    
+## [25] &quot;ImpurityHellinger&quot;  &quot;UniformDKM&quot;         &quot;UniformGini&quot;       
+## [28] &quot;UniformInf&quot;         &quot;UniformAccuracy&quot;    &quot;EqualDKM&quot;          
+## [31] &quot;EqualGini&quot;          &quot;EqualInf&quot;           &quot;EqualHellinger&quot;    
+## [34] &quot;DistHellinger&quot;      &quot;DistAUC&quot;            &quot;DistAngle&quot;         
+## [37] &quot;DistEuclid&quot;</code></pre>
+<p>我们用服装消费者数据为例，假设感兴趣的是收入，特征是所有问卷的问题。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat&lt;-<span class="kw">read.csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/SegData.csv&quot;</span>)
+<span class="co"># 删除应变量缺失的行</span>
+dat=<span class="kw">filter</span>(dat,!<span class="kw">is.na</span>(income))
+<span class="co"># 选取需要的变量</span>
+<span class="co"># 特征矩阵</span>
+xtrain=dat%&gt;%
+<span class="st">  </span>dplyr::<span class="kw">select</span>(<span class="kw">num_range</span>(<span class="st">&quot;Q&quot;</span>, <span class="dv">1</span>:<span class="dv">10</span>))
+<span class="co"># 应变量</span>
+ytrain=dat$income
+<span class="co"># 实践Relief算法</span>
+reliefValues =<span class="st"> </span><span class="kw">attrEval</span>(ytrain ~<span class="st"> </span>., <span class="dt">data =</span> xtrain,
+## 有许多计算Relief的方法，这里将k个邻近样本设置为等权重
+## 更多信息键入?attrEval
+<span class="dt">estimator =</span> <span class="st">&quot;RReliefFequalK&quot;</span>,
+## 测试的数目：
+<span class="dt">ReliefIterations =</span> <span class="dv">50</span>)</code></pre></div>
+<p>得到的分值如下：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(reliefValues)</code></pre></div>
+<pre><code>##           Q1           Q2           Q3           Q4           Q5 
+## -0.009624742 -0.031902397  0.005705953 -0.016508364  0.034252308 
+##           Q6 
+## -0.007082354</code></pre>
+<p>该函数也能用来计算其它分值，如增益比，基尼系数等。要用置换检验观测到的Relief分值可以使用<code>AppliedPredictiveModeling</code>包中的<code>permuteRelief()</code>函数：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(AppliedPredictiveModeling)
+perm =<span class="st"> </span><span class="kw">permuteRelief</span>(<span class="dt">x =</span> xtrain, <span class="dt">y =</span> ytrain,
+<span class="dt">nperm =</span> <span class="dv">500</span>,
+<span class="dt">estimator =</span> <span class="st">&quot;RReliefFequalK&quot;</span>,
+<span class="dt">ReliefIterations =</span> <span class="dv">50</span>)</code></pre></div>
+<p>置换得到的Relief分值存在叫做<code>permutations</code>的子对象里：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(perm$permutations)</code></pre></div>
+<pre><code>##   Var1 Predictor        value
+## 1    1        Q1  0.005194469
+## 2    2        Q1 -0.035755040
+## 3    3        Q1 -0.006193998
+## 4    4        Q1 -0.004264219
+## 5    5        Q1  0.004122471
+## 6    6        Q1 -0.009931796</code></pre>
+<p>重要性分值的置换分布非常有帮助，能够让我们直观的了解分值的随机性，我们可以用下面方式对置换分值分布进行可视化：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lattice::<span class="kw">histogram</span>(~<span class="st"> </span>value|Predictor,<span class="dt">data =</span> perm$permutations)</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-135-1.png" width="672" /></p>
+<p>标准化后的分值存在叫做<code>standardized</code>的子对象里，其代表了观测到的Relief分值（无置换）离置换分布中心的距离与标准差的比值：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(perm$standardized)</code></pre></div>
+<pre><code>##          Q1          Q2          Q3          Q4          Q5          Q6 
+## -1.25769126 -1.27600996  1.97581995 -2.13350438 -0.62782489 -0.04602102</code></pre>
 </div>
 </div>
 <div id="section-9.3.2" class="section level3">
@@ -1113,6 +1109,24 @@ summary(fit2)
 </div>
 <div id="ref-venk2000">
 <p>E, Venkatraman. 2000. “A Permutation Test to Compare Receiver Operating Characteristic Curves.” <em>Biometrics</em> 56 (4): 1134–8.</p>
+</div>
+<div id="ref-bland2000">
+<p>J, Bland, and Altman D. 2000. “The Odds Ratio.” <em>British Medical Journal</em> 320 (7247): 1468.</p>
+</div>
+<div id="ref-Agresti2002">
+<p>A, Agresti. 2002. <em>Categorical Data Analysis</em>. <em>Wiley–Interscience</em>. Wiley.</p>
+</div>
+<div id="ref-kira1992">
+<p>K, Kira, and Rendell L. 1992. “The Feature Selection Problem: Traditional Methods and a New Algorithm.” <em>Proceedings of the National Conference on Artificial Intelligence</em>, 129–29.</p>
+</div>
+<div id="ref-Kononenko1994">
+<p>I, Kononenko. 1994. <em>Estimating Attributes: Analysis and Extensions of Relief.” in F Bergadano, L de Raedt (Eds.), ``Machine Learning: ECML–94&quot;</em>. Vol. 784. 171–182. Springer Berlin / Heidelberg.</p>
+</div>
+<div id="ref-Robnik1997">
+<p>M, Robnik-Sikonja, and Kononenko I. 1997. “An Adaptation of Relief for Attribute Estimation in Regression.” <em>Proceedings of the Fourteenth International Conference on Machine Learning</em>, 296–304.</p>
+</div>
+<div id="ref-Marko2003">
+<p>Robnik-Sˇikonja, Marko, and Igor Kononenko. 2003. “Theoretical and Empirical Analysis of ReliefF and RReliefF.” <em>Machine Learning Journal</em> 53 (23-69).</p>
 </div>
 </div>
             </section>
