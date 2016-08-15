@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-08-13">
+<meta name="date" content="2016-08-14">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -930,16 +930,17 @@ rocValues</code></pre></div>
 <p><span class="math display">\[diff(x_{ij}, x{kj}) = \frac{x_{ij} − x_{kj}}{C}\]</span></p>
 <p>这里常数<span class="math inline">\(C=max(\mathbf{x_{.j}})-min(\mathbf{x_{.j}})\)</span>将差别标准化到<span class="math inline">\([0,1]\)</span> 区间。对于二项数据 (即, 0/1)， 可以简单使用绝对值： <span class="math display">\[diff(x_{ij}, x_{kj}) = |x_{ij} − x_{kj}|\]</span></p>
 <p>这样值域即为[0,1]。对于二分类问题具体算法如下所示：</p>
-<pre>
-1. 将预测变量分值$S_{j}$初始值设为0 （j=1,...,p）
-2. 对 i=1…m随机抽取训练集样本$R_{i}$执行
-3.         找到最近的同类（H）和不同类（M）样本
-4.         对 预测变量 j=1…p 执行
-5.              基于$R_{i}$与最近的同类和不同类样本的距离，按如下方式调整分值：
-6.              $S_{j}=S_{j}-diff_{j}(R_{j},H)^{2}/m + diff_{j}(R_{j},M)^{2}/m$       
-7.              结束
-8.  结束
-</pre>
+<ol style="list-style-type: decimal">
+<li>将预测变量分值<span class="math inline">\(S_{j}\)</span>初始值设为0 （j=1,…,p）</li>
+<li>对 i=1…m随机抽取训练集样本<span class="math inline">\(R_{i}\)</span>执行</li>
+<li>找到最近的同类（H）和不同类（M）样本</li>
+<li>对 预测变量 j=1…p 执行</li>
+<li>基于<span class="math inline">\(R_{i}\)</span>与最近的同类和不同类样本的距离，按如下方式调整分值：</li>
+<li><span class="math inline">\(S_{j}=S_{j}-diff_{j}(R_{j},H)^{2}/m + diff_{j}(R_{j},M)^{2}/m\)</span><br />
+</li>
+<li>结束</li>
+<li>结束</li>
+</ol>
 <p>Relief算法的运行时间随着样本的抽样次数m和原始特征个数p的增加线性增加，因而运行效率非常高。之后Kononenko改进了该算法，改进后的算法称为ReliefF<span class="citation">(I <a href="#ref-Kononenko1994">1994</a>)</span>，其使用多个邻近点和不同的差别计算方式，并且能用于类数目大于2和有观测缺失的情况。之后Robnik-Sikonja和Kononenko进一步改进该方法使之适于回归（即，数值型结果变量）<span class="citation">(M and I <a href="#ref-Robnik1997">1997</a>)</span>。关于这几种Relief算法的一个比较完整的介绍可以参考Marko Robnik-Sˇikonja和Igor Kononenko的文章<span class="citation">(Robnik-Sˇikonja and Kononenko <a href="#ref-Marko2003">2003</a>)</span>。</p>
 <p>Relief 统计量的计算可以使用<code>CORElearn</code>包。其中函数<code>attrEval()</code>能计算几个不同版本的Relief值(使用<code>estimator</code>选项)。回归模型对应的<code>estimator</code>的参数设置可以通过下面代码查看：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 需要事先安装CORElearn包</span>
@@ -1008,11 +1009,112 @@ perm =<span class="st"> </span><span class="kw">permuteRelief</span>(<span class
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(perm$standardized)</code></pre></div>
 <pre><code>##          Q1          Q2          Q3          Q4          Q5          Q6 
 ## -1.25769126 -1.27600996  1.97581995 -2.13350438 -0.62782489 -0.04602102</code></pre>
+<p>上面讲到的各种通过对每个特征计算重要性分值，然后在建模时只包括满足一定条件的特征。该方法是在建模过程之前先对特征进行选择，选择标准和模型效果没有直接关系，计算更快，但比较粗糙，选出来的变量不一定能很好的优化模型效能。下面我们介绍另外一类基于模型效果的特征选择方法。</p>
 </div>
 </div>
 <div id="section-9.3.2" class="section level3">
 <h3><span class="header-section-number">9.3.2</span> 绕封法</h3>
-<p>wrapper方法实质上是一个分类器，封装器用选取的特征子集对样本集进行分类，分类的精度作为衡量特征子集好坏的标准,经过比较选出最好的特征子集。常用的有逐步回归（Stepwise regression）、向前选择（Forward selection）和向后选择（Backward selection）。它的优点是考虑了特征与特征之间的关联性，缺点是：当观测数据较少时容易过拟合，而当特征数量较多时,计算时间又会增长。</p>
+<p>绕封法按照一定规律不断增加或者删除变量，通过评估不同特征组合得到的模型拟合结果寻找能够最优化模型拟合的特征组合。其本质是搜索算法，将不同的特征子集当作输入，然后将模型评估结果作为需要优化的输出。</p>
+<div id="section-9.3.2.1" class="section level4">
+<h4><span class="header-section-number">9.3.2.1</span> 穷举法</h4>
+<p>最简单直接的是通过穷举得到所有可能的特征子集，然后找到优化模型拟合的组合。比如对于一个含有p个特征的最小二乘回归，我们可以先拟合p个只有一个特征的模型，然后拟合所有可能的<span class="math inline">\(\left(_{2}^{p}\right)=\frac{p(p-1)}{2}\)</span>个含有两个特征的模型，依次类推搜索所有的模型。算法如下：</p>
+<ol style="list-style-type: decimal">
+<li>用<span class="math inline">\(M_{0}\)</span>代表没有特征的模型，该模型用样本均值预测每个观测</li>
+<li>对<span class="math inline">\(k=1,2,...,p\)</span>:
+<ol style="list-style-type: decimal">
+<li>拟合所有<span class="math inline">\(\left(_{k}^{p}\right)\)</span>个含有k个特征的模型</li>
+<li>选择其中最优的模型，记为<span class="math inline">\(M_{k}\)</span>。这里，最优指<span class="math inline">\(MSE\)</span>最小或者<span class="math inline">\(R^{2}\)</span>最大</li>
+</ol></li>
+<li>选择<span class="math inline">\(M_{0},M_{1},...,M_{p}\)</span>中最优的模型，选择标准可以是交互校验预测误差，<span class="math inline">\(C_{p}\)</span>，AIC，BIC或者调整后的<span class="math inline">\(R^{2}\)</span></li>
+</ol>
+<p>我们下面对服装消费者数据中的收入（<code>income</code>）建立一般线性模型，将消费记录变量和问卷调查回复变量作为因变量。通过<code>leap</code>包中的<code>regsubsets()</code>函数进行穷举变量选择。该函数可以给出对不同变量个数对应的最优模型，这里默认最优的标准是误差平方和。函数的语法和<code>lm()</code>函数相同。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 需要先安装包</span>
+<span class="kw">library</span>(leaps)
+<span class="co"># 载入服装消费者数据</span>
+sim.dat&lt;-<span class="kw">read.csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/SegData.csv&quot;</span>)
+ytrain&lt;-sim.dat$income
+xtrain&lt;-dplyr::<span class="kw">select</span>(sim.dat,store_exp,online_exp,store_trans,online_trans,
+               Q1,Q2,Q3,Q4,Q5,Q6,Q7,Q8,Q9,Q10)
+<span class="co"># 先用所有变量拟合全模型</span>
+regfit.full=<span class="kw">regsubsets</span>(ytrain~.,xtrain)</code></pre></div>
+<p>用<code>summary()</code>函数可以得到不同变量个数对应的模型选择结果：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(regfit.full)</code></pre></div>
+<pre><code>## Subset selection object
+## Call: regsubsets.formula(ytrain ~ ., xtrain)
+## 14 Variables  (and intercept)
+##              Forced in Forced out
+## store_exp        FALSE      FALSE
+## online_exp       FALSE      FALSE
+## store_trans      FALSE      FALSE
+## online_trans     FALSE      FALSE
+## Q1               FALSE      FALSE
+## Q2               FALSE      FALSE
+## Q3               FALSE      FALSE
+## Q4               FALSE      FALSE
+## Q5               FALSE      FALSE
+## Q6               FALSE      FALSE
+## Q7               FALSE      FALSE
+## Q8               FALSE      FALSE
+## Q9               FALSE      FALSE
+## Q10              FALSE      FALSE
+## 1 subsets of each size up to 8
+## Selection Algorithm: exhaustive
+##          store_exp online_exp store_trans online_trans Q1  Q2  Q3  Q4  Q5 
+## 1  ( 1 ) &quot; &quot;       &quot; &quot;        &quot; &quot;         &quot; &quot;          &quot; &quot; &quot;*&quot; &quot; &quot; &quot; &quot; &quot; &quot;
+## 2  ( 1 ) &quot; &quot;       &quot; &quot;        &quot; &quot;         &quot; &quot;          &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot;*&quot;
+## 3  ( 1 ) &quot; &quot;       &quot; &quot;        &quot; &quot;         &quot; &quot;          &quot;*&quot; &quot;*&quot; &quot; &quot; &quot; &quot; &quot; &quot;
+## 4  ( 1 ) &quot; &quot;       &quot; &quot;        &quot; &quot;         &quot; &quot;          &quot;*&quot; &quot;*&quot; &quot; &quot; &quot; &quot; &quot; &quot;
+## 5  ( 1 ) &quot;*&quot;       &quot; &quot;        &quot; &quot;         &quot; &quot;          &quot;*&quot; &quot;*&quot; &quot; &quot; &quot; &quot; &quot; &quot;
+## 6  ( 1 ) &quot;*&quot;       &quot; &quot;        &quot; &quot;         &quot; &quot;          &quot;*&quot; &quot;*&quot; &quot; &quot; &quot;*&quot; &quot; &quot;
+## 7  ( 1 ) &quot;*&quot;       &quot; &quot;        &quot; &quot;         &quot; &quot;          &quot;*&quot; &quot;*&quot; &quot; &quot; &quot;*&quot; &quot;*&quot;
+## 8  ( 1 ) &quot;*&quot;       &quot; &quot;        &quot;*&quot;         &quot; &quot;          &quot;*&quot; &quot;*&quot; &quot; &quot; &quot;*&quot; &quot;*&quot;
+##          Q6  Q7  Q8  Q9  Q10
+## 1  ( 1 ) &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot;
+## 2  ( 1 ) &quot;*&quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot;
+## 3  ( 1 ) &quot;*&quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot;
+## 4  ( 1 ) &quot;*&quot; &quot; &quot; &quot; &quot; &quot;*&quot; &quot; &quot;
+## 5  ( 1 ) &quot;*&quot; &quot; &quot; &quot; &quot; &quot;*&quot; &quot; &quot;
+## 6  ( 1 ) &quot;*&quot; &quot; &quot; &quot; &quot; &quot;*&quot; &quot; &quot;
+## 7  ( 1 ) &quot;*&quot; &quot; &quot; &quot; &quot; &quot;*&quot; &quot; &quot;
+## 8  ( 1 ) &quot;*&quot; &quot; &quot; &quot; &quot; &quot;*&quot; &quot; &quot;</code></pre>
+<p>结果中星号表示对应特征被选中。例如，第3行对应有3个“*”号，代表相应被选中的3个特征，该特征组合在所有可能的3特征模型中表现最好。默认设置下，函数只会返回1到8个特征对应的最优模型。但你可以通过设置<code>nvmax</code>选项来改变特征个数。下面我们将特征个数改成10：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">regfit.full=<span class="kw">regsubsets</span>(ytrain~.,xtrain,<span class="dt">nvmax=</span><span class="dv">10</span>)
+reg.summary=<span class="kw">summary</span>(regfit.full)</code></pre></div>
+<p><code>summary()</code>函数也会返回<span class="math inline">\(R^{2}\)</span>、RSS、调整<span class="math inline">\(R^{2}\)</span>、<span class="math inline">\(C_{p}\)</span>以及BIC这些模型评估统计量。同门可以通过这些统计量来得到最好的模型。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">names</span>(reg.summary)</code></pre></div>
+<pre><code>## [1] &quot;which&quot;  &quot;rsq&quot;    &quot;rss&quot;    &quot;adjr2&quot;  &quot;cp&quot;     &quot;bic&quot;    &quot;outmat&quot; &quot;obj&quot;</code></pre>
+<p>例如，我们可以看到当模型从1个特征到2个特征，<span class="math inline">\(R^{2}\)</span>统计量从60%上升到73%，之后增加特征变化不是太大。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">reg.summary$adjr2</code></pre></div>
+<pre><code>##  [1] 0.5992310 0.7313060 0.7417694 0.7486184 0.7505515 0.7515352 0.7518327
+##  [8] 0.7519945 0.7521044 0.7522297</code></pre>
+<p>对所有模型绘制RSS、调整<span class="math inline">\(R^{2}\)</span>、<span class="math inline">\(C_{p}\)</span>以及BIC统计量图能够帮助选择最优模型。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))
+<span class="kw">plot</span>(reg.summary$adjr2,<span class="dt">xlab=</span><span class="st">&quot;变量个数&quot;</span>,<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>,<span class="dt">ylab=</span><span class="st">&quot;调整R2&quot;</span>,<span class="dt">type=</span><span class="st">&quot;l&quot;</span>)
+<span class="co"># 用which.max()函数找到调整R2最大的点</span>
+idx&lt;-<span class="kw">which.max</span>(reg.summary$adjr2)
+<span class="co"># 用points()函数将调整R2最大的点在图上标出</span>
+<span class="kw">points</span>(idx,reg.summary$adjr2[idx],<span class="dt">col=</span><span class="st">&quot;red&quot;</span>,<span class="dt">cex=</span><span class="dv">2</span>,<span class="dt">pch=</span><span class="dv">20</span>)
+<span class="kw">plot</span>(reg.summary$cp,<span class="dt">xlab=</span><span class="st">&quot;变量个数&quot;</span>,<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>,<span class="dt">ylab=</span><span class="st">&quot;Cp&quot;</span>,<span class="dt">type=</span><span class="st">&quot;l&quot;</span>)
+<span class="co"># 类似的找到Cp最小的点</span>
+idx&lt;-<span class="kw">which.min</span>(reg.summary$cp)
+<span class="co"># 将Cp最小的点在图上标出</span>
+<span class="kw">points</span>(idx,reg.summary$cp[idx],<span class="dt">col=</span><span class="st">&quot;red&quot;</span>,<span class="dt">cex=</span><span class="dv">2</span>,<span class="dt">pch=</span><span class="dv">20</span>)
+<span class="kw">plot</span>(reg.summary$bic,<span class="dt">xlab=</span><span class="st">&quot;变量个数&quot;</span>,<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>,<span class="dt">ylab=</span><span class="st">&quot;BIC&quot;</span>,<span class="dt">type=</span><span class="st">&quot;l&quot;</span>)
+<span class="co"># 找到BIC最小的点</span>
+idx&lt;-<span class="kw">which.min</span>(reg.summary$bic)
+<span class="co"># 将Cp最小的点在图上标出</span>
+<span class="kw">points</span>(idx,reg.summary$bic[idx],<span class="dt">col=</span><span class="st">&quot;red&quot;</span>,<span class="dt">cex=</span><span class="dv">2</span>,<span class="dt">pch=</span><span class="dv">20</span>)
+<span class="kw">plot</span>(reg.summary$rss,<span class="dt">xlab=</span><span class="st">&quot;变量个数&quot;</span>,<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>,<span class="dt">ylab=</span><span class="st">&quot;RSS&quot;</span>,<span class="dt">type=</span><span class="st">&quot;l&quot;</span>)
+<span class="co"># 找到RSS最小的点</span>
+idx&lt;-<span class="kw">which.min</span>(reg.summary$rss)
+<span class="co"># 将Cp最小的点在图上标出</span>
+<span class="kw">points</span>(idx,reg.summary$rss[idx],<span class="dt">col=</span><span class="st">&quot;red&quot;</span>,<span class="dt">cex=</span><span class="dv">2</span>,<span class="dt">pch=</span><span class="dv">20</span>)</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-142-1.png" width="672" /></p>
+<p>该方法的问题在与要拟合和评估所有可能的特征子集，这想起来容易，但对于稍微大一点的p来说计算量大的难以实施。这种穷尽的方法也会导致统计问题，比如过度拟合和参数估计的高方差。考虑到这点，逐步回归是比穷尽所有特征子集更好的方法，此类方法的搜索领域小的多。逐步回归有向前选择，向后选择和双向选择。</p>
+</div>
+<div id="section" class="section level4">
+<h4><span class="header-section-number">9.3.2.2</span> </h4>
+</div>
 </div>
 <div id="section-9.3.3" class="section level3">
 <h3><span class="header-section-number">9.3.3</span> 总结</h3>
