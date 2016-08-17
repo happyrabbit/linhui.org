@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-08-14">
+<meta name="date" content="2016-08-16">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -933,12 +933,14 @@ rocValues</code></pre></div>
 <ol style="list-style-type: decimal">
 <li>将预测变量分值<span class="math inline">\(S_{j}\)</span>初始值设为0 （j=1,…,p）</li>
 <li>对 i=1…m随机抽取训练集样本<span class="math inline">\(R_{i}\)</span>执行</li>
-<li>找到最近的同类（H）和不同类（M）样本</li>
-<li>对 预测变量 j=1…p 执行</li>
-<li>基于<span class="math inline">\(R_{i}\)</span>与最近的同类和不同类样本的距离，按如下方式调整分值：</li>
-<li><span class="math inline">\(S_{j}=S_{j}-diff_{j}(R_{j},H)^{2}/m + diff_{j}(R_{j},M)^{2}/m\)</span><br />
-</li>
-<li>结束</li>
+</ol>
+<ul>
+<li>找到最近的同类（H）和不同类（M）样本
+<ul>
+<li>对 预测变量 j=1…p 执行 1. 基于<span class="math inline">\(R_{i}\)</span>与最近的同类和不同类样本的距离，按如下方式调整分值： 1. <span class="math inline">\(S_{j}=S_{j}-diff_{j}(R_{j},H)^{2}/m + diff_{j}(R_{j},M)^{2}/m\)</span> 1. - 结束</li>
+</ul></li>
+</ul>
+<ol style="list-style-type: decimal">
 <li>结束</li>
 </ol>
 <p>Relief算法的运行时间随着样本的抽样次数m和原始特征个数p的增加线性增加，因而运行效率非常高。之后Kononenko改进了该算法，改进后的算法称为ReliefF<span class="citation">(I <a href="#ref-Kononenko1994">1994</a>)</span>，其使用多个邻近点和不同的差别计算方式，并且能用于类数目大于2和有观测缺失的情况。之后Robnik-Sikonja和Kononenko进一步改进该方法使之适于回归（即，数值型结果变量）<span class="citation">(M and I <a href="#ref-Robnik1997">1997</a>)</span>。关于这几种Relief算法的一个比较完整的介绍可以参考Marko Robnik-Sˇikonja和Igor Kononenko的文章<span class="citation">(Robnik-Sˇikonja and Kononenko <a href="#ref-Marko2003">2003</a>)</span>。</p>
@@ -1109,11 +1111,67 @@ idx&lt;-<span class="kw">which.min</span>(reg.summary$bic)
 idx&lt;-<span class="kw">which.min</span>(reg.summary$rss)
 <span class="co"># 将Cp最小的点在图上标出</span>
 <span class="kw">points</span>(idx,reg.summary$rss[idx],<span class="dt">col=</span><span class="st">&quot;red&quot;</span>,<span class="dt">cex=</span><span class="dv">2</span>,<span class="dt">pch=</span><span class="dv">20</span>)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-142-1.png" width="672" /></p>
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-142"></span>
+<img src="DS_R_files/figure-html/unnamed-chunk-142-1.png" alt="穷尽法选择结果。" width="80%" />
+<p class="caption">
+Figure 9.1: 穷尽法选择结果。
+</p>
+</div>
 <p>该方法的问题在与要拟合和评估所有可能的特征子集，这想起来容易，但对于稍微大一点的p来说计算量大的难以实施。这种穷尽的方法也会导致统计问题，比如过度拟合和参数估计的高方差。考虑到这点，逐步回归是比穷尽所有特征子集更好的方法，此类方法的搜索领域小的多。逐步回归有向前选择，向后选择和双向选择。</p>
 </div>
-<div id="section" class="section level4">
-<h4><span class="header-section-number">9.3.2.2</span> </h4>
+<div id="section-9.3.2.2" class="section level4">
+<h4><span class="header-section-number">9.3.2.2</span> 向前选择</h4>
+<p>向前选择考虑的特征子集数目小多了。其从没有特征的模型开始逐一加入特征，直到所有的特征都在模型当中。当加入一个变量对模型提升有很大帮助时，就将该变量保留在模型中。具体算法如下：</p>
+<ol style="list-style-type: decimal">
+<li>用<span class="math inline">\(M_{0}\)</span>代表没有特征的模型，该模型用样本均值预测每个观测</li>
+<li>对<span class="math inline">\(k=0,2,...,p-1\)</span>:
+<ul>
+<li>依次在<span class="math inline">\(M_{k}\)</span>中加入剩下的<span class="math inline">\(p-k\)</span>个特征，每次加入1个特征，然后放回加入另外一个，逐一衡量每个特征对模型表现的提升</li>
+<li>选择<span class="math inline">\(p-k\)</span>个模型中最优的模型，记为<span class="math inline">\(M_{k+1}\)</span>。这里，最优指<span class="math inline">\(MSE\)</span>最小或者<span class="math inline">\(R^{2}\)</span>最大</li>
+</ul></li>
+<li>选择<span class="math inline">\(M_{0},M_{1},...,M_{p}\)</span>中最优的模型，选择标准可以是交互校验预测误差，<span class="math inline">\(C_{p}\)</span>，AIC，BIC或者调整后的<span class="math inline">\(R^{2}\)</span></li>
+</ol>
+<p>和穷举法不同，向前选择先拟合一个初始模型<span class="math inline">\(M_{0}\)</span>，然后对第<span class="math inline">\(k\)</span>次迭代，拟合<span class="math inline">\(p-k\)</span>个模型，这里<span class="math inline">\(k=0,1,...,p-1\)</span>，这样一共拟合的模型数目是：<span class="math inline">\(1+\Sigma_{k=0}^{p-1}(p-k)=1+\frac{p(p-1)}{2}\)</span>个。和穷举法的<span class="math inline">\(2^{p}\)</span>个模型相比，差太多的。当<span class="math inline">\(p=20\)</span>时，穷举法要拟合1048576个模型，而向前选择只需要拟合211个模型。上面算法的第2步得到了不同大小的特征集合对应的最优模型，然后在第3步中从<span class="math inline">\(p+1\)</span>个特征个数不同的模型中选出最优的模型。这里要注意一点，就是RSS随着特征个数的增加而增加，<span class="math inline">\(R^{2}\)</span>随着特征个数的增加而单调下降。因此在第2步中，我们在特征数目相同的模型中进行选择时可以直接使用训练集的拟合优度统计量。但在第3步中，我们要在特征个数不同的模型中选择，这时就需要使用交互校验。关于交互校验，大家可以参考之前的基础建模技术那一章。</p>
+<p>我们可以继续使用<code>regsubsets()</code>这个函数进行向前选择，只需要设置<code>method=&quot;forward&quot;</code>。沿用之前小节的例子：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 需要先安装包</span>
+<span class="kw">library</span>(leaps)
+<span class="co"># 载入服装消费者数据</span>
+sim.dat&lt;-<span class="kw">read.csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/SegData.csv&quot;</span>)
+ytrain&lt;-sim.dat$income
+xtrain&lt;-dplyr::<span class="kw">select</span>(sim.dat,store_exp,online_exp,store_trans,online_trans,
+               Q1,Q2,Q3,Q4,Q5,Q6,Q7,Q8,Q9,Q10)
+<span class="co"># 先用所有变量拟合全模型</span>
+regfit.fwd=<span class="kw">regsubsets</span>(ytrain~.,xtrain,<span class="dt">nvmax=</span><span class="dv">10</span>,<span class="dt">method=</span><span class="st">&quot;forward&quot;</span>)
+<span class="co"># 可以用summary()函数得到模型选择</span>
+reg.summary=<span class="kw">summary</span>(regfit.fwd)</code></pre></div>
+<p>类似的，我们可以对向前选择结果进行可视化，得到最优的变量个数。这里的个数选择和穷尽法相同。从图中可以看出，当变量个数超过4时，模型表现的变化很小。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))
+<span class="kw">plot</span>(reg.summary$adjr2,<span class="dt">xlab=</span><span class="st">&quot;变量个数&quot;</span>,<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>,<span class="dt">ylab=</span><span class="st">&quot;调整R2&quot;</span>,<span class="dt">type=</span><span class="st">&quot;l&quot;</span>)
+<span class="co"># 用which.max()函数找到调整R2最大的点</span>
+idx&lt;-<span class="kw">which.max</span>(reg.summary$adjr2)
+<span class="co"># 用points()函数将调整R2最大的点在图上标出</span>
+<span class="kw">points</span>(idx,reg.summary$adjr2[idx],<span class="dt">col=</span><span class="st">&quot;red&quot;</span>,<span class="dt">cex=</span><span class="dv">2</span>,<span class="dt">pch=</span><span class="dv">20</span>)
+<span class="kw">plot</span>(reg.summary$cp,<span class="dt">xlab=</span><span class="st">&quot;变量个数&quot;</span>,<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>,<span class="dt">ylab=</span><span class="st">&quot;Cp&quot;</span>,<span class="dt">type=</span><span class="st">&quot;l&quot;</span>)
+<span class="co"># 类似的找到Cp最小的点</span>
+idx&lt;-<span class="kw">which.min</span>(reg.summary$cp)
+<span class="co"># 将Cp最小的点在图上标出</span>
+<span class="kw">points</span>(idx,reg.summary$cp[idx],<span class="dt">col=</span><span class="st">&quot;red&quot;</span>,<span class="dt">cex=</span><span class="dv">2</span>,<span class="dt">pch=</span><span class="dv">20</span>)
+<span class="kw">plot</span>(reg.summary$bic,<span class="dt">xlab=</span><span class="st">&quot;变量个数&quot;</span>,<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>,<span class="dt">ylab=</span><span class="st">&quot;BIC&quot;</span>,<span class="dt">type=</span><span class="st">&quot;l&quot;</span>)
+<span class="co"># 找到BIC最小的点</span>
+idx&lt;-<span class="kw">which.min</span>(reg.summary$bic)
+<span class="co"># 将Cp最小的点在图上标出</span>
+<span class="kw">points</span>(idx,reg.summary$bic[idx],<span class="dt">col=</span><span class="st">&quot;red&quot;</span>,<span class="dt">cex=</span><span class="dv">2</span>,<span class="dt">pch=</span><span class="dv">20</span>)
+<span class="kw">plot</span>(reg.summary$rss,<span class="dt">xlab=</span><span class="st">&quot;变量个数&quot;</span>,<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>,<span class="dt">ylab=</span><span class="st">&quot;RSS&quot;</span>,<span class="dt">type=</span><span class="st">&quot;l&quot;</span>)
+<span class="co"># 找到RSS最小的点</span>
+idx&lt;-<span class="kw">which.min</span>(reg.summary$rss)
+<span class="co"># 将Cp最小的点在图上标出</span>
+<span class="kw">points</span>(idx,reg.summary$rss[idx],<span class="dt">col=</span><span class="st">&quot;red&quot;</span>,<span class="dt">cex=</span><span class="dv">2</span>,<span class="dt">pch=</span><span class="dv">20</span>)</code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-144"></span>
+<img src="DS_R_files/figure-html/unnamed-chunk-144-1.png" alt="向前选择结果。" width="80%" />
+<p class="caption">
+Figure 9.2: 向前选择结果。
+</p>
+</div>
 </div>
 </div>
 <div id="section-9.3.3" class="section level3">
