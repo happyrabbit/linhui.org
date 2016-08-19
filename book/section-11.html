@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-08-17">
+<meta name="date" content="2016-08-19">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -191,7 +191,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="9.3" data-path="section-9.html"><a href="section-9.html#section-9.3"><i class="fa fa-check"></i><b>9.3</b> 特征选择</a><ul>
 <li class="chapter" data-level="9.3.1" data-path="section-9.html"><a href="section-9.html#section-9.3.1"><i class="fa fa-check"></i><b>9.3.1</b> 过滤法</a></li>
 <li class="chapter" data-level="9.3.2" data-path="section-9.html"><a href="section-9.html#section-9.3.2"><i class="fa fa-check"></i><b>9.3.2</b> 绕封法</a></li>
-<li class="chapter" data-level="9.3.3" data-path="section-9.html"><a href="section-9.html#section-9.3.3"><i class="fa fa-check"></i><b>9.3.3</b> 总结</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="10" data-path="section-10.html"><a href="section-10.html"><i class="fa fa-check"></i><b>10</b> 线性回归极其衍生</a><ul>
@@ -255,7 +254,28 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
             <section class="normal" id="section-">
 <div id="section-11" class="section level1">
 <h1><span class="header-section-number">第11章</span> 树模型</h1>
-<p>本章讲介绍基于树的模型。树模型可以用于回归和判别。这类模型常被称为决策树（或分类回归树），是经典的机器学习算法，也是最广泛使用的工具。不太大的决策树简洁明了，容易解释。但是简单的树表现不一定好，复杂的树（比如之后会讲到的集成方法）效果大为提高，但过程如同黑箱，无法解释。所以建模者需要在解释性和精确性之间进行权衡。之所以称其为“树”当然因为结构有类似之处，只是决策树的方向和真实的树相反，根在上，叶在下。一棵决策树从单个根节点开始划分为几个不同的枝桠，从⽽产生更多的节点,在每个节点都可以决定是不是要继续划分，如果停止则该节点就是叶节点，若继续就是枝节点接着分裂产生下一层新节点。每个⾮叶节点都牵扯到决定接下来选择哪根树枝。叶节点包含 最终“决定”，讲该样本归于哪个最终类或者取值。</p>
+<p>本章讲介绍基于树的模型。树模型可以用于回归和判别。这类模型常被称为决策和回归树（CART：Classification And Regression Trees），是经典的机器学习算法，也是最广泛使用的工具。CART可以用来指代广义的树模型，有时也特别指代Breiman最初提出的建立分类回归树的算法<span class="citation">(al <a href="#ref-Breiman1984">1984</a>)</span>。在Breiman之后又有很多新的算法出现，比如ID3、C4.5和C5.0，这几个都是Ross Quinlan提出的。是C4.5的改进版本，但由于C5.0还没有开源，因此C4.5算法依然非常流行。原始的CART算法只针对二分类的应变量，但是C4.5能处理多分类结果。CART使用Gini系数准则，C4.5使用熵。CART通过复杂性成本模型来对树进行剪枝，通过交互校验来估计参数；C4.5使用的是一个从二项置信区间衍生处的单通算法。在对缺失值的处理上，CART使用的是代理切分。对于每一个切分， 模型会计算一系列的备选方案（称为代理切分）。代理切分是指与树中实际切分结果相类似的备选切分方案，如果一个代理切分对原始切分的近似效果良好，那么当原始切分的预测变量有缺失值时，代理切分就可以发挥作用。在实际应用中，树中的每一个切分都可以事先计算一些代理切分。C4.5算法不是直接填充缺失值或寻找替代，而是用概率知识把信息增益率的求解作些变化。</p>
+<p>不太大的决策树简洁明了，容易解释。但是简单的树表现不一定好，复杂的树（比如之后会讲到的集成方法）效果大为提高，但过程如同黑箱，无法解释。所以建模者需要在解释性和精确性之间进行权衡。之所以称其为“树”当然因为结构有类似之处，只是决策树的方向和真实的树相反，根在上，叶在下。一棵决策树从单个根节点开始划分为几个不同的枝桠，从⽽产生更多的节点,在每个节点都可以决定是不是要继续划分，如果停止则该节点就是叶节点，若继续就是枝节点接着分裂产生下一层新节点。每个⾮叶节点都牵扯到决定接下来选择哪根树枝。叶节点包含 最终“决策”，将该样本归于哪个最终类或者取值。树模型中有如下几个重要的定义：</p>
+<ul>
+<li>分类树：用于预测离散型结果的树</li>
+<li>回归树：用于预测连续型结果的树</li>
+<li>分裂点：每个非叶节点的处都有一个分裂点用来决定样本的走向（如 收入&gt;20000 和 收入&lt;=20000）</li>
+<li>叶节点（或者终节点）：包含样本的最终“决策”，没有分裂点</li>
+</ul>
+<p>树模型和规则模型之所以成为非常流行的建模工具有下面几个原因：</p>
+<ol style="list-style-type: decimal">
+<li>能处理变量个数相对于观测个数很大情况</li>
+<li>对冗余变量具有抗性</li>
+<li>小型的树非常容易解释（但一旦树结构复杂或者使用集成方法时模型变得无法解释）</li>
+<li>根据它们建立模型时采用的逻辑，它们能有效地处理各种类型的预测变量（稀疏的，偏态的，连续的，分类的，等等），而不需要对这些变量事先进行预处理。此外，这些模型没有任何变量分布的假设，而在回归模型中通常有分布假设</li>
+<li>这些模型可以有效地处理缺失值，并内嵌有特征选择的功能，这一点在很多实际建模问题中非常有用</li>
+</ol>
+<p>单棵树或简单规则模型具有局限性，其中最重要的就是模型不稳定以及预测能力比较差。数据中的微小变动可能会引起树或规则结构的巨大变化。单棵树定义的一系列的矩形区域过于简单，一旦因变量与预测变量之间的关系不能充分地通过矩形子空间来进行表达， 那么树模型和规则模型将产生比其他模型更大的预测误差。为了克服这些缺点，研究者提出了集成模型，它们将许多棵树（或规则）进行组合。集成模型通常具有比单一的树模型好得多的预测表现。我们在之后会做介绍。树模型</p>
+<p>树模型是在数据中寻找一系列的规则，组合起来对新样本进行判定。</p>
+<p>分裂准则</p>
+<p>与回归树一样，分类树的目标是把数据划分为更小、同质性更强的组。在这里同质意味着分裂的节点更纯（即在每个节点有一个类的样本比例很大）。最原始的CART算法使用基尼系数作为分裂准则；ID3、C4.5以及C5.0使用交叉熵，也被称为信息或散度作为标准。下面逐一介绍这三个标准。</p>
+<p>Gini系数</p>
+<p>基尼（Gini）系数<span class="citation">(al <a href="#ref-Breiman1984">1984</a>)</span>用来衡量一个集合样本的杂质（我们希望的是更高的纯度，更少的杂质）。对于二分类问题，给定节点的基尼系数定义为：</p>
 <div id="section-11.1" class="section level2">
 <h2><span class="header-section-number">11.1</span> 基本树模型</h2>
 <!--https://github.com/ledell/useR-machine-learning-tutorial/blob/master/random-forest.ipynb-->
@@ -289,6 +309,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </div>
 <h3> References</h3>
 <div id="refs" class="references">
+<div id="ref-Breiman1984">
+<p>al, Leo Breiman et. 1984. <em>Classification and Regression Trees.</em> ISBN 978-0-412-04841-8. Monterey, CA: Wadsworth &amp; Brooks/Cole Advanced Books &amp; Software.</p>
+</div>
 <div id="ref-APM">
 <p>Max Kuhn, Kjell Johnston. 2013. <em>Applied Predictive Modeling</em>. Springer.</p>
 </div>
