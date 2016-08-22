@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-08-19">
+<meta name="date" content="2016-08-21">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -455,16 +455,16 @@ Import a file from internet: read_delim(url) if a txt file or read_csv(url) if a
       <span class="dt">online_exp=</span><span class="kw">round</span>(<span class="kw">mean</span>(online_exp),<span class="dv">0</span>),
       <span class="dt">store_trans=</span><span class="kw">round</span>(<span class="kw">mean</span>(store_trans),<span class="dv">1</span>),
       <span class="dt">online_trans=</span><span class="kw">round</span>(<span class="kw">mean</span>(online_trans),<span class="dv">1</span>))</code></pre></div>
-<pre><code>##       segment Age FemalePct HouseYes store_exp online_exp
-## 1 Conspicuous  40      0.32     0.86      4990       4898
-## 2       Price  60      0.45     0.94       501        205
-## 3     Quality  35      0.47     0.34       301       2013
-## 4       Style  24      0.81     0.27       200       1962
-##   store_trans online_trans
-## 1        10.9         11.1
-## 2         6.1          3.0
-## 3         2.9         16.0
-## 4         3.0         21.1</code></pre>
+<pre><code>##       segment Age FemalePct HouseYes store_exp online_exp store_trans
+## 1 Conspicuous  40      0.32     0.86      4990       4898        10.9
+## 2       Price  60      0.45     0.94       501        205         6.1
+## 3     Quality  35      0.47     0.34       301       2013         2.9
+## 4       Style  24      0.81     0.27       200       1962         3.0
+##   online_trans
+## 1         11.1
+## 2          3.0
+## 3         16.0
+## 4         21.1</code></pre>
 <p>这结果信息量太大了，不过并不奇怪。在实际应用中，真实客户分组是未知的并且分析的目标就是找到这样的组。也就是说在实际客户分组的项目中，这是我们希望的到的分析上的最终结果。在对这个结果进行解读之前，我们先看看上面<code>ddply()</code>代码。函数的第一个参数是数据集（<code>sim.dat</code>），其次是告诉函数要按照哪个分类变量进行总结，这里我们只想对不同类别的消费者进行总结，但也可以是多个变量，如你可以将该参数设置成<code>ddply(sim.dat, c(“segment”,”house”), …)</code>，结果读者试着自行脑补下：）。接下来<code>summarize</code>是说我们希望对数据框分组做总结，你可以设置其它功能比如<code>transform</code>（在组内进行数据变换）和<code>subset</code>（在组内进行数据选择）。接下来分别是：</p>
 <ul>
 <li><p>Age：计算每组的年龄均值</p></li>
@@ -558,9 +558,9 @@ dplyr::<span class="kw">tbl_df</span>()</code></pre></div>
 ## 2    33   Male 319704.3    Yes  5998.305   4395.923           9
 ## 3    41   Male 317476.2    Yes  3029.844   4179.671          11
 ## 4    37 Female 315697.2    Yes  6548.970   4284.065          13
-## # ... with 12 more variables: online_trans &lt;int&gt;, Q1 &lt;int&gt;,
-## #   Q2 &lt;int&gt;, Q3 &lt;int&gt;, Q4 &lt;int&gt;, Q5 &lt;int&gt;, Q6 &lt;int&gt;, Q7 &lt;int&gt;,
-## #   Q8 &lt;int&gt;, Q9 &lt;int&gt;, Q10 &lt;int&gt;, segment &lt;fctr&gt;</code></pre>
+## # ... with 12 more variables: online_trans &lt;int&gt;, Q1 &lt;int&gt;, Q2 &lt;int&gt;,
+## #   Q3 &lt;int&gt;, Q4 &lt;int&gt;, Q5 &lt;int&gt;, Q6 &lt;int&gt;, Q7 &lt;int&gt;, Q8 &lt;int&gt;, Q9 &lt;int&gt;,
+## #   Q10 &lt;int&gt;, segment &lt;fctr&gt;</code></pre>
 <p>这里用到了一个可能大家之间没有见过的操作符号<code>%&gt;%</code>，这是管道操作，其意思是将<code>%&gt;%</code>左边的对象传递给右边的函数，作为第一个选项的设置（或剩下唯一一个选项的设置）。比如：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x %&gt;%<span class="st"> </span><span class="kw">f</span>(y) 等同于 <span class="kw">f</span>(x, y)
 y %&gt;%<span class="st"> </span><span class="kw">f</span>(x, ., z) 等同于 <span class="kw">f</span>(x, y, z )</code></pre></div>
@@ -638,25 +638,23 @@ dplyr::<span class="kw">summarise</span>(sim.dat, <span class="dt">avg_online =<
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 对数据框中的每一列应用函数anyNA()</span>
 <span class="co"># 这里可以指定一个函数向量，如c(&quot;anyNA&quot;,&quot;is.factor&quot;)</span>
 dplyr::<span class="kw">summarise_each</span>(sim.dat, <span class="kw">funs_</span>(<span class="kw">c</span>(<span class="st">&quot;anyNA&quot;</span>)))</code></pre></div>
-<pre><code>##     age gender income house store_exp online_exp store_trans
-## 1 FALSE  FALSE   TRUE FALSE     FALSE      FALSE       FALSE
-##   online_trans    Q1    Q2    Q3    Q4    Q5    Q6    Q7    Q8
-## 1        FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
-##      Q9   Q10 segment
-## 1 FALSE FALSE   FALSE</code></pre>
+<pre><code>##     age gender income house store_exp online_exp store_trans online_trans
+## 1 FALSE  FALSE   TRUE FALSE     FALSE      FALSE       FALSE        FALSE
+##      Q1    Q2    Q3    Q4    Q5    Q6    Q7    Q8    Q9   Q10 segment
+## 1 FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE   FALSE</code></pre>
 <p>若要根据某分类变量对观测进行分组总结，可以使用<code>group_by()</code>函数。比如：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 对每个消费者类别对应变量应用anyNA()函数</span>
 sim.dat %&gt;%<span class="st"> </span><span class="kw">group_by</span>(segment) %&gt;%<span class="st"> </span><span class="kw">summarise_each</span>(<span class="kw">funs_</span>(<span class="kw">c</span>(<span class="st">&quot;anyNA&quot;</span>)))</code></pre></div>
 <pre><code>## # A tibble: 4 x 19
-##       segment   age gender income house store_exp online_exp
-##        &lt;fctr&gt; &lt;lgl&gt;  &lt;lgl&gt;  &lt;lgl&gt; &lt;lgl&gt;     &lt;lgl&gt;      &lt;lgl&gt;
-## 1 Conspicuous FALSE  FALSE   TRUE FALSE     FALSE      FALSE
-## 2       Price FALSE  FALSE   TRUE FALSE     FALSE      FALSE
-## 3     Quality FALSE  FALSE   TRUE FALSE     FALSE      FALSE
-## 4       Style FALSE  FALSE   TRUE FALSE     FALSE      FALSE
-## # ... with 12 more variables: store_trans &lt;lgl&gt;,
-## #   online_trans &lt;lgl&gt;, Q1 &lt;lgl&gt;, Q2 &lt;lgl&gt;, Q3 &lt;lgl&gt;, Q4 &lt;lgl&gt;,
-## #   Q5 &lt;lgl&gt;, Q6 &lt;lgl&gt;, Q7 &lt;lgl&gt;, Q8 &lt;lgl&gt;, Q9 &lt;lgl&gt;, Q10 &lt;lgl&gt;</code></pre>
+##       segment   age gender income house store_exp online_exp store_trans
+##        &lt;fctr&gt; &lt;lgl&gt;  &lt;lgl&gt;  &lt;lgl&gt; &lt;lgl&gt;     &lt;lgl&gt;      &lt;lgl&gt;       &lt;lgl&gt;
+## 1 Conspicuous FALSE  FALSE   TRUE FALSE     FALSE      FALSE       FALSE
+## 2       Price FALSE  FALSE   TRUE FALSE     FALSE      FALSE       FALSE
+## 3     Quality FALSE  FALSE   TRUE FALSE     FALSE      FALSE       FALSE
+## 4       Style FALSE  FALSE   TRUE FALSE     FALSE      FALSE       FALSE
+## # ... with 11 more variables: online_trans &lt;lgl&gt;, Q1 &lt;lgl&gt;, Q2 &lt;lgl&gt;,
+## #   Q3 &lt;lgl&gt;, Q4 &lt;lgl&gt;, Q5 &lt;lgl&gt;, Q6 &lt;lgl&gt;, Q7 &lt;lgl&gt;, Q8 &lt;lgl&gt;, Q9 &lt;lgl&gt;,
+## #   Q10 &lt;lgl&gt;</code></pre>
 <p>你在数据总结操作中赋予各种总结函数，如<code>mean()</code>，<code>sd()</code>等。但注意这里的总结函数是作用于向量，返回单一值。比如函数<code>is.na()</code>，作用于向量，但返回的也是向量，就不可以在此使用。</p>
 </div>
 <div id="section-6.1.3.4" class="section level4">
