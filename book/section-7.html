@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-08-22">
+<meta name="date" content="2016-08-23">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -324,10 +324,225 @@ y_{n}
 <h3><span class="header-section-number">7.2.1</span> 系统误差和随机误差</h3>
 <p>假设我们对于<span class="math inline">\(\mathbf{X}\)</span>得到<span class="math inline">\(f\)</span>的估计<span class="math inline">\(\hat{f}\)</span>，进而得到<span class="math inline">\(\mathbf{y}\)</span>的预测 <span class="math inline">\(\hat{\mathbf{y}}=\hat{f}(\mathbf{X})\)</span>。预测的误差分成两部分，系统误差和随机误差：</p>
 <p><span class="math display">\[
-E(\mathbf{y}-\hat{\mathbf{y}})^{2}=E[f(\mathbf{X})+\mathbf{\epsilon}-\hat{f}(\mathbf{X})]^{2}=\underset{\text{(1)}}{\underbrace{[f(\mathbf{X})-\hat{f}(\mathbf{X})]^{2}}}+\underset{\text{(2)}}{\underbrace{Var(\mathbf{\epsilon})}}
+E(\mathbf{y}-\hat{\mathbf{y}})^{2}=E[f(\mathbf{X})+\mathbf{\epsilon}-\hat{f}(\mathbf{X})]^{2}=\underset{\text{(1)}}{\underbrace{E[f(\mathbf{X})-\hat{f}(\mathbf{X})]^{2}}}+\underset{\text{(2)}}{\underbrace{Var(\mathbf{\epsilon})}}
   \label{eq:error}\]</span></p>
 <p>其中（1）是系统误差， <span class="math inline">\(\hat{f}\)</span>通常不能彻底对<span class="math inline">\(\mathbf{X}\)</span>和<span class="math inline">\(\mathbf{y}\)</span>之间的“系统关系”建模，这里系统关系指的是在不同样本上存在的稳定关系。这一部分误差能通过改进模型得到提高；（2）是随机误差，这部分误差代表当前数据无法解释的部分，因此无法通过建立更复杂的模型来改进。那些拥有众多参数的复杂黑箱模型最大的问题就是试图通过自变量解释这部分误差，也就是过度拟合。随机误差的显著特点就是在不同的样本上是无法重复的，于是判断是否存在过度拟合的一个准则就是预留一部分样本作为测试集，然后检验训练出来的模型在测试集上的表现。这个我们随后会讲到。这里要澄清一点，过度拟合不只发生在这些黑箱模型上，其发生的根源在于参数个数太多（常超过观测个数），理论上说任何模型都可能过度拟合，只是因为黑箱模型的参数尤其多，其高灵活性和复杂度放大了过度拟合的问题。有些黑箱模型在训练的过程中会使用“袋外数据”（又称为Out of Bag [OOB]）来尽量避免过度拟合的影响。</p>
 <p>如果建模的目的也包含推断，那么这些“黑箱”模型就不合适，这就需要在模型可以解释的范围内使用尽量灵活的模型，比如Lasso回归，多元自适应回归样条等。有人可能不同意Lasso回归是灵活的。从其本质还是传统回归的角度看，它确实没有那么灵活，受到很多模型假设的限制。但由于Lasso的罚函数能同时起到变量选择的作用，这个变量的选择的过程可以不依赖于p值之类的参数（这些参数基于数据分布假设因此具有局限性），而可以通过优化模型预测值和真实值的差距来进行变量选择，从这个角度上看，该模型是灵活的。根据笔者的应用经验，Lasso作为收缩（或变量选择）方法在实际应用中的效果非常好。对于一些市场营销或者社会心理学相关的抽样调查数据分析，分层贝叶斯可能是一种灵活有效的方法，但拟合所需的计算时间更长。</p>
+<p>其中系统误差可以进一步分解：</p>
+<p><span class="math display">\[E[f(\mathbf{X})-\hat{f}(\mathbf{X})]^{2} &amp; = &amp; E\left(f(\mathbf{X})-E[\hat{f}(\mathbf{X})]+E[\hat{f}(\mathbf{X})]-\hat{f}(\mathbf{X})\right)^{2}\\
+ &amp; = &amp; E\left(E[\hat{f}(\mathbf{X})]-f(\mathbf{X})\right)^{2}+E\left(\hat{f}(\mathbf{X})-E[\hat{f}(\mathbf{X})]\right)^{2}\\
+ &amp; = &amp; [Bias(\hat{f}(\mathbf{X}))]^{2}+Var(\hat{f}(\mathbf{X}))\]</span></p>
+<p>系统误差由两部分组成，估计的偏度<span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span>和估计的方差<span class="math inline">\(Var(\hat{f}(\mathbf{X}))\)</span>。上面公式告诉我们，如果要最小化系统误差，需要同时最小化估计偏度和估计方差。偏度代表用模型逼近现实情况导致的误差，这部分误差可能非常复杂。比如线性回归假设自变量和应变量之间是线性关系，但现实生活中完全的线性关系并不常见。下图中x和fx的关系就是非线性的。因此，观测样本量再大，也无法用线性回归给出准确的预测。换句话说，在这种情况下，线性回归模型的预测具有很高的偏度。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(grid)
+<span class="kw">library</span>(lattice)
+<span class="kw">library</span>(ggplot2)
+<span class="co"># 可以从网站下载multiplot()函数代码</span>
+<span class="co"># 用该函数在同一张画布上放置多张ggplot图</span>
+<span class="co"># 需要用到grid包</span>
+<span class="kw">source</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/R_Code/multiplot.r&quot;</span>)
+<span class="co"># 随机抽取一些非线性样本</span>
+x=<span class="kw">seq</span>(<span class="dv">1</span>,<span class="dv">10</span>,<span class="fl">0.01</span>)*pi
+e=<span class="kw">rnorm</span>(<span class="kw">length</span>(x),<span class="dt">mean=</span><span class="dv">0</span>,<span class="dt">sd=</span><span class="fl">0.2</span>)
+fx&lt;-<span class="kw">sin</span>(x)+e+<span class="kw">sqrt</span>(x)
+dat=<span class="kw">data.frame</span>(x,fx)
+<span class="co"># 绘制线性拟合图</span>
+<span class="kw">ggplot</span>(dat,<span class="kw">aes</span>(x,fx))+<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_point</span>() +
+<span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-65-1.png" width="672" /></p>
+<p>由于我们通常使用训练集进行参数估计，如果训练集不同，得到的参数估计也会不同。直观的讲，估计方差表示如果我们用不同的数据集拟合相同的模型，得到估计值的变化，理想的情况是估计值的变化不会太大。对于高方差的模型，训练集的微小变化会导致很不相同的估计值。通常情况下，灵活度高的模型方差也更高，比如树模型，以及最初的助推法，后来在此基础上的随机森林模型和梯度助推法这样的集成方法的重要目标之一，就是通过汇总不同样本上得到的结果来降低估计方差。下图中的蓝色曲线是用平滑方法对上面的非线性观测进行拟合得到的，该曲线的灵活性很高，能够高度拟合当前数据：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(dat,<span class="kw">aes</span>(x,fx))+<span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-66-1.png" width="672" /></p>
+<p>但是该方法有很高的方差，如果我们随机抽取不同的样本子集，得到的拟合曲线会有明显变化：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 设置随机种子</span>
+<span class="kw">set.seed</span>(<span class="dv">2016</span>)
+<span class="co"># 抽取其中部分样本拟合模型</span>
+<span class="co"># 样本1</span>
+idx1=<span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">length</span>(x),<span class="dv">100</span>)
+dat1=<span class="kw">data.frame</span>(<span class="dt">x1=</span>x[idx1],<span class="dt">fx1=</span>fx[idx1])
+p1=<span class="kw">ggplot</span>(dat1,<span class="kw">aes</span>(x1,fx1))+<span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)
+<span class="co"># 样本2</span>
+idx2=<span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">length</span>(x),<span class="dv">100</span>)
+dat2=<span class="kw">data.frame</span>(<span class="dt">x2=</span>x[idx2],<span class="dt">fx2=</span>fx[idx2])
+p2=<span class="kw">ggplot</span>(dat2,<span class="kw">aes</span>(x2,fx2))+<span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)
+<span class="co"># 样本3</span>
+idx3=<span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">length</span>(x),<span class="dv">100</span>)
+dat3=<span class="kw">data.frame</span>(<span class="dt">x3=</span>x[idx3],<span class="dt">fx3=</span>fx[idx3])
+p3=<span class="kw">ggplot</span>(dat3,<span class="kw">aes</span>(x3,fx3))+<span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)
+<span class="co"># 样本4</span>
+idx4=<span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">length</span>(x),<span class="dv">100</span>)
+dat4=<span class="kw">data.frame</span>(<span class="dt">x4=</span>x[idx4],<span class="dt">fx4=</span>fx[idx4])
+p4=<span class="kw">ggplot</span>(dat4,<span class="kw">aes</span>(x4,fx4))+<span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)
+<span class="kw">multiplot</span>(p1,p2,p3,p4,<span class="dt">cols=</span><span class="dv">2</span>)</code></pre></div>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : span too small. fewer data values than degrees of freedom.</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : pseudoinverse used at 3.0651</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : neighborhood radius 1.553</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : reciprocal condition number 0</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : There are other near singularities as well. 1.862</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : k-d tree limited by memory. ncmax= 200</code></pre>
+<pre><code>## Warning in sqrt(sum.squares/one.delta): NaNs produced</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if
+## (is.null(newdata)) object$x else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : span too small.
+## fewer data values than degrees of freedom.</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if
+## (is.null(newdata)) object$x else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : pseudoinverse used
+## at 3.0651</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if
+## (is.null(newdata)) object$x else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : neighborhood radius
+## 1.553</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if
+## (is.null(newdata)) object$x else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : reciprocal
+## condition number 0</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if
+## (is.null(newdata)) object$x else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : There are other
+## near singularities as well. 1.862</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if
+## (is.null(newdata)) object$x else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : k-d tree limited by
+## memory. ncmax= 200</code></pre>
+<pre><code>## Warning in stats::qt(level/2 + 0.5, pred$df): NaNs produced</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : span too small. fewer data values than degrees of freedom.</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : pseudoinverse used at 3.1592</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : neighborhood radius 0.70497</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : reciprocal condition number 0</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : There are other near singularities as well. 0.49699</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : k-d tree limited by memory. ncmax= 200</code></pre>
+<pre><code>## Warning in sqrt(sum.squares/one.delta): NaNs produced</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if
+## (is.null(newdata)) object$x else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : span too small.
+## fewer data values than degrees of freedom.</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if
+## (is.null(newdata)) object$x else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : pseudoinverse used
+## at 3.1592</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if
+## (is.null(newdata)) object$x else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : neighborhood radius
+## 0.70497</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if
+## (is.null(newdata)) object$x else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : reciprocal
+## condition number 0</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if
+## (is.null(newdata)) object$x else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : There are other
+## near singularities as well. 0.49699</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if
+## (is.null(newdata)) object$x else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : k-d tree limited by
+## memory. ncmax= 200</code></pre>
+<pre><code>## Warning in stats::qt(level/2 + 0.5, pred$df): NaNs produced</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : span too small. fewer data values than degrees of freedom.</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : pseudoinverse used at 3.7291</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : neighborhood radius 0.63774</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : reciprocal condition number 0</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : There are other near singularities as well. 0.067992</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : k-d tree limited by memory. ncmax= 200</code></pre>
+<pre><code>## Warning in sqrt(sum.squares/one.delta): NaNs produced</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if
+## (is.null(newdata)) object$x else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : span too small.
+## fewer data values than degrees of freedom.</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if
+## (is.null(newdata)) object$x else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : pseudoinverse used
+## at 3.7291</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if
+## (is.null(newdata)) object$x else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : neighborhood radius
+## 0.63774</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if
+## (is.null(newdata)) object$x else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : reciprocal
+## condition number 0</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if
+## (is.null(newdata)) object$x else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : There are other
+## near singularities as well. 0.067992</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if
+## (is.null(newdata)) object$x else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : k-d tree limited by
+## memory. ncmax= 200</code></pre>
+<pre><code>## Warning in stats::qt(level/2 + 0.5, pred$df): NaNs produced</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : span too small. fewer data values than degrees of freedom.</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : pseudoinverse used at 3.0984</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : neighborhood radius 0.86001</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : reciprocal condition number 0</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : There are other near singularities as well. 0.23331</code></pre>
+<pre><code>## Warning in simpleLoess(y, x, w, span, degree = degree, parametric =
+## parametric, : k-d tree limited by memory. ncmax= 200</code></pre>
+<pre><code>## Warning in sqrt(sum.squares/one.delta): NaNs produced</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if
+## (is.null(newdata)) object$x else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : span too small.
+## fewer data values than degrees of freedom.</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if
+## (is.null(newdata)) object$x else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : pseudoinverse used
+## at 3.0984</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if
+## (is.null(newdata)) object$x else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : neighborhood radius
+## 0.86001</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if
+## (is.null(newdata)) object$x else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : reciprocal
+## condition number 0</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if
+## (is.null(newdata)) object$x else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : There are other
+## near singularities as well. 0.23331</code></pre>
+<pre><code>## Warning in predLoess(object$y, object$x, newx = if
+## (is.null(newdata)) object$x else if (is.data.frame(newdata))
+## as.matrix(model.frame(delete.response(terms(object)), : k-d tree limited by
+## memory. ncmax= 200</code></pre>
+<pre><code>## Warning in stats::qt(level/2 + 0.5, pred$df): NaNs produced</code></pre>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-67-1.png" width="672" /></p>
+<p>当是对相同的4个子集拟合线性模型，变化非常小：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p1=<span class="kw">ggplot</span>(dat1,<span class="kw">aes</span>(x1,fx1))+<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_point</span>() +
+<span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)
+p2=<span class="kw">ggplot</span>(dat2,<span class="kw">aes</span>(x2,fx2))+<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_point</span>() +
+<span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)
+p3=<span class="kw">ggplot</span>(dat3,<span class="kw">aes</span>(x3,fx3))+<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_point</span>() +
+<span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)
+p4=<span class="kw">ggplot</span>(dat4,<span class="kw">aes</span>(x4,fx4))+<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_point</span>() +
+<span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)
+<span class="kw">multiplot</span>(p1,p2,p3,p4,<span class="dt">cols=</span><span class="dv">2</span>)</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-68-1.png" width="672" /></p>
+<p>总体说来，方差随着模型灵活度的增加而增加，偏差随着模型的灵活度增加而降低。在方差和偏差的变化共同决定了系统误差（或者均方误差，MSE）的变化。当我们提高模型的灵活性，偏差减小的速度开始时会超过方差增大的速度，MSE随之减小。但到了一定程度以后，提高模型的灵活性对偏差的影响不大但是方差大幅度增加，MSE随之增加。在之后的章节我们会看到，对于那些有一个控制模型灵活性的调优参数的模型，随着调优参数的减小（参数越大灵活度越低），模型误差先升高，后降低。</p>
 <p>模型选择向来是非常困难的，这种困难不是数据分析行业特有的，很多专业领域都有类似的情况，比如医生判断病人所患的疾病，并在众多治疗方案中选择最合适的，这不是答案一目了然的选择题，决策的过程需要很多权衡和妥协。模型选择也类似，在选择过程中需要考虑具体的情况：项目目的，客户要求的精确度（这点很重要），计算量等等。这个选择的过程很难白纸黑字的像食谱一样写下来，这里我们只是尽己所能的介绍模型选择过程中需要考虑的点，以及评估不同模型的辅助性技术。具体的应用和“数据科学思维”还需要大家在从业过程中通过实践思考不断学习打磨。</p>
 </div>
 <div id="section-7.2.2" class="section level3">
