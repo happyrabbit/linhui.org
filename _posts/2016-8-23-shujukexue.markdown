@@ -11,7 +11,7 @@ layout: post
 
 50年前，John Tukey他老人家就预言有个类似今天的数据科学的东西会出现。早在1962年，他在“数据分析的未来（The Future of Data Analysis）”中John Tukey [1] 就嚷着要对学术统计进行改革。这篇文章当时发表在“数理统计年鉴（The Annals of Mathematical Statistics）”上，他的观点震惊了许多统计界的同事，这都是一群根正苗红的数理统计出身的大神们，那会数理统计年鉴中的文章都是满满的数学公式推导，从定义，定理到证明，逻辑缜密，理论精确。
 
-![](http://upload-images.jianshu.io/upload_images/2825142-a12b0678d6ed844a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![](http://scientistcafe.com/images/JohnTukeyQuote.png)
 
 当然牛人最大的特点就是可以随时任性。John推了大半辈子公式突然有天发现统计不是这么玩的，于是他跳出来说：
 
