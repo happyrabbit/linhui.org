@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-08-21">
+<meta name="date" content="2016-08-22">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -256,16 +256,25 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h1><span class="header-section-number">第12章</span> 聚类判别分析</h1>
 <div id="section-12.1" class="section level2">
 <h2><span class="header-section-number">12.1</span> 聚类分析</h2>
-<p>聚类是无监督学习，主要着眼于梳理数据结构。林林总总的聚类方法的目的都是将数据划分成不同的部分（类），使得同一类的观测尽可能相似，不同类的样本尽可能相异。 What makes clustering different from supervised learning is that there is no number or name that tells you what group each point belongs to, what the groups represent, or even how many groups there should be. If supervised learning is picking out planets from among the stars in the night sky, then clustering is inventing constellations. Clustering tries to separate out data into natural “clumps,” so that a human analyst can more easily interpret it and explain it to others.</p>
-<p>Clustering always relies on a definition of closeness or similarity, called a distance metric. The distance metric can be any measurable quantity, such as difference in IQ, number of shared genetic base pairs, or miles-as-the-crow-flies. Clustering questions all try to break data into more nearly uniform groups.</p>
-<p>Which shoppers have similar tastes in produce? Which viewers like the same kind of movies? Which printer models fail the same way? During which days of the week does this electrical substation have similar electrical power demands? What is a natural way to break these documents into five topic groups?</p>
+<p>聚类是无监督学习，因为聚类分析没有一个应变量告诉你真实情况下每个观测是来自哪类，不知道有哪些类，甚至对有几类通常也是一无所知。林林总总的聚类方法的目的都是将数据划分成不同的部分（类），使得同一类的观测尽可能相似，不同类的样本尽可能相异。聚类分析总是基于一个距离或相似度的定义，称为距离矩阵。距离矩阵可以是可测量的量，如IQ的不同，问卷调查满意度评分的不同，收入差距等等。</p>
 </div>
 <div id="section-12.2" class="section level2">
 <h2><span class="header-section-number">12.2</span> 判别分析</h2>
 <div id="section-12.2.1" class="section level3">
 <h3><span class="header-section-number">12.2.1</span> 逻辑回归</h3>
+<p>逻辑回归是非常流行的判别方法，尤其对于二分类问题。我们以生猪疫情数据为例来讲解模型以及实践代码。这里研究目标是对农场爆发疫情建模。假设样本量为<span class="math inline">\(n\)</span>，对应<span class="math inline">\(G\)</span>个分类变量（也就是农场问卷调查的问题）。第<span class="math inline">\(i\)</span>个农场对应疫情发生的概率是<span class="math inline">\(\theta_i\)</span>，那相应的模型可以写成： Consider risk scoring system construction using a samples of <span class="math inline">\(n\)</span> observations, with information collected for <span class="math inline">\(G\)</span> categorical predictors and one binary response variable for each observation. Let <span class="math inline">\(\bx_{i,g}\)</span> be the vector of dummy variables associated with the <span class="math inline">\(g\)</span>th categorical predictor for the <span class="math inline">\(i\)</span>th observation, and let <span class="math inline">\(y_i\)</span> (= 1, diseased; or 0, not diseased) be the binary response for the <span class="math inline">\(i\)</span>th observation, <span class="math inline">\(i=1,\cdots,n\)</span>, <span class="math inline">\(g=1,\cdots,G\)</span>. Denote the degrees of freedom of the <span class="math inline">\(g\)</span>th predictor by <span class="math inline">\(df_g\)</span>, which is also the length of vector <span class="math inline">\(\bx_{i,g}\)</span>, <span class="math inline">\(i=1,\cdots,n\)</span>.</p>
 <div id="section-12.2.1.1" class="section level4">
 <h4><span class="header-section-number">12.2.1.1</span> 普通逻辑回归</h4>
+<p><span class="math display">\[y_{i}\sim Bounoulli(\theta_{i})\]</span></p>
+<p><span class="math display">\[log\left(\frac{\theta_{i}}{1-\theta_{i}}\right)=\eta_{\mathbf{\beta}}(x_{i})=\beta_{0}+\sum_{g=1}^{G}\mathbf{x_{i,g}}^{T}\mathbf{\mathbf{\beta_{g}}}\]</span></p>
+<p>其中 <span class="math inline">\(\beta_{0}\)</span> 是截距项，且<span class="math inline">\(\mathbf{\beta_{g}}\)</span>是第 is the parameter vector corresponding to the <span class="math inline">\(g\)</span>th predictor.</p>
+Construction of risk scoring systems using logistic regression usually consists of two steps: selection among the <span class="math inline">\(G\)</span> risk factors, and estimation of the selected factor parameters. For model selection, significance has been used as a criterion for inclusion and exclusion of risk factors . Some researchers use univariate logistic regression to screen factors by significance before putting them into a multivariate logistic regression model , whereas others  don’t. Traditional estimation of logistic parameters <span class="math inline">\(\bbeta=(\beta_{0}^{T},\bbeta_{1}^{T},\bbeta_{2}^{T},...,\bbeta_{G}^{T})^{T}\)</span> is done through maximizing the log-likelihood
+\begin{eqnarray*}
+l(\bbeta)&amp;=&amp;log[\prod_{i=1}^{n}\theta_{i}^{y_{i}}(1-\theta_{i})^{1-y_{i}}]\\
+&amp;=&amp;\sum_{i=1}^{n}\{y_{i}log(\theta_{i})+(1-y_{i})log(1-\theta_{i})\}\\
+&amp;=&amp;\sum_{i=1}^{n}\{\ y_{i}\eta_{\bbeta}(\bx_{i})-log[1+exp(\eta_{\bbeta}(\bx_{i}))]\ \}.
+\end{eqnarray*}
+<p>For logistic regression analysis with a large number of explanatory variables, complete- or quasi-complete-separation may result which makes the maximum likelihood estimation unstable.</p>
 </div>
 <div id="lasso" class="section level4">
 <h4><span class="header-section-number">12.2.1.2</span> LASSO逻辑回归</h4>
@@ -285,26 +294,9 @@ Kim et al. . They proposed a gradient descent algorithm to solve the correspondi
 </div>
 <div id="models-for-risk-scoring-systems" class="section level4">
 <h4><span class="header-section-number">12.2.1.5</span> Models for risk scoring systems</h4>
-<p>Consider risk scoring system construction using a samples of <span class="math inline">\(n\)</span> observations, with information collected for <span class="math inline">\(G\)</span> categorical predictors and one binary response variable for each observation. Let <span class="math inline">\(\bx_{i,g}\)</span> be the vector of dummy variables associated with the <span class="math inline">\(g\)</span>th categorical predictor for the <span class="math inline">\(i\)</span>th observation, and let <span class="math inline">\(y_i\)</span> (= 1, diseased; or 0, not diseased) be the binary response for the <span class="math inline">\(i\)</span>th observation, <span class="math inline">\(i=1,\cdots,n\)</span>, <span class="math inline">\(g=1,\cdots,G\)</span>. Denote the degrees of freedom of the <span class="math inline">\(g\)</span>th predictor by <span class="math inline">\(df_g\)</span>, which is also the length of vector <span class="math inline">\(\bx_{i,g}\)</span>, <span class="math inline">\(i=1,\cdots,n\)</span>.</p>
 </div>
 <div id="multivariate-logistic-regression-model" class="section level4">
 <h4><span class="header-section-number">12.2.1.6</span> Multivariate logistic regression model</h4>
-<p>Multivariate logistic regression has been used to construct risk scoring systems for predicting disease . Denote the probability of disease for <span class="math inline">\(i\)</span>th subject by <span class="math inline">\(\theta_i\)</span>, the model can be formulated as</p>
-\begin{equation}
-y_{i}\sim Bounoulli(\theta_{i}),
-\end{equation}
-with
-\begin{equation}
-\log\left(\frac{\theta_{i}}{1-\theta_{i}}\right)=\eta_{\bbeta}(x_{i})=\beta_{0}+\sum_{g=1}^{G}\bx_{i,g}^{T}\bbeta_{g},
-\end{equation}
-<p>where <span class="math inline">\(\beta_{0}\)</span> is the intercept and <span class="math inline">\(\bbeta_{g}\)</span> is the parameter vector corresponding to the <span class="math inline">\(g\)</span>th predictor.</p>
-Construction of risk scoring systems using logistic regression usually consists of two steps: selection among the <span class="math inline">\(G\)</span> risk factors, and estimation of the selected factor parameters. For model selection, significance has been used as a criterion for inclusion and exclusion of risk factors . Some researchers use univariate logistic regression to screen factors by significance before putting them into a multivariate logistic regression model , whereas others  don’t. Traditional estimation of logistic parameters <span class="math inline">\(\bbeta=(\beta_{0}^{T},\bbeta_{1}^{T},\bbeta_{2}^{T},...,\bbeta_{G}^{T})^{T}\)</span> is done through maximizing the log-likelihood
-\begin{eqnarray*}
-l(\bbeta)&amp;=&amp;log[\prod_{i=1}^{n}\theta_{i}^{y_{i}}(1-\theta_{i})^{1-y_{i}}]\\
-&amp;=&amp;\sum_{i=1}^{n}\{y_{i}log(\theta_{i})+(1-y_{i})log(1-\theta_{i})\}\\
-&amp;=&amp;\sum_{i=1}^{n}\{\ y_{i}\eta_{\bbeta}(\bx_{i})-log[1+exp(\eta_{\bbeta}(\bx_{i}))]\ \}.
-\end{eqnarray*}
-<p>For logistic regression analysis with a large number of explanatory variables, complete- or quasi-complete-separation may result which makes the maximum likelihood estimation unstable.</p>
 </div>
 <div id="group-lasso-for-logistic-regression" class="section level4">
 <h4><span class="header-section-number">12.2.1.7</span> Group lasso for logistic regression}</h4>
