@@ -199,7 +199,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="10.1.2" data-path="section-10.html"><a href="section-10.html#section-10.1.2"><i class="fa fa-check"></i><b>10.1.2</b> 回归诊断</a></li>
 <li class="chapter" data-level="10.1.3" data-path="section-10.html"><a href="section-10.html#section-10.1.3"><i class="fa fa-check"></i><b>10.1.3</b> 离群点，高杠杆点和强影响点</a></li>
 </ul></li>
-<li class="chapter" data-level="10.2" data-path="section-10.html"><a href="section-10.html#section-10.2"><i class="fa fa-check"></i><b>10.2</b> 收缩方法</a></li>
+<li class="chapter" data-level="10.2" data-path="section-10.html"><a href="section-10.html#section-10.2"><i class="fa fa-check"></i><b>10.2</b> 收缩方法</a><ul>
+<li class="chapter" data-level="10.2.1" data-path="section-10.html"><a href="section-10.html#section-10.2.1"><i class="fa fa-check"></i><b>10.2.1</b> 岭回归</a></li>
+</ul></li>
 <li class="chapter" data-level="10.3" data-path="section-10.html"><a href="section-10.html#section-10.3"><i class="fa fa-check"></i><b>10.3</b> 分层线性回归</a></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="section-11.html"><a href="section-11.html"><i class="fa fa-check"></i><b>11</b> 树模型</a><ul>
@@ -466,7 +468,23 @@ influence.measures(model)
 <div id="section-10.2" class="section level2">
 <h2><span class="header-section-number">10.2</span> 收缩方法</h2>
 <p>之前特征工程的章节中讲到各种变量选择方法，其中我们对内嵌法没有详细展开。内嵌法是将特征选择的过程内嵌如建模的过程，它是学习器自身自主选择特征，这里我们要讲的收缩方法就属于内嵌法。我们可以通过对模型参数进行限制或者规范化来达到变量选择的效果，这些方法能将一些参数估计朝着0收缩。使用收缩方法提高模型拟合表现的原理可能不那么显而易见，但是收缩方法的效果是非常好的，这也是我最常使用的方法，尤其是项目要求使用可以解释的模型时。收缩方法不仅仅限于线性回归，之后我们在讲判别分析时会介绍将lasso用于逻辑回归。最常用的收缩方法是岭回归（ridge regression）、lasso以及弹性网络（elastic net）。弹性网络结合了岭回归和lasso中的罚函数，可以说是它们的一般化版本。</p>
-<p>对于一般线性回归，在标准模型假设下最小二乘估计号称是方差最小无偏估计，这里的方差最小是在所有线性无偏估计当中最小。当如果MSE 是方差和偏差的一个组合（5.2节），因此很可能出现的一种情况是， 一个具有微小偏差的估计能得到更小的 MSE。 我们经常会发现，一个微小的偏差的增长可以带来方差显著的减小， 从而得到比普通最小二乘估计更小的MSE。当预测变量存在高度相关时， 估计量的方差可能会非常大，因此对于回归模型中的多重共线性问题， 有偏模型也可能得到具有竞争力的MSE取值。 构建有偏回归模型的一种方法是在误差平方和的基础上加上一个惩罚项。 回顾最小二乘模型，可以了解到它的目的是寻找参数的估计，以使得误差平方和达到最小：</p>
+<p>对于一般线性回归，在标准模型假设下最小二乘估计号称是方差最小无偏估计，这里的方差最小是在所有线性无偏估计当中最小。之间在介绍误差来源时讲过MSE是方差和偏差的一个组合。当预测变量存在高度相关时，估计量的方差可能会非常大，偏差的微小增加可能使得方差大幅度下降，因此对于回归模型中的多重共线性问题，有偏模型也可能得到具有竞争力的MSE取值。构建有偏回归模型的一种方法是在误差平方和的基础上加上一个惩罚项。</p>
+<div id="section-10.2.1" class="section level3">
+<h3><span class="header-section-number">10.2.1</span> 岭回归</h3>
+<p>回顾最小二乘模型，它的目的是寻找参数的估计，以使得误差平方（RSS）和达到最小：</p>
+<p><span class="math display">\[RSS=\Sigma_{i=1}^{n}(y_{i}-\beta_{0}-\Sigma_{j=1}^{p}\beta_{j}x_{ij})^{2}\]</span></p>
+<p>岭回归和最小二乘回归有类似之处，不同在于优化的方程略有变化。岭回归寻找的是优化下面方程的<span class="math inline">\(\hat{\beta}^{R}\)</span>：</p>
+<p><span class="math display">\[\Sigma_{i=1}^{n}(y_{i}-\beta_{0}-\Sigma_{j=1}^{p}\beta_{j}x_{ij})^{2}+\lambda\Sigma_{j=1}^{p}\beta_{j}^{2}=RSS+\lambda\Sigma_{j=1}^{p}\beta_{j}^{2}\]</span></p>
+<p>其中<span class="math inline">\(\lambda &gt;0\)</span>是需要额外估计的调优参数。上式是在两个不同的准则间权衡。和最小二乘回归类似，岭回归考虑了最小化RSS，但其还有一个称为收缩惩罚的项<span class="math inline">\(\lambda\Sigma_{j=1}^{p}\beta_{j}^{2}\)</span>，该项在参数<span class="math inline">\(\beta_{1},...,\beta_{p}\)</span>趋近于0的时候变小，因此有向0收缩参数估计的用处。调优参数<span class="math inline">\(\lambda\)</span>用来调整这两个部分对最后参数估计的影响。当<span class="math inline">\(\lambda=0\)</span>时，惩罚项对结果没有影响，这时岭回归等同于最小二乘回归。当<span class="math inline">\(\lambda\rightarrow\infty\)</span>时，惩罚项的影响增大，岭回归系数估计趋近于0。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat&lt;-<span class="kw">read.csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/SegData.csv&quot;</span>)
+<span class="co"># 对数据进行一些清理，删除错误的样本观测，消费金额不能为负数</span>
+dat&lt;-<span class="kw">subset</span>(dat,store_exp&gt;<span class="dv">0</span> &amp;<span class="st"> </span>online_exp&gt;<span class="dv">0</span>)
+<span class="co"># 将10个问卷调查变量当作自变量</span>
+modeldat&lt;-dat[,<span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>,<span class="kw">names</span>(dat))]
+<span class="co"># 将实体店消费量和在线消费之和当作应变量</span>
+<span class="co"># 得到总消费量=实体店消费+在线消费</span>
+modeldat$total_exp&lt;-dat$store_exp+dat$online_exp</code></pre></div>
+</div>
 </div>
 <div id="section-10.3" class="section level2">
 <h2><span class="header-section-number">10.3</span> 分层线性回归</h2>
