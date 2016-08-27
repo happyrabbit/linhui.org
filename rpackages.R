@@ -1,5 +1,5 @@
 pkg<-c("gridExtra","lattice","imputeMissings","RANN","corrplot","nnet","car",
-       "gpairs","reshape2","psych","plyr","DT","CORElearn")
+       "gpairs","reshape2","psych","plyr","DT","CORElearn","coreNLP","elasticnet")
 install.packages(pkg)
 install.packages("shiny")
 install.packages("vcd")
