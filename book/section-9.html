@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-08-28">
+<meta name="date" content="2016-09-03">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -202,6 +202,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="10.2" data-path="section-10.html"><a href="section-10.html#section-10.2"><i class="fa fa-check"></i><b>10.2</b> 收缩方法</a><ul>
 <li class="chapter" data-level="10.2.1" data-path="section-10.html"><a href="section-10.html#section-10.2.1"><i class="fa fa-check"></i><b>10.2.1</b> 岭回归</a></li>
 <li class="chapter" data-level="10.2.2" data-path="section-10.html"><a href="section-10.html#lasso"><i class="fa fa-check"></i><b>10.2.2</b> Lasso</a></li>
+<li class="chapter" data-level="10.2.3" data-path="section-10.html"><a href="section-10.html#section-10.2.3"><i class="fa fa-check"></i><b>10.2.3</b> 弹性网络</a></li>
 </ul></li>
 <li class="chapter" data-level="10.3" data-path="section-10.html"><a href="section-10.html#section-10.3"><i class="fa fa-check"></i><b>10.3</b> 分层线性回归</a></li>
 </ul></li>
@@ -929,7 +930,7 @@ rocValues</code></pre></div>
 <p>原始的Relief算法的基本原理是通过特征对近距离样本的区分能力来估计重要性。沿用之前高维标度化中的公式表达，假设有n个样本观测和p个变量，对应应变量为<span class="math inline">\(\mathbf{y}\)</span>（或者目标变量），观测矩阵为<span class="math inline">\(\mathbf{X}_{n\times p}\)</span>。特征向量为：</p>
 <p><span class="math display">\[\mathbf{x_{.1}}, \mathbf{x_{.2}},...,\mathbf{x_{.p}}\]</span></p>
 <p>算法从训练集中随机选择一个样本R，然后从和R同类的样本中寻找最近的同类（称为“hit”，之后用H表示）和不同类的样本（称为“miss”，之后用M表示），然后根据以下规则更新每个特征的权重：如果R和H在某个特征上的距离小于R和M的距离，则说明该特征对区分R附近同类和不同类样本是有益的，因此增加该特征的权重；反之，如果R和H在某个特征的距离大于R和M的距离，说明该特征对区分附近同类和不同类样本起负面作用，随即降低该特征的权重。将上面过程重复m次，最后得到各特征的平均权重。特征的权重越大，表示该特征的分类能力越强，反之，表示该特征分类能力越弱。对连续型特征的距离，Kira和Rendell建议用两点之间的距离除以该特征的观测极差:</p>
-<p><span class="math display">\[diff(x_{ij}, x{kj}) = \frac{x_{ij} − x_{kj}}{C}\]</span></p>
+<p><span class="math display">\[diff(x_{ij}, x_{kj}) = \frac{x_{ij} − x_{kj}}{C}\]</span></p>
 <p>这里常数<span class="math inline">\(C=max(\mathbf{x_{.j}})-min(\mathbf{x_{.j}})\)</span>将差别标准化到<span class="math inline">\([0,1]\)</span> 区间。对于二项数据 (即, 0/1)， 可以简单使用绝对值： <span class="math display">\[diff(x_{ij}, x_{kj}) = |x_{ij} − x_{kj}|\]</span></p>
 <p>这样值域即为[0,1]。对于二分类问题具体算法如下所示：</p>
 <ol style="list-style-type: decimal">
@@ -939,8 +940,9 @@ rocValues</code></pre></div>
 <ul>
 <li>找到最近的同类（H）和不同类（M）样本
 <ul>
-<li>对 预测变量 j=1…p 执行 1. 基于<span class="math inline">\(R_{i}\)</span>与最近的同类和不同类样本的距离，按如下方式调整分值： 1. <span class="math inline">\(S_{j}=S_{j}-diff_{j}(R_{j},H)^{2}/m + diff_{j}(R_{j},M)^{2}/m\)</span> 1.<br />
-</li>
+<li><p>对 预测变量 j=1…p 执行</p>
+<pre><code> 1. 基于$R_{i}$与最近的同类和不同类样本的距离，按如下方式调整分值：
+ 1. $S_{j}=S_{j}-diff_{j}(R_{i},H)^{2}/m + diff_{j}(R_{i},M)^{2}/m$  </code></pre></li>
 <li>结束</li>
 </ul></li>
 </ul>

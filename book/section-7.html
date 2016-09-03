@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-08-28">
+<meta name="date" content="2016-09-03">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -202,6 +202,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="10.2" data-path="section-10.html"><a href="section-10.html#section-10.2"><i class="fa fa-check"></i><b>10.2</b> 收缩方法</a><ul>
 <li class="chapter" data-level="10.2.1" data-path="section-10.html"><a href="section-10.html#section-10.2.1"><i class="fa fa-check"></i><b>10.2.1</b> 岭回归</a></li>
 <li class="chapter" data-level="10.2.2" data-path="section-10.html"><a href="section-10.html#lasso"><i class="fa fa-check"></i><b>10.2.2</b> Lasso</a></li>
+<li class="chapter" data-level="10.2.3" data-path="section-10.html"><a href="section-10.html#section-10.2.3"><i class="fa fa-check"></i><b>10.2.3</b> 弹性网络</a></li>
 </ul></li>
 <li class="chapter" data-level="10.3" data-path="section-10.html"><a href="section-10.html#section-10.3"><i class="fa fa-check"></i><b>10.3</b> 分层线性回归</a></li>
 </ul></li>
@@ -428,7 +429,7 @@ withnoise&lt;-sim.dat$income+noise[,i]
 fit0&lt;-<span class="kw">lm</span>(withnoise~store_exp+online_exp+store_trans+online_trans,<span class="dt">data=</span>sim.dat)
 rsq_linear[i]&lt;-<span class="kw">summary</span>(fit0)$adj.r.squared
 }</code></pre></div>
-<p>下面我们接着拟合偏最小二乘回归（PLS）。偏最小二乘源自于Herman Wold的非线性迭代偏最小二乘（NIPALS）算法 <span class="citation">(H <a href="#ref-woldh1">1966</a>; H <a href="#ref-woldh2">1982</a>)</span>，是一种通过隐层级将非线性关系线性化的方法。该方法和主成分回归类似，不同在于主成分回归在选择成分的时候没有考虑因变量的信息，其目的是找到最大程度概括自变量空间变异性的线性组合（即，是无监督方法）。当自变量和因变量相关时，主成分回归能够很好的识别出它们之间的系统关系。然而，当存在和因变量不相关的自变量时，该方法的效果就会受到影响。而PLS最大程度概括与因变量相关性的线性组合。推荐大家用PLS解决那些自变量之间存在相关性，但不确定所有自变量都和因变量有关，同时希望用线性回归来解决的问题。在当前情况下，更加复杂的PLS表现效果并不比简单线性好，因为这里几个自变量都和因变量有关的不同信息（从前面的拟合结果看到所有变量都是显著的）。</p>
+<p>下面我们接着拟合偏最小二乘回归（PLS）。偏最小二乘源自于Herman Wold的非线性迭代偏最小二乘（NIPALS）算法 <span class="citation">(W. H <a href="#ref-woldh1">1966</a>; W. H <a href="#ref-woldh2">1982</a>)</span>，是一种通过隐层级将非线性关系线性化的方法。该方法和主成分回归类似，不同在于主成分回归在选择成分的时候没有考虑因变量的信息，其目的是找到最大程度概括自变量空间变异性的线性组合（即，是无监督方法）。当自变量和因变量相关时，主成分回归能够很好的识别出它们之间的系统关系。然而，当存在和因变量不相关的自变量时，该方法的效果就会受到影响。而PLS最大程度概括与因变量相关性的线性组合。推荐大家用PLS解决那些自变量之间存在相关性，但不确定所有自变量都和因变量有关，同时希望用线性回归来解决的问题。在当前情况下，更加复杂的PLS表现效果并不比简单线性好，因为这里几个自变量都和因变量有关的不同信息（从前面的拟合结果看到所有变量都是显著的）。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># pls: 进行偏最小二乘回归和主成分回归</span>
 <span class="kw">library</span>(pls)
 rsq_pls&lt;-<span class="kw">rep</span>(<span class="dv">0</span>,<span class="kw">ncol</span>(noise))

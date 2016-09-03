@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-08-28">
+<meta name="date" content="2016-09-03">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -202,6 +202,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="10.2" data-path="section-10.html"><a href="section-10.html#section-10.2"><i class="fa fa-check"></i><b>10.2</b> 收缩方法</a><ul>
 <li class="chapter" data-level="10.2.1" data-path="section-10.html"><a href="section-10.html#section-10.2.1"><i class="fa fa-check"></i><b>10.2.1</b> 岭回归</a></li>
 <li class="chapter" data-level="10.2.2" data-path="section-10.html"><a href="section-10.html#lasso"><i class="fa fa-check"></i><b>10.2.2</b> Lasso</a></li>
+<li class="chapter" data-level="10.2.3" data-path="section-10.html"><a href="section-10.html#section-10.2.3"><i class="fa fa-check"></i><b>10.2.3</b> 弹性网络</a></li>
 </ul></li>
 <li class="chapter" data-level="10.3" data-path="section-10.html"><a href="section-10.html#section-10.3"><i class="fa fa-check"></i><b>10.3</b> 分层线性回归</a></li>
 </ul></li>
@@ -479,48 +480,7 @@ influence.measures(model)
 <p>其中<span class="math inline">\(\lambda &gt;0\)</span>是需要额外估计的调优参数。上式是在两个不同的准则间权衡。和最小二乘回归类似，岭回归考虑了最小化RSS，但其还有一个称为收缩惩罚的项<span class="math inline">\(\lambda\Sigma_{j=1}^{p}\beta_{j}^{2}\)</span>，该项在参数<span class="math inline">\(\beta_{1},...,\beta_{p}\)</span>趋近于0的时候变小，因此有向0收缩参数估计的用处。调优参数<span class="math inline">\(\lambda\)</span>用来调整这两个部分对最后参数估计的影响。当<span class="math inline">\(\lambda=0\)</span>时，惩罚项对结果没有影响，这时岭回归等同于最小二乘回归。当<span class="math inline">\(\lambda\rightarrow\infty\)</span>时，惩罚项的影响增大，岭回归系数估计趋近于0。这里惩罚只针对<span class="math inline">\(\beta_{1},...,\beta_{p}\)</span>，对截距项<span class="math inline">\(\beta_{0}\)</span>并没有惩罚。每个<span class="math inline">\(\lambda\)</span>值都对应一组参数估计，通过尝试不同的调优参数值，找到最优的模型。通常使用交互校验来选择调优参数，关于交互校验，我在之前基础建模技术那一章节已经讲过了。</p>
 <p>有许多R函数可以进行岭回归。<code>MASS</code>包中的<code>lm.ridge()</code>函数，以及<code>elasticnet</code>包中的<code>enet()</code>函数，如果你知道调优参数的值，可以直接使用这两个函数拟合岭回归模型。如果你要对参数进行调优，最方便的函数是<code>caret</code>包中的<code>train()</code>函数。还是以服装消费者数据为例展示这些函数的使用，自变量为10个问卷调查问题以及年龄、性别、收入和房产情况，应变量为总体花销（在线花销和实体店花销的总和）。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat&lt;-<span class="kw">read.csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/SegData.csv&quot;</span>)
-<span class="kw">summary</span>(dat)</code></pre></div>
-<pre><code>##       age            gender        income       house    
-##  Min.   : 16.00   Female:554   Min.   : 41776   No :432  
-##  1st Qu.: 25.00   Male  :446   1st Qu.: 85832   Yes:568  
-##  Median : 36.00                Median : 93869            
-##  Mean   : 38.84                Mean   :113543            
-##  3rd Qu.: 53.00                3rd Qu.:124572            
-##  Max.   :300.00                Max.   :319704            
-##                                NA&#39;s   :184               
-##    store_exp         online_exp       store_trans     online_trans  
-##  Min.   : -500.0   Min.   :  68.82   Min.   : 1.00   Min.   : 1.00  
-##  1st Qu.:  205.0   1st Qu.: 420.34   1st Qu.: 3.00   1st Qu.: 6.00  
-##  Median :  329.0   Median :1941.86   Median : 4.00   Median :14.00  
-##  Mean   : 1356.8   Mean   :2120.18   Mean   : 5.35   Mean   :13.55  
-##  3rd Qu.:  597.3   3rd Qu.:2440.78   3rd Qu.: 7.00   3rd Qu.:20.00  
-##  Max.   :50000.0   Max.   :9479.44   Max.   :20.00   Max.   :36.00  
-##                                                                     
-##        Q1              Q2              Q3              Q4       
-##  Min.   :1.000   Min.   :1.000   Min.   :1.000   Min.   :1.000  
-##  1st Qu.:2.000   1st Qu.:1.000   1st Qu.:1.000   1st Qu.:2.000  
-##  Median :3.000   Median :1.000   Median :1.000   Median :3.000  
-##  Mean   :3.101   Mean   :1.823   Mean   :1.992   Mean   :2.763  
-##  3rd Qu.:4.000   3rd Qu.:2.000   3rd Qu.:3.000   3rd Qu.:4.000  
-##  Max.   :5.000   Max.   :5.000   Max.   :5.000   Max.   :5.000  
-##                                                                 
-##        Q5              Q6              Q7              Q8       
-##  Min.   :1.000   Min.   :1.000   Min.   :1.000   Min.   :1.000  
-##  1st Qu.:1.750   1st Qu.:1.000   1st Qu.:2.500   1st Qu.:1.000  
-##  Median :4.000   Median :2.000   Median :4.000   Median :2.000  
-##  Mean   :2.945   Mean   :2.448   Mean   :3.434   Mean   :2.396  
-##  3rd Qu.:4.000   3rd Qu.:4.000   3rd Qu.:4.000   3rd Qu.:3.000  
-##  Max.   :5.000   Max.   :5.000   Max.   :5.000   Max.   :5.000  
-##                                                                 
-##        Q9             Q10              segment   
-##  Min.   :1.000   Min.   :1.00   Conspicuous:200  
-##  1st Qu.:2.000   1st Qu.:1.00   Price      :250  
-##  Median :4.000   Median :2.00   Quality    :200  
-##  Mean   :3.085   Mean   :2.32   Style      :350  
-##  3rd Qu.:4.000   3rd Qu.:3.00                    
-##  Max.   :5.000   Max.   :5.00                    
-## </code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 对数据进行一些清理，删除错误的样本观测，消费金额不能为负数</span>
+<span class="co"># 对数据进行一些清理，删除错误的样本观测，消费金额不能为负数</span>
 dat&lt;-<span class="kw">subset</span>(dat,store_exp&gt;<span class="dv">0</span> &amp;<span class="st"> </span>online_exp&gt;<span class="dv">0</span>)
 <span class="co"># 将10个问卷调查变量当作自变量</span>
 trainx&lt;-dat[,<span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>,<span class="kw">names</span>(dat))]
@@ -594,13 +554,14 @@ ridgeRegTune</code></pre></div>
                    <span class="dt">s=</span><span class="dv">1</span>, <span class="dt">mode=</span><span class="st">&quot;fraction&quot;</span>, <span class="dt">type=</span><span class="st">&quot;coefficients&quot;</span>)</code></pre></div>
 <p>返回的结果依旧是一个列表，其中<code>coefficients</code>项包含各个变量的参数估计：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 这里不显示结果</span>
-ridgeCoef$coefficients</code></pre></div>
+RidgeCoef=ridgeCoef$coefficients</code></pre></div>
 <p>岭回归和原始最小二乘回归相比优势在于偏差和方差之间的权衡。之前讲过，一般线性回归中的最小二乘估计在无偏估计中是最优的，但是通常估计方差会很大。这意味着训练集数据的微小变化可能导致参数估计较大的变化。而岭回归估计就是通过牺牲一点点“无偏性”，换取估计方差的减小。因此，岭回归适合在普通最小二乘回归参数估计方差很大的情况下使用。</p>
 </div>
 <div id="lasso" class="section level3">
 <h3><span class="header-section-number">10.2.2</span> Lasso</h3>
 <p>虽然岭回归可以将参数估计值向0进行收缩，但对于任何调优参数值，它都不能将系数取值变为严格的0。尽管某些参数估计值变得非常小以至于可以忽略，但事实上岭回归并没有进行变量选择。这可能对预测精确度来说不是问题，但却对模型解释提出了挑战，尤其在变量个数大的时候。一种流行的用来替代岭回归的模型是“最小绝对收缩与选择算子”模型，通常被称为lasso<span class="citation">(R <a href="#ref-Tibshirani1996">1996</a>)</span>。这个模型使用了与岭回归类似的惩罚项，lasso的回归参数估计<span class="math inline">\(\hat{\beta}_{\lambda}^{L}\)</span>最小化如下方程：</p>
 <p><span class="math display">\[\Sigma_{i=1}^{n}(y_{i}-\beta_{0}-\Sigma_{j=1}^{p}\beta_{j}x_{ij})^{2}+\lambda\Sigma_{j=1}^{p}|\beta_{j}|=RSS+\lambda\Sigma_{j=1}^{p}|\beta_{j}|\]</span></p>
+<p>lasso和岭回归很相似，唯一的不同在于罚函数。岭回归中的<span class="math inline">\(\beta_{j}^{2}\)</span>在lasso中变为<span class="math inline">\(|\beta_{j}|\)</span>。用统计术语讲就是岭回归是在结构风险最小化的正则化因子上使用模型参数向量的二阶范数形式，lasso使用的是一阶范数形式。lasso不仅将参数估计向0收缩，当调优参数足够大时，一些参数估计将直接缩减为零，这可以达到特征提取的作用。这样一来，lasso回归的结果更易于解释。和其它有调优参数的模型类似，lasso也需要通过交互校验进行参数调优。下面我们展示在R中如何进行调优和拟合。</p>
 <p>先用<code>train()</code>函数对参数进行调优。首先设置交互校验和参数调优范围，这里我们使用10层交互校验。建议大家在用此类方法前都先进行标准化：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ctrl &lt;-<span class="st"> </span><span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>, <span class="dt">number =</span> <span class="dv">10</span>)
 lassoGrid &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">fraction =</span> <span class="kw">seq</span>(.<span class="dv">8</span>, <span class="dv">1</span>, <span class="dt">length =</span> <span class="dv">20</span>))
@@ -649,7 +610,7 @@ lassoTune</code></pre></div>
 ## The final value used for the model was fraction = 0.9473684.</code></pre>
 <p>训练出的模型调优参数为0.95，对应RMSE和<span class="math inline">\(R^{2}\)</span>分别为1761和79%，和之间岭回归几乎相同。从交互校验的RMSE结果图中可以看到，随着调优参数增加，RMSE有一个减小然后增加的过程。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(lassoTune)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-168-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-169-1.png" width="672" /></p>
 <p>lasso模型可以用许多不同的函数进行拟合。<code>lars</code>包中的<code>lars()</code>函数，<code>elasticnet</code>包的<code>enet()</code>函数，<code>glmnet</code>包的<code>glmnet()</code>函数都可以拟合lasso，它们的语法非常相似。我们还是使用<code>enet()</code>函数，其要求自变量必须是一个矩阵对象，因此要将数据框<code>trainx</code>转换成矩阵。此外，预测变量在建模之前需要中心化和标准化，函数中的<code>normalize</code>参数可以自动完成这一过程<code>lambda</code>参数控制了岭回归的罚参数，因此将该值设为0即为拟合lasso模型。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lassoModel&lt;-<span class="st"> </span><span class="kw">enet</span>(<span class="dt">x =</span> <span class="kw">as.matrix</span>(trainx), <span class="dt">y =</span> trainy, <span class="dt">lambda =</span> <span class="dv">0</span>, <span class="dt">normalize =</span> <span class="ot">TRUE</span>)</code></pre></div>
 <p>lasso模型在进行预测之前不需要进行指定：</p>
@@ -662,7 +623,15 @@ lassoTune</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lassoCoef&lt;-<span class="kw">predict</span>(lassoModel,<span class="dt">newx =</span> <span class="kw">as.matrix</span>(trainx),<span class="dt">s=</span><span class="fl">0.95</span>, <span class="dt">mode=</span><span class="st">&quot;fraction&quot;</span>, <span class="dt">type=</span><span class="st">&quot;coefficients&quot;</span>)</code></pre></div>
 <p>返回的结果依旧是一个列表，其中<code>coefficients</code>项包含各个变量的参数估计：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 这里不显示结果</span>
-lassoCoef$coefficients</code></pre></div>
+LassoCoef=lassoCoef$coefficients</code></pre></div>
+<p>这类规则化方法的研究现在非常活跃。很多学者将lasso模型嫁接到其它方法上，比如线性判别<span class="citation">(Clemmensen L <a href="#ref-Clem2011">2011</a>)</span>，偏最小二乘回归<span class="citation">(C. H and S <a href="#ref-chun2010">2010</a>)</span>。但由于一阶范数不是连续可导的，lasso回归的计算过程更复杂。很多学者对相应的优化算法进行了研究，其中最重要的改进是Bradley Efron等<span class="citation">(Efron B <a href="#ref-efron2014">2014</a>)</span>提出的最小角回归(Least Angle Regression［LARS］)算法，该算法很好地解决Lasso的计算问题，尤其在维度高的时候。</p>
+</div>
+<div id="section-10.2.3" class="section level3">
+<h3><span class="header-section-number">10.2.3</span> 弹性网络</h3>
+<p>弹性网络是lasso的一般化版本<span class="citation">(Z. H and T <a href="#ref-zou2005">2005</a>)</span>，该模型结合了两种罚函数，参数估计最小化如下方程：</p>
+<p><span class="math display">\[\Sigma_{i=1}^{n}(y_{i}-\hat{y}_{i})^{2}+\lambda_{1}\Sigma_{j=1}^{p}\beta_{j}^{2}+\lambda_{2}\Sigma_{j=1}^{p}|\beta_{j}|\]</span></p>
+<p>lasso对应的估计方差较大，而岭回归又没有特征选择的功能，弹性网络的优点在于利用了岭回归的罚函数，同时又有lasso的特征选择功能。Zou和Hastie<span class="citation">(Z. H and T <a href="#ref-zou2005">2005</a>)</span>指出该模型能够更有效的处理成组的高度相关变量。</p>
+<p>还是先用<code>train()</code>函数对参数进行调优。首先设置交互校验和参数调优范围，这里我们使用10层交互校验，并且对变量标准化：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">enetGrid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">.lambda =</span> <span class="kw">seq</span>(<span class="dv">0</span>,<span class="fl">0.2</span>,<span class="dt">length=</span><span class="dv">20</span>), <span class="dt">.fraction =</span> <span class="kw">seq</span>(.<span class="dv">8</span>, <span class="dv">1</span>, <span class="dt">length =</span> <span class="dv">20</span>))
 <span class="kw">set.seed</span>(<span class="dv">100</span>)
 enetTune &lt;-<span class="st"> </span><span class="kw">train</span>(trainx, trainy,
@@ -670,6 +639,8 @@ enetTune &lt;-<span class="st"> </span><span class="kw">train</span>(trainx, tra
                   <span class="dt">tuneGrid =</span> enetGrid,
                   <span class="dt">trControl =</span> ctrl,
                   <span class="dt">preProc =</span> <span class="kw">c</span>(<span class="st">&quot;center&quot;</span>, <span class="st">&quot;scale&quot;</span>))</code></pre></div>
+<p>fraction = 0.9578947 and lambda = 0.01052632.</p>
+<p>0.01052632 0.9578947 1760.652 0.7901601</p>
 </div>
 </div>
 <div id="section-10.3" class="section level2">
@@ -708,6 +679,18 @@ enetTune &lt;-<span class="st"> </span><span class="kw">train</span>(trainx, tra
 </div>
 <div id="ref-Tibshirani1996">
 <p>R, Tibshirani. 1996. “Regression Shrinkage and Selection via the Lasso.” <em>Journal of the Royal Statistical Society Series B (Methodological)</em> 58 (1): 267–88.</p>
+</div>
+<div id="ref-Clem2011">
+<p>Clemmensen L, Witten D, Hastie T. 2011. “Sparse Discriminant Analysis.” <em>Technometrics</em> 53 (4): 406–13.</p>
+</div>
+<div id="ref-chun2010">
+<p>H, Chun, and Kele S. 2010. “Sparse Partial Least Squares Regression for Simultaneous Dimension Reduction and Variable Selection.” <em>Journal of the Royal Statistical Society: Series B (Statistical Methodology)</em> 72 (1): 3–25.</p>
+</div>
+<div id="ref-efron2014">
+<p>Efron B, Johnstone I, Hastie T. 2014. “Least Angle Regression.” <em>The Annals of Statistics</em> 32 (2): 407–99.</p>
+</div>
+<div id="ref-zou2005">
+<p>H, Zou, and Hastie T. 2005. “Regularization and Variable Selection via the Elastic Net.” <em>Journal of the Royal Statistical Society, Series B,</em> 67 (2): 301–20.</p>
 </div>
 </div>
 <div class="footnotes">
