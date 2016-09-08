@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-09-03">
+<meta name="date" content="2016-09-07">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -204,7 +204,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="10.2.2" data-path="section-10.html"><a href="section-10.html#lasso"><i class="fa fa-check"></i><b>10.2.2</b> Lasso</a></li>
 <li class="chapter" data-level="10.2.3" data-path="section-10.html"><a href="section-10.html#section-10.2.3"><i class="fa fa-check"></i><b>10.2.3</b> 弹性网络</a></li>
 </ul></li>
-<li class="chapter" data-level="10.3" data-path="section-10.html"><a href="section-10.html#section-10.3"><i class="fa fa-check"></i><b>10.3</b> 分层线性回归</a></li>
+<li class="chapter" data-level="10.3" data-path="section-10.html"><a href="section-10.html#lasso"><i class="fa fa-check"></i><b>10.3</b> 知识扩展：Lasso的变量选择功能</a></li>
+<li class="chapter" data-level="10.4" data-path="section-10.html"><a href="section-10.html#glmnet"><i class="fa fa-check"></i><b>10.4</b> 广义线性模型压缩方法及<code>glmnet</code>包</a></li>
+<li class="chapter" data-level="10.5" data-path="section-10.html"><a href="section-10.html#section-10.5"><i class="fa fa-check"></i><b>10.5</b> 分层线性回归</a></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="section-11.html"><a href="section-11.html"><i class="fa fa-check"></i><b>11</b> 树模型</a><ul>
 <li class="chapter" data-level="11.1" data-path="section-11.html"><a href="section-11.html#section-11.1"><i class="fa fa-check"></i><b>11.1</b> 基本树模型</a></li>
@@ -639,12 +641,33 @@ enetTune &lt;-<span class="st"> </span><span class="kw">train</span>(trainx, tra
                   <span class="dt">tuneGrid =</span> enetGrid,
                   <span class="dt">trControl =</span> ctrl,
                   <span class="dt">preProc =</span> <span class="kw">c</span>(<span class="st">&quot;center&quot;</span>, <span class="st">&quot;scale&quot;</span>))</code></pre></div>
-<p>fraction = 0.9578947 and lambda = 0.01052632.</p>
-<p>0.01052632 0.9578947 1760.652 0.7901601</p>
+<p>训练出的模型对应的lasso调优参数为0.958，岭回归调优参数为0.01。相应RMSE和<span class="math inline">\(R^{2}\)</span>分别为1760和79%，在这里这三种方法的效果并没有很大的不同。这里展示如何使用<code>elasticnet</code>包中的<code>enet()</code>函数：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">enetfit =<span class="st"> </span><span class="kw">enet</span>(<span class="dt">x =</span> <span class="kw">as.matrix</span>(trainx), <span class="dt">y =</span> trainy, <span class="dt">lambda =</span> <span class="fl">0.01</span>,
+                <span class="co"># 这里设置将自变量标准化</span>
+                <span class="dt">normalize =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<p>和之前一样，<code>enetfit</code>只指定了岭回归的罚函数，由于弹性网模型同时具有岭回归和lasso罚函数，我们需要进一步通过<code>predict()</code>函数得到相应的拟合系数和拟合结果。针对<code>enet</code>对象的<code>predict()</code>函数可以通过参数<code>s</code>和<code>mode</code>来指定在lasso罚参数下的拟合，和之前不同的是，这里我们对应的lasso的罚函数参数设置为<code>s = 0.958</code> 和 <code>mode = &quot;fraction&quot;</code>：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">enetPred &lt;-<span class="st"> </span><span class="kw">predict</span>(enetfit, <span class="dt">newx =</span> <span class="kw">as.matrix</span>(trainx), 
+                     <span class="dt">s =</span> <span class="fl">0.958</span>, <span class="dt">mode =</span> <span class="st">&quot;fraction&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;fit&quot;</span>)</code></pre></div>
+<p>注意上面<code>type = &quot;fit&quot;</code>返回的结果是一个列表，其中<code>fit</code>项包含预测结果。如果要得到参数拟合结果，需要在<code>predict()</code>函数中设定<code>type=&quot;coefficients&quot;</code>：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">enetCoef&lt;-<span class="kw">predict</span>(ridgefit,<span class="dt">newx =</span> <span class="kw">as.matrix</span>(trainx), 
+                   <span class="dt">s=</span><span class="fl">0.958</span>, <span class="dt">mode=</span><span class="st">&quot;fraction&quot;</span>, <span class="dt">type=</span><span class="st">&quot;coefficients&quot;</span>)</code></pre></div>
+<p>返回的结果依旧是一个列表，其中<code>coefficients</code>项包含各个变量的参数估计。</p>
 </div>
 </div>
-<div id="section-10.3" class="section level2">
-<h2><span class="header-section-number">10.3</span> 分层线性回归</h2>
+<div id="lasso" class="section level2">
+<h2><span class="header-section-number">10.3</span> 知识扩展：Lasso的变量选择功能</h2>
+<p>可能有人会问从岭回归到lasso，只是罚函数从二阶范数变成一阶范数，为什么lasso就能够将参数估计收缩成0而岭回归不能呢？要回答这个问题，我们先看下lasso和岭回归分别对应的另一版本的等价优化方程。对于lasso而言，优化下面两个方程是等价的：</p>
+<p><span class="math display">\[\Sigma_{i=1}^{n}(y_{i}-\beta_{0}-\Sigma_{j=1}^{p}\beta_{j}x_{ij})^{2}+\lambda\Sigma_{j=1}^{p}|\beta_{j}|=RSS+\lambda\Sigma_{j=1}^{p}|\beta_{j}|\]</span></p>
+<p><span class="math display">\[\underset{\beta}{min}\left\{ \Sigma_{i=1}^{n}\left(y_{i}-\beta_{0}-\Sigma_{j=1}^{p}\beta_{j}x_{ij}\right)^{2}\right\} ,\ \Sigma_{j=1}^{p}|\beta_{j}|\leq s\]</span></p>
+<p>也就是说，对每个调优参数<span class="math inline">\(\lambda\)</span>的取值，都存在相应的<span class="math inline">\(s\)</span>值，使得上面两个方程优化后得到的参数估计相同。类似的，对于岭回归，下面两个方程等价：</p>
+<p><span class="math display">\[\underset{\beta}{min}\left\{ \Sigma_{i=1}^{n}\left(y_{i}-\beta_{0}-\Sigma_{j=1}^{p}\beta_{j}x_{ij}\right)^{2}\right\} ,\ \Sigma_{j=1}^{p}\beta_{j}^{2}\leq s\]</span></p>
+<p><span class="math display">\[\Sigma_{i=1}^{n}(y_{i}-\beta_{0}-\Sigma_{j=1}^{p}\beta_{j}x_{ij})^{2}+\lambda\Sigma_{j=1}^{p}\beta_{j}^{2}=RSS+\lambda\Sigma_{j=1}^{p}\beta_{j}^{2}\]</span></p>
+</div>
+<div id="glmnet" class="section level2">
+<h2><span class="header-section-number">10.4</span> 广义线性模型压缩方法及<code>glmnet</code>包</h2>
+</div>
+<div id="section-10.5" class="section level2">
+<h2><span class="header-section-number">10.5</span> 分层线性回归</h2>
 <p>我们已经讨论过简单线性模型，下面讨论该模型的扩展分层线性模型。什么时候需要使用分层模型呢？需要考虑分层结构的常见情况有两种。（1）当你的数据有嵌套结构，这是指一些观测可能属于更高一层级单位。比如在教育学分析当中通常需要研究学生的学习情况，同一所学校或者同一班级的学生相似度更高，这里我们就需要考虑学生学习情况的个体观测可能嵌套在班级，或者学校这个更高一层级单位中。市场营销中，地理位置通常是一个更高的层极单位。北上广的消费者和一些二三线城市的消费者可能不同，东南沿海和东北地区的消费者差异可能更大。这些情况中我们都需要考虑分层结构。（2）还有一种情况是针对纵向数据。比如对一些人年收入连续10年的观测，那么研究观测就该考虑个人的随机效应。类似的还有我们的航空公司满意度调查数据，每个受访者针对每项对3个航空公司进行评分，这里也需要考虑受访者的个体随机效应，可能的情况是有的人倾向于给高分，有的人倾向于给低分，这样的倾向和问卷问题以及哪家航空公司无关。</p>
 <!--
 ## 贝叶斯线性回归
