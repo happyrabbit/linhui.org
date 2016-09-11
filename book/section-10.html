@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-09-09">
+<meta name="date" content="2016-09-10">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -665,12 +665,15 @@ enetTune &lt;-<span class="st"> </span><span class="kw">train</span>(trainx, tra
 <p>当p＝2时，lasso的参数估计是所有满足<span class="math inline">\(|\beta_{1}|+|\beta_{2}|\leq s\)</span>的<span class="math inline">\(\beta_{1}\)</span>和<span class="math inline">\(\beta_{2}\)</span>取值中最小化<span class="math inline">\(RSS\)</span>的。岭回归是估计所有满足<span class="math inline">\(\beta_{1}^{2}+\beta_{2}^{2}\leq s\)</span>的参数取值中最小化<span class="math inline">\(RSS\)</span>的。当s很大时，相应的限制条件几乎是无效的，只要参数估计能够最小化<span class="math inline">\(RSS\)</span>即使绝对值很大也没有问题。只要s所定义的区域包含最小二乘解，那么收缩方法得出的参数估计和一般最小二乘回归就相同。相反，如果s很小，那么可能的参数取值范围就很有限。</p>
 <p>了解这样的等价表达之后，我们再看看岭回归和lasso的不同之处。</p>
 <div class="figure">
-<img src="/Users/happyrabbit/Documents/GitHub/linhui.org/book/Figure/LassoRidge.png" alt="" />
-
+<img src="/Users/happyrabbit/Documents/GitHub/linhui.org/book/Figure/LassoRidge.png" alt="左边是lasso对应的误差等位线和正方形限制区域，右边是岭回归对应的等位线和圆形限制区域" />
+<p class="caption">左边是lasso对应的误差等位线和正方形限制区域，右边是岭回归对应的等位线和圆形限制区域</p>
 </div>
+<p>上面图中围绕在<span class="math inline">\(\hat{\beta}\)</span>周围的椭圆表示有相同RSS的参数估计。随着椭圆的扩大，对应的RSS增加。lasso和岭回归的估计值就是在一定的限制区域下，椭圆不断扩张的过程中和限制区域的第一个接触点。大家想想看，如果有某个参数的估计是0的话，那么这个接触点该在哪里？一定在某条坐标轴上。由于岭回归的限制区域是圆形，所以真正的触点无法落在坐标轴上，可能无限接近，但就是到不了。这就是求之而不可得的数学诠释。所以岭回归无法将参数收缩成0，而lasso可以。</p>
+<p>上面是2个参数的情况。如果参数个数是3的话，那么lasso的限制区域就是一个三位空间的多面体，而岭回归的限制区域就是个球。参数个数再增加的话，就得让科幻小说家来描述了。希望大家理解lasso可以进行变量选择，而岭回归不行的几何解释。</p>
 </div>
 <div id="glmnet" class="section level2">
 <h2><span class="header-section-number">10.4</span> 广义线性模型压缩方法及<code>glmnet</code>包</h2>
+<p>之前只是对线性回归使用罚函数。不难理解，这样的罚函数可以用于很多其它回回归函数的优化上，比如逻辑回归，泊松回归等。<code>glmnet</code>包能够通过<strong>罚极大似然函数</strong>拟合广义线性回归，也就是在似然函数上加上罚函数，和之间在RSS上加罚函数类似。之前的线性回归的情况是广义线性回归的一个特例。和之前一样，罚函数的选择可以是一阶范数和二阶范数的一个组合。<code>glmnet</code>包可以对一系列调优参数值同时计算参数估计。除了线性回归外，该包可以拟合的广义线性模型还有：逻辑回归、多项式回归，泊松回归，cox回归。<code>glmnet</code>包的作者是Jerome Friedman、Trevor Hastie、Rob Tibshirani和Noah Simon，当前的R包由Trevor Hastie维护。该包还有一个matlab版本。</p>
 </div>
 <div id="section-10.5" class="section level2">
 <h2><span class="header-section-number">10.5</span> 分层线性回归</h2>

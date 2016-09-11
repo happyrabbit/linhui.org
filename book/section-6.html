@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-09-09">
+<meta name="date" content="2016-09-10">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -268,159 +268,98 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 RStudio在2015年推出的`readr`包可以取代传统的`read.csv()`和`read.table()`等函数。使用该包中对应的`read_csv()`和`write_csv()`函数读写数据的效率大幅度提高。`readr`包基于 C++ 的SourceFile，SourceString，SourceRaw的文件API接口，避免了数据的复制和分配，能更加快速读取格式化数据（和传统基础R中的包相比，速度快乐超过10倍）。此外，`readr`不会将字符串转化成因子变量，能够解析时间观测，不会修改列名。
 
-There are many solutions for importing txt|csv file into R. In our previous articles, we described some best practices for preparing your data as well as R base functions (read.delim() and read.csv()) for importing txt|csv file into R.
+11.2 Getting started
 
+Most of readr’s functions are concerned with turning flat files into data frames:
 
-In this article, we’ll describe the readr package, developed by Hadley Wickham. readr package provides a fast and friendly solution to read a delimited file into R.
+read_csv() reads comma delimited files, read_csv2() reads semicolon separated files (common in countries where , is used as the decimal place), read_tsv() reads tab delimited files, and read_delim() reads in files with any delimiter.
 
-Compared to R base functions, readr functions are:
+read_fwf() reads fixed width files. You can specify fields either by their widths with fwf_widths() or their position with fwf_positions(). read_table() reads a common variation of fixed width files where columns are separated by white space.
 
-much faster (X10),
-have a helpful progress bar if loading is going to take a while and
-all functions work exactly the same way.
+read_log() reads Apache style log files. (But also check out webreadr which is built on top of read_log() and provides many more helpful tools.)
 
-The readr package contains functions for reading i) delimited files, ii) lines and iii) the whole file.
+These functions all have similar syntax: once you’ve mastered one, you can use the others with ease. For the rest of this chapter we’ll focus on read_csv(). Not only are csv files one of the most common forms of data storage, but once you understand read_csv(), you can easily apply your knowledge to all the other functions in readr.
 
-Functions for reading delimited files: txt|csv
+The first argument to read_csv() is the most important: it’s the path to the file to read.
 
-The function read_delim()[in readr package] is a general function to import a data table into R. Depending on the format of your file, you can also use:
+heights <- read_csv("data/heights.csv")
+#> Parsed with column specification:
+#> cols(
+#>   earn = col_double(),
+#>   height = col_double(),
+#>   sex = col_character(),
+#>   ed = col_integer(),
+#>   age = col_integer(),
+#>   race = col_character()
+#> )
+When you run read_csv() it prints out a column specification that gives the name and type of each column. That’s an important part of readr, which we’ll come back to in parsing a file.
 
+You can also supply an inline csv file. This is useful for experimenting with readr and for creating reproducible examples to share with others:
 
-read_csv(): to read a comma (“,”) separated values
-read_csv2(): to read a semicolon (“;”) separated values
-read_tsv(): to read a tab separated (“\t”) values
+read_csv("a,b,c
+1,2,3
+4,5,6")
+#> # A tibble: 2 × 3
+#>       a     b     c
+#>   <int> <int> <int>
+#> 1     1     2     3
+#> 2     4     5     6
+In both cases read_csv() uses the first line of the data for the column names, which is a very common convention. There are two cases where you might want to tweak this behaviour:
 
+Sometimes there are a few lines of metadata at the top of the file. You can use skip = n to skip the first n lines; or use comment = "#" to drop all lines that start with (e.g.) #.
 
-The simplified format of these functions are, as follow:
+read_csv("The first line of metadata
+  The second line of metadata
+  x,y,z
+  1,2,3", skip = 2)
+#> # A tibble: 1 × 3
+#>       x     y     z
+#>   <int> <int> <int>
+#> 1     1     2     3
 
-# General function
-read_delim(file, delim, col_names = TRUE)
+read_csv("# A comment I want to skip
+  x,y,z
+  1,2,3", comment = "#")
+#> # A tibble: 1 × 3
+#>       x     y     z
+#>   <int> <int> <int>
+#> 1     1     2     3
+The data might not have column names. You can use col_names = FALSE to tell read_csv() not to treat the first row as headings, and instead label them sequentially from X1 to Xn:
 
-# Read comma (",") separated values
-read_csv(file, col_names = TRUE)
+read_csv("1,2,3\n4,5,6", col_names = FALSE)
+#> # A tibble: 2 × 3
+#>      X1    X2    X3
+#>   <int> <int> <int>
+#> 1     1     2     3
+#> 2     4     5     6
+("\n" is a convenient shortcut for adding a new line. You’ll learn more about it and other types of string escape in string basics.)
 
-# Read semicolon (";") separated values
-# (this is common in European countries)
-read_csv2(file, col_names = TRUE)
-    
-# Read tab separated values
-read_tsv(file, col_names = TRUE)
+Alternatively you can pass col_names a character vector which will be used as the column names:
 
-file: file path, connexion or raw vector. Files ending in .gz, .bz2, .xz, or .zip will be automatically uncompressed. Files starting with “http://”, “https://”, “ftp://”, or “ftps://” will be automatically downloaded. Remote gz files can also be automatically downloaded & decompressed.
-delim: the character that separates the values in the data file.
-col_names: Either TRUE, FALSE or a character vector specifying column names. If TRUE, the first row of the input will be used as the column names.
+read_csv("1,2,3\n4,5,6", col_names = c("x", "y", "z"))
+#> # A tibble: 2 × 3
+#>       x     y     z
+#>   <int> <int> <int>
+#> 1     1     2     3
+#> 2     4     5     6
+Another option that commonly needs tweaking is na: this specifies the value (or values) that are used to represent missing values in your file:
 
+read_csv("a,b,c\n1,2,.", na = ".")
+#> # A tibble: 1 × 3
+#>       a     b     c
+#>   <int> <int> <chr>
+#> 1     1     2  <NA>
+This is all you need to know to read ~75% of csv files that you’ll encounter in practice. You can also easily adapt what you’ve learned to read tab separated files with read_tsv() and fixed width files with read_fwf(). To read in more challenging files, you’ll need to learn more about how readr parses each column, turning them in to R vectors.
 
-read_csv() and read_tsv() are special case of the general function read_delim(). They’re useful for reading the most common types of flat file data, comma separated values and tab separated values, respectively.
+11.2.1 Compared to base R
 
-The above mentioned functions return an object of class tbl_df which is data frame providing a nicer printing method, useful when working with large data sets.
+If you’ve used R before, you might wonder why we’re not using read.csv(). There are a few good reasons to favour readr functions over the base equivalents:
 
-Reading a file
+They are typically much faster (~10x) than their base equivalents. Long running jobs have a progress bar, so you can see what’s happening. If you’re looking for raw speed, try data.table::fread(). It doesn’t fit quite so well into the tidyverse, but it can be quite a bit faster.
 
-Reading a local file
-To import a local .txt or .csv files, the syntax would be:
-# Read a txt file, named "mtcars.txt"
-my_data <- read_tsv("mtcars.txt")
+They produce tibbles, they don’t convert character vectors to factors, use row names, or munge the column names. These are common sources of frustration with the base R functions.
 
-# Read a csv file, named "mtcars.csv"
-my_data <- read_csv("mtcars.csv")
-The above R code, assumes that the file “mtcars.txt” or “mtcars.csv” is in your current working directory. To know your current working directory, type the function getwd() in R console.
-
-It’s also possible to choose a file interactively using the function file.choose(), which I recommend if you’re a beginner in R programming:
-# Read a txt file
-my_data <- read_tsv(file.choose())
-
-# Read a csv file
-my_data <- read_csv(file.choose())
-If you use the R code above in RStudio, you will be asked to choose a file.
-
-If your field separator is for example “|”, it’s possible to use the general function read_delim(), which reads in files with a user supplied delimiter:
-my_data <- read_delim(file.choose(), sep = "|")
-Reading a file from internet
-It’s possible to use the functions read_delim(), read_csv() and read_tsv() to import files from the web.
-
-my_data <- read_tsv("http://www.sthda.com/upload/boxplot_format.txt")
-head(my_data)
-   Nom variable Group
-1 IND1       10     A
-2 IND2        7     A
-3 IND3       20     A
-4 IND4       14     A
-5 IND5       14     A
-6 IND6       12     A
-In the case of parsing problems
-If there are parsing problems, a warning tells you how many, and you can retrieve the details with the function problems().
-
-my_data <- read_csv(file.choose())
-problems(my_data)
-Specify column types
-
-There are different types of data: numeric, character, logical, …
-
-readr tries to guess automatically the type of data contained in each column. You might see a lot of warnings in a situation where readr has guessed the column type incorrectly. To fix these problems you can use the additional arguments col_type() to specify the data type of each column.
-
-The following column types are available:
-
-
-col_integer(): to specify integer (alias = “i”)
-col_double(): to specify double (alias = “d”).
-col_logical(): to specify logical variable (alias = “l”)
-col_character(): leaves strings as is. Don’t convert it to a factor (alias = “c”).
-col_factor(): to specify a factor (or grouping) variable (alias = “f”)
-col_skip(): to ignore a column (alias = “-” or “_“)
-col_date() (alias = “D”), col_datetime() (alias = “T”) and col_time() (“t”) to specify dates, date times, and times.
-
-
-An example is as follow (column x is an integer (i) and column treatment = “character” (c):
-
-read_csv("my_file.csv", col_types = cols(
-  x = "i", # integer column
-  treatment = "c" # character column
-))
-Reading lines from a file
-
-Function: read_lines().
-
-Simplified format:
-read_lines(file, skip = 0, n_max = -1L)
-
-file: file path
-skip: Number of lines to skip before reading data
-n_max: Numbers of lines to read. If n is -1, all lines in file will be read.
-
-
-The function read_lines() returns a character vector with one element for each line.
-
-Example of usage
-# Demo file
-my_file <- system.file("extdata/mtcars.csv", package = "readr")
-# Read lines
-my_data <- read_lines(my_file)
-head(my_data)
-[1] "\"mpg\",\"cyl\",\"disp\",\"hp\",\"drat\",\"wt\",\"qsec\",\"vs\",\"am\",\"gear\",\"carb\""
-[2] "21,6,160,110,3.9,2.62,16.46,0,1,4,4"                                                     
-[3] "21,6,160,110,3.9,2.875,17.02,0,1,4,4"                                                    
-[4] "22.8,4,108,93,3.85,2.32,18.61,1,1,4,1"                                                   
-[5] "21.4,6,258,110,3.08,3.215,19.44,1,0,3,1"                                                 
-[6] "18.7,8,360,175,3.15,3.44,17.02,0,0,3,2"                                                  
-Read whole file
-
-Simplified format
-read_file(file)
-Example of usage
-# Demo file
-my_file <- system.file("extdata/mtcars.csv", package = "readr")
-# Read whole file
-read_file(my_file)
-[1] "\"mpg\",\"cyl\",\"disp\",\"hp\",\"drat\",\"wt\",\"qsec\",\"vs\",\"am\",\"gear\",\"carb\"\n21,6,160,110,3.9,2.62,16.46,0,1,4,4\n21,6,160,110,3.9,2.875,17.02,0,1,4,4\n22.8,4,108,93,3.85,2.32,18.61,1,1,4,1\n21.4,6,258,110,3.08,3.215,19.44,1,0,3,1\n18.7,8,360,175,3.15,3.44,17.02,0,0,3,2\n18.1,6,225,105,2.76,3.46,20.22,1,0,3,1\n14.3,8,360,245,3.21,3.57,15.84,0,0,3,4\n24.4,4,146.7,62,3.69,3.19,20,1,0,4,2\n22.8,4,140.8,95,3.92,3.15,22.9,1,0,4,2\n19.2,6,167.6,123,3.92,3.44,18.3,1,0,4,4\n17.8,6,167.6,123,3.92,3.44,18.9,1,0,4,4\n16.4,8,275.8,180,3.07,4.07,17.4,0,0,3,3\n17.3,8,275.8,180,3.07,3.73,17.6,0,0,3,3\n15.2,8,275.8,180,3.07,3.78,18,0,0,3,3\n10.4,8,472,205,2.93,5.25,17.98,0,0,3,4\n10.4,8,460,215,3,5.424,17.82,0,0,3,4\n14.7,8,440,230,3.23,5.345,17.42,0,0,3,4\n32.4,4,78.7,66,4.08,2.2,19.47,1,1,4,1\n30.4,4,75.7,52,4.93,1.615,18.52,1,1,4,2\n33.9,4,71.1,65,4.22,1.835,19.9,1,1,4,1\n21.5,4,120.1,97,3.7,2.465,20.01,1,0,3,1\n15.5,8,318,150,2.76,3.52,16.87,0,0,3,2\n15.2,8,304,150,3.15,3.435,17.3,0,0,3,2\n13.3,8,350,245,3.73,3.84,15.41,0,0,3,4\n19.2,8,400,175,3.08,3.845,17.05,0,0,3,2\n27.3,4,79,66,4.08,1.935,18.9,1,1,4,1\n26,4,120.3,91,4.43,2.14,16.7,0,1,5,2\n30.4,4,95.1,113,3.77,1.513,16.9,1,1,5,2\n15.8,8,351,264,4.22,3.17,14.5,0,1,5,4\n19.7,6,145,175,3.62,2.77,15.5,0,1,5,6\n15,8,301,335,3.54,3.57,14.6,0,1,5,8\n21.4,4,121,109,4.11,2.78,18.6,1,1,4,2\n"
-Summary
-
-
-Import a local .txt file: read_tsv(file.choose())
-
-Import a local .csv file: read_csv(file.choose())
-
-Import a file from internet: read_delim(url) if a txt file or read_csv(url) if a csv file
+They are more reproducible. Base R functions inherit some behaviour from your operating system and environment variables, so import code that works on your computer might not work on someone else’s.
 -->
 <div id="section-6.1" class="section level2">
 <h2><span class="header-section-number">6.1</span> 数据整合</h2>
