@@ -3,6 +3,17 @@ title: 为什么lasso有变量选择功能而ridge没有？"
 ---
 
 
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
 <meta name="author" content="林荟" />
 
 <meta name="date" content="2016-09-11" />
@@ -98,6 +109,7 @@ $(document).ready(function () {
   window.buildTabsets("TOC");
 });
 </script>
+
 
 <!-- code folding -->
 
