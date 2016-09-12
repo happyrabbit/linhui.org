@@ -1,5 +1,5 @@
 ---
-title: 为什么lasso有变量选择功能而ridge没有？"
+title: 为什么lasso有变量选择功能而ridge没有？
 author: "林荟"
 date: "Sep 11, 2016"
 layout: post
