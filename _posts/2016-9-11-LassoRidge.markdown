@@ -1,6 +1,7 @@
 ---
-title: "为什么lasso有变量选择功能而ridge没有？"
+title: 为什么lasso有变量选择功能而ridge没有？"
 ---
+
 
 <meta name="author" content="林荟" />
 
@@ -68,8 +69,8 @@ h6 {
 <style type="text/css">
 .main-container {
   max-width: 940px;
-  margin-left: 1.35em;
-  margin-right: 1.35em;
+  margin-left: auto;
+  margin-right: auto;
 }
 code {
   color: inherit;
