@@ -1,6 +1,6 @@
 ---
 title: "什么是数据科学?"
-author: "Hui Lin"
+author: "林荟"
 date: "August 23, 2016"
 output: html_document
 layout: post
