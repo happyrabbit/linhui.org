@@ -1,5 +1,5 @@
 ---
-title: "数据科学可以解决什么问题？?"
+title: "数据科学可以解决什么问题？"
 author: "林荟"
 date: "Sep 12, 2016"
 output: html_document
