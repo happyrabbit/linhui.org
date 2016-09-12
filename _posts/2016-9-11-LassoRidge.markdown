@@ -68,8 +68,8 @@ h6 {
 <style type="text/css">
 .main-container {
   max-width: 940px;
-  margin-left: auto;
-  margin-right: auto;
+  margin-left: 1.35em;
+  margin-right: 1.35em;
 }
 code {
   color: inherit;
