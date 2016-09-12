@@ -6,11 +6,10 @@ layout: post
 ---
 
 
-## 为什么lasso有变量选择功能而ridge没有？
-### 林荟
-### 2016-09-11
-
-<h5 class="title">  <a href="http://scientistcafe.com/">Back to Homepage</a> </h4>
+<h2 class="title toc-ignore">为什么lasso有变量选择功能而ridge没有？</h1>
+<h4 class="author"><em>林荟</em></h4>
+<h4 class="date"><em>2016-09-11</em></h4>
+<h4 class="title">  <a href="http://scientistcafe.com/">Back to Homepage</a> </h4>
 
 
 
