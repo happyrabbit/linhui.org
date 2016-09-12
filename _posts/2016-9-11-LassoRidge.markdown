@@ -2,7 +2,6 @@
 title: 为什么lasso有变量选择功能而ridge没有？"
 author: "林荟"
 date: "Sep 11, 2016"
-output: html_document
 layout: post
 ---
 
@@ -31,3 +30,12 @@ layout: post
 <p>上面是2个参数的情况。如果参数个数是3的话，那么lasso的限制区域就是一个三位空间的多面体，而ridge的限制区域就是个球。参数个数再增加的话，就得让科幻小说家来描述了。希望大家理解lasso可以进行变量选择，而ridge不行的几何解释。</p>
 
 
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
