@@ -8,8 +8,9 @@ layout: post
 <h4 class="author"><em>林荟</em></h4>
 <h4 class="date"><em>2016-09-11</em></h4>
 
+<!--
 <h5 class="title">  <a href="http://scientistcafe.com/">Back to Homepage</a> </h5>
-
+-->
 
 
 <p>对模型参数进行限制或者规范化能将一些参数估计朝着0收缩。使用收缩方法提高模型拟合表现的原理可能不那么显而易见，但是收缩方法的效果是非常好的，这也是我最常使用的方法，尤其是项目要求使用可以解释的模型时。岭回归（ridge regression）、lasso以及弹性网络（elastic net）。弹性网络结合了ridge和lasso中的罚函数，可以说是它们的一般化版本。</p>
