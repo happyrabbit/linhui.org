@@ -11,7 +11,10 @@ layout: post
 
 # 数据科学可以解决什么问题？
 
-![](http://linhui.org/images/Jokes/jokeBayes.png)
+
+<p align="center">
+  <img src="http://linhui.org/images/Jokes/jokeBayes.png"   />
+</p>
 
 ## 前提要求
 
