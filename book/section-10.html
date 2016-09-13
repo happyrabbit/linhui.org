@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-09-10">
+<meta name="date" content="2016-09-13">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -500,8 +500,16 @@ ridgeRegTune &lt;-<span class="st"> </span><span class="kw">train</span>(trainx,
                       <span class="dt">tuneGrid =</span> ridgeGrid,
                       <span class="dt">trControl =</span> ctrl,
                       ## 中心化和标度化变量
-                      <span class="dt">preProc =</span> <span class="kw">c</span>(<span class="st">&quot;center&quot;</span>, <span class="st">&quot;scale&quot;</span>))
-ridgeRegTune</code></pre></div>
+                      <span class="dt">preProc =</span> <span class="kw">c</span>(<span class="st">&quot;center&quot;</span>, <span class="st">&quot;scale&quot;</span>))</code></pre></div>
+<pre><code>## Loading required package: elasticnet</code></pre>
+<pre><code>## Loading required package: lars</code></pre>
+<pre><code>## Loaded lars 1.2</code></pre>
+<pre><code>## 
+## Attaching package: &#39;lars&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:psych&#39;:
+## 
+##     error.bars</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ridgeRegTune</code></pre></div>
 <pre><code>## Ridge Regression 
 ## 
 ## 999 samples
@@ -667,12 +675,18 @@ enetTune &lt;-<span class="st"> </span><span class="kw">train</span>(trainx, tra
 <p align="center">
 <img src="http://scientistcafe.com/book/Figure/LassoRidge.png" width="50%"  />
 </p>
-<p>左边是lasso对应的误差等位线和正方形限制区域，右边是岭回归对应的等位线和圆形限制区域 上面图中围绕在<span class="math inline">\(\hat{\beta}\)</span>周围的椭圆表示有相同RSS的参数估计。随着椭圆的扩大，对应的RSS增加。lasso和岭回归的估计值就是在一定的限制区域下，椭圆不断扩张的过程中和限制区域的第一个接触点。大家想想看，如果有某个参数的估计是0的话，那么这个接触点该在哪里？一定在某条坐标轴上。由于岭回归的限制区域是圆形，所以真正的触点无法落在坐标轴上，可能无限接近，但就是到不了。这就是求之而不可得的数学诠释。所以岭回归无法将参数收缩成0，而lasso可以。</p>
+<p>左边是lasso对应的误差等位线和正方形限制区域，右边是岭回归对应的等位线和圆形限制区域。 上面图中围绕在<span class="math inline">\(\hat{\beta}\)</span>周围的椭圆表示有相同RSS的参数估计。随着椭圆的扩大，对应的RSS增加。lasso和岭回归的估计值就是在一定的限制区域下，椭圆不断扩张的过程中和限制区域的第一个接触点。大家想想看，如果有某个参数的估计是0的话，那么这个接触点该在哪里？一定在某条坐标轴上。由于岭回归的限制区域是圆形，所以真正的触点无法落在坐标轴上，可能无限接近，但就是到不了。这就是求之而不可得的数学诠释。所以岭回归无法将参数收缩成0，而lasso可以。</p>
 <p>上面是2个参数的情况。如果参数个数是3的话，那么lasso的限制区域就是一个三位空间的多面体，而岭回归的限制区域就是个球。参数个数再增加的话，就得让科幻小说家来描述了。希望大家理解lasso可以进行变量选择，而岭回归不行的几何解释。</p>
 </div>
 <div id="glmnet" class="section level2">
 <h2><span class="header-section-number">10.4</span> 广义线性模型压缩方法及<code>glmnet</code>包</h2>
 <p>之前只是对线性回归使用罚函数。不难理解，这样的罚函数可以用于很多其它回回归函数的优化上，比如逻辑回归，泊松回归等。<code>glmnet</code>包能够通过<strong>罚极大似然函数</strong>拟合广义线性回归，也就是在似然函数上加上罚函数，和之间在RSS上加罚函数类似。之前的线性回归的情况是广义线性回归的一个特例。和之前一样，罚函数的选择可以是一阶范数和二阶范数的一个组合。<code>glmnet</code>包可以对一系列调优参数值同时计算参数估计。除了线性回归外，该包可以拟合的广义线性模型还有：逻辑回归、多项式回归，泊松回归，cox回归。<code>glmnet</code>包的作者是Jerome Friedman、Trevor Hastie、Rob Tibshirani和Noah Simon，当前的R包由Trevor Hastie维护。该包还有一个matlab版本。</p>
+<p>广义线性模型压缩方法可以表达成优化下面方程：</p>
+<p><span class="math display">\[\underset{\beta_{0},\mathbf{\beta}}{min}\frac{1}{N}\Sigma_{i=1}^{N}w_{i}l(y_{i},\beta_{0}+\mathbf{\beta^{T}x_{i}})+\lambda[(1-\alpha)\parallel\mathbf{\beta}\parallel_{2}^{2}/2+\alpha\parallel\mathbf{\beta}\parallel_{1}]\]</span></p>
+<p>其中需要对一定范围内的<span class="math inline">\(\lambda\)</span>值进行调优。其中：</p>
+<p><span class="math display">\[l(y_{i},\beta_{0}+\mathbf{\beta^{T}x_{i}})=-log[\mathcal{L}(y_{i},\beta_{0}+\mathbf{\beta^{T}x_{i}})]\]</span></p>
+<p>也就是似然函数<span class="math inline">\(\mathcal{L}(y_{i},\beta_{0}+\mathbf{\beta^{T}x_{i}})\)</span>取对数后再加负号，最大化似然函数即等价于最小化<span class="math inline">\(l(y_{i},\beta_{0}+\mathbf{\beta^{T}x_{i}})\)</span>。参数<span class="math inline">\(\alpha\)</span>控制了弹性网络罚函数，即在岭回归（<span class="math inline">\(\alpha=0\)</span>）和lasso（<span class="math inline">\(\alpha=1\)</span>）之间权衡。<span class="math inline">\(\lambda\)</span>控制了罚函数的总体权重，其值越大，罚函数相对于似然函数的权重越高。</p>
+<p>之前我们已经讲过，岭回归的罚函数能够将参数估计向0收缩，但是不能收缩为0。而lasso的罚函数能够将参数严格收缩为0，因而具有变量选择功能。弹性网络的罚函数结合了这两者。这里的<span class="math inline">\(\alpha\)</span>也是需要估计的参数。</p>
 </div>
 <div id="section-10.5" class="section level2">
 <h2><span class="header-section-number">10.5</span> 分层线性回归</h2>
