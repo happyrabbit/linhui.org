@@ -10,6 +10,9 @@ layout: post
 **[Back to Homepage](http://scientistcafe.com)** 
 
 # 数据科学可以解决什么问题？
+
+![](http://linhui.org/images/Jokes/jokeBayes.png)
+
 ## 前提要求
 
 数据科学不是万能药，数据科学家也不是魔术师，有些问题我们无法用数据科学解决，最好在一开始就对问题做出判断，对于那些无法解决的问题，诚实的告诉对方并解释原因，那我们对问题有什么要求呢？
