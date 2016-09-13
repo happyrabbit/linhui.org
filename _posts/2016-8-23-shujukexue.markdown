@@ -10,7 +10,7 @@ layout: post
 **[Back to Homepage](http://scientistcafe.com)**
 -->
 
-<h4 class="author"><em>林荟</em></h4>
+<h4 class="author"><em>林荟 (Hui Lin)</em></h4>
 <h4 class="date"><em>2016-08-23</em></h4>
 
 # 什么是数据科学?

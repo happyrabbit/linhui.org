@@ -6,7 +6,7 @@ output: html_document
 layout: post
 ---
 
-<h4 class="author"><em>林荟</em></h4>
+<h4 class="author"><em>林荟 (Hui Lin)</em></h4>
 <h4 class="date"><em>2016-09-12</em></h4>
 
 # 数据科学可以解决什么问题？
