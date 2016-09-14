@@ -1,0 +1,476 @@
+<h4 class="author"><em>林荟 (Hui Lin)</em></h4>
+<h4 class="author"><em>Twitter: @gossip_rabbit</em></h4>
+<h4 class="date"><em>2016-09-14</em></h4>
+
+
+<h3>base包：apply()</h3>
+<p>R基础包中有几个强大的函数，<code>apply()</code>、<code>lapply()</code>和<code>sapply()</code>等。它们做的事情类似，只是对应的对象，或返回对象的格式不同。这些函数对于R的初学者来说可能有些难，但一旦熟悉以后会发现它们非常有效。它们是干什么的？简单来说就是依次对某一对象的某一部分重复应用一个指定的函数。它们的不同在于，<code>apply()</code>将你指定的函数作用于<strong>数据框</strong>对象的行或列，返回一个<strong>向量</strong>。‘lapply()’ 将指定的函数作用于<strong>列表</strong>或者<strong>数据框</strong>对象，返回一个长度相同的<strong>列表</strong>。<code>sapply()</code>更加便捷，且算是对<code>lapply()</code>进行了包装，若<code>sapply()</code>中参数<code>simplify=FALSE</code>，那么其返回的值和<code>lapply()</code>是一样的。若<code>simplify=TRUE</code>，则<code>sapply()</code>的返回值不是一个列表，而是一个矩阵。因为在平常工作中通常处理的都是数据框，所以这里主要介绍函数<code>apply()</code>的用法。大家可能会觉得很抽象，觉得抽象很正常，因为这几兄弟确实不太接地气，我现在用这些函数几乎每次都得去查帮助文档。这里我们用一个服装消费者数据来展示这些函数的使用。</p>
+<pre class="r"><code>library(dplyr)
+library(plyr)
+# 读入数据
+sim.dat&lt;-read.csv(&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/SegData.csv&quot;)
+summary(sim.dat)</code></pre>
+<pre><code>##       age            gender        income       house    
+##  Min.   : 16.00   Female:554   Min.   : 41776   No :432  
+##  1st Qu.: 25.00   Male  :446   1st Qu.: 85832   Yes:568  
+##  Median : 36.00                Median : 93869            
+##  Mean   : 38.84                Mean   :113543            
+##  3rd Qu.: 53.00                3rd Qu.:124572            
+##  Max.   :300.00                Max.   :319704            
+##                                NA's   :184               
+##    store_exp         online_exp       store_trans     online_trans  
+##  Min.   : -500.0   Min.   :  68.82   Min.   : 1.00   Min.   : 1.00  
+##  1st Qu.:  205.0   1st Qu.: 420.34   1st Qu.: 3.00   1st Qu.: 6.00  
+##  Median :  329.0   Median :1941.86   Median : 4.00   Median :14.00  
+##  Mean   : 1356.8   Mean   :2120.18   Mean   : 5.35   Mean   :13.55  
+##  3rd Qu.:  597.3   3rd Qu.:2440.78   3rd Qu.: 7.00   3rd Qu.:20.00  
+##  Max.   :50000.0   Max.   :9479.44   Max.   :20.00   Max.   :36.00  
+##                                                                     
+##        Q1              Q2              Q3              Q4       
+##  Min.   :1.000   Min.   :1.000   Min.   :1.000   Min.   :1.000  
+##  1st Qu.:2.000   1st Qu.:1.000   1st Qu.:1.000   1st Qu.:2.000  
+##  Median :3.000   Median :1.000   Median :1.000   Median :3.000  
+##  Mean   :3.101   Mean   :1.823   Mean   :1.992   Mean   :2.763  
+##  3rd Qu.:4.000   3rd Qu.:2.000   3rd Qu.:3.000   3rd Qu.:4.000  
+##  Max.   :5.000   Max.   :5.000   Max.   :5.000   Max.   :5.000  
+##                                                                 
+##        Q5              Q6              Q7              Q8       
+##  Min.   :1.000   Min.   :1.000   Min.   :1.000   Min.   :1.000  
+##  1st Qu.:1.750   1st Qu.:1.000   1st Qu.:2.500   1st Qu.:1.000  
+##  Median :4.000   Median :2.000   Median :4.000   Median :2.000  
+##  Mean   :2.945   Mean   :2.448   Mean   :3.434   Mean   :2.396  
+##  3rd Qu.:4.000   3rd Qu.:4.000   3rd Qu.:4.000   3rd Qu.:3.000  
+##  Max.   :5.000   Max.   :5.000   Max.   :5.000   Max.   :5.000  
+##                                                                 
+##        Q9             Q10              segment   
+##  Min.   :1.000   Min.   :1.00   Conspicuous:200  
+##  1st Qu.:2.000   1st Qu.:1.00   Price      :250  
+##  Median :4.000   Median :2.00   Quality    :200  
+##  Mean   :3.085   Mean   :2.32   Style      :350  
+##  3rd Qu.:4.000   3rd Qu.:3.00                    
+##  Max.   :5.000   Max.   :5.00                    
+## </code></pre>
+<p>数据中包含N=1000个观测，我们将模拟3类变量（括号内是变量对应的模拟数据框中的列标签名）：</p>
+<p>（1）人口统计学变量。</p>
+<ul>
+<li>年龄（age）</li>
+<li>性别（gender）</li>
+<li>有房还是租房（house）</li>
+</ul>
+<p>（2）消费者行为变量。</p>
+<ul>
+<li>2015年实体店购买该品牌服装花销（store_exp）</li>
+<li>2015年在线购买该品牌服装花销（online_exp）</li>
+<li>2015年实体店交易次数（store_trans）</li>
+<li>2015年在线交易次数（online_trans）</li>
+</ul>
+<p>（3）客户认知问卷调查。为了进一步了解消费者，商家时常对消费者进行问卷调查，然后对调查结果进行分组，其目标是寻找在产品兴趣，市场参与度或营销反应的重要方面有显著差异的客户群。通过了解组间的不同，市场营销人员可以优化产品定位，进行更加精准的营销。这里我们假设该服装品牌对消费者进行了下面的调查，并模拟该调查问卷的回复。</p>
+<p>你是否同意下面的申明？</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">问题</th>
+<th align="left">1（非常不同意）</th>
+<th align="left">2（有点不同意）</th>
+<th align="left">3（中立/不知道）</th>
+<th align="left">4（有点同意）</th>
+<th align="left">5（非常同意）</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">（Q1）：我喜欢买不同品牌的服装，比较它们</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">（Q2）：我喜欢买同一个品牌的服装</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">（Q3）：品牌的知名度对我来说非常重要</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">（Q4）：服装质量对我来说非常重要</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">（Q5）：服装风格我喜欢的风格</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">（Q6）：我喜欢在实体店购买</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">（Q7）：我喜欢在网上购买</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">（Q8）：价格对我来说很重要</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">（Q9）：我喜欢不同风格的衣服</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">（Q10）：我喜欢自己挑选服装，不需要周围人的建议</td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+</tbody>
+</table>
+<p>我们进一步假设这些根据问卷调查的结果可以将消费者分成4组：价格敏感（Price），炫耀性消费（Conspicuous），质量（Quality），风格（Style）。</p>
+<p>我们首先想要对数据框中的所有数值型变量求均值和标准查，首先选取其中数值型的变量：</p>
+<pre class="r"><code>sdat&lt;-sim.dat[,!lapply(sim.dat,class)==&quot;factor&quot;]</code></pre>
+<p>现在的数据框<code>sdat</code>中只包括数值型的变量。这样我们就可以用<code>apply()</code>函数对每列求均值和标准差了：</p>
+<pre class="r"><code>apply(sdat, MARGIN=2,function(x) mean(na.omit(x)))</code></pre>
+<pre><code>##          age       income    store_exp   online_exp  store_trans 
+##       38.840   113543.065     1356.851     2120.181        5.350 
+## online_trans           Q1           Q2           Q3           Q4 
+##       13.546        3.101        1.823        1.992        2.763 
+##           Q5           Q6           Q7           Q8           Q9 
+##        2.945        2.448        3.434        2.396        3.085 
+##          Q10 
+##        2.320</code></pre>
+<p>这里我们定义了一个函数<code>function(x) mean(na.omit(x))</code>，这个函数很简单，就是对任何向量求均值同时忽略其中的缺失值。<code>MARGIN=2</code>告诉函数逐列应用定义的函数。如果要计算行均值，只要简单的将margin参数设置为1即可。结果可见，平均说来在线购买次数和消费量都要高于实体店购买。对于10个问卷调查，第二个问题（<code>Q2</code>）平均得分最低。</p>
+<pre class="r"><code>apply(sdat, MARGIN=2,function(x) sd(na.omit(x)))</code></pre>
+<pre><code>##          age       income    store_exp   online_exp  store_trans 
+##    16.416818 49842.287197  2774.399785  1731.224308     3.695559 
+## online_trans           Q1           Q2           Q3           Q4 
+##     7.956959     1.450139     1.168348     1.402106     1.155061 
+##           Q5           Q6           Q7           Q8           Q9 
+##     1.284377     1.438529     1.455941     1.154347     1.118493 
+##          Q10 
+##     1.136174</code></pre>
+<p>让我们再来看看标准差，代码和计算均值几乎是一样的，只是将均值函数<code>mean()</code>换成标准差函数<code>sd()</code>。虽然这都是一些简单的统计量，但能够使你在建模前了解更多的关于数据的信息，这对于模型选择和结果解释都有无形的帮助。</p>
+</div>
+<div id="plyrddply" class="section level3">
+<h3>plyr包：ddply()函数</h3>
+<p>这里要讲一个居家旅行必备神器<code>plyr</code>包。主要展示如何用这个包中的ddply()函数帮助我们进行数据分析。还是服装消费者的数据，之前我们都没有用到数据框中的最后一列指明消费者类别的变量<code>segment</code>。有客户分组项目经验的人都知道，在通过聚类（在聚类的章节会说到）得到分组以后，下一件事情就是看看每组客户都是些什么样的人，也就是建立各组客户档案。下面我们就来看看各组客户的人口统计学和消费行为档案吧：</p>
+<pre class="r"><code>ddply(sim.dat,&quot;segment&quot;,summarize, Age=round(mean(na.omit(age)),0),
+      FemalePct=round(mean(gender==&quot;Female&quot;),2),
+      HouseYes=round(mean(house==&quot;Yes&quot;),2),
+      store_exp=round(mean(na.omit(store_exp),trim=0.1),0),
+      online_exp=round(mean(online_exp),0),
+      store_trans=round(mean(store_trans),1),
+      online_trans=round(mean(online_trans),1))</code></pre>
+<pre><code>##       segment Age FemalePct HouseYes store_exp online_exp store_trans
+## 1 Conspicuous  42      0.32     0.86      4990       4898        10.9
+## 2       Price  60      0.45     0.94       501        205         6.1
+## 3     Quality  35      0.47     0.34       301       2013         2.9
+## 4       Style  24      0.81     0.27       200       1962         3.0
+##   online_trans
+## 1         11.1
+## 2          3.0
+## 3         16.0
+## 4         21.1</code></pre>
+<p>这结果信息量太大了，不过并不奇怪。在实际应用中，真实客户分组是未知的并且分析的目标就是找到这样的组。也就是说在实际客户分组的项目中，这是我们希望的到的分析上的最终结果。在对这个结果进行解读之前，我们先看看上面<code>ddply()</code>代码。函数的第一个参数是数据集（<code>sim.dat</code>），其次是告诉函数要按照哪个分类变量进行总结，这里我们只想对不同类别的消费者进行总结，但也可以是多个变量，如你可以将该参数设置成<code>ddply(sim.dat, c(“segment”,”house”), …)</code>，结果读者试着自行脑补下：）。接下来<code>summarize</code>是说我们希望对数据框分组做总结，你可以设置其它功能比如<code>transform</code>（在组内进行数据变换）和<code>subset</code>（在组内进行数据选择）。接下来分别是：</p>
+<ul>
+<li><p>Age：计算每组的年龄均值</p></li>
+<li><p>FemalePct：计算每组女性的比例</p></li>
+<li><p>HouseYes：计算每组内有房的人的比例</p></li>
+<li><p>store_exp：计算每组实体店消费均值，这里我们用修剪后的（<code>trim=0.1</code>）均值，因为通过之前的数据探索我们知道这个变量观测有些土豪离群点。</p></li>
+<li><p>online_exp：计算每组在线消费均值</p></li>
+<li><p>store_trans：计算每组实体店消费次数均值</p></li>
+<li><p>online_trans：计算每组在线消费次数均值</p></li>
+</ul>
+<p>了解这些以后，我们看看消费者群体之间有何不同。</p>
+<ul>
+<li><p>炫耀性消费（Conspicuous）人群年龄平均40岁左右，基本中年土豪，女性大概占了1/3另外2/3是男性（基本是大叔控的目标），土豪在哪里都买的多，在线消费量和实体店消费量都远大于其他人，在线和实体店消费的量和次数都差不多，反正有钱不在乎在哪买，看到好的就买，有钱任性嘛！基本有房（0.86），剩下14%没房的如果不是由于观点坚决不买房的话，那或许是在北上广这样的地方高不成低不就，买房不够消费有余，这也提醒我们如果这些样本是来自不同城市的话，我们可能还需要收集消费者所在城市的信息，城市的生活水平很大程度上影响了消费行为。</p></li>
+<li><p>对价格敏感的人（Price）年龄大（60），基本有房（0.94）这和他们的年龄有关，房奴是后来时代发展的产物。这类人在线消费比其他人都少，还是倾向于在实体店消费（平均在线交易次数是3，而实体店消费次数是6），这也是唯一一类在线消费低于实体店消费的。</p></li>
+<li><p>注重服装质量的人（Quality）平均年龄居中，可能和炫耀性消费人群没有显著差别，男女比例基本一半一半。明显偏爱在线消费，消费量和土豪比差远了，但位居其次，估计是中产。有房的人不是很多（0.34），这代人很不幸已经进入房奴的时代。</p></li>
+<li><p>风格类（Style），这些无疑是年轻人了，平均年龄只有24，大学生或者刚工作不久的白领，绝大多数是女性（0.81），有房的不多（0.27）或者可以说能完全靠啃老的不多：），也是典型的在线一族，在线购买的次数比Quality和Conspicuous的人多但是消费额却没有他们大。</p></li>
+</ul>
+<p>这里就提醒我们需要计算平均每次购买的花销，这样可以了解各个群体大概都买什么价位的东西。大家看到没有，分析是一个迭代学习的过程，我们在探索数据的过程中可能会发现一些问题，促使我们去检查某部分数据或者计算一些新的变量，使用新的可视化来探索数据。我们接着用<code>ddply()</code>补充计算这两个统计量：</p>
+<pre class="r"><code>ddply(sim.dat,&quot;segment&quot;,summarize,avg_online=round(sum(online_exp)/sum(online_trans),2),
+      avg_store=round(sum(store_exp)/sum(store_trans),2))</code></pre>
+<pre><code>##       segment avg_online avg_store
+## 1 Conspicuous     442.27    479.25
+## 2       Price      69.28     81.30
+## 3     Quality     126.05    105.12
+## 4       Style      92.83    121.07</code></pre>
+<p>结果显示价格敏感的人群果然买的价位最低，其次是风格类人群，这些人不一定是对价格敏感，但或许钱包不允许他们买太贵的。注重质量的买的东西价格比风格类的高些，但远不及土豪组，物美价廉的东西毕竟少，这些人可能更看重性价比，不会炫耀性消费但也不会买低质廉价的东西。我们在之后客户分组的时候还会进行类似的总结，那时我们会加上关于问卷调查的回复。大家看到了么，短短的几行代码就可以得到这么有信息量的总结。你可能会说这样的总结通过excel的数据透视表（pivot table）也能完成，但是用R代码要快得多，而且这只是其中一部分功能，如果之前说的，你可以设置其它功能比如<code>transform</code>（在组内进行数据变换）和<code>subset</code>（在组内进行数据选择），并且计算的东西也是可以自己定义。</p>
+<p>为了方便，我们按照消费者类别比例随机抽取11个样本，选择3个变量（<code>age</code>，<code>store_exp</code>和<code>segment</code>）用于展示（数据框：<code>examp</code>）。这里用于分层抽样的函数在之后介绍建模辅助技术时会讲到，所以这里不做介绍。</p>
+<pre class="r"><code>library(caret)
+set.seed(2016)
+trainIndex&lt;-createDataPartition(sim.dat$segment,p=0.01,list=F,times=1)
+examp&lt;-sim.dat[trainIndex,c(&quot;age&quot;,&quot;store_exp&quot;,&quot;segment&quot;)]</code></pre>
+<p><code>examp</code>数据集只有11行3列。我们先看看<code>transform</code>设置的作用：</p>
+<pre class="r"><code>ddply(examp,&quot;segment&quot;,transform,store_pct=round(store_exp/sum(store_exp),2))</code></pre>
+<pre><code>##    age store_exp     segment store_pct
+## 1   42 6319.0718 Conspicuous      0.55
+## 2   42 5106.4816 Conspicuous      0.45
+## 3   55  595.2520       Price      0.42
+## 4   64  399.3550       Price      0.28
+## 5   64  426.6653       Price      0.30
+## 6   39  362.4795     Quality      0.58
+## 7   35  260.5065     Quality      0.42
+## 8   23  205.6099       Style      0.25
+## 9   24  212.3040       Style      0.26
+## 10  24  202.1017       Style      0.25
+## 11  28  200.1906       Style      0.24</code></pre>
+<p>可以看到，设置<code>transform</code>使得函数对数据集按照指定分类变量（<code>segment</code>）在组内进行数据变换，并将变换后得到的新变量添加到原数据集后。再来看看<code>subset</code>设置：</p>
+<pre class="r"><code>ddply(examp,&quot;segment&quot;,subset,store_exp&gt;median(store_exp))</code></pre>
+<pre><code>##   age store_exp     segment
+## 1  42 6319.0718 Conspicuous
+## 2  55  595.2520       Price
+## 3  39  362.4795     Quality
+## 4  23  205.6099       Style
+## 5  24  212.3040       Style</code></pre>
+<p>上面代码可以获取每个消费者类别（<code>segment</code>）中实体店消费（<code>store_exp</code>）大于该类别中位数的样本。</p>
+</div>
+<div id="dplyr" class="section level3">
+<h3>dplyr包</h3>
+<p><code>dplyr</code>包是<code>plyr</code>包中的<code>ddply()</code>等函数的强化版，专门处理数据框（dataframe）对象，大幅提高了速度, 并且提供了更稳健的与其它数据库对象间的接口。由于分析中绝大多数是处理数据框，这个包尤其好用。这里我对这个包进行比较详细的介绍。接下来会按顺序介绍该包的几块重要功能：</p>
+<ol style="list-style-type: decimal">
+<li>数据框显示</li>
+<li>数据截选（按行／列）</li>
+<li>数据总结</li>
+<li>生成新变量</li>
+<li>合并数据集</li>
+</ol>
+<div class="section level4">
+<h4>数据框显示</h4>
+<ul>
+<li><code>tbl_df()</code>函数: 能将数据转化成<code>tbl</code>类，这样查看起来更加方便，输出会调整适应当前窗口</li>
+</ul>
+<pre class="r"><code># 这里不展示输出
+dplyr::tbl_df(sim.dat)</code></pre>
+<ul>
+<li><code>glimpse()</code>函数：类似之前的<code>tbl_df()</code>函数，只是转了方向。变量由列变成行。输出结果同样可以自动调整以适应窗口。</li>
+</ul>
+<pre class="r"><code># 这里不展示输出
+dplyr::glimpse(sim.dat)</code></pre>
+</div>
+<div class="section level4">
+<h4>数据截选（按行／列）</h4>
+<p>先介绍按行截选。</p>
+<pre class="r"><code># 提取出满足条件的行：收入大于30万的样本
+library(magrittr)
+library(dplyr)
+dplyr::filter(sim.dat, income &gt;300000) %&gt;%
+dplyr::tbl_df()</code></pre>
+<pre><code>## # A tibble: 4 x 19
+##     age gender   income  house store_exp online_exp store_trans
+##   &lt;int&gt; &lt;fctr&gt;    &lt;dbl&gt; &lt;fctr&gt;     &lt;dbl&gt;      &lt;dbl&gt;       &lt;int&gt;
+## 1    40   Male 301398.0    Yes  4840.461   3618.212          10
+## 2    33   Male 319704.3    Yes  5998.305   4395.923           9
+## 3    41   Male 317476.2    Yes  3029.844   4179.671          11
+## 4    37 Female 315697.2    Yes  6548.970   4284.065          13
+## # ... with 12 more variables: online_trans &lt;int&gt;, Q1 &lt;int&gt;, Q2 &lt;int&gt;,
+## #   Q3 &lt;int&gt;, Q4 &lt;int&gt;, Q5 &lt;int&gt;, Q6 &lt;int&gt;, Q7 &lt;int&gt;, Q8 &lt;int&gt;, Q9 &lt;int&gt;,
+## #   Q10 &lt;int&gt;, segment &lt;fctr&gt;</code></pre>
+<p>这里用到了一个可能大家之间没有见过的操作符号<code>%&gt;%</code>，这是管道操作，其意思是将<code>%&gt;%</code>左边的对象传递给右边的函数，作为第一个选项的设置（或剩下唯一一个选项的设置）。比如：</p>
+<pre class="r"><code>x %&gt;% f(y) 等同于 f(x, y)
+y %&gt;% f(x, ., z) 等同于 f(x, y, z )</code></pre>
+<p>管道操作来自于<code>magrittr</code>包，它能够极大简化代码，增加代码可读性。尤其对于<code>dplyr</code>包中的函数操作。大家看下面这段代码，能够知道都干了什么么？</p>
+<pre class="r"><code>ave_exp &lt;- filter( 
+  summarise(
+    group_by( 
+      filter(
+        sim.dat, 
+        !is.na(income)
+      ), 
+      segment
+    ), 
+    ave_online_exp = mean(online_exp), 
+    n = n()
+  ), 
+  n &gt; 200
+) </code></pre>
+<p>再看看用管道操作符进行相同操作的代码：</p>
+<pre class="r"><code>avg_exp &lt;- sim.dat %&gt;% 
+ filter(!is.na(income)) %&gt;% 
+ group_by(segment) %&gt;% 
+ summarise( 
+   ave_online_exp = mean(online_exp), 
+   n = n() ) %&gt;% 
+  filter(n &gt; 200)</code></pre>
+<p>用<code>%&gt;%</code>的代码是不是简洁清晰的多？我们从上掉下依次读下代码都干了什么：</p>
+<ol style="list-style-type: decimal">
+<li>选出数据框<code>sim.dat</code>中收入未缺失的观测</li>
+<li>按照<code>segment</code>变量对观测分组</li>
+<li>对每组数据求在线消费额的平均值，并赋予新的变量<code>ave_online_exp</code></li>
+<li>对每组计算观测个数，赋值为<code>n</code></li>
+<li>选出结果中观测个数大于200的行</li>
+</ol>
+<p>上面代码中用到的一些没有讲到的函数马上就会介绍。 <code>distinct()</code>函数可以删除数据框中重复的行。可以说是<code>unique()</code>函数在数据框上的扩展。</p>
+<pre class="r"><code>## 删除重复的行
+## 这里没有重复的行
+dplyr::distinct(sim.dat)</code></pre>
+<p><code>sample_frac()</code>函数可以随机选取一定比例的行。<code>sample_n()</code>函数可以随机选取一定数目的行。</p>
+<pre class="r"><code>dplyr::sample_frac(sim.dat, 0.5, replace = TRUE) 
+dplyr::sample_n(sim.dat, 10, replace = TRUE) </code></pre>
+<p><code>slice()</code>可以选取指定位置的行。和<code>sim.dat[10:15,]</code>类似。</p>
+<pre class="r"><code># 选取sim.dat的10到15行
+dplyr::slice(sim.dat, 10:15) </code></pre>
+<p><code>top_n()</code>可以选取某变量取值最高的若干观测。如果有指定组的话，可以对每组选择相应变量取值最高的观测。</p>
+<pre class="r"><code># 选取收入最高的两个观测
+dplyr::top_n(sim.dat,2,income)</code></pre>
+<p>对列变量的选择使用的是<code>select()</code>函数。下面我展示一些代码，并在相应的注释中指出该代码的功能。大家自己运行下看看结果。更多信息，键入<code>?select</code>查阅该函数的帮助文档。</p>
+<pre class="r"><code># 通过列名选取变量
+# 选取 sim.dat数据框中的income，age和store_exp列
+dplyr::select(sim.dat,income,age,store_exp)
+# 选取列名中含有某字符串（_）的列
+# 该命令将选取store_exp，online_exp，store_trans和online_trans
+dplyr::select(sim.dat, contains(&quot;_&quot;))
+# 选取以某字符串（e）结尾的列
+# 结果选取了age，income和house
+# 类似的starts_with指以某字符串开始的列
+dplyr::select(sim.dat, ends_with(&quot;e&quot;))
+# 选取列Q1，Q2，Q3，Q4和Q5
+select(sim.dat, num_range(&quot;Q&quot;, 1:5)) 
+# 选取列名在某字符串中的列
+dplyr::select(sim.dat, one_of(c(&quot;age&quot;, &quot;income&quot;)))
+# 选取两个列名之间的列，包含头尾两列
+dplyr::select(sim.dat, age:online_exp)
+# 选出出了某列（age）以外的其它列
+dplyr::select(sim.dat, -age)</code></pre>
+</div>
+<div class="section level4">
+<h4>数据总结</h4>
+<p>这里的操作类似于<code>apply()</code>和<code>ddply()</code>， 可以对数据框的每一列进行某个函数操作；或者按照某个分类变量将观测分组，然后对每组观测按列进行函数操作。</p>
+<pre class="r"><code># 对列online_trans取均值，返回的是一个单一值
+dplyr::summarise(sim.dat, avg_online = mean(online_trans)) </code></pre>
+<pre><code>##   avg_online
+## 1     13.546</code></pre>
+<pre class="r"><code># 对数据框中的每一列应用函数anyNA()
+# 这里可以指定一个函数向量，如c(&quot;anyNA&quot;,&quot;is.factor&quot;)
+dplyr::summarise_each(sim.dat, funs_(c(&quot;anyNA&quot;)))</code></pre>
+<pre><code>##     age gender income house store_exp online_exp store_trans online_trans
+## 1 FALSE  FALSE   TRUE FALSE     FALSE      FALSE       FALSE        FALSE
+##      Q1    Q2    Q3    Q4    Q5    Q6    Q7    Q8    Q9   Q10 segment
+## 1 FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE   FALSE</code></pre>
+<p>若要根据某分类变量对观测进行分组总结，可以使用<code>group_by()</code>函数。比如：</p>
+<pre class="r"><code># 对每个消费者类别对应变量应用anyNA()函数
+sim.dat %&gt;% group_by(segment) %&gt;% summarise_each(funs_(c(&quot;anyNA&quot;)))</code></pre>
+<pre><code>## # A tibble: 4 x 19
+##       segment   age gender income house store_exp online_exp store_trans
+##        &lt;fctr&gt; &lt;lgl&gt;  &lt;lgl&gt;  &lt;lgl&gt; &lt;lgl&gt;     &lt;lgl&gt;      &lt;lgl&gt;       &lt;lgl&gt;
+## 1 Conspicuous FALSE  FALSE   TRUE FALSE     FALSE      FALSE       FALSE
+## 2       Price FALSE  FALSE   TRUE FALSE     FALSE      FALSE       FALSE
+## 3     Quality FALSE  FALSE   TRUE FALSE     FALSE      FALSE       FALSE
+## 4       Style FALSE  FALSE   TRUE FALSE     FALSE      FALSE       FALSE
+## # ... with 11 more variables: online_trans &lt;lgl&gt;, Q1 &lt;lgl&gt;, Q2 &lt;lgl&gt;,
+## #   Q3 &lt;lgl&gt;, Q4 &lt;lgl&gt;, Q5 &lt;lgl&gt;, Q6 &lt;lgl&gt;, Q7 &lt;lgl&gt;, Q8 &lt;lgl&gt;, Q9 &lt;lgl&gt;,
+## #   Q10 &lt;lgl&gt;</code></pre>
+<p>你在数据总结操作中赋予各种总结函数，如<code>mean()</code>，<code>sd()</code>等。但注意这里的总结函数是作用于向量，返回单一值。比如函数<code>is.na()</code>，作用于向量，但返回的也是向量，就不可以在此使用。</p>
+</div>
+<div class="section level4">
+<h4>生成新变量</h4>
+<p><code>dplyr</code>包中的<code>mutate()</code>函数可以进行列计算，然后将结果添加到原数据集上。</p>
+<pre class="r"><code>dplyr::mutate(sim.dat, total_exp = store_exp + online_exp)</code></pre>
+<p>对每列应用窗口函数，它们作用于一个向量然后返回一个向量。回顾刚才介绍<code>dplyr</code>的总结功能时讲到总结函数作用于一个向量返回一个数值。注意理解这两者的不同。</p>
+<pre class="r"><code># 这里的min_rank等价于rank(ties.method = &quot;min&quot;)
+# mutate_each()对每列应用指定的窗口函数
+dplyr::mutate_each(sim.dat, funs(min_rank)) </code></pre>
+<p><code>transmute()</code>函数和<code>mutate()</code>类似，区别在于它只返回新生成的列，删除原始列。</p>
+<pre class="r"><code>dplyr::transmute(sim.dat, total_exp = store_exp + online_exp) </code></pre>
+<p>这里没有显示代码的结果，大家需要自己操作看看结果，这样对理解学习这些函数很有帮助。关于R中的窗口函数，大家可以自己查找相关资料。熟悉这些常见的函数及其功能，可以提高用R做数据变换的效率（不用总查帮助）。这个过程没有什么技巧可言，纯粹是熟能生巧。</p>
+</div>
+<div class="section level4">
+<h4>合并数据集</h4>
+<p>这里先随机抽取两个小数据集来展示数据集合并。</p>
+<pre class="r"><code>x&lt;-data.frame(cbind(ID=c(&quot;A&quot;,&quot;B&quot;,&quot;C&quot;),x1=c(1,2,3)))
+y&lt;-data.frame(cbind(ID=c(&quot;B&quot;,&quot;C&quot;,&quot;D&quot;),y1=c(T,T,F)))
+x</code></pre>
+<pre><code>##   ID x1
+## 1  A  1
+## 2  B  2
+## 3  C  3</code></pre>
+<pre class="r"><code>y</code></pre>
+<pre><code>##   ID    y1
+## 1  B  TRUE
+## 2  C  TRUE
+## 3  D FALSE</code></pre>
+<p>这里数据框<code>x</code>和<code>y</code>都非常简单，由一个<code>ID</code>变量和各自的观测变量组成。下面我们来介绍各种合并操作。</p>
+<ul>
+<li><code>left_join()</code>从<code>y</code>到<code>x</code>合并数据。结果保留了数据框<code>x</code>的3行。类似大家可以自行尝试<code>right_join()</code>。</li>
+</ul>
+<pre class="r"><code>left_join(x,y,by=&quot;ID&quot;)</code></pre>
+<pre><code>##   ID x1   y1
+## 1  A  1 &lt;NA&gt;
+## 2  B  2 TRUE
+## 3  C  3 TRUE</code></pre>
+<ul>
+<li><code>inner_join()</code>返回的是<code>y</code>和<code>x</code>中都可以匹配的观测。</li>
+</ul>
+<pre class="r"><code>inner_join(x,y,by=&quot;ID&quot;)</code></pre>
+<pre><code>##   ID x1   y1
+## 1  B  2 TRUE
+## 2  C  3 TRUE</code></pre>
+<ul>
+<li><code>full_join()</code>返回的是<code>y</code>或者<code>x</code>中含有的观测。</li>
+</ul>
+<pre class="r"><code>full_join(x,y,by=&quot;ID&quot;)</code></pre>
+<pre><code>##   ID   x1    y1
+## 1  A    1  &lt;NA&gt;
+## 2  B    2  TRUE
+## 3  C    3  TRUE
+## 4  D &lt;NA&gt; FALSE</code></pre>
+<ul>
+<li><code>semi_join()</code>对<code>x</code>中的观测进行筛选，找到那些同时在<code>y</code>中<strong>可以匹配</strong>的观测，但并没有将<code>y</code>的变量<code>y1</code>合并进来。</li>
+</ul>
+<pre class="r"><code>semi_join(x,y,by=&quot;ID&quot;)</code></pre>
+<pre><code>##   ID x1
+## 1  B  2
+## 2  C  3</code></pre>
+<ul>
+<li><code>anti_join()</code>同样对<code>x</code>中的观测进行筛选，找到那些在<code>y</code>中<strong>无法匹配</strong>的观测。</li>
+</ul>
+<pre class="r"><code>anti_join(x,y,by=&quot;ID&quot;)</code></pre>
+<pre><code>##   ID x1
+## 1  A  1</code></pre>
+<p>此外，<code>dplyr</code>包中还有各种针对数据框的交（<code>intersect()</code>）、并（<code>union()</code>）和补（<code>setdiff()</code>）运算，以及将一个数据框按照行或者列添加到另一个数据框上的操作（<code>bind_rows()</code>，<code>bind_cols()</code>）。这里就不一一介绍，大家自己用一个简单的数据框尝试下。</p>
+
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+
