@@ -54,7 +54,7 @@ $(document).ready(function () {
 <h2>数据整形和清理：reshape2，tidyr包</h2>
 
 <p align="center">
-  <img src="http://scientistcafe.com/images/Data_Analysis_and_Cleaning.png"  width="80%" />
+  <img src="http://scientistcafe.com/images/dataclean.png"  width="50%" />
 </p>
 
 
@@ -224,7 +224,7 @@ sepdat %&gt;% tbl_df()</code></pre>
 <div class="section level2">
 <h2>总结</h2>
 <p>之前讲了数据的整合，这里介绍了数据整形和清理，这都是数据分析从业人员必须熟练掌握的基本技能。这里展示了R中能够进行相应高效数据操作包的使用方法，文章中所有的代码都是可重复的，希望大家能够自己实践下，这样对学习很有帮助。除了文章之外，我在统计之都北美沙龙上讲过相应的话题，感兴趣的可以看之前的讲课视频：</p>
-<iframe width="560" height="315" src="https://www.youtube.com/embed/fsHgJhOYOTM" frameborder="0" allowfullscreen>
+<iframe align="center" width="560" height="315" src="https://www.youtube.com/embed/fsHgJhOYOTM" frameborder="0" allowfullscreen>
 </iframe>
 <p>整合方法类似于excel中的透视表格，R中有一些功能强大的函数能够有效的进行各种数据整合。我介绍了<code>base</code>包中的<code>apply()</code>函数，还有更加高级灵活的<code>plyr</code>包中<code>ddply()</code>函数的各种用法。由于实际工作中大部分时间是处理数据框，所以这里我们介绍了<code>plyr</code>包的一个专门针对数据框的强化包<code>dplyr</code>。该包对于数据的整合非常高效。对于数据的整形（长型数据和宽型数据的转换），举例说明了由于模型需要将数据从宽型转化成长型的情况，并且用<code>reshape2</code>包实现了该过程。此外还介绍了另外一个数据整形的包<code>tidyr</code>，该包可以进行数据变量揉合，拆分，合并；还可以进行数据框的各种合并。这些包的使用需要一些时间学习，实践尤其重要，大家需要多花功夫熟悉这些的操作，这是数据科学家的基本技能。这里说的“熟悉”是指成为第二天性，再应用时不需要占用大脑的工作记忆。</p>
 <p>大家要是有什么问题或者感兴趣的有关数据科学的话题，可以给我邮件：<a href="mailto:longqiman@gmail.com">longqiman@gmail.com</a>。学习愉快！</p>
