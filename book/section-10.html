@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-09-14">
+<meta name="date" content="2016-09-18">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -692,7 +692,7 @@ enetTune &lt;-<span class="st"> </span><span class="kw">train</span>(trainx, tra
 <div id="glmnet" class="section level3">
 <h3><span class="header-section-number">10.4.1</span> 初识<code>glmnet</code></h3>
 <p>在介绍具体不同的广义线性模型压缩方法之前，先让大家熟悉一下这个R包的基本使用方式。我会简单的介绍下其中的主要函数，功能，和输出。这样大家对这个包能做什么有个大致的概念。后面的小节会分别介绍不同模型。</p>
-<p>默认设置下的模型是高斯线性回归或者最小二乘模型，也就是之前几个小节介绍的模型，只是参数化的方式略有不同，但都是RSS加上一个罚函数。所以我们还是从之前的自变量和应变量开始：</p>
+<p>默认设置下的模型是高斯线性回归或者最小二乘模型，也就是之前几个小节介绍的模型，只是参数化的方式略有不同，但都是RSS加上一个罚函数。所以我们还是从之前服装消费者数据集中的自变量和应变量开始：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(glmnet)</code></pre></div>
 <pre><code>## Loading required package: Matrix</code></pre>
 <pre><code>## 
@@ -718,9 +718,11 @@ trainx&lt;-dat[,<span class="kw">grep</span>(<span class="st">&quot;Q&quot;</spa
 <span class="co"># 将实体店消费量和在线消费之和当作应变量</span>
 <span class="co"># 得到总消费量=实体店消费+在线消费</span>
 trainy&lt;-dat$store_exp+dat$online_exp</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glmfit=<span class="kw">glmnet</span>(<span class="kw">as.matrix</span>(trainx),trainy)
-<span class="kw">plot</span>(glmfit)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-179-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glmfit=<span class="kw">glmnet</span>(<span class="kw">as.matrix</span>(trainx),trainy)</code></pre></div>
+<p>这里函数<code>glmnet()</code>返回的对象<code>glmfit</code>中含有所有之后可能进一步会用到的模型拟合信息。大家并不需要手动的检查<code>glmfit</code>中都有那些信息，然后提取相应的部分，而是可以通过<code>plot()</code>、<code>coef()</code>、<code>predict()</code>这类耳熟能详的函数来得到相应的信息。比如我们可以用如下方式绘制lasso的参数选择路径图：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(glmfit,<span class="dt">label=</span>T)</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-180-1.png" width="672" /></p>
+<p>图中每种颜色的线代表对应一个自变量，展示的是随着lasso罚函数（也就是一阶范数，有时也称为<span class="math inline">\(l_{1}-norm\)</span>）对应调优参数<span class="math inline">\(\lambda\)</span>变化，各个变量对应的参数估计路径（注：当<span class="math inline">\(\alpha=1\)</span>时，优化方程里就只有lasso罚函数）。图中有上下两个x轴标度，下x轴是<span class="math inline">\(\lambda\)</span>变化对应最优解的一阶范数值（也就是<span class="math inline">\(\parallel\mathbf{\beta}\parallel_{1}\)</span>），上x轴是相应<span class="math inline">\(\lambda\)</span>值对应的非0参数估计个数，也就是lasso模型的自由度。</p>
 </div>
 </div>
 <div id="section-10.5" class="section level2">
