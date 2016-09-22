@@ -211,10 +211,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="10.5" data-path="section-10.html"><a href="section-10.html#section-10.5"><i class="fa fa-check"></i><b>10.5</b> 分层线性回归</a></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="section-11.html"><a href="section-11.html"><i class="fa fa-check"></i><b>11</b> 树模型</a><ul>
-<li class="chapter" data-level="11.1" data-path="section-11.html"><a href="section-11.html#section-11.1"><i class="fa fa-check"></i><b>11.1</b> 基本树模型</a></li>
-<li class="chapter" data-level="11.2" data-path="section-11.html"><a href="section-11.html#section-11.2"><i class="fa fa-check"></i><b>11.2</b> 装袋树</a></li>
-<li class="chapter" data-level="11.3" data-path="section-11.html"><a href="section-11.html#section-11.3"><i class="fa fa-check"></i><b>11.3</b> 随机森林</a></li>
-<li class="chapter" data-level="11.4" data-path="section-11.html"><a href="section-11.html#section-11.4"><i class="fa fa-check"></i><b>11.4</b> 其它树话题</a></li>
+<li class="chapter" data-level="11.1" data-path="section-11.html"><a href="section-11.html#section-11.1"><i class="fa fa-check"></i><b>11.1</b> 分裂准则</a></li>
+<li class="chapter" data-level="11.2" data-path="section-11.html"><a href="section-11.html#section-11.2"><i class="fa fa-check"></i><b>11.2</b> 基本树模型</a></li>
+<li class="chapter" data-level="11.3" data-path="section-11.html"><a href="section-11.html#section-11.3"><i class="fa fa-check"></i><b>11.3</b> 装袋树</a></li>
+<li class="chapter" data-level="11.4" data-path="section-11.html"><a href="section-11.html#section-11.4"><i class="fa fa-check"></i><b>11.4</b> 随机森林</a></li>
+<li class="chapter" data-level="11.5" data-path="section-11.html"><a href="section-11.html#section-11.5"><i class="fa fa-check"></i><b>11.5</b> 其它树话题</a></li>
 </ul></li>
 <li class="chapter" data-level="12" data-path="section-12.html"><a href="section-12.html"><i class="fa fa-check"></i><b>12</b> 聚类判别分析</a><ul>
 <li class="chapter" data-level="12.1" data-path="section-12.html"><a href="section-12.html#section-12.1"><i class="fa fa-check"></i><b>12.1</b> 聚类分析</a></li>
@@ -291,18 +292,42 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li>这些模型可以有效地处理缺失值，并内嵌有特征选择的功能，这一点在很多实际建模问题中非常有用</li>
 </ol>
 <p>单棵树或简单规则模型具有局限性，其中最重要的就是模型不稳定以及预测能力比较差。数据中的微小变动可能会引起树或规则结构的巨大变化。单棵树定义的一系列的矩形区域过于简单，一旦因变量与预测变量之间的关系不能充分地通过矩形子空间来进行表达， 那么树模型和规则模型将产生比其他模型更大的预测误差。为了克服这些缺点，研究者提出了集成模型，它们将许多棵树（或规则）进行组合。集成模型通常具有比单一的树模型好得多的预测表现。我们在之后会做介绍。</p>
-<p>分裂准则</p>
-<p>与回归树一样，分类树的目标是把数据划分为更小、同质性更强的组。在这里同质意味着分裂的节点更纯（即在每个节点有一个类的样本比例很大）。最原始的CART算法使用基尼系数作为分裂准则；ID3、C4.5以及C5.0使用交叉熵，也被称为信息或散度作为标准。下面逐一介绍这三个标准。</p>
+<div id="section-11.1" class="section level2">
+<h2><span class="header-section-number">11.1</span> 分裂准则</h2>
+<p>分裂节点的方式能够极大的影响树的精确度。回归树和分类树所使用的分裂准则非常不同。与回归树一样，分类树的目标是把数据划分为更小、同质性更强的组。在这里同质意味着分裂的节点更纯（即在每个节点有一个类的样本比例很大）。最原始的CART算法使用基尼系数作为分裂准则；ID3、C4.5以及C5.0使用交叉熵，也被称为信息或散度作为标准。下面逐一介绍这三个标准。</p>
 <p>Gini系数</p>
 <p>基尼（Gini）系数<span class="citation">(al <a href="#ref-Breiman1984">1984</a>)</span>用来衡量一个集合样本的杂质（我们希望的是更高的纯度，更少的杂质）。对于二分类问题，给定节点的基尼系数定义为：</p>
 <p><span class="math display">\[p_{1}(1-p_{1})+p_{2}(1-p_{2})\]</span></p>
-<p>其中<span class="math inline">\(p_{1}\)</span>和<span class="math inline">\(p_{2}\)</span>分别为类1、类2的概率。不难看出，当集合样本纯度很高时，某一类概率趋近于0，基尼系数最小。相反，当<span class="math inline">\(p_{1}=p_{2}=0.5\)</span>时基尼系数最大，在这种情况下，节点的纯度最小。</p>
-<div id="section-11.1" class="section level2">
-<h2><span class="header-section-number">11.1</span> 基本树模型</h2>
-<!--https://github.com/ledell/useR-machine-learning-tutorial/blob/master/random-forest.ipynb-->
+<p>其中<span class="math inline">\(p_{1}\)</span>和<span class="math inline">\(p_{2}\)</span>分别为类1、类2的概率。不难看出，当集合样本纯度很高时，某一类概率趋近于0，基尼系数最小。相反，当<span class="math inline">\(p_{1}=p_{2}=0.5\)</span>时基尼系数最大，在这种情况下，节点的纯度最小。我们来看一个例子，假设我们想要判定哪些学生是计算机专业的，下面是用性别这个变量得到的简单分类树结果。</p>
+<div class="figure">
+<img src="http://scientistcafe.com/book/Figure/tree.png" alt="用性别判定计算机专业的学生" />
+<p class="caption">用性别判定计算机专业的学生</p>
+</div>
+<p>现在我们来计算用性别变量划分对应的Gini系数：</p>
+<ol style="list-style-type: decimal">
+<li>计算女生对应的Gini系数=<span class="math inline">\(\frac{1}{6}\times\frac{5}{6}+\frac{5}{6}\times\frac{1}{6}=\frac{5}{18}\)</span></li>
+<li>计算男生对应的Gini系数=<span class="math inline">\(0\times1+1\times 0=0\)</span></li>
+</ol>
+<p>可以用如下加权计算性别这个分裂总体的Gini系数：</p>
+<p><span class="math display">\[\frac{3}{5}\times\frac{5}{18}+\frac{2}{5}\times 0=\frac{1}{6}\]</span></p>
+<p>信息增益</p>
+<p>看下面二分类问题中三个节点内的样本，哪个最容易描述？显然是C，因为C中所有的样本都是一类的，这样描述起来需要的信息最少。相反B需要更多的信息，A需要的信息最多。换句话说，C的纯度最高，B次之，A的纯度最差。我们可以这么说，纯度更高的节点描述起来需要的信息更少。反之，纯度更低的节点描述起来需要的信息更多。</p>
+<div class="figure">
+<img src="http://scientistcafe.com/book/Figure/infogain.png" alt="" />
+
+</div>
+<p>信息理论就是为了衡量系统的无序度的，无序的度量也叫做熵。如果某个节点对应的样本全都是一类（如C）,其熵就是0。如果某个节点中各类样本比例是50%－50%，那么熵就是1。熵自然是越小越好。</p>
+<p>熵（Entropy）的计算公式如下：</p>
+<p><span class="math display">\[Entropy=-plog_{2}p-(1-p)log_{2}(1-p)\]</span></p>
+<p>这里p是其中一类样本的比例。熵也能用来分裂分类树节点。其选择和亲节点以及其它分裂点相比熵最小的那个分裂。</p>
+<!--加一个例子-->
 </div>
 <div id="section-11.2" class="section level2">
-<h2><span class="header-section-number">11.2</span> 装袋树</h2>
+<h2><span class="header-section-number">11.2</span> 基本树模型</h2>
+<!--https://github.com/ledell/useR-machine-learning-tutorial/blob/master/random-forest.ipynb-->
+</div>
+<div id="section-11.3" class="section level2">
+<h2><span class="header-section-number">11.3</span> 装袋树</h2>
 <p>Bootstrap 样本是对数据进行有放回随机抽样得到的样本（Efron 和 Tibshirani 1986）。这意味着，当一个样本点被选中时，它有可能会在将来的抽取中继续被选中。Bootstrap 样本和原数据的样本量一样。因此，一些样本可能被抽到过很多次，而另一些则可能没有被选到。没有被选到的样本被称为“袋外样本“（out-of-bag）。在一次 Bootstrap 重抽样迭代中，选中的样本点被用来建立模型，而袋外样本则被用于预测。 在20世纪90年代，集成方法（即将许多模型组合起来进行预测的模型）开始出现。 装袋法（Bagging，bootstrap aggregation 的缩写）最初由 Leo Breiman 提出，它是最早发展起来的集成方法之一（Breiman 1996a）。 装袋法是一种利用 bootstrap的通用方法，可用于任何回归（或分类）模型来构建集成组合。这种方法的构建非常简单，它包含算法 8.1 中所述的步骤。 集成组合中的每一个模型都对新样本进行一次预测，然后这 个预测将进行平均， 来给出装袋法模型的预测值。</p>
 <blockquote>
 <p><strong>算法：装袋法</strong></p>
@@ -320,11 +345,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>尽管装袋法通常都能改进不稳定模型的预测效能，但它同样有一些缺陷。 首先，是计算量。随着 bootstrap 样本数目的增多，计算成本和内存需求也会相应增加。这一劣势可以通过并行计算来得到大部分的消减，原因是装袋的过程是非常容易并行化的。 回顾之前的介绍可以发现，每一个 boostrap 样本和相应的模型都是独立于其他样本和模型的。 这意味着每个模型都可以单独进行建模， 而只需在最后将所有模型的结果组合起来以生成最终的预测。</p>
 <p>装袋法的另一个劣势在于解释性差， 我们无法在装袋法中得到之前单棵回归树给出的简洁的规则。然而，变量重要性依旧可以通过将单个模型的重要性得分组合起来进行构建。 下一节介绍的随机森林将进一步讨论变量重要性。</p>
 </div>
-<div id="section-11.3" class="section level2">
-<h2><span class="header-section-number">11.3</span> 随机森林</h2>
-</div>
 <div id="section-11.4" class="section level2">
-<h2><span class="header-section-number">11.4</span> 其它树话题</h2>
+<h2><span class="header-section-number">11.4</span> 随机森林</h2>
+</div>
+<div id="section-11.5" class="section level2">
+<h2><span class="header-section-number">11.5</span> 其它树话题</h2>
 
 </div>
 </div>
