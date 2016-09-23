@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-09-21">
+<meta name="date" content="2016-09-23">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -208,7 +208,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="10.4" data-path="section-10.html"><a href="section-10.html#glmnet"><i class="fa fa-check"></i><b>10.4</b> 广义线性模型压缩方法及<code>glmnet</code>包</a><ul>
 <li class="chapter" data-level="10.4.1" data-path="section-10.html"><a href="section-10.html#glmnet"><i class="fa fa-check"></i><b>10.4.1</b> 初识<code>glmnet</code></a></li>
 </ul></li>
-<li class="chapter" data-level="10.5" data-path="section-10.html"><a href="section-10.html#section-10.5"><i class="fa fa-check"></i><b>10.5</b> 分层线性回归</a></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="section-11.html"><a href="section-11.html"><i class="fa fa-check"></i><b>11</b> 树模型</a><ul>
 <li class="chapter" data-level="11.1" data-path="section-11.html"><a href="section-11.html#section-11.1"><i class="fa fa-check"></i><b>11.1</b> 分裂准则</a></li>
@@ -295,12 +294,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="section-11.1" class="section level2">
 <h2><span class="header-section-number">11.1</span> 分裂准则</h2>
 <p>分裂节点的方式能够极大的影响树的精确度。回归树和分类树所使用的分裂准则非常不同。与回归树一样，分类树的目标是把数据划分为更小、同质性更强的组。在这里同质意味着分裂的节点更纯（即在每个节点有一个类的样本比例很大）。最原始的CART算法使用基尼系数作为分裂准则；ID3、C4.5以及C5.0使用交叉熵，也被称为信息或散度作为标准。下面逐一介绍这三个标准。</p>
-<p>Gini系数</p>
+<p><strong>Gini系数</strong></p>
 <p>基尼（Gini）系数<span class="citation">(al <a href="#ref-Breiman1984">1984</a>)</span>用来衡量一个集合样本的杂质（我们希望的是更高的纯度，更少的杂质）。对于二分类问题，给定节点的基尼系数定义为：</p>
 <p><span class="math display">\[p_{1}(1-p_{1})+p_{2}(1-p_{2})\]</span></p>
 <p>其中<span class="math inline">\(p_{1}\)</span>和<span class="math inline">\(p_{2}\)</span>分别为类1、类2的概率。不难看出，当集合样本纯度很高时，某一类概率趋近于0，基尼系数最小。相反，当<span class="math inline">\(p_{1}=p_{2}=0.5\)</span>时基尼系数最大，在这种情况下，节点的纯度最小。我们来看一个例子，假设我们想要判定哪些学生是计算机专业的，下面是用性别这个变量得到的简单分类树结果。</p>
 <div class="figure">
-<img src="http://scientistcafe.com/book/Figure/tree.png" alt="用性别判定计算机专业的学生" />
+<img src="http://scientistcafe.com/book/Figure/gini.png" alt="用性别判定计算机专业的学生" />
 <p class="caption">用性别判定计算机专业的学生</p>
 </div>
 <p>现在我们来计算用性别变量划分对应的Gini系数：</p>
@@ -310,7 +309,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ol>
 <p>可以用如下加权计算性别这个分裂总体的Gini系数：</p>
 <p><span class="math display">\[\frac{3}{5}\times\frac{5}{18}+\frac{2}{5}\times 0=\frac{1}{6}\]</span></p>
-<p>信息增益</p>
+<p><strong>信息增益</strong></p>
 <p>看下面二分类问题中三个节点内的样本，哪个最容易描述？显然是C，因为C中所有的样本都是一类的，这样描述起来需要的信息最少。相反B需要更多的信息，A需要的信息最多。换句话说，C的纯度最高，B次之，A的纯度最差。我们可以这么说，纯度更高的节点描述起来需要的信息更少。反之，纯度更低的节点描述起来需要的信息更多。</p>
 <div class="figure">
 <img src="http://scientistcafe.com/book/Figure/infogain.png" alt="" />
@@ -320,6 +319,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>熵（Entropy）的计算公式如下：</p>
 <p><span class="math display">\[Entropy=-plog_{2}p-(1-p)log_{2}(1-p)\]</span></p>
 <p>这里p是其中一类样本的比例。熵也能用来分裂分类树节点。其选择和亲节点以及其它分裂点相比熵最小的那个分裂。</p>
+<p><strong>方差削减</strong></p>
+<p>目前为止我们讨论了对于分类树（离散应变量）情况的分裂准则。下面我们</p>
 <!--加一个例子-->
 </div>
 <div id="section-11.2" class="section level2">

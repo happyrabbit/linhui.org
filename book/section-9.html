@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-09-21">
+<meta name="date" content="2016-09-23">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -208,7 +208,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="10.4" data-path="section-10.html"><a href="section-10.html#glmnet"><i class="fa fa-check"></i><b>10.4</b> 广义线性模型压缩方法及<code>glmnet</code>包</a><ul>
 <li class="chapter" data-level="10.4.1" data-path="section-10.html"><a href="section-10.html#glmnet"><i class="fa fa-check"></i><b>10.4.1</b> 初识<code>glmnet</code></a></li>
 </ul></li>
-<li class="chapter" data-level="10.5" data-path="section-10.html"><a href="section-10.html#section-10.5"><i class="fa fa-check"></i><b>10.5</b> 分层线性回归</a></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="section-11.html"><a href="section-11.html"><i class="fa fa-check"></i><b>11</b> 树模型</a><ul>
 <li class="chapter" data-level="11.1" data-path="section-11.html"><a href="section-11.html#section-11.1"><i class="fa fa-check"></i><b>11.1</b> 分裂准则</a></li>
@@ -281,12 +280,12 @@ topic&lt;-<span class="kw">read_csv</span>(<span class="st">&quot;/Users/happyra
 <span class="kw">glimpse</span>(topic)</code></pre></div>
 <pre><code>## Observations: 209,607
 ## Variables: 6
-## $ tid           &lt;int&gt; 242, 259, 270, 281, 301, 312, 333, 367, 386, 387, 420, 461, 467, 476, 513, 566, ...
-## $ fid           &lt;int&gt; 5, 5, 5, 5, 5, 5, 5, 7, 5, 5, 5, 5, 5, 5, 5, 7, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,...
-## $ title         &lt;chr&gt; &quot;0&quot;, &quot;Adobe Reader&quot;, &quot;? about this forum veiw?&quot;, &quot;Getting a map dot.........&quot;, &quot;...
-## $ posted_at     &lt;time&gt; 2006-04-01 02:26:00, 2006-04-01 08:39:00, 2006-04-01 09:44:00, 2006-04-01 11:00...
-## $ user_name     &lt;chr&gt; &quot;Rich&quot;, &quot;Larry NCKS&quot;, &quot;Hay Hud Ohio&quot;, &quot;jakescia&quot;, &quot;Curt Keiser&quot;, &quot;Rich&quot;, &quot;jaco&quot;,...
-## $ user_location &lt;chr&gt; &quot;Kansas&quot;, &quot;Washington, Kansas  &amp; Lincoln, Nebraska&quot;, &quot;SW Ohio&quot;, &quot;Oskaloosa, Iowa...</code></pre>
+## $ tid           &lt;int&gt; 242, 259, 270, 281, 301, 312, 333, 367, 386, 387...
+## $ fid           &lt;int&gt; 5, 5, 5, 5, 5, 5, 5, 7, 5, 5, 5, 5, 5, 5, 5, 7, ...
+## $ title         &lt;chr&gt; &quot;0&quot;, &quot;Adobe Reader&quot;, &quot;? about this forum veiw?&quot;,...
+## $ posted_at     &lt;time&gt; 2006-04-01 02:26:00, 2006-04-01 08:39:00, 2006-...
+## $ user_name     &lt;chr&gt; &quot;Rich&quot;, &quot;Larry NCKS&quot;, &quot;Hay Hud Ohio&quot;, &quot;jakescia&quot;...
+## $ user_location &lt;chr&gt; &quot;Kansas&quot;, &quot;Washington, Kansas  &amp; Lincoln, Nebras...</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 将发帖时间提取出来，存在posted_at2对象中</span>
 posted_at2&lt;-topic$posted_at</code></pre></div>
 <p>数据由6列，这里只解释其中2列。<code>posted_at</code>是发帖时间，<code>user_name</code>是论坛用户名。对于发帖时间，我们可以将其拆分成不同的变量，这个过程类似于探索性数据分析。这里时间观测是按照年、月、日、时、分、秒的顺序，以这样的格式<code>2006-04-01 02:26:00</code>排列的。在具体分析中，我们通常希望知道用户的发帖规律。在事先不知道怎样划分能够看到规律的情况下该怎么办？尝试不同的划分方法。比如我们可以研究每年的发帖量，可以通过<code>substr()</code>函数截取字符串的固定位置得到年份：</p>
@@ -322,23 +321,23 @@ airline&lt;-<span class="kw">read.csv</span>(<span class="st">&quot;/Users/happy
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glimpse</span>(airline)</code></pre></div>
 <pre><code>## Observations: 3,000
 ## Variables: 17
-## $ Easy_Reservation &lt;int&gt; 6, 5, 6, 5, 4, 5, 6, 4, 6, 4, 5, 5, 6, 5, 5, 3, 6, 3, 4, 5, 5, 5, 5, 5, 4, 5,...
-## $ Preferred_Seats  &lt;int&gt; 5, 7, 6, 6, 5, 6, 6, 6, 5, 4, 7, 5, 7, 6, 6, 5, 7, 6, 6, 7, 6, 5, 6, 5, 7, 8,...
-## $ Flight_Options   &lt;int&gt; 4, 7, 5, 5, 3, 4, 6, 3, 4, 5, 6, 6, 6, 5, 6, 4, 4, 4, 4, 5, 4, 4, 5, 6, 7, 4,...
-## $ Ticket_Prices    &lt;int&gt; 5, 6, 6, 5, 6, 5, 5, 5, 5, 6, 7, 7, 6, 7, 7, 6, 8, 6, 5, 6, 6, 5, 6, 4, 6, 5,...
-## $ Seat_Comfort     &lt;int&gt; 5, 6, 7, 7, 6, 6, 6, 4, 6, 9, 7, 7, 6, 6, 6, 7, 7, 7, 6, 7, 7, 6, 7, 7, 7, 7,...
-## $ Seat_Roominess   &lt;int&gt; 7, 8, 6, 8, 7, 8, 6, 5, 7, 8, 8, 9, 7, 8, 6, 8, 8, 8, 8, 7, 9, 7, 7, 8, 7, 8,...
-## $ Overhead_Storage &lt;int&gt; 5, 5, 7, 6, 5, 4, 4, 4, 5, 7, 6, 6, 7, 5, 4, 6, 6, 6, 5, 5, 8, 5, 4, 6, 6, 7,...
-## $ Clean_Aircraft   &lt;int&gt; 7, 6, 7, 7, 7, 7, 6, 4, 6, 7, 7, 7, 7, 7, 6, 7, 7, 7, 7, 7, 9, 6, 6, 5, 7, 8,...
-## $ Courtesy         &lt;int&gt; 5, 6, 6, 4, 2, 5, 5, 4, 5, 6, 4, 6, 4, 5, 5, 5, 6, 5, 4, 5, 4, 4, 5, 7, 4, 5,...
-## $ Friendliness     &lt;int&gt; 4, 6, 6, 6, 3, 4, 5, 5, 4, 5, 6, 7, 5, 4, 4, 4, 6, 4, 3, 5, 5, 5, 6, 7, 5, 5,...
-## $ Helpfulness      &lt;int&gt; 6, 5, 6, 4, 4, 5, 5, 4, 3, 5, 5, 6, 5, 4, 5, 5, 5, 4, 4, 5, 5, 4, 7, 6, 5, 5,...
-## $ Service          &lt;int&gt; 6, 5, 6, 5, 3, 5, 5, 5, 3, 5, 6, 6, 5, 5, 4, 5, 5, 4, 3, 4, 5, 4, 5, 6, 4, 6,...
-## $ Satisfaction     &lt;int&gt; 6, 7, 7, 5, 4, 6, 5, 5, 4, 7, 6, 7, 6, 4, 4, 6, 7, 5, 6, 5, 7, 5, 6, 6, 4, 6,...
-## $ Fly_Again        &lt;int&gt; 6, 6, 6, 7, 4, 5, 3, 4, 7, 6, 8, 6, 5, 4, 6, 6, 6, 6, 4, 4, 6, 5, 6, 5, 7, 6,...
-## $ Recommend        &lt;int&gt; 3, 6, 5, 5, 4, 5, 6, 5, 8, 6, 8, 7, 6, 5, 6, 7, 7, 5, 4, 6, 7, 6, 6, 5, 6, 6,...
-## $ ID               &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22...
-## $ Airline          &lt;fctr&gt; AirlineCo.1, AirlineCo.1, AirlineCo.1, AirlineCo.1, AirlineCo.1, AirlineCo.1...</code></pre>
+## $ Easy_Reservation &lt;int&gt; 6, 5, 6, 5, 4, 5, 6, 4, 6, 4, 5, 5, 6, 5, 5, ...
+## $ Preferred_Seats  &lt;int&gt; 5, 7, 6, 6, 5, 6, 6, 6, 5, 4, 7, 5, 7, 6, 6, ...
+## $ Flight_Options   &lt;int&gt; 4, 7, 5, 5, 3, 4, 6, 3, 4, 5, 6, 6, 6, 5, 6, ...
+## $ Ticket_Prices    &lt;int&gt; 5, 6, 6, 5, 6, 5, 5, 5, 5, 6, 7, 7, 6, 7, 7, ...
+## $ Seat_Comfort     &lt;int&gt; 5, 6, 7, 7, 6, 6, 6, 4, 6, 9, 7, 7, 6, 6, 6, ...
+## $ Seat_Roominess   &lt;int&gt; 7, 8, 6, 8, 7, 8, 6, 5, 7, 8, 8, 9, 7, 8, 6, ...
+## $ Overhead_Storage &lt;int&gt; 5, 5, 7, 6, 5, 4, 4, 4, 5, 7, 6, 6, 7, 5, 4, ...
+## $ Clean_Aircraft   &lt;int&gt; 7, 6, 7, 7, 7, 7, 6, 4, 6, 7, 7, 7, 7, 7, 6, ...
+## $ Courtesy         &lt;int&gt; 5, 6, 6, 4, 2, 5, 5, 4, 5, 6, 4, 6, 4, 5, 5, ...
+## $ Friendliness     &lt;int&gt; 4, 6, 6, 6, 3, 4, 5, 5, 4, 5, 6, 7, 5, 4, 4, ...
+## $ Helpfulness      &lt;int&gt; 6, 5, 6, 4, 4, 5, 5, 4, 3, 5, 5, 6, 5, 4, 5, ...
+## $ Service          &lt;int&gt; 6, 5, 6, 5, 3, 5, 5, 5, 3, 5, 6, 6, 5, 5, 4, ...
+## $ Satisfaction     &lt;int&gt; 6, 7, 7, 5, 4, 6, 5, 5, 4, 7, 6, 7, 6, 4, 4, ...
+## $ Fly_Again        &lt;int&gt; 6, 6, 6, 7, 4, 5, 3, 4, 7, 6, 8, 6, 5, 4, 6, ...
+## $ Recommend        &lt;int&gt; 3, 6, 5, 5, 4, 5, 6, 5, 8, 6, 8, 7, 6, 5, 6, ...
+## $ ID               &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14...
+## $ Airline          &lt;fctr&gt; AirlineCo.1, AirlineCo.1, AirlineCo.1, Airli...</code></pre>
 <p>数据的前15列都是问卷调查的各种问题，问题格式如下：对该航空公司的<问卷项>你的满意度是？从1到9，分值越大满意度越高。可以看到前15列评分在1-9之间，是整数型了。<code>ID</code>代表受访者编号，不同编号代表不同受访者。每个受访者需要评估3家航空公司，列<code>Airline</code>指出相应的航空公司。一共有1000名受访者，因此观测的总行数为1000x3=3000。关于数据各列变量的解释，大家可以参考“数据集模拟和背景介绍”中相关小节。</p>
 <p>我们用<code>corrplot()</code>函数检查问卷调查问题的相关性：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(corrplot)
@@ -431,14 +430,18 @@ airline.mean&lt;-dplyr::<span class="kw">select</span>(airline.mean,-Airline)
 <span class="st">  </span><span class="kw">prcomp</span>()
 <span class="kw">summary</span>(airline.pc)</code></pre></div>
 <pre><code>## Importance of components:
-##                          PC1    PC2     PC3     PC4     PC5     PC6     PC7     PC8     PC9    PC10
-## Standard deviation     4.693 4.2836 1.68335 1.03625 0.88896 0.82333 0.80349 0.78694 0.77536 0.77020
-## Proportion of Variance 0.435 0.3624 0.05596 0.02121 0.01561 0.01339 0.01275 0.01223 0.01187 0.01172
-## Cumulative Proportion  0.435 0.7974 0.85338 0.87458 0.89019 0.90358 0.91633 0.92856 0.94043 0.95215
-##                           PC11    PC12    PC13    PC14    PC15
-## Standard deviation     0.74612 0.71831 0.69417 0.66650 0.65131
-## Proportion of Variance 0.01099 0.01019 0.00952 0.00877 0.00838
-## Cumulative Proportion  0.96314 0.97333 0.98285 0.99162 1.00000</code></pre>
+##                          PC1    PC2     PC3     PC4     PC5     PC6
+## Standard deviation     4.693 4.2836 1.68335 1.03625 0.88896 0.82333
+## Proportion of Variance 0.435 0.3624 0.05596 0.02121 0.01561 0.01339
+## Cumulative Proportion  0.435 0.7974 0.85338 0.87458 0.89019 0.90358
+##                            PC7     PC8     PC9    PC10    PC11    PC12
+## Standard deviation     0.80349 0.78694 0.77536 0.77020 0.74612 0.71831
+## Proportion of Variance 0.01275 0.01223 0.01187 0.01172 0.01099 0.01019
+## Cumulative Proportion  0.91633 0.92856 0.94043 0.95215 0.96314 0.97333
+##                           PC13    PC14    PC15
+## Standard deviation     0.69417 0.66650 0.65131
+## Proportion of Variance 0.00952 0.00877 0.00838
+## Cumulative Proportion  0.98285 0.99162 1.00000</code></pre>
 <p>由上面输出结果的第一行是主成分的标准差，第二行对应成分单独解释方差的比例，第三行是累计解释方差。可见，前两个主成分解释的大部分原变量方差（80%）。<code>plot()</code>函数作用在PCA结果上默认绘制陡坡图，该图展示每个成分额外解释的方差。我们可用累计解释方差比例或者陡坡图来判断需要的主成分。我们通过下面代码绘制图形：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(airline.pc,<span class="dt">type=</span><span class="st">&quot;l&quot;</span>,<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>,<span class="dt">main=</span><span class="st">&quot;PCA陡坡图&quot;</span>)</code></pre></div>
 <p><img src="DS_R_files/figure-html/unnamed-chunk-108-1.png" width="672" /></p>
@@ -470,12 +473,12 @@ Thus, vectors that point in the same direction correspond to variables that have
 </ul>
 <p>如果航空公司1只是一个很小的公司，并不是主要竞争对手。你的主要竞争对手是航空公司2，那你可以进一步检查你们公司和航空公司2的得分差别：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">airline.mean[<span class="dv">3</span>,]-airline.mean[<span class="dv">1</span>,]</code></pre></div>
-<pre><code>##   Easy_Reservation Preferred_Seats Flight_Options Ticket_Prices Seat_Comfort Seat_Roominess
-## 1           -2.993          -4.006         -2.929        -3.939         0.93          0.013
-##   Overhead_Storage Clean_Aircraft Courtesy Friendliness Helpfulness Service Satisfaction Fly_Again
-## 1            1.957          0.935    2.926        2.917       2.937   2.887        1.959     1.937
-##   Recommend
-## 1     1.921</code></pre>
+<pre><code>##   Easy_Reservation Preferred_Seats Flight_Options Ticket_Prices
+## 1           -2.993          -4.006         -2.929        -3.939
+##   Seat_Comfort Seat_Roominess Overhead_Storage Clean_Aircraft Courtesy
+## 1         0.93          0.013            1.957          0.935    2.926
+##   Friendliness Helpfulness Service Satisfaction Fly_Again Recommend
+## 1        2.917       2.937   2.887        1.959     1.937     1.921</code></pre>
 <p>从上面结果可以看出，和主要竞争对手相比，我们主要的劣势在于购票容易度（<code>Easy_Reservation</code>）、座椅选择（<code>Preferred_Seats</code>）、航班选择（<code>Flight_Options</code>）和票价（<code>Ticket_Prices</code>）上。在座椅舒适度（<code>Seat_Comfort</code>）、座椅空间（<code>Seat_Roominess</code>）、机舱清洁（<code>Clean_Aircraft</code>）和随机行李存放（<code>Overhead_Storage</code>）上两者相当。在剩余方面我们有优势。</p>
 <p>通常情况下，对这样的问卷调查数据，你需要在不同维度上比较各个公司。可以通过陡坡图或者直接观察累计方差来决定该用多少的主成分。两个主成分张成的平面上绘制感知图能够解释观测在主成分维度上的分布。对这样多维度的市场调查数据，用PCA进行可视化是理解各个公司或者品牌在消费者认知中的分布的有效手段。关于该方法有几个需要注意的地方：</p>
 <ol style="list-style-type: decimal">
@@ -506,8 +509,9 @@ eigenvalue&lt;-<span class="kw">subset</span>(airline,<span class="dt">select=</
 <span class="st">  </span><span class="kw">cor</span>()%&gt;%
 <span class="st">  </span><span class="kw">eigen</span>()
 eigenvalue$values</code></pre></div>
-<pre><code>##  [1] 6.13519681 5.47501966 0.94251965 0.46623604 0.26506447 0.22711198 0.21221230 0.21044797 0.19462556
-## [10] 0.17989084 0.16075997 0.15678382 0.15513097 0.13273209 0.08626788</code></pre>
+<pre><code>##  [1] 6.13519681 5.47501966 0.94251965 0.46623604 0.26506447 0.22711198
+##  [7] 0.21221230 0.21044797 0.19462556 0.17989084 0.16075997 0.15678382
+## [13] 0.15513097 0.13273209 0.08626788</code></pre>
 <p>可以看到开始2个特征值都大于1，因此，这里给出的因子数目建议还是2。再次强调，最后模型是不是有效取决于其可解释性。在实际应用中，最好检测多个因子数目。比如，2个或者3个。这里我们使用2个因子。接下来通过<code>factanal()</code>函数拟合EFA模型：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">airline%&gt;%
 <span class="st">  </span><span class="kw">subset</span>(<span class="dt">select=</span>Easy_Reservation:Recommend)%&gt;%
@@ -953,20 +957,23 @@ rocValues</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 需要事先安装CORElearn包</span>
 <span class="kw">library</span>(CORElearn)
 <span class="kw">infoCore</span>(<span class="dt">what=</span><span class="st">&quot;attrEvalReg&quot;</span>)</code></pre></div>
-<pre><code>## [1] &quot;RReliefFequalK&quot;      &quot;RReliefFexpRank&quot;     &quot;RReliefFbestK&quot;       &quot;RReliefFwithMSE&quot;    
-## [5] &quot;MSEofMean&quot;           &quot;MSEofModel&quot;          &quot;MAEofModel&quot;          &quot;RReliefFdistance&quot;   
-## [9] &quot;RReliefFsqrDistance&quot;</code></pre>
+<pre><code>## [1] &quot;RReliefFequalK&quot;      &quot;RReliefFexpRank&quot;     &quot;RReliefFbestK&quot;      
+## [4] &quot;RReliefFwithMSE&quot;     &quot;MSEofMean&quot;           &quot;MSEofModel&quot;         
+## [7] &quot;MAEofModel&quot;          &quot;RReliefFdistance&quot;    &quot;RReliefFsqrDistance&quot;</code></pre>
 <p>类似的，分类模型对应的<code>estimator</code>的参数设置为：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">infoCore</span>(<span class="dt">what=</span><span class="st">&quot;attrEval&quot;</span>)</code></pre></div>
-<pre><code>##  [1] &quot;ReliefFequalK&quot;      &quot;ReliefFexpRank&quot;     &quot;ReliefFbestK&quot;       &quot;Relief&quot;            
-##  [5] &quot;InfGain&quot;            &quot;GainRatio&quot;          &quot;MDL&quot;                &quot;Gini&quot;              
-##  [9] &quot;MyopicReliefF&quot;      &quot;Accuracy&quot;           &quot;ReliefFmerit&quot;       &quot;ReliefFdistance&quot;   
-## [13] &quot;ReliefFsqrDistance&quot; &quot;DKM&quot;                &quot;ReliefFexpC&quot;        &quot;ReliefFavgC&quot;       
-## [17] &quot;ReliefFpe&quot;          &quot;ReliefFpa&quot;          &quot;ReliefFsmp&quot;         &quot;GainRatioCost&quot;     
-## [21] &quot;DKMcost&quot;            &quot;ReliefKukar&quot;        &quot;MDLsmp&quot;             &quot;ImpurityEuclid&quot;    
-## [25] &quot;ImpurityHellinger&quot;  &quot;UniformDKM&quot;         &quot;UniformGini&quot;        &quot;UniformInf&quot;        
-## [29] &quot;UniformAccuracy&quot;    &quot;EqualDKM&quot;           &quot;EqualGini&quot;          &quot;EqualInf&quot;          
-## [33] &quot;EqualHellinger&quot;     &quot;DistHellinger&quot;      &quot;DistAUC&quot;            &quot;DistAngle&quot;         
+<pre><code>##  [1] &quot;ReliefFequalK&quot;      &quot;ReliefFexpRank&quot;     &quot;ReliefFbestK&quot;      
+##  [4] &quot;Relief&quot;             &quot;InfGain&quot;            &quot;GainRatio&quot;         
+##  [7] &quot;MDL&quot;                &quot;Gini&quot;               &quot;MyopicReliefF&quot;     
+## [10] &quot;Accuracy&quot;           &quot;ReliefFmerit&quot;       &quot;ReliefFdistance&quot;   
+## [13] &quot;ReliefFsqrDistance&quot; &quot;DKM&quot;                &quot;ReliefFexpC&quot;       
+## [16] &quot;ReliefFavgC&quot;        &quot;ReliefFpe&quot;          &quot;ReliefFpa&quot;         
+## [19] &quot;ReliefFsmp&quot;         &quot;GainRatioCost&quot;      &quot;DKMcost&quot;           
+## [22] &quot;ReliefKukar&quot;        &quot;MDLsmp&quot;             &quot;ImpurityEuclid&quot;    
+## [25] &quot;ImpurityHellinger&quot;  &quot;UniformDKM&quot;         &quot;UniformGini&quot;       
+## [28] &quot;UniformInf&quot;         &quot;UniformAccuracy&quot;    &quot;EqualDKM&quot;          
+## [31] &quot;EqualGini&quot;          &quot;EqualInf&quot;           &quot;EqualHellinger&quot;    
+## [34] &quot;DistHellinger&quot;      &quot;DistAUC&quot;            &quot;DistAngle&quot;         
 ## [37] &quot;DistEuclid&quot;</code></pre>
 <p>我们用服装消费者数据为例，假设感兴趣的是收入，特征是所有问卷的问题。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat&lt;-<span class="kw">read.csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/SegData.csv&quot;</span>)
@@ -987,8 +994,10 @@ reliefValues =<span class="st"> </span><span class="kw">attrEval</span>(ytrain ~
 <span class="dt">ReliefIterations =</span> <span class="dv">50</span>)</code></pre></div>
 <p>得到的分值如下：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(reliefValues)</code></pre></div>
-<pre><code>##           Q1           Q2           Q3           Q4           Q5           Q6 
-## -0.009624742 -0.031902397  0.005705953 -0.016508364  0.034252308 -0.007082354</code></pre>
+<pre><code>##           Q1           Q2           Q3           Q4           Q5 
+## -0.009624742 -0.031902397  0.005705953 -0.016508364  0.034252308 
+##           Q6 
+## -0.007082354</code></pre>
 <p>该函数也能用来计算其它分值，如增益比，基尼系数等。要用置换检验观测到的Relief分值可以使用<code>AppliedPredictiveModeling</code>包中的<code>permuteRelief()</code>函数：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(AppliedPredictiveModeling)
 perm =<span class="st"> </span><span class="kw">permuteRelief</span>(<span class="dt">x =</span> xtrain, <span class="dt">y =</span> ytrain,
@@ -1061,15 +1070,24 @@ regfit.full=<span class="kw">regsubsets</span>(ytrain~.,xtrain)</code></pre></di
 ## Q10              FALSE      FALSE
 ## 1 subsets of each size up to 8
 ## Selection Algorithm: exhaustive
-##          store_exp online_exp store_trans online_trans Q1  Q2  Q3  Q4  Q5  Q6  Q7  Q8  Q9  Q10
-## 1  ( 1 ) &quot; &quot;       &quot; &quot;        &quot; &quot;         &quot; &quot;          &quot; &quot; &quot;*&quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot;
-## 2  ( 1 ) &quot; &quot;       &quot; &quot;        &quot; &quot;         &quot; &quot;          &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot;*&quot; &quot;*&quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot;
-## 3  ( 1 ) &quot; &quot;       &quot; &quot;        &quot; &quot;         &quot; &quot;          &quot;*&quot; &quot;*&quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot;*&quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot;
-## 4  ( 1 ) &quot; &quot;       &quot; &quot;        &quot; &quot;         &quot; &quot;          &quot;*&quot; &quot;*&quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot;*&quot; &quot; &quot; &quot; &quot; &quot;*&quot; &quot; &quot;
-## 5  ( 1 ) &quot;*&quot;       &quot; &quot;        &quot; &quot;         &quot; &quot;          &quot;*&quot; &quot;*&quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot;*&quot; &quot; &quot; &quot; &quot; &quot;*&quot; &quot; &quot;
-## 6  ( 1 ) &quot;*&quot;       &quot; &quot;        &quot; &quot;         &quot; &quot;          &quot;*&quot; &quot;*&quot; &quot; &quot; &quot;*&quot; &quot; &quot; &quot;*&quot; &quot; &quot; &quot; &quot; &quot;*&quot; &quot; &quot;
-## 7  ( 1 ) &quot;*&quot;       &quot; &quot;        &quot; &quot;         &quot; &quot;          &quot;*&quot; &quot;*&quot; &quot; &quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot; &quot; &quot; &quot; &quot;*&quot; &quot; &quot;
-## 8  ( 1 ) &quot;*&quot;       &quot; &quot;        &quot;*&quot;         &quot; &quot;          &quot;*&quot; &quot;*&quot; &quot; &quot; &quot;*&quot; &quot;*&quot; &quot;*&quot; &quot; &quot; &quot; &quot; &quot;*&quot; &quot; &quot;</code></pre>
+##          store_exp online_exp store_trans online_trans Q1  Q2  Q3  Q4  Q5 
+## 1  ( 1 ) &quot; &quot;       &quot; &quot;        &quot; &quot;         &quot; &quot;          &quot; &quot; &quot;*&quot; &quot; &quot; &quot; &quot; &quot; &quot;
+## 2  ( 1 ) &quot; &quot;       &quot; &quot;        &quot; &quot;         &quot; &quot;          &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot;*&quot;
+## 3  ( 1 ) &quot; &quot;       &quot; &quot;        &quot; &quot;         &quot; &quot;          &quot;*&quot; &quot;*&quot; &quot; &quot; &quot; &quot; &quot; &quot;
+## 4  ( 1 ) &quot; &quot;       &quot; &quot;        &quot; &quot;         &quot; &quot;          &quot;*&quot; &quot;*&quot; &quot; &quot; &quot; &quot; &quot; &quot;
+## 5  ( 1 ) &quot;*&quot;       &quot; &quot;        &quot; &quot;         &quot; &quot;          &quot;*&quot; &quot;*&quot; &quot; &quot; &quot; &quot; &quot; &quot;
+## 6  ( 1 ) &quot;*&quot;       &quot; &quot;        &quot; &quot;         &quot; &quot;          &quot;*&quot; &quot;*&quot; &quot; &quot; &quot;*&quot; &quot; &quot;
+## 7  ( 1 ) &quot;*&quot;       &quot; &quot;        &quot; &quot;         &quot; &quot;          &quot;*&quot; &quot;*&quot; &quot; &quot; &quot;*&quot; &quot;*&quot;
+## 8  ( 1 ) &quot;*&quot;       &quot; &quot;        &quot;*&quot;         &quot; &quot;          &quot;*&quot; &quot;*&quot; &quot; &quot; &quot;*&quot; &quot;*&quot;
+##          Q6  Q7  Q8  Q9  Q10
+## 1  ( 1 ) &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot;
+## 2  ( 1 ) &quot;*&quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot;
+## 3  ( 1 ) &quot;*&quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot; &quot;
+## 4  ( 1 ) &quot;*&quot; &quot; &quot; &quot; &quot; &quot;*&quot; &quot; &quot;
+## 5  ( 1 ) &quot;*&quot; &quot; &quot; &quot; &quot; &quot;*&quot; &quot; &quot;
+## 6  ( 1 ) &quot;*&quot; &quot; &quot; &quot; &quot; &quot;*&quot; &quot; &quot;
+## 7  ( 1 ) &quot;*&quot; &quot; &quot; &quot; &quot; &quot;*&quot; &quot; &quot;
+## 8  ( 1 ) &quot;*&quot; &quot; &quot; &quot; &quot; &quot;*&quot; &quot; &quot;</code></pre>
 <p>结果中星号表示对应特征被选中。例如，第3行对应有3个“*”号，代表相应被选中的3个特征，该特征组合在所有可能的3特征模型中表现最好。默认设置下，函数只会返回1到8个特征对应的最优模型。但你可以通过设置<code>nvmax</code>选项来改变特征个数。下面我们将特征个数改成10：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">regfit.full=<span class="kw">regsubsets</span>(ytrain~.,xtrain,<span class="dt">nvmax=</span><span class="dv">10</span>)
 reg.summary=<span class="kw">summary</span>(regfit.full)</code></pre></div>
@@ -1078,7 +1096,8 @@ reg.summary=<span class="kw">summary</span>(regfit.full)</code></pre></div>
 <pre><code>## [1] &quot;which&quot;  &quot;rsq&quot;    &quot;rss&quot;    &quot;adjr2&quot;  &quot;cp&quot;     &quot;bic&quot;    &quot;outmat&quot; &quot;obj&quot;</code></pre>
 <p>例如，我们可以看到当模型从1个特征到2个特征，<span class="math inline">\(R^{2}\)</span>统计量从60%上升到73%，之后增加特征变化不是太大。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">reg.summary$adjr2</code></pre></div>
-<pre><code>##  [1] 0.5992310 0.7313060 0.7417694 0.7486184 0.7505515 0.7515352 0.7518327 0.7519945 0.7521044 0.7522297</code></pre>
+<pre><code>##  [1] 0.5992310 0.7313060 0.7417694 0.7486184 0.7505515 0.7515352 0.7518327
+##  [8] 0.7519945 0.7521044 0.7522297</code></pre>
 <p>对所有模型绘制RSS、调整<span class="math inline">\(R^{2}\)</span>、<span class="math inline">\(C_{p}\)</span>以及BIC统计量图能够帮助选择最优模型。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))
 <span class="kw">plot</span>(reg.summary$adjr2,<span class="dt">xlab=</span><span class="st">&quot;变量个数&quot;</span>,<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>,<span class="dt">ylab=</span><span class="st">&quot;调整R2&quot;</span>,<span class="dt">type=</span><span class="st">&quot;l&quot;</span>)
