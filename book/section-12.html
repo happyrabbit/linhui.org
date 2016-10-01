@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-09-29">
+<meta name="date" content="2016-09-30">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -268,11 +268,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p><span class="math display">\[log\left(\frac{\theta_{i}}{1-\theta_{i}}\right)=\eta_{\mathbf{\beta}}(x_{i})=\beta_{0}+\sum_{g=1}^{G}\mathbf{x_{i,g}}^{T}\mathbf{\mathbf{\beta_{g}}}\]</span></p>
 <p>其中 <span class="math inline">\(\beta_{0}\)</span> 是截距项，且<span class="math inline">\(\mathbf{\beta_{g}}\)</span>是第 is the parameter vector corresponding to the <span class="math inline">\(g\)</span>th predictor.</p>
 Construction of risk scoring systems using logistic regression usually consists of two steps: selection among the <span class="math inline">\(G\)</span> risk factors, and estimation of the selected factor parameters. For model selection, significance has been used as a criterion for inclusion and exclusion of risk factors . Some researchers use univariate logistic regression to screen factors by significance before putting them into a multivariate logistic regression model , whereas others  don’t. Traditional estimation of logistic parameters <span class="math inline">\(\bbeta=(\beta_{0}^{T},\bbeta_{1}^{T},\bbeta_{2}^{T},...,\bbeta_{G}^{T})^{T}\)</span> is done through maximizing the log-likelihood
-\begin{eqnarray*}
+<span class="math display">\[\begin{eqnarray*}
 l(\bbeta)&amp;=&amp;log[\prod_{i=1}^{n}\theta_{i}^{y_{i}}(1-\theta_{i})^{1-y_{i}}]\\
 &amp;=&amp;\sum_{i=1}^{n}\{y_{i}log(\theta_{i})+(1-y_{i})log(1-\theta_{i})\}\\
 &amp;=&amp;\sum_{i=1}^{n}\{\ y_{i}\eta_{\bbeta}(\bx_{i})-log[1+exp(\eta_{\bbeta}(\bx_{i}))]\ \}.
-\end{eqnarray*}
+\end{eqnarray*}\]</span>
 <p>For logistic regression analysis with a large number of explanatory variables, complete- or quasi-complete-separation may result which makes the maximum likelihood estimation unstable.</p>
 </div>
 <div id="lasso" class="section level4">
@@ -300,26 +300,26 @@ Kim et al. . They proposed a gradient descent algorithm to solve the correspondi
 <div id="group-lasso-for-logistic-regression" class="section level4">
 <h4><span class="header-section-number">12.2.1.7</span> Group lasso for logistic regression}</h4>
 <p>In this paper, we propose to perform model selection and parameter estimation for risk scoring system construction by using the group lasso algorithm of Meier et al. . Instead of minimizing the negative log-likelihood <span class="math inline">\(-l(\bbeta)\)</span> in the maximum likelihood method, the logistic group lasso estimates are calculated by minimizing the covex function</p>
-\begin{equation}
+<span class="math display">\[\begin{equation}
 S_{\lambda}(\beta)=-l(\bbeta)+\lambda\sum_{g=1}^{G}s(df_{g})\parallel\bbeta_{g}\parallel_{2},
-\end{equation}
+\end{equation}\]</span>
 <p>where <span class="math inline">\(\lambda\)</span> is a tuning parameter for the penalty and <span class="math inline">\(s(\cdot)\)</span> is a function to rescale the penalty. In lasso algorithms, choice of <span class="math inline">\(\lambda\)</span> is usually determined by cross-validation using data. For <span class="math inline">\(s(\cdot)\)</span>, we use the square root function <span class="math inline">\(s(df_g)=df_g^{0.5}\)</span> as suggested in Meier et al. .</p>
 <p>%### Choosing <span class="math inline">\(\lambda\)</span> through leave-one-out cross validation}</p>
 <p>Here we consider selection of the tuning parameter <span class="math inline">\(\lambda\)</span> from a multiplicative grid of 148 values <span class="math inline">\(\{0.96\lambda_{max},0.96^{2}\lambda_{max},0.96^{3}\lambda_{max},...,0.96^{148}\lambda_{max}\}\)</span>, as in Meier et al. . Here <span class="math inline">\(\lambda_{max}\)</span> is defined as</p>
-\begin{equation}
+<span class="math display">\[\begin{equation}
 \lambda_{max}=\underset{g\in\{1,...,G\}}{max}\left\{\frac{1}{s(df_{g})}\parallel \bx_{g}^{T}(\by-\bar{\by})\parallel_{2}\right\},
-\end{equation}
+\end{equation}\]</span>
 <p>such that when <span class="math inline">\(\lambda=\lambda_{max}\)</span>, only the intercept is in the model. When <span class="math inline">\(\lambda\)</span> goes to <span class="math inline">\(0\)</span>, the model is equivalent to regular logistic regression.</p>
 <p>The optimal value of <span class="math inline">\(\lambda\)</span> is determined through leave-one-out cross validation, which is a special case of K-fold cross-validation with K being equal to <span class="math inline">\(n\)</span>, the number of observations in the sample. In each fold, leave-one-out cross validation uses a single observation from the original sample as the validation data, and the remaining observations as the training data. This step is repeated until each observation in the sample is used once as the validation data. Predicted probabilities of disease are calculated from cross-validation and are compared to true observed disease status to assess the predictive power of model.</p>
 <p>In this paper, we assess the predictive power of each model through ROC analysis. ROC curve is a graph of pairs of the true positive rate (sensitivity) and false positive rate (1-specificity) that result as the cutoff value for the predicted probability of disease is varied. %The cutoff value varied in order from minimum to maximum of the resulted score. Theoretically, cutoff values can be any values on the real line. The practical cutoff values are determined from resulting scores based on our data. The value of AUC is used as the criterion to evaluate the predictive power of the logistic model. AUC as well as the confidence interval are estimated through the approach proposed by DeLong et al. . The AUC can be interpreted as the probability that a random diseased individual has larger predicted probability of disease than a random non-diseased individual  and it has been used to assess predictive power of risk scoring systems . We calculate the AUCs for cross-validations of all <span class="math inline">\(\lambda\)</span>s, and the value of <span class="math inline">\(\lambda\)</span> with the largest AUC is chosen as the <span class="math inline">\(\lambda\)</span> used in constructing the final scoring system.</p>
 <p>Besides AUC, two other goodness-of-fit criteria for: the log-likelihood score used in Meier et al. , and the maximum correlation coefficient in Yeo and Burge  were also considered. The log-likelihood is taken as the average over all cross-validation sets. The maximum correlation coefficient is defined as</p>
-\begin{equation}
+<span class="math display">\[\begin{equation}
 \rho_{max}=max\{\rho_{\tau}|\tau\in(0,1)\},
-\end{equation}
+\end{equation}\]</span>
 <p>where <span class="math inline">\(\tau\in(0,1)\)</span> is a threshold to classify the predicted probability into a binary disease status and <span class="math inline">\(\rho_\tau\)</span> is the Pearson correlation coefficient between the true binary disease status and the predictive disease status with threshold <span class="math inline">\(\tau\)</span>.</p>
-\section{Simulation Study}
+
 <p>A simulation study to %use simulation to demonstrate group lasso logistic regression and compare it to ordinary forward stepwise logistic regression is performed.</p>
-\section{Application to PRRS Data}
+
 <p>In this section, we apply the proposed method to construct a scoring system for PRRS survey data of swine breeding herd sites in the United States and Canada.</p>
 </div>
 <div id="data-description" class="section level4">
@@ -334,12 +334,7 @@ S_{\lambda}(\beta)=-l(\bbeta)+\lambda\sum_{g=1}^{G}s(df_{g})\parallel\bbeta_{g}\
 <p>For each <span class="math inline">\(\lambda\)</span> in the grid <span class="math inline">\(\{0.96\lambda_{max},0.96^{2}\lambda_{max},0.96^{3}\lambda_{max},...,0.96^{148}\lambda_{max}\}\)</span>, the values of three evaluation criteria are calculated based on cross validation. The penalty parameter for final risk scoring system is selected to be the one that optimizes AUC.</p>
 <p>%### Comparison with other risk scoring systems}</p>
 <p>The logistic group lasso based scoring system is compared with two other systems:</p>
-\begin{enumerate}
 
-\item The current risk scoring system used in versions 2 of the PRRS risk assessment for the breeding herd that is based on expert opinion,
-\item A risk scoring system based on multivariate logistic regression model  selected by variable significance.
-
-\end{enumerate}
 <p>We construct the significance based logistic model by following the method used by Van Zee et al. . Specifically, we use forward stepwise variable selection to construct the logistic regression model with 0.05 significant level. Leave-one-out cross validation is applied to the model construction by variable significance, in the same manner as described for logistic group lasso.</p>
 <p>ROC curves are plotted for the three risk scoring systems. A point estimate as well as the 95% confidence interval for the AUC are provided. The estimated AUCs are compared by using the nonparametric approach of DeLong et al.  and p-values are calculated.</p>
 <p>R package {}``grplasso’’  is used to perform group lasso logistic regression. Significance-based logistic model selection is performed using the LOGISTIC procedure in SAS. All other algorithms and calculations are programmed in R language.</p>
@@ -347,66 +342,25 @@ S_{\lambda}(\beta)=-l(\bbeta)+\lambda\sum_{g=1}^{G}s(df_{g})\parallel\bbeta_{g}\
 <div id="determination-of-penalty-parameter-lambda" class="section level4">
 <h4><span class="header-section-number">12.2.1.10</span> Determination of penalty parameter <span class="math inline">\(\lambda\)</span></h4>
 <p>The AUC, maximum correlation coefficient and log-likelihood are calculated based on leave-one-out cross validation and are plotted against the penalty parameter <span class="math inline">\(\lambda\)</span> in Figure . The trends for all three criteria are similar with a sharp increase for small values of <span class="math inline">\(\lambda\)</span> and gradual decrease after reaching the maximum. The optimal values of <span class="math inline">\(\lambda\)</span> selected to maximize the three criteria are 11.72, 4.22 and 11.72 for AUC, maximum correlation coefficient and log-likelihood respectively.</p>
-\begin{figure}
-\resizebox*{15cm}{!}{\includegraphics{ThreeCri}}%
-\caption{Three criteria for choice of penalty parameter $\lambda$}
-\label{Flo:penalty}
-\end{figure}
+
 </div>
 <div id="logistic-group-lasso-based-prrs-risk-scoring-system" class="section level4">
 <h4><span class="header-section-number">12.2.1.11</span> Logistic group lasso based PRRS risk scoring system</h4>
 <p>The penalty parameter maximizing AUC (i.e. <span class="math inline">\(\lambda=11.72\)</span>) from the leave-one-out cross validation is used for the group lasso estimation of the logistic regression parameters. Figure~ show the distributions of the predicted probabilities based on cross validation for both negative and positive farms. It can be observed that the predicted probability for positive farms is larger than that of negative farms in stochastic order. The actual risk score can take the value of the predicted probability, the linear predictor in the logistic regression model, or any strictly increasing function of the predicted probability. This is because the ROC curve for a predictor is invariate to such transformation.</p>
-\begin{figure}
-\resizebox*{15cm}{!}{\includegraphics{histograms}}%
-\caption{Distributions of estimated probabilities for both negative and positive groups}
-\label{histogram}
-\end{figure}
-In the resulting scoring system, 74 out of 127 survey questions are estimated with 0 coefficients and are excluded from the system. PADRAP questions target internal risks (bio-management of virus already present) and external risks (bio-exclusion of virus not present). A summary of the number of questions included in the final risk scoring system in each category of risk factors in the PRRS Risk Assessment for the Breeding Herd is shown in Table 1.
-\begin{table}
-\caption{Summary of number of questions in the final risk scoring system by category of risk factors }
-\begin{center} \begin{tabular}{lrrrr} \hline Category of risk factors &amp; \multicolumn{2}{r}{Questions} &amp; \multicolumn{2}{r}{Dummy Variables}  \\ \hline INTERNAL RISKS &amp; Included &amp; Total &amp; Included &amp; Total \\ Circulation Risk &amp; &amp; &amp; &amp; \\ Characteristics of the herd &amp; 3 &amp; 4 &amp; 9 &amp; 11 \\ Characteristics of the site &amp; 0 &amp; 2 &amp; 0 &amp; 5 \\ Management practices &amp; 0 &amp; 2 &amp; 0 &amp; 9 \\--------- &amp;-------&amp;------&amp;------&amp;------\\
-\textbf{\textit{Total}} &amp; \textbf{\textit{3}}  &amp; \textbf{\textit{8}} &amp; \textbf{\textit{9}} &amp; \textbf{\textit{25}}\\ &amp; &amp; &amp; &amp;
 
-\\ EXTERNAL RISKS &amp; &amp; &amp; &amp; \\ Pig Related &amp; &amp; &amp; &amp; \\ Entry of replacement animals into the breeding herd &amp; 4 &amp; 12 &amp; 18 &amp; 40 \\ Entry of semen into the breeding herd &amp; 13 &amp; 31 &amp; 47 &amp; 104 \\ &amp; &amp; &amp; &amp; \\ Non-Pig Related &amp; &amp; &amp; &amp; \\ Transportation of live animals &amp; 13 &amp; 29 &amp; 38 &amp; 71 \\ Transportation of feed &amp; 1 &amp; 1 &amp; 2 &amp; 2 \\ Employee and service vehicles &amp; 1 &amp; 2 &amp; 3 &amp; 6 \\ Disposal of dead animals and waste management &amp; 2 &amp; 8 &amp; 3 &amp; 10 \\ Employees and visitors &amp; 5 &amp; 9 &amp; 15 &amp; 19 \\ Entry of supplies &amp; 1 &amp; 1 &amp; 3 &amp; 3 \\ Facilities &amp; 0 &amp; 4 &amp; 0 &amp; 11 \\ Biovectors &amp; 1 &amp; 1 &amp; 2 &amp; 1 \\ Density of pig farms in the area &amp; 3 &amp; 3 &amp; 10 &amp; 10 \\ Neighboring pig farms &amp; 3 &amp; 13 &amp; 12 &amp; 28 \\ Distance to pork industry infrastructure &amp; 2 &amp; 4 &amp; 5 &amp; 11 \\ Topography and forestation of surrounding area &amp; 1 &amp; 1 &amp; 3 &amp; 3 \\ --------- &amp;-------&amp;------&amp;------&amp;------\\
-\textbf{\textit{Total}} &amp; \textbf{\textit{50}}  &amp; \textbf{\textit{119}} &amp; \textbf{\textit{161}} &amp;\textbf{\textit{319}}\\\hline \end{tabular} \end{center} 
-\end{table}
+In the resulting scoring system, 74 out of 127 survey questions are estimated with 0 coefficients and are excluded from the system. PADRAP questions target internal risks (bio-management of virus already present) and external risks (bio-exclusion of virus not present). A summary of the number of questions included in the final risk scoring system in each category of risk factors in the PRRS Risk Assessment for the Breeding Herd is shown in Table 1.
+
 <p>Three out of eight questions regarding internal risk factors remain in the scoring system, and they are all factors concerning characteristics of the herd. Fifty questions remain in external risk factor section out of the total 119 questions. %Sixty nine questions are excluded out of the external risk factors section and fifty remain. In the external risks section, all of the 14 categories have at least one question remaining in the final scoring system, except all 4 questions concerning facilities are excluded. Several categories have a large number of questions removed. In particular, 8 of 12 (66.7%) questions concerning entry of animals into the breeding herd, 18 of 31 (58.1%) questions concerning entry of semen into the breeding herd, 16 of 29 (55.2%) questions concerning transportation of live animals, and 10 of 13 (76.9%) questions concerning neighboring pig farms are excluded.</p>
 </div>
 <div id="comparison-among-risk-scoring-systems" class="section level4">
 <h4><span class="header-section-number">12.2.1.12</span> Comparison among risk scoring systems</h4>
 <p>The ROC curves for the three risk scoring systems are plotted in Figure . The ROC curves for the two scoring systems based on logistic regression analyses of the data are constructed using the results of leave-one-out cross validation. The ROC curve of logistic group lasso apparently dominates the other two scoring systems.</p>
-\begin{figure}
-\includegraphics{roc_plot_diff_model}
-\caption{ROC curves for three risk scoring systems}
-\label{ROC}
-\end{figure}
+
 <p>Point and 95% interval estimates of AUC are reported in Table 2. The risk scoring system based on the has the largest AUC = 0.848. This AUC estimate is significantly higher than those based on either expert opinion (AUC = 0.696, p-value <span class="math inline">\(&lt;\)</span> 0.001) or logistic regression model selected by variable significance (AUC = 0.807, p-value <span class="math inline">\(&lt;\)</span> 0.001).</p>
-\begin{table}
-\caption{AUC estimations for three risk scoring systems}
-\begin{center} \begin{tabular}{lcc} \hline Model Names &amp; AUC &amp; 95\% CI \\ \hline Group Lasso &amp; 0.848 &amp; (0.822, 0.873) \\ Significance Based Method &amp; 0.807 &amp; (0.773, 0.841) \\ Expert Opinion &amp; 0.696 &amp; (0.661, 0.731) \\ \hline \end{tabular} \end{center}
-\end{table}
+
 <p>Results for the simulation study are shown in Table 3. The mean AUC is increasing with the value of <span class="math inline">\(\gamma\)</span> for both methods. The Wilcoxon signed-rank test result in the last column of Table 3 shows that AUC’s from group lasso are significant larger than those from logistic regression, especially for <span class="math inline">\(\gamma \geq 0.25\)</span>.</p>
 <p></p>
-\begin{table}
-\caption{Simulation study result with various values of coefficient $\gamma$ with  mean and standard deviation for both method, mean difference and p value from Wilcox signed rank test }
-\begin{center}
-\begin{tabular}{|c|c|c|c|c|}
-\hline 
-Coefficient $\gamma$  &amp; Group Lasso (mean$\pm$sd ) &amp; Logistic Regression (mean$\pm$sd )  &amp; Difference  &amp; p value \tabularnewline
-\hline 
-0.1  &amp; $0.57\pm0.03$ &amp; $0.54\pm0.06$ &amp; $0.03$ &amp; $0.040$\tabularnewline
-\hline 
-0.25 &amp; $0.71\pm0.02$ &amp; $0.64\pm0.04$ &amp; $0.07$ &amp; $&lt;0.001$\tabularnewline
-\hline 
-0.5  &amp; $0.91\pm0.03$ &amp; $0.78\pm0.03$ &amp; $0.13$ &amp; $&lt;0.001$\tabularnewline
-\hline 
-1 &amp; $0.92\pm0.01$ &amp; $0.82\pm0.02$ &amp; $0.1$0 &amp; $&lt;0.001$\tabularnewline
-\hline 
-2 &amp; $0.95\pm0.01$ &amp; $0.84\pm0.02$ &amp; $0.11$ &amp; $&lt;0.001$\tabularnewline
-\hline 
-\end{tabular}
- \end{center}
-\end{table}
+
 </div>
 <div id="discussion" class="section level4">
 <h4><span class="header-section-number">12.2.1.13</span> Discussion</h4>

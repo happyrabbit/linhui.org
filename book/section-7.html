@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-09-29">
+<meta name="date" content="2016-09-30">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -352,10 +352,10 @@ dat=<span class="kw">data.frame</span>(x,fx)
 <span class="kw">ggplot</span>(dat,<span class="kw">aes</span>(x,fx))+<span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_point</span>() +
 <span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-65-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-66-1.png" width="672" /></p>
 <p>由于我们通常使用训练集进行参数估计，如果训练集不同，得到的参数估计也会不同。直观的讲，估计方差表示如果我们用不同的数据集拟合相同的模型，得到估计值的变化，理想的情况是估计值的变化不会太大。对于高方差的模型，训练集的微小变化会导致很不相同的估计值。通常情况下，灵活度高的模型方差也更高，比如树模型，以及最初的助推法，后来在此基础上的随机森林模型和梯度助推法这样的集成方法的重要目标之一，就是通过汇总不同样本上得到的结果来降低估计方差。下图中的蓝色曲线是用平滑方法对上面的非线性观测进行拟合得到的，该曲线的灵活性很高，能够高度拟合当前数据：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(dat,<span class="kw">aes</span>(x,fx))+<span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-66-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-67-1.png" width="672" /></p>
 <p>但是该方法有很高的方差，如果我们随机抽取不同的样本子集，得到的拟合曲线会有明显变化：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 设置随机种子</span>
 <span class="kw">set.seed</span>(<span class="dv">2016</span>)
@@ -377,7 +377,7 @@ idx4=<span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">l
 dat4=<span class="kw">data.frame</span>(<span class="dt">x4=</span>x[idx4],<span class="dt">fx4=</span>fx[idx4])
 p4=<span class="kw">ggplot</span>(dat4,<span class="kw">aes</span>(x4,fx4))+<span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)
 <span class="kw">multiplot</span>(p1,p2,p3,p4,<span class="dt">cols=</span><span class="dv">2</span>)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-67-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-68-1.png" width="672" /></p>
 <p>对相同的4个子集拟合线性模型，变化非常小：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p1=<span class="kw">ggplot</span>(dat1,<span class="kw">aes</span>(x1,fx1))+<span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_point</span>() +
@@ -392,7 +392,7 @@ p4=<span class="kw">ggplot</span>(dat4,<span class="kw">aes</span>(x4,fx4))+<spa
 <span class="st">  </span><span class="kw">geom_point</span>() +
 <span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)
 <span class="kw">multiplot</span>(p1,p2,p3,p4,<span class="dt">cols=</span><span class="dv">2</span>)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-68-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-69-1.png" width="672" /></p>
 <p>总体说来，方差随着模型灵活度的增加而增加，偏差随着模型的灵活度增加而降低。在方差和偏差的变化共同决定了系统误差（或者均方误差，MSE）的变化。当我们提高模型的灵活性，偏差减小的速度开始时会超过方差增大的速度，MSE随之减小。但到了一定程度以后，提高模型的灵活性对偏差的影响不大但是方差大幅度增加，MSE随之增加。在之后的章节我们会看到，对于那些有一个控制模型灵活性的调优参数的模型，随着调优参数的减小（参数越大灵活度越低），模型误差先升高，后降低。</p>
 <p>模型选择向来是非常困难的，这种困难不是数据分析行业特有的，很多专业领域都有类似的情况，比如医生判断病人所患的疾病，并在众多治疗方案中选择最合适的，这不是答案一目了然的选择题，决策的过程需要很多权衡和妥协。模型选择也类似，在选择过程中需要考虑具体的情况：项目目的，客户要求的精确度（这点很重要），计算量等等。这个选择的过程很难白纸黑字的像食谱一样写下来，这里我们只是尽己所能的介绍模型选择过程中需要考虑的点，以及评估不同模型的辅助性技术。具体的应用和“数据科学思维”还需要大家在从业过程中通过实践思考不断学习打磨。</p>
 </div>
@@ -766,11 +766,11 @@ trainSlices[[<span class="dv">1</span>]]</code></pre></div>
 <blockquote>
 <ol style="list-style-type: decimal">
 <li>将样本随机划分为<span class="math inline">\(k\)</span>个大小相当的子集</li>
-<li>对<span class="math inline">\(i=1…k\)</span>
+<li>对<span class="math inline">\(i=1…k\)</span></li>
+</ol>
 <ol style="list-style-type: lower-alpha">
 <li>用除了第<span class="math inline">\(i\)</span>个样本集之外的样本拟合模型<span class="math inline">\(M_{i}\)</span></li>
 <li>将<span class="math inline">\(M_{i}\)</span>用在第i个样本集上，对结果进行评估</li>
-</ol></li>
 </ol>
 </blockquote>
 <p>这样会得到k个模型评估结果，将这些结果进行汇总（通常是计算均值和标准差），然后基于此了解调优参数和模型表现之间的关系。联系之前介绍的不同划分方法，可以将这些划分方法应用到k折交叉验证中，使k个子集中的因变量组成尽可能平衡。k折交叉验证的一个特定是k等于样本量，这时每次只有一个预留样本，该情况也称为留一交叉验证（LOOCV），注意在这种情况下模型最终的评估结果将根据所有的预测值进行计算。通常在样本量较小的时候使用LOOCV，道理很简单，样本量小的时候我们应该用尽可能多的样本拟合模型。关于交互校验的折数，很多R函数默认设置k=10，但没有黄金标准。折数越多，每次预留在外的样本就越少，模型表现估计值和真实值之间的差距就越小。但LOOCV的计算量最大，因为其模型拟合的次数等于样本量，且每次模型拟合使用的子集样本量几乎和训练集相同。另一方面，当k值很小时（2或者3），计算效率高但是结果的方差和偏差都会增加。这意味着如果重复抽样的过程得到的结果可能很不一样。当样本量足够大时，方差和偏差的潜在影响就可以忽略不计，在这种情况下可以使用折数较低的交叉验证。这里讲到的关于计算效率和偏差之间的权衡，需要读者自己反复实践才能真正理解。</p>

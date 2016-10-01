@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-09-29">
+<meta name="date" content="2016-09-30">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -538,7 +538,7 @@ ridgeRegTune &lt;-<span class="st"> </span><span class="kw">train</span>(trainx,
 ## RMSE was used to select the optimal model using  the smallest value.
 ## The final value used for the model was lambda = 0.01052632.</code></pre>
 <p>训练出的模型调优参数为0.01，对应RMSE和<span class="math inline">\(R^{2}\)</span>分别为1762.469和80%。从交互校验的RMSE结果图中可以看到，随着调优参数增加，RMSE有一个略微减小然后增加的过程。</p>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-162-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-163-1.png" width="672" /></p>
 <p>训练出调优参数之后，很多函数都可以用来拟合岭回归。这里展示如何使用<code>elasticnet</code>包中的<code>enet()</code>函数：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ridgefit =<span class="st"> </span><span class="kw">enet</span>(<span class="dt">x =</span> <span class="kw">as.matrix</span>(trainx), <span class="dt">y =</span> trainy, <span class="dt">lambda =</span> <span class="fl">0.01</span>,
                 <span class="co"># 这里设置将自变量标准化</span>
@@ -613,7 +613,7 @@ lassoTune</code></pre></div>
 ## The final value used for the model was fraction = 0.9473684.</code></pre>
 <p>训练出的模型调优参数为0.95，对应RMSE和<span class="math inline">\(R^{2}\)</span>分别为1761和79%，和之间岭回归几乎相同。从交互校验的RMSE结果图中可以看到，随着调优参数增加，RMSE有一个减小然后增加的过程。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(lassoTune)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-169-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-170-1.png" width="672" /></p>
 <p>lasso模型可以用许多不同的函数进行拟合。<code>lars</code>包中的<code>lars()</code>函数，<code>elasticnet</code>包的<code>enet()</code>函数，<code>glmnet</code>包的<code>glmnet()</code>函数都可以拟合lasso，它们的语法非常相似。我们还是使用<code>enet()</code>函数，其要求自变量必须是一个矩阵对象，因此要将数据框<code>trainx</code>转换成矩阵。此外，预测变量在建模之前需要中心化和标准化，函数中的<code>normalize</code>参数可以自动完成这一过程<code>lambda</code>参数控制了岭回归的罚参数，因此将该值设为0即为拟合lasso模型。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lassoModel&lt;-<span class="st"> </span><span class="kw">enet</span>(<span class="dt">x =</span> <span class="kw">as.matrix</span>(trainx), <span class="dt">y =</span> trainy, <span class="dt">lambda =</span> <span class="dv">0</span>, <span class="dt">normalize =</span> <span class="ot">TRUE</span>)</code></pre></div>
 <p>lasso模型在进行预测之前不需要进行指定：</p>
@@ -673,8 +673,11 @@ enetTune &lt;-<span class="st"> </span><span class="kw">train</span>(trainx, tra
 </div>
 <div id="section-10.4" class="section level2">
 <h2><span class="header-section-number">10.4</span> 主成分和偏最小二乘回归</h2>
-<p>在实际应用中，自变量之间通常是彼此相关的，包含相似的信息。比如我们在建模技术那章用消费记录变量建立关于消费者收入的预测模型，其中实体店花销（<code>store_exp</code>），在线花销（<code>online_exp</code>），实体店交易次数（<code>store_trans</code>），在线交易次数（<code>online_trans</code>）这几个变量之间有不同程度的相关性，尤其是交易次数和对应花销相关性较高。如果自变量之间相关性较大， 那么多元线性回归的最小二乘估计将会很不稳定。有的时候，自变量的数目会高于观测，这时通常意义上的最小二乘将同样无法得到一组唯一的最小化SSE的回归系数。在这些情况下进行回归，通常的解决办法是对自变量进行预处理，包括数据预处理章节讲到的删除高度相关的自变量算法，移除高度相关的预测变量可以保证它们两两间的相关系数不超过一个给定的阈值。然而，这一过程并不能保证某些预测变量的线性组合与其他变量是不相关的。 如果情况如此，那么最小二乘的解将依然是不稳定的。因此特别需要注意的是， 移除两两之间高度相关的预测变量并不能保证一个稳定的解。 你也可以参考特征工程那章讲到的特征提取方法，比如对预测变量进行主成分分析（PCA），让后用主成分进行回归。这种方法得到的主成分是彼此不相关的。但存在的弊端是得到的新自变量是原变量的线性组合，因此使得模型难以解释。</p>
-<p>对自变量进行主成分分析，然后用得到得主成分进行回归的方法称为主成分回归（PCR）<span class="citation">(W <a href="#ref-Massy1965">1965</a>)</span>。 这项技术在自变量内在强相关或者变量个数大于观测个数时可以使用。然而，尽管这样先降维然后回归的方法可以在理论上建立回归模型，但结果可能并不理想。因为PCA降维得到的新变量并不一定能很好地解释因变量，因为这个过程是无监督的，在降维的时候并没有考虑到因变量的信息，它只是简单地追踪自变量空间的方差。如果自变量自身的变异恰好与因变量相关，那么PCR或许能很好地识别出它们之间的关系。 然而，如果自变量自身方差大，但其变化并不影响因变量，那么PCR或许就无法识别出真实存在的关系。</p>
+<p>在实际应用中，自变量之间通常是彼此相关的，包含相似的信息。比如我们在建模技术那章用消费记录变量建立关于消费者收入的预测模型，其中实体店花销（<code>store_exp</code>），在线花销（<code>online_exp</code>），实体店交易次数（<code>store_trans</code>），在线交易次数（<code>online_trans</code>）这几个变量之间有不同程度的相关性，尤其是交易次数和对应花销相关性较高。如果自变量之间相关性较大， 那么多元线性回归的最小二乘估计将会很不稳定。有的时候，自变量的数目会高于观测，这时通常意义上的最小二乘将同样无法得到一组唯一的最小化SSE的回归系数。在这些情况下进行回归，通常的解决办法是对自变量进行预处理，包括数据预处理章节讲到的删除高度相关的自变量算法，移除高度相关的预测变量可以保证它们两两间的相关系数不超过一个给定的阈值。然而，这一过程并不能保证某些预测变量的线性组合与其他变量是不相关的。如果情况如此，那么最小二乘的解将依然是不稳定的。因此特别需要注意的是，移除两两之间高度相关的预测变量并不能保证一个稳定的解。你也可以参考特征工程那章讲到的特征提取方法，比如对预测变量进行主成分分析（PCA），让后用主成分进行回归。这种方法得到的主成分是彼此不相关的。但存在的弊端是得到的新自变量是原变量的线性组合，因此使得模型难以解释。</p>
+<p>对自变量进行主成分分析，然后用得到得主成分进行回归的方法称为主成分回归（PCR）<span class="citation">(W <a href="#ref-Massy1965">1965</a>)</span>。 这项技术在自变量内在强相关或者变量个数大于观测个数时可以使用。然而，尽管这样先降维然后回归的方法可以在理论上建立回归模型，但结果可能并不理想。因为PCA降维得到的新变量并不一定能很好地解释因变量，因为这个过程是无监督的，在降维的时候并没有考虑到因变量的信息，它只是简单地追踪自变量空间的方差。如果自变量自身的变异恰好与因变量相关，那么PCR或许能很好地识别出它们之间的关系。 然而，如果自变量自身方差大，但其变化并不影响因变量，那么PCR或许就无法识别出真实存在的关系。还有需要注意的一点是，虽然PCR是降维的方法，但它并不是变量选择的方法，因为它是所有的自变量的线性组合。</p>
+<p>偏最小二乘回归（PLS）可以说是PCR的有监督版本。像PCR，PLS是一种降维方法，它首先确定一个新的更小的一套是原始特征线性组合的功能，然后通过拟合最小二乘到新的M功能的线性模型。然而，与PCR，PLS使得以识别新功能使用的响应变量。</p>
+<p>PLS通过将较高的权重对那些最密切相关的响应变量执行此操作。为了实现随后的方向中，该方法首先通过倒退第一组分上的每个变量，并采取残差调整每个用于第一组分的变量。残差可被解释为还没有被第一PLS方向解释剩余的信息。然后我们计算在完全相同的方式作为第一组分的第二组分。这可以被重复M次，以确定多个PLS组件。</p>
+<p>在实践中执行PLS不超过岭回归或PCR更好。这是因为，即使PLS能减少偏见，它也有潜力增加方差，因此整体的利益是不是真的不同。</p>
 <!--
 由于PCR存在这种内在的问题，我们推荐使用PLS来解决那些存在相关预测变量且希望用线性回归来加以解决的问题。
 ---------------------- 原书P114图6.8 ----------------------
