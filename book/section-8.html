@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-09-30">
+<meta name="date" content="2016-10-02">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -388,7 +388,7 @@ car::<span class="kw">some</span>(yhat)</code></pre></div>
 <p>其中TP代表真阳性，FP代表假阳性，TN代表真阴性，FN代表假阴性。表格左上到右下对角线上的元素表示正确预测的样本数目，另一个方向的对角线上的元素代表误判的样本数。评估类预测最简单的指标是<strong>总体精确率</strong>，即预测正确的总体样本比例:</p>
 <p><span class="math display">\[总体精确率=\frac{TP+TN}{TP+TN+FP+FN}\]</span></p>
 <p>对类别数目大于2的情况，可以类似计算总体精确率。该统计量很直观，但有一些缺点，首先总体精确率没有区分错误类型。实际应用中，不同错误对应的损失可能不同，这时就无法用总体精确率衡量模型。 比如过滤垃圾邮件，误删一封重要的邮件带来的损失要高于收到一封垃圾邮件的损失。Provost等人<span class="citation">(Provost F <a href="#ref-Provost1998">1998</a>)</span>深入讨论了用精确率来比较不同的分类器存在的问题。其次总体精确率没有考虑真实频率。比如在保险风险分析中，有风险的概率可能只有千分之一或者更小，模型只要将所有样本都清一色判定为无风险就能达到几乎完美的精确率。有时我们将不用模型也能得到的精确率称为<strong>无信息率</strong>。这里将所有样本判定为无风险得到的无信息率至少是99.9%。在这种情况下模型的精确率需要高于无信息率才算合理。</p>
-<p>还有一种一致性检验方法叫做Kappa统计量，最早由Cohen等人在1960年提出用于考察两个不同的诊断方法在结果上是否具有一致性<span class="citation">(C. J <a href="#ref-Cohen1960">1960</a>)</span>。Kappa考虑到简单由偶然情况产生的准确性。具体公式如下：</p>
+<p>还有一种一致性检验方法叫做Kappa统计量，最早由Cohen等人在1960年提出用于考察两个不同的诊断方法在结果上是否具有一致性<span class="citation">(J <a href="#ref-Cohen1960">1960</a>)</span>。Kappa考虑到简单由偶然情况产生的准确性。具体公式如下：</p>
 <p><span class="math display">\[Kappa=\frac{P_{0}+P_{e}}{1-P_{e}}\]</span></p>
 <p>假设<span class="math inline">\(n=TP+TN+FP+FN\)</span>为总体样本数，其中<span class="math inline">\(P_{0}=\frac{TP+TN}{n}\)</span>为实际预测一致率，<span class="math inline">\(P_{e}=\frac{(TP+FP)(TP+FN)+(FN+TN)(FP+TN)}{n^{2}}\)</span>为由简单偶然情况产生的一致率。Kappa取值从-1到1，值越高一致性越强。</p>
 <ul>
@@ -424,7 +424,7 @@ kt$Result$estimate</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(pROC)
 rocCurve&lt;-<span class="kw">roc</span>(<span class="dt">response=</span>yTest,<span class="dt">predictor=</span>yhatprob[,<span class="dv">2</span>])
 <span class="kw">plot</span>(rocCurve,<span class="dt">legacy.axes=</span>T)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-93-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-94-1.png" width="672" /></p>
 <pre><code>## 
 ## Call:
 ## roc.default(response = yTest, predictor = yhatprob[, 2])
@@ -439,7 +439,7 @@ rocCurve&lt;-<span class="kw">roc</span>(<span class="dt">response=</span>yTest,
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># DeLong方法得到的AUC置信区间</span>
 <span class="kw">ci.auc</span>(rocCurve)</code></pre></div>
 <pre><code>## 95% CI: 0.7419-0.8746 (DeLong)</code></pre>
-<p>ROC曲线和线下面积AUC是我最常用的评估分类模型的方式，由于它是灵敏度和特异度的函数，对类失衡有抗性<span class="citation">(Provost F <a href="#ref-Provost1998">1998</a>; F. T <a href="#ref-Fawcett2006">2006</a>)</span>。用AUC和其它单一度量类似，在用某个量总结曲线时会带来信息的损失，因为很可能没有某条曲线一致好于其它的曲线（曲线交叉）。如果我们对曲线特定的区域感兴趣，可以直接比较曲线。如果我们关心的是ROC曲线低的一端，可以使用ROC曲线下局部面积度量<span class="citation">(M. D <a href="#ref-McClish1989">1989</a>)</span>，该度量关注曲线特定部分。ROC曲线主要针对二分类定义，但之后不同人将其扩展到多分类的情况<span class="citation">(Hand D <a href="#ref-Hand2001">2001</a>; Lachiche N <a href="#ref-Lachiche2003">2003</a>; Li J <a href="#ref-Li2008">2008</a>)</span>。</p>
+<p>ROC曲线和线下面积AUC是我最常用的评估分类模型的方式，由于它是灵敏度和特异度的函数，对类失衡有抗性<span class="citation">(Provost F <a href="#ref-Provost1998">1998</a>; T <a href="#ref-Fawcett2006">2006</a>)</span>。用AUC和其它单一度量类似，在用某个量总结曲线时会带来信息的损失，因为很可能没有某条曲线一致好于其它的曲线（曲线交叉）。如果我们对曲线特定的区域感兴趣，可以直接比较曲线。如果我们关心的是ROC曲线低的一端，可以使用ROC曲线下局部面积度量<span class="citation">(D <a href="#ref-McClish1989">1989</a>)</span>，该度量关注曲线特定部分。ROC曲线主要针对二分类定义，但之后不同人将其扩展到多分类的情况<span class="citation">(Hand D <a href="#ref-Hand2001">2001</a>; Lachiche N <a href="#ref-Lachiche2003">2003</a>; Li J <a href="#ref-Li2008">2008</a>)</span>。</p>
 </div>
 <div id="section-8.2.3" class="section level3">
 <h3><span class="header-section-number">8.2.3</span> 提升图</h3>
@@ -454,7 +454,7 @@ labs&lt;-<span class="kw">c</span>(<span class="dt">modelscore=</span><span clas
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">liftCurve&lt;-<span class="kw">lift</span>(yTest~modelscore+randomscore,<span class="dt">class=</span><span class="st">&quot;1&quot;</span>,<span class="dt">labels=</span>labs)</code></pre></div>
 <p>为了绘制多条提升图，使用lattice包中的xyplot()函数：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">xyplot</span>(liftCurve,<span class="dt">auto.key=</span><span class="kw">list</span>(<span class="dt">columns=</span><span class="dv">2</span>,<span class="dt">lines=</span>T,<span class="dt">points=</span>F))</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-97-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-98-1.png" width="672" /></p>
 <p>提升图的横轴是累计样本百分比，纵轴是累计获取的目标类样本百分比。比如随机森林模型提升曲线上的点(6.25,11.24)表示：按照模型预测分值从高到低排序后的前6.25%的样本中含有160个疫情爆发样本中的0.1123596。和ROC曲线类似，我们可以通过比较不同模型的提升图来选择模型，曲线下面积也可作为模型效果的度量。此外我们也可能对曲线的某一部分特别感兴趣。比如在当前的例子中，如果判定一个农场在未来5年内可能爆发疫情，那么通常的措施是对该农场进行大规模的清洗消毒，这样的措施花费很高。假设我们只能对50%的农场进行清理，那么就该选择对应横坐标为50%，疫情爆发样本命中率最高的模型。在这个应用场景下，在支出预算一定时最大化效率。</p>
 <!--
 

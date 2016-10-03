@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-09-30">
+<meta name="date" content="2016-10-02">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -410,7 +410,7 @@ Figure 10.2: 一般线性回归残差图
 <ul>
 <li>离群点</li>
 </ul>
-<p>刚才介绍的Cook距离图，以及之前讲到的Z分值都可以用来检测线性模型中的离群点。注意，Z分值仅仅是针对应变量观测而言，和使用的模型无关，即其并未考虑模型的拟合情况。下面我们用<code>car</code>包<span class="citation">(John Fox and Weisberg <a href="#ref-car">2011</a>)</span>中的<code>outlierTest()</code>函数对拟合模型对象检测是否存在离群点，和Z分值方法鉴别的离群点不同，这里的离群点指的是<strong>那些模型预测效果不佳的观测点</strong>，通常有很大的、或正或负的残差，正残差说明模型低估了响应值，负残差说明高佑了响应值。这里使用的是Bonferroni离群点检验，该检验也可作用于广义线性模型。对于一般线性模型使用的是t检验，对于广义线性模型使用的是正态检验。关于该检验相关知识见 <span class="citation">(Williams <a href="#ref-Williams1987">1987</a>; J. Fox <a href="#ref-fox2008">2008</a>; Cook and Weisberg <a href="#ref-cookd">1982</a>; S. Weisberg <a href="#ref-weisberg14">2014</a>)</span>。</p>
+<p>刚才介绍的Cook距离图，以及之前讲到的Z分值都可以用来检测线性模型中的离群点。注意，Z分值仅仅是针对应变量观测而言，和使用的模型无关，即其并未考虑模型的拟合情况。下面我们用<code>car</code>包<span class="citation">(Fox and Weisberg <a href="#ref-car">2011</a>)</span>中的<code>outlierTest()</code>函数对拟合模型对象检测是否存在离群点，和Z分值方法鉴别的离群点不同，这里的离群点指的是<strong>那些模型预测效果不佳的观测点</strong>，通常有很大的、或正或负的残差，正残差说明模型低估了响应值，负残差说明高佑了响应值。这里使用的是Bonferroni离群点检验，该检验也可作用于广义线性模型。对于一般线性模型使用的是t检验，对于广义线性模型使用的是正态检验。关于该检验相关知识见 <span class="citation">(Williams <a href="#ref-Williams1987">1987</a>; Fox <a href="#ref-fox2008">2008</a>; Cook and Weisberg <a href="#ref-cookd">1982</a>; Weisberg <a href="#ref-weisberg14">2014</a>)</span>。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(car)
 <span class="kw">outlierTest</span>(lmfit) <span class="co">#Bonferroni离群点检验</span></code></pre></div>
 <pre><code>##      rstudent unadjusted p-value Bonferonni p
@@ -470,7 +470,7 @@ influence.measures(model)
 <h3><span class="header-section-number">10.2.1</span> 岭回归</h3>
 <p>回顾最小二乘模型，它的目的是寻找参数的估计，以使得误差平方（RSS）和达到最小：</p>
 <p><span class="math display">\[RSS=\Sigma_{i=1}^{n}(y_{i}-\beta_{0}-\Sigma_{j=1}^{p}\beta_{j}x_{ij})^{2}\]</span></p>
-<p>岭回归<span class="citation">(H. A <a href="#ref-Hoerl1970">1970</a>)</span>和最小二乘回归有类似之处，不同在于优化的方程略有变化。岭回归寻找的是优化下面方程的<span class="math inline">\(\hat{\beta}^{R}\)</span>：</p>
+<p>岭回归<span class="citation">(A <a href="#ref-Hoerl1970">1970</a>)</span>和最小二乘回归有类似之处，不同在于优化的方程略有变化。岭回归寻找的是优化下面方程的<span class="math inline">\(\hat{\beta}^{R}\)</span>：</p>
 <p><span class="math display">\[\Sigma_{i=1}^{n}(y_{i}-\beta_{0}-\Sigma_{j=1}^{p}\beta_{j}x_{ij})^{2}+\lambda\Sigma_{j=1}^{p}\beta_{j}^{2}=RSS+\lambda\Sigma_{j=1}^{p}\beta_{j}^{2}\]</span></p>
 <p>其中<span class="math inline">\(\lambda &gt;0\)</span>是需要额外估计的调优参数。上式是在两个不同的准则间权衡。和最小二乘回归类似，岭回归考虑了最小化RSS，但其还有一个称为收缩惩罚的项<span class="math inline">\(\lambda\Sigma_{j=1}^{p}\beta_{j}^{2}\)</span>，该项在参数<span class="math inline">\(\beta_{1},...,\beta_{p}\)</span>趋近于0的时候变小，因此有向0收缩参数估计的用处。调优参数<span class="math inline">\(\lambda\)</span>用来调整这两个部分对最后参数估计的影响。当<span class="math inline">\(\lambda=0\)</span>时，惩罚项对结果没有影响，这时岭回归等同于最小二乘回归。当<span class="math inline">\(\lambda\rightarrow\infty\)</span>时，惩罚项的影响增大，岭回归系数估计趋近于0。这里惩罚只针对<span class="math inline">\(\beta_{1},...,\beta_{p}\)</span>，对截距项<span class="math inline">\(\beta_{0}\)</span>并没有惩罚。每个<span class="math inline">\(\lambda\)</span>值都对应一组参数估计，通过尝试不同的调优参数值，找到最优的模型。通常使用交互校验来选择调优参数，关于交互校验，我在之前基础建模技术那一章节已经讲过了。</p>
 <p>有许多R函数可以进行岭回归。<code>MASS</code>包中的<code>lm.ridge()</code>函数，以及<code>elasticnet</code>包中的<code>enet()</code>函数，如果你知道调优参数的值，可以直接使用这两个函数拟合岭回归模型。如果你要对参数进行调优，最方便的函数是<code>caret</code>包中的<code>train()</code>函数。还是以服装消费者数据为例展示这些函数的使用，自变量为10个问卷调查问题以及年龄、性别、收入和房产情况，应变量为总体花销（在线花销和实体店花销的总和）。</p>
@@ -538,7 +538,7 @@ ridgeRegTune &lt;-<span class="st"> </span><span class="kw">train</span>(trainx,
 ## RMSE was used to select the optimal model using  the smallest value.
 ## The final value used for the model was lambda = 0.01052632.</code></pre>
 <p>训练出的模型调优参数为0.01，对应RMSE和<span class="math inline">\(R^{2}\)</span>分别为1762.469和80%。从交互校验的RMSE结果图中可以看到，随着调优参数增加，RMSE有一个略微减小然后增加的过程。</p>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-163-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-164-1.png" width="672" /></p>
 <p>训练出调优参数之后，很多函数都可以用来拟合岭回归。这里展示如何使用<code>elasticnet</code>包中的<code>enet()</code>函数：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ridgefit =<span class="st"> </span><span class="kw">enet</span>(<span class="dt">x =</span> <span class="kw">as.matrix</span>(trainx), <span class="dt">y =</span> trainy, <span class="dt">lambda =</span> <span class="fl">0.01</span>,
                 <span class="co"># 这里设置将自变量标准化</span>
@@ -613,7 +613,7 @@ lassoTune</code></pre></div>
 ## The final value used for the model was fraction = 0.9473684.</code></pre>
 <p>训练出的模型调优参数为0.95，对应RMSE和<span class="math inline">\(R^{2}\)</span>分别为1761和79%，和之间岭回归几乎相同。从交互校验的RMSE结果图中可以看到，随着调优参数增加，RMSE有一个减小然后增加的过程。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(lassoTune)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-170-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-171-1.png" width="672" /></p>
 <p>lasso模型可以用许多不同的函数进行拟合。<code>lars</code>包中的<code>lars()</code>函数，<code>elasticnet</code>包的<code>enet()</code>函数，<code>glmnet</code>包的<code>glmnet()</code>函数都可以拟合lasso，它们的语法非常相似。我们还是使用<code>enet()</code>函数，其要求自变量必须是一个矩阵对象，因此要将数据框<code>trainx</code>转换成矩阵。此外，预测变量在建模之前需要中心化和标准化，函数中的<code>normalize</code>参数可以自动完成这一过程<code>lambda</code>参数控制了岭回归的罚参数，因此将该值设为0即为拟合lasso模型。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lassoModel&lt;-<span class="st"> </span><span class="kw">enet</span>(<span class="dt">x =</span> <span class="kw">as.matrix</span>(trainx), <span class="dt">y =</span> trainy, <span class="dt">lambda =</span> <span class="dv">0</span>, <span class="dt">normalize =</span> <span class="ot">TRUE</span>)</code></pre></div>
 <p>lasso模型在进行预测之前不需要进行指定：</p>
@@ -627,13 +627,13 @@ lassoTune</code></pre></div>
 <p>返回的结果依旧是一个列表，其中<code>coefficients</code>项包含各个变量的参数估计：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 这里不显示结果</span>
 LassoCoef=lassoCoef$coefficients</code></pre></div>
-<p>这类规则化方法的研究现在非常活跃。很多学者将lasso模型嫁接到其它方法上，比如线性判别<span class="citation">(Clemmensen L <a href="#ref-Clem2011">2011</a>)</span>，偏最小二乘回归<span class="citation">(C. H and S <a href="#ref-chun2010">2010</a>)</span>。但由于一阶范数不是连续可导的，lasso回归的计算过程更复杂。很多学者对相应的优化算法进行了研究，其中最重要的改进是Bradley Efron等<span class="citation">(Efron B <a href="#ref-efron2014">2014</a>)</span>提出的最小角回归(Least Angle Regression［LARS］)算法，该算法很好地解决Lasso的计算问题，尤其在维度高的时候。</p>
+<p>这类规则化方法的研究现在非常活跃。很多学者将lasso模型嫁接到其它方法上，比如线性判别<span class="citation">(Clemmensen L <a href="#ref-Clem2011">2011</a>)</span>，偏最小二乘回归<span class="citation">(H and S <a href="#ref-chun2010">2010</a>)</span>。但由于一阶范数不是连续可导的，lasso回归的计算过程更复杂。很多学者对相应的优化算法进行了研究，其中最重要的改进是Bradley Efron等<span class="citation">(Efron B <a href="#ref-efron2014">2014</a>)</span>提出的最小角回归(Least Angle Regression［LARS］)算法，该算法很好地解决Lasso的计算问题，尤其在维度高的时候。</p>
 </div>
 <div id="section-10.2.3" class="section level3">
 <h3><span class="header-section-number">10.2.3</span> 弹性网络</h3>
-<p>弹性网络是lasso的一般化版本<span class="citation">(Z. H and T <a href="#ref-zou2005">2005</a>)</span>，该模型结合了两种罚函数，参数估计最小化如下方程：</p>
+<p>弹性网络是lasso的一般化版本<span class="citation">(H and T <a href="#ref-zou2005">2005</a>)</span>，该模型结合了两种罚函数，参数估计最小化如下方程：</p>
 <p><span class="math display">\[\Sigma_{i=1}^{n}(y_{i}-\hat{y}_{i})^{2}+\lambda_{1}\Sigma_{j=1}^{p}\beta_{j}^{2}+\lambda_{2}\Sigma_{j=1}^{p}|\beta_{j}|\]</span></p>
-<p>lasso对应的估计方差较大，而岭回归又没有特征选择的功能，弹性网络的优点在于利用了岭回归的罚函数，同时又有lasso的特征选择功能。Zou和Hastie<span class="citation">(Z. H and T <a href="#ref-zou2005">2005</a>)</span>指出该模型能够更有效的处理成组的高度相关变量。</p>
+<p>lasso对应的估计方差较大，而岭回归又没有特征选择的功能，弹性网络的优点在于利用了岭回归的罚函数，同时又有lasso的特征选择功能。Zou和Hastie<span class="citation">(H and T <a href="#ref-zou2005">2005</a>)</span>指出该模型能够更有效的处理成组的高度相关变量。</p>
 <p>还是先用<code>train()</code>函数对参数进行调优。首先设置交互校验和参数调优范围，这里我们使用10层交互校验，并且对变量标准化：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">enetGrid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">.lambda =</span> <span class="kw">seq</span>(<span class="dv">0</span>,<span class="fl">0.2</span>,<span class="dt">length=</span><span class="dv">20</span>), <span class="dt">.fraction =</span> <span class="kw">seq</span>(.<span class="dv">8</span>, <span class="dv">1</span>, <span class="dt">length =</span> <span class="dv">20</span>))
 <span class="kw">set.seed</span>(<span class="dv">100</span>)
@@ -674,27 +674,30 @@ enetTune &lt;-<span class="st"> </span><span class="kw">train</span>(trainx, tra
 <div id="section-10.4" class="section level2">
 <h2><span class="header-section-number">10.4</span> 主成分和偏最小二乘回归</h2>
 <p>在实际应用中，自变量之间通常是彼此相关的，包含相似的信息。比如我们在建模技术那章用消费记录变量建立关于消费者收入的预测模型，其中实体店花销（<code>store_exp</code>），在线花销（<code>online_exp</code>），实体店交易次数（<code>store_trans</code>），在线交易次数（<code>online_trans</code>）这几个变量之间有不同程度的相关性，尤其是交易次数和对应花销相关性较高。如果自变量之间相关性较大， 那么多元线性回归的最小二乘估计将会很不稳定。有的时候，自变量的数目会高于观测，这时通常意义上的最小二乘将同样无法得到一组唯一的最小化SSE的回归系数。在这些情况下进行回归，通常的解决办法是对自变量进行预处理，包括数据预处理章节讲到的删除高度相关的自变量算法，移除高度相关的预测变量可以保证它们两两间的相关系数不超过一个给定的阈值。然而，这一过程并不能保证某些预测变量的线性组合与其他变量是不相关的。如果情况如此，那么最小二乘的解将依然是不稳定的。因此特别需要注意的是，移除两两之间高度相关的预测变量并不能保证一个稳定的解。你也可以参考特征工程那章讲到的特征提取方法，比如对预测变量进行主成分分析（PCA），让后用主成分进行回归。这种方法得到的主成分是彼此不相关的。但存在的弊端是得到的新自变量是原变量的线性组合，因此使得模型难以解释。</p>
-<p>对自变量进行主成分分析，然后用得到得主成分进行回归的方法称为主成分回归（PCR）<span class="citation">(W <a href="#ref-Massy1965">1965</a>)</span>。 这项技术在自变量内在强相关或者变量个数大于观测个数时可以使用。然而，尽管这样先降维然后回归的方法可以在理论上建立回归模型，但结果可能并不理想。因为PCA降维得到的新变量并不一定能很好地解释因变量，因为这个过程是无监督的，在降维的时候并没有考虑到因变量的信息，它只是简单地追踪自变量空间的方差。如果自变量自身的变异恰好与因变量相关，那么PCR或许能很好地识别出它们之间的关系。 然而，如果自变量自身方差大，但其变化并不影响因变量，那么PCR或许就无法识别出真实存在的关系。还有需要注意的一点是，虽然PCR是降维的方法，但它并不是变量选择的方法，因为它是所有的自变量的线性组合。</p>
-<p>偏最小二乘回归（PLS）可以说是PCR的有监督版本。像PCR，PLS是一种降维方法，它首先确定一个新的更小的一套是原始特征线性组合的功能，然后通过拟合最小二乘到新的M功能的线性模型。然而，与PCR，PLS使得以识别新功能使用的响应变量。</p>
-<p>PLS通过将较高的权重对那些最密切相关的响应变量执行此操作。为了实现随后的方向中，该方法首先通过倒退第一组分上的每个变量，并采取残差调整每个用于第一组分的变量。残差可被解释为还没有被第一PLS方向解释剩余的信息。然后我们计算在完全相同的方式作为第一组分的第二组分。这可以被重复M次，以确定多个PLS组件。</p>
-<p>在实践中执行PLS不超过岭回归或PCR更好。这是因为，即使PLS能减少偏见，它也有潜力增加方差，因此整体的利益是不是真的不同。</p>
-<!--
-由于PCR存在这种内在的问题，我们推荐使用PLS来解决那些存在相关预测变量且希望用线性回归来加以解决的问题。
----------------------- 原书P114图6.8 ----------------------
-图6.8：一个用以展示主成分回归的例子，这个简单的数据集包括两个预测变量和一个因变量。 左图：这两个预测变量的散点图显示出第一个主成分的方向。 右图：第一个PCA方向没有包含对因变量的预测信息。
-PLS源自于Herman Wold的非线性迭代偏最小二乘（NIPALS）算法(Wold 1966, 1982)。 该算法被用来对那些参数非线性的模型进行线性化。 之后，Wold等(1983)将NIPALS方法应用在变量之间彼此相关的回归问题中， 并称其为“PLS”。简单来说， NIPALS算法会迭代地寻找高度相关的预测变量与因变量之间潜在的关系。 对于单因变量问题而言，算法的每一次迭代都会评价预测变量（） 与因变量（）之间的关系，并将这种关系用一个权重向量（）进行数值汇总；该向量被称为一个方向。接下来，预测变量将被正交地投影到这个方向上， 从而生成得分（）。得分被用来生成载荷（）， 它衡量了得分向量与原预测变量之间的相关系数。在每次迭代的最后， 预测变量和因变量将被“缩减”，意思是它们将分别减去当前对预测变量和因变量结构的估计值。缩减后的预测变量和因变量信息将被用来生成下一组权重、得分和载荷。 这些数值将按次序分别存储至矩阵、和中，而它们又被用来预测新的样本， 以及计算预测变量的重要性。预测变量和因变量之间的PLS关系原理图可参见图 6.9， 对于该算法的完整解释可参考 Geladi 和 Kowalski (1986)。
-为了更好地理解这个算法的原理，Stone 和 Brooks (1990) 将其与众所周知的统计概念， 如协方差和回归，相联系起来。特别地，Stone 和 Brooks 指出，PLS与PCA类似， 都是寻找预测变量的线性组合。这些线性组合通常被称为 成分 或潜变量。 PCA的线性组合将最大程度地概括预测变量空间的变异性， 而PLS的线性组合则是最大化其与因变量的协方差。这意味着PLS在寻找成分时， 不仅要最大程度地概括预测变量的变异性，同时还要使得这些成分与因变量的相关系数达到最大。 因此，PLS是在两个目标之间达到一个平衡：对预测变量空间进行降维， 以及保持预测变量与因变量之间的预测关系。换言之， PLS可以被看作是一种 有监督 的降维方法，而PCR则是 无监督 的。
----------------------- 原书P115图6.9 ----------------------
-图6.9：用来展示PLS模型结构的图表。PLS寻找的成分在概括预测变量变异的同时也要最大化与因变量的相关性。
-【原图右边的文字（从上到下）翻译：最大程度概括预测变量空间变异性的线性组合；最大程度概括与因变量相关性的线性组合】
-为了更好地理解PLS是如何工作，以及它是如何与PCR相关联的，我们将再次考察图6.8中的数据。 这一次我们寻找PLS的第一个成分。图6.10左边的散点图对比了第一个PLS方向和第一个PCA方向。 在这种情形下两个方向几乎是正交的，表明最优的降维方向与预测变量空间最大变异的方向是不相关的。 相反， PLS找到的最优降维方向是以与因变量作回归为目的的。
-当然，这个例子只是为了展示PCR一项重大的缺点，在实际中，PCR的效果并不会如此之差。 事实上，PCR往往与PLS具有类似的预测效果。基于笔者的经验， 通过交叉验证确定的PCR成分数几乎总是大于或等于PLS确定的成分数。 这是因为PLS确定的成分被用来最大化与因变量的相关性，而PCR选择的则不是如此。
----------------------- 原书P116图6.10 ----------------------
-图6.10：一个用以展示偏最小二乘回归的例子，这个简单的数据集包括两个预测变量和一个因变量。 左图：第一个PLS方向几乎与第一个PCA方向正交。 右图：与PCA不同，PLS的方向包含了很多关于因变量的预测信息。
-在进行PLS之前，预测变量应该首先进行中心化和标准化，特别是当预测变量具有不同的量级时。 如之前所描述的那样，PLS在寻找最大化变异方向的同时还要考虑与因变量的相关关系。 但即使是加入了与因变量相关关系这条约束，PLS依然会倾向于选择那些使得预测变量变异很大的方向。 因此，在进行PLS之前预测变量应该进行必要的预处理。
-当预测变量进行预处理后，实际工作者就可以利用PLS对因变量建模。 PLS有一个调优参数：需要保留的成分数。第4.4节中介绍的重抽样方法可以用来选择最优的成分数。
--->
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 载入数据</span>
+<p>对自变量进行主成分分析，然后用得到得主成分进行回归的方法称为<strong>主成分回归（PCR）</strong><span class="citation">(W <a href="#ref-Massy1965">1965</a>)</span>。 这项技术在自变量内在强相关或者变量个数大于观测个数时可以使用。然而，尽管这样先降维然后回归的方法可以在理论上建立回归模型，但结果可能并不理想。因为PCA降维得到的新变量并不一定能很好地解释因变量，因为这个过程是无监督的，在降维的时候并没有考虑到因变量的信息，它只是简单地追踪自变量空间的方差。如果自变量自身的变异恰好与因变量相关，那么PCR或许能很好地识别出它们之间的关系。 然而，如果自变量自身方差大，但其变化并不影响因变量，那么PCR或许就无法识别出真实存在的关系。还有需要注意的一点是，虽然PCR是降维的方法，但它并不是变量选择的方法，因为它是所有的自变量的线性组合。</p>
+<p><strong>偏最小二乘回归（PLS）</strong>可以说是PCR的有监督版本。像PCR，PLS也是一种降维方法，而且也受变量方差的影响，因此通常需要在建模前对变量进行标准化。假设我们有随机变量组成的向量<span class="math inline">\(\mathbf{X}=[X_{1},X_{2},...,X_{p}]^{T}\)</span>，其对应的协方差矩阵为<span class="math inline">\(\Sigma\)</span>。PLS也需要通过对原变量进行线性组合找到<strong>彼此不相关</strong>的新变量 <span class="math inline">\((Z_{1} , Z_{2} , \ldots , Z_{m})\)</span>来代替原变量，且当<span class="math inline">\(m=p\)</span>时，PLS的结果和普通最小二乘的结果相同。这和PCA类似，且生成的线性组合通常被称为主成分或者潜变量。但其不同在于，PCA的线性组合将最大程度地概括预测变量空间的变异性， 而PLS的线性组合则是最大化其与因变量的协方差。PLS在构建自变量线性组合的过程中考虑了自变量和应变量的关系，赋予和应变量相关性高的自变量更高的权重。PLS是在两个目标之间达到一个平衡：对预测变量空间进行降维， 以及保持预测变量与因变量之间的预测关系。</p>
+<div class="figure">
+<img src="http://scientistcafe.com/book/Figure/pls.png" alt="PLS流程图" />
+<p class="caption">PLS流程图</p>
+</div>
+<p>PLS源自于Herman Wold的非线性迭代偏最小二乘（NIPALS）算法<span class="citation">(W. H <a href="#ref-wold1966">1966</a><a href="#ref-wold1966">b</a>; W. H <a href="#ref-wold1982">1982</a><a href="#ref-wold1982">b</a>)</span>。 该算法被用来对那些参数非线性的模型进行线性化。之后NIPALS方法被应用在变量之间彼此相关的回归问题中，称其为“PLS”<span class="citation">(Wold S <a href="#ref-wold1983">1983</a>)</span>。简单来说，NIPALS算法会迭代地寻找高度相关的预测变量与因变量之间潜在的关系。 对于单因变量问题而言，算法的每一次迭代都会评价自变量（<span class="math inline">\(\mathbf{X}\)</span>）与因变量（<span class="math inline">\(\mathbf{y}\)</span>）之间的关系，并将这种关系用一个权重向量（<span class="math inline">\(\mathbf{\varphi}\)</span>）表达，该向量被称为一个方向。接下来，自变量将被正交地投影到这个方向上，从而生成这个方向上的分值（<span class="math inline">\(\mathbf{z}\)</span>），接着用这个分值生成载荷（<span class="math inline">\(\mathbf{\theta}\)</span>），载荷代表了得分向量与原自变量之间的相关系数。每经过一次迭代，自变量和因变量将被“缩减”，意思是它们将分别减去当前对自变量和因变量结构的估计值。缩减后的自变量和因变量信息将被用来生成下一组权重、得分和载荷。PLS的具体算法如下（这里我们默认将所有的<span class="math inline">\(\mathbf{x}\)</span>标准化为均值0方差1的向量）：</p>
+<ol style="list-style-type: decimal">
+<li>设置初始值<span class="math inline">\(\mathbf{\hat{y}^{0}}=\bar{y}\mathbf{1}\)</span>，<span class="math inline">\(\mathbf{x_j^{0}}=\mathbf{x_j},\ j=1,\dots,p\)</span>；</li>
+<li>对<span class="math inline">\(m=1,2,...,p\)</span>:
+<ul>
+<li><span class="math inline">\(\mathbf{z_{m}}=\Sigma_{j=1}^p \hat{\varphi}_{mj}\mathbf{x_j^{m-1}}\)</span>，其中<span class="math inline">\(\hat{\varphi}_{mj}=&lt;\mathbf{x_j^{m-1},y}&gt;\)</span>；</li>
+<li><span class="math inline">\(\mathbf{\hat{\theta}_m}=\frac{&lt;\mathbf{z_{m},y}&gt;}{&lt;\mathbf{z_{m},z_{m}}&gt;}\)</span>；</li>
+<li><span class="math inline">\(\mathbf{\hat{y}^m}=\mathbf{\hat{y}^{m-1}}+\hat{\theta}_{m}\mathbf{z_m}\)</span>；</li>
+<li>每个<span class="math inline">\(\mathbf{x_j^{m-1}}\)</span>对<span class="math inline">\(\mathbf{z_{m}}\)</span>的方向正交化：<span class="math inline">\(\mathbf{x_{j}^{m}}=\mathbb{x_j^{m-1}}-\frac{&lt;\mathbf{z_m,x_j^{m-1}}&gt;\mathbf{z_m}}{&lt;\mathbf{z_m,z_m}&gt;},\ j=1,2,\dots, p\)</span>；</li>
+</ul></li>
+<li>输出一系列的<span class="math inline">\(\mathbf{\hat{y}^{m}}, m=1,\dots, p\)</span>。由于所有的<span class="math inline">\(\mathbf{z_m}\)</span>都是<span class="math inline">\(\mathbf{x_j}\)</span>的线性组合，所以<span class="math inline">\(\mathbf{\hat{y}^{m}}=\mathbf{X}\hat{\beta}^{pls}(m)\)</span>也是<span class="math inline">\(\mathbf{x_j}\)</span>的线性组合。</li>
+</ol>
+<p>下面我们以服装消费者数据中的10个问卷调查回复为自变量（<code>Q1-Q10</code>），收入（<code>income</code>）为应变量展示如何用R中的<code>caret</code>包训练PCR和PLS模型。</p>
+<p>先载入相应的包和数据，并且对数据进行适当预处理：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(lattice)
+<span class="kw">library</span>(caret)
+<span class="kw">library</span>(dplyr)
+<span class="co"># 载入数据</span>
 sim.dat&lt;-<span class="kw">read.csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/SegData.csv&quot;</span>)
 ymad&lt;-<span class="kw">mad</span>(<span class="kw">na.omit</span>(sim.dat$income))
 <span class="co"># 计算Z分值</span>
@@ -703,8 +706,106 @@ zs&lt;-(sim.dat$income-<span class="kw">mean</span>(<span class="kw">na.omit</sp
 <span class="co"># which(is.na(zs)) 找到缺失值</span>
 idex&lt;-<span class="kw">c</span>(<span class="kw">which</span>(<span class="kw">na.omit</span>(zs&gt;<span class="fl">3.5</span>)),<span class="kw">which</span>(<span class="kw">is.na</span>(zs)))
 <span class="co"># 删除含有离群点和缺失值的行</span>
-sim.dat&lt;-sim.dat[-idex,]
-<span class="co">#fit&lt;-lm(income~store_exp+online_exp+store_trans+online_trans,data=sim.dat)</span></code></pre></div>
+sim.dat&lt;-sim.dat[-idex,]</code></pre></div>
+<p>选取10个问卷调查变量作为自变量矩阵<code>xtrain</code>，收入作为应变量存在<code>ytrain</code>中：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">xtrain=dplyr::<span class="kw">select</span>(sim.dat, Q1:Q10)
+ytrain=sim.dat$income</code></pre></div>
+<p>设置随机种子，以及交互校验的方式为10层交互校验：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">100</span>)
+ctrl &lt;-<span class="st"> </span><span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>, <span class="dt">number=</span><span class="dv">10</span>)</code></pre></div>
+<p>先训练PLS模型，这里的调优参数为使用潜变量的个数，因为这里最多只有10个变量，设置调优参数值为1-10：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">plsTune &lt;-<span class="st"> </span><span class="kw">train</span>(xtrain, ytrain,
+                 <span class="dt">method =</span> <span class="st">&quot;pls&quot;</span>,
+                 <span class="co"># 设置调优参数值</span>
+                 <span class="dt">tuneGrid =</span> <span class="kw">expand.grid</span>(<span class="dt">.ncomp =</span> <span class="dv">1</span>:<span class="dv">10</span>),
+                 <span class="dt">trControl =</span> ctrl)</code></pre></div>
+<pre><code>## Loading required package: pls</code></pre>
+<pre><code>## 
+## Attaching package: &#39;pls&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:corrplot&#39;:
+## 
+##     corrplot</code></pre>
+<pre><code>## The following object is masked from &#39;package:caret&#39;:
+## 
+##     R2</code></pre>
+<pre><code>## The following object is masked from &#39;package:stats&#39;:
+## 
+##     loadings</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">plsTune</code></pre></div>
+<pre><code>## Partial Least Squares 
+## 
+## 772 samples
+##  10 predictor
+## 
+## No pre-processing
+## Resampling: Cross-Validated (10 fold) 
+## Summary of sample sizes: 695, 694, 694, 694, 694, 695, ... 
+## Resampling results across tuning parameters:
+## 
+##   ncomp  RMSE      Rsquared 
+##    1     27761.47  0.6487324
+##    2     24493.98  0.7280445
+##    3     23222.55  0.7561373
+##    4     23068.86  0.7595387
+##    5     23034.38  0.7604738
+##    6     23035.39  0.7604228
+##    7     23034.19  0.7604444
+##    8     23034.85  0.7604287
+##    9     23034.69  0.7604318
+##   10     23034.70  0.7604316
+## 
+## RMSE was used to select the optimal model using  the smallest value.
+## The final value used for the model was ncomp = 7.</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">resPLS &lt;-<span class="st"> </span><span class="kw">predict</span>(plsTune, xtrain)
+
+<span class="kw">set.seed</span>(<span class="dv">100</span>)
+pcrTune &lt;-<span class="st"> </span><span class="kw">train</span>(<span class="dt">x =</span> xtrain, <span class="dt">y =</span> ytrain,
+                 <span class="dt">method =</span> <span class="st">&quot;pcr&quot;</span>,
+                 <span class="dt">tuneGrid =</span> <span class="kw">expand.grid</span>(<span class="dt">.ncomp =</span> <span class="dv">1</span>:<span class="dv">10</span>),
+                 <span class="dt">trControl =</span> ctrl)
+pcrTune                  </code></pre></div>
+<pre><code>## Principal Component Analysis 
+## 
+## 772 samples
+##  10 predictor
+## 
+## No pre-processing
+## Resampling: Cross-Validated (10 fold) 
+## Summary of sample sizes: 695, 694, 694, 694, 694, 695, ... 
+## Resampling results across tuning parameters:
+## 
+##   ncomp  RMSE      Rsquared  
+##    1     45915.48  0.03427177
+##    2     32495.72  0.51800996
+##    3     23280.82  0.75489255
+##    4     23307.53  0.75429987
+##    5     23215.51  0.75599048
+##    6     23191.55  0.75656906
+##    7     23174.19  0.75701726
+##    8     23164.03  0.75748073
+##    9     23058.54  0.76014078
+##   10     23034.70  0.76043161
+## 
+## RMSE was used to select the optimal model using  the smallest value.
+## The final value used for the model was ncomp = 10.</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">plsResamples &lt;-<span class="st"> </span>plsTune$results
+plsResamples$Model &lt;-<span class="st"> &quot;PLS&quot;</span>
+pcrResamples &lt;-<span class="st"> </span>pcrTune$results
+pcrResamples$Model &lt;-<span class="st"> &quot;PCR&quot;</span>
+plsPlotData &lt;-<span class="st"> </span><span class="kw">rbind</span>(plsResamples, pcrResamples)
+
+<span class="kw">xyplot</span>(RMSE ~<span class="st"> </span>ncomp,
+       <span class="dt">data =</span> plsPlotData,
+       <span class="co">#aspect = 1,</span>
+       <span class="dt">xlab =</span> <span class="st">&quot;# Components&quot;</span>,
+       <span class="dt">ylab =</span> <span class="st">&quot;RMSE (Cross-Validation)&quot;</span>,
+       <span class="dt">auto.key =</span> <span class="kw">list</span>(<span class="dt">columns =</span> <span class="dv">2</span>),
+       <span class="dt">groups =</span> Model,
+       <span class="dt">type =</span> <span class="kw">c</span>(<span class="st">&quot;o&quot;</span>, <span class="st">&quot;g&quot;</span>))</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-184-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">plsImp &lt;-<span class="st"> </span><span class="kw">varImp</span>(plsTune, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
+<span class="kw">plot</span>(plsImp, <span class="dt">top =</span> <span class="dv">10</span>, <span class="dt">scales =</span> <span class="kw">list</span>(<span class="dt">y =</span> <span class="kw">list</span>(<span class="dt">cex =</span> .<span class="dv">95</span>)))</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-184-2.png" width="672" /></p>
 <!--## 分层线性回归
 
 我们已经讨论过简单线性模型，下面讨论该模型的扩展分层线性模型。什么时候需要使用分层模型呢？需要考虑分层结构的常见情况有两种。（1）当你的数据有嵌套结构，这是指一些观测可能属于更高一层级单位。比如在教育学分析当中通常需要研究学生的学习情况，同一所学校或者同一班级的学生相似度更高，这里我们就需要考虑学生学习情况的个体观测可能嵌套在班级，或者学校这个更高一层级单位中。市场营销中，地理位置通常是一个更高的层极单位。北上广的消费者和一些二三线城市的消费者可能不同，东南沿海和东北地区的消费者差异可能更大。这些情况中我们都需要考虑分层结构。（2）还有一种情况是针对纵向数据。比如对一些人年收入连续10年的观测，那么研究观测就该考虑个人的随机效应。类似的还有我们的航空公司满意度调查数据，每个受访者针对每项对3个航空公司进行评分，这里也需要考虑受访者的个体随机效应，可能的情况是有的人倾向于给高分，有的人倾向于给低分，这样的倾向和问卷问题以及哪家航空公司无关。
@@ -756,6 +857,15 @@ sim.dat&lt;-sim.dat[-idex,]
 </div>
 <div id="ref-Massy1965">
 <p>W, Massy. 1965. “Principal Components Regression in Exploratory Sta- Tistical Research.” <em>Journal of the American Statistical Association</em> 60: 234–46.</p>
+</div>
+<div id="ref-wold1966">
+<p>H, Wold. 1966b. “Multivariate Analyses.” In, In P Krishnaiah (ed.), 391–420. New York: Academic Press.</p>
+</div>
+<div id="ref-wold1982">
+<p>H, Wold. 1982b. “Systems Under Indirect Observation: Causal- Ity, Structure, Prediction.” In, In K Joreskog, H Wold (eds.), 1–54. North–Holland, Amsterdam.</p>
+</div>
+<div id="ref-wold1983">
+<p>Wold S, Wold H, Martens H. 1983. “The Multivariate Calibration Problem in Chemistry Solved by the Pls Method.” Springer–Verlag, Heidelberg.</p>
 </div>
 </div>
 <div class="footnotes">
