@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-10-02">
+<meta name="date" content="2016-10-03">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -718,20 +718,8 @@ ctrl &lt;-<span class="st"> </span><span class="kw">trainControl</span>(<span cl
                  <span class="dt">method =</span> <span class="st">&quot;pls&quot;</span>,
                  <span class="co"># 设置调优参数值</span>
                  <span class="dt">tuneGrid =</span> <span class="kw">expand.grid</span>(<span class="dt">.ncomp =</span> <span class="dv">1</span>:<span class="dv">10</span>),
-                 <span class="dt">trControl =</span> ctrl)</code></pre></div>
-<pre><code>## Loading required package: pls</code></pre>
-<pre><code>## 
-## Attaching package: &#39;pls&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:corrplot&#39;:
-## 
-##     corrplot</code></pre>
-<pre><code>## The following object is masked from &#39;package:caret&#39;:
-## 
-##     R2</code></pre>
-<pre><code>## The following object is masked from &#39;package:stats&#39;:
-## 
-##     loadings</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">plsTune</code></pre></div>
+                 <span class="dt">trControl =</span> ctrl)
+plsTune</code></pre></div>
 <pre><code>## Partial Least Squares 
 ## 
 ## 772 samples
@@ -756,11 +744,17 @@ ctrl &lt;-<span class="st"> </span><span class="kw">trainControl</span>(<span cl
 ## 
 ## RMSE was used to select the optimal model using  the smallest value.
 ## The final value used for the model was ncomp = 7.</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">resPLS &lt;-<span class="st"> </span><span class="kw">predict</span>(plsTune, xtrain)
-
+<p>可以看到，调优的结果是选取7个主成分。但如果大家注意输出模型中成分数目对应的<code>RMSE</code>的值可以发现，其实在成分数目5之后<code>RMSE</code>变化就不太大了。</p>
+<p>从PLS调优过程中还可以得到变量的重要性排序，我们可以通过下面代码得到各个变量的重要性并且对其可视化：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">plsImp &lt;-<span class="st"> </span><span class="kw">varImp</span>(plsTune, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
+<span class="kw">plot</span>(plsImp, <span class="dt">top =</span> <span class="dv">10</span>, <span class="dt">scales =</span> <span class="kw">list</span>(<span class="dt">y =</span> <span class="kw">list</span>(<span class="dt">cex =</span> .<span class="dv">95</span>)))</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-184-1.png" width="672" /></p>
+<p>可以看到，Q1、Q2、Q3和Q6的重要性明显高于其它变量。下面我们对主成分回归进行调优，调优参数仍旧是模型中成分的数目：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 设置随机种子</span>
 <span class="kw">set.seed</span>(<span class="dv">100</span>)
 pcrTune &lt;-<span class="st"> </span><span class="kw">train</span>(<span class="dt">x =</span> xtrain, <span class="dt">y =</span> ytrain,
                  <span class="dt">method =</span> <span class="st">&quot;pcr&quot;</span>,
+                 <span class="co"># 设置调优参数值</span>
                  <span class="dt">tuneGrid =</span> <span class="kw">expand.grid</span>(<span class="dt">.ncomp =</span> <span class="dv">1</span>:<span class="dv">10</span>),
                  <span class="dt">trControl =</span> ctrl)
 pcrTune                  </code></pre></div>
@@ -788,12 +782,16 @@ pcrTune                  </code></pre></div>
 ## 
 ## RMSE was used to select the optimal model using  the smallest value.
 ## The final value used for the model was ncomp = 10.</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">plsResamples &lt;-<span class="st"> </span>plsTune$results
+<p>结果建议的调优参数的个数是10，同样的，如果大家观察输出中<code>RMSE</code>的变化可以发现，其实在成分数目为5之后变化就开始趋于平缓了。这里的两种情况下，选择5个成分用于建模都是合理的。我们比较下两个模型调优的过程：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 将PLS模型调优返回对象中需要的模型调优部分信息存在对象plsResamples里</span>
+plsResamples &lt;-<span class="st"> </span>plsTune$results
 plsResamples$Model &lt;-<span class="st"> &quot;PLS&quot;</span>
+<span class="co"># 将PCR模型调优返回对象中需要的模型调优部分信息存在对象plsResamples里</span>
 pcrResamples &lt;-<span class="st"> </span>pcrTune$results
 pcrResamples$Model &lt;-<span class="st"> &quot;PCR&quot;</span>
+<span class="co"># 合并二者得到用于作图的数据集</span>
 plsPlotData &lt;-<span class="st"> </span><span class="kw">rbind</span>(plsResamples, pcrResamples)
-
+<span class="co"># 用lattice包中的xyplot()函数对两个模型结果可视化比较</span>
 <span class="kw">xyplot</span>(RMSE ~<span class="st"> </span>ncomp,
        <span class="dt">data =</span> plsPlotData,
        <span class="co">#aspect = 1,</span>
@@ -802,10 +800,8 @@ plsPlotData &lt;-<span class="st"> </span><span class="kw">rbind</span>(plsResam
        <span class="dt">auto.key =</span> <span class="kw">list</span>(<span class="dt">columns =</span> <span class="dv">2</span>),
        <span class="dt">groups =</span> Model,
        <span class="dt">type =</span> <span class="kw">c</span>(<span class="st">&quot;o&quot;</span>, <span class="st">&quot;g&quot;</span>))</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-184-1.png" width="672" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">plsImp &lt;-<span class="st"> </span><span class="kw">varImp</span>(plsTune, <span class="dt">scale =</span> <span class="ot">FALSE</span>)
-<span class="kw">plot</span>(plsImp, <span class="dt">top =</span> <span class="dv">10</span>, <span class="dt">scales =</span> <span class="kw">list</span>(<span class="dt">y =</span> <span class="kw">list</span>(<span class="dt">cex =</span> .<span class="dv">95</span>)))</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-184-2.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-186-1.png" width="672" /></p>
+<p>之前我们通过观察<code>RMSE</code>得出结论可以取前5个成分，这里的图形表明用前3个成分给出的模型效果和用更多成分给出的模型效果已经没有太大差别了。</p>
 <!--## 分层线性回归
 
 我们已经讨论过简单线性模型，下面讨论该模型的扩展分层线性模型。什么时候需要使用分层模型呢？需要考虑分层结构的常见情况有两种。（1）当你的数据有嵌套结构，这是指一些观测可能属于更高一层级单位。比如在教育学分析当中通常需要研究学生的学习情况，同一所学校或者同一班级的学生相似度更高，这里我们就需要考虑学生学习情况的个体观测可能嵌套在班级，或者学校这个更高一层级单位中。市场营销中，地理位置通常是一个更高的层极单位。北上广的消费者和一些二三线城市的消费者可能不同，东南沿海和东北地区的消费者差异可能更大。这些情况中我们都需要考虑分层结构。（2）还有一种情况是针对纵向数据。比如对一些人年收入连续10年的观测，那么研究观测就该考虑个人的随机效应。类似的还有我们的航空公司满意度调查数据，每个受访者针对每项对3个航空公司进行评分，这里也需要考虑受访者的个体随机效应，可能的情况是有的人倾向于给高分，有的人倾向于给低分，这样的倾向和问卷问题以及哪家航空公司无关。
