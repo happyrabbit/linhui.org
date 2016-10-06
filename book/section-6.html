@@ -397,91 +397,28 @@ sim.dat &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span cla
 <h3><span class="header-section-number">6.2.1</span> base包：apply()</h3>
 <p>R基础包中有几个强大的函数，<code>apply()</code>、<code>lapply()</code>和<code>sapply()</code>等。它们做的事情类似，只是对应的对象，或返回对象的格式不同。这些函数对于R的初学者来说可能有些难，但一旦熟悉以后会发现它们非常有效。它们是干什么的？简单来说就是依次对某一对象的某一部分重复应用一个指定的函数。它们的不同在于，<code>apply()</code>将你指定的函数作用于<strong>数据框</strong>对象的行或列，返回一个<strong>向量</strong>。‘lapply()’ 将指定的函数作用于<strong>列表</strong>或者<strong>数据框</strong>对象，返回一个长度相同的<strong>列表</strong>。<code>sapply()</code>更加便捷，且算是对<code>lapply()</code>进行了包装，若<code>sapply()</code>中参数<code>simplify=FALSE</code>，那么其返回的值和<code>lapply()</code>是一样的。若<code>simplify=TRUE</code>，则<code>sapply()</code>的返回值不是一个列表，而是一个矩阵。因为在平常工作中通常处理的都是数据框，所以这里主要介绍函数<code>apply()</code>的用法。大家可能会觉得很抽象，觉得抽象很正常，因为这几兄弟确实不太接地气，我现在用这些函数几乎每次都得去查帮助文档。回到我们的服装消费者数据。如果我想知道样本中所有数值变量的均值和标准差该怎么办？这在建模前检查数据和建模后展示数据时都经常用到。</p>
 <p>记得我们之前通过<code>preProcess()</code>函数对数据进行KNN填补时，需要提取数据框中所有的数值变量用到的是<code>lapply()</code>函数。这里不能用<code>apply()</code>函数是因为<code>apply()</code>函数自动将对象转化成矩阵，这样就会丢失每列的类别信息，而<code>lapply()</code>不会对对象进行转化（这样细微的差别需要常用R渐渐熟悉了才会慢慢了解，我也是写书的时候发现这个，方才请教了一位R高人才明白个中缘由：））。我们再次用该函数选取其中数值型的变量：</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sdat&lt;-sim.dat[,!<span class="kw">lapply</span>(sim.dat,class)==<span class="st">&quot;factor&quot;</span>]</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sim.dat&lt;-<span class="kw">read.csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv&quot;</span>)
+sdat&lt;-sim.dat[,!<span class="kw">lapply</span>(sim.dat,class)==<span class="st">&quot;factor&quot;</span>]</code></pre></div>
 <p>现在的数据框<code>sdat</code>中只包括数值型的变量。这样我们就可以用<code>apply()</code>函数对每列求均值和标准差了：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">apply</span>(sdat, <span class="dt">MARGIN=</span><span class="dv">2</span>,function(x) <span class="kw">mean</span>(<span class="kw">na.omit</span>(x)))</code></pre></div>
-<pre><code>## Warning in mean.default(na.omit(x)): argument is not numeric or logical:
-## returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not numeric or logical:
-## returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not numeric or logical:
-## returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not numeric or logical:
-## returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not numeric or logical:
-## returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not numeric or logical:
-## returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not numeric or logical:
-## returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not numeric or logical:
-## returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not numeric or logical:
-## returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not numeric or logical:
-## returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not numeric or logical:
-## returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not numeric or logical:
-## returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not numeric or logical:
-## returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not numeric or logical:
-## returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not numeric or logical:
-## returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not numeric or logical:
-## returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not numeric or logical:
-## returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not numeric or logical:
-## returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not numeric or logical:
-## returning NA</code></pre>
-<pre><code>##          age       gender       income        house    store_exp 
-##           NA           NA           NA           NA           NA 
-##   online_exp  store_trans online_trans           Q1           Q2 
-##           NA           NA           NA           NA           NA 
-##           Q3           Q4           Q5           Q6           Q7 
-##           NA           NA           NA           NA           NA 
-##           Q8           Q9          Q10      segment 
-##           NA           NA           NA           NA</code></pre>
+<pre><code>##          age       income    store_exp   online_exp  store_trans 
+##       38.840   113543.065     1356.851     2120.181        5.350 
+## online_trans           Q1           Q2           Q3           Q4 
+##       13.546        3.101        1.823        1.992        2.763 
+##           Q5           Q6           Q7           Q8           Q9 
+##        2.945        2.448        3.434        2.396        3.085 
+##          Q10 
+##        2.320</code></pre>
 <p>这里我们定义了一个函数<code>function(x) mean(na.omit(x))</code>，这个函数很简单，就是对任何向量求均值同时忽略其中的缺失值。<code>MARGIN=2</code>告诉函数逐列应用定义的函数。如果要计算行均值，只要简单的将margin参数设置为1即可。结果可见，平均说来在线购买次数和消费量都要高于实体店购买。对于10个问卷调查，第二个问题（<code>Q2</code>）平均得分最低。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">apply</span>(sdat, <span class="dt">MARGIN=</span><span class="dv">2</span>,function(x) <span class="kw">sd</span>(<span class="kw">na.omit</span>(x)))</code></pre></div>
-<pre><code>## Warning in var(if (is.vector(x) || is.factor(x)) x else as.double(x), na.rm
-## = na.rm): NAs introduced by coercion
-
-## Warning in var(if (is.vector(x) || is.factor(x)) x else as.double(x), na.rm
-## = na.rm): NAs introduced by coercion
-
-## Warning in var(if (is.vector(x) || is.factor(x)) x else as.double(x), na.rm
-## = na.rm): NAs introduced by coercion</code></pre>
-<pre><code>##          age       gender       income        house    store_exp 
-##    16.416818           NA 49842.287061           NA  2774.399785 
-##   online_exp  store_trans online_trans           Q1           Q2 
-##  1731.224308     3.695559     7.956959     1.450139     1.168348 
-##           Q3           Q4           Q5           Q6           Q7 
-##     1.402106     1.155061     1.284377     1.438529     1.455941 
-##           Q8           Q9          Q10      segment 
-##     1.154347     1.118493     1.136174           NA</code></pre>
+<pre><code>##          age       income    store_exp   online_exp  store_trans 
+##    16.416818 49842.287197  2774.399785  1731.224308     3.695559 
+## online_trans           Q1           Q2           Q3           Q4 
+##     7.956959     1.450139     1.168348     1.402106     1.155061 
+##           Q5           Q6           Q7           Q8           Q9 
+##     1.284377     1.438529     1.455941     1.154347     1.118493 
+##          Q10 
+##     1.136174</code></pre>
 <p>让我们再来看看标准差，代码和计算均值几乎是一样的，只是将均值函数<code>mean()</code>换成标准差函数<code>sd()</code>。虽然在线花费的均值高过实体店花费，但是实体店花费的标准差比在线花费高很多，认真看过本章开头的读者应该知道，这是由于个把土豪在实体店买了上万的衣服。还有问卷调查的第二个问题，虽然之前看到的均值很小，但是标准差也很小，这说明了什么？说明总体对该问题的评分都偏低，如果用于客户分组的话该问题可能不具有太高的区分度。关于这点，我们可以在客户分组那个章节以该数据集为例进行核实。虽然这都是一些简单的统计量，但能够使你在建模前了解更多的关于数据的信息，这对于模型选择和结果解释都有无形的帮助。</p>
 </div>
 <div id="plyrddply" class="section level3">
