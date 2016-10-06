@@ -281,7 +281,7 @@ trainy&lt;-dat$store_exp+dat$online_exp</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glmfit=<span class="kw">glmnet</span>(<span class="kw">as.matrix</span>(trainx),trainy)</code></pre></div>
 <p>这里函数<code>glmnet()</code>返回的对象<code>glmfit</code>中含有所有之后可能进一步会用到的模型拟合信息。大家并不需要手动的检查<code>glmfit</code>中都有那些信息，然后提取相应的部分，而是可以通过<code>plot()</code>、<code>coef()</code>、<code>predict()</code>这类耳熟能详的函数来得到相应的信息。比如我们可以用如下方式绘制lasso的参数选择路径图：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(glmfit,<span class="dt">label=</span>T)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-205-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-206-1.png" width="672" /></p>
 <p>图中每种颜色的线代表对应一个自变量，展示的是随着lasso罚函数（也就是一阶范数，有时也称为<span class="math inline">\(l_{1}-norm\)</span>）对应调优参数<span class="math inline">\(\lambda\)</span>变化，各个变量对应的参数估计路径（注：当<span class="math inline">\(\alpha=1\)</span>时，优化方程里就只有lasso罚函数）。图中有上下两个x轴标度，下x轴是<span class="math inline">\(\lambda\)</span>变化对应最优解的一阶范数值（也就是<span class="math inline">\(\parallel\mathbf{\beta}\parallel_{1}\)</span>），上x轴是相应<span class="math inline">\(\lambda\)</span>值对应的非0参数估计个数，也就是lasso模型的自由度。我们可以查看路径的具体每一步信息：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(glmfit)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode html"><code class="sourceCode html">Call:  glmnet(x = as.matrix(trainx), y = trainy) 
@@ -328,7 +328,7 @@ trainy&lt;-dat$store_exp+dat$online_exp</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cvfit=<span class="kw">cv.glmnet</span>(<span class="kw">as.matrix</span>(trainx),trainy)</code></pre></div>
 <p><code>cv.glmnet()</code>会返回一个列表，其中包括交互校验过程的结果，我们将该结果存在<code>cvfit</code>这个对象里。 我们可以对交互校验结果可视化：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(cvfit)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-209-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-210-1.png" width="672" /></p>
 <p>红色的点是不同<span class="math inline">\(\lambda\)</span>取值对应的交互校验均方误差，灰色的线是相应置信区间。两条虚线表示选中的两个调优参数。左边的那个调优参数值对应的是最小的交互校验均方误差，右边的那个调优参数值是离最小均方误差一个标准差的调优参数值。我们可以通过下面代码查看根据两种不同规则选中的调优参数值：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 最小均方误差对应的参数值</span>
 cvfit$lambda.min</code></pre></div>
