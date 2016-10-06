@@ -292,16 +292,16 @@ car::<span class="kw">some</span>(topic$year)</code></pre></div>
 <pre><code>##  [1] &quot;2011&quot; &quot;2012&quot; &quot;2013&quot; &quot;2013&quot; &quot;2013&quot; &quot;2013&quot; &quot;2014&quot; &quot;2014&quot; &quot;2014&quot; &quot;2015&quot;</code></pre>
 <p>接下来我们可以查看下每年发帖数目的变化情况：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">barplot</span>(<span class="kw">table</span>(topic$year),<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>, <span class="dt">main=</span><span class="st">&quot;年度发帖数目频数直方图&quot;</span>)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-116-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-117-1.png" width="672" /></p>
 <p>图中我们可以看到，从2006年论坛创建以来，帖子的数目几乎呈指数上升，2015年貌似不符合规律，其实是因为当前数据中只饱含到2015年5月的论坛数据，也就是说如果我们由所有2015年的数据，最后的直方条应该会超过2014年。这么简单的统计能够告诉我们什么呢？这样的统计量对于公司的市场预算是很重要的。假如某农业公司要决定是否投入人力和财力去挖掘这个农业论坛数据，首先需要明确的就是这些数据是不是有代表性，该论坛是不是活跃。上图就表明该论坛是处在高速发展阶段的，而且考虑到论坛的用户是农民，这样的活跃度是非常高的。所以相关决策人员或许可以将该论坛当作一个消费者评论信息的来源。只考虑年是不够的，我们可能还想类似的检查下月度发帖分布，我们可以类似的截取时间字符串中的月份，绘制直方图：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">topic$month&lt;-<span class="kw">substr</span>(posted_at2,<span class="dv">6</span>,<span class="dv">7</span>)
 <span class="kw">barplot</span>(<span class="kw">table</span>(topic$month),<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>, <span class="dt">main=</span><span class="st">&quot;月度发帖数目频数直方图&quot;</span>)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-117-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-118-1.png" width="672" /></p>
 <p>大家可以看到明显的季节效应。通常北半球12-4月是农闲时节，这个时候发帖数远高于开春（5月）之后。基于此，我们可以假设12-4月的帖子或许更多的是关于去年购买的种子收获情况以及一些下一年的耕种计划的信息，5月到11月间或许更多的是当下遇到的问题，比如播种时种子发芽情况，生长中雨水，作物抗旱性能等等。这些为农业公司提供了消费者对其产品的体验信息。这样简单的统计能够给我们之后的分析指引放下。再次强调，分析的整个流程是个渐进且协同的过程，前一步中获得的信息可能有助于我们明确之后要如何进行分析，下一步分析的结果可能又让我们返回之前的步骤，比如收集构建新变量等等。</p>
 <p>再看看每天发帖的规律：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">topic$time&lt;-<span class="kw">substr</span>(posted_at2,<span class="dv">12</span>,<span class="dv">13</span>)
 <span class="kw">barplot</span>(<span class="kw">table</span>(topic$time),<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>,<span class="dt">main=</span><span class="st">&quot;每日不同时间段发帖频数直方图&quot;</span>)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-118-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-119-1.png" width="672" /></p>
 <p>可以看到，每天有两个发帖高峰，中午一阵，晚上一阵（这里不考虑北美不同纬度的时差影响）。这能给我们什么信息呢？很有可能农民习惯于在这两个时间段上网查询信息等。如果农业公司想要发营销广告，这或许是最佳的时间。</p>
 <p>上面是一个简单的关于构建特征的例子，在具体应用中特征构建的方法可以非常灵活，没有一个黄金标准。随着分析经验的增长，以及对相关领域的了解加深，构建有意义特征的能力也会随之提高。特征构建是特征工程中艺术成分最高的部分，接下来我们要介绍的特征提取和特征选择就有更强的技术性。</p>
 </div>
@@ -344,7 +344,7 @@ dplyr::<span class="kw">select</span>(airline,Easy_Reservation:Recommend)%&gt;%
 <span class="st">  </span><span class="co"># 用corrplot()绘制相关图</span>
 <span class="st">  </span><span class="co"># 选项order=&quot;hclust&quot;按照变量的相似度，基于系统聚类的结果对行列进行重新排列</span>
 <span class="st">  </span><span class="kw">corrplot</span>(,<span class="dt">order=</span><span class="st">&quot;hclust&quot;</span>)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-121-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-122-1.png" width="672" /></p>
 <p>由相关矩阵图可以看到，这些问卷项大致分成3类：</p>
 <ol style="list-style-type: decimal">
 <li>空航服务相关
@@ -415,7 +415,7 @@ airline.mean&lt;-dplyr::<span class="kw">select</span>(airline.mean,-Airline)
           <span class="dt">col=</span><span class="kw">brewer.pal</span>(<span class="dv">9</span>,<span class="st">&quot;YlGn&quot;</span>),<span class="dt">trace=</span><span class="st">&quot;none&quot;</span>,<span class="dt">key=</span><span class="ot">FALSE</span>,<span class="dt">dend=</span><span class="st">&quot;none&quot;</span>,<span class="dt">cexCol=</span><span class="fl">0.6</span>,<span class="dt">cexRow =</span><span class="dv">1</span>)
 <span class="kw">title</span>(<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>,
           <span class="dt">main=</span><span class="st">&quot;航空公司问卷调查均值热图&quot;</span>)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-123-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-124-1.png" width="672" /></p>
 <p>在上面代码中，我们将数据框<code>airline.mean</code>转化成矩阵传递给<code>heatmap.2()</code>，因为函数要求。我们通过<code>RColorBrewer</code>包中的<code>YlGn</code>调色盘，用黄色和绿色对热图着色，并且取消了一些将热图变得复杂的选项（<code>trace</code>、<code>key</code>和<code>dend</code>）。在结果图中，绿色表示高观测值，黄色表示低观测值，处于中间的值对应的颜色较浅。乘客对不同航空公司的满意度分值分布很显然有区别。航空公司3和2有明显让人满意和不满意的地方，而公司1总体来说比较平均，除了乘客对其位置前后空间（Seat_Roominess）特别满意。如果考虑和竞争对手的差距，1和2需要改进的地方显然比3要多。</p>
 <p>通过观测目前得到的一些探索性结果，我们可以猜测各个问题可能的聚类情况，以及它们之间的关系。但我们最好使用更严格正规的统计模型验证这些猜测。接下来我们就开始介绍模型。</p>
 </div>
@@ -440,10 +440,10 @@ airline.mean&lt;-dplyr::<span class="kw">select</span>(airline.mean,-Airline)
 ## Cumulative Proportion  0.98285 0.99162 1.00000</code></pre>
 <p>由上面输出结果的第一行是主成分的标准差，第二行对应成分单独解释方差的比例，第三行是累计解释方差。可见，前两个主成分解释的大部分原变量方差（80%）。<code>plot()</code>函数作用在PCA结果上默认绘制陡坡图，该图展示每个成分额外解释的方差。我们可用累计解释方差比例或者陡坡图来判断需要的主成分。我们通过下面代码绘制图形：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(airline.pc,<span class="dt">type=</span><span class="st">&quot;l&quot;</span>,<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>,<span class="dt">main=</span><span class="st">&quot;PCA陡坡图&quot;</span>)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-125-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-126-1.png" width="672" /></p>
 <p>图的横坐标是主成分编号，纵坐标是该主成分解释的方差，即变量协方差矩阵单位正交特征向量对应的特征值。图中由陡到缓的转折点能告诉我们从哪个主成分开始，继续添加更多的成分对解释更多方差没有太大帮助，反而增加模型复杂度。关于拐点的判断是主观的。从第3个主成分开始，新的主成分解释的方差相对较小，因此我们可以取头2个主成分。将各个原始变量映射到前两个主成分张成的平面上能够揭示这些变量之间的关系。这样的图称为“双标图”，可以用<code>biplot()</code>函数绘制：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">biplot</span>(airline.pc,<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>,<span class="dt">main=</span><span class="st">&quot;PCA双标图&quot;</span>,<span class="dt">cex=</span><span class="kw">c</span>(<span class="fl">0.5</span>,<span class="dv">1</span>),<span class="dt">xlim=</span><span class="kw">c</span>(-<span class="fl">0.06</span>,<span class="fl">0.04</span>))</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-126-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-127-1.png" width="672" /></p>
 <p>双标图的横坐标是第一个主成分（PC1），纵坐标是第二个主成分（PC2）。图中的点代表各个观测评分投影在这两个主成分张成的平面上。图中的箭头代表每个变量对应这两个主成分的载荷系数决定的方向。由于这两个主成分能够解释原始观测大部分的方差，在双标图中距离较近的点有相似的观测。</p>
 <!--
 Interpreting Vectors: Both the direction and length of the vectors can be interpreted. Vectors point away from the origin in some direction.
@@ -459,7 +459,7 @@ Thus, vectors that point in the same direction correspond to variables that have
 <span class="st">  </span><span class="kw">prcomp</span>()
 <span class="kw">biplot</span>(airline.mean.pc,<span class="dt">family =</span><span class="st">&quot;Songti SC&quot;</span>,<span class="dt">main=</span><span class="st">&quot;聚合后PCA结果双标图&quot;</span>,
        <span class="dt">cex=</span><span class="fl">0.7</span>, <span class="dt">expand=</span><span class="dv">2</span>,<span class="dt">xlim=</span><span class="kw">c</span>(-<span class="fl">0.8</span>, <span class="dv">1</span>),<span class="dt">ylim=</span><span class="kw">c</span>(-<span class="fl">0.7</span>,<span class="fl">0.8</span>))</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-127-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-128-1.png" width="672" /></p>
 <p>按航空公司聚合后的结果双标图提供了可解释的乘客<strong>感知图</strong>，该图展示了各个航空公司在前两个主成分上的定位。我们先和聚合前后的感知图进行比较。注意，感知图的空间旋转是任意的，重要的是箭头的相对位置。比如，在两个感知图中，<code>Courtesy</code>、<code>Friendliness</code>、<code>Service</code>和<code>Helpfulness</code>都几乎重叠。 <code>Seat_Comfort</code>、<code>Seat_Roominess</code>、<code>Overhead_Storage</code>、<code>Clean_Aircraft</code>、<code>Satisfaction</code>、<code>Fly_Again</code>和<code>Recommend</code>大致指向相同的方向。剩下的<code>Easy_Reservation</code>、<code>Preferred_Seats</code>、<code>Flight_Options</code>和<code>Ticket_Prices</code>紧密相连。因此聚合后变量在主成分纬度上的分布位置和用原始观测得到的一致，但基于公司平均分值的结果更清晰的展示了公司相对定位情况。航空公司3在机舱设施、总体满意度和空航服务上得分都较高。航空公司2在空航服务方面得分较高。航空公司1在购票体验上表现较好。且在购票体验上满意度高的乘客更不满空航服务。如果你是航空公司3的商业数据分析师，看到这样的结果你可以得到什么结果？</p>
 <ul>
 <li>公司在很多方面具有竞争优势，客户满意度总体高于竞争对手</li>
@@ -615,7 +615,7 @@ Recommend         0.942                 </code></pre></div>
 ## 6  1.10832836 -5.605850</code></pre>
 <p>函数<code>cmdscale()</code>返回的是一个2列的数据框，分别对应不同样本两个坐标的取值。也就是将原本15列的数据降到2维平面上，和之前在头两个主成分张成的平面投影很类似。我们可以按照这些坐标值，用<code>plot()</code>函数进行基础可视化：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(var.mds)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-133-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-134-1.png" width="672" /></p>
 <p>这些点聚类的情况和我们在之前没有聚合的双标图类似。下面我们同样将观测按照不同航空公司聚合后重复相同的分析，看看结果如何：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mean.dist&lt;-airline.mean%&gt;%
 <span class="st">    </span><span class="kw">dist</span>()
@@ -625,7 +625,7 @@ mean.mds&lt;-<span class="kw">cmdscale</span>(mean.dist)%&gt;%
 <span class="kw">names</span>(mean.mds)&lt;-<span class="kw">c</span>(<span class="st">&quot;Score1&quot;</span>,<span class="st">&quot;Score2&quot;</span>)
 <span class="kw">plot</span>(mean.mds,<span class="dt">type=</span><span class="st">&quot;n&quot;</span>,<span class="dt">xlim=</span><span class="kw">c</span>(-<span class="dv">8</span>,<span class="dv">6</span>),<span class="dt">ylim=</span><span class="kw">c</span>(-<span class="dv">5</span>,<span class="dv">6</span>))
 <span class="kw">text</span>(mean.mds,<span class="kw">row.names</span>(mean.mds),<span class="dt">cex=</span><span class="dv">1</span>)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-134-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-135-1.png" width="672" /></p>
 <p>上面代码中，<code>plot(..., type=&quot;n&quot;,...)</code>是告诉R不要用任何符号绘制数据点，然后用<code>text()</code>函数将航空公司名作为数据点绘制在图上。这里的结果类似于之前聚合后的双标图。</p>
 <p>对于分类或者排序变量，你可以使用不同的方法计算距离，比如<code>cluster</code>包中的<code>daisy()</code>可以用来计算排序变量之间的距离。我们们将聚合后的数据转换为排序来展示MDS在这种情况下的使用。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mean.rank&lt;-<span class="kw">lapply</span>(airline.mean,function(x) <span class="kw">factor</span>(<span class="kw">rank</span>(x),<span class="dt">ordered=</span>T))%&gt;%
@@ -659,7 +659,7 @@ mean.mds.gower&lt;-<span class="kw">isoMDS</span>(mean.rank.gower)</code></pre><
 ## converged</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(mean.mds.gower$points,<span class="dt">type=</span><span class="st">&quot;n&quot;</span>,<span class="dt">xlim=</span><span class="kw">c</span>(-<span class="fl">0.5</span>,<span class="fl">0.5</span>),<span class="dt">ylim=</span><span class="kw">c</span>(-<span class="fl">0.2</span>,<span class="fl">0.4</span>))
 <span class="kw">text</span>(mean.mds.gower$points,<span class="kw">row.names</span>(mean.mds),<span class="dt">cex=</span><span class="dv">1</span>)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-137-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-138-1.png" width="672" /></p>
 <p>函数<code>isoMDS()</code>的坐标结果存在返回对象的<code>points</code>矩阵中，所以我们通过<code>mean.mds.gower$points</code>获取该矩阵。我们和之前基于欧几里德距离的结果比较可以发现，这两个结果中3个航空公司的分布并不相同。和之前相比，现在3个航空公司的分布更加对称，基本在一个等边三角形的3个顶点上，任意两个航空公司之间的距离都差不多。但之前欧几里德距离下的结果显示航空公司1和3更加接近。对于这两者结果差别我们并不感到意外，因为当你将具体分值转成排序的时候损失了一些信息。在有具体分值观测的情况下用欧几里德距离就可以了。这里只是为了展示<code>isoMDS()</code>的用法所以将其转化为排序变量。</p>
 <p>总体来说在当前例子中，和PCA相比，MDS得到的信息更少。但是在处理文本数据时，比如用户反馈评论MDS就显示出优势了。比如你可以检查不同品牌名称在多少评论中的同时出现，出现的频数矩阵可以用来衡量不同品牌的分布<span class="citation">(Oded Netzer <a href="#ref-tm2012">2012</a>)</span>。</p>
 </div>
@@ -854,11 +854,11 @@ tss&lt;-<span class="kw">sum</span>((dat$online_exp-<span class="kw">mean</span>
 <span class="dt">type =</span> <span class="kw">c</span>(<span class="st">&quot;p&quot;</span>, <span class="st">&quot;smooth&quot;</span>),
 <span class="dt">xlab =</span> <span class="st">&quot;age&quot;</span>,
 <span class="dt">ylab =</span> <span class="st">&quot;online_exp&quot;</span>)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-142-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-143-1.png" width="672" /></p>
 <p>此外，ggplot2包也可以很方便的对多种平滑方法进行可视化：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ggplot2)
 <span class="kw">ggplot</span>(dat,<span class="kw">aes</span>(age,online_exp))+<span class="kw">geom_smooth</span>()</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-143-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-144-1.png" width="672" /></p>
 <p>其中<code>geom_smooth()</code>默认设置是使用LOESS平滑，所以你不用进行额外的设置。其中蓝色的线代表LOESS平滑器拟合结果。</p>
 <p>可以通过<code>caret</code>包中的函数<code>filterVarImp</code>对每个预测变量建立LOESS模型，并且定量分析其与结果变量之间的关系。这里我们将10个问卷调查变量当作自变量，将实体店消费量和在线消费之和当作应变量，重新得到一个数据框，然后用其进行展示：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">TrainXtrans&lt;-dat[,<span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>,<span class="kw">names</span>(dat))]
@@ -1013,7 +1013,7 @@ perm =<span class="st"> </span><span class="kw">permuteRelief</span>(<span class
 ## 6    6        Q1 -0.009931796</code></pre>
 <p>重要性分值的置换分布非常有帮助，能够让我们直观的了解分值的随机性，我们可以用下面方式对置换分值分布进行可视化：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lattice::<span class="kw">histogram</span>(~<span class="st"> </span>value|Predictor,<span class="dt">data =</span> perm$permutations)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-156-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-157-1.png" width="672" /></p>
 <p>标准化后的分值存在叫做<code>standardized</code>的子对象里，其代表了观测到的Relief分值（无置换）离置换分布中心的距离与标准差的比值：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(perm$standardized)</code></pre></div>
 <pre><code>##          Q1          Q2          Q3          Q4          Q5          Q6 
@@ -1118,8 +1118,8 @@ idx&lt;-<span class="kw">which.min</span>(reg.summary$bic)
 idx&lt;-<span class="kw">which.min</span>(reg.summary$rss)
 <span class="co"># 将Cp最小的点在图上标出</span>
 <span class="kw">points</span>(idx,reg.summary$rss[idx],<span class="dt">col=</span><span class="st">&quot;red&quot;</span>,<span class="dt">cex=</span><span class="dv">2</span>,<span class="dt">pch=</span><span class="dv">20</span>)</code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-163"></span>
-<img src="DS_R_files/figure-html/unnamed-chunk-163-1.png" alt="穷尽法选择结果。" width="80%" />
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-164"></span>
+<img src="DS_R_files/figure-html/unnamed-chunk-164-1.png" alt="穷尽法选择结果。" width="80%" />
 <p class="caption">
 Figure 9.1: 穷尽法选择结果。
 </p>
@@ -1173,8 +1173,8 @@ idx&lt;-<span class="kw">which.min</span>(reg.summary$bic)
 idx&lt;-<span class="kw">which.min</span>(reg.summary$rss)
 <span class="co"># 将Cp最小的点在图上标出</span>
 <span class="kw">points</span>(idx,reg.summary$rss[idx],<span class="dt">col=</span><span class="st">&quot;red&quot;</span>,<span class="dt">cex=</span><span class="dv">2</span>,<span class="dt">pch=</span><span class="dv">20</span>)</code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-165"></span>
-<img src="DS_R_files/figure-html/unnamed-chunk-165-1.png" alt="向前选择结果。" width="80%" />
+<div class="figure" style="text-align: center"><span id="fig:unnamed-chunk-166"></span>
+<img src="DS_R_files/figure-html/unnamed-chunk-166-1.png" alt="向前选择结果。" width="80%" />
 <p class="caption">
 Figure 9.2: 向前选择结果。
 </p>
