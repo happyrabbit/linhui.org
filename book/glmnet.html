@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-10-06">
+<meta name="date" content="2016-10-14">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -270,19 +270,19 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>在介绍具体不同的广义线性模型压缩方法之前，先让大家熟悉一下这个R包的基本使用方式。我会简单的介绍下其中的主要函数，功能，和输出。这样大家对这个包能做什么有个大致的概念。后面的小节会分别介绍不同模型。</p>
 <p>默认设置下的模型是高斯线性回归或者最小二乘模型，也就是之前几个小节介绍的模型，只是参数化的方式略有不同，但都是RSS加上一个罚函数。所以我们还是从之前服装消费者数据集中的自变量和应变量开始：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(glmnet)
-dat&lt;-<span class="kw">read.csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/SegData.csv&quot;</span>)
+dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/SegData.csv&quot;</span>)
 <span class="co"># 对数据进行一些清理，删除错误的样本观测，消费金额不能为负数</span>
-dat&lt;-<span class="kw">subset</span>(dat,store_exp&gt;<span class="dv">0</span> &amp;<span class="st"> </span>online_exp&gt;<span class="dv">0</span>)
+dat &lt;-<span class="st"> </span><span class="kw">subset</span>(dat, store_exp &gt;<span class="st"> </span><span class="dv">0</span> &amp;<span class="st"> </span>online_exp &gt;<span class="st"> </span><span class="dv">0</span>)
 <span class="co"># 将10个问卷调查变量当作自变量</span>
-trainx&lt;-dat[,<span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>,<span class="kw">names</span>(dat))]
+trainx &lt;-<span class="st"> </span>dat[, <span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>, <span class="kw">names</span>(dat))]
 <span class="co"># 将实体店消费量和在线消费之和当作应变量</span>
 <span class="co"># 得到总消费量=实体店消费+在线消费</span>
-trainy&lt;-dat$store_exp+dat$online_exp</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glmfit=<span class="kw">glmnet</span>(<span class="kw">as.matrix</span>(trainx),trainy)</code></pre></div>
+trainy &lt;-<span class="st"> </span>dat$store_exp +<span class="st"> </span>dat$online_exp</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glmfit =<span class="st"> </span><span class="kw">glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy)</code></pre></div>
 <p>这里函数<code>glmnet()</code>返回的对象<code>glmfit</code>中含有所有之后可能进一步会用到的模型拟合信息。大家并不需要手动的检查<code>glmfit</code>中都有那些信息，然后提取相应的部分，而是可以通过<code>plot()</code>、<code>coef()</code>、<code>predict()</code>这类耳熟能详的函数来得到相应的信息。比如我们可以用如下方式绘制lasso的参数选择路径图：</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(glmfit,<span class="dt">label=</span>T)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-206-1.png" width="672" /></p>
-<p>图中每种颜色的线代表对应一个自变量，展示的是随着lasso罚函数（也就是一阶范数，有时也称为<span class="math inline">\(l_{1}-norm\)</span>）对应调优参数<span class="math inline">\(\lambda\)</span>变化，各个变量对应的参数估计路径（注：当<span class="math inline">\(\alpha=1\)</span>时，优化方程里就只有lasso罚函数）。图中有上下两个x轴标度，下x轴是<span class="math inline">\(\lambda\)</span>变化对应最优解的一阶范数值（也就是<span class="math inline">\(\parallel\mathbf{\beta}\parallel_{1}\)</span>），上x轴是相应<span class="math inline">\(\lambda\)</span>值对应的非0参数估计个数，也就是lasso模型的自由度。我们可以查看路径的具体每一步信息：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(glmfit, <span class="dt">label =</span> T)</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-242-1.png" width="672" /></p>
+<p>图中每种颜色的线代表对应一个自变量，展示的是随着lasso罚函数（也就是一阶范数，有时也称为<span class="math inline">\(l_{1}-norm\)</span>）对应调优参数<span class="math inline">\(\lambda\)</span>变化，各个变量对应的参数估计路径（注：当<span class="math inline">\(\alpha=1\)</span>时，优化方程里就只有lasso罚函数，这是默认设置）。图中有上下两个x轴标度，下x轴是<span class="math inline">\(\lambda\)</span>变化对应最优解的一阶范数值（也就是<span class="math inline">\(\parallel\mathbf{\beta}\parallel_{1}\)</span>），上x轴是相应<span class="math inline">\(\lambda\)</span>值对应的非0参数估计个数，也就是lasso模型的自由度。我们可以查看路径的具体每一步信息：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(glmfit)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode html"><code class="sourceCode html">Call:  glmnet(x = as.matrix(trainx), y = trainy) 
 
@@ -303,7 +303,7 @@ trainy&lt;-dat$store_exp+dat$online_exp</code></pre></div>
 [14,]  3 0.6280  907.500
 ...</code></pre></div>
 <p>这里第一列<code>Df</code>表示非零估计的参数个数，<code>%Dev</code>解释的方差百分比，以及<code>Lambda</code>调优参数<span class="math inline">\(\lambda\)</span>的取值。虽然在默认设置下，glmnet会尝试100个不同的<span class="math inline">\(\lambda\)</span>取值，但如果随着<span class="math inline">\(\lambda\)</span>的减小，<code>%Dev</code>百分比只发生微小变化的时候，算法也会提前停止，上面的例子算法就只计算了68个不同的调优参数取值。我们也可以通过指定一个<span class="math inline">\(\lambda\)</span>的取值来得到对应的参数估计，其中<code>s=</code>用来指定调优参数值：</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">coef</span>(glmfit,<span class="dt">s=</span><span class="dv">1200</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">coef</span>(glmfit, <span class="dt">s =</span> <span class="dv">1200</span>)</code></pre></div>
 <pre><code>## 11 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
 ##                     1
 ## (Intercept) 2255.2221
@@ -318,17 +318,17 @@ trainy&lt;-dat$store_exp+dat$online_exp</code></pre></div>
 ## Q9             .     
 ## Q10            .</code></pre>
 <p>在<span class="math inline">\(\lambda=1200\)</span>时，只有3个变量（<code>Q1</code>、<code>Q2</code>和<code>Q3</code>）的参数估计非0。你也可以用新数据对一个或多个<span class="math inline">\(\lambda\)</span>值进行预测。我们随机抽取3个观测作为新数据，然后用<code>predict()</code>函数得到针对多个<span class="math inline">\(\lambda\)</span>值的预测：</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">newdat=<span class="kw">matrix</span>(<span class="kw">sample</span>(<span class="dv">1</span>:<span class="dv">9</span>,<span class="dv">30</span>,<span class="dt">replace =</span> T),<span class="dt">nrow=</span><span class="dv">3</span>)
-<span class="kw">predict</span>(glmfit,newdat,<span class="dt">s=</span><span class="kw">c</span>(<span class="dv">1741</span>,<span class="dv">2000</span>))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">newdat =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">sample</span>(<span class="dv">1</span>:<span class="dv">9</span>, <span class="dv">30</span>, <span class="dt">replace =</span> T), <span class="dt">nrow =</span> <span class="dv">3</span>)
+<span class="kw">predict</span>(glmfit, newdat, <span class="dt">s =</span> <span class="kw">c</span>(<span class="dv">1741</span>, <span class="dv">2000</span>))</code></pre></div>
 <pre><code>##             1        2
 ## [1,] 3337.144 3394.986
 ## [2,] 6559.382 6186.969
 ## [3,] 6831.266 6765.357</code></pre>
 <p>结果中每列分别对应一个<span class="math inline">\(\lambda\)</span>取值的预测。这里需要通过交互校验进行参数（<span class="math inline">\(\lambda\)</span>）调优。<code>glmnet</code>包中的<code>cv.glmnet()</code>可以实现这一目标。</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cvfit=<span class="kw">cv.glmnet</span>(<span class="kw">as.matrix</span>(trainx),trainy)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cvfit =<span class="st"> </span><span class="kw">cv.glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy)</code></pre></div>
 <p><code>cv.glmnet()</code>会返回一个列表，其中包括交互校验过程的结果，我们将该结果存在<code>cvfit</code>这个对象里。 我们可以对交互校验结果可视化：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(cvfit)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-210-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-246-1.png" width="672" /></p>
 <p>红色的点是不同<span class="math inline">\(\lambda\)</span>取值对应的交互校验均方误差，灰色的线是相应置信区间。两条虚线表示选中的两个调优参数。左边的那个调优参数值对应的是最小的交互校验均方误差，右边的那个调优参数值是离最小均方误差一个标准差的调优参数值。我们可以通过下面代码查看根据两种不同规则选中的调优参数值：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 最小均方误差对应的参数值</span>
 cvfit$lambda.min</code></pre></div>
@@ -338,7 +338,7 @@ cvfit$lambda.1se</code></pre></div>
 <pre><code>## [1] 1199.688</code></pre>
 <p>我们也可以按如下方式查看不同调优参数值对应的回归参数（注意这里不是调优参数估计）估计：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 一个标准差原则下对应的回归参数估计</span>
-<span class="kw">coef</span>(cvfit,<span class="dt">s=</span><span class="st">&quot;lambda.1se&quot;</span>)</code></pre></div>
+<span class="kw">coef</span>(cvfit, <span class="dt">s =</span> <span class="st">&quot;lambda.1se&quot;</span>)</code></pre></div>
 <pre><code>## 11 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
 ##                     1
 ## (Intercept) 2255.3136
@@ -366,6 +366,127 @@ cvfit$lambda.1se</code></pre></div>
 <li><p><code>lambda</code>：如果不用设定<code>nlambda</code>的方式，你也可以通过设定<code>lambda</code>这个参数自己定义调优参数值向量。</p></li>
 <li><p><code>standardize</code>：用来告诉函数是否标准化自变量的逻辑值。默认设置为<code>standardize=TRUE</code>。</p></li>
 </ul>
+<p>作为例子，这里设置<code>alpha=0.2</code>，<code>nlamdba=10</code>。在实际应用中，通常会尝试100-150个不同的<span class="math inline">\(\lambda\)</span>取值，这里为了避免过多的输出，只设置20个值。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 这里要用as.matrix(xtrain)将自变量输入转化成矩阵</span>
+fit =<span class="st"> </span><span class="kw">glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy, <span class="dt">alpha =</span> <span class="fl">0.2</span>, <span class="dt">nlambda =</span> <span class="dv">20</span>)
+<span class="co"># 这里digits=2限制了输出中的小数位数</span>
+<span class="kw">print</span>(fit, <span class="dt">digits =</span> <span class="dv">4</span>)</code></pre></div>
+<pre><code>## 
+## Call:  glmnet(x = as.matrix(trainx), y = trainy, alpha = 0.2, nlambda = 20) 
+## 
+##       Df   %Dev    Lambda
+##  [1,]  0 0.0000 15210.000
+##  [2,]  4 0.2502  9366.000
+##  [3,]  6 0.4590  5768.000
+##  [4,]  7 0.5848  3552.000
+##  [5,]  9 0.6502  2188.000
+##  [6,]  9 0.6823  1347.000
+##  [7,]  9 0.6967   829.700
+##  [8,]  9 0.7033   511.000
+##  [9,]  9 0.7064   314.700
+## [10,]  9 0.7080   193.800
+## [11,]  9 0.7088   119.300
+## [12,]  9 0.7093    73.500
+## [13,]  9 0.7095    45.270
+## [14,]  9 0.7096    27.880
+## [15,]  9 0.7096    17.170
+## [16,]  9 0.7096    10.570
+## [17,] 10 0.7096     6.511
+## [18,] 10 0.7096     4.010</code></pre>
+<p>关于输出中各列代表什么，参考之前的解释。大家可能会发现，之前设置了20个调优参数值，这里只输出了18个。其原因在于算法中设置了停止条件。根据默认设置，在下面两种情况下计算会停止：</p>
+<ol style="list-style-type: decimal">
+<li>解释的方差百分比（<code>%Dev</code>）的变化小于<span class="math inline">\(10^{-5}\)</span>时</li>
+<li>解释的方差百分比本身大于<span class="math inline">\(0.999\)</span></li>
+</ol>
+<p>这里停止是因为遇到了第一种情况，<span class="math inline">\(\lambda\)</span>的取值变化几乎不会对解释的方差百分比造成影响。更多关于算法的控制条件，可以键入<code>help(&quot;glmnet.control&quot;)</code>。</p>
+<p>我们可以用<code>plot()</code>绘制拟合过程的参数估计路径图。图的x坐标轴有3个设置：</p>
+<ol style="list-style-type: decimal">
+<li><code>norm</code>：参数估计的一阶范数，这是默认设置</li>
+<li><code>lambda</code>：<span class="math inline">\(log(\lambda)\)</span>值</li>
+<li><code>dev</code>：解释方差的百分比，即之前结果输出中的<code>%Dev</code></li>
+</ol>
+<p>我们之前展示了默认设置下的参数估计路径图（<code>norm</code>）。现在绘制另外两种情况。设置<code>xvar = &quot;lambda&quot;</code>可以得到对应<span class="math inline">\(log(\lambda)\)</span>的路径图：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(fit, <span class="dt">xvar =</span> <span class="st">&quot;lambda&quot;</span>, <span class="dt">label =</span> T)</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-250-1.png" width="672" /></p>
+<p>可以看到，随着<span class="math inline">\(\lambda\)</span>值的增大，参数逐步向0收缩。<code>Q1</code>、<code>Q2</code>、<code>Q3</code>和<code>Q8</code>的参数估计都差不多在最后才收缩为0。说明这几个变量对解释应变量最重要。下面我们看看对于解释方差的百分比的路径图：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(fit, <span class="dt">xvar =</span> <span class="st">&quot;dev&quot;</span>, <span class="dt">label =</span> T)</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-251-1.png" width="672" /></p>
+<p>横坐标为解释方差的百分比时的路径图和之前的不太一样。非0参数个数越多，解释的方差百分比就越大。到最右端的时候，解释方差变化很小，但是参数估计确急剧增大。由图中我们可以看出，<code>Q7</code>对模型拟合几乎起不了作用。观察这些图能够帮助我们将注意力放在一些重要的变量上。</p>
+<p>如果确定了调优参数<span class="math inline">\(\lambda\)</span>的取值，我们便可以进一步得到相应的参数估计并预测新数据。在之前“初识<code>glmnet</code>”那一小节中，我们展示了在默认设置（<code>alpha = 1</code>，即只有lasso罚函数的情况下）下如何得到调优参数<span class="math inline">\(\lambda\)</span>的某个取值下的拟合结果。这里和之前的情况稍有不同，因为我们设置<code>alpha=0.2</code>，也就是说现在lasso和岭回归的罚函数同时存在。我们可以在<code>fit=glmnet(as.matrix(trainx),trainy,alpha=0.2,nlambda=20)</code>结果的基础上得到相应<span class="math inline">\(\lambda\)</span>取值的调优参数。从输出结果看，若考虑解释方差的变化情况，<span class="math inline">\(\lambda \in [829.7, 1347]\)</span>之间比较妥当。这里我们选择<span class="math inline">\(\lambda ＝ 1000\)</span>，这里为了展示一些函数的用法，特意选择了不在调优过的<span class="math inline">\(\lambda\)</span>取值中的数，也可以通过下面这行简短的代码查看你想要的取值是不是已经调优拟合过：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">any</span>(fit$lambda ==<span class="st"> </span><span class="dv">1000</span>)</code></pre></div>
+<pre><code>## [1] FALSE</code></pre>
+<p>可以看到返回的是<code>FALSE</code>，即<span class="math inline">\(\lambda ＝ 1000\)</span>这个取值不在调优取值内。于是有两种方法可以得到相应的参数估计。第一种是重新用<span class="math inline">\(\lambda ＝ 1000\)</span>更新拟合模型，这时我们想要得到的是确切的拟合值，可以设置<code>exact = T</code>，再次强调注意在函数中<span class="math inline">\(\lambda\)</span>对应的设置是<code>s</code>：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">coef.exact =<span class="st"> </span><span class="kw">coef</span>(fit, <span class="dt">s =</span> <span class="dv">1000</span>, <span class="dt">exact =</span> T)</code></pre></div>
+<p>你也可以不要再次拟合模型，那么我们可以设置<code>exact = F</code>（这是函数的默认设置），这样函数会用插值法得到相应的近似结果：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">coef.apprx =<span class="st"> </span><span class="kw">coef</span>(fit, <span class="dt">s =</span> <span class="dv">1000</span>, <span class="dt">exact =</span> F)</code></pre></div>
+<p>我们可以看看这两种情况下参数估计有何不同：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cbind2</span>(coef.exact, coef.apprx)</code></pre></div>
+<pre><code>## 11 x 2 sparse Matrix of class &quot;dgCMatrix&quot;
+##                      1          1
+## (Intercept) 1208.75790 1177.37262
+## Q1          -485.44857 -483.29175
+## Q2           852.41149  850.50376
+## Q3           645.89607  645.89528
+## Q4            59.16109   60.82823
+## Q5           161.48707  163.98503
+## Q6           188.02162  192.23258
+## Q7             .          .      
+## Q8          -196.29622 -193.76827
+## Q9           196.35592  198.42621
+## Q10         -129.38656 -132.20608</code></pre>
+<p>输出的左边那列是确切拟合，右边的是插值近似，可以看到它们非常相近，所以通常情况下直接用线性插值就可以，不一定要重新拟合模型。同样我们可以在新的数据集上预测结果：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 和之前一样，我们抽取一个小样本最为新自变量观测</span>
+newdat =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">sample</span>(<span class="dv">1</span>:<span class="dv">9</span>, <span class="dv">30</span>, <span class="dt">replace =</span> T), <span class="dt">nrow =</span> <span class="dv">3</span>)
+<span class="kw">predict</span>(fit, newdat, <span class="dt">type =</span> <span class="st">&quot;response&quot;</span>, <span class="dt">s =</span> <span class="dv">1000</span>)</code></pre></div>
+<pre><code>##             1
+## [1,] 6664.514
+## [2,] 9799.426
+## [3,] 2430.454</code></pre>
+<p>这里的<code>type</code>选项设置有3种，上面的<code>type = &quot;response&quot;</code>也就是直接得到预测的应变量估计。如果<code>type = &quot;coefficients&quot;</code>，等价与之前的<code>coef.apprx = coef(fit, s = 1000, exact = F)</code>，得到的是线性插值参数估计：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">predict</span>(fit, newdat, <span class="dt">type =</span> <span class="st">&quot;coefficients&quot;</span>, <span class="dt">s =</span> <span class="dv">1000</span>)</code></pre></div>
+<pre><code>## 11 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
+##                      1
+## (Intercept) 1177.37262
+## Q1          -483.29175
+## Q2           850.50376
+## Q3           645.89528
+## Q4            60.82823
+## Q5           163.98503
+## Q6           192.23258
+## Q7             .      
+## Q8          -193.76827
+## Q9           198.42621
+## Q10         -132.20608</code></pre>
+<p><code>type = &quot;nonzero&quot;</code> 将会返回一个向量告诉你那些自变量的参数估计非0：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">predict</span>(fit, newdat, <span class="dt">type =</span> <span class="st">&quot;nonzero&quot;</span>, <span class="dt">s =</span> <span class="dv">1000</span>)</code></pre></div>
+<pre><code>##   X1
+## 1  1
+## 2  2
+## 3  3
+## 4  4
+## 5  5
+## 6  6
+## 7  8
+## 8  9
+## 9 10</code></pre>
+<p>此外，你也可以自定义k层交互校验的层数。<code>glmnet()</code>中的参数在<code>cv.glmnet()</code>中都有，后者还多了参数<code>nfolds</code>用来定义层级的数目，<code>foldid</code>让用户自定义层级，以及<code>type.measure</code>评估标准：方差（<code>deviance</code>）或者绝对误差均值（<code>mae</code>）。不同类型的的模型有不同的评估标准。比如<code>type.measure=&quot;class&quot;</code>仅仅适用于二项回归和多项逻辑回归，其使用的是误判率。<code>type.measure=&quot;auc&quot;</code>只针对二分类逻辑回归，使用的是ROC线下面积。刚才提到的绝对误差均值<code>type.measure=&quot;mae&quot;</code>可以用与除了cox模型之外的其它所有模型。我们会在之后介绍其它模型。对于高斯族类的模型，默认设置是<code>type.measure=&quot;deviance&quot;</code>。这里我们修改下设置，用绝对误差均值：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cvfit =<span class="st"> </span><span class="kw">cv.glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy, <span class="dt">type.measure =</span> <span class="st">&quot;mae&quot;</span>, <span class="dt">nfolds =</span> <span class="dv">20</span>)</code></pre></div>
+<p>这里顺便提一下，<code>cv.glmnet()</code>函数能够支持并行计算，这用到<code>doMC</code>包。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 抽取一个大样本来展示并行计算对效率的提高</span>
+X =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(<span class="fl">1e5</span>*<span class="dv">200</span>), <span class="fl">1e5</span>, <span class="dv">200</span>)
+Y =<span class="st"> </span><span class="kw">rnorm</span>(<span class="fl">1e5</span>)
+<span class="co"># 不用并行计算</span>
+<span class="kw">system.time</span>(<span class="kw">cv.glmnet</span>(X, Y))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode html"><code class="sourceCode html">   user  system elapsed 
+ 26.476   1.423  27.918 </code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(doMC)
+<span class="co"># 我的电脑是4核的，所以设置cores = 4</span>
+<span class="kw">registerDoMC</span>(<span class="dt">cores =</span> <span class="dv">4</span>)
+<span class="co"># 用并行计算</span>
+<span class="kw">system.time</span>(<span class="kw">cv.glmnet</span>(X, Y, <span class="dt">parallel =</span> T))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode html"><code class="sourceCode html">   user  system elapsed 
+ 15.574   1.047  12.603 </code></pre></div>
+<p>大家可以看到用并行计算在数据量大的时候能够节省好多时间。</p>
 
 </div>
 </div>
