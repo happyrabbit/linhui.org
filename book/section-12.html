@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-10-14">
+<meta name="date" content="2016-10-16">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -213,15 +213,18 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 <li class="chapter" data-level="11" data-path="glmnet.html"><a href="glmnet.html"><i class="fa fa-check"></i><b>11</b> 广义线性模型压缩方法及<code>glmnet</code>包</a><ul>
 <li class="chapter" data-level="11.1" data-path="glmnet.html"><a href="glmnet.html#glmnet"><i class="fa fa-check"></i><b>11.1</b> 初识<code>glmnet</code></a></li>
-<li class="chapter" data-level="11.2" data-path="glmnet.html"><a href="glmnet.html#section-11.2"><i class="fa fa-check"></i><b>11.2</b> 线性回归</a></li>
+<li class="chapter" data-level="11.2" data-path="glmnet.html"><a href="glmnet.html#section-11.2"><i class="fa fa-check"></i><b>11.2</b> 收缩线性回归</a></li>
+<li class="chapter" data-level="11.3" data-path="glmnet.html"><a href="glmnet.html#section-11.3"><i class="fa fa-check"></i><b>11.3</b> 逻辑回归</a><ul>
+<li class="chapter" data-level="11.3.1" data-path="glmnet.html"><a href="glmnet.html#section-11.3.1"><i class="fa fa-check"></i><b>11.3.1</b> 普通逻辑回归</a></li>
+<li class="chapter" data-level="11.3.2" data-path="glmnet.html"><a href="glmnet.html#section-11.3.2"><i class="fa fa-check"></i><b>11.3.2</b> 收缩逻辑回归</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="12" data-path="section-12.html"><a href="section-12.html"><i class="fa fa-check"></i><b>12</b> 聚类判别分析</a><ul>
 <li class="chapter" data-level="12.1" data-path="section-12.html"><a href="section-12.html#section-12.1"><i class="fa fa-check"></i><b>12.1</b> 聚类分析</a></li>
 <li class="chapter" data-level="12.2" data-path="section-12.html"><a href="section-12.html#section-12.2"><i class="fa fa-check"></i><b>12.2</b> 判别分析</a><ul>
-<li class="chapter" data-level="12.2.1" data-path="section-12.html"><a href="section-12.html#section-12.2.1"><i class="fa fa-check"></i><b>12.2.1</b> 逻辑回归</a></li>
-<li class="chapter" data-level="12.2.2" data-path="section-12.html"><a href="section-12.html#section-12.2.2"><i class="fa fa-check"></i><b>12.2.2</b> 线性判别分析</a></li>
-<li class="chapter" data-level="12.2.3" data-path="section-12.html"><a href="section-12.html#section-12.2.3"><i class="fa fa-check"></i><b>12.2.3</b> 最小二乘判别分析</a></li>
-<li class="chapter" data-level="12.2.4" data-path="section-12.html"><a href="section-12.html#section-12.2.4"><i class="fa fa-check"></i><b>12.2.4</b> 朴素贝叶斯</a></li>
+<li class="chapter" data-level="12.2.1" data-path="section-12.html"><a href="section-12.html#section-12.2.1"><i class="fa fa-check"></i><b>12.2.1</b> 线性判别分析</a></li>
+<li class="chapter" data-level="12.2.2" data-path="section-12.html"><a href="section-12.html#section-12.2.2"><i class="fa fa-check"></i><b>12.2.2</b> 最小二乘判别分析</a></li>
+<li class="chapter" data-level="12.2.3" data-path="section-12.html"><a href="section-12.html#section-12.2.3"><i class="fa fa-check"></i><b>12.2.3</b> 朴素贝叶斯</a></li>
 </ul></li>
 <li class="chapter" data-level="12.3" data-path="section-12.html"><a href="section-12.html#section-12.3"><i class="fa fa-check"></i><b>12.3</b> 案例：客户分组</a></li>
 </ul></li>
@@ -264,30 +267,14 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </div>
 <div id="section-12.2" class="section level2">
 <h2><span class="header-section-number">12.2</span> 判别分析</h2>
-<div id="section-12.2.1" class="section level3">
-<h3><span class="header-section-number">12.2.1</span> 逻辑回归</h3>
-<p>逻辑回归是非常流行的判别方法，尤其对于二分类问题。我们以生猪疫情数据为例来讲解模型以及实践代码。这里研究目标是对农场爆发疫情建模。假设样本量为<span class="math inline">\(n\)</span>，对应<span class="math inline">\(G\)</span>个分类变量（也就是农场问卷调查的问题）。第<span class="math inline">\(i\)</span>个农场对应疫情发生的概率是<span class="math inline">\(\theta_i\)</span>，那相应的模型可以写成： Consider risk scoring system construction using a samples of <span class="math inline">\(n\)</span> observations, with information collected for <span class="math inline">\(G\)</span> categorical predictors and one binary response variable for each observation. Let <span class="math inline">\(\bx_{i,g}\)</span> be the vector of dummy variables associated with the <span class="math inline">\(g\)</span>th categorical predictor for the <span class="math inline">\(i\)</span>th observation, and let <span class="math inline">\(y_i\)</span> (= 1, diseased; or 0, not diseased) be the binary response for the <span class="math inline">\(i\)</span>th observation, <span class="math inline">\(i=1,\cdots,n\)</span>, <span class="math inline">\(g=1,\cdots,G\)</span>. Denote the degrees of freedom of the <span class="math inline">\(g\)</span>th predictor by <span class="math inline">\(df_g\)</span>, which is also the length of vector <span class="math inline">\(\bx_{i,g}\)</span>, <span class="math inline">\(i=1,\cdots,n\)</span>.</p>
-<div id="section-12.2.1.1" class="section level4">
-<h4><span class="header-section-number">12.2.1.1</span> 普通逻辑回归</h4>
-<p><span class="math display">\[y_{i}\sim Bounoulli(\theta_{i})\]</span></p>
-<p><span class="math display">\[log\left(\frac{\theta_{i}}{1-\theta_{i}}\right)=\eta_{\mathbf{\beta}}(x_{i})=\beta_{0}+\sum_{g=1}^{G}\mathbf{x_{i,g}}^{T}\mathbf{\mathbf{\beta_{g}}}\]</span></p>
-<p>其中 <span class="math inline">\(\beta_{0}\)</span> 是截距项，且<span class="math inline">\(\mathbf{\beta_{g}}\)</span>是第 is the parameter vector corresponding to the <span class="math inline">\(g\)</span>th predictor.</p>
-Construction of risk scoring systems using logistic regression usually consists of two steps: selection among the <span class="math inline">\(G\)</span> risk factors, and estimation of the selected factor parameters. For model selection, significance has been used as a criterion for inclusion and exclusion of risk factors . Some researchers use univariate logistic regression to screen factors by significance before putting them into a multivariate logistic regression model , whereas others  don’t. Traditional estimation of logistic parameters <span class="math inline">\(\bbeta=(\beta_{0}^{T},\bbeta_{1}^{T},\bbeta_{2}^{T},...,\bbeta_{G}^{T})^{T}\)</span> is done through maximizing the log-likelihood
-<span class="math display">\[\begin{eqnarray*}
-l(\bbeta)&amp;=&amp;log[\prod_{i=1}^{n}\theta_{i}^{y_{i}}(1-\theta_{i})^{1-y_{i}}]\\
-&amp;=&amp;\sum_{i=1}^{n}\{y_{i}log(\theta_{i})+(1-y_{i})log(1-\theta_{i})\}\\
-&amp;=&amp;\sum_{i=1}^{n}\{\ y_{i}\eta_{\bbeta}(\bx_{i})-log[1+exp(\eta_{\bbeta}(\bx_{i}))]\ \}.
-\end{eqnarray*}\]</span>
-<p>For logistic regression analysis with a large number of explanatory variables, complete- or quasi-complete-separation may result which makes the maximum likelihood estimation unstable.</p>
+<div id="lasso" class="section level4">
+<h4><span class="header-section-number">12.2.0.1</span> LASSO逻辑回归</h4>
 </div>
 <div id="lasso" class="section level4">
-<h4><span class="header-section-number">12.2.1.2</span> LASSO逻辑回归</h4>
+<h4><span class="header-section-number">12.2.0.2</span> 分组LASSO逻辑回归</h4>
 </div>
-<div id="lasso" class="section level4">
-<h4><span class="header-section-number">12.2.1.3</span> 分组LASSO逻辑回归</h4>
-</div>
-<div id="section-12.2.1.4" class="section level4">
-<h4><span class="header-section-number">12.2.1.4</span> 疾病预测案例</h4>
+<div id="section-12.2.0.3" class="section level4">
+<h4><span class="header-section-number">12.2.0.3</span> 疾病预测案例</h4>
 <p>Risk scoring systems for predicting disease are widely used in medicine. Such scoring systems are usually derived from multivariate logistic regression models with disease as the response variable. Typical approaches in the literature select potential explanatory variables (risk factors) based on variable significance , with risk scores of selected variables assigned based on estimated regression coefficients . However, when the number of potential explanatory variables is large, such approaches may fail to produce a risk scoring system with the greatest power for predicting disease.</p>
 <p>This paper is motivated by the need to develop a risk scoring system for porcine reproductive and respiratory syndrome (PRRS) based on survey data. PRRS, caused by the PRRS virus, is a major disease, production and financial problem for swine producers in nearly every country. PRRS costs the United States swine industry around $560 million annually . PRRS outbreaks in China caused pork prices to increase by 85 percent in 2006 . For breeding herds, costs of clinical outbreaks of PRRS result from lost production due to abortion, mummies, stillborns, pre-wean mortality and sow deaths and increased costs for treatment and control. Performance of observational studies to better understand the relative importance of risk factors for PRRS outbreaks have been limited by the availability of good data on a large set of farms over a relatively long period of time.</p>
 <p>In human medicine, large datasets of information on risk factors, prevalence, incidence and clinical outcomes of disease are common. In veterinary medicine, until recently, there have been no parallel efforts to create epidemiological databases on a similar scale. The American Association of Swine Veterinarians (AASV) Production Animal Disease Risk Assessment Program (PADRAP) is a program through which a set of web-based risk assessment surveys are delivered(please visit: <a href="http://vdpambi.vdl.iastate.edu/padrap/default.aspx" class="uri">http://vdpambi.vdl.iastate.edu/padrap/default.aspx</a>). It is used by veterinarians who are members of the AASV. Each of the surveys consists of a set of questions about potential risk factors for clinical outbreaks of PRRS in swine. Each question may have up to 6 possible responses. Members of the AASV use PADRAP to help producers systematically assess biosecurity factors that may be associated with clinical outcomes. As assessments are performed by veterinarians they are added to the database of completed assessments.</p>
@@ -297,13 +284,10 @@ Kim et al. . They proposed a gradient descent algorithm to solve the correspondi
 <p>In this paper, we propose to use the logistic group lasso algorithm to construct risk scoring systems for predicting clinical PRRS outbreaks in swine herds. The paper is organized as follows. In Section 2, we introduce the group lasso method for logistic regression to construct risk scoring system for clinical PRRS outbreaks. The penalty parameter <span class="math inline">\(\lambda\)</span> for group lasso is selected through leave-one-out cross validation, using the criterion of the area under the receiver operating characteristic curve (AUC). Section 3 presents a simulation study to evaluate the performance of each method. In Section 4, we discuss the application to the PRRS survey data from 896 swine breeding herd sites in the United States and Canada. We show our scoring system for PRRS is superior to both the current scoring system based on expert opinion and that developed by using logistic regression with model selection based on variable significance. Finally results and conclusions presented in Section 5 and 6.</p>
 </div>
 <div id="models-for-risk-scoring-systems" class="section level4">
-<h4><span class="header-section-number">12.2.1.5</span> Models for risk scoring systems</h4>
-</div>
-<div id="multivariate-logistic-regression-model" class="section level4">
-<h4><span class="header-section-number">12.2.1.6</span> Multivariate logistic regression model</h4>
+<h4><span class="header-section-number">12.2.0.4</span> Models for risk scoring systems</h4>
 </div>
 <div id="group-lasso-for-logistic-regression" class="section level4">
-<h4><span class="header-section-number">12.2.1.7</span> Group lasso for logistic regression}</h4>
+<h4><span class="header-section-number">12.2.0.5</span> Group lasso for logistic regression}</h4>
 <p>In this paper, we propose to perform model selection and parameter estimation for risk scoring system construction by using the group lasso algorithm of Meier et al. . Instead of minimizing the negative log-likelihood <span class="math inline">\(-l(\bbeta)\)</span> in the maximum likelihood method, the logistic group lasso estimates are calculated by minimizing the covex function</p>
 <span class="math display">\[\begin{equation}
 S_{\lambda}(\beta)=-l(\bbeta)+\lambda\sum_{g=1}^{G}s(df_{g})\parallel\bbeta_{g}\parallel_{2},
@@ -328,13 +312,13 @@ S_{\lambda}(\beta)=-l(\bbeta)+\lambda\sum_{g=1}^{G}s(df_{g})\parallel\bbeta_{g}\
 <p>In this section, we apply the proposed method to construct a scoring system for PRRS survey data of swine breeding herd sites in the United States and Canada.</p>
 </div>
 <div id="data-description" class="section level4">
-<h4><span class="header-section-number">12.2.1.8</span> Data Description</h4>
+<h4><span class="header-section-number">12.2.0.6</span> Data Description</h4>
 <p>Surveys in the database completed between March 2005 and March 2009 are candidates for inclusion in the analysis. To avoid multiple surveys from a single swine breeding herd site, the study dataset is limited to responses obtained from the most recently completed survey for each site. Surveys meeting these criteria are extracted from the database, and identity information is removed. Incomplete surveys are excluded.</p>
 <p>%The outcome of interest is whether a breeding herd site reported %a clinical PRRS outbreak in the 3 years prior to when the assessment %was completed. The outcome of interest is whether a site is positive or not. Positive sites are sites with clinical PRRS outbreak in the 3 years prior to when the assessment was completed, negative sites otherwise. The information to determine the outcome was obtained from the survey. A clinical PRRS outbreak is described in the survey as an increase in one or more reproductive performance measures that exceeds normal variation with diagnostic confirmation of PRRS virus involvement.</p>
 <p>Of the 896 sites in the United States and Canada included in the study, 499 (56%) became positive during the past 3 years. 127 survey questions are considered potential explanatory variables in the analysis. The survey questions are first converted to dummy indicator variables. All of the responses for each survey question are defined as a group of variables.</p>
 </div>
 <div id="application-of-logistic-group-lasso" class="section level4">
-<h4><span class="header-section-number">12.2.1.9</span> Application of logistic group lasso</h4>
+<h4><span class="header-section-number">12.2.0.7</span> Application of logistic group lasso</h4>
 <p>First, leave-one-out cross validation is used to choose tuning parameter <span class="math inline">\(\lambda\)</span>, as described in Section 2.3. % In each fold of cross-validation, one of the 896 farms is excluded and the other 895 farms are used as a training data set on which the % group lasso logistic regression is applied. The resulting model is used to calculate a predicted probability for PRRS outbreak for the excluded farm. This procedure is repeated for all 896 farms.</p>
 <p>For each <span class="math inline">\(\lambda\)</span> in the grid <span class="math inline">\(\{0.96\lambda_{max},0.96^{2}\lambda_{max},0.96^{3}\lambda_{max},...,0.96^{148}\lambda_{max}\}\)</span>, the values of three evaluation criteria are calculated based on cross validation. The penalty parameter for final risk scoring system is selected to be the one that optimizes AUC.</p>
 <p>%### Comparison with other risk scoring systems}</p>
@@ -345,12 +329,12 @@ S_{\lambda}(\beta)=-l(\bbeta)+\lambda\sum_{g=1}^{G}s(df_{g})\parallel\bbeta_{g}\
 <p>R package {}``grplasso’’  is used to perform group lasso logistic regression. Significance-based logistic model selection is performed using the LOGISTIC procedure in SAS. All other algorithms and calculations are programmed in R language.</p>
 </div>
 <div id="determination-of-penalty-parameter-lambda" class="section level4">
-<h4><span class="header-section-number">12.2.1.10</span> Determination of penalty parameter <span class="math inline">\(\lambda\)</span></h4>
+<h4><span class="header-section-number">12.2.0.8</span> Determination of penalty parameter <span class="math inline">\(\lambda\)</span></h4>
 <p>The AUC, maximum correlation coefficient and log-likelihood are calculated based on leave-one-out cross validation and are plotted against the penalty parameter <span class="math inline">\(\lambda\)</span> in Figure . The trends for all three criteria are similar with a sharp increase for small values of <span class="math inline">\(\lambda\)</span> and gradual decrease after reaching the maximum. The optimal values of <span class="math inline">\(\lambda\)</span> selected to maximize the three criteria are 11.72, 4.22 and 11.72 for AUC, maximum correlation coefficient and log-likelihood respectively.</p>
 
 </div>
 <div id="logistic-group-lasso-based-prrs-risk-scoring-system" class="section level4">
-<h4><span class="header-section-number">12.2.1.11</span> Logistic group lasso based PRRS risk scoring system</h4>
+<h4><span class="header-section-number">12.2.0.9</span> Logistic group lasso based PRRS risk scoring system</h4>
 <p>The penalty parameter maximizing AUC (i.e. <span class="math inline">\(\lambda=11.72\)</span>) from the leave-one-out cross validation is used for the group lasso estimation of the logistic regression parameters. Figure~ show the distributions of the predicted probabilities based on cross validation for both negative and positive farms. It can be observed that the predicted probability for positive farms is larger than that of negative farms in stochastic order. The actual risk score can take the value of the predicted probability, the linear predictor in the logistic regression model, or any strictly increasing function of the predicted probability. This is because the ROC curve for a predictor is invariate to such transformation.</p>
 
 In the resulting scoring system, 74 out of 127 survey questions are estimated with 0 coefficients and are excluded from the system. PADRAP questions target internal risks (bio-management of virus already present) and external risks (bio-exclusion of virus not present). A summary of the number of questions included in the final risk scoring system in each category of risk factors in the PRRS Risk Assessment for the Breeding Herd is shown in Table 1.
@@ -358,7 +342,7 @@ In the resulting scoring system, 74 out of 127 survey questions are estimated wi
 <p>Three out of eight questions regarding internal risk factors remain in the scoring system, and they are all factors concerning characteristics of the herd. Fifty questions remain in external risk factor section out of the total 119 questions. %Sixty nine questions are excluded out of the external risk factors section and fifty remain. In the external risks section, all of the 14 categories have at least one question remaining in the final scoring system, except all 4 questions concerning facilities are excluded. Several categories have a large number of questions removed. In particular, 8 of 12 (66.7%) questions concerning entry of animals into the breeding herd, 18 of 31 (58.1%) questions concerning entry of semen into the breeding herd, 16 of 29 (55.2%) questions concerning transportation of live animals, and 10 of 13 (76.9%) questions concerning neighboring pig farms are excluded.</p>
 </div>
 <div id="comparison-among-risk-scoring-systems" class="section level4">
-<h4><span class="header-section-number">12.2.1.12</span> Comparison among risk scoring systems</h4>
+<h4><span class="header-section-number">12.2.0.10</span> Comparison among risk scoring systems</h4>
 <p>The ROC curves for the three risk scoring systems are plotted in Figure . The ROC curves for the two scoring systems based on logistic regression analyses of the data are constructed using the results of leave-one-out cross validation. The ROC curve of logistic group lasso apparently dominates the other two scoring systems.</p>
 
 <p>Point and 95% interval estimates of AUC are reported in Table 2. The risk scoring system based on the has the largest AUC = 0.848. This AUC estimate is significantly higher than those based on either expert opinion (AUC = 0.696, p-value <span class="math inline">\(&lt;\)</span> 0.001) or logistic regression model selected by variable significance (AUC = 0.807, p-value <span class="math inline">\(&lt;\)</span> 0.001).</p>
@@ -368,21 +352,20 @@ In the resulting scoring system, 74 out of 127 survey questions are estimated wi
 
 </div>
 <div id="discussion" class="section level4">
-<h4><span class="header-section-number">12.2.1.13</span> Discussion</h4>
+<h4><span class="header-section-number">12.2.0.11</span> Discussion</h4>
 <p>The risk scoring system for disease developed using the logistic group lasso algorithm significantly improves upon the current risk scoring system based on expert opinion for predicting whether a swine breeding site experienced a PRRS outbreak. %We introduce the logistic group lasso algorithm to develop risk scoring systems for diseases. Choice of penalty parameter <span class="math inline">\(\lambda\)</span> is determined by leave-one-out cross validation with criterion %of AUC. %We apply our method to construct a new risk scoring system for PRRS outbreak in swine farms. Our scoring system significantly improves the current risk scoring system based on expert %opinion with respect to informing us about the contribution of certain category to the probability of outbreak. The simuation study explores the performance of the scoring systems with different settings of coefficients. The logistic group lasso based scoring system is superior to the scoring system constructed through logistic regression selected by variable significance.</p>
 <p>One advantage of group lasso is that it can be used as variable selection tool by setting 0 coefficients to parameters. It not only helps to find important explanatory factors in predicting the response variables but also identifies questions that could be removed from the survey without affecting the survey’s ability for classifying herds according to whether they report clinical PRRS outbreaks in the previous 3 years.</p>
 <p>Seventy-four of the 127 questions analyzed are excluded from the final risk scoring system based on logistic group lasso. The analysis and results demonstrate how a program like PADRAP, that is supported by a professional association and used by a community of veterinarians, can generate valuable data that contributes to our understanding of the relative importance of risk factors and areas of risk factors for clinical outcomes. The results may also be used to decrease the reliance upon expert opinion to identify questions that should remain in the survey and those that may be eliminated to iteratively increase the value of the program and the data.</p>
 <p>关于100多种判别分析的选择。</p>
 </div>
+<div id="section-12.2.1" class="section level3">
+<h3><span class="header-section-number">12.2.1</span> 线性判别分析</h3>
 </div>
 <div id="section-12.2.2" class="section level3">
-<h3><span class="header-section-number">12.2.2</span> 线性判别分析</h3>
+<h3><span class="header-section-number">12.2.2</span> 最小二乘判别分析</h3>
 </div>
 <div id="section-12.2.3" class="section level3">
-<h3><span class="header-section-number">12.2.3</span> 最小二乘判别分析</h3>
-</div>
-<div id="section-12.2.4" class="section level3">
-<h3><span class="header-section-number">12.2.4</span> 朴素贝叶斯</h3>
+<h3><span class="header-section-number">12.2.3</span> 朴素贝叶斯</h3>
 <p>朴素贝叶斯（Naive Bayes）是基于概率的判别法。</p>
 </div>
 </div>

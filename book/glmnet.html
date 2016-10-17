@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-10-14">
+<meta name="date" content="2016-10-16">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -213,15 +213,18 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 <li class="chapter" data-level="11" data-path="glmnet.html"><a href="glmnet.html"><i class="fa fa-check"></i><b>11</b> 广义线性模型压缩方法及<code>glmnet</code>包</a><ul>
 <li class="chapter" data-level="11.1" data-path="glmnet.html"><a href="glmnet.html#glmnet"><i class="fa fa-check"></i><b>11.1</b> 初识<code>glmnet</code></a></li>
-<li class="chapter" data-level="11.2" data-path="glmnet.html"><a href="glmnet.html#section-11.2"><i class="fa fa-check"></i><b>11.2</b> 线性回归</a></li>
+<li class="chapter" data-level="11.2" data-path="glmnet.html"><a href="glmnet.html#section-11.2"><i class="fa fa-check"></i><b>11.2</b> 收缩线性回归</a></li>
+<li class="chapter" data-level="11.3" data-path="glmnet.html"><a href="glmnet.html#section-11.3"><i class="fa fa-check"></i><b>11.3</b> 逻辑回归</a><ul>
+<li class="chapter" data-level="11.3.1" data-path="glmnet.html"><a href="glmnet.html#section-11.3.1"><i class="fa fa-check"></i><b>11.3.1</b> 普通逻辑回归</a></li>
+<li class="chapter" data-level="11.3.2" data-path="glmnet.html"><a href="glmnet.html#section-11.3.2"><i class="fa fa-check"></i><b>11.3.2</b> 收缩逻辑回归</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="12" data-path="section-12.html"><a href="section-12.html"><i class="fa fa-check"></i><b>12</b> 聚类判别分析</a><ul>
 <li class="chapter" data-level="12.1" data-path="section-12.html"><a href="section-12.html#section-12.1"><i class="fa fa-check"></i><b>12.1</b> 聚类分析</a></li>
 <li class="chapter" data-level="12.2" data-path="section-12.html"><a href="section-12.html#section-12.2"><i class="fa fa-check"></i><b>12.2</b> 判别分析</a><ul>
-<li class="chapter" data-level="12.2.1" data-path="section-12.html"><a href="section-12.html#section-12.2.1"><i class="fa fa-check"></i><b>12.2.1</b> 逻辑回归</a></li>
-<li class="chapter" data-level="12.2.2" data-path="section-12.html"><a href="section-12.html#section-12.2.2"><i class="fa fa-check"></i><b>12.2.2</b> 线性判别分析</a></li>
-<li class="chapter" data-level="12.2.3" data-path="section-12.html"><a href="section-12.html#section-12.2.3"><i class="fa fa-check"></i><b>12.2.3</b> 最小二乘判别分析</a></li>
-<li class="chapter" data-level="12.2.4" data-path="section-12.html"><a href="section-12.html#section-12.2.4"><i class="fa fa-check"></i><b>12.2.4</b> 朴素贝叶斯</a></li>
+<li class="chapter" data-level="12.2.1" data-path="section-12.html"><a href="section-12.html#section-12.2.1"><i class="fa fa-check"></i><b>12.2.1</b> 线性判别分析</a></li>
+<li class="chapter" data-level="12.2.2" data-path="section-12.html"><a href="section-12.html#section-12.2.2"><i class="fa fa-check"></i><b>12.2.2</b> 最小二乘判别分析</a></li>
+<li class="chapter" data-level="12.2.3" data-path="section-12.html"><a href="section-12.html#section-12.2.3"><i class="fa fa-check"></i><b>12.2.3</b> 朴素贝叶斯</a></li>
 </ul></li>
 <li class="chapter" data-level="12.3" data-path="section-12.html"><a href="section-12.html#section-12.3"><i class="fa fa-check"></i><b>12.3</b> 案例：客户分组</a></li>
 </ul></li>
@@ -281,7 +284,7 @@ trainy &lt;-<span class="st"> </span>dat$store_exp +<span class="st"> </span>dat
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glmfit =<span class="st"> </span><span class="kw">glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy)</code></pre></div>
 <p>这里函数<code>glmnet()</code>返回的对象<code>glmfit</code>中含有所有之后可能进一步会用到的模型拟合信息。大家并不需要手动的检查<code>glmfit</code>中都有那些信息，然后提取相应的部分，而是可以通过<code>plot()</code>、<code>coef()</code>、<code>predict()</code>这类耳熟能详的函数来得到相应的信息。比如我们可以用如下方式绘制lasso的参数选择路径图：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(glmfit, <span class="dt">label =</span> T)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-242-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-206-1.png" width="672" /></p>
 <p>图中每种颜色的线代表对应一个自变量，展示的是随着lasso罚函数（也就是一阶范数，有时也称为<span class="math inline">\(l_{1}-norm\)</span>）对应调优参数<span class="math inline">\(\lambda\)</span>变化，各个变量对应的参数估计路径（注：当<span class="math inline">\(\alpha=1\)</span>时，优化方程里就只有lasso罚函数，这是默认设置）。图中有上下两个x轴标度，下x轴是<span class="math inline">\(\lambda\)</span>变化对应最优解的一阶范数值（也就是<span class="math inline">\(\parallel\mathbf{\beta}\parallel_{1}\)</span>），上x轴是相应<span class="math inline">\(\lambda\)</span>值对应的非0参数估计个数，也就是lasso模型的自由度。我们可以查看路径的具体每一步信息：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(glmfit)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode html"><code class="sourceCode html">Call:  glmnet(x = as.matrix(trainx), y = trainy) 
@@ -328,7 +331,7 @@ trainy &lt;-<span class="st"> </span>dat$store_exp +<span class="st"> </span>dat
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cvfit =<span class="st"> </span><span class="kw">cv.glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy)</code></pre></div>
 <p><code>cv.glmnet()</code>会返回一个列表，其中包括交互校验过程的结果，我们将该结果存在<code>cvfit</code>这个对象里。 我们可以对交互校验结果可视化：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(cvfit)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-246-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-210-1.png" width="672" /></p>
 <p>红色的点是不同<span class="math inline">\(\lambda\)</span>取值对应的交互校验均方误差，灰色的线是相应置信区间。两条虚线表示选中的两个调优参数。左边的那个调优参数值对应的是最小的交互校验均方误差，右边的那个调优参数值是离最小均方误差一个标准差的调优参数值。我们可以通过下面代码查看根据两种不同规则选中的调优参数值：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 最小均方误差对应的参数值</span>
 cvfit$lambda.min</code></pre></div>
@@ -354,7 +357,7 @@ cvfit$lambda.1se</code></pre></div>
 ## Q10            .</code></pre>
 </div>
 <div id="section-11.2" class="section level2">
-<h2><span class="header-section-number">11.2</span> 线性回归</h2>
+<h2><span class="header-section-number">11.2</span> 收缩线性回归</h2>
 <p>普通线性回归是广义线性回归框架下的一种特殊情况。这里将要介绍的是之前章节中线性回归的收缩方法的另外一种实现方式。之后我们会介绍广义框架下更多模型的收缩方法：逻辑回归，多项回归和泊松回归。</p>
 <p>线性回归有两种，一种是我们已经介绍过的属于高斯（<code>gaussian</code>）家族的模型，其中应变量是一个向量。另外一种是多元高斯（<code>multivariate gaussian</code>），也就是多元响应变量的情况，这时应变量是一个矩阵，参数也是矩阵。我们着重介绍用<code>glmnet</code>包实现普通高斯收缩回归。</p>
 <p>假定自变量观测<span class="math inline">\(\mathbf{x_{i}}\in \mathbb{R}^{p}\)</span>，应变量<span class="math inline">\(y_{i} \in \mathbb{R},\ i=1,\dots,n\)</span>。这里的收缩线性回归目标是找到能够优化下面方程的参数估计，这和前一章参数化的方式略有不同，但本质是相同的：</p>
@@ -407,10 +410,10 @@ fit =<span class="st"> </span><span class="kw">glmnet</span>(<span class="kw">as
 </ol>
 <p>我们之前展示了默认设置下的参数估计路径图（<code>norm</code>）。现在绘制另外两种情况。设置<code>xvar = &quot;lambda&quot;</code>可以得到对应<span class="math inline">\(log(\lambda)\)</span>的路径图：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(fit, <span class="dt">xvar =</span> <span class="st">&quot;lambda&quot;</span>, <span class="dt">label =</span> T)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-250-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-214-1.png" width="672" /></p>
 <p>可以看到，随着<span class="math inline">\(\lambda\)</span>值的增大，参数逐步向0收缩。<code>Q1</code>、<code>Q2</code>、<code>Q3</code>和<code>Q8</code>的参数估计都差不多在最后才收缩为0。说明这几个变量对解释应变量最重要。下面我们看看对于解释方差的百分比的路径图：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(fit, <span class="dt">xvar =</span> <span class="st">&quot;dev&quot;</span>, <span class="dt">label =</span> T)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-251-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-215-1.png" width="672" /></p>
 <p>横坐标为解释方差的百分比时的路径图和之前的不太一样。非0参数个数越多，解释的方差百分比就越大。到最右端的时候，解释方差变化很小，但是参数估计确急剧增大。由图中我们可以看出，<code>Q7</code>对模型拟合几乎起不了作用。观察这些图能够帮助我们将注意力放在一些重要的变量上。</p>
 <p>如果确定了调优参数<span class="math inline">\(\lambda\)</span>的取值，我们便可以进一步得到相应的参数估计并预测新数据。在之前“初识<code>glmnet</code>”那一小节中，我们展示了在默认设置（<code>alpha = 1</code>，即只有lasso罚函数的情况下）下如何得到调优参数<span class="math inline">\(\lambda\)</span>的某个取值下的拟合结果。这里和之前的情况稍有不同，因为我们设置<code>alpha=0.2</code>，也就是说现在lasso和岭回归的罚函数同时存在。我们可以在<code>fit=glmnet(as.matrix(trainx),trainy,alpha=0.2,nlambda=20)</code>结果的基础上得到相应<span class="math inline">\(\lambda\)</span>取值的调优参数。从输出结果看，若考虑解释方差的变化情况，<span class="math inline">\(\lambda \in [829.7, 1347]\)</span>之间比较妥当。这里我们选择<span class="math inline">\(\lambda ＝ 1000\)</span>，这里为了展示一些函数的用法，特意选择了不在调优过的<span class="math inline">\(\lambda\)</span>取值中的数，也可以通过下面这行简短的代码查看你想要的取值是不是已经调优拟合过：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">any</span>(fit$lambda ==<span class="st"> </span><span class="dv">1000</span>)</code></pre></div>
@@ -486,8 +489,98 @@ Y =<span class="st"> </span><span class="kw">rnorm</span>(<span class="fl">1e5</
 <span class="kw">system.time</span>(<span class="kw">cv.glmnet</span>(X, Y, <span class="dt">parallel =</span> T))</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode html"><code class="sourceCode html">   user  system elapsed 
  15.574   1.047  12.603 </code></pre></div>
-<p>大家可以看到用并行计算在数据量大的时候能够节省好多时间。</p>
+<p>大家可以看到用并行计算在数据量大的时候能够节省好多时间。函数<code>coef()</code>和<code>predict()</code>用于<code>cv.glmnet</code>对象的方式和<code>glmnet</code>相似，只是前者多了两个关于<span class="math inline">\(\lambda\)</span>参数值<code>s</code>的字符串设置：<code>lambda.min</code>（对应最小均方误差的<span class="math inline">\(\lambda\)</span>值）和<code>lambda.1se</code>（对应最小均方误差1个标准差的<span class="math inline">\(\lambda\)</span>值）：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 这里不展示输出结果</span>
+cvfit =<span class="st"> </span><span class="kw">cv.glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy, <span class="dt">type.measure =</span> <span class="st">&quot;mse&quot;</span>, <span class="dt">nfolds =</span> <span class="dv">20</span>)
+<span class="co"># 最小均方误差对应的参数值</span>
+cvfit$lambda.min
+<span class="co"># 预测新样本</span>
+<span class="kw">predict</span>(cvfit, <span class="dt">newx =</span> newdat, <span class="dt">s=</span> <span class="st">&quot;lambda.min&quot;</span>)
+<span class="co"># 得到参数估计</span>
+<span class="kw">coef</span>(cvfit, <span class="dt">s =</span> <span class="st">&quot;lambda.min&quot;</span>)</code></pre></div>
+<p>如果你不仅想要选择<span class="math inline">\(\lambda\)</span>，还要尝试不同的<span class="math inline">\(\alpha\)</span>的参数值，可以自己指定交互校验的样本分层情况。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 自定义层级</span>
+foldid =<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span>:<span class="dv">10</span>, <span class="dt">size =</span> <span class="kw">length</span>(trainy), <span class="dt">replace =</span> T)
+<span class="co"># 尝试3个不同的alpha取值：1、0.5、0.2和0</span>
+cv1 =<span class="st"> </span><span class="kw">cv.glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy, <span class="dt">foldid =</span> foldid, <span class="dt">alpha =</span> <span class="dv">1</span>)
+cv<span class="fl">.2</span> =<span class="st"> </span><span class="kw">cv.glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy, <span class="dt">foldid =</span> foldid, <span class="dt">alpha =</span> .<span class="dv">2</span>)
+cv<span class="fl">.5</span> =<span class="st"> </span><span class="kw">cv.glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy, <span class="dt">foldid =</span> foldid, <span class="dt">alpha =</span> .<span class="dv">5</span>)
+cv0 =<span class="st"> </span><span class="kw">cv.glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy, <span class="dt">foldid =</span> foldid, <span class="dt">alpha =</span> <span class="dv">0</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(<span class="kw">log</span>(cv1$lambda), cv1$cvm, <span class="dt">pch =</span> <span class="dv">19</span>, <span class="dt">col =</span> <span class="dv">2</span>, <span class="dt">xlab =</span> <span class="st">&quot;log(Lambda)&quot;</span>, <span class="dt">ylab =</span> cv1$name)
+<span class="kw">points</span>(<span class="kw">log</span>(cv<span class="fl">.5</span>$lambda), cv<span class="fl">.5</span>$cvm, <span class="dt">col =</span> <span class="dv">1</span>)
+<span class="kw">points</span>(<span class="kw">log</span>(cv<span class="fl">.2</span>$lambda), cv<span class="fl">.2</span>$cvm, <span class="dt">col =</span> <span class="dv">3</span>)
+<span class="kw">points</span>(<span class="kw">log</span>(cv0$lambda), cv0$cvm, <span class="dt">col =</span> <span class="dv">4</span>)
+<span class="kw">legend</span>(<span class="st">&quot;topleft&quot;</span>, <span class="dt">legend =</span> <span class="kw">c</span>(<span class="st">&quot;alpha = 1&quot;</span>, <span class="st">&quot;alpha = 0.5&quot;</span>, <span class="st">&quot;alpha = 0.2&quot;</span>, <span class="st">&quot;alpha = 0&quot;</span>), 
+       <span class="dt">pch =</span> <span class="dv">19</span>, <span class="dt">col =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">4</span>))</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-225-1.png" width="672" /></p>
+<p>可以看到，不同 <code>alpha</code>的取值对应的最优均方误差几乎相同，只是在<span class="math inline">\(\lambda\)</span>值大的时候（图的右端），<span class="math inline">\(\alpha\)</span>值的变化会对模型拟合结果产生影响。</p>
+<p>在实际应用中，基于问题的背景需要对参数进行一些限制。回顾下面三个问卷调查的问题（小伙伴们可以到“数据集模拟和背景介绍”那一章中查看所有问卷调查的问题）：</p>
+<p>-（<code>Q3</code>）：品牌的知名度对我来说非常重要 -（<code>Q8</code>）：价格对我来说很重要</p>
+<p>其中问题<code>Q3</code>和消费金额应该是正相关的，对品牌知名度在意的人，很可能是土豪或者国民老公一类的，反正相对不差钱，衣着对于这部分群体而言满足的需求已经从马斯洛的需求金字塔底端升级到顶端。而<code>Q8</code>的回复和消费金额应该是负相关的，对价格越是在意的人，花销很可能越小，屌丝群体，动不动就得卖肾，生活不易，且花且珍惜。好啦，人艰不拆，我们从残酷的现实世界回到美好的数据世界。在这里，我们需要限定参数估计的区间，<code>Q3</code>的参数估计是正数，<code>Q8</code>的参数估计是负数。在<code>glmnet()</code>函数中，我们可以对每个参数设置可能的限制区间，如果不知道区间的，可以用很小或者很大的上下限。这里需要赋予一个长度为10的向量，其中每个元素对应一个变量的上（或下）限值：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 先得到一个下限向量，设置成负无穷大</span>
+<span class="co"># 这时等于没有下限</span>
+lower.limits &lt;-<span class="st"> </span><span class="kw">rep</span>(-<span class="ot">Inf</span>, <span class="kw">ncol</span>(trainx))
+<span class="co"># 在将需要的下限值加入</span>
+<span class="co"># Q3的估计是正数，所以下限为0</span>
+lower.limits[<span class="dv">3</span>] &lt;-<span class="st"> </span><span class="dv">0</span>
+<span class="co"># 类似的设置上限向量</span>
+upper.limits &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="ot">Inf</span>, <span class="kw">ncol</span>(trainx))
+upper.limits[<span class="dv">8</span>] &lt;-<span class="st"> </span><span class="dv">0</span>
+boundfit =<span class="st"> </span><span class="kw">glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy, <span class="dt">lower.limits =</span> lower.limits, <span class="dt">upper.limits =</span> upper.limits)</code></pre></div>
+<p>注意，这里下限<code>lower.limits</code>的值必须是负数或者0，上限<code>upper.limits</code>的值必须是正数或者0。</p>
+</div>
+<div id="section-11.3" class="section level2">
+<h2><span class="header-section-number">11.3</span> 逻辑回归</h2>
+<p>逻辑回归是非常流行的判别方法，尤其对于二分类问题。我们以生猪疫情数据为例来讲解模型以及实践代码。关于数据的模拟和背景介绍，可以参考之前“数据集模拟和背景介绍”章节中相应小节。研究目标是对农场爆发疫情建模。假设样本量为<span class="math inline">\(n\)</span>，对应<span class="math inline">\(G\)</span>个自变量（也就是农场问卷调查的问题），每个问题对应3个选项（A、B和C），因此每个分类自变量将转化为3个虚拟变量，不知道大家是不是记得，我们在数据模拟的部分讲过选项C作为基准选项，因为某个回复一定是A、B和C中的一种，所以有一列包含重复信息，我们任意选择一个作为基准列从自变量矩阵中删去。假设第<span class="math inline">\(i\)</span>个受访农场（<span class="math inline">\(i=1,\dots,n\)</span>）对应第<span class="math inline">\(g\)</span>个问题（<span class="math inline">\(g=1,\dots,G\)</span>）回复编码后的虚拟变量观测是<span class="math inline">\(\mathbf{x_{ig}}\)</span>（如果第1个农场在第2个问题中选择B，那么对应的观测就是<span class="math inline">\(\mathbf{x_{12}}=(0,1)^{T}\)</span>），这种情况下第<span class="math inline">\(g\)</span>个问题对应的自由度就是2，我们将自由度一般化的记为<span class="math inline">\(df_g\)</span>。第<span class="math inline">\(i\)</span>个农场对应疫情发生实际观测情况就是应变量<span class="math inline">\(y_i \in \{0,1\}\)</span>，其中1代表发生疫情，0代表没有发生疫情。第<span class="math inline">\(i\)</span>个农场疫情发生的概率是<span class="math inline">\(\theta_i\in [0,1]\)</span>。</p>
+<div id="section-11.3.1" class="section level3">
+<h3><span class="header-section-number">11.3.1</span> 普通逻辑回归</h3>
+<p>基于上述数学符号定义，对于普通逻辑回归：</p>
+<p><span class="math display">\[y_{i}\sim Bounoulli(\theta_{i})\]</span></p>
+<p><span class="math display">\[log\left(\frac{\theta_{i}}{1-\theta_{i}}\right)=\eta_{\mathbf{\beta}}(x_{i})=\beta_{0}+\sum_{g=1}^{G}\mathbf{x_{i,g}}^{T}\mathbf{\mathbf{\beta_{g}}}\]</span></p>
+<p>其中 <span class="math inline">\(\beta_{0}\)</span> 是截距项，且<span class="math inline">\(\mathbf{\beta_{g}}\)</span>是第<span class="math inline">\(g\)</span>个问题观测转化成的虚拟变量对应的参数估计。在当前例子中，每个问题有3个选项，所以每个问题对应3-1=2个虚拟变量（其中选项C是基准项，之前已经讲过了），<span class="math inline">\(\mathbf{\beta_{g}}\)</span>就是长度为2的向量。 <!--Construction of risk scoring systems using logistic regression usually consists of two steps: selection among
+the $G$ risk factors, and estimation of the selected factor parameters. For model selection, significance has been used 
+as a criterion for inclusion and exclusion of risk factors \cite{Emmanuel2005,Kimberly2003,Rhatigan2010}. Some researchers use univariate logistic regression
+to screen factors by significance before putting them into a multivariate logistic regression model \cite{Emmanuel2005,Rhatigan2010}, whereas others \cite{Kimberly2003} don't.
+--></p>
+<p>一般逻辑回归就是通过最大化下面的极大似然函数的对数估计<span class="math inline">\(\mathbf{\beta}=(\beta_{0}^{T},\mathbf{\beta_{1}}^{T},\mathbf{\beta_{2}}^{T},...,\mathbf{\beta_{G}}^{T})^{T}\)</span>：</p>
+<p><span class="math display">\[ 
+\begin{eqnarray*}
+l(\mathbf{\beta})&amp;=&amp;log[\prod_{i=1}^{n}\theta_{i}^{y_{i}}(1-\theta_{i})^{1-y_{i}}]\\
+&amp;=&amp;\sum_{i=1}^{n}\{y_{i}log(\theta_{i})+(1-y_{i})log(1-\theta_{i})\}\\
+&amp;=&amp;\sum_{i=1}^{n}\{\ y_{i}\eta_{\mathbf{\beta}}(\mathbf{x_{i}})-log[1+exp(\eta_{\mathbf{\beta}}(\mathbf{x_{i}}))]\ \}.
+\end{eqnarray*}
+\]</span></p>
+<p>在逻辑回归中，当变量个数相对观测较大时，很容易发生完全分离或者准完全分离的现象，这时候没有唯一的极大似然估计，因此参数估计的方差极大。关于逻辑回归这样的对数线性模型参数极大似然估计的存在性，唯一性的讨论可以参考<span class="citation">(Wedderburn <a href="#ref-Wed1976">1976</a>)</span>和<span class="citation">(A and J <a href="#ref-albert1984">1984</a>)</span>。这种情况时常出现，比如疾病预测数据：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(MASS)
+dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/sim1_da1.csv&quot;</span>)
+fit &lt;-<span class="st"> </span><span class="kw">glm</span>(y~., dat, <span class="dt">family =</span> <span class="st">&quot;binomial&quot;</span>)</code></pre></div>
+<pre class="http"><code>glm.fit: algorithm did not convergeglm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+<p>大家可以看到，函数报错说无法收敛，这里就是发生了完全分离的情况。这时收缩方法就可以解决这个问题。</p>
+</div>
+<div id="section-11.3.2" class="section level3">
+<h3><span class="header-section-number">11.3.2</span> 收缩逻辑回归</h3>
+<p>我们可以类似的在逻辑回归的似然函数后添加罚函数来收缩参数估计：</p>
+<p><span class="math display">\[
+\underset{\mathbf{\beta}\in \mathbb{R}^{p+1}}{min} -\sum_{i=1}^{n}\{\ y_{i}\eta_{\mathbf{\beta}}(\mathbf{x_{i}})-log[1+exp(\eta_{\mathbf{\beta}}(\mathbf{x_{i}}))]\ \}+\lambda [(1-\alpha) \parallel \mathbf{\beta}\parallel _{2}^{2}/2] + \alpha \parallel \mathbf{\beta}\parallel _{1} ]
+\]</span></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/sim1_da1.csv&quot;</span>)
+trainx =<span class="st"> </span>dplyr::<span class="kw">select</span>(dat, -y)
+trainy =<span class="st"> </span>dat$y
+fit &lt;-<span class="st"> </span><span class="kw">glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy, <span class="dt">family =</span> <span class="st">&quot;binomial&quot;</span>)</code></pre></div>
+<p>可以看到，这里没有错误信息。和之前类似，我们可以绘制参数收缩的路径图，提取某个<span class="math inline">\(\lambda\)</span>取值对应的参数估计，并且进行预测。比如我们可以绘制下面的解释方差比例的参数路径图，绘制图形的语法和之前高斯的情况一样：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(fit, <span class="dt">xvar =</span> <span class="st">&quot;dev&quot;</span>)</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-228-1.png" width="672" /></p>
 
+</div>
+</div>
+</div>
+<h3> References</h3>
+<div id="refs" class="references">
+<div id="ref-Wed1976">
+<p>Wedderburn, R. W. M. 1976. “On the Existence and Uniqueness of the Maximum Likelihood Estimates for Certain Generalized Linear Models.” <em>Biometrika</em> 63: 27–32.</p>
+</div>
+<div id="ref-albert1984">
+<p>A, Albert, and Anderson A. J. 1984. “On the Existence of the Maximum Likelihood Estimates in Logistic Regression Models.” <em>Biometrika</em> 71 (1): 1–10.</p>
 </div>
 </div>
             </section>
