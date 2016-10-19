@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-10-16">
+<meta name="date" content="2016-10-19">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -217,6 +217,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="11.3" data-path="glmnet.html"><a href="glmnet.html#section-11.3"><i class="fa fa-check"></i><b>11.3</b> 逻辑回归</a><ul>
 <li class="chapter" data-level="11.3.1" data-path="glmnet.html"><a href="glmnet.html#section-11.3.1"><i class="fa fa-check"></i><b>11.3.1</b> 普通逻辑回归</a></li>
 <li class="chapter" data-level="11.3.2" data-path="glmnet.html"><a href="glmnet.html#section-11.3.2"><i class="fa fa-check"></i><b>11.3.2</b> 收缩逻辑回归</a></li>
+<li class="chapter" data-level="11.3.3" data-path="section-10.html"><a href="section-10.html#lasso"><i class="fa fa-check"></i><b>11.3.3</b> 知识扩展：群组lasso逻辑回归</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="12" data-path="section-12.html"><a href="section-12.html"><i class="fa fa-check"></i><b>12</b> 聚类判别分析</a><ul>
@@ -570,6 +571,52 @@ fit &lt;-<span class="st"> </span><span class="kw">glmnet</span>(<span class="kw
 <p>可以看到，这里没有错误信息。和之前类似，我们可以绘制参数收缩的路径图，提取某个<span class="math inline">\(\lambda\)</span>取值对应的参数估计，并且进行预测。比如我们可以绘制下面的解释方差比例的参数路径图，绘制图形的语法和之前高斯的情况一样：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(fit, <span class="dt">xvar =</span> <span class="st">&quot;dev&quot;</span>)</code></pre></div>
 <p><img src="DS_R_files/figure-html/unnamed-chunk-228-1.png" width="672" /></p>
+<p>预测函数<code>predict()</code>和之前的高斯族情况有所不同，主要在于<code>type</code>选项。在二项应变量的情况下，函数的<code>type</code>选项有如下几种：</p>
+<ul>
+<li><code>link</code>：返回链结函数的拟合值</li>
+<li><code>response</code>：返回拟合的概率值</li>
+<li><code>class</code>：返回预测的类别（0/1）值</li>
+<li><code>coefficients</code>：返回相应的参数估计</li>
+<li><code>nonzero</code>：返回估计非0的参数指针向量（即告诉你模型选择了哪些参数）</li>
+</ul>
+<p>函数默认的这些估计针对的是因子型应变量中第二个层级。比如这里的应变量<code>trainy</code>对应的因子层级是：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">levels</span>(<span class="kw">as.factor</span>(trainy))</code></pre></div>
+<pre><code>## [1] &quot;0&quot; &quot;1&quot;</code></pre>
+<p>这里的预测概率针对的是第二个因子层级，也就是“1”的概率。这里用3个观测行和两个<span class="math inline">\(\lambda\)</span>的取值为例，展示<code>predict()</code>函数的用法：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">newdat =<span class="st"> </span><span class="kw">as.matrix</span>(trainx[<span class="dv">1</span>:<span class="dv">3</span>, ])
+<span class="kw">predict</span>(fit, newdat, <span class="dt">type =</span> <span class="st">&quot;link&quot;</span>, <span class="dt">s =</span> <span class="kw">c</span>(<span class="fl">2.833e-02</span>, <span class="fl">3.110e-02</span>))</code></pre></div>
+<pre><code>##            1          2
+## 1  0.1943472  0.1442796
+## 2 -0.9913159 -1.0076600
+## 3 -0.5840566 -0.5496074</code></pre>
+<p>上面输出中第1列对应的是<span class="math inline">\(\lambda=0.02833\)</span>时3个样本的链结函数预测值。第2列对应的是<span class="math inline">\(\lambda=0.0311\)</span>时的链结函数预测值。类似的，大家可以自己改变<code>type</code>的设置看结果输出。对逻辑回归我们也可以类似的使用<code>cv.glmnet()</code>函数通过交互校验对参数进行调优。参数和高斯的情况基本相同，不同的地方在于<code>type.measure</code>参数的设置。因为这里应变量是分类变量而非连续变量，在之前的“模型评估度量”章节里详细的介绍过应变量为分类和连续时模型评估方法的差异。在分类情况下，模型评估方法的常用设置<code>type.measure</code>有：</p>
+<ul>
+<li><code>class</code>：计算误判率</li>
+<li><code>auc</code>：仅对于二分类的情况，计算ROC曲线下面积</li>
+</ul>
+<p>例如：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 老用as.matrix(trainx)确实有些烦人，但是函数要求时矩阵格式。</span>
+<span class="co"># 小伙伴可以在一开始选择将trainx直接转化成矩阵格式。</span>
+<span class="co"># 这里不这么做的原因是矩阵格式下有的数据框的操作又无法进行</span>
+<span class="co"># 且一些数据框的行列信息可能在转化过程中丢失。</span>
+<span class="co"># 所以在每次拟合模型的时候临时转化而不更改原数据框</span>
+cvfit =<span class="st"> </span><span class="kw">cv.glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy, <span class="dt">family =</span> <span class="st">&quot;binomial&quot;</span>, <span class="dt">type.measure =</span> <span class="st">&quot;class&quot;</span>)
+<span class="kw">plot</span>(cvfit)</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-231-1.png" width="672" /></p>
+<p>上面使用的是误判率作为标准，进行10层交互校验。同样你可以得到对应最小误判率的<span class="math inline">\(\lambda\)</span>取值，以及距离最小误判率一个标准差的<span class="math inline">\(\lambda\)</span>取值：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cvfit$lambda.min</code></pre></div>
+<pre><code>## [1] 8.856624e-05</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cvfit$lambda.1se</code></pre></div>
+<pre><code>## [1] 0.001315181</code></pre>
+<p>至于获取参数估计以及对新样本进行预测之前已经讲过，在此就不赘述。</p>
+</div>
+<div id="lasso" class="section level3">
+<h3><span class="header-section-number">11.3.3</span> 知识扩展：群组lasso逻辑回归</h3>
+<p>下面我进一步讲一个相对较新的方法：群组lasso逻辑回归。该方法最早由Meier等人在2008年提出 et al. . Instead of minimizing the negative log-likelihood <span class="math inline">\(-l(\bbeta)\)</span> in the maximum likelihood method, the logistic group lasso estimates are calculated by minimizing the covex function</p>
+<span class="math display">\[\begin{equation}
+S_{\lambda}(\beta)=-l(\bbeta)+\lambda\sum_{g=1}^{G}s(df_{g})\parallel\bbeta_{g}\parallel_{2},
+\end{equation}\]</span>
+<p>where <span class="math inline">\(\lambda\)</span> is a tuning parameter for the penalty and <span class="math inline">\(s(\cdot)\)</span> is a function to rescale the penalty. In lasso algorithms, choice of <span class="math inline">\(\lambda\)</span> is usually determined by cross-validation using data. For <span class="math inline">\(s(\cdot)\)</span>, we use the square root function <span class="math inline">\(s(df_g)=df_g^{0.5}\)</span> as suggested in Meier et al. .</p>
 
 </div>
 </div>

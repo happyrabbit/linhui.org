@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-10-16">
+<meta name="date" content="2016-10-19">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -217,6 +217,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="11.3" data-path="glmnet.html"><a href="glmnet.html#section-11.3"><i class="fa fa-check"></i><b>11.3</b> 逻辑回归</a><ul>
 <li class="chapter" data-level="11.3.1" data-path="glmnet.html"><a href="glmnet.html#section-11.3.1"><i class="fa fa-check"></i><b>11.3.1</b> 普通逻辑回归</a></li>
 <li class="chapter" data-level="11.3.2" data-path="glmnet.html"><a href="glmnet.html#section-11.3.2"><i class="fa fa-check"></i><b>11.3.2</b> 收缩逻辑回归</a></li>
+<li class="chapter" data-level="11.3.3" data-path="section-10.html"><a href="section-10.html#lasso"><i class="fa fa-check"></i><b>11.3.3</b> 知识扩展：群组lasso逻辑回归</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="12" data-path="section-12.html"><a href="section-12.html"><i class="fa fa-check"></i><b>12</b> 聚类判别分析</a><ul>
@@ -285,14 +286,6 @@ Kim et al. . They proposed a gradient descent algorithm to solve the correspondi
 </div>
 <div id="models-for-risk-scoring-systems" class="section level4">
 <h4><span class="header-section-number">12.2.0.4</span> Models for risk scoring systems</h4>
-</div>
-<div id="group-lasso-for-logistic-regression" class="section level4">
-<h4><span class="header-section-number">12.2.0.5</span> Group lasso for logistic regression}</h4>
-<p>In this paper, we propose to perform model selection and parameter estimation for risk scoring system construction by using the group lasso algorithm of Meier et al. . Instead of minimizing the negative log-likelihood <span class="math inline">\(-l(\bbeta)\)</span> in the maximum likelihood method, the logistic group lasso estimates are calculated by minimizing the covex function</p>
-<span class="math display">\[\begin{equation}
-S_{\lambda}(\beta)=-l(\bbeta)+\lambda\sum_{g=1}^{G}s(df_{g})\parallel\bbeta_{g}\parallel_{2},
-\end{equation}\]</span>
-<p>where <span class="math inline">\(\lambda\)</span> is a tuning parameter for the penalty and <span class="math inline">\(s(\cdot)\)</span> is a function to rescale the penalty. In lasso algorithms, choice of <span class="math inline">\(\lambda\)</span> is usually determined by cross-validation using data. For <span class="math inline">\(s(\cdot)\)</span>, we use the square root function <span class="math inline">\(s(df_g)=df_g^{0.5}\)</span> as suggested in Meier et al. .</p>
 <p>%### Choosing <span class="math inline">\(\lambda\)</span> through leave-one-out cross validation}</p>
 <p>Here we consider selection of the tuning parameter <span class="math inline">\(\lambda\)</span> from a multiplicative grid of 148 values <span class="math inline">\(\{0.96\lambda_{max},0.96^{2}\lambda_{max},0.96^{3}\lambda_{max},...,0.96^{148}\lambda_{max}\}\)</span>, as in Meier et al. . Here <span class="math inline">\(\lambda_{max}\)</span> is defined as</p>
 <span class="math display">\[\begin{equation}
@@ -312,13 +305,13 @@ S_{\lambda}(\beta)=-l(\bbeta)+\lambda\sum_{g=1}^{G}s(df_{g})\parallel\bbeta_{g}\
 <p>In this section, we apply the proposed method to construct a scoring system for PRRS survey data of swine breeding herd sites in the United States and Canada.</p>
 </div>
 <div id="data-description" class="section level4">
-<h4><span class="header-section-number">12.2.0.6</span> Data Description</h4>
+<h4><span class="header-section-number">12.2.0.5</span> Data Description</h4>
 <p>Surveys in the database completed between March 2005 and March 2009 are candidates for inclusion in the analysis. To avoid multiple surveys from a single swine breeding herd site, the study dataset is limited to responses obtained from the most recently completed survey for each site. Surveys meeting these criteria are extracted from the database, and identity information is removed. Incomplete surveys are excluded.</p>
 <p>%The outcome of interest is whether a breeding herd site reported %a clinical PRRS outbreak in the 3 years prior to when the assessment %was completed. The outcome of interest is whether a site is positive or not. Positive sites are sites with clinical PRRS outbreak in the 3 years prior to when the assessment was completed, negative sites otherwise. The information to determine the outcome was obtained from the survey. A clinical PRRS outbreak is described in the survey as an increase in one or more reproductive performance measures that exceeds normal variation with diagnostic confirmation of PRRS virus involvement.</p>
 <p>Of the 896 sites in the United States and Canada included in the study, 499 (56%) became positive during the past 3 years. 127 survey questions are considered potential explanatory variables in the analysis. The survey questions are first converted to dummy indicator variables. All of the responses for each survey question are defined as a group of variables.</p>
 </div>
 <div id="application-of-logistic-group-lasso" class="section level4">
-<h4><span class="header-section-number">12.2.0.7</span> Application of logistic group lasso</h4>
+<h4><span class="header-section-number">12.2.0.6</span> Application of logistic group lasso</h4>
 <p>First, leave-one-out cross validation is used to choose tuning parameter <span class="math inline">\(\lambda\)</span>, as described in Section 2.3. % In each fold of cross-validation, one of the 896 farms is excluded and the other 895 farms are used as a training data set on which the % group lasso logistic regression is applied. The resulting model is used to calculate a predicted probability for PRRS outbreak for the excluded farm. This procedure is repeated for all 896 farms.</p>
 <p>For each <span class="math inline">\(\lambda\)</span> in the grid <span class="math inline">\(\{0.96\lambda_{max},0.96^{2}\lambda_{max},0.96^{3}\lambda_{max},...,0.96^{148}\lambda_{max}\}\)</span>, the values of three evaluation criteria are calculated based on cross validation. The penalty parameter for final risk scoring system is selected to be the one that optimizes AUC.</p>
 <p>%### Comparison with other risk scoring systems}</p>
@@ -329,12 +322,12 @@ S_{\lambda}(\beta)=-l(\bbeta)+\lambda\sum_{g=1}^{G}s(df_{g})\parallel\bbeta_{g}\
 <p>R package {}``grplasso’’  is used to perform group lasso logistic regression. Significance-based logistic model selection is performed using the LOGISTIC procedure in SAS. All other algorithms and calculations are programmed in R language.</p>
 </div>
 <div id="determination-of-penalty-parameter-lambda" class="section level4">
-<h4><span class="header-section-number">12.2.0.8</span> Determination of penalty parameter <span class="math inline">\(\lambda\)</span></h4>
+<h4><span class="header-section-number">12.2.0.7</span> Determination of penalty parameter <span class="math inline">\(\lambda\)</span></h4>
 <p>The AUC, maximum correlation coefficient and log-likelihood are calculated based on leave-one-out cross validation and are plotted against the penalty parameter <span class="math inline">\(\lambda\)</span> in Figure . The trends for all three criteria are similar with a sharp increase for small values of <span class="math inline">\(\lambda\)</span> and gradual decrease after reaching the maximum. The optimal values of <span class="math inline">\(\lambda\)</span> selected to maximize the three criteria are 11.72, 4.22 and 11.72 for AUC, maximum correlation coefficient and log-likelihood respectively.</p>
 
 </div>
 <div id="logistic-group-lasso-based-prrs-risk-scoring-system" class="section level4">
-<h4><span class="header-section-number">12.2.0.9</span> Logistic group lasso based PRRS risk scoring system</h4>
+<h4><span class="header-section-number">12.2.0.8</span> Logistic group lasso based PRRS risk scoring system</h4>
 <p>The penalty parameter maximizing AUC (i.e. <span class="math inline">\(\lambda=11.72\)</span>) from the leave-one-out cross validation is used for the group lasso estimation of the logistic regression parameters. Figure~ show the distributions of the predicted probabilities based on cross validation for both negative and positive farms. It can be observed that the predicted probability for positive farms is larger than that of negative farms in stochastic order. The actual risk score can take the value of the predicted probability, the linear predictor in the logistic regression model, or any strictly increasing function of the predicted probability. This is because the ROC curve for a predictor is invariate to such transformation.</p>
 
 In the resulting scoring system, 74 out of 127 survey questions are estimated with 0 coefficients and are excluded from the system. PADRAP questions target internal risks (bio-management of virus already present) and external risks (bio-exclusion of virus not present). A summary of the number of questions included in the final risk scoring system in each category of risk factors in the PRRS Risk Assessment for the Breeding Herd is shown in Table 1.
@@ -342,7 +335,7 @@ In the resulting scoring system, 74 out of 127 survey questions are estimated wi
 <p>Three out of eight questions regarding internal risk factors remain in the scoring system, and they are all factors concerning characteristics of the herd. Fifty questions remain in external risk factor section out of the total 119 questions. %Sixty nine questions are excluded out of the external risk factors section and fifty remain. In the external risks section, all of the 14 categories have at least one question remaining in the final scoring system, except all 4 questions concerning facilities are excluded. Several categories have a large number of questions removed. In particular, 8 of 12 (66.7%) questions concerning entry of animals into the breeding herd, 18 of 31 (58.1%) questions concerning entry of semen into the breeding herd, 16 of 29 (55.2%) questions concerning transportation of live animals, and 10 of 13 (76.9%) questions concerning neighboring pig farms are excluded.</p>
 </div>
 <div id="comparison-among-risk-scoring-systems" class="section level4">
-<h4><span class="header-section-number">12.2.0.10</span> Comparison among risk scoring systems</h4>
+<h4><span class="header-section-number">12.2.0.9</span> Comparison among risk scoring systems</h4>
 <p>The ROC curves for the three risk scoring systems are plotted in Figure . The ROC curves for the two scoring systems based on logistic regression analyses of the data are constructed using the results of leave-one-out cross validation. The ROC curve of logistic group lasso apparently dominates the other two scoring systems.</p>
 
 <p>Point and 95% interval estimates of AUC are reported in Table 2. The risk scoring system based on the has the largest AUC = 0.848. This AUC estimate is significantly higher than those based on either expert opinion (AUC = 0.696, p-value <span class="math inline">\(&lt;\)</span> 0.001) or logistic regression model selected by variable significance (AUC = 0.807, p-value <span class="math inline">\(&lt;\)</span> 0.001).</p>
@@ -352,7 +345,7 @@ In the resulting scoring system, 74 out of 127 survey questions are estimated wi
 
 </div>
 <div id="discussion" class="section level4">
-<h4><span class="header-section-number">12.2.0.11</span> Discussion</h4>
+<h4><span class="header-section-number">12.2.0.10</span> Discussion</h4>
 <p>The risk scoring system for disease developed using the logistic group lasso algorithm significantly improves upon the current risk scoring system based on expert opinion for predicting whether a swine breeding site experienced a PRRS outbreak. %We introduce the logistic group lasso algorithm to develop risk scoring systems for diseases. Choice of penalty parameter <span class="math inline">\(\lambda\)</span> is determined by leave-one-out cross validation with criterion %of AUC. %We apply our method to construct a new risk scoring system for PRRS outbreak in swine farms. Our scoring system significantly improves the current risk scoring system based on expert %opinion with respect to informing us about the contribution of certain category to the probability of outbreak. The simuation study explores the performance of the scoring systems with different settings of coefficients. The logistic group lasso based scoring system is superior to the scoring system constructed through logistic regression selected by variable significance.</p>
 <p>One advantage of group lasso is that it can be used as variable selection tool by setting 0 coefficients to parameters. It not only helps to find important explanatory factors in predicting the response variables but also identifies questions that could be removed from the survey without affecting the survey’s ability for classifying herds according to whether they report clinical PRRS outbreaks in the previous 3 years.</p>
 <p>Seventy-four of the 127 questions analyzed are excluded from the final risk scoring system based on logistic group lasso. The analysis and results demonstrate how a program like PADRAP, that is supported by a professional association and used by a community of veterinarians, can generate valuable data that contributes to our understanding of the relative importance of risk factors and areas of risk factors for clinical outcomes. The results may also be used to decrease the reliance upon expert opinion to identify questions that should remain in the survey and those that may be eliminated to iteratively increase the value of the program and the data.</p>
