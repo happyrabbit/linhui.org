@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-10-19">
+<meta name="date" content="2016-10-20">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -285,7 +285,7 @@ trainy &lt;-<span class="st"> </span>dat$store_exp +<span class="st"> </span>dat
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glmfit =<span class="st"> </span><span class="kw">glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy)</code></pre></div>
 <p>这里函数<code>glmnet()</code>返回的对象<code>glmfit</code>中含有所有之后可能进一步会用到的模型拟合信息。大家并不需要手动的检查<code>glmfit</code>中都有那些信息，然后提取相应的部分，而是可以通过<code>plot()</code>、<code>coef()</code>、<code>predict()</code>这类耳熟能详的函数来得到相应的信息。比如我们可以用如下方式绘制lasso的参数选择路径图：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(glmfit, <span class="dt">label =</span> T)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-206-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-207-1.png" width="672" /></p>
 <p>图中每种颜色的线代表对应一个自变量，展示的是随着lasso罚函数（也就是一阶范数，有时也称为<span class="math inline">\(l_{1}-norm\)</span>）对应调优参数<span class="math inline">\(\lambda\)</span>变化，各个变量对应的参数估计路径（注：当<span class="math inline">\(\alpha=1\)</span>时，优化方程里就只有lasso罚函数，这是默认设置）。图中有上下两个x轴标度，下x轴是<span class="math inline">\(\lambda\)</span>变化对应最优解的一阶范数值（也就是<span class="math inline">\(\parallel\mathbf{\beta}\parallel_{1}\)</span>），上x轴是相应<span class="math inline">\(\lambda\)</span>值对应的非0参数估计个数，也就是lasso模型的自由度。我们可以查看路径的具体每一步信息：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(glmfit)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode html"><code class="sourceCode html">Call:  glmnet(x = as.matrix(trainx), y = trainy) 
@@ -332,7 +332,7 @@ trainy &lt;-<span class="st"> </span>dat$store_exp +<span class="st"> </span>dat
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cvfit =<span class="st"> </span><span class="kw">cv.glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy)</code></pre></div>
 <p><code>cv.glmnet()</code>会返回一个列表，其中包括交互校验过程的结果，我们将该结果存在<code>cvfit</code>这个对象里。 我们可以对交互校验结果可视化：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(cvfit)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-210-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-211-1.png" width="672" /></p>
 <p>红色的点是不同<span class="math inline">\(\lambda\)</span>取值对应的交互校验均方误差，灰色的线是相应置信区间。两条虚线表示选中的两个调优参数。左边的那个调优参数值对应的是最小的交互校验均方误差，右边的那个调优参数值是离最小均方误差一个标准差的调优参数值。我们可以通过下面代码查看根据两种不同规则选中的调优参数值：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 最小均方误差对应的参数值</span>
 cvfit$lambda.min</code></pre></div>
@@ -411,10 +411,10 @@ fit =<span class="st"> </span><span class="kw">glmnet</span>(<span class="kw">as
 </ol>
 <p>我们之前展示了默认设置下的参数估计路径图（<code>norm</code>）。现在绘制另外两种情况。设置<code>xvar = &quot;lambda&quot;</code>可以得到对应<span class="math inline">\(log(\lambda)\)</span>的路径图：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(fit, <span class="dt">xvar =</span> <span class="st">&quot;lambda&quot;</span>, <span class="dt">label =</span> T)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-214-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-215-1.png" width="672" /></p>
 <p>可以看到，随着<span class="math inline">\(\lambda\)</span>值的增大，参数逐步向0收缩。<code>Q1</code>、<code>Q2</code>、<code>Q3</code>和<code>Q8</code>的参数估计都差不多在最后才收缩为0。说明这几个变量对解释应变量最重要。下面我们看看对于解释方差的百分比的路径图：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(fit, <span class="dt">xvar =</span> <span class="st">&quot;dev&quot;</span>, <span class="dt">label =</span> T)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-215-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-216-1.png" width="672" /></p>
 <p>横坐标为解释方差的百分比时的路径图和之前的不太一样。非0参数个数越多，解释的方差百分比就越大。到最右端的时候，解释方差变化很小，但是参数估计确急剧增大。由图中我们可以看出，<code>Q7</code>对模型拟合几乎起不了作用。观察这些图能够帮助我们将注意力放在一些重要的变量上。</p>
 <p>如果确定了调优参数<span class="math inline">\(\lambda\)</span>的取值，我们便可以进一步得到相应的参数估计并预测新数据。在之前“初识<code>glmnet</code>”那一小节中，我们展示了在默认设置（<code>alpha = 1</code>，即只有lasso罚函数的情况下）下如何得到调优参数<span class="math inline">\(\lambda\)</span>的某个取值下的拟合结果。这里和之前的情况稍有不同，因为我们设置<code>alpha=0.2</code>，也就是说现在lasso和岭回归的罚函数同时存在。我们可以在<code>fit=glmnet(as.matrix(trainx),trainy,alpha=0.2,nlambda=20)</code>结果的基础上得到相应<span class="math inline">\(\lambda\)</span>取值的调优参数。从输出结果看，若考虑解释方差的变化情况，<span class="math inline">\(\lambda \in [829.7, 1347]\)</span>之间比较妥当。这里我们选择<span class="math inline">\(\lambda ＝ 1000\)</span>，这里为了展示一些函数的用法，特意选择了不在调优过的<span class="math inline">\(\lambda\)</span>取值中的数，也可以通过下面这行简短的代码查看你想要的取值是不是已经调优拟合过：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">any</span>(fit$lambda ==<span class="st"> </span><span class="dv">1000</span>)</code></pre></div>
@@ -513,7 +513,7 @@ cv0 =<span class="st"> </span><span class="kw">cv.glmnet</span>(<span class="kw"
 <span class="kw">points</span>(<span class="kw">log</span>(cv0$lambda), cv0$cvm, <span class="dt">col =</span> <span class="dv">4</span>)
 <span class="kw">legend</span>(<span class="st">&quot;topleft&quot;</span>, <span class="dt">legend =</span> <span class="kw">c</span>(<span class="st">&quot;alpha = 1&quot;</span>, <span class="st">&quot;alpha = 0.5&quot;</span>, <span class="st">&quot;alpha = 0.2&quot;</span>, <span class="st">&quot;alpha = 0&quot;</span>), 
        <span class="dt">pch =</span> <span class="dv">19</span>, <span class="dt">col =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">4</span>))</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-225-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-226-1.png" width="672" /></p>
 <p>可以看到，不同 <code>alpha</code>的取值对应的最优均方误差几乎相同，只是在<span class="math inline">\(\lambda\)</span>值大的时候（图的右端），<span class="math inline">\(\alpha\)</span>值的变化会对模型拟合结果产生影响。</p>
 <p>在实际应用中，基于问题的背景需要对参数进行一些限制。回顾下面三个问卷调查的问题（小伙伴们可以到“数据集模拟和背景介绍”那一章中查看所有问卷调查的问题）：</p>
 <p>-（<code>Q3</code>）：品牌的知名度对我来说非常重要 -（<code>Q8</code>）：价格对我来说很重要</p>
@@ -570,7 +570,7 @@ trainy =<span class="st"> </span>dat$y
 fit &lt;-<span class="st"> </span><span class="kw">glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy, <span class="dt">family =</span> <span class="st">&quot;binomial&quot;</span>)</code></pre></div>
 <p>可以看到，这里没有错误信息。和之前类似，我们可以绘制参数收缩的路径图，提取某个<span class="math inline">\(\lambda\)</span>取值对应的参数估计，并且进行预测。比如我们可以绘制下面的解释方差比例的参数路径图，绘制图形的语法和之前高斯的情况一样：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(fit, <span class="dt">xvar =</span> <span class="st">&quot;dev&quot;</span>)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-228-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-229-1.png" width="672" /></p>
 <p>预测函数<code>predict()</code>和之前的高斯族情况有所不同，主要在于<code>type</code>选项。在二项应变量的情况下，函数的<code>type</code>选项有如下几种：</p>
 <ul>
 <li><code>link</code>：返回链结函数的拟合值</li>
@@ -602,7 +602,7 @@ fit &lt;-<span class="st"> </span><span class="kw">glmnet</span>(<span class="kw
 <span class="co"># 所以在每次拟合模型的时候临时转化而不更改原数据框</span>
 cvfit =<span class="st"> </span><span class="kw">cv.glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy, <span class="dt">family =</span> <span class="st">&quot;binomial&quot;</span>, <span class="dt">type.measure =</span> <span class="st">&quot;class&quot;</span>)
 <span class="kw">plot</span>(cvfit)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-231-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-232-1.png" width="672" /></p>
 <p>上面使用的是误判率作为标准，进行10层交互校验。同样你可以得到对应最小误判率的<span class="math inline">\(\lambda\)</span>取值，以及距离最小误判率一个标准差的<span class="math inline">\(\lambda\)</span>取值：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cvfit$lambda.min</code></pre></div>
 <pre><code>## [1] 8.856624e-05</code></pre>
@@ -612,11 +612,83 @@ cvfit =<span class="st"> </span><span class="kw">cv.glmnet</span>(<span class="k
 </div>
 <div id="lasso" class="section level3">
 <h3><span class="header-section-number">11.3.3</span> 知识扩展：群组lasso逻辑回归</h3>
-<p>下面我进一步讲一个相对较新的方法：群组lasso逻辑回归。该方法最早由Meier等人在2008年提出 et al. . Instead of minimizing the negative log-likelihood <span class="math inline">\(-l(\bbeta)\)</span> in the maximum likelihood method, the logistic group lasso estimates are calculated by minimizing the covex function</p>
-<span class="math display">\[\begin{equation}
-S_{\lambda}(\beta)=-l(\bbeta)+\lambda\sum_{g=1}^{G}s(df_{g})\parallel\bbeta_{g}\parallel_{2},
-\end{equation}\]</span>
-<p>where <span class="math inline">\(\lambda\)</span> is a tuning parameter for the penalty and <span class="math inline">\(s(\cdot)\)</span> is a function to rescale the penalty. In lasso algorithms, choice of <span class="math inline">\(\lambda\)</span> is usually determined by cross-validation using data. For <span class="math inline">\(s(\cdot)\)</span>, we use the square root function <span class="math inline">\(s(df_g)=df_g^{0.5}\)</span> as suggested in Meier et al. .</p>
+<p>下面我进一步讲一个相对较新的方法：群组lasso逻辑回归。该方法最早由Meier等人在2008年提出的<span class="citation">(L. Meier and Buhlmann <a href="#ref-Meier2008">2008</a>)</span>。它在普通lasso逻辑回归的基础上加上了变量的分组信息。比如在疾病预测的例子中，每个问题的回复对应两个虚拟变量，来自同一个问卷调查问题的虚拟变量在反映的信息上有相似性，可以归为一组。这样分组在当前应用例子中是必须的。因为增加分组信息之后，模型不仅可以在组内选择变量，而且可以对不同的组进行选择。此例子中，不同组代表不同的问题。这里变量选择的目标主要是从问卷中选择重要的对疾病爆发有预测性的问题，而非问题中的具体选项，所以群组lasso逻辑回归对解决这样的问题非常有效。群组逻辑回归最小化下面方程：</p>
+<p><span class="math display">\[
+S_{\lambda}(\mathbf{\beta})=-l(\mathbf{\beta})+\lambda\sum_{g=1}^{G}s(df_{g})\parallel\mathbf{\beta_{g}}\parallel_{2}
+\]</span> 其中<span class="math inline">\(\lambda\)</span>是调优参数，<span class="math inline">\(s(\cdot)\)</span>调整罚函数大小的系数，<span class="citation">(L. Meier and Buhlmann <a href="#ref-Meier2008">2008</a>)</span>最初提出<span class="math inline">\(s(df_g)=df_g^{0.5}\)</span>，因为这样能够保证每个组参数估计对应的罚函数值和该组含有的变量数目同阶。<span class="math inline">\(l(\mathbf{\beta})\)</span> 是普通逻辑回归的似然函数。这里需要对<span class="math inline">\(\lambda\)</span>进行调优，范围在0到<span class="math inline">\(\lambda_{max}\)</span>之间。这里的<span class="math inline">\(\lambda_{max}\)</span>定义如下<span class="citation">(L. Meier and Buhlmann <a href="#ref-Meier2008">2008</a>)</span>：</p>
+<p><span class="math display">\[
+\lambda_{max}=\underset{g\in\{1,...,G\}}{max}\left\{\frac{1}{s(df_{g})}\parallel \mathbf{x}_{g}^{T}(\mathbf{y}-\bar{\mathbf{y}})\parallel_{2}\right\},
+\]</span></p>
+<p>当<span class="math inline">\(\lambda=\lambda_{max}\)</span>时，模型中只有截距项存在，也就是说除了<span class="math inline">\(\beta_0\)</span>以外所有其它变量参数估计都是0。当<span class="math inline">\(\lambda=0\)</span>时，模型等价于普通逻辑回归。我们通常取如下m个<span class="math inline">\(\lambda\)</span>值进行调优： <span class="math display">\[\{0.96\lambda_{max},0.96^{2}\lambda_{max},0.96^{3}\lambda_{max},...,0.96^{m}\lambda_{max}\}\]</span> 这里的m表示你想要调优的参数个数，通常在100到150之间比较合适。参数的选择还是需要交互校验。我正在开发的一个R包中有实现群组lasso逻辑回归调优拟合的函数。可以通过下面代码安装该包：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">devtools::<span class="kw">install_github</span>(<span class="st">&quot;happyrabbit/DataScienceR&quot;</span>)</code></pre></div>
+<p>安装好了之后载入该包：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(DataScienceR)</code></pre></div>
+<p>该包中含有这里使用的疾病预测数据，只需要用下面代码载入数据：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&quot;sim1_da1&quot;</span>)</code></pre></div>
+<p>包中的函数<code>cv_glasso()</code>可以用来对不同的参数进行调优：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># sim1_da1中最后一列y是应变量，其余的都是自变量</span>
+<span class="co"># trainx是自变量矩阵，去除应变量列</span>
+trainx =<span class="st"> </span>dplyr::<span class="kw">select</span>(sim1_da1, -y)
+<span class="co"># 将应变量存在trainy中</span>
+trainy =<span class="st"> </span>sim1_da1$y
+<span class="co"># 得到关于群组的指针</span>
+index &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">..*&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="kw">names</span>(trainx))</code></pre></div>
+<p>可以看到，每个问题对应的虚拟变量属于同一组：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">index[<span class="dv">1</span>:<span class="dv">50</span>]</code></pre></div>
+<pre><code>##  [1] &quot;Q1&quot;  &quot;Q1&quot;  &quot;Q2&quot;  &quot;Q2&quot;  &quot;Q3&quot;  &quot;Q3&quot;  &quot;Q4&quot;  &quot;Q4&quot;  &quot;Q5&quot;  &quot;Q5&quot;  &quot;Q6&quot; 
+## [12] &quot;Q6&quot;  &quot;Q7&quot;  &quot;Q7&quot;  &quot;Q8&quot;  &quot;Q8&quot;  &quot;Q9&quot;  &quot;Q9&quot;  &quot;Q10&quot; &quot;Q10&quot; &quot;Q11&quot; &quot;Q11&quot;
+## [23] &quot;Q12&quot; &quot;Q12&quot; &quot;Q13&quot; &quot;Q13&quot; &quot;Q14&quot; &quot;Q14&quot; &quot;Q15&quot; &quot;Q15&quot; &quot;Q16&quot; &quot;Q16&quot; &quot;Q17&quot;
+## [34] &quot;Q17&quot; &quot;Q18&quot; &quot;Q18&quot; &quot;Q19&quot; &quot;Q19&quot; &quot;Q20&quot; &quot;Q20&quot; &quot;Q21&quot; &quot;Q21&quot; &quot;Q22&quot; &quot;Q22&quot;
+## [45] &quot;Q23&quot; &quot;Q23&quot; &quot;Q24&quot; &quot;Q24&quot; &quot;Q25&quot; &quot;Q25&quot;</code></pre>
+<p>下面我们设置调优参数，<code>nlam</code>是调优参数个数，也就是<span class="math inline">\(\{0.96\lambda_{max},0.96^{2}\lambda_{max},0.96^{3}\lambda_{max},...,0.96^{m}\lambda_{max}\}\)</span>中的m。调优过程中会有很多输出，这里省略这些输出：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 对100个调优参数值进行调优</span>
+nlam &lt;-<span class="st"> </span><span class="dv">100</span>
+<span class="co"># 设置调优过程中模型的预测类型</span>
+<span class="co"># - `link`：返回链结函数的拟合值</span>
+<span class="co"># - `response`：返回拟合的概率值</span>
+<span class="co"># </span>
+<span class="co"># 这和之前的</span>
+type =<span class="st"> &quot;link&quot;</span>
+<span class="co"># number of cross-validation folds</span>
+kfold &lt;-<span class="st"> </span><span class="dv">10</span>
+cv_fit &lt;-<span class="st"> </span><span class="kw">cv_glasso</span>(trainx, trainy, <span class="dt">nlam =</span> nlam, <span class="dt">kfold =</span> kfold)
+<span class="co"># 只展示部分结果</span>
+<span class="kw">str</span>(cv_fit)</code></pre></div>
+<p>这里由于篇幅所限，只展示部分<code>cv_fit</code>的结果：</p>
+<div class="sourceCode"><pre class="sourceCode html"><code class="sourceCode html">...
+ $ auc               : num [1:100] 0.573 0.567 0.535 0.484 0.514 ...
+ $ log_likelihood    : num [1:100] -554 -554 -553 -553 -552 ...
+ $ maxrho            : num [1:100] -0.0519 0.00666 0.04631 0.0486 0.06269 ...
+ $ lambda.max.auc    : Named num [1:2] 0.922 0.94
+  ..- attr(*, &quot;names&quot;)= chr [1:2] &quot;lambda&quot; &quot;auc&quot;
+ $ lambda.1se.auc    : Named num [1:2] 16.74 0.81
+  ..- attr(*, &quot;names&quot;)= chr [1:2] &quot;&quot; &quot;se.auc&quot;
+ $ lambda.max.loglike: Named num [1:2] 1.77 -248.86
+  ..- attr(*, &quot;names&quot;)= chr [1:2] &quot;lambda&quot; &quot;loglike&quot;
+ $ lambda.1se.loglike: Named num [1:2] 9.45 -360.13
+  ..- attr(*, &quot;names&quot;)= chr [1:2] &quot;lambda&quot; &quot;se.loglike&quot;
+ $ lambda.max.maxco  : Named num [1:2] 0.922 0.708
+  ..- attr(*, &quot;names&quot;)= chr [1:2] &quot;lambda&quot; &quot;maxco&quot;
+ $ lambda.1se.maxco  : Named num [1:2] 14.216 0.504
+  ..- attr(*, &quot;names&quot;)= chr [1:2] &quot;lambda&quot; &quot;se.maxco&quot;</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># plot.cv_glasso(cv_fit)</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># index of the group</span>
+index &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">..*&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="kw">names</span>(trainx))
+<span class="co"># nlam is the number of values of tuning variable</span>
+nlam &lt;-<span class="st"> </span><span class="dv">10</span>
+<span class="co"># type of prediction</span>
+type =<span class="st"> &quot;link&quot;</span>
+<span class="co"># number of cross-validation folds</span>
+kfold &lt;-<span class="st"> </span><span class="dv">10</span>
+
+<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">1</span>),<span class="dt">mar =</span> .<span class="dv">1</span>+<span class="st"> </span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">1</span>,<span class="dv">1</span>), <span class="dt">oma=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>), <span class="dt">cex.axis=</span><span class="fl">1.5</span>)
+<span class="kw">plot</span>(lambda,AUC,<span class="dt">type=</span><span class="st">&#39;l&#39;</span>)
+<span class="kw">mtext</span>(<span class="st">&#39;AUC&#39;</span>,<span class="dt">side=</span><span class="dv">2</span>,<span class="dt">outer=</span>F,<span class="dt">line=</span><span class="dv">3</span>)
+<span class="kw">plot</span>(lambda,maxco,<span class="dt">type=</span><span class="st">&#39;l&#39;</span>)
+<span class="kw">mtext</span>(<span class="st">&#39;Max Correlation Coefficient&#39;</span>,<span class="dt">side=</span><span class="dv">2</span>, <span class="dt">outer=</span>F,<span class="dt">line=</span><span class="dv">3</span>)
+<span class="kw">plot</span>(lambda,loglike,<span class="dt">type=</span><span class="st">&#39;l&#39;</span>)
+<span class="kw">mtext</span>(<span class="st">&#39;log-likelihood&#39;</span>,<span class="dt">side=</span><span class="dv">2</span>,<span class="dt">outer=</span>F,<span class="dt">line=</span><span class="dv">3</span>)
+<span class="kw">mtext</span>(<span class="st">&#39;Penalty&#39;</span>,<span class="dt">side=</span><span class="dv">1</span>, <span class="dt">outer=</span>T, <span class="dt">line=</span><span class="dv">1</span>)</code></pre></div>
 
 </div>
 </div>
@@ -628,6 +700,9 @@ S_{\lambda}(\beta)=-l(\bbeta)+\lambda\sum_{g=1}^{G}s(df_{g})\parallel\bbeta_{g}\
 </div>
 <div id="ref-albert1984">
 <p>A, Albert, and Anderson A. J. 1984. “On the Existence of the Maximum Likelihood Estimates in Logistic Regression Models.” <em>Biometrika</em> 71 (1): 1–10.</p>
+</div>
+<div id="ref-Meier2008">
+<p>L. Meier, S. van de Geer, and P. Buhlmann. 2008. “The Group Lasso for Logistic Regression.” <em>J. R. Stat. Soc. Ser. B Stat. Methodol</em> 70: 53–71.</p>
 </div>
 </div>
             </section>
