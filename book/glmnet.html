@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-10-20">
+<meta name="date" content="2016-10-23">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -231,7 +231,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 <li class="chapter" data-level="13" data-path="section-13.html"><a href="section-13.html"><i class="fa fa-check"></i><b>13</b> 树模型</a><ul>
 <li class="chapter" data-level="13.1" data-path="section-13.html"><a href="section-13.html#section-13.1"><i class="fa fa-check"></i><b>13.1</b> 分裂准则</a></li>
-<li class="chapter" data-level="13.2" data-path="section-13.html"><a href="section-13.html#section-13.2"><i class="fa fa-check"></i><b>13.2</b> 树模型的参数</a></li>
+<li class="chapter" data-level="13.2" data-path="section-13.html"><a href="section-13.html#section-13.2"><i class="fa fa-check"></i><b>13.2</b> 树的修剪</a></li>
 <li class="chapter" data-level="13.3" data-path="section-13.html"><a href="section-13.html#section-13.3"><i class="fa fa-check"></i><b>13.3</b> 装袋树</a></li>
 <li class="chapter" data-level="13.4" data-path="section-13.html"><a href="section-13.html#section-13.4"><i class="fa fa-check"></i><b>13.4</b> 随机森林</a></li>
 <li class="chapter" data-level="13.5" data-path="section-13.html"><a href="section-13.html#section-13.5"><i class="fa fa-check"></i><b>13.5</b> 其它树话题</a></li>
@@ -285,7 +285,7 @@ trainy &lt;-<span class="st"> </span>dat$store_exp +<span class="st"> </span>dat
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">glmfit =<span class="st"> </span><span class="kw">glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy)</code></pre></div>
 <p>这里函数<code>glmnet()</code>返回的对象<code>glmfit</code>中含有所有之后可能进一步会用到的模型拟合信息。大家并不需要手动的检查<code>glmfit</code>中都有那些信息，然后提取相应的部分，而是可以通过<code>plot()</code>、<code>coef()</code>、<code>predict()</code>这类耳熟能详的函数来得到相应的信息。比如我们可以用如下方式绘制lasso的参数选择路径图：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(glmfit, <span class="dt">label =</span> T)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-207-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-206-1.png" width="672" /></p>
 <p>图中每种颜色的线代表对应一个自变量，展示的是随着lasso罚函数（也就是一阶范数，有时也称为<span class="math inline">\(l_{1}-norm\)</span>）对应调优参数<span class="math inline">\(\lambda\)</span>变化，各个变量对应的参数估计路径（注：当<span class="math inline">\(\alpha=1\)</span>时，优化方程里就只有lasso罚函数，这是默认设置）。图中有上下两个x轴标度，下x轴是<span class="math inline">\(\lambda\)</span>变化对应最优解的一阶范数值（也就是<span class="math inline">\(\parallel\mathbf{\beta}\parallel_{1}\)</span>），上x轴是相应<span class="math inline">\(\lambda\)</span>值对应的非0参数估计个数，也就是lasso模型的自由度。我们可以查看路径的具体每一步信息：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(glmfit)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode html"><code class="sourceCode html">Call:  glmnet(x = as.matrix(trainx), y = trainy) 
@@ -332,7 +332,7 @@ trainy &lt;-<span class="st"> </span>dat$store_exp +<span class="st"> </span>dat
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cvfit =<span class="st"> </span><span class="kw">cv.glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy)</code></pre></div>
 <p><code>cv.glmnet()</code>会返回一个列表，其中包括交互校验过程的结果，我们将该结果存在<code>cvfit</code>这个对象里。 我们可以对交互校验结果可视化：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(cvfit)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-211-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-210-1.png" width="672" /></p>
 <p>红色的点是不同<span class="math inline">\(\lambda\)</span>取值对应的交互校验均方误差，灰色的线是相应置信区间。两条虚线表示选中的两个调优参数。左边的那个调优参数值对应的是最小的交互校验均方误差，右边的那个调优参数值是离最小均方误差一个标准差的调优参数值。我们可以通过下面代码查看根据两种不同规则选中的调优参数值：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 最小均方误差对应的参数值</span>
 cvfit$lambda.min</code></pre></div>
@@ -411,10 +411,10 @@ fit =<span class="st"> </span><span class="kw">glmnet</span>(<span class="kw">as
 </ol>
 <p>我们之前展示了默认设置下的参数估计路径图（<code>norm</code>）。现在绘制另外两种情况。设置<code>xvar = &quot;lambda&quot;</code>可以得到对应<span class="math inline">\(log(\lambda)\)</span>的路径图：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(fit, <span class="dt">xvar =</span> <span class="st">&quot;lambda&quot;</span>, <span class="dt">label =</span> T)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-215-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-214-1.png" width="672" /></p>
 <p>可以看到，随着<span class="math inline">\(\lambda\)</span>值的增大，参数逐步向0收缩。<code>Q1</code>、<code>Q2</code>、<code>Q3</code>和<code>Q8</code>的参数估计都差不多在最后才收缩为0。说明这几个变量对解释应变量最重要。下面我们看看对于解释方差的百分比的路径图：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(fit, <span class="dt">xvar =</span> <span class="st">&quot;dev&quot;</span>, <span class="dt">label =</span> T)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-216-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-215-1.png" width="672" /></p>
 <p>横坐标为解释方差的百分比时的路径图和之前的不太一样。非0参数个数越多，解释的方差百分比就越大。到最右端的时候，解释方差变化很小，但是参数估计确急剧增大。由图中我们可以看出，<code>Q7</code>对模型拟合几乎起不了作用。观察这些图能够帮助我们将注意力放在一些重要的变量上。</p>
 <p>如果确定了调优参数<span class="math inline">\(\lambda\)</span>的取值，我们便可以进一步得到相应的参数估计并预测新数据。在之前“初识<code>glmnet</code>”那一小节中，我们展示了在默认设置（<code>alpha = 1</code>，即只有lasso罚函数的情况下）下如何得到调优参数<span class="math inline">\(\lambda\)</span>的某个取值下的拟合结果。这里和之前的情况稍有不同，因为我们设置<code>alpha=0.2</code>，也就是说现在lasso和岭回归的罚函数同时存在。我们可以在<code>fit=glmnet(as.matrix(trainx),trainy,alpha=0.2,nlambda=20)</code>结果的基础上得到相应<span class="math inline">\(\lambda\)</span>取值的调优参数。从输出结果看，若考虑解释方差的变化情况，<span class="math inline">\(\lambda \in [829.7, 1347]\)</span>之间比较妥当。这里我们选择<span class="math inline">\(\lambda ＝ 1000\)</span>，这里为了展示一些函数的用法，特意选择了不在调优过的<span class="math inline">\(\lambda\)</span>取值中的数，也可以通过下面这行简短的代码查看你想要的取值是不是已经调优拟合过：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">any</span>(fit$lambda ==<span class="st"> </span><span class="dv">1000</span>)</code></pre></div>
@@ -513,7 +513,7 @@ cv0 =<span class="st"> </span><span class="kw">cv.glmnet</span>(<span class="kw"
 <span class="kw">points</span>(<span class="kw">log</span>(cv0$lambda), cv0$cvm, <span class="dt">col =</span> <span class="dv">4</span>)
 <span class="kw">legend</span>(<span class="st">&quot;topleft&quot;</span>, <span class="dt">legend =</span> <span class="kw">c</span>(<span class="st">&quot;alpha = 1&quot;</span>, <span class="st">&quot;alpha = 0.5&quot;</span>, <span class="st">&quot;alpha = 0.2&quot;</span>, <span class="st">&quot;alpha = 0&quot;</span>), 
        <span class="dt">pch =</span> <span class="dv">19</span>, <span class="dt">col =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">4</span>))</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-226-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-225-1.png" width="672" /></p>
 <p>可以看到，不同 <code>alpha</code>的取值对应的最优均方误差几乎相同，只是在<span class="math inline">\(\lambda\)</span>值大的时候（图的右端），<span class="math inline">\(\alpha\)</span>值的变化会对模型拟合结果产生影响。</p>
 <p>在实际应用中，基于问题的背景需要对参数进行一些限制。回顾下面三个问卷调查的问题（小伙伴们可以到“数据集模拟和背景介绍”那一章中查看所有问卷调查的问题）：</p>
 <p>-（<code>Q3</code>）：品牌的知名度对我来说非常重要 -（<code>Q8</code>）：价格对我来说很重要</p>
@@ -570,7 +570,7 @@ trainy =<span class="st"> </span>dat$y
 fit &lt;-<span class="st"> </span><span class="kw">glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy, <span class="dt">family =</span> <span class="st">&quot;binomial&quot;</span>)</code></pre></div>
 <p>可以看到，这里没有错误信息。和之前类似，我们可以绘制参数收缩的路径图，提取某个<span class="math inline">\(\lambda\)</span>取值对应的参数估计，并且进行预测。比如我们可以绘制下面的解释方差比例的参数路径图，绘制图形的语法和之前高斯的情况一样：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(fit, <span class="dt">xvar =</span> <span class="st">&quot;dev&quot;</span>)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-229-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-228-1.png" width="672" /></p>
 <p>预测函数<code>predict()</code>和之前的高斯族情况有所不同，主要在于<code>type</code>选项。在二项应变量的情况下，函数的<code>type</code>选项有如下几种：</p>
 <ul>
 <li><code>link</code>：返回链结函数的拟合值</li>
@@ -602,7 +602,7 @@ fit &lt;-<span class="st"> </span><span class="kw">glmnet</span>(<span class="kw
 <span class="co"># 所以在每次拟合模型的时候临时转化而不更改原数据框</span>
 cvfit =<span class="st"> </span><span class="kw">cv.glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy, <span class="dt">family =</span> <span class="st">&quot;binomial&quot;</span>, <span class="dt">type.measure =</span> <span class="st">&quot;class&quot;</span>)
 <span class="kw">plot</span>(cvfit)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-232-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-231-1.png" width="672" /></p>
 <p>上面使用的是误判率作为标准，进行10层交互校验。同样你可以得到对应最小误判率的<span class="math inline">\(\lambda\)</span>取值，以及距离最小误判率一个标准差的<span class="math inline">\(\lambda\)</span>取值：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cvfit$lambda.min</code></pre></div>
 <pre><code>## [1] 8.856624e-05</code></pre>
@@ -623,6 +623,11 @@ S_{\lambda}(\mathbf{\beta})=-l(\mathbf{\beta})+\lambda\sum_{g=1}^{G}s(df_{g})\pa
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">devtools::<span class="kw">install_github</span>(<span class="st">&quot;happyrabbit/DataScienceR&quot;</span>)</code></pre></div>
 <p>安装好了之后载入该包：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(DataScienceR)</code></pre></div>
+<pre><code>## 
+## Attaching package: &#39;DataScienceR&#39;</code></pre>
+<pre><code>## The following object is masked _by_ &#39;.GlobalEnv&#39;:
+## 
+##     multiplot</code></pre>
 <p>该包中含有这里使用的疾病预测数据，只需要用下面代码载入数据：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&quot;sim1_da1&quot;</span>)</code></pre></div>
 <p>包中的函数<code>cv_glasso()</code>可以用来对不同的参数进行调优：</p>
@@ -671,7 +676,8 @@ cv_fit &lt;-<span class="st"> </span><span class="kw">cv_glasso</span>(trainx, t
   ..- attr(*, &quot;names&quot;)= chr [1:2] &quot;lambda&quot; &quot;maxco&quot;
  $ lambda.1se.maxco  : Named num [1:2] 14.216 0.504
   ..- attr(*, &quot;names&quot;)= chr [1:2] &quot;lambda&quot; &quot;se.maxco&quot;</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># plot.cv_glasso(cv_fit)</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(cv_fit)</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-238-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># index of the group</span>
 index &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">..*&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="kw">names</span>(trainx))
 <span class="co"># nlam is the number of values of tuning variable</span>
