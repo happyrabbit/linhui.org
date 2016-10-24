@@ -65,8 +65,8 @@ library(dplyr)
 library(plyr)
 library(reshape2)
 library(tidyr)
-# 读入数据
-sim.dat&lt;-read.csv(&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/SegData.csv&quot;)</code></pre>
+# 读入数据，运行这行代码可以得到数据
+sim.dat&lt;-read.csv(&quot;https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv&quot;)</code></pre>
 <p>如果我们希望有一个新的变量指示购买的渠道（是在线还是实体店），并且将这个变量用于建模，这时就需要对数据进行整形（也称作数据整理，或者揉数据），将在线购买的记录和实体店购买的记录逐行排列而非现在的逐列。我们可以用<code>reshape2</code>包中的相关函数实现这些操作。可能有的读者知道有个包叫做<code>reshape</code>，这是初版，后面的<code>reshape2</code>是重写升级版。这个数据整形的过程确实和揉面团有些类似，先将数据通过<code>melt()</code>函数将数据揉开，然后再通过<code>dcast()</code>函数将数据重塑成想要的形状，为了更清晰的展示函数对数据结构的影响，我们选取其中小部分列，和前5行：</p>
 <pre class="r"><code>(sdat&lt;-sim.dat[1:5,1:6])</code></pre>
 <pre><code>##   age gender   income house store_exp online_exp
