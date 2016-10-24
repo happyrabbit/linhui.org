@@ -11,8 +11,8 @@ layout: post
 -->
 
 <h4 class="author"><em>林荟 (Hui Lin)</em></h4>
-<h4 class="author"><em>Twitter: @gossip_rabbit</em></h4>
 <h4 class="date"><em>2016-08-23</em></h4>
+<h4 class="author"><em>有任何问题联系邮箱: longqiman@gmail.com</em></h4>
 
 # 什么是数据科学?
 

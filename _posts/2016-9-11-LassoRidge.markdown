@@ -6,8 +6,8 @@ layout: post
 ---
 
 <h4 class="author"><em>林荟 (Hui Lin)</em></h4>
-<h4 class="author"><em>Twitter: @gossip_rabbit</em></h4>
 <h4 class="date"><em>2016-09-11</em></h4>
+<h4 class="author"><em>有任何问题联系邮箱: longqiman@gmail.com</em></h4>
 
 <!--
 <h5 class="title">  <a href="http://scientistcafe.com/">Back to Homepage</a> </h5>
