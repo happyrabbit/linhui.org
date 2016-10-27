@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-10-26">
+<meta name="date" content="2016-10-27">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -225,10 +225,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 <li class="chapter" data-level="12" data-path="section-12.html"><a href="section-12.html"><i class="fa fa-check"></i><b>12</b> 树模型</a><ul>
 <li class="chapter" data-level="12.1" data-path="section-12.html"><a href="section-12.html#section-12.1"><i class="fa fa-check"></i><b>12.1</b> 分裂准则</a></li>
-<li class="chapter" data-level="12.2" data-path="section-12.html"><a href="section-12.html#section-12.2"><i class="fa fa-check"></i><b>12.2</b> 树的修剪</a></li>
-<li class="chapter" data-level="12.3" data-path="section-12.html"><a href="section-12.html#section-12.3"><i class="fa fa-check"></i><b>12.3</b> 装袋树</a></li>
-<li class="chapter" data-level="12.4" data-path="section-12.html"><a href="section-12.html#section-12.4"><i class="fa fa-check"></i><b>12.4</b> 随机森林</a></li>
-<li class="chapter" data-level="12.5" data-path="section-12.html"><a href="section-12.html#section-12.5"><i class="fa fa-check"></i><b>12.5</b> 其它树话题</a></li>
+<li class="chapter" data-level="12.2" data-path="section-12.html"><a href="section-12.html#section-12.2"><i class="fa fa-check"></i><b>12.2</b> 回归树</a></li>
+<li class="chapter" data-level="12.3" data-path="section-12.html"><a href="section-12.html#section-12.3"><i class="fa fa-check"></i><b>12.3</b> 树的修剪</a></li>
+<li class="chapter" data-level="12.4" data-path="section-12.html"><a href="section-12.html#section"><i class="fa fa-check"></i><b>12.4</b> </a></li>
+<li class="chapter" data-level="12.5" data-path="section-12.html"><a href="section-12.html#section-12.5"><i class="fa fa-check"></i><b>12.5</b> 装袋树</a></li>
+<li class="chapter" data-level="12.6" data-path="section-12.html"><a href="section-12.html#section-12.6"><i class="fa fa-check"></i><b>12.6</b> 随机森林</a></li>
+<li class="chapter" data-level="12.7" data-path="section-12.html"><a href="section-12.html#section-12.7"><i class="fa fa-check"></i><b>12.7</b> 其它树话题</a></li>
 </ul></li>
 <li class="chapter" data-level="13" data-path="section-13.html"><a href="section-13.html"><i class="fa fa-check"></i><b>13</b> 聚类判别分析</a><ul>
 <li class="chapter" data-level="13.1" data-path="section-13.html"><a href="section-13.html#section-13.1"><i class="fa fa-check"></i><b>13.1</b> 聚类分析</a></li>
@@ -555,7 +557,7 @@ l(\mathbf{\beta})&amp;=&amp;log[\prod_{i=1}^{n}\theta_{i}^{y_{i}}(1-\theta_{i})^
 &amp;=&amp;\sum_{i=1}^{n}\{\ y_{i}\eta_{\mathbf{\beta}}(\mathbf{x_{i}})-log[1+exp(\eta_{\mathbf{\beta}}(\mathbf{x_{i}}))]\ \}.
 \end{eqnarray*}
 \]</span></p>
-<p>在逻辑回归中，当变量个数相对观测较大时，很容易发生完全分离或者准完全分离的现象，这时候没有唯一的极大似然估计，因此参数估计的方差极大。关于逻辑回归这样的对数线性模型参数极大似然估计的存在性，唯一性的讨论可以参考<span class="citation">(Wedderburn <a href="#ref-Wed1976">1976</a>)</span>和<span class="citation">(A and J <a href="#ref-albert1984">1984</a>)</span>。这种情况时常出现，比如疾病预测数据：</p>
+<p>在逻辑回归中，当变量个数相对观测较大时，很容易发生完全分离或者准完全分离的现象，这时候没有唯一的极大似然估计，因此参数估计的方差极大。关于逻辑回归这样的对数线性模型参数极大似然估计的存在性，唯一性的讨论可以参考<span class="citation">[<a href="#ref-Wed1976">67</a>]</span>和<span class="citation">[<a href="#ref-albert1984">68</a>]</span>。这种情况时常出现，比如疾病预测数据：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(MASS)
 dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/sim1_da1.csv&quot;</span>)
 fit &lt;-<span class="st"> </span><span class="kw">glm</span>(y~., dat, <span class="dt">family =</span> <span class="st">&quot;binomial&quot;</span>)</code></pre></div>
@@ -616,16 +618,16 @@ cvfit =<span class="st"> </span><span class="kw">cv.glmnet</span>(<span class="k
 </div>
 <div id="lasso" class="section level3">
 <h3><span class="header-section-number">11.3.3</span> 知识扩展：群组lasso逻辑回归</h3>
-<p>下面我进一步讲一个相对较新的方法：群组lasso逻辑回归。该方法最早由Meier等人在2008年提出的<span class="citation">(L. Meier and Buhlmann <a href="#ref-Meier2008">2008</a>)</span>。它在普通lasso逻辑回归的基础上加上了变量的分组信息。比如在疾病预测的例子中，每个问题的回复对应两个虚拟变量，来自同一个问卷调查问题的虚拟变量在反映的信息上有相似性，可以归为一组。这样分组在当前应用例子中是必须的。因为增加分组信息之后，模型不仅可以在组内选择变量，而且可以对不同的组进行选择，也就是说属于同一组的变量参数同时为0或者同时不为0。此例子中，不同组代表不同的问题。这里变量选择的目标主要是从问卷中选择重要的对疾病爆发有预测性的问题，而非问题中的具体选项，所以群组lasso逻辑回归对解决这样的问题非常有效。群组逻辑回归最小化下面方程：</p>
+<p>下面我进一步讲一个相对较新的方法：群组lasso逻辑回归。该方法最早由Meier等人在2008年提出的<span class="citation">[<a href="#ref-Meier2008">69</a>]</span>。它在普通lasso逻辑回归的基础上加上了变量的分组信息。比如在疾病预测的例子中，每个问题的回复对应两个虚拟变量，来自同一个问卷调查问题的虚拟变量在反映的信息上有相似性，可以归为一组。这样分组在当前应用例子中是必须的。因为增加分组信息之后，模型不仅可以在组内选择变量，而且可以对不同的组进行选择，也就是说属于同一组的变量参数同时为0或者同时不为0。此例子中，不同组代表不同的问题。这里变量选择的目标主要是从问卷中选择重要的对疾病爆发有预测性的问题，而非问题中的具体选项，所以群组lasso逻辑回归对解决这样的问题非常有效。群组逻辑回归最小化下面方程：</p>
 <p><span class="math display">\[
 S_{\lambda}(\mathbf{\beta})=-l(\mathbf{\beta})+\lambda\sum_{g=1}^{G}s(df_{g})\parallel\mathbf{\beta_{g}}\parallel_{2}
-\]</span> 其中<span class="math inline">\(\lambda\)</span>是调优参数，<span class="math inline">\(s(\cdot)\)</span>调整罚函数大小的系数，<span class="citation">(L. Meier and Buhlmann <a href="#ref-Meier2008">2008</a>)</span>最初提出<span class="math inline">\(s(df_g)=df_g^{0.5}\)</span>，因为这样能够保证每个组参数估计对应的罚函数值和该组含有的变量数目同阶。<span class="math inline">\(l(\mathbf{\beta})\)</span> 是普通逻辑回归的似然函数。这里需要对<span class="math inline">\(\lambda\)</span>进行调优，范围在0到<span class="math inline">\(\lambda_{max}\)</span>之间。这里的<span class="math inline">\(\lambda_{max}\)</span>定义如下<span class="citation">(L. Meier and Buhlmann <a href="#ref-Meier2008">2008</a>)</span>：</p>
+\]</span> 其中<span class="math inline">\(\lambda\)</span>是调优参数，<span class="math inline">\(s(\cdot)\)</span>调整罚函数大小的系数，<span class="citation">[<a href="#ref-Meier2008">69</a>]</span>最初提出<span class="math inline">\(s(df_g)=df_g^{0.5}\)</span>，因为这样能够保证每个组参数估计对应的罚函数值和该组含有的变量数目同阶。<span class="math inline">\(l(\mathbf{\beta})\)</span> 是普通逻辑回归的似然函数。这里需要对<span class="math inline">\(\lambda\)</span>进行调优，范围在0到<span class="math inline">\(\lambda_{max}\)</span>之间。这里的<span class="math inline">\(\lambda_{max}\)</span>定义如下<span class="citation">[<a href="#ref-Meier2008">69</a>]</span>：</p>
 <p><span class="math display">\[
 \lambda_{max}=\underset{g\in\{1,...,G\}}{max}\left\{\frac{1}{s(df_{g})}\parallel \mathbf{x}_{g}^{T}(\mathbf{y}-\bar{\mathbf{y}})\parallel_{2}\right\},
 \]</span></p>
 <p>当<span class="math inline">\(\lambda=\lambda_{max}\)</span>时，模型中只有截距项存在，也就是说除了<span class="math inline">\(\beta_0\)</span>以外所有其它变量参数估计都是0。当<span class="math inline">\(\lambda=0\)</span>时，模型等价于普通逻辑回归。我们通常取如下m个<span class="math inline">\(\lambda\)</span>值进行调优：</p>
 <p><span class="math display">\[\{0.96\lambda_{max},0.96^{2}\lambda_{max},0.96^{3}\lambda_{max},...,0.96^{m}\lambda_{max}\}\]</span></p>
-<p>这里的m表示你想要调优的参数个数，通常在100到150之间比较合适。参数的选择还是需要交互校验。有3种调优准则，其中之一是已经讲过的AUC，在此不赘述。除了AUC之外，还有两种准则：对数似然函数值<span class="citation">(L. Meier and Buhlmann <a href="#ref-Meier2008">2008</a>)</span>和最大相关系数。每个调优参数对应的对数似然函数值是其在不同交互校验拟合得到的对数似然函数的平均，这个很容易理解。最大相关系数来自Yeo和Burge的论文，其定义如下<span class="citation">(Yeo and Burge <a href="#ref-Yeo2004">2004</a>)</span>：</p>
+<p>这里的m表示你想要调优的参数个数，通常在100到150之间比较合适。参数的选择还是需要交互校验。有3种调优准则，其中之一是已经讲过的AUC，在此不赘述。除了AUC之外，还有两种准则：对数似然函数值<span class="citation">[<a href="#ref-Meier2008">69</a>]</span>和最大相关系数。每个调优参数对应的对数似然函数值是其在不同交互校验拟合得到的对数似然函数的平均，这个很容易理解。最大相关系数来自Yeo和Burge的论文，其定义如下<span class="citation">[<a href="#ref-Yeo2004">70</a>]</span>：</p>
 <p><span class="math display">\[
 \rho_{max}=max\{\rho_{\tau}|\tau\in(0,1)\},
 \]</span></p>
@@ -990,7 +992,7 @@ Seventy-four of the 127 questions analyzed are excluded from the final risk scor
 <p>这里的应变量可以转化成虚拟变量的矩阵，每一列代表一个类别。假设<span class="math inline">\(\mathbf{Y}\)</span>是应变量转化成的<span class="math inline">\(N\times K\)</span>的0/1矩阵，其中<span class="math inline">\(y_{il}=I(g_{i}=l)\)</span>，也就是某个观测<span class="math inline">\(i\)</span>从属的类别<span class="math inline">\(l\)</span>的位置上观测是1，其余是0。此时弹性网络模型优化的是如下方程：</p>
 <p><span class="math display">\[l({\beta_{0k}, \mathbf{\beta_{k}}_{1}^{K}})= - \left[ \frac{1}{N}\Sigma_{i=1}^N \left( \Sigma_{k=1}^K y_{il}(\beta_{0k} + \mathbf{x_i^T\beta_{k}}) - log(\Sigma_{k=1}^{K}e^{\beta_{0k}+\mathbf{x_i^T\beta_{k}}}) \right) \right]+\lambda\left[  \frac{(1-\alpha)\parallel \beta \parallel_F^2}{2} + \alpha \Sigma_{j=1}^p \parallel \beta_j \parallel_q\right]\]</span></p>
 <p>这个式子有些复杂，稍微解释一下。其实思路和之前是一样的，上式的前半部分是应变量矩阵中对应<span class="math inline">\(l\)</span>类那列的对数似然函数取负号，第二部分是罚函数。第一部分<span class="math inline">\(y_{il}(\beta_{0k} + \mathbf{x_i^T\beta_{k}})\)</span>中，<span class="math inline">\(y_{il}\)</span>和<span class="math inline">\(\mathbf{x_i^T\beta_{k}}\)</span>是取乘积因为<span class="math inline">\(y_{il}\)</span>的取值是0/1，否则应该是<span class="math inline">\(log(y_{il})+\beta_{0k} + \mathbf{x_i^T\beta_{k}}\)</span>的形式。此外，罚函数中<span class="math inline">\(\parallel\beta\parallel_{F}^{2}\)</span>的<span class="math inline">\(\beta\)</span>是一个矩阵而非向量，因为这里每个类别都对应一个参数向量，所以所有类别的参数向量集结成了一个矩阵<span class="math inline">\(\beta\)</span>。罚函数中的另外一项<span class="math inline">\(\parallel \beta_j \parallel_q\)</span>中的q可以有两个取值：<span class="math inline">\(q\in \{1, 2\}\)</span>。当<span class="math inline">\(q=1\)</span>时，是对每个类对应的参数应用lasso罚，当<span class="math inline">\(q=2\)</span>时，相当于是群组lasso罚，和之前“知识扩展：群组lasso逻辑回归”这个小节的方法非常类似，这时观测j对应的所有K个群组的参数同时为0或者同时不为0。</p>
-<p>这里严格使用标准的牛顿迭代算法优化起来非常繁琐。<code>glmnet</code>包使用了一种叫做偏牛顿优化算法（Partial Newton Algorithm）的方法。该方法对对数似然函数进行偏二项逼近，即对某一类别每次只允许对应的参数<span class="math inline">\((\beta_{0k}, \mathbf{\beta_{k}})\)</span>变化，其余参数保持不变。关于该算法更加详细的介绍，可以参考Noah Simon, Jerome Friedman和Trevor Hastie的论文<span class="citation">(Noah Simon and Hastie, n.d.)</span>。</p>
+<p>这里严格使用标准的牛顿迭代算法优化起来非常繁琐。<code>glmnet</code>包使用了一种叫做偏牛顿优化算法（Partial Newton Algorithm）的方法。该方法对对数似然函数进行偏二项逼近，即对某一类别每次只允许对应的参数<span class="math inline">\((\beta_{0k}, \mathbf{\beta_{k}})\)</span>变化，其余参数保持不变。关于该算法更加详细的介绍，可以参考Noah Simon, Jerome Friedman和Trevor Hastie的论文<span class="citation">[<a href="#ref-Noah2013">71</a>]</span>。</p>
 <p>下面还是用服装消费者数据展示如何通过<code>glmnet</code>包实现该方法，这里自变量依旧和之前一样是问卷调查的问题，应变量变成是消费者类别：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(glmnet)
 dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/SegData.csv&quot;</span>)
@@ -998,7 +1000,7 @@ dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="
 trainx &lt;-<span class="st"> </span>dat[, <span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>, <span class="kw">names</span>(dat))]
 <span class="co"># 将消费者类别当作应变量</span>
 trainy &lt;-<span class="st"> </span>dat$segment</code></pre></div>
-<p>对于多项回归中有一个关于罚函数的选项<code>type.multinomial</code>，这是用来指定在上面提到过的$ _j _q<span class="math inline">\(部分。如果`type.multinomial = &quot;group&quot;`对应的就是\)</span>q=2<span class="math inline">\(的情况，也就是群组lasso。默认设置是非群组，也就是\)</span>q=1$。</p>
+<p>对于多项回归中有一个关于罚函数的选项<code>type.multinomial</code>，这是用来指定在上面提到过的<span class="math inline">\(\parallel \beta_j \parallel_q\)</span>部分。如果<code>type.multinomial = &quot;group&quot;</code>对应的就是<span class="math inline">\(q=2\)</span>的情况，也就是群组lasso。默认设置是非群组，也就是<span class="math inline">\(q=1\)</span>。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit &lt;-<span class="st"> </span><span class="kw">glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy, <span class="dt">family =</span> <span class="st">&quot;multinomial&quot;</span>)</code></pre></div>
 <p>可以对拟合对象进行绘图：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(fit, <span class="dt">xvar =</span> <span class="st">&quot;lambda&quot;</span>, <span class="dt">label =</span> T, <span class="dt">type.coef =</span> <span class="st">&quot;2norm&quot;</span>)</code></pre></div>
@@ -1028,7 +1030,7 @@ trainy &lt;-<span class="st"> </span>dat$segment</code></pre></div>
 <div id="section-11.5" class="section level2">
 <h2><span class="header-section-number">11.5</span> 泊松收缩回归</h2>
 <p>关于广义收缩方法中我们要介绍的最后一个是泊松模型。泊松回归处理的是应变量为计数的情况，比如消费者光顾实体店的次数。或者其它应变量非负，并且均值和方差成比例的情况。这里对应变量的要求是大致服从泊松分布的假设。泊松分布也是指数分布家族中的一员。通常对应变量进行对数变换：</p>
-<p><span class="math display">\[log \mu{x}=\beta_{0}+\mathbf{\beta^{T}x}\]</span></p>
+<p><span class="math display">\[log (\mu_{x})=\beta_{0}+\mathbf{\beta^{T}x}\]</span></p>
 <p>这时的对数似然函数是：</p>
 <p><span class="math display">\[l(\mathbf{\beta|X,y})=\Sigma_{i=1}^{N}\left(y_i(\beta_0+\mathbf{\beta^Tx_i})-e^{\beta_0+\mathbf{\beta^Tx_i}} \right)\]</span></p>
 <p>和之前类似，我们需要优化的加上罚函数后的式子：</p>
@@ -1076,16 +1078,19 @@ fit &lt;-<span class="st"> </span><span class="kw">glmnet</span>(<span class="kw
 <h3> References</h3>
 <div id="refs" class="references">
 <div id="ref-Wed1976">
-<p>Wedderburn, R. W. M. 1976. “On the Existence and Uniqueness of the Maximum Likelihood Estimates for Certain Generalized Linear Models.” <em>Biometrika</em> 63: 27–32.</p>
+<p>67. Wedderburn, R.W.M.: On the existence and uniqueness of the maximum likelihood estimates for certain generalized linear models. Biometrika. 63, 27–32 (1976).</p>
 </div>
 <div id="ref-albert1984">
-<p>A, Albert, and Anderson A. J. 1984. “On the Existence of the Maximum Likelihood Estimates in Logistic Regression Models.” <em>Biometrika</em> 71 (1): 1–10.</p>
+<p>68. A, A., J, A.A.: On the existence of the maximum likelihood estimates in logistic regression models. Biometrika. 71, 1–10 (1984).</p>
 </div>
 <div id="ref-Meier2008">
-<p>L. Meier, S. van de Geer, and P. Buhlmann. 2008. “The Group Lasso for Logistic Regression.” <em>J. R. Stat. Soc. Ser. B Stat. Methodol</em> 70: 53–71.</p>
+<p>69. L. Meier, S. van de Geer, Buhlmann, P.: The group lasso for logistic regression. J. R. Stat. Soc. Ser. B Stat. Methodol. 70, 53–71 (2008).</p>
 </div>
 <div id="ref-Yeo2004">
-<p>Yeo, G.W., and C.B. Burge. 2004. “Maximum Entropy Modeling of Short Sequence Motifs with Applications to Rna Splicing Signals.” <em>Journal of Computational Biology</em>, November, 475–94.</p>
+<p>70. Yeo, G., Burge, C.: Maximum entropy modeling of short sequence motifs with applications to rna splicing signals. Journal of Computational Biology. 475–494 (2004).</p>
+</div>
+<div id="ref-Noah2013">
+<p>71. Noah Simon, J.F., Hastie, T.: A blockwise descent algorithm for group-penalized multiresponse and multinomial regression. arXiv:1311.6529.</p>
 </div>
 </div>
             </section>

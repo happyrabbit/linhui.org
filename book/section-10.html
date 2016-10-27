@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-10-26">
+<meta name="date" content="2016-10-27">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -225,10 +225,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 <li class="chapter" data-level="12" data-path="section-12.html"><a href="section-12.html"><i class="fa fa-check"></i><b>12</b> 树模型</a><ul>
 <li class="chapter" data-level="12.1" data-path="section-12.html"><a href="section-12.html#section-12.1"><i class="fa fa-check"></i><b>12.1</b> 分裂准则</a></li>
-<li class="chapter" data-level="12.2" data-path="section-12.html"><a href="section-12.html#section-12.2"><i class="fa fa-check"></i><b>12.2</b> 树的修剪</a></li>
-<li class="chapter" data-level="12.3" data-path="section-12.html"><a href="section-12.html#section-12.3"><i class="fa fa-check"></i><b>12.3</b> 装袋树</a></li>
-<li class="chapter" data-level="12.4" data-path="section-12.html"><a href="section-12.html#section-12.4"><i class="fa fa-check"></i><b>12.4</b> 随机森林</a></li>
-<li class="chapter" data-level="12.5" data-path="section-12.html"><a href="section-12.html#section-12.5"><i class="fa fa-check"></i><b>12.5</b> 其它树话题</a></li>
+<li class="chapter" data-level="12.2" data-path="section-12.html"><a href="section-12.html#section-12.2"><i class="fa fa-check"></i><b>12.2</b> 回归树</a></li>
+<li class="chapter" data-level="12.3" data-path="section-12.html"><a href="section-12.html#section-12.3"><i class="fa fa-check"></i><b>12.3</b> 树的修剪</a></li>
+<li class="chapter" data-level="12.4" data-path="section-12.html"><a href="section-12.html#section"><i class="fa fa-check"></i><b>12.4</b> </a></li>
+<li class="chapter" data-level="12.5" data-path="section-12.html"><a href="section-12.html#section-12.5"><i class="fa fa-check"></i><b>12.5</b> 装袋树</a></li>
+<li class="chapter" data-level="12.6" data-path="section-12.html"><a href="section-12.html#section-12.6"><i class="fa fa-check"></i><b>12.6</b> 随机森林</a></li>
+<li class="chapter" data-level="12.7" data-path="section-12.html"><a href="section-12.html#section-12.7"><i class="fa fa-check"></i><b>12.7</b> 其它树话题</a></li>
 </ul></li>
 <li class="chapter" data-level="13" data-path="section-13.html"><a href="section-13.html"><i class="fa fa-check"></i><b>13</b> 聚类判别分析</a><ul>
 <li class="chapter" data-level="13.1" data-path="section-13.html"><a href="section-13.html#section-13.1"><i class="fa fa-check"></i><b>13.1</b> 聚类分析</a></li>
@@ -342,7 +344,7 @@ modeldat&lt;-modeldat[,-highcor]</code></pre></div>
 <ul>
 <li><strong>关于p值的讨论</strong></li>
 </ul>
-<p>谈到p值，不能不提美国统计协会在2016年2月发表的关于P值的声明 “Position on p-values: context, process, and purpose” <span class="citation">(Ronald L. Wassersteina <a href="#ref-ASA_P">2016</a>)</span> ，统计之都有一篇对该声明的中文总结<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>。关于p值弊端的讨论在统计学领域已经不是新鲜事。其中一些抨击言辞比较激烈的是 Siegfried：</p>
+<p>谈到p值，不能不提美国统计协会在2016年2月发表的关于P值的声明 “Position on p-values: context, process, and purpose” <span class="citation">[<a href="#ref-ASA_P">51</a>]</span> ，统计之都有一篇对该声明的中文总结<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>。关于p值弊端的讨论在统计学领域已经不是新鲜事。其中一些抨击言辞比较激烈的是 Siegfried：</p>
 <blockquote>
 <p>这是科学中最肮脏的秘密：使用统计假设检验的“科学方法”建立在一个脆弱的基础之上。——ScienceNews（Siegfried, 2010）</p>
 </blockquote>
@@ -422,7 +424,7 @@ Figure 10.2: 一般线性回归残差图
 <ul>
 <li>离群点</li>
 </ul>
-<p>刚才介绍的Cook距离图，以及之前讲到的Z分值都可以用来检测线性模型中的离群点。注意，Z分值仅仅是针对应变量观测而言，和使用的模型无关，即其并未考虑模型的拟合情况。下面我们用<code>car</code>包<span class="citation">(Fox and Weisberg <a href="#ref-car">2011</a>)</span>中的<code>outlierTest()</code>函数对拟合模型对象检测是否存在离群点，和Z分值方法鉴别的离群点不同，这里的离群点指的是<strong>那些模型预测效果不佳的观测点</strong>，通常有很大的、或正或负的残差，正残差说明模型低估了响应值，负残差说明高佑了响应值。这里使用的是Bonferroni离群点检验，该检验也可作用于广义线性模型。对于一般线性模型使用的是t检验，对于广义线性模型使用的是正态检验。关于该检验相关知识见 <span class="citation">(Williams <a href="#ref-Williams1987">1987</a>; Fox <a href="#ref-fox2008">2008</a>; Cook and Weisberg <a href="#ref-cookd">1982</a>; Weisberg <a href="#ref-weisberg14">2014</a>)</span>。</p>
+<p>刚才介绍的Cook距离图，以及之前讲到的Z分值都可以用来检测线性模型中的离群点。注意，Z分值仅仅是针对应变量观测而言，和使用的模型无关，即其并未考虑模型的拟合情况。下面我们用<code>car</code>包<span class="citation">[<a href="#ref-car">52</a>]</span>中的<code>outlierTest()</code>函数对拟合模型对象检测是否存在离群点，和Z分值方法鉴别的离群点不同，这里的离群点指的是<strong>那些模型预测效果不佳的观测点</strong>，通常有很大的、或正或负的残差，正残差说明模型低估了响应值，负残差说明高佑了响应值。这里使用的是Bonferroni离群点检验，该检验也可作用于广义线性模型。对于一般线性模型使用的是t检验，对于广义线性模型使用的是正态检验。关于该检验相关知识见 <span class="citation">[<a href="#ref-Williams1987">53</a>–<a href="#ref-weisberg14">56</a>]</span>。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(car)
 <span class="kw">outlierTest</span>(lmfit) <span class="co">#Bonferroni离群点检验</span></code></pre></div>
 <pre><code>##      rstudent unadjusted p-value Bonferonni p
@@ -482,7 +484,7 @@ influence.measures(model)
 <h3><span class="header-section-number">10.2.1</span> 岭回归</h3>
 <p>回顾最小二乘模型，它的目的是寻找参数的估计，以使得误差平方（RSS）和达到最小：</p>
 <p><span class="math display">\[RSS=\Sigma_{i=1}^{n}(y_{i}-\beta_{0}-\Sigma_{j=1}^{p}\beta_{j}x_{ij})^{2}\]</span></p>
-<p>岭回归<span class="citation">(A <a href="#ref-Hoerl1970">1970</a>)</span>和最小二乘回归有类似之处，不同在于优化的方程略有变化。岭回归寻找的是优化下面方程的<span class="math inline">\(\hat{\beta}^{R}\)</span>：</p>
+<p>岭回归<span class="citation">[<a href="#ref-Hoerl1970">57</a>]</span>和最小二乘回归有类似之处，不同在于优化的方程略有变化。岭回归寻找的是优化下面方程的<span class="math inline">\(\hat{\beta}^{R}\)</span>：</p>
 <p><span class="math display">\[\Sigma_{i=1}^{n}(y_{i}-\beta_{0}-\Sigma_{j=1}^{p}\beta_{j}x_{ij})^{2}+\lambda\Sigma_{j=1}^{p}\beta_{j}^{2}=RSS+\lambda\Sigma_{j=1}^{p}\beta_{j}^{2}\]</span></p>
 <p>其中<span class="math inline">\(\lambda &gt;0\)</span>是需要额外估计的调优参数。上式是在两个不同的准则间权衡。和最小二乘回归类似，岭回归考虑了最小化RSS，但其还有一个称为收缩惩罚的项<span class="math inline">\(\lambda\Sigma_{j=1}^{p}\beta_{j}^{2}\)</span>，该项在参数<span class="math inline">\(\beta_{1},...,\beta_{p}\)</span>趋近于0的时候变小，因此有向0收缩参数估计的用处。调优参数<span class="math inline">\(\lambda\)</span>用来调整这两个部分对最后参数估计的影响。当<span class="math inline">\(\lambda=0\)</span>时，惩罚项对结果没有影响，这时岭回归等同于最小二乘回归。当<span class="math inline">\(\lambda\rightarrow\infty\)</span>时，惩罚项的影响增大，岭回归系数估计趋近于0。这里惩罚只针对<span class="math inline">\(\beta_{1},...,\beta_{p}\)</span>，对截距项<span class="math inline">\(\beta_{0}\)</span>并没有惩罚。每个<span class="math inline">\(\lambda\)</span>值都对应一组参数估计，通过尝试不同的调优参数值，找到最优的模型。通常使用交互校验来选择调优参数，关于交互校验，我在之前基础建模技术那一章节已经讲过了。</p>
 <p>有许多R函数可以进行岭回归。<code>MASS</code>包中的<code>lm.ridge()</code>函数，以及<code>elasticnet</code>包中的<code>enet()</code>函数，如果你知道调优参数的值，可以直接使用这两个函数拟合岭回归模型。如果你要对参数进行调优，最方便的函数是<code>caret</code>包中的<code>train()</code>函数。还是以服装消费者数据为例展示这些函数的使用，自变量为10个问卷调查问题以及年龄、性别、收入和房产情况，应变量为总体花销（在线花销和实体店花销的总和）。</p>
@@ -574,7 +576,7 @@ RidgeCoef=ridgeCoef$coefficients</code></pre></div>
 </div>
 <div id="lasso" class="section level3">
 <h3><span class="header-section-number">10.2.2</span> Lasso</h3>
-<p>虽然岭回归可以将参数估计值向0进行收缩，但对于任何调优参数值，它都不能将系数取值变为严格的0。尽管某些参数估计值变得非常小以至于可以忽略，但事实上岭回归并没有进行变量选择。这可能对预测精确度来说不是问题，但却对模型解释提出了挑战，尤其在变量个数大的时候。一种流行的用来替代岭回归的模型是“最小绝对收缩与选择算子”模型，通常被称为lasso<span class="citation">(R <a href="#ref-Tibshirani1996">1996</a>)</span>。这个模型使用了与岭回归类似的惩罚项，lasso的回归参数估计<span class="math inline">\(\hat{\beta}_{\lambda}^{L}\)</span>最小化如下方程：</p>
+<p>虽然岭回归可以将参数估计值向0进行收缩，但对于任何调优参数值，它都不能将系数取值变为严格的0。尽管某些参数估计值变得非常小以至于可以忽略，但事实上岭回归并没有进行变量选择。这可能对预测精确度来说不是问题，但却对模型解释提出了挑战，尤其在变量个数大的时候。一种流行的用来替代岭回归的模型是“最小绝对收缩与选择算子”模型，通常被称为lasso<span class="citation">[<a href="#ref-Tibshirani1996">58</a>]</span>。这个模型使用了与岭回归类似的惩罚项，lasso的回归参数估计<span class="math inline">\(\hat{\beta}_{\lambda}^{L}\)</span>最小化如下方程：</p>
 <p><span class="math display">\[\Sigma_{i=1}^{n}(y_{i}-\beta_{0}-\Sigma_{j=1}^{p}\beta_{j}x_{ij})^{2}+\lambda\Sigma_{j=1}^{p}|\beta_{j}|=RSS+\lambda\Sigma_{j=1}^{p}|\beta_{j}|\]</span></p>
 <p>lasso和岭回归很相似，唯一的不同在于罚函数。岭回归中的<span class="math inline">\(\beta_{j}^{2}\)</span>在lasso中变为<span class="math inline">\(|\beta_{j}|\)</span>。用统计术语讲就是岭回归是在结构风险最小化的正则化因子上使用模型参数向量的二阶范数形式，lasso使用的是一阶范数形式。lasso不仅将参数估计向0收缩，当调优参数足够大时，一些参数估计将直接缩减为零，这可以达到特征提取的作用。这样一来，lasso回归的结果更易于解释。和其它有调优参数的模型类似，lasso也需要通过交互校验进行参数调优。下面我们展示在R中如何进行调优和拟合。</p>
 <p>先用<code>train()</code>函数对参数进行调优。首先设置交互校验和参数调优范围，这里我们使用10层交互校验。建议大家在用此类方法前都先进行标准化：</p>
@@ -639,13 +641,13 @@ lassoTune</code></pre></div>
 <p>返回的结果依旧是一个列表，其中<code>coefficients</code>项包含各个变量的参数估计：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 这里不显示结果</span>
 LassoCoef=lassoCoef$coefficients</code></pre></div>
-<p>这类规则化方法的研究现在非常活跃。很多学者将lasso模型嫁接到其它方法上，比如线性判别<span class="citation">(Clemmensen L <a href="#ref-Clem2011">2011</a>)</span>，偏最小二乘回归<span class="citation">(H and S <a href="#ref-chun2010">2010</a>)</span>。但由于一阶范数不是连续可导的，lasso回归的计算过程更复杂。很多学者对相应的优化算法进行了研究，其中最重要的改进是Bradley Efron等<span class="citation">(Efron B <a href="#ref-efron2014">2014</a>)</span>提出的最小角回归(Least Angle Regression［LARS］)算法，该算法很好地解决Lasso的计算问题，尤其在维度高的时候。</p>
+<p>这类规则化方法的研究现在非常活跃。很多学者将lasso模型嫁接到其它方法上，比如线性判别<span class="citation">[<a href="#ref-Clem2011">59</a>]</span>，偏最小二乘回归<span class="citation">[<a href="#ref-chun2010">60</a>]</span>。但由于一阶范数不是连续可导的，lasso回归的计算过程更复杂。很多学者对相应的优化算法进行了研究，其中最重要的改进是Bradley Efron等<span class="citation">[<a href="#ref-efron2014">61</a>]</span>提出的最小角回归(Least Angle Regression［LARS］)算法，该算法很好地解决Lasso的计算问题，尤其在维度高的时候。</p>
 </div>
 <div id="section-10.2.3" class="section level3">
 <h3><span class="header-section-number">10.2.3</span> 弹性网络</h3>
-<p>弹性网络是lasso的一般化版本<span class="citation">(H and T <a href="#ref-zou2005">2005</a>)</span>，该模型结合了两种罚函数，参数估计最小化如下方程：</p>
+<p>弹性网络是lasso的一般化版本<span class="citation">[<a href="#ref-zou2005">62</a>]</span>，该模型结合了两种罚函数，参数估计最小化如下方程：</p>
 <p><span class="math display">\[\Sigma_{i=1}^{n}(y_{i}-\hat{y}_{i})^{2}+\lambda_{1}\Sigma_{j=1}^{p}\beta_{j}^{2}+\lambda_{2}\Sigma_{j=1}^{p}|\beta_{j}|\]</span></p>
-<p>lasso对应的估计方差较大，而岭回归又没有特征选择的功能，弹性网络的优点在于利用了岭回归的罚函数，同时又有lasso的特征选择功能。Zou和Hastie<span class="citation">(H and T <a href="#ref-zou2005">2005</a>)</span>指出该模型能够更有效的处理成组的高度相关变量。</p>
+<p>lasso对应的估计方差较大，而岭回归又没有特征选择的功能，弹性网络的优点在于利用了岭回归的罚函数，同时又有lasso的特征选择功能。Zou和Hastie<span class="citation">[<a href="#ref-zou2005">62</a>]</span>指出该模型能够更有效的处理成组的高度相关变量。</p>
 <p>还是先用<code>train()</code>函数对参数进行调优。首先设置交互校验和参数调优范围，这里我们使用10层交互校验，并且对变量标准化：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">enetGrid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">.lambda =</span> <span class="kw">seq</span>(<span class="dv">0</span>,<span class="fl">0.2</span>,<span class="dt">length=</span><span class="dv">20</span>), <span class="dt">.fraction =</span> <span class="kw">seq</span>(.<span class="dv">8</span>, <span class="dv">1</span>, <span class="dt">length =</span> <span class="dv">20</span>))
 <span class="kw">set.seed</span>(<span class="dv">100</span>)
@@ -686,13 +688,13 @@ enetTune &lt;-<span class="st"> </span><span class="kw">train</span>(trainx, tra
 <div id="section-10.4" class="section level2">
 <h2><span class="header-section-number">10.4</span> 主成分和偏最小二乘回归</h2>
 <p>在实际应用中，自变量之间通常是彼此相关的，包含相似的信息。比如我们在建模技术那章用消费记录变量建立关于消费者收入的预测模型，其中实体店花销（<code>store_exp</code>），在线花销（<code>online_exp</code>），实体店交易次数（<code>store_trans</code>），在线交易次数（<code>online_trans</code>）这几个变量之间有不同程度的相关性，尤其是交易次数和对应花销相关性较高。如果自变量之间相关性较大， 那么多元线性回归的最小二乘估计将会很不稳定。有的时候，自变量的数目会高于观测，这时通常意义上的最小二乘将同样无法得到一组唯一的最小化SSE的回归系数。在这些情况下进行回归，通常的解决办法是对自变量进行预处理，包括数据预处理章节讲到的删除高度相关的自变量算法，移除高度相关的预测变量可以保证它们两两间的相关系数不超过一个给定的阈值。然而，这一过程并不能保证某些预测变量的线性组合与其他变量是不相关的。如果情况如此，那么最小二乘的解将依然是不稳定的。因此特别需要注意的是，移除两两之间高度相关的预测变量并不能保证一个稳定的解。你也可以参考特征工程那章讲到的特征提取方法，比如对预测变量进行主成分分析（PCA），让后用主成分进行回归。这种方法得到的主成分是彼此不相关的。但存在的弊端是得到的新自变量是原变量的线性组合，因此使得模型难以解释。</p>
-<p>对自变量进行主成分分析，然后用得到得主成分进行回归的方法称为<strong>主成分回归（PCR）</strong><span class="citation">(W <a href="#ref-Massy1965">1965</a>)</span>。 这项技术在自变量内在强相关或者变量个数大于观测个数时可以使用。然而，尽管这样先降维然后回归的方法可以在理论上建立回归模型，但结果可能并不理想。因为PCA降维得到的新变量并不一定能很好地解释因变量，因为这个过程是无监督的，在降维的时候并没有考虑到因变量的信息，它只是简单地追踪自变量空间的方差。如果自变量自身的变异恰好与因变量相关，那么PCR或许能很好地识别出它们之间的关系。 然而，如果自变量自身方差大，但其变化并不影响因变量，那么PCR或许就无法识别出真实存在的关系。还有需要注意的一点是，虽然PCR是降维的方法，但它并不是变量选择的方法，因为它是所有的自变量的线性组合。</p>
+<p>对自变量进行主成分分析，然后用得到得主成分进行回归的方法称为<strong>主成分回归（PCR）</strong><span class="citation">[<a href="#ref-Massy1965">63</a>]</span>。 这项技术在自变量内在强相关或者变量个数大于观测个数时可以使用。然而，尽管这样先降维然后回归的方法可以在理论上建立回归模型，但结果可能并不理想。因为PCA降维得到的新变量并不一定能很好地解释因变量，因为这个过程是无监督的，在降维的时候并没有考虑到因变量的信息，它只是简单地追踪自变量空间的方差。如果自变量自身的变异恰好与因变量相关，那么PCR或许能很好地识别出它们之间的关系。 然而，如果自变量自身方差大，但其变化并不影响因变量，那么PCR或许就无法识别出真实存在的关系。还有需要注意的一点是，虽然PCR是降维的方法，但它并不是变量选择的方法，因为它是所有的自变量的线性组合。</p>
 <p><strong>偏最小二乘回归（PLS）</strong>可以说是PCR的有监督版本。像PCR，PLS也是一种降维方法，而且也受变量方差的影响，因此通常需要在建模前对变量进行标准化。假设我们有随机变量组成的向量<span class="math inline">\(\mathbf{X}=[X_{1},X_{2},...,X_{p}]^{T}\)</span>，其对应的协方差矩阵为<span class="math inline">\(\Sigma\)</span>。PLS也需要通过对原变量进行线性组合找到<strong>彼此不相关</strong>的新变量 <span class="math inline">\((Z_{1} , Z_{2} , \ldots , Z_{m})\)</span>来代替原变量，且当<span class="math inline">\(m=p\)</span>时，PLS的结果和普通最小二乘的结果相同。这和PCA类似，且生成的线性组合通常被称为主成分或者潜变量。但其不同在于，PCA的线性组合将最大程度地概括预测变量空间的变异性， 而PLS的线性组合则是最大化其与因变量的协方差。PLS在构建自变量线性组合的过程中考虑了自变量和应变量的关系，赋予和应变量相关性高的自变量更高的权重。PLS是在两个目标之间达到一个平衡：对预测变量空间进行降维， 以及保持预测变量与因变量之间的预测关系。</p>
 <div class="figure">
 <img src="http://scientistcafe.com/book/Figure/pls.png" alt="PLS流程图" />
 <p class="caption">PLS流程图</p>
 </div>
-<p>PLS源自于Herman Wold的非线性迭代偏最小二乘（NIPALS）算法<span class="citation">(W. H <a href="#ref-wold1966">1966</a><a href="#ref-wold1966">b</a>; W. H <a href="#ref-wold1982">1982</a><a href="#ref-wold1982">b</a>)</span>。 该算法被用来对那些参数非线性的模型进行线性化。之后NIPALS方法被应用在变量之间彼此相关的回归问题中，称其为“PLS”<span class="citation">(Wold S <a href="#ref-wold1983">1983</a>)</span>。简单来说，NIPALS算法会迭代地寻找高度相关的预测变量与因变量之间潜在的关系。 对于单因变量问题而言，算法的每一次迭代都会评价自变量（<span class="math inline">\(\mathbf{X}\)</span>）与因变量（<span class="math inline">\(\mathbf{y}\)</span>）之间的关系，并将这种关系用一个权重向量（<span class="math inline">\(\mathbf{\varphi}\)</span>）表达，该向量被称为一个方向。接下来，自变量将被正交地投影到这个方向上，从而生成这个方向上的分值（<span class="math inline">\(\mathbf{z}\)</span>），接着用这个分值生成载荷（<span class="math inline">\(\mathbf{\theta}\)</span>），载荷代表了得分向量与原自变量之间的相关系数。每经过一次迭代，自变量和因变量将被“缩减”，意思是它们将分别减去当前对自变量和因变量结构的估计值。缩减后的自变量和因变量信息将被用来生成下一组权重、得分和载荷。PLS的具体算法如下（这里我们默认将所有的<span class="math inline">\(\mathbf{x}\)</span>标准化为均值0方差1的向量）：</p>
+<p>PLS源自于Herman Wold的非线性迭代偏最小二乘（NIPALS）算法<span class="citation">[<a href="#ref-wold1966">64</a>, <a href="#ref-wold1982">65</a>]</span>。 该算法被用来对那些参数非线性的模型进行线性化。之后NIPALS方法被应用在变量之间彼此相关的回归问题中，称其为“PLS”<span class="citation">[<a href="#ref-wold1983">66</a>]</span>。简单来说，NIPALS算法会迭代地寻找高度相关的预测变量与因变量之间潜在的关系。 对于单因变量问题而言，算法的每一次迭代都会评价自变量（<span class="math inline">\(\mathbf{X}\)</span>）与因变量（<span class="math inline">\(\mathbf{y}\)</span>）之间的关系，并将这种关系用一个权重向量（<span class="math inline">\(\mathbf{\varphi}\)</span>）表达，该向量被称为一个方向。接下来，自变量将被正交地投影到这个方向上，从而生成这个方向上的分值（<span class="math inline">\(\mathbf{z}\)</span>），接着用这个分值生成载荷（<span class="math inline">\(\mathbf{\theta}\)</span>），载荷代表了得分向量与原自变量之间的相关系数。每经过一次迭代，自变量和因变量将被“缩减”，意思是它们将分别减去当前对自变量和因变量结构的估计值。缩减后的自变量和因变量信息将被用来生成下一组权重、得分和载荷。PLS的具体算法如下（这里我们默认将所有的<span class="math inline">\(\mathbf{x}\)</span>标准化为均值0方差1的向量）：</p>
 <ol style="list-style-type: decimal">
 <li>设置初始值<span class="math inline">\(\mathbf{\hat{y}^{0}}=\bar{y}\mathbf{1}\)</span>，<span class="math inline">\(\mathbf{x_j^{0}}=\mathbf{x_j},\ j=1,\dots,p\)</span>；</li>
 <li>对<span class="math inline">\(m=1,2,...,p\)</span>:
@@ -830,52 +832,46 @@ plsPlotData &lt;-<span class="st"> </span><span class="kw">rbind</span>(plsResam
 <h3> References</h3>
 <div id="refs" class="references">
 <div id="ref-ASA_P">
-<p>Ronald L. Wassersteina, Nicole A. Lazara. 2016. “Position on P-Values: Context, Process, and Purpose.”</p>
+<p>51. Ronald L. Wassersteina, N.A.L.: Position on p-values: Context, process, and purpose. (2016).</p>
 </div>
 <div id="ref-car">
-<p>Fox, John, and Sanford Weisberg. 2011. “An R Companion to Applied Regression.” <em>Sage</em>.</p>
+<p>52. Fox, J., Weisberg, S.: An r companion to applied regression. Sage. (2011).</p>
 </div>
 <div id="ref-Williams1987">
-<p>Williams, D. A. 1987. “Generalized Linear Model Diagnostics Using the Deviance and Single Case Deletions.” <em>Applied Statistics</em> 36: 181–191.</p>
-</div>
-<div id="ref-fox2008">
-<p>Fox, J. 2008. “Applied Regression Analysis and Generalized Linear Models.” <em>Sage</em>.</p>
-</div>
-<div id="ref-cookd">
-<p>Cook, R. D., and S Weisberg. 1982. <em>Residuals and Influence in Regression</em>. Chapman; Hall.</p>
+<p>53. Williams, D.A.: Generalized linear model diagnostics using the deviance and single case deletions. Applied Statistics. 36, 181–191. (1987).</p>
 </div>
 <div id="ref-weisberg14">
-<p>Weisberg, S. 2014. <em>Applied Linear Regression</em>. <em>Applied Linear Regression</em>. Fourth Edition. Wiley.</p>
+<p>56. Weisberg, S.: Applied linear regression. Wiley (2014).</p>
 </div>
 <div id="ref-Hoerl1970">
-<p>A, Hoerl. 1970. “Ridge Regression: Biased Estimation for Nonorthogonal Problems.” <em>Technometrics</em> 12 (1): 55–67.</p>
+<p>57. A, H.: Ridge regression: Biased estimation for nonorthogonal problems. Technometrics. 12, 55–67 (1970).</p>
 </div>
 <div id="ref-Tibshirani1996">
-<p>R, Tibshirani. 1996. “Regression Shrinkage and Selection via the Lasso.” <em>Journal of the Royal Statistical Society Series B (Methodological)</em> 58 (1): 267–88.</p>
+<p>58. R, T.: Regression shrinkage and selection via the lasso. Journal of the Royal Statistical Society Series B (Methodological). 58, 267–288 (1996).</p>
 </div>
 <div id="ref-Clem2011">
-<p>Clemmensen L, Witten D, Hastie T. 2011. “Sparse Discriminant Analysis.” <em>Technometrics</em> 53 (4): 406–13.</p>
+<p>59. Clemmensen L, W.D., Hastie T: Sparse discriminant analysis. Technometrics. 53, 406–413 (2011).</p>
 </div>
 <div id="ref-chun2010">
-<p>H, Chun, and Kele S. 2010. “Sparse Partial Least Squares Regression for Simultaneous Dimension Reduction and Variable Selection.” <em>Journal of the Royal Statistical Society: Series B (Statistical Methodology)</em> 72 (1): 3–25.</p>
+<p>60. H, C., S, K.: Sparse partial least squares regression for simultaneous dimension reduction and variable selection. Journal of the Royal Statistical Society: Series B (Statistical Methodology). 72, 3–25 (2010).</p>
 </div>
 <div id="ref-efron2014">
-<p>Efron B, Johnstone I, Hastie T. 2014. “Least Angle Regression.” <em>The Annals of Statistics</em> 32 (2): 407–99.</p>
+<p>61. Efron B, J.I., Hastie T: Least angle regression. The Annals of Statistics. 32, 407–499 (2014).</p>
 </div>
 <div id="ref-zou2005">
-<p>H, Zou, and Hastie T. 2005. “Regularization and Variable Selection via the Elastic Net.” <em>Journal of the Royal Statistical Society, Series B,</em> 67 (2): 301–20.</p>
+<p>62. H, Z., T, H.: Regularization and variable selection via the elastic net. Journal of the Royal Statistical Society, Series B, 67, 301–320 (2005).</p>
 </div>
 <div id="ref-Massy1965">
-<p>W, Massy. 1965. “Principal Components Regression in Exploratory Sta- Tistical Research.” <em>Journal of the American Statistical Association</em> 60: 234–46.</p>
+<p>63. W, M.: Principal components regression in exploratory sta- tistical research. Journal of the American Statistical Association. 60, 234–246 (1965).</p>
 </div>
 <div id="ref-wold1966">
-<p>H, Wold. 1966b. “Multivariate Analyses.” In, In P Krishnaiah (ed.), 391–420. New York: Academic Press.</p>
+<p>64. H, W.: Multivariate analyses. Presented at the (1966).</p>
 </div>
 <div id="ref-wold1982">
-<p>H, Wold. 1982b. “Systems Under Indirect Observation: Causal- Ity, Structure, Prediction.” In, In K Joreskog, H Wold (eds.), 1–54. North–Holland, Amsterdam.</p>
+<p>65. H, W.: Systems under indirect observation: Causal- ity, structure, prediction. Presented at the (1982).</p>
 </div>
 <div id="ref-wold1983">
-<p>Wold S, Wold H, Martens H. 1983. “The Multivariate Calibration Problem in Chemistry Solved by the Pls Method.” Springer–Verlag, Heidelberg.</p>
+<p>66. Wold S, W.H., Martens H: The multivariate calibration problem in chemistry solved by the pls method, (1983).</p>
 </div>
 </div>
 <div class="footnotes">
