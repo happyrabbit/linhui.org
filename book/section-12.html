@@ -378,6 +378,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="section-12.2" class="section level2">
 <h2><span class="header-section-number">12.2</span> 树的修剪</h2>
 <p>另外一种方法是先让树充分生长，然后再回过头移除一些不显著的树枝，以回到一个较小的深度。背后原理是先让树在训练集上过度拟合，然后通过测试集对树进行调整以校正过度拟合，这里树模型在测试集上的表现代表了其在新样本上的表现。下面介绍实现这一目的几种常见方法。</p>
+<div class="figure">
+<img src="http://scientistcafe.com/book/Figure/prunetree.png" />
+
+</div>
 <ul>
 <li>代价-复杂度调优</li>
 </ul>
@@ -388,9 +392,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <ul>
 <li>降低误判率修剪</li>
 </ul>
-<p>该修剪方法最早由Quinlan提出 [J. Quinlan, Simplifying decision trees, Int. J. Human-Computer Studies]。这是最容易理解的修剪方法。树的所有分裂点都纳入修剪的候选名单，对某个分裂点进行修剪意味着将该分裂点下的整个子树都去掉，将该节点设置为叶节点（或者终节点）。这里数据集将被分成3个子集：</p>
-<p>（1）用于训练完整的树； （2）用于修剪； （3）用于测试最终模型。</p>
-<p>如果对某个节点修剪后的的树在第（2）个子集上得到的准确度不小于原来完整的树在（2）上的精确度，那么就将该节点设置为叶节点。否则保留该节点。该算法的好处在于计算上较简单。当子集（2）的样本量比用于训练的子集（1）小很多时，该方法存在过度修剪的风险。许多研究人员发现，这类基于判别误差的修剪方法得到的模型准确度比那些基于树大小得到的模型高[F. Espoito, D. Malerba, and G. Semeraro, A comparative analysis of methods for pruning decision trees, IEEE transactions on pattern analysis and machine intelligence, 19(5): pp. 476-491, 1997]。</p>
+<p>该修剪方法最早由Quinlan提出<span class="citation">(Quinlan <a href="#ref-Quinlan1999">1999</a>)</span>。这是最容易理解的修剪方法。树的所有分裂点都纳入修剪的候选名单，对某个分裂点进行修剪意味着将该分裂点下的整个子树都去掉，将该节点设置为叶节点（或者终节点）。这里数据集将被分成3个子集：</p>
+<p>（1）用于训练完整的树；</p>
+<p>（2）用于修剪；</p>
+<p>（3）用于测试最终模型。</p>
+<p>如果对某个节点修剪后的的树在第（2）个子集上得到的准确度不小于原来完整的树在（2）上的精确度，那么就将该节点设置为叶节点。否则保留该节点。该算法的好处在于计算上较简单。当子集（2）的样本量比用于训练的子集（1）小很多时，该方法存在过度修剪的风险。许多研究人员发现，这类基于判别误差的修剪方法得到的模型准确度比那些基于树大小得到的模型高<span class="citation">(F. Espoito and Semeraro <a href="#ref-Espoito1997">1997</a>)</span>。</p>
 <p>[加一个划分数据集的图]</p>
 <ul>
 <li>误判率-复杂度修剪</li>
@@ -405,7 +411,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p><span class="math display">\[R(T)=\Sigma_{i是子树T的叶节点}R(i)\]</span></p>
 <p>该节点对应的误判率-复杂度定义为：</p>
 <p><span class="math display">\[a(t)=\frac{R(t)-R(T)_{t}}{子树T的叶节点数目-1}\]</span></p>
-<p><span class="math inline">\(a(t)\)</span>可以看成是子树<span class="math inline">\(T\)</span>对应价值的衡量。基于上面介绍的一些度量，该修剪过程大致如下[Nikita Patel and Saurabh Upadhyay, International Journal of Computer Applications (0975-8887), Volume 60-No. 12, December 2012]：</p>
+<p><span class="math inline">\(a(t)\)</span>可以看成是子树<span class="math inline">\(T\)</span>对应价值的衡量。基于上面介绍的一些度量，该修剪过程大致如下<span class="citation">(Patel and Upadhyay <a href="#ref-Nikita2012">2012</a>)</span>：</p>
 <ol style="list-style-type: decimal">
 <li>对每个分裂节点计算对应的价值度量<span class="math inline">\(a\)</span></li>
 <li>剪去价值最低的节点</li>
@@ -415,15 +421,15 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <ul>
 <li>最小化误判率修剪</li>
 </ul>
-<p>该方法由Niblett和Brotko在1991年提出[B. Cestnik, and I. Bratko, Estimating Probabilities in Tree Pruning, EWSL, pp. 138-150, 1991]。这是一个自下而上的过程，目的在于寻找能够最小化模型在新数据上预期误判率的树。对于某个分裂点t，如果该节点修剪成叶节点后，其下所有的样本都被预测为c类，那么该节点对应的修剪预期误判率为：</p>
+<p>该方法由Niblett和Brotko在1991年提出<span class="citation">(B. Cestnik and Bratko <a href="#ref-Cestnik1991">1991</a>)</span>。这是一个自下而上的过程，目的在于寻找能够最小化模型在新数据上预期误判率的树。对于某个分裂点t，如果该节点修剪成叶节点后，其下所有的样本都被预测为c类，那么该节点对应的修剪预期误判率为：</p>
 <p><span class="math display">\[E(t)=\frac{n_{t}-n_{t,c}+k-1}{n_{t}+k}\]</span></p>
 <p>其中：</p>
 <p><span class="math display">\[k=类别数目\]</span> <span class="math display">\[n_{t}=节点t的样本总数\]</span> <span class="math display">\[n_{t,c}=节点t下c类样本的数目\]</span></p>
-<p>基于上述定义，该修剪算法过程如下[Esposito F., Malerba D., Semeraro G, A Comparative Analysis of Methods for Pruning Decision Trees, IEEE Transactions on Pattern Analysis and Machine Intelligence, Vol 19, NO. 5, 1997, P476-491]：</p>
+<p>基于上述定义，该修剪算法过程如下<span class="citation">(F. Espoito and Semeraro <a href="#ref-Espoito1997">1997</a>)</span>：</p>
 <ul>
 <li>在树的每个非叶节点处，计算对该节点修剪后的预期误判率</li>
-<li></li>
-<li></li>
+<li>计算如果该节点下的子树未经修剪得到的预期误判率</li>
+<li>如果修剪使得预期误判率提高，那不修剪，否则修剪</li>
 </ul>
 </div>
 <div id="section-12.3" class="section level2">
@@ -460,6 +466,18 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </div>
 <div id="ref-Hastie2008">
 <p>Hastie T, Friedman J, Tibshirani R. 2008. <em>The Elements of Statistical Learning: Data Mining, Inference and Prediction</em>. 2nd ed. Springer.</p>
+</div>
+<div id="ref-Quinlan1999">
+<p>Quinlan, J. 1999. “Simplifying Decision Trees.” <em>International Journal of Human-Computer Studies</em> 61 (2).</p>
+</div>
+<div id="ref-Espoito1997">
+<p>F. Espoito, D. Malerba, and G. Semeraro. 1997. “A Comparative Analysis of Methods for Pruning Decision Trees.” <em>IEEE Transactions on Pattern Analysis and Machine Intelligence</em> 19 (5): 476–91.</p>
+</div>
+<div id="ref-Nikita2012">
+<p>Patel, Nikita, and Saurabh Upadhyay. 2012. “Study of Various Decision Tree Pruning Methods with Their Empirical Comparison in Weka.” <em>International Journal of Computer Applications</em> 60 (12).</p>
+</div>
+<div id="ref-Cestnik1991">
+<p>B. Cestnik, and I. Bratko. 1991. “Estimating Probabilities in Tree Pruning.” <em>EWSL</em>, 138–50.</p>
 </div>
 <div id="ref-APM">
 <p>Max Kuhn, Kjell Johnston. 2013. <em>Applied Predictive Modeling</em>. Springer.</p>
