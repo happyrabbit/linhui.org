@@ -225,12 +225,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 <li class="chapter" data-level="12" data-path="section-12.html"><a href="section-12.html"><i class="fa fa-check"></i><b>12</b> 树模型</a><ul>
 <li class="chapter" data-level="12.1" data-path="section-12.html"><a href="section-12.html#section-12.1"><i class="fa fa-check"></i><b>12.1</b> 分裂准则</a></li>
-<li class="chapter" data-level="12.2" data-path="section-12.html"><a href="section-12.html#section-12.2"><i class="fa fa-check"></i><b>12.2</b> 回归树</a></li>
+<li class="chapter" data-level="12.2" data-path="section-12.html"><a href="section-12.html#section-12.2"><i class="fa fa-check"></i><b>12.2</b> 回归树和决策树</a></li>
 <li class="chapter" data-level="12.3" data-path="section-12.html"><a href="section-12.html#section-12.3"><i class="fa fa-check"></i><b>12.3</b> 树的修剪</a></li>
-<li class="chapter" data-level="12.4" data-path="section-12.html"><a href="section-12.html#section"><i class="fa fa-check"></i><b>12.4</b> </a></li>
-<li class="chapter" data-level="12.5" data-path="section-12.html"><a href="section-12.html#section-12.5"><i class="fa fa-check"></i><b>12.5</b> 装袋树</a></li>
-<li class="chapter" data-level="12.6" data-path="section-12.html"><a href="section-12.html#section-12.6"><i class="fa fa-check"></i><b>12.6</b> 随机森林</a></li>
-<li class="chapter" data-level="12.7" data-path="section-12.html"><a href="section-12.html#section-12.7"><i class="fa fa-check"></i><b>12.7</b> 其它树话题</a></li>
+<li class="chapter" data-level="12.4" data-path="section-12.html"><a href="section-12.html#section-12.4"><i class="fa fa-check"></i><b>12.4</b> 装袋树</a></li>
+<li class="chapter" data-level="12.5" data-path="section-12.html"><a href="section-12.html#section-12.5"><i class="fa fa-check"></i><b>12.5</b> 随机森林</a></li>
+<li class="chapter" data-level="12.6" data-path="section-12.html"><a href="section-12.html#section-12.6"><i class="fa fa-check"></i><b>12.6</b> 其它树话题</a></li>
 </ul></li>
 <li class="chapter" data-level="13" data-path="section-13.html"><a href="section-13.html"><i class="fa fa-check"></i><b>13</b> 聚类判别分析</a><ul>
 <li class="chapter" data-level="13.1" data-path="section-13.html"><a href="section-13.html#section-13.1"><i class="fa fa-check"></i><b>13.1</b> 聚类分析</a></li>
@@ -365,12 +364,31 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>上面提到的这三种分裂准则是建立树模型的基础。</p>
 </div>
 <div id="section-12.2" class="section level2">
-<h2><span class="header-section-number">12.2</span> 回归树</h2>
+<h2><span class="header-section-number">12.2</span> 回归树和决策树</h2>
 <p>我们现在进一步介绍回归树的构建过程<span class="citation">[<a href="#ref-ISLR15">73</a>]</span>。建立回归树大致分两步：</p>
 <ol style="list-style-type: decimal">
 <li>将自变量<span class="math inline">\(X_1,X_2,\dots,X_p\)</span>所有可能取值构成的自变量空间划分成<span class="math inline">\(J\)</span>个彼此不重叠的区域：<span class="math inline">\(R_1,R_2,\dots,R_J\)</span></li>
-<li></li>
+<li>落入某个区域<span class="math inline">\(R_j\)</span>的新样本对应相同的预测值，即训练集中<span class="math inline">\(R_j\)</span>内所有观测的平均</li>
 </ol>
+<p>一个及其简化的例子，假设我们就用性别划分成两个区域<span class="math inline">\(R_1\)</span>（女）和<span class="math inline">\(R_2\)</span>（男）：</p>
+<div class="figure">
+<img src="http://scientistcafe.com/book/Figure/var.png" />
+
+</div>
+<p>那么，落入<span class="math inline">\(R_1\)</span>的训练集样本均值为163，落入<span class="math inline">\(R_2\)</span>的训练集样本均值为176。那么对新样本，如果是女生，树模型预测的身高就是163，男生则为176。第2步其实很好理解。现在我们更详细的讲解第1步，也就是怎么划分出区域<span class="math inline">\(R_1,R_2,\dots,R_J\)</span>。</p>
+<p>理论上说，划分的区域可以是任何形状，但这里为了简化问题便于解释，我们选择将自变量空间划分成高维矩形，或者说高维盒子。对于回归模型划分目标是最小化之前讲过的RSS。考虑所有可能的划分在现实问题中几乎不可能，这和之前特征选择中讲到的穷举法是一个道理，理论上最优但是实际不可操作。所以建造树模型的时候使用的是从上到下（top-down）的贪婪算法——递归二元分割。该方法从树的根节点开始逐步向下分割自变量空间。每次分裂都产生2条树枝，所以叫做“二元分割”。之所以说该算法贪婪是因为在建造树过程中的每一步，都只是针对当前情况寻找最优分割方式而没有考虑之后在这之后的分裂。</p>
+<p>首先在根节点处选择一个变量<span class="math inline">\(X_j\)</span>和分裂点<span class="math inline">\(s\)</span>，将自变量空间划分成下面两个空间：</p>
+<p><span class="math display">\[R_{1}(j, s)=\{X|X_j&lt;s\}\ 和\ R_{2}(j, s)=\{X|X_j\geq s\}\]</span> 计算相应分裂后RSS的减少量。对不同的<span class="math inline">\((j,s)\)</span>搜索能最大程度减少RSS的组合，也就是最小化下面式子：</p>
+<p><span class="math display">\[\Sigma_{i:x_i\in R_1(j,s)}(y_i-\hat{y}_{R_{1}})^2+\Sigma_{i:x_i\in R_2(j,s)}(y_i-\hat{y}_{R_{2}})^2\]</span> 其中<span class="math inline">\(\hat{y}_{R_1}\)</span>是<span class="math inline">\(R_1\)</span>中训练样本的应变量均值，<span class="math inline">\(\hat{y}_{R_2}\)</span>是<span class="math inline">\(R_2\)</span>中训练样本的应变量均值。优化上面的式子很容易，尤其当<span class="math inline">\(p\)</span>不是很大的时候。</p>
+<p>接下来就在这两个生成的子区域中按照同样的方式继续寻找最优化该区域RSS的分裂。注意这里只在新的子区域内优化。这个过程一直延续到满足设定的停止准则，比如区域内的样本量少于5，或者RSS降低的百分比小于1%。大家可以脑补下这个动态的过程，节点不断分裂出两个新的子节点直到所有的节点满足停止条件。这就好像一棵树在不断生长。</p>
+<div class="figure">
+<img src="http://scientistcafe.com/book/Figure/grow_tree.png" />
+
+</div>
+<p>决策树和回归树的思想是类似的，不同在于应变量是个分类变量而不是数值。这时，预测就不是基于平均而是基于每个类别样本的频数。叶节点的预测值就是落入相应区域训练集样本中频数最高的类别。决策树的分裂准则不是RSS，而是之间介绍的熵（Entropy）和Gini系数，其它的都很类似。</p>
+</div>
+<div id="section-12.3" class="section level2">
+<h2><span class="header-section-number">12.3</span> 树的修剪</h2>
 <p>树模型面对的主要挑战是过度拟合。假设我们对决策树的参数没有任何限制，那么得到的树模型在训练集上的准确度将会是100%，因为每个终结点将只对应一个样本。因此，防止过度拟合是创建树模型的关键所在。总的说来可以通过下面两种方法来实现这一点：</p>
 <ol style="list-style-type: decimal">
 <li>对树的大小进行限制</li>
@@ -384,9 +402,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li>最大树深度：如果树生长的过深，那么模型就会过度拟合特定的样本。这也是一个需要调优的参数。</li>
 <li>最大终结点数目：对终结点数目的限制和对树深度的限制是类似的，可以取代使用。因为这两者是成正比的。 每个分裂考虑的变量个数：在每一层级寻找最优分裂点的时候使用的变量是随机抽取的。通常情况下，取变量个数的平方根效果最好，这也是R种函数的默认设置。但我们还是应该对该参数在变量个数的30%~40%区间内调优。</li>
 </ul>
-</div>
-<div id="section-12.3" class="section level2">
-<h2><span class="header-section-number">12.3</span> 树的修剪</h2>
 <p>另外一种方法是先让树充分生长，然后再回过头移除一些不显著的树枝，以回到一个较小的深度。背后原理是先让树在训练集上过度拟合，然后通过测试集对树进行调整以校正过度拟合，这里树模型在测试集上的表现代表了其在新样本上的表现。下面介绍实现这一目的几种常见方法。</p>
 <div class="figure">
 <img src="http://scientistcafe.com/book/Figure/prunetree.png" />
@@ -441,12 +456,52 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li>计算如果该节点下的子树未经修剪得到的预期误判率</li>
 <li>如果修剪使得预期误判率提高，那不修剪，否则修剪</li>
 </ul>
+<p>在R中有好几个包能够用来建造决策树，如<code>ctree</code>、<code>rpart</code>和<code>tree</code>。<code>rpart</code>是广为使用的一个建造单棵树的包，切分方法基于<code>CART</code>，使用<code>rpart()</code>函数，用公式表达法。<code>rpart()</code>有若干调节参数，可以通过<code>rpart.control</code>选项设定。或者你可以使用之前反复讲到的神器<code>caret</code>包的<code>train()</code>函数，通过其为接口调用<code>rpart()</code>函数，方便进行交互校验。 <code>train()</code>在此情况下常用的函数设定的参数是复杂度参数（<code>cp</code>）和最大节点深度（<code>maxdepth</code>）。为了对 <code>CART</code>树的复杂度参数进行调优，<code>train()</code>中的方法选项应该设定为<code>method = &quot;rpart&quot;</code>。为了对最大深度进行调优，方法选项则应为<code>method = &quot;rpart2&quot;</code>：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(rpart)
+<span class="kw">library</span>(tree)
+dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/SegData.csv&quot;</span>)
+<span class="co"># 对数据进行一些清理，删除错误的样本观测，消费金额不能为负数</span>
+dat &lt;-<span class="st"> </span><span class="kw">subset</span>(dat, store_exp &gt;<span class="st"> </span><span class="dv">0</span> &amp;<span class="st"> </span>online_exp &gt;<span class="st"> </span><span class="dv">0</span>)
+<span class="co"># 将10个问卷调查变量当作自变量</span>
+trainx &lt;-<span class="st"> </span>dat[, <span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>, <span class="kw">names</span>(dat))]
+<span class="co"># 将实体店消费量和在线消费之和当作应变量</span>
+<span class="co"># 得到总消费量=实体店消费+在线消费</span>
+trainy &lt;-<span class="st"> </span>dat$store_exp +<span class="st"> </span>dat$online_exp
+<span class="kw">set.seed</span>(<span class="dv">100</span>)
+rpartTune &lt;-<span class="st"> </span><span class="kw">train</span>(trainx, trainy,
+                   <span class="dt">method =</span> <span class="st">&quot;rpart2&quot;</span>,
+                   <span class="dt">tuneLength =</span> <span class="dv">10</span>,
+                   <span class="dt">trControl =</span> <span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>))
+<span class="kw">plot</span>(rpartTune)</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-251-1.png" width="672" /></p>
+<p>最大树的深度大于2貌似RMSE就不再变化了。这里我们就用深度为2来建立树：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rpartTree &lt;-<span class="st"> </span><span class="kw">rpart</span>(trainy ~<span class="st"> </span>., <span class="dt">data =</span> trainx, <span class="dt">maxdepth =</span> <span class="dv">2</span>)</code></pre></div>
+<p>你可以通过<code>print()</code>查看相应的规则：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(rpartTree)</code></pre></div>
+<pre><code>## n= 999 
+## 
+## node), split, n, deviance, yval
+##       * denotes terminal node
+## 
+## 1) root 999 15812720000  3479.113  
+##   2) Q3&lt; 3.5 799  2373688000  1818.720  
+##     4) Q5&lt; 1.5 250     3534392   705.193 *
+##     5) Q5&gt;=1.5 549  1919009000  2325.791 *
+##   3) Q3&gt;=3.5 200  2436211000 10112.380 *</code></pre>
+<p>可见，Q3和Q5被最终用来预测总花销。要对<code>rpart</code>生成的树绘制图形，可以使用<code>partykit</code>包先将<code>rpart</code>对象转换成<code>party</code>对象，然后再使用<code>plot()</code>：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(partykit)
+rpartTree2 &lt;-<span class="st"> </span><span class="kw">as.party</span>(rpartTree)
+<span class="kw">plot</span>(rpartTree2)</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-254-1.png" width="672" /></p>
+<p>单棵树很直观，容易解释。但它有两个缺点：</p>
+<ol style="list-style-type: decimal">
+<li>和很多回归模型相比精确度差</li>
+<li>非常不稳定，数据微小的变化会导致模型结果很大的变化</li>
+</ol>
+<p>将不同的决策树聚合起来能够解决这两个问题，比如下面要介绍的装袋树，随机森林和助推树就是这样的思想。这些模型的表现和单棵树相比显著提高。</p>
 </div>
-<div id="section" class="section level2">
-<h2><span class="header-section-number">12.4</span> </h2>
-</div>
-<div id="section-12.5" class="section level2">
-<h2><span class="header-section-number">12.5</span> 装袋树</h2>
+<div id="section-12.4" class="section level2">
+<h2><span class="header-section-number">12.4</span> 装袋树</h2>
 <p>Bootstrap 样本是对数据进行有放回随机抽样得到的样本（Efron 和 Tibshirani 1986）。这意味着，当一个样本点被选中时，它有可能会在将来的抽取中继续被选中。Bootstrap 样本和原数据的样本量一样。因此，一些样本可能被抽到过很多次，而另一些则可能没有被选到。没有被选到的样本被称为“袋外样本“（out-of-bag）。在一次 Bootstrap 重抽样迭代中，选中的样本点被用来建立模型，而袋外样本则被用于预测。 在20世纪90年代，集成方法（即将许多模型组合起来进行预测的模型）开始出现。 装袋法（Bagging，bootstrap aggregation 的缩写）最初由 Leo Breiman 提出，它是最早发展起来的集成方法之一（Breiman 1996a）。 装袋法是一种利用 bootstrap的通用方法，可用于任何回归（或分类）模型来构建集成组合。这种方法的构建非常简单，它包含算法 8.1 中所述的步骤。 集成组合中的每一个模型都对新样本进行一次预测，然后这 个预测将进行平均， 来给出装袋法模型的预测值。</p>
 <blockquote>
 <p><strong>算法：装袋法</strong></p>
@@ -464,11 +519,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>尽管装袋法通常都能改进不稳定模型的预测效能，但它同样有一些缺陷。 首先，是计算量。随着 bootstrap 样本数目的增多，计算成本和内存需求也会相应增加。这一劣势可以通过并行计算来得到大部分的消减，原因是装袋的过程是非常容易并行化的。 回顾之前的介绍可以发现，每一个 boostrap 样本和相应的模型都是独立于其他样本和模型的。 这意味着每个模型都可以单独进行建模， 而只需在最后将所有模型的结果组合起来以生成最终的预测。</p>
 <p>装袋法的另一个劣势在于解释性差， 我们无法在装袋法中得到之前单棵回归树给出的简洁的规则。然而，变量重要性依旧可以通过将单个模型的重要性得分组合起来进行构建。 下一节介绍的随机森林将进一步讨论变量重要性。</p>
 </div>
-<div id="section-12.6" class="section level2">
-<h2><span class="header-section-number">12.6</span> 随机森林</h2>
+<div id="section-12.5" class="section level2">
+<h2><span class="header-section-number">12.5</span> 随机森林</h2>
 </div>
-<div id="section-12.7" class="section level2">
-<h2><span class="header-section-number">12.7</span> 其它树话题</h2>
+<div id="section-12.6" class="section level2">
+<h2><span class="header-section-number">12.6</span> 其它树话题</h2>
 
 </div>
 </div>
