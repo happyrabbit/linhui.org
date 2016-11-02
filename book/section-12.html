@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-10-29">
+<meta name="date" content="2016-11-01">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -506,15 +506,26 @@ rpartTree2 &lt;-<span class="st"> </span><span class="kw">as.party</span>(rpartT
 <li><p>不对分类变量进行变换，每个分类型自变量作为单独的个体输入到模型当中以便模型决定如何对值进行分组或分裂。这时可以对数据做更为动态的分裂，如分裂点一侧有两个或更多的组。为了进行这样的分裂，算法需要对自变量的类别按照某种方式进行排序。</p></li>
 <li><p>分类型自变量先被重新编码为二元虚拟变量，这样将类别信息分解成独立信息块。每一个虚拟变量都融入各自的模型中。这样一来评估每个这些新自变量的方法就很简单，因为每个自变量仅有一个分裂点。</p></li>
 </ol>
-<p>从业者需要根据哪一种方法更合适当前的问题来进行选择。下面我们用不同的方法对服装消费者性别进行判定（这里是分类模型而非回归模型）：</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/SegData.csv&quot;</span>)
+<p>如果某些类对结果有强预测性，第一种方法可能更合适。然而，正如我们后面看到的，该选择会对模型的复杂度和模型性能有显著影响。在接下来的章节，我们将使用上面说的两种方法构建模型，以便评估那种方法更优。从业者需要根据哪一种方法更合适当前的问题来进行选择。</p>
+<p>下面我们用不同的方法对服装消费者性别进行判定（这里是分类模型而非回归模型）：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(caret)
+<span class="kw">library</span>(pROC)
+dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/SegData.csv&quot;</span>)
 <span class="co"># 将10个问卷调查变量当作自变量</span>
-trainx &lt;-<span class="st"> </span>dat[, <span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>, <span class="kw">names</span>(dat))]
+trainx1 &lt;-<span class="st"> </span>dat[, <span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>, <span class="kw">names</span>(dat))]
 <span class="co"># 将类别也作为自变量</span>
-trainx$segment &lt;-<span class="st"> </span>dat$segment
+<span class="co"># 这里用两种方法编码分类变量</span>
+<span class="co"># trainx1 不对消费者类别进行变换</span>
+trainx1$segment &lt;-<span class="st"> </span>dat$segment
+<span class="co"># trainx2 中的消费者类别被转化成虚拟变量</span>
+dumMod&lt;-<span class="kw">dummyVars</span>(~.,
+                  <span class="dt">data=</span>trainx1,
+                  <span class="co"># 用原变量名加上因子层级的名称作为新的名义变量名</span>
+                  <span class="dt">levelsOnly=</span>F)
+trainx2 &lt;-<span class="st"> </span><span class="kw">predict</span>(dumMod,trainx1)
 <span class="co"># 性别作为应变量</span>
 trainy &lt;-<span class="st"> </span>dat$gender</code></pre></div>
-<!--有很多R包能构建单棵分类树。主要的包是rpart。如在回归中介绍过的，函数只需要明确模型的形式的公式。
+<p>构建分类树的R包也有很多，这里讲主要的<code>rpart</code>包。 <!--有很多R包能构建单棵分类树。主要的包是rpart。如在回归中介绍过的，函数只需要明确模型的形式的公式。
 如前面提及到的，经费申请数据有大量的自变量。用程序创建R公式来对分组类进行建模。下面的语句对这些使用数据切分策略生成的自变量拟合CART模型。
 
 > library(rpart)
@@ -526,17 +537,18 @@ trainy &lt;-<span class="st"> </span>dat$gender</code></pre></div>
 分类树的模型输出和回归树不同。为了展示这点，我们拟合了一个只有两个变量的小模型：
 
 > rpart(Class ~ NumCI + Weekday, data = training[pre2008,])
--->
-<p><code>caret</code>包中的<code>train()</code>函数将建立单棵树的一些函数包装起来，我们可以用它来训练树模型：</p>
+--></p>
+<p><code>caret</code>包中的<code>train()</code>函数将建立单棵树的一些函数包装起来，我们可以用它来训练树模型。我们分别对分类变量两种编码方法进行建模比较：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">100</span>)
-rpartGrouped &lt;-<span class="st"> </span>caret::<span class="kw">train</span>( trainx, trainy, <span class="dt">method =</span> <span class="st">&quot;rpart&quot;</span>,
+rpartTune1 &lt;-<span class="st"> </span>caret::<span class="kw">train</span>(trainx1, trainy, <span class="dt">method =</span> <span class="st">&quot;rpart&quot;</span>,
                        <span class="dt">tuneLength =</span> <span class="dv">30</span>,
                        <span class="dt">metric =</span> <span class="st">&quot;ROC&quot;</span>, 
                        <span class="co"># 规定了预留数据集以及需要计算那些模型表现度量（如敏感度，特异度和AUC）。</span>
                        <span class="dt">trControl =</span> <span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>,
                                                 <span class="dt">summaryFunction =</span> twoClassSummary,
-                                                <span class="dt">classProbs =</span> <span class="ot">TRUE</span>))
-rpartGrouped</code></pre></div>
+                                                <span class="dt">classProbs =</span> <span class="ot">TRUE</span>,
+                                                <span class="dt">savePredictions =</span> <span class="ot">TRUE</span>))
+rpartTune1</code></pre></div>
 <pre><code>## CART 
 ## 
 ## 1000 samples
@@ -582,7 +594,58 @@ rpartGrouped</code></pre></div>
 ## 
 ## ROC was used to select the optimal model using  the largest value.
 ## The final value used for the model was cp = 0.008350085.</code></pre>
-<p>如果某些类对结果有强预测性，第一种方法可能更合适。然而，正如我们后面看到的，该选择会对模型的复杂度和模型性能有显著影响。在接下来的章节，我们将使用上面说的两种方法构建模型，以便评估那种方法更优。</p>
+<p>上面是不对分类变量进行编码的情况。这里<code>cp</code>指的是复杂度参数（complexity parameter）。是树生长的停止准则，<code>cp = 0.01</code>意味者相应分裂度量（Gini，熵等）每一步分裂都需要比之前提高0.01，在交互校验结果中不满足0.01提升的部分会被修剪掉。</p>
+<p>下面我们接着对将分类变量进行编码后的数据集进行训练：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rpartTune2 &lt;-<span class="st"> </span>caret::<span class="kw">train</span>(trainx2, trainy, <span class="dt">method =</span> <span class="st">&quot;rpart&quot;</span>,
+                       <span class="dt">tuneLength =</span> <span class="dv">30</span>,
+                       <span class="dt">metric =</span> <span class="st">&quot;ROC&quot;</span>, 
+                       <span class="co"># 规定了预留数据集以及需要计算那些模型表现度量（如敏感度，特异度和AUC）。</span>
+                       <span class="dt">trControl =</span> <span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>,
+                                                <span class="dt">summaryFunction =</span> twoClassSummary,
+                                                <span class="dt">classProbs =</span> <span class="ot">TRUE</span>,
+                                                <span class="dt">savePredictions =</span> <span class="ot">TRUE</span>))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rpartRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span class="dt">response =</span> rpartTune1$pred$obs,
+                <span class="dt">predictor =</span> rpartTune1$pred$Female,
+                <span class="dt">levels =</span> <span class="kw">rev</span>(<span class="kw">levels</span>(rpartTune1$pred$obs)))
+
+rpartFactorRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span class="dt">response =</span> rpartTune2$pred$obs,
+                      <span class="dt">predictor =</span> rpartTune2$pred$Female,
+                      <span class="dt">levels =</span> <span class="kw">rev</span>(<span class="kw">levels</span>(rpartTune1$pred$obs)))
+
+<span class="kw">plot</span>(rpartRoc, <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>, <span class="dt">print.thres =</span> <span class="kw">c</span>(.<span class="dv">5</span>),
+     <span class="dt">print.thres.pch =</span> <span class="dv">3</span>,
+     <span class="dt">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>,
+     <span class="dt">print.thres.cex =</span> <span class="fl">1.2</span>,
+     <span class="dt">col =</span> <span class="st">&quot;red&quot;</span>, <span class="dt">legacy.axes =</span> <span class="ot">TRUE</span>,
+     <span class="dt">print.thres.col =</span> <span class="st">&quot;red&quot;</span>)</code></pre></div>
+<pre><code>## 
+## Call:
+## roc.default(response = rpartTune1$pred$obs, predictor = rpartTune1$pred$Female,     levels = rev(levels(rpartTune1$pred$obs)))
+## 
+## Data: rpartTune1$pred$Female in 13380 controls (rpartTune1$pred$obs Male) &lt; 16620 cases (rpartTune1$pred$obs Female).
+## Area under the curve: 0.667</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(rpartFactorRoc,
+     <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>,
+     <span class="dt">add =</span> <span class="ot">TRUE</span>,
+     <span class="dt">print.thres =</span> <span class="kw">c</span>(.<span class="dv">5</span>),
+     <span class="dt">print.thres.pch =</span> <span class="dv">16</span>, <span class="dt">legacy.axes =</span> <span class="ot">TRUE</span>,
+     <span class="dt">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>,
+     <span class="dt">print.thres.cex =</span> <span class="fl">1.2</span>)</code></pre></div>
+<pre><code>## 
+## Call:
+## roc.default(response = rpartTune2$pred$obs, predictor = rpartTune2$pred$Female,     levels = rev(levels(rpartTune1$pred$obs)))
+## 
+## Data: rpartTune2$pred$Female in 13380 controls (rpartTune2$pred$obs Male) &lt; 16620 cases (rpartTune2$pred$obs Female).
+## Area under the curve: 0.6547</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">legend</span>(.<span class="dv">75</span>, .<span class="dv">2</span>,
+       <span class="kw">c</span>(<span class="st">&quot;Grouped Categories&quot;</span>, <span class="st">&quot;Independent Categories&quot;</span>),
+       <span class="dt">lwd =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>),
+       <span class="dt">col =</span> <span class="kw">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;red&quot;</span>),
+       <span class="dt">pch =</span> <span class="kw">c</span>(<span class="dv">16</span>, <span class="dv">3</span>))</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-258-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(partykit)
+<span class="kw">plot</span>(<span class="kw">as.party</span>(rpartTune1$finalModel))</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-259-1.png" width="672" /></p>
 <p>单棵树很直观，容易解释。但它有两个缺点：</p>
 <ol style="list-style-type: decimal">
 <li>和很多回归模型相比精确度差</li>
