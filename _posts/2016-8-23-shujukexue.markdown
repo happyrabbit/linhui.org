@@ -10,9 +10,9 @@ layout: post
 **[Back to Homepage](http://scientistcafe.com)**
 -->
 
-<h4 class="author"><em>林荟 (Hui Lin)</em></h4>
-<h4 class="date"><em>2016-08-23</em></h4>
-<h4 class="author"><em>有任何问题联系邮箱: longqiman@gmail.com</em></h4>
+<p style="font-family: serif; margin:0; font-size:14pt; font-style:italic">林荟 (Hui Lin) &nbsp; </p>
+<p style="font-family: serif; margin:0; font-size:14pt; font-style:italic">2016-8-23 &nbsp; </p>
+
 
 # 什么是数据科学?
 

@@ -6,9 +6,10 @@ output: html_document
 layout: post
 ---
 
-<h4 class="author"><em>林荟 (Hui Lin)</em></h4>
-<h4 class="date"><em>2016-09-12</em></h4>
-<h4 class="author"><em>有任何问题联系邮箱: longqiman@gmail.com</em></h4>
+<p style="font-family: serif; margin:0; font-size:14pt; font-style:italic">林荟 (Hui Lin) &nbsp; </p>
+<p style="font-family: serif; margin:0; font-size:14pt; font-style:italic">2016-9-12 &nbsp; </p>
+<p style="font-family: serif; margin:0; font-size:14pt; font-style:italic">文中的代码可重复：），有任何问题联系邮箱: <em>
+&lt;longqiman&gt;@gmail.com </em></p> 
 
 # 数据科学可以解决什么问题？
 
