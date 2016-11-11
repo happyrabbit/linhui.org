@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-11-06">
+<meta name="date" content="2016-11-10">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -717,22 +717,27 @@ bagTune &lt;-<span class="st"> </span>caret::<span class="kw">train</span>(train
 ##   0.7016242  0.6642532  0.6522727
 ## 
 ## </code></pre>
-<p>可以看到，最优的ROC比之前单棵树有所改进。ROC曲线上的最优点，也就是最靠近左上角的点对应敏感度（<code>Sens</code>）为0.66，特异度（<code>Spec</code>）为0.65。</p>
+<p>可以看到，最优的ROC比之前单棵树有所改进。ROC曲线上的最优点，也就是最靠近左上角的点对应敏感度（<code>Sens</code>）为0.66，特异度（<code>Spec</code>）为0.65。这里因为变量的个数并不多，所以改进不那么明显，在变量多的时候装袋树的表现可能远好过单棵树。</p>
 </div>
 <div id="section-12.5" class="section level2">
 <h2><span class="header-section-number">12.5</span> 随机森林</h2>
-<p>装袋树（或其他高方差低偏差的方法）相对于单棵树减小了预测的方差，进而提升了模型的预测效果。生成 boostrap 样本给建立树的过程带来了随机的成分，因此其中的树是带有一定的分布的。类似地，对于每一个被预测的样本，其预测值也具有一个分布。然而，装袋法中的每棵树并不是完全独立的，这是因为每一棵树的每一个切分点上都考虑了所有的预测变量。可以想象，如果初始的样本量足够大，而且树模型可以充分刻画预测变量与因变量之间的关系，那么不同 bootstrap 样本生成的树应该具有类似的结构（特别是在树顶部分），因为它们背后的关系是相近的。这一特点被称为树相关性，它会使得装袋法不能最大限度地减少预测值的方差。图 8.14 给出了这一现象一个直接的展示。对于不同的 bootstrap 样本，所有的树都是以碳原子数目为首要切分变量，而且切分点都大约为3.5。第二个切分点略微有了一些变动，但也仅限于两个表面积变量和分子重量。尽管最终所有的树都是不同的，但他们的初始部分具有类似的结构，因此不同的树实际上是彼此相关的。这说明，装袋法对方差的缩减还可以进一步提升。对树相关现象的数学解释，可以参见 Hastie 等（2008）。减少树之间的相关性，即树的去相关化，将是提升装袋法效能的下一个逻辑步骤。 从统计的角度来看，要减小预测变量之间的相关性，可以在建立树的过程中引入一定的随机性。在 Breiman 发明装袋法后，有一些其他的作者通过在训练过程中加入随机性来进一步优化模型算法。由于树是装袋法中一个常见的模型，Dietterich（2000）提出了随机选择切分点的想法，即在树的每一个切分点中随机选择 个变量来生成树。另一种方法是随机选择变量的子集来构建整棵树（Ho 19898；Amit 和 Geman 1997）。Breiman（2000）同样尝试了在响应变量中加入噪声来对树的结构进行扰动。在细致地对这些推广后的装袋法进行研究之后，Breiman（2001）构建了一个统一的算法，称为随机森林。一般化的基于树的随机森林算法可以通过算法 8.2 来进行实现。 在集成组合中，每一个模型都对新样本进行一次预测，对产生的 个预测值进行平均得到随机森林的最终预测结果。由于算法在每个切分点上都会随机挑选预测变量，因此树之间的相关性将会被减弱。例如，在用随机森林对溶解度数据进行处理时，前六棵树的第一个切分点分别是 NumNonHBonds，NumCarbon，NumNonHAtoms，NumCarbon，NumCarbon 和 NumCarbon。这与图 8.14 中展示的树有着很大的不同。 随机森林的调优参数是每个切分点上随机选择的预测变量的数目，，它通常被记为 。在回归模型的设定下，Breiman（2001）推荐将 设为总预测变量数目的三分之一。由于随机森林的计算量通常较大，因此如果要对 进行调优，笔者建议首先考虑五个 值，它们从 2 变动到 ，并尽可能等间隔地划分。除此之外，建模者还需要指定森林中树的个数。Breiman（2001）证明了随机森林可以避免过度拟合；因此，使用大量的树建立森林不会对模型产生不利的影响。从实际使用的角度来说，森林的规模越大，训练和建立模型所耗费的计算负担也会越大。笔者建议最少应使用1000棵树，如果交叉验证的结果显示模型在1000棵树的位置还可以提升，那么建模者就应该加入更多的树，直到模型效能开始下降。</p>
+<p>我们已经知道装袋树使用了boostrap样本，但这些树之间并不是独立的，因为这些树的每个分裂点上都考虑了所有的自变量。可以想象，如果初始的样本量足够大，而且树模型可以充分刻画预测变量与因变量之间的关系，那么不同bootstrap样本生成的树应该具有类似的结构（特别是在树顶部分），因为它们背后的关系是相近的。这一特点被称为树相关性，它会使得装袋法不能最大限度地减少预测值的方差。这说明，装袋法对方差的缩减还可以进一步通过减小树之间的相关性得以提升。对树相关现象的数学解释，可以参见<span class="citation">[<a href="#ref-Hastie2008">73</a>]</span>。随机森林就是通过减少树的相关性在装袋树的基础上进行提高的。</p>
+<p>从统计的角度来看，要减小预测变量之间的相关性，可以在建立树的过程中引入一定的随机性，使得每一棵树使用的变量有些不同。在Breiman发明装袋法后，有一些其他的作者通过在训练过程中加入随机性来进一步优化模型算法。由于树是装袋法中一个常见的模型，Dietterich<span class="citation">[<a href="#ref-Dietterich2000">79</a>]</span>提出了随机选择切分点的想法，即在树的每一个分裂点处随机选择<span class="math inline">\(m\)</span>个变量来生成树。另一种方法是随机选择变量的子集来构建整棵树<span class="citation">[<a href="#ref-Ho1998">80</a>, <a href="#ref-amit1997">81</a>]</span>。Breiman同样尝试了在响应变量中加入噪声来对树的结构进行扰动<span class="citation">[<a href="#ref-Breiman2000">82</a>]</span>。在对这些各种升级改版的装袋法进行研究之后，Breiman于2001年提出了随机森林<span class="citation">[<a href="#ref-Breiman2001">83</a>]</span>。随机森林建造树的时候，每个分裂处都会从所有<span class="math inline">\(p\)</span>个变量中随机抽取<span class="math inline">\(m\)</span>个，然后在其中选出最优的<strong>一个</strong>变量用于分裂。</p>
+<p>通常情况下<span class="math inline">\(m=\sqrt{p}\)</span>。比如这里是10个问卷调查的问题，那么每个分裂点出随机抽取用于候选的变量大约为4。在考虑每个分裂点的时候，算法都会随机挑选新变量，通过这种方式减小树之间的相关性。这对于变量数目多的情况更加有效，这里由于我们一共只有10个变量，大家之后会看到，随机森林算法对结果的改进并不是很明显。这里每次选择变量的个数也是一个调优参数。在数据集合很大变量个数又很多的时候，对该参数调优的过程计算量比较大。这里建议在<span class="math inline">\(m=\sqrt{p}\)</span>附近取5个值先初步调优。森林中树的棵树是另外一个需要调优的参数。由于森林的规模越大，计算量就越大，通常情况下需要至少1000棵树，逐渐增加直到模型的效果没有改进。当模型表现趋于稳定后，增加更多的树没有什么帮助。</p>
+<p>一般的基于树的随机森林算法如下：</p>
 <blockquote>
 <p>基本的随机森林算法</p>
+</blockquote>
+<blockquote>
 <ol style="list-style-type: decimal">
-<li>选择模型数目m</li>
-<li>对 i=1 到 m 执行</li>
+<li>选择模型数目B</li>
+<li>对 i=1 到 B 执行</li>
 </ol>
 <ul>
 <li>从原数据中生成一个bootstrap样本</li>
 <li>在该样本上训练一个树模型</li>
 <li>对每个分裂点执行</li>
-<li>随机抽取k（&lt;P）个预测变量</li>
+<li>随机抽取m（&lt;p）个预测变量</li>
 <li>在这k个变量中选择能用于划分数据的最优变量</li>
 <li>终止</li>
 <li>使用通常的终止树模型的规则决定何时让树停止生长（不要修剪）</li>
@@ -741,11 +746,13 @@ bagTune &lt;-<span class="st"> </span>caret::<span class="kw">train</span>(train
 <li>终止</li>
 </ol>
 </blockquote>
+<p>随机森林和树的主要不同在于随机抽取m个预测变量。如果<span class="math inline">\(m=p\)</span>，那么随机森林等同于装袋。当我们有大量相关的变量时，通常选择较小的m比较好。下面我们用<code>caret</code>包调优随机森林模型：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 对入选的变量个数参数进行调优</span>
 mtryValues &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>:<span class="dv">5</span>)
 <span class="kw">set.seed</span>(<span class="dv">100</span>)
 rfTune &lt;-<span class="st"> </span><span class="kw">train</span>(<span class="dt">x =</span> trainx, 
                <span class="dt">y =</span> trainy,
+               <span class="co"># 指定随机森模型</span>
                <span class="dt">method =</span> <span class="st">&quot;rf&quot;</span>,
                <span class="dt">ntree =</span> <span class="dv">1000</span>,
                <span class="dt">tuneGrid =</span> <span class="kw">data.frame</span>(<span class="dt">.mtry =</span> mtryValues),
@@ -755,7 +762,7 @@ rfTune &lt;-<span class="st"> </span><span class="kw">train</span>(<span class="
                            <span class="dt">summaryFunction =</span> twoClassSummary,
                            <span class="dt">classProbs =</span> <span class="ot">TRUE</span>,
                            <span class="dt">savePredictions =</span> <span class="ot">TRUE</span>))</code></pre></div>
-<p>随机森林调优结果，在这个例子中，变量的数目不多，随机森林调优过程得到的每次考虑的变量数目是1。最优的曲线下面积和装袋树相比又有所提高：</p>
+<p>随机森林调优结果，在这个例子中，变量的数目不多，随机森林调优过程得到的每次考虑的变量数目是1。最优的曲线下面积和装袋树相比又有所提高但是提高的程度不大：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rfTune</code></pre></div>
 <pre><code>## Random Forest 
 ## 
@@ -777,12 +784,35 @@ rfTune &lt;-<span class="st"> </span><span class="kw">train</span>(<span class="
 ## 
 ## ROC was used to select the optimal model using  the largest value.
 ## The final value used for the model was mtry = 1.</code></pre>
+<p>得到调优参数之后也可以通过<code>randomForest</code>包拟合随机森林。由于装袋树只是随机森林的一种特殊情况，所以当你在随机森林函数中设置<span class="math inline">\(mtry=p\)</span>时，就能得到装袋树。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(randomForest)
+rfit =<span class="st"> </span><span class="kw">randomForest</span>(trainy ~<span class="st"> </span>., trainx, <span class="dt">mtry =</span> <span class="dv">1</span>, <span class="dt">ntree =</span> <span class="dv">1000</span>)</code></pre></div>
+<p>可以通过<code>importance()</code>函数得到变量的重要性：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">importance</span>(rfit)</code></pre></div>
+<pre><code>##         MeanDecreaseGini
+## Q1              9.403995
+## Q2              7.402103
+## Q3              8.145370
+## Q4             10.976084
+## Q5              5.351417
+## Q6              9.440028
+## Q7              6.341507
+## Q8              7.988312
+## Q9              5.853341
+## Q10             4.017603
+## segment        13.228502</code></pre>
+<p>这里对于分类的情况，重要性的衡量基于预测袋外数据时基尼系数减小的均值。可以用<code>varImpPlot()</code>函数对重要性绘图：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">varImpPlot</span>(rfit)</code></pre></div>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-268-1.png" width="672" /></p>
+<p>可以看到，平均考虑所有的树，变量<code>segment</code>和<code>Q4</code>最重要对于区分用户性别最重要。</p>
 </div>
 <div id="boosting" class="section level2">
 <h2><span class="header-section-number">12.6</span> 助推（Boosting）</h2>
-<p>助推法最早发明于20世纪80年代（Valiant 1984; Kearns和Valiant 1989），是用来解决分类问题。其大致思想是组合一系列的弱分类器（仅比随机猜测的预测效果好一些的分类器），使总体的误判率有所改进。研究者花费了一段时间来寻找一种有效实现助推理论的算法，最后终于由Freund 和 Schapire合作提出了AdaBoost 算法（Schapire 1999）。</p>
-<p>助推法，特别是 AdaBoost 算法，被证明是一种强大的预测工具，它通常会优于任何单个的模型。助推法的成功迅速吸引了建模研究者的注意，并且它开始被广泛地应用于基因表达（Dudoit 等 2002；Ben-Dor 等 2000），化学计量学（Varmuza 等2003），音乐流派识别（Bergstra 等 2006）等各个领域中。 在 AdaBoost 算法的成功问世之后，一些研究者（Friedman 等 2000）开始将 AdaBoost 算法与一系列的统计学概念联系起来，如损失函数，可加模型，Logistic 回归等，并且指出助推法可以被解释为最小化指数损失的向前逐步可加模型。这一对助推法本质上的理解提供了一种全新的视角，使得助推法可以在分类问题上进行算法上的推广。此外，这一新的视角使得该方法可以扩展至回归的问题。助推算法有好几种，这里我们介绍两种主要的方法：自适助推（AdaBoost）和随机梯度助推。</p>
-<p>自适助推（AdaBoost）</p>
+<p>助推法最早发明于20世纪80年代<span class="citation">[<a href="#ref-Valiant1984">84</a>, <a href="#ref-KV1989">85</a>]</span>，是用来解决分类问题。其被证明是一种强大的预测工具，被广泛地应用于基因表达<span class="citation">[<a href="#ref-dudoit2002">86</a>, <a href="#ref-ben-dor2000">87</a>]</span>、化学计量学<span class="citation">[<a href="#ref-Varmuza2003">88</a>]</span>、音乐流派识别<span class="citation">[<a href="#ref-Bergstra2006">89</a>]</span>等各个领域中。其大致思想是组合一系列的弱分类器（仅比随机猜测的预测效果好一些的分类器），使总体的误判率有所改进。</p>
+<p>研究者花费了一段时间来寻找一种有效实现助推理论的算法，最后终于在1996年，Yoav Freund和Robert Schapire合作提出了自适助推（AdaBoost）算法<span class="citation">[<a href="#ref-Schapire1999">90</a>]</span>，这是Adaptive Boosting的缩写。在自适助推算法的成功问世之后，一些研究者<span class="citation">[<span class="citeproc-not-found" data-reference-id="Friedman2000"><strong>???</strong></span>]</span>开始将自适助推算法与一系列的统计学概念联系起来，如损失函数，可加模型，逻辑回归等，并且指出助推法可以被解释为<strong>最小化指数损失的向前逐步可加模型</strong>。这用一个新的视角理解助推法的本质，使得助推法扩展至回归的问题。助推算法有好几种，这里我们介绍两种主要的方法：<strong>自适助推</strong>和<strong>随机梯度助推</strong>。</p>
+<ul>
+<li>自适助推（AdaBoost）</li>
+</ul>
 <p>自适助推生成一系列弱分类器，每次迭代，算法都会基于当前样本权重发现最佳的分类器。在第k轮迭代中被误分的样本在k+1轮迭代中将赋予更高的权重，被正确分类的样本在下一轮迭代中权重会降低。这意味着分类困难的样本的权重会不断加大直至算法识别出能正确分类这些样本的模型。因此，该算法要求每轮迭代学习数据的不同方面，着眼于包含难以分类的样本区域。每一次迭代中都会基于误差率计算一个阶段权重。算法中描述的阶段权重的本质表明精确度更高的模型有更高的正样本值，精确度较低的模型有较低的负样本值（脚注5：由于使用一个弱分类器，阶段值经常趋近与0）。一系列加权的分类器融合为一个集合，该集合有很强的潜在分类能力，比任何一个个体分类器都要好。</p>
 <pre>
 1 一类样本值标记为+1，另一类样本值为-1
@@ -901,7 +931,7 @@ gbmRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span class="dt
        <span class="dt">lwd =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>),
        <span class="dt">col =</span> <span class="kw">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;red&quot;</span>, <span class="st">&quot;green&quot;</span>, <span class="st">&quot;blue&quot;</span>),
        <span class="dt">pch =</span> <span class="kw">c</span>(<span class="dv">16</span>, <span class="dv">3</span>, <span class="dv">1</span>, <span class="dv">10</span>))</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-268-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-271-1.png" width="672" /></p>
 </div>
 <div id="section-12.7" class="section level2">
 <h2><span class="header-section-number">12.7</span> 其它树话题</h2>
@@ -933,6 +963,42 @@ gbmRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span class="dt
 </div>
 <div id="ref-APM">
 <p>13. Max Kuhn, K.J.: Applied predictive modeling. Springer (2013).</p>
+</div>
+<div id="ref-Dietterich2000">
+<p>79. T, D.: An experimental comparison of three methods for constructing ensembles of decision trees: Bagging, boosting, and randomization. Machine Learning. 40, 139–158 (2000).</p>
+</div>
+<div id="ref-Ho1998">
+<p>80. T, H.: The random subspace method for constructing decision forests. IEEE Transactions on Pattern Analysis and Machine Intelligence. 13, 340–354 (1998).</p>
+</div>
+<div id="ref-amit1997">
+<p>81. Y, A., D, G.: Shape quantization and recognition with randomized trees. Neural Computation. 9, 1545–1588 (1997).</p>
+</div>
+<div id="ref-Breiman2000">
+<p>82. L, B.: Randomizing outputs to increase prediction accuracy. Machine Learning. 40, 229–242 (2000).</p>
+</div>
+<div id="ref-Breiman2001">
+<p>83. L, B.: Random forests. Machine Learning. 45, 5–32 (2001).</p>
+</div>
+<div id="ref-Valiant1984">
+<p>84. L, V.: A theory of the learnable. Communications of the ACM. 27, 1134–1142 (1984).</p>
+</div>
+<div id="ref-KV1989">
+<p>85. M, K., L, V.: Cryptographic limitations on learning boolean formulae and finite automata, (1989).</p>
+</div>
+<div id="ref-dudoit2002">
+<p>86. Dudoit S, F.J., T, S.: Comparison of discrimination meth- ods for the classification of tumors using gene expression data. Journal of the American Statistical Association. 97, 77–87 (2002).</p>
+</div>
+<div id="ref-ben-dor2000">
+<p>87. Ben-Dor A, F.N., Bruhn L, Z, Y.: Tissue classification with gene expression profiles. Journal of Computational Biology. 7, 559–583 (2000).</p>
+</div>
+<div id="ref-Varmuza2003">
+<p>88. Varmuza K, H.P., K, F.: Boosting applied to classification of mass spectral data. Journal of Data Science. 1, (2003).</p>
+</div>
+<div id="ref-Bergstra2006">
+<p>89. Bergstra J, E.D., Casagrande N, B, K. ́egl: Aggregate features and adaboost for music classification. Machine Learning. 65, 473–484 (2006).</p>
+</div>
+<div id="ref-Schapire1999">
+<p>90. YFR, S.: Adaptive game playing using multiplicative weights. Games and Economic Behavior. 29, 79–103 (1999).</p>
 </div>
 </div>
             </section>
