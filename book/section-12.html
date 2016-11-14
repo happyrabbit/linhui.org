@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-11-10">
+<meta name="date" content="2016-11-14">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -809,23 +809,29 @@ rfit =<span class="st"> </span><span class="kw">randomForest</span>(trainy ~<spa
 <div id="boosting" class="section level2">
 <h2><span class="header-section-number">12.6</span> 助推（Boosting）</h2>
 <p>助推法最早发明于20世纪80年代<span class="citation">[<a href="#ref-Valiant1984">84</a>, <a href="#ref-KV1989">85</a>]</span>，是用来解决分类问题。其被证明是一种强大的预测工具，被广泛地应用于基因表达<span class="citation">[<a href="#ref-dudoit2002">86</a>, <a href="#ref-ben-dor2000">87</a>]</span>、化学计量学<span class="citation">[<a href="#ref-Varmuza2003">88</a>]</span>、音乐流派识别<span class="citation">[<a href="#ref-Bergstra2006">89</a>]</span>等各个领域中。其大致思想是组合一系列的弱分类器（仅比随机猜测的预测效果好一些的分类器），使总体的误判率有所改进。</p>
-<p>研究者花费了一段时间来寻找一种有效实现助推理论的算法，最后终于在1996年，Yoav Freund和Robert Schapire合作提出了自适助推（AdaBoost）算法<span class="citation">[<a href="#ref-Schapire1999">90</a>]</span>，这是Adaptive Boosting的缩写。在自适助推算法的成功问世之后，一些研究者<span class="citation">[<span class="citeproc-not-found" data-reference-id="Friedman2000"><strong>???</strong></span>]</span>开始将自适助推算法与一系列的统计学概念联系起来，如损失函数，可加模型，逻辑回归等，并且指出助推法可以被解释为<strong>最小化指数损失的向前逐步可加模型</strong>。这用一个新的视角理解助推法的本质，使得助推法扩展至回归的问题。助推算法有好几种，这里我们介绍两种主要的方法：<strong>自适助推</strong>和<strong>随机梯度助推</strong>。</p>
+<p>研究者花费了一段时间来寻找一种有效实现助推理论的算法，最后终于在1996年，Yoav Freund和Robert Schapire合作提出了自适助推（AdaBoost）算法<span class="citation">[<a href="#ref-Schapire1999">90</a>]</span>，这是Adaptive Boosting的缩写。在自适助推算法的成功问世之后，一些研究者<span class="citation">[<a href="#ref-Friedman2000">91</a>]</span>开始将自适助推算法与一系列的统计学概念联系起来，如损失函数，可加模型，逻辑回归等，并且指出助推法可以被解释为<strong>最小化指数损失的向前逐步可加模型</strong>。这用一个新的视角理解助推法的本质，使得助推法扩展至回归的问题。助推算法有好几种，这里我们介绍两种主要的方法：<strong>自适助推</strong>和<strong>随机梯度助推</strong>。</p>
 <ul>
 <li>自适助推（AdaBoost）</li>
 </ul>
-<p>自适助推生成一系列弱分类器，每次迭代，算法都会基于当前样本权重发现最佳的分类器。在第k轮迭代中被误分的样本在k+1轮迭代中将赋予更高的权重，被正确分类的样本在下一轮迭代中权重会降低。这意味着分类困难的样本的权重会不断加大直至算法识别出能正确分类这些样本的模型。因此，该算法要求每轮迭代学习数据的不同方面，着眼于包含难以分类的样本区域。每一次迭代中都会基于误差率计算一个阶段权重。算法中描述的阶段权重的本质表明精确度更高的模型有更高的正样本值，精确度较低的模型有较低的负样本值（脚注5：由于使用一个弱分类器，阶段值经常趋近与0）。一系列加权的分类器融合为一个集合，该集合有很强的潜在分类能力，比任何一个个体分类器都要好。</p>
-<pre>
-1 一类样本值标记为+1，另一类样本值为-1
-2 每个样本有着相同的起始权重（$\frac{1}{n}$）
-3 对 k=1到K 执行
-4   用加权后的样本拟合一个弱分类器，并计算出第k个模型的误判率（$err_k$）
-5   计算第k轮迭代的值$ln\frac{1-err_k}{err_k}$
-6   更新样本权重，增加误判样本的权重，减小正确判定样本的权重
-7 结束
-8 通过如下方式计算助推分类器对每个样本的预测：将第k步得到的值乘以第k布的模型预测结果，并且将该乘积对所有的k求和。如果和是正数，那么将样本判定为+1类，反之为-1类。
-
-对于二分类问题的自适助推算法
-</pre>
+<p>我们从有名的“AdaBoost.M1.”算法开始，其由Yoav Freund和Robert Schapire的<span class="citation">[<a href="#ref-Freund1997">92</a>]</span>提出。该算法考虑二分类问题，应变量编码为<span class="math inline">\(Y \in \{-1, 1\}\)</span>。对于自变量<span class="math inline">\(X\)</span>，对应的分类器<span class="math inline">\(G(X)\)</span>输出的预测值是1或者－1。在训练集样本上的误判率为：</p>
+<p><span class="math display">\[\bar{err}=\frac{1}{N}\Sigma_{i=1}^NI(y_i\neq G(x_i))\]</span></p>
+<p>对于自适助推生成一系列弱分类器<span class="math inline">\(G_m(x),\ m=1,2,...,M\)</span>，每次迭代，算法都会基于当前样本权重发现最佳的分类器。在第m轮迭代中被误分的样本在m+1轮迭代中将赋予更高的权重，被正确分类的样本在下一轮迭代中权重会降低。这意味着分类困难的样本的权重会不断加大直至算法识别出能正确分类这些样本的模型。因此，该算法要求每轮迭代学习数据的不同方面，着眼于包含难以分类的样本区域。每一次迭代中都会基于误差率计算一个阶段权重。最后的预测是将这些弱分类器通过这些阶段权重进行加权平均：</p>
+<p><span class="math display">\[G(x)=sign ( \Sigma_{m=1}^M \alpha_{m}G_m(x))\]</span> 这里<span class="math inline">\(\alpha_1,\alpha_2,...,\alpha_M\)</span>是每个阶段的权重。</p>
+<blockquote>
+<p>AdaBoost.M1.算法</p>
+</blockquote>
+<blockquote>
+<ol style="list-style-type: decimal">
+<li>一类样本值标记为+1，另一类样本值为-1</li>
+<li>每个样本有着相同的起始权重（<span class="math inline">\(w_i=\frac{1}{N},i=1,...,N\)</span>）</li>
+<li>对 m = 1到M 执行:</li>
+<li>用<span class="math inline">\(w_i\)</span>加权后的样本拟合一个弱分类器<span class="math inline">\(G_m(x)\)</span></li>
+<li>计算出第M个模型的误判率（<span class="math inline">\(err_m=\frac{\Sigma_{i=1}^Nw_i I(y_i\neq G_m(x_i))}{\Sigma_{i=1}^Nw_i}\)</span>）</li>
+<li>计算第m轮迭代的权重值<span class="math inline">\(\alpha_m=ln\frac{1-err_m}{err_m}\)</span></li>
+<li>更新样本权重<span class="math inline">\(w_i = w_i\cdot exp[\alpha_m\cdot I(y_i \neq G_m(x_i))],\ i=1,2,\dots,N\)</span></li>
+<li>通过下面方式计算助推分类器对每个样本的预测：<span class="math inline">\(G(x)=sign[\Sigma_{m=1}^M\alpha_mG_m(x)]\)</span>，<span class="math inline">\(sign(\cdot)\)</span>表示如果<span class="math inline">\(\cdot\)</span>是正数，那么将样本判定为+1类，反之为-1类</li>
+</ol>
+</blockquote>
 <p>助推可应用于任何分类技术，但是分类树是助推的一个常用方法，因为分类树可以通过限制树的深度减少分裂数目制造弱分类器。Breinman（1998）给出了解释了为什么分类树在助推上表现良好。由于分类树是一种低偏差/高方差的技术，树的集合有助于降低方差，产生一个低方差低偏差的结果。透过助推算法，Johnson和 Rayens (2007)表明通过助推无法显著改进低方差的模型。因此，诸如LDA或KNN等助推方法对方差的改善程度不像神经网络(Freund和Schapire1996)和朴素贝叶斯方法那样显著(Bauer和Kohavi1999)。</p>
 <p>随机梯度助推</p>
 <p>Friedman等（2000）提供了自适助推算法的统计学见解。他们发现分类问题可以被解释为一个正向分步可加模型，该模型最小化指数损失函数。基于该框架产生了一些泛化算法，如Real AdaBoost, Gentle AdaBoost, 和LogitBoost。随后，这些泛化的被统一放入一个称为梯度助推机的框架内。</p>
@@ -999,6 +1005,12 @@ gbmRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span class="dt
 </div>
 <div id="ref-Schapire1999">
 <p>90. YFR, S.: Adaptive game playing using multiplicative weights. Games and Economic Behavior. 29, 79–103 (1999).</p>
+</div>
+<div id="ref-Friedman2000">
+<p>91. Friedman J, H.T., R, T.: Additive logistic regression: A statistical view of boosting. Annals of Statistics. 38, 337–374 (2000).</p>
+</div>
+<div id="ref-Freund1997">
+<p>92. Freund, Y., Schapire, R.: A decision-theoretic generalization of online learning and an application to boosting. Journal of Computer and System Sciences. 55, 119–139 (1997).</p>
 </div>
 </div>
             </section>
