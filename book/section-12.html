@@ -233,7 +233,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="12.4" data-path="section-12.html"><a href="section-12.html#section-12.4"><i class="fa fa-check"></i><b>12.4</b> 装袋树</a></li>
 <li class="chapter" data-level="12.5" data-path="section-12.html"><a href="section-12.html#section-12.5"><i class="fa fa-check"></i><b>12.5</b> 随机森林</a></li>
 <li class="chapter" data-level="12.6" data-path="section-12.html"><a href="section-12.html#boosting"><i class="fa fa-check"></i><b>12.6</b> 助推（Boosting）</a></li>
-<li class="chapter" data-level="12.7" data-path="section-12.html"><a href="section-12.html#section-12.7"><i class="fa fa-check"></i><b>12.7</b> 助推法的可加模型框架</a></li>
+<li class="chapter" data-level="12.7" data-path="section-12.html"><a href="section-12.html#section-12.7"><i class="fa fa-check"></i><b>12.7</b> 知识扩展：助推法的可加模型框架</a></li>
 <li class="chapter" data-level="12.8" data-path="section-12.html"><a href="section-12.html#section-12.8"><i class="fa fa-check"></i><b>12.8</b> 其它树话题</a></li>
 </ul></li>
 <li class="chapter" data-level="13" data-path="section-13.html"><a href="section-13.html"><i class="fa fa-check"></i><b>13</b> 深度学习</a><ul>
@@ -825,42 +825,46 @@ rfit =<span class="st"> </span><span class="kw">randomForest</span>(trainy ~<spa
 <li>一类样本值标记为+1，另一类样本值为-1</li>
 <li>每个样本有着相同的起始权重（<span class="math inline">\(w_i=\frac{1}{N},i=1,...,N\)</span>）</li>
 <li>对 m = 1到M 执行:
-<ol style="list-style-type: decimal">
+<ul>
 <li>用<span class="math inline">\(w_i\)</span>加权后的样本拟合一个弱分类器<span class="math inline">\(G_m(x)\)</span></li>
 <li>计算出第M个模型的误判率（<span class="math inline">\(err_m=\frac{\Sigma_{i=1}^Nw_i I(y_i\neq G_m(x_i))}{\Sigma_{i=1}^Nw_i}\)</span>）</li>
 <li>计算第m轮迭代的权重值<span class="math inline">\(\alpha_m=ln\frac{1-err_m}{err_m}\)</span></li>
 <li>更新样本权重<span class="math inline">\(w_i = w_i\cdot exp[\alpha_m\cdot I(y_i \neq G_m(x_i))],\ i=1,2,\dots,N\)</span></li>
-</ol></li>
+</ul></li>
 <li>通过下面方式计算助推分类器对每个样本的预测：<span class="math inline">\(G(x)=sign[\Sigma_{m=1}^M\alpha_mG_m(x)]\)</span>，<span class="math inline">\(sign(\cdot)\)</span>表示如果<span class="math inline">\(\cdot\)</span>是正数，那么将样本判定为+1类，反之为-1类</li>
 </ol>
 <p>AdaBoost.M1算法也称为“离散AdaBoost”算法，因为迭代产生的分类器<span class="math inline">\(G_m(x)\)</span>返回的是离散的标签，如果分类器返回的是数值，比如一个概率值，可以对上面算法进行适当修改<span class="citation">[<a href="#ref-Friedman2000">91</a>]</span>。助推可应用于任何分类技术，但是分类树是助推的一个常用方法，因为分类树可以通过限制树的深度减少分裂数目制造弱分类器。Breinman<span class="citation">[<a href="#ref-Breiman1998">93</a>]</span>解释了为什么分类树在助推上表现良好。由于分类树是一种低偏差/高方差的技术，树的集合有助于降低方差，产生一个低方差低偏差的结果。助推无法显著改进低方差的模型。因此，助推对诸如LDA或KNN等的改善程度不像其对神经网络<span class="citation">[<a href="#ref-Freund1996">94</a>]</span>和朴素贝叶斯方法那样显著<span class="citation">[<a href="#ref-Bauer1999">95</a>]</span>。</p>
 <ul>
 <li>随机梯度助推</li>
 </ul>
-<p>Friedman等（2000）提供了自适助推算法的统计学见解。他们发现分类问题可以被解释为一个正向分步可加模型，该模型最小化指数损失函数。基于该框架产生了一些泛化算法，如Real AdaBoost, Gentle AdaBoost, 和LogitBoost。随后，这些泛化的被统一放入一个称为梯度助推机的框架内。</p>
-<pre>
-1 设定样本预测初始值为对数发生：
-2 对 j=1到M 执行
-3   计算残差（即，梯度）$z_i=y_i-\hat{p}_i$
-4   对训练集随机抽样
-5   基于随机样本，将之前得到的残差作为结果变量训练树模型
-6   计算终节点Pearson残差的估计：$r_i=\frac{1/n\Sigma_i^n(y_i-\hat{p}_i)}{1/n\Sigma_i^n\hat{p}_i(1-\hat{p}_i)}$
-7   更新当前模型为：$f_i=f_i+\lambda f_i^{(j)}$
-8 结束
-
-对二分类问题的简单梯度助推
-</pre>
+<p>Friedman等<span class="citation">[<a href="#ref-Friedman2000">91</a>]</span>提供了自适助推算法的统计学见解，并且指出助推法可以被解释为<strong>最小化指数损失的向前逐步可加模型</strong>。该框架产生了一些泛化算法，如Real AdaBoost、Gentle AdaBoost和LogitBoost。随后，这些算法被统一放入一个称为<strong>梯度助推器</strong>的框架内。本章最后的知识扩展小节介绍了将助推放在向前逐步可加模型框架内，希望有一定数学基础的小伙伴能花些时间理解背后的基本原理。</p>
+<blockquote>
+<p>对二分类问题的简单梯度助推</p>
+</blockquote>
+<ol style="list-style-type: decimal">
+<li>设定样本预测初始值为对数发生：</li>
+<li>对 j=1到M 执行
+<ul>
+<li>计算残差（即，梯度）<span class="math inline">\(z_i=y_i-\hat{p}_i\)</span></li>
+<li>对训练集随机抽样</li>
+<li>基于随机样本，将之前得到的残差作为结果变量训练树模型</li>
+</ul></li>
+<li>计算终节点Pearson残差的估计：<span class="math inline">\(r_i=\frac{1/n\Sigma_i^n(y_i-\hat{p}_i)}{1/n\Sigma_i^n\hat{p}_i(1-\hat{p}_i)}\)</span></li>
+<li>更新当前模型为：<span class="math inline">\(f_i=f_i+\lambda f_i^{(j)}\)</span></li>
+<li>结束</li>
+</ol>
 <p>在回归中，当树模型用作基础的学习器，基本的梯度助推有两个调优参数：树深度（或交互深度）和迭代的次数。随机梯度助推对事件概率建模的公式为，与我们在逻辑回归中见到的类似：</p>
 <p><span class="math display">\[\hat{p}_i=\frac{1}{1+exp[-f(x)]}\]</span></p>
 <p>上式中，<span class="math inline">\(f(x)\)</span>为在的模型预测值。举例来说，模型的初始估计可能是样本的对数发生比，公式中p为训练集中一个类的样本比例。</p>
-<p>使用者可以通过选择合适的损失函数和对应的梯度来使算法更具有针对性(Hastie等2008)。萎缩可以在算法最后一步实现。更进一步，若在该算法第一步内循环前添加一个随机抽样方案，则其可以归入随机梯度助推框架。</p>
-<p>自从助推法问世以来一直很受青睐，尤其是在分类问题上，常常被用来当作基础学习器。很多崇尚“拿来主义”的分析师通常将助推树当成一切问题的万精油。目前为止，这个方法在大多数情况下都能够给出合理的结果，虽然并不总是最优的模型。对于那些对模型背景知识不了解，只知道通过使用相应代码实践模型的分析人员，助推树确实是很好的“现成模型”，因为它不需要对数据进行预处理，也不要求你解释变量。但对于想要更近一步的小伙伴们，我建议大家还是努力了解背后的原理，这样一来能够知道在什么场合其它模型可能会给出更好的结果。使用一个你完全不了解的东西不仅仅有风险，也不符合匠人精神。个人认为，模型和分析的美，都在于其背后的原理和思想，而数学只是表达这个思想的一种方式。</p>
+<p>使用者可以通过选择合适的损失函数和对应的梯度来使算法更具有针对性<span class="citation">[<a href="#ref-Hastie2008">73</a>]</span>。收缩可以在算法最后一步实现。若在该算法第一步内循环前添加一个随机抽样方案，则其可以归入<strong>随机梯度助推</strong>框架。</p>
 <!--
 对于经费申请数据，构造一个调定参数方格，交互深度在1到9之间，树的数量在100到2000之间，萎缩范围从0.01到0.1。该网格用于构造一个助推模型，模型中类别变量分别被看做独立类和分组类。对于独立类模型，ROC曲线下面积的最优值为0.94，交互深度为9，树的数量为1300，萎缩为0.01.对于分组类模型，ROC曲线下面积最佳值为0.92，交互深度为7，树的数量为100，萎缩为0.01（见图14.9）。在这种情况下，基于ROC曲线，独立类模型表现上好于分组类模型。然而，两个模型中树的数量有很大不同，这在逻辑上是合理的，因为二元自变量集大于分组类。
 
 考察图14.10和图14.11展示的分组类和独立类自变量的调优参数设定揭示了一些有趣的对比。首先，助推独立分类变量在所有调优参数设置上的表现几乎一致优于分组变量。由于对许多重要的分类变量而言，只有其中一个类别的值包含有意义的预测信息，故出现该模式【译者注：指代前一句话说的助推独立分类变量表现优于分组标量的模式】是很可能的。因此，使用独立类变量的树能更容易快速找到信息，进而推动助推过程。在分组变量内，对不同深度的树，模型预测表现几乎随着萎缩参数的增大一致减小。这些结果表明，对分组类助推从尺寸适当的初始树获取大部分预测信息。一个支持该结论的证据是单棵树（0.89）和最优数目的助推树（0.92）对应的AUC值明显的不同。助推独立类结果显示：对于低萎缩值，模型表现随树的棵树增加而增加；对于高萎缩值，模型表现随树棵树增加而降低。但是无论萎缩值大还是小，每个过程的预测表现的峰值大约为ROC=0.94。该结果表明对于该数据，不需要很大的萎缩值助推法就能搜索到最优的参数设置。
 -->
 <p>助推方法在分类问题中变量重要性的计算方式和在回归问题中类似：对于集合中任何一棵树，每个变量带来的分裂准则的改进（对于所有使用该变量的分裂点）的累加得到一个重要性值（这个值是某个变量在某个树上的重要性累加值）。集合内所有树上的重要性值的平均就是相应变量重要性。</p>
+<p>自从助推法问世以来一直很受青睐，尤其是在分类问题上，常常被用来当作基础学习器。很多崇尚“拿来主义”的分析师通常将助推树当成一切问题的万精油。目前为止，这个方法在大多数情况下都能够给出合理的结果，虽然并不总是最优的模型。对于那些对模型背景知识不了解，只知道通过使用相应代码实践模型的分析人员，助推树确实是很好的“现成模型”，因为它不需要对数据进行预处理，也不要求你解释变量。但对于想要更近一步的小伙伴们，我建议大家还是努力了解背后的原理，这样一来能够知道在什么场合其它模型可能会给出更好的结果。使用一个你完全不了解的东西不仅仅有风险，也不符合匠人精神。个人认为，模型和分析的美，都在于其背后的原理和思想，而数学只是表达这个思想的一种方式。</p>
+<p>下面我们展示如何用R拟合助推树。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gbmGrid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">interaction.depth =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">9</span>),
                        <span class="dt">n.trees =</span> <span class="dv">1</span>:<span class="dv">5</span>,
                        <span class="dt">shrinkage =</span> <span class="kw">c</span>(.<span class="dv">01</span>, .<span class="dv">1</span>),
@@ -885,6 +889,7 @@ gbmTune</code></pre></div>
 ROC was used to select the optimal model using  the largest value.
 The final values used for the model were n.trees = 4, interaction.depth =
  3, shrinkage = 0.01 and n.minobsinnode = 6. </code></pre></div>
+<p>我们来比较下各种树模型给出的结果：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">treebagRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span class="dt">response =</span> bagTune$pred$obs,
                         <span class="dt">predictor =</span> bagTune$pred$Female,
                         <span class="dt">levels =</span> <span class="kw">rev</span>(<span class="kw">levels</span>(bagTune$pred$obs)))
@@ -944,7 +949,7 @@ gbmRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span class="dt
 <p><img src="DS_R_files/figure-html/unnamed-chunk-271-1.png" width="672" /></p>
 </div>
 <div id="section-12.7" class="section level2">
-<h2><span class="header-section-number">12.7</span> 助推法的可加模型框架</h2>
+<h2><span class="header-section-number">12.7</span> 知识扩展：助推法的可加模型框架</h2>
 <p>助推法其实没有想象中的那么神秘。如前所述，Friedman<span class="citation">[<a href="#ref-Friedman2000">91</a>]</span>将自适助推算法与一系列的统计学概念联系起来，并且指出助推法可以被解释为<strong>最小化指数损失的向前逐步可加模型</strong>。本小节将介绍可加模型框架下的助推法，理解这一点有助于大家理解该模型的本质。</p>
 <p>很多看似不同的模型，其本质都是<strong>基扩展模型</strong>。回顾AdaBoost.M1算法最终得到的分类器：</p>
 <p><span class="math display">\[G(x)=sign ( \Sigma_{m=1}^M \alpha_{m}G_m(x))\]</span></p>
@@ -977,7 +982,39 @@ gbmRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span class="dt
 <p>对应可以得到：</p>
 <p><span class="math display">\[L(y_i,f_{m-1}(x_i)+\beta b(x_i;\gamma))=(y_i-f_{m-1}(x_i)-\beta b(x_i;\gamma))^2\]</span></p>
 <p>其中<span class="math inline">\(y_i-f_{m-1}(x_i)\)</span>是当前模型下第i个样本对应的残差。也就是说，在平方误差损失下，每一步迭代其实是在拟合之前模型的残差。这也是最小二乘助推回归的基本思想。但平方损失并不是一个好的选择，用于回归问题时容易受离群点的影响，所以我们通常会选择其它损失函数。</p>
-<p>类似的，之前的AdaBoost.M1算法</p>
+<p>类似的，之前的AdaBoost.M1算法是向前逐步可加模型算法取下面损失函数时的一个特例：</p>
+<p><span class="math display">\[L(y,f(x))=exp(-yf(x))\]</span></p>
+<p>在AdaBoost.M1算法中，基函数是每次迭代得到的分类器<span class="math inline">\(G_m(x)\in \{-1,1\}\)</span>。如果使用上面指数损失函数，相应优化问题为：</p>
+<p><span class="math display">\[\begin{array}{ccc}
+(\beta_m,G_m) &amp; = &amp; \underset{\beta,G}{argmin}\Sigma_{i=1}^N exp[-y_i(f_{m-1}(x_i)+\beta G(x_i))]\\
+&amp; = &amp; \underset{\beta, G}{argmin}\Sigma_{i=1}^N exp[-y_i \beta G(x_i)]\cdot exp[-y_if_{m-1}(x_i)]\\
+&amp; = &amp; \underset{\beta, G}{argmin}\Sigma_{i=1}^N w_i^m exp[-y_i\beta G(x_i)]
+\end{array}
+\]</span></p>
+<p>其中<span class="math inline">\(w_i^m= exp[-y_if_{m-1}(x_i)]\)</span>，其并不依赖于<span class="math inline">\(\beta\)</span>和<span class="math inline">\(G(x)\)</span>，因此可以看成对每个观测赋予的权重。该权重和<span class="math inline">\(f_{m-1}(x_i)\)</span>有关，因此每次迭代权重也会相应变化。我们可以进一步分解上面优化函数：</p>
+<p><span class="math display">\[\begin{array}{ccc}
+(\beta_{m},G_{m}) &amp; = &amp; \underset{\beta,G}{argmin}\Sigma_{i=1}^{N}w_{i}^{m}exp[-y_{i}\beta G(x_{i})]\\
+ &amp; = &amp; \underset{\beta,G}{argmin}\Sigma_{i=1}^{N}\left\{ w_{i}^{m}e^{-\beta}I(y_{i}=G(x))+w_{i}^{m}e^{\beta}I(y_{i}\neq G(x))\right\}\\
+ &amp; = &amp;  \underset{\beta,G}{argmin}\Sigma_{i=1}^{N}\left\{ w_{i}^{m}e^{-\beta}[1-I(y_{i}\neq G(x))]+w_{i}^{m}e^{\beta}I(y_{i}\neq G(x))\right\}\\
+ &amp; = &amp; \underset{\beta,G}{argmin} \left{(e^{\beta}-e^{-\beta})\cdot \Sigma_{i=1}^N w_i^{m}I(y_i \neq G(x_i))+e^{-\beta}\cdot \Sigma_{i=1}^N w_i^{m} \right}
+\end{array}
+\]</span></p>
+<p>当<span class="math inline">\(\beta &gt;0\)</span>时，上式的解为：</p>
+<p><span class="math display">\[G_{m} = \underset{G}{argmin}\Sigma_{i=1}^{N}w_{i}^{m}I(y_{i}\neq G(x))\]</span></p>
+<p>也就是寻找最小化加权误判率的判别器。将上面<span class="math inline">\(G_m\)</span>代入优化函数，对<span class="math inline">\(\beta\)</span>求导设置其为0，可以解出：</p>
+<p><span class="math display">\[\beta_m =\frac{1}{2}ln\frac{1-err_m}{err_m}\]</span></p>
+<p>其中</p>
+<p><span class="math display">\[err_m = \frac{\Sigma_{i=1}^N w_i^{m}I(y_i \neq G_m(x_i))}{\Sigma_{i=1}^N w_i^{m}}\]</span></p>
+<p>根据向前逐步可加模型算法，结果更新为：</p>
+<p><span class="math display">\[f_m(x)=f_{m-1}(x)+\beta_m G_m(x)\]</span></p>
+<p>进而我们可以得到下一次迭代的权重：</p>
+<p><span class="math display">\[\begin{array}{ccc}
+w_i^{m+1} &amp; = &amp; exp[-y_if_m (x_i)]\\
+&amp; = &amp; exp[-y_if_{m-1}(x)-y_i \beta_m G_m(x)]\\
+&amp; = &amp; w_{i}^{m}\cdot exp[-\beta_m y_i G_m(x_i)]
+\end{array}\]</span></p>
+<p>由于<span class="math inline">\(-y_i G_m(x_i)=2\cdot I(y_i \neq G_m(x_i))-1\)</span>，上式可以进一步写为：</p>
+<p><span class="math display">\[w_i^{m+1}=w_i^m \cdot exp[\alpha_mI(y_i\neq G_m(x_i))] \cdot exp[-\beta_m]\]</span> 其中<span class="math inline">\(\alpha_m=2\beta_m=ln\frac{1-err_m}{err_m}\)</span>，和之前AdaBoost.M1算法中的<span class="math inline">\(\alpha_m\)</span>一样。因此，AdaBoost.M1算法实际上是向前逐步可加模型算法的一个特例。关于损失函数的选择和比较，大家可以参考<span class="citation">[<a href="#ref-Hastie2008">73</a>]</span>的10.5和10.6小节。</p>
 </div>
 <div id="section-12.8" class="section level2">
 <h2><span class="header-section-number">12.8</span> 其它树话题</h2>
