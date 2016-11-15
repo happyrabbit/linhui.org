@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-11-14">
+<meta name="date" content="2016-11-15">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -233,7 +233,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="12.4" data-path="section-12.html"><a href="section-12.html#section-12.4"><i class="fa fa-check"></i><b>12.4</b> 装袋树</a></li>
 <li class="chapter" data-level="12.5" data-path="section-12.html"><a href="section-12.html#section-12.5"><i class="fa fa-check"></i><b>12.5</b> 随机森林</a></li>
 <li class="chapter" data-level="12.6" data-path="section-12.html"><a href="section-12.html#boosting"><i class="fa fa-check"></i><b>12.6</b> 助推（Boosting）</a></li>
-<li class="chapter" data-level="12.7" data-path="section-12.html"><a href="section-12.html#section-12.7"><i class="fa fa-check"></i><b>12.7</b> 其它树话题</a></li>
+<li class="chapter" data-level="12.7" data-path="section-12.html"><a href="section-12.html#section-12.7"><i class="fa fa-check"></i><b>12.7</b> 助推法的可加模型框架</a></li>
+<li class="chapter" data-level="12.8" data-path="section-12.html"><a href="section-12.html#section-12.8"><i class="fa fa-check"></i><b>12.8</b> 其它树话题</a></li>
 </ul></li>
 <li class="chapter" data-level="13" data-path="section-13.html"><a href="section-13.html"><i class="fa fa-check"></i><b>13</b> 深度学习</a><ul>
 <li class="chapter" data-level="13.1" data-path="section-6.html"><a href="section-6.html#-1"><i class="fa fa-check"></i><b>13.1</b> 介绍</a></li>
@@ -728,24 +729,24 @@ bagTune &lt;-<span class="st"> </span>caret::<span class="kw">train</span>(train
 <blockquote>
 <p>基本的随机森林算法</p>
 </blockquote>
-<blockquote>
 <ol style="list-style-type: decimal">
 <li>选择模型数目B</li>
-<li>对 i=1 到 B 执行</li>
-</ol>
+<li>对 i=1 到 B 执行
 <ul>
 <li>从原数据中生成一个bootstrap样本</li>
-<li>在该样本上训练一个树模型</li>
-<li>对每个分裂点执行</li>
+<li>在该样本上训练一个树模型
+<ul>
+<li>对每个分裂点执行
+<ul>
 <li>随机抽取m（&lt;p）个预测变量</li>
 <li>在这k个变量中选择能用于划分数据的最优变量</li>
+</ul></li>
 <li>终止</li>
+</ul></li>
 <li>使用通常的终止树模型的规则决定何时让树停止生长（不要修剪）</li>
-</ul>
-<ol style="list-style-type: decimal">
+</ul></li>
 <li>终止</li>
 </ol>
-</blockquote>
 <p>随机森林和树的主要不同在于随机抽取m个预测变量。如果<span class="math inline">\(m=p\)</span>，那么随机森林等同于装袋。当我们有大量相关的变量时，通常选择较小的m比较好。下面我们用<code>caret</code>包调优随机森林模型：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 对入选的变量个数参数进行调优</span>
 mtryValues &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>:<span class="dv">5</span>)
@@ -818,22 +819,24 @@ rfit =<span class="st"> </span><span class="kw">randomForest</span>(trainy ~<spa
 <p>对于自适助推生成一系列弱分类器<span class="math inline">\(G_m(x),\ m=1,2,...,M\)</span>，每次迭代，算法都会基于当前样本权重发现最佳的分类器。在第m轮迭代中被误分的样本在m+1轮迭代中将赋予更高的权重，被正确分类的样本在下一轮迭代中权重会降低。这意味着分类困难的样本的权重会不断加大直至算法识别出能正确分类这些样本的模型。因此，该算法要求每轮迭代学习数据的不同方面，着眼于包含难以分类的样本区域。每一次迭代中都会基于误差率计算一个阶段权重。最后的预测是将这些弱分类器通过这些阶段权重进行加权平均：</p>
 <p><span class="math display">\[G(x)=sign ( \Sigma_{m=1}^M \alpha_{m}G_m(x))\]</span> 这里<span class="math inline">\(\alpha_1,\alpha_2,...,\alpha_M\)</span>是每个阶段的权重。</p>
 <blockquote>
-<p>AdaBoost.M1.算法</p>
+<p>AdaBoost.M1算法</p>
 </blockquote>
-<blockquote>
 <ol style="list-style-type: decimal">
 <li>一类样本值标记为+1，另一类样本值为-1</li>
 <li>每个样本有着相同的起始权重（<span class="math inline">\(w_i=\frac{1}{N},i=1,...,N\)</span>）</li>
-<li>对 m = 1到M 执行:</li>
+<li>对 m = 1到M 执行:
+<ol style="list-style-type: decimal">
 <li>用<span class="math inline">\(w_i\)</span>加权后的样本拟合一个弱分类器<span class="math inline">\(G_m(x)\)</span></li>
 <li>计算出第M个模型的误判率（<span class="math inline">\(err_m=\frac{\Sigma_{i=1}^Nw_i I(y_i\neq G_m(x_i))}{\Sigma_{i=1}^Nw_i}\)</span>）</li>
 <li>计算第m轮迭代的权重值<span class="math inline">\(\alpha_m=ln\frac{1-err_m}{err_m}\)</span></li>
 <li>更新样本权重<span class="math inline">\(w_i = w_i\cdot exp[\alpha_m\cdot I(y_i \neq G_m(x_i))],\ i=1,2,\dots,N\)</span></li>
+</ol></li>
 <li>通过下面方式计算助推分类器对每个样本的预测：<span class="math inline">\(G(x)=sign[\Sigma_{m=1}^M\alpha_mG_m(x)]\)</span>，<span class="math inline">\(sign(\cdot)\)</span>表示如果<span class="math inline">\(\cdot\)</span>是正数，那么将样本判定为+1类，反之为-1类</li>
 </ol>
-</blockquote>
-<p>助推可应用于任何分类技术，但是分类树是助推的一个常用方法，因为分类树可以通过限制树的深度减少分裂数目制造弱分类器。Breinman（1998）给出了解释了为什么分类树在助推上表现良好。由于分类树是一种低偏差/高方差的技术，树的集合有助于降低方差，产生一个低方差低偏差的结果。透过助推算法，Johnson和 Rayens (2007)表明通过助推无法显著改进低方差的模型。因此，诸如LDA或KNN等助推方法对方差的改善程度不像神经网络(Freund和Schapire1996)和朴素贝叶斯方法那样显著(Bauer和Kohavi1999)。</p>
-<p>随机梯度助推</p>
+<p>AdaBoost.M1算法也称为“离散AdaBoost”算法，因为迭代产生的分类器<span class="math inline">\(G_m(x)\)</span>返回的是离散的标签，如果分类器返回的是数值，比如一个概率值，可以对上面算法进行适当修改<span class="citation">[<a href="#ref-Friedman2000">91</a>]</span>。助推可应用于任何分类技术，但是分类树是助推的一个常用方法，因为分类树可以通过限制树的深度减少分裂数目制造弱分类器。Breinman<span class="citation">[<a href="#ref-Breiman1998">93</a>]</span>解释了为什么分类树在助推上表现良好。由于分类树是一种低偏差/高方差的技术，树的集合有助于降低方差，产生一个低方差低偏差的结果。助推无法显著改进低方差的模型。因此，助推对诸如LDA或KNN等的改善程度不像其对神经网络<span class="citation">[<a href="#ref-Freund1996">94</a>]</span>和朴素贝叶斯方法那样显著<span class="citation">[<a href="#ref-Bauer1999">95</a>]</span>。</p>
+<ul>
+<li>随机梯度助推</li>
+</ul>
 <p>Friedman等（2000）提供了自适助推算法的统计学见解。他们发现分类问题可以被解释为一个正向分步可加模型，该模型最小化指数损失函数。基于该框架产生了一些泛化算法，如Real AdaBoost, Gentle AdaBoost, 和LogitBoost。随后，这些泛化的被统一放入一个称为梯度助推机的框架内。</p>
 <pre>
 1 设定样本预测初始值为对数发生：
@@ -851,6 +854,7 @@ rfit =<span class="st"> </span><span class="kw">randomForest</span>(trainy ~<spa
 <p><span class="math display">\[\hat{p}_i=\frac{1}{1+exp[-f(x)]}\]</span></p>
 <p>上式中，<span class="math inline">\(f(x)\)</span>为在的模型预测值。举例来说，模型的初始估计可能是样本的对数发生比，公式中p为训练集中一个类的样本比例。</p>
 <p>使用者可以通过选择合适的损失函数和对应的梯度来使算法更具有针对性(Hastie等2008)。萎缩可以在算法最后一步实现。更进一步，若在该算法第一步内循环前添加一个随机抽样方案，则其可以归入随机梯度助推框架。</p>
+<p>自从助推法问世以来一直很受青睐，尤其是在分类问题上，常常被用来当作基础学习器。很多崇尚“拿来主义”的分析师通常将助推树当成一切问题的万精油。目前为止，这个方法在大多数情况下都能够给出合理的结果，虽然并不总是最优的模型。对于那些对模型背景知识不了解，只知道通过使用相应代码实践模型的分析人员，助推树确实是很好的“现成模型”，因为它不需要对数据进行预处理，也不要求你解释变量。但对于想要更近一步的小伙伴们，我建议大家还是努力了解背后的原理，这样一来能够知道在什么场合其它模型可能会给出更好的结果。使用一个你完全不了解的东西不仅仅有风险，也不符合匠人精神。个人认为，模型和分析的美，都在于其背后的原理和思想，而数学只是表达这个思想的一种方式。</p>
 <!--
 对于经费申请数据，构造一个调定参数方格，交互深度在1到9之间，树的数量在100到2000之间，萎缩范围从0.01到0.1。该网格用于构造一个助推模型，模型中类别变量分别被看做独立类和分组类。对于独立类模型，ROC曲线下面积的最优值为0.94，交互深度为9，树的数量为1300，萎缩为0.01.对于分组类模型，ROC曲线下面积最佳值为0.92，交互深度为7，树的数量为100，萎缩为0.01（见图14.9）。在这种情况下，基于ROC曲线，独立类模型表现上好于分组类模型。然而，两个模型中树的数量有很大不同，这在逻辑上是合理的，因为二元自变量集大于分组类。
 
@@ -940,7 +944,43 @@ gbmRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span class="dt
 <p><img src="DS_R_files/figure-html/unnamed-chunk-271-1.png" width="672" /></p>
 </div>
 <div id="section-12.7" class="section level2">
-<h2><span class="header-section-number">12.7</span> 其它树话题</h2>
+<h2><span class="header-section-number">12.7</span> 助推法的可加模型框架</h2>
+<p>助推法其实没有想象中的那么神秘。如前所述，Friedman<span class="citation">[<a href="#ref-Friedman2000">91</a>]</span>将自适助推算法与一系列的统计学概念联系起来，并且指出助推法可以被解释为<strong>最小化指数损失的向前逐步可加模型</strong>。本小节将介绍可加模型框架下的助推法，理解这一点有助于大家理解该模型的本质。</p>
+<p>很多看似不同的模型，其本质都是<strong>基扩展模型</strong>。回顾AdaBoost.M1算法最终得到的分类器：</p>
+<p><span class="math display">\[G(x)=sign ( \Sigma_{m=1}^M \alpha_{m}G_m(x))\]</span></p>
+<p>其实上面式子就符合基扩展模型：</p>
+<p><span class="math display">\[f(x)=\Sigma_{m=1}^M \beta_m b(x,\gamma_m)\]</span> 其中<span class="math inline">\(\beta_m,\ m=1,\dots,M\)</span>是扩展系数，<span class="math inline">\(b(x,\gamma)\in \mathbb{R}\)</span>就是基函数，通常是x的函数，其中<span class="math inline">\(\gamma\)</span>是定义函数的参数。很多常见的方法都可以表达为这种基扩展模型的形式，由于篇幅所限，本书并没有讲到所有的方法，这里列举几个这类模型，感兴趣的小伙伴可以参考相关资料：</p>
+<ul>
+<li>对于单层级神经网络（可参考<span class="citation">[<a href="#ref-Hastie2008">73</a>]</span>的第11章），<span class="math inline">\(b(x;\gamma)=\sigma(\gamma_0+\mathbf{\gamma_1^{T}x})\)</span>，其中<span class="math inline">\(\sigma(t)=\frac{1}{1+e^{-t}}\)</span>是一个S型曲线函数，<span class="math inline">\(\mathbf{\gamma}\)</span>是自变量<span class="math inline">\(\mathbf{x}\)</span>线性组合的参数。</li>
+<li>多元自适应回归样条（MARS）法中（可参考<span class="citation">[<a href="#ref-Hastie2008">73</a>]</span>的9.4小节），其中<span class="math inline">\(b(x;\gamma)=(x_j-\gamma_m)_{+}\)</span>或者<span class="math inline">\(b(x;\gamma)=(\gamma_m-x_j)_{+}\)</span>。</li>
+<li>对于树模型，参数<span class="math inline">\(\gamma\)</span>控制了每个节点使用的变量和分裂点，以及最后的总节点的预测。</li>
+</ul>
+<p>这些模型本质上其实是最小化在训练集样本上的损失函数：</p>
+<p><span class="math display">\[\underset{\{\beta_m,\gamma_m\}_i^M}{min}\Sigma_{i=1}^N L\left(y_i,\Sigma_{m=1}^M\beta_{m}b(x_i;\gamma_m)\right)\]</span></p>
+<p>对于不同的模型，基础函数<span class="math inline">\(b(x_i;\gamma_m)\)</span>不同，同时损失函数<span class="math inline">\(L(\cdot)\)</span>也有很多不同的选择，比如平方误差，或者基于似然函数的损失函数。不管怎么选择这两个函数，通常情况下在整个训练集样本上最优化上式的计算量都非常大。好消息是，通常问题可以简化为优化单一迭代的损失：</p>
+<p><span class="math display">\[\underset{\beta,\gamma}{min}=\Sigma_{i=1}^N L(y_i,\beta b(x_i;\gamma))\]</span></p>
+<p>向前逐步可加模型算法可以用来逼近上面优化解，该算法在原基底上迭代加上新的基函数。具体算法如下：</p>
+<blockquote>
+<p>向前逐步可加模型算法</p>
+</blockquote>
+<ol style="list-style-type: decimal">
+<li>初始化函数<span class="math inline">\(f_0(x)=0\)</span></li>
+<li>对于<span class="math inline">\(m=1,\dots,M\)</span>：
+<ul>
+<li>计算 <span class="math display">\[(\beta_m,\gamma_m)=\underset{\beta,\gamma}{argmin}\Sigma_{i=1}^NL(y_i,f_{m-1}(x_i)+\beta b(x_i;\gamma))\]</span></li>
+<li>设置<span class="math inline">\(f_m(x)=f_{m-1}(x)+\beta_m b(x;\gamma_m)\)</span></li>
+</ul></li>
+</ol>
+<p>在每次迭代m中，算法会在之前基底<span class="math inline">\(f_{m-1}(x)\)</span>上寻找最优的基函数<span class="math inline">\(b(x;\gamma_m)\)</span>和<span class="math inline">\(\beta_m\)</span>，基底加上新的基函数能够最小化损失函数。随后更新得到新的基底<span class="math inline">\(f_m(x)\)</span>。</p>
+<p>如果我们使用平方误差损失：</p>
+<p><span class="math display">\[L(y,f(x))=(y-f(x))^2\]</span></p>
+<p>对应可以得到：</p>
+<p><span class="math display">\[L(y_i,f_{m-1}(x_i)+\beta b(x_i;\gamma))=(y_i-f_{m-1}(x_i)-\beta b(x_i;\gamma))^2\]</span></p>
+<p>其中<span class="math inline">\(y_i-f_{m-1}(x_i)\)</span>是当前模型下第i个样本对应的残差。也就是说，在平方误差损失下，每一步迭代其实是在拟合之前模型的残差。这也是最小二乘助推回归的基本思想。但平方损失并不是一个好的选择，用于回归问题时容易受离群点的影响，所以我们通常会选择其它损失函数。</p>
+<p>类似的，之前的AdaBoost.M1算法</p>
+</div>
+<div id="section-12.8" class="section level2">
+<h2><span class="header-section-number">12.8</span> 其它树话题</h2>
 
 </div>
 </div>
@@ -1011,6 +1051,15 @@ gbmRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span class="dt
 </div>
 <div id="ref-Freund1997">
 <p>92. Freund, Y., Schapire, R.: A decision-theoretic generalization of online learning and an application to boosting. Journal of Computer and System Sciences. 55, 119–139 (1997).</p>
+</div>
+<div id="ref-Breiman1998">
+<p>93. L, B.: Arcing classifiers. The Annals of Statistics. 26, 123–140 (1998).</p>
+</div>
+<div id="ref-Freund1996">
+<p>94. Y, F., R, S.: Experiments with a new boosting algorithm, (1996).</p>
+</div>
+<div id="ref-Bauer1999">
+<p>95. E, B., R, K.: An empirical comparison of voting classifica- tion algorithms: Bagging, boosting, and variants. Machine Learning. 36, 105–142.</p>
 </div>
 </div>
             </section>
