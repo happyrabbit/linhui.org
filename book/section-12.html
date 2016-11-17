@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-11-15">
+<meta name="date" content="2016-11-16">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -232,9 +232,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 <li class="chapter" data-level="12.4" data-path="section-12.html"><a href="section-12.html#section-12.4"><i class="fa fa-check"></i><b>12.4</b> 装袋树</a></li>
 <li class="chapter" data-level="12.5" data-path="section-12.html"><a href="section-12.html#section-12.5"><i class="fa fa-check"></i><b>12.5</b> 随机森林</a></li>
-<li class="chapter" data-level="12.6" data-path="section-12.html"><a href="section-12.html#boosting"><i class="fa fa-check"></i><b>12.6</b> 助推（Boosting）</a></li>
+<li class="chapter" data-level="12.6" data-path="section-12.html"><a href="section-12.html#section-12.6"><i class="fa fa-check"></i><b>12.6</b> 助推法</a></li>
 <li class="chapter" data-level="12.7" data-path="section-12.html"><a href="section-12.html#section-12.7"><i class="fa fa-check"></i><b>12.7</b> 知识扩展：助推法的可加模型框架</a></li>
-<li class="chapter" data-level="12.8" data-path="section-12.html"><a href="section-12.html#section-12.8"><i class="fa fa-check"></i><b>12.8</b> 其它树话题</a></li>
+<li class="chapter" data-level="12.8" data-path="section-12.html"><a href="section-12.html#section-12.8"><i class="fa fa-check"></i><b>12.8</b> 知识扩展：助推树的数学框架</a></li>
+<li class="chapter" data-level="12.9" data-path="section-12.html"><a href="section-12.html#section-12.9"><i class="fa fa-check"></i><b>12.9</b> 其它树话题</a></li>
 </ul></li>
 <li class="chapter" data-level="13" data-path="section-13.html"><a href="section-13.html"><i class="fa fa-check"></i><b>13</b> 深度学习</a><ul>
 <li class="chapter" data-level="13.1" data-path="section-6.html"><a href="section-6.html#-1"><i class="fa fa-check"></i><b>13.1</b> 介绍</a></li>
@@ -807,8 +808,8 @@ rfit =<span class="st"> </span><span class="kw">randomForest</span>(trainy ~<spa
 <p><img src="DS_R_files/figure-html/unnamed-chunk-268-1.png" width="672" /></p>
 <p>可以看到，平均考虑所有的树，变量<code>segment</code>和<code>Q4</code>最重要对于区分用户性别最重要。</p>
 </div>
-<div id="boosting" class="section level2">
-<h2><span class="header-section-number">12.6</span> 助推（Boosting）</h2>
+<div id="section-12.6" class="section level2">
+<h2><span class="header-section-number">12.6</span> 助推法</h2>
 <p>助推法最早发明于20世纪80年代<span class="citation">[<a href="#ref-Valiant1984">84</a>, <a href="#ref-KV1989">85</a>]</span>，是用来解决分类问题。其被证明是一种强大的预测工具，被广泛地应用于基因表达<span class="citation">[<a href="#ref-dudoit2002">86</a>, <a href="#ref-ben-dor2000">87</a>]</span>、化学计量学<span class="citation">[<a href="#ref-Varmuza2003">88</a>]</span>、音乐流派识别<span class="citation">[<a href="#ref-Bergstra2006">89</a>]</span>等各个领域中。其大致思想是组合一系列的弱分类器（仅比随机猜测的预测效果好一些的分类器），使总体的误判率有所改进。</p>
 <p>研究者花费了一段时间来寻找一种有效实现助推理论的算法，最后终于在1996年，Yoav Freund和Robert Schapire合作提出了自适助推（AdaBoost）算法<span class="citation">[<a href="#ref-Schapire1999">90</a>]</span>，这是Adaptive Boosting的缩写。在自适助推算法的成功问世之后，一些研究者<span class="citation">[<a href="#ref-Friedman2000">91</a>]</span>开始将自适助推算法与一系列的统计学概念联系起来，如损失函数，可加模型，逻辑回归等，并且指出助推法可以被解释为<strong>最小化指数损失的向前逐步可加模型</strong>。这用一个新的视角理解助推法的本质，使得助推法扩展至回归的问题。助推算法有好几种，这里我们介绍两种主要的方法：<strong>自适助推</strong>和<strong>随机梯度助推</strong>。</p>
 <ul>
@@ -947,6 +948,10 @@ gbmRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span class="dt
        <span class="dt">col =</span> <span class="kw">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;red&quot;</span>, <span class="st">&quot;green&quot;</span>, <span class="st">&quot;blue&quot;</span>),
        <span class="dt">pch =</span> <span class="kw">c</span>(<span class="dv">16</span>, <span class="dv">3</span>, <span class="dv">1</span>, <span class="dv">10</span>))</code></pre></div>
 <p><img src="DS_R_files/figure-html/unnamed-chunk-271-1.png" width="672" /></p>
+<p>预测建模是数据挖掘的一个重要话题。每个特定的方法都有适用和不适用的时候。但在实际应用中，事先很少知道哪个过程对于给定的问题将表现最好或甚至良好。 表10.1总结了一些学习方法的一些特点。</p>
+<p>工业和商业数据挖掘应用在对学习过程的要求方面往往特别具有挑战性。因为现实情况可能有各种问题。数据集可能很大，所以需要考虑计算量的问题。而且数据通常不那么干净：自变量可能有多种类型，数值，二项以及多分类变量。而且时常发生数据缺失，完整无缺失的数据很少出现。数值型的变量观测常是长尾而且高度有偏的，而且还有离群值。变量的取值范围也不一样。</p>
+<p>此外，通常自变量集合中只有很小一部分真正对应变量有预测作用。和模式识别的问题不同，在预测问题中通常无法通过相关应用领域的知识来筛选变量。和应变量无关的预测变量会影响很多模型的表现。如果应用的语境要求模型可解释，比如在市场营销中需要知道具体那些变量如何影响消费者行为，以便营销人员能够采取相应的行动，而不仅仅是预测，这时很多黑箱模型，如神经网络，就无法给出答案。</p>
+<p>这些对计算机速度，结果可解释性的要求，以及不干净的数据使得很多模型不能拿来就用。那些“现成”模型指的是不需要数据预处理以及仔细的模型调试就能应用的模型。在所有模型中，树模型最接近“现成”的模型。 树模型可以处理不同类型的变量，对缺失值和离群值也稳健，如果对数值型变量进行单调变换的话不会影响模型拟合结果。由于其内在过程中有对变量进行选择（选择那些能够最优化相应准则的变量，如Gini系数，熵等），即使不能说完全不受冗余变量的影响，至少对无信息变量具有抗性。当树很小的时候可能还好解释，但前所述，单棵树通常非常不稳定，因此广泛使用的是集成方法。这导致模型难以解释（除了能够给出变量重要性排序以外）。总的来说，上面的这些特性使得树模型成为最受欢迎的模型。</p>
 </div>
 <div id="section-12.7" class="section level2">
 <h2><span class="header-section-number">12.7</span> 知识扩展：助推法的可加模型框架</h2>
@@ -994,11 +999,10 @@ gbmRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span class="dt
 <p>其中<span class="math inline">\(w_i^m= exp[-y_if_{m-1}(x_i)]\)</span>，其并不依赖于<span class="math inline">\(\beta\)</span>和<span class="math inline">\(G(x)\)</span>，因此可以看成对每个观测赋予的权重。该权重和<span class="math inline">\(f_{m-1}(x_i)\)</span>有关，因此每次迭代权重也会相应变化。我们可以进一步分解上面优化函数：</p>
 <p><span class="math display">\[\begin{array}{ccc}
 (\beta_{m},G_{m}) &amp; = &amp; \underset{\beta,G}{argmin}\Sigma_{i=1}^{N}w_{i}^{m}exp[-y_{i}\beta G(x_{i})]\\
- &amp; = &amp; \underset{\beta,G}{argmin}\Sigma_{i=1}^{N}\left\{ w_{i}^{m}e^{-\beta}I(y_{i}=G(x))+w_{i}^{m}e^{\beta}I(y_{i}\neq G(x))\right\}\\
- &amp; = &amp;  \underset{\beta,G}{argmin}\Sigma_{i=1}^{N}\left\{ w_{i}^{m}e^{-\beta}[1-I(y_{i}\neq G(x))]+w_{i}^{m}e^{\beta}I(y_{i}\neq G(x))\right\}\\
- &amp; = &amp; \underset{\beta,G}{argmin} \left{(e^{\beta}-e^{-\beta})\cdot \Sigma_{i=1}^N w_i^{m}I(y_i \neq G(x_i))+e^{-\beta}\cdot \Sigma_{i=1}^N w_i^{m} \right}
-\end{array}
-\]</span></p>
+ &amp; = &amp; \underset{\beta,G}{argmin}\Sigma_{i=1}^{N}\left\{ w_{i}^{m}e^{-\beta}I(y_{i}=G(x))+w_{i}^{m}e^{\beta}I(y_{i}\neq G(x))\right\} \\
+ &amp; = &amp; \underset{\beta,G}{argmin}\Sigma_{i=1}^{N}\left\{ w_{i}^{m}e^{-\beta}[1-I(y_{i}\neq G(x))]+w_{i}^{m}e^{\beta}I(y_{i}\neq G(x))\right\} \\
+ &amp; = &amp; \underset{\beta,G}{argmin}\left\{ (e^{\beta}-e^{-\beta})\cdot\Sigma_{i=1}^{N}w_{i}^{m}I(y_{i}\neq G(x_{i}))+e^{-\beta}\cdot\Sigma_{i=1}^{N}w_{i}^{m}\right\} 
+\end{array}\]</span></p>
 <p>当<span class="math inline">\(\beta &gt;0\)</span>时，上式的解为：</p>
 <p><span class="math display">\[G_{m} = \underset{G}{argmin}\Sigma_{i=1}^{N}w_{i}^{m}I(y_{i}\neq G(x))\]</span></p>
 <p>也就是寻找最小化加权误判率的判别器。将上面<span class="math inline">\(G_m\)</span>代入优化函数，对<span class="math inline">\(\beta\)</span>求导设置其为0，可以解出：</p>
@@ -1017,7 +1021,20 @@ w_i^{m+1} &amp; = &amp; exp[-y_if_m (x_i)]\\
 <p><span class="math display">\[w_i^{m+1}=w_i^m \cdot exp[\alpha_mI(y_i\neq G_m(x_i))] \cdot exp[-\beta_m]\]</span> 其中<span class="math inline">\(\alpha_m=2\beta_m=ln\frac{1-err_m}{err_m}\)</span>，和之前AdaBoost.M1算法中的<span class="math inline">\(\alpha_m\)</span>一样。因此，AdaBoost.M1算法实际上是向前逐步可加模型算法的一个特例。关于损失函数的选择和比较，大家可以参考<span class="citation">[<a href="#ref-Hastie2008">73</a>]</span>的10.5和10.6小节。</p>
 </div>
 <div id="section-12.8" class="section level2">
-<h2><span class="header-section-number">12.8</span> 其它树话题</h2>
+<h2><span class="header-section-number">12.8</span> 知识扩展：助推树的数学框架</h2>
+<p>之前介绍简单回归和分类树时讲过，建立树的目的是找到自变量区域的划分<span class="math inline">\(R_j,\ j=1,2,\dots,J\)</span>，对每个划分区域内的样本指定一个拟合值<span class="math inline">\(\gamma_j\)</span>：</p>
+<p><span class="math display">\[x\in R_j \Rightarrow f(x)=\gamma_j\]</span></p>
+<p>树模型可以用如下方式表达：</p>
+<p><span class="math display">\[
+\begin{equation}
+T(x;\Theta)=\Sigma_{j=1}^J\gamma_j I(x\in R_j)
+\label{eq:btree}
+\end{equation}
+\]</span></p>
+<p>这里<span class="math inline">\(\Theta=\{R_j,\gamma_j\}_i^J\)</span>。J通常, </p>
+</div>
+<div id="section-12.9" class="section level2">
+<h2><span class="header-section-number">12.9</span> 其它树话题</h2>
 
 </div>
 </div>
