@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-11-16">
+<meta name="date" content="2016-11-22">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -649,7 +649,7 @@ rpartFactorRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span c
 </div>
 <div id="section-12.4" class="section level2">
 <h2><span class="header-section-number">12.4</span> 装袋树</h2>
-<p>Bootstrap 样本是对数据进行有放回随机抽样得到的样本（Efron 和 Tibshirani 1986）。这意味着，当一个样本点被选中时，它有可能会在将来的抽取中继续被选中。Bootstrap 样本和原数据的样本量一样。因此，一些样本可能被抽到过很多次，而另一些则可能没有被选到。没有被选到的样本被称为“袋外样本“（out-of-bag）。这在统计学史上是一个看似平淡无奇，但实际上具有突破性意义的思想。在很多难以甚至不可能直接计算标准差的情况下能够用bootstrap来对估计标准差。很长一段时间我并不理解这样一种流氓的方法怎么会大受追捧，这里追捧的人指的不是一般群众，而是象牙塔里那些根正苗红的统计教授。这个方法就像聚宝盆，一直不停的有放回抽样。一个极端的情况，假如你只有1个样本，难道你不停有放回抽样就能得到大样本了？当然不是，这是对该方法的扭曲。bootstrap要在样本量足够多的时候才最有效。</p>
+<p>Bootstrap 样本是对数据进行有放回随机抽样得到的样本<span class="citation">[<a href="#ref-Efron1986">79</a>]</span>。这意味着，当一个样本点被选中时，它有可能会在将来的抽取中继续被选中。Bootstrap 样本和原数据的样本量一样。因此，一些样本可能被抽到过很多次，而另一些则可能没有被选到。没有被选到的样本被称为“袋外样本“（out-of-bag）。这在统计学史上是一个看似平淡无奇，但实际上具有突破性意义的思想。在很多难以甚至不可能直接计算标准差的情况下能够用bootstrap来对估计标准差。很长一段时间我并不理解这样一种流氓的方法怎么会大受追捧，这里追捧的人指的不是一般群众，而是象牙塔里那些根正苗红的统计教授。这个方法就像聚宝盆，一直不停的有放回抽样。一个极端的情况，假如你只有1个样本，难道你不停有放回抽样就能得到大样本了？当然不是，这是对该方法的扭曲。bootstrap要在样本量足够多的时候才最有效。</p>
 <div class="figure">
 <img src="http://scientistcafe.com/book/Figure/bootstrap.png" alt="bootstrap示意图" />
 <p class="caption">bootstrap示意图</p>
@@ -684,7 +684,7 @@ rpartFactorRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span c
 <p>下面我们展示如何用R建立装袋树，先得到自变量和应变量：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(caret)
 <span class="kw">library</span>(pROC)
-dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/SegData.csv&quot;</span>)
+dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv&quot;</span>)
 <span class="co"># 将10个问卷调查变量当作自变量</span>
 trainx &lt;-<span class="st"> </span>dat[, <span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>, <span class="kw">names</span>(dat))]
 <span class="co"># 将类别也作为自变量</span>
@@ -724,7 +724,7 @@ bagTune &lt;-<span class="st"> </span>caret::<span class="kw">train</span>(train
 <div id="section-12.5" class="section level2">
 <h2><span class="header-section-number">12.5</span> 随机森林</h2>
 <p>我们已经知道装袋树使用了boostrap样本，但这些树之间并不是独立的，因为这些树的每个分裂点上都考虑了所有的自变量。可以想象，如果初始的样本量足够大，而且树模型可以充分刻画预测变量与因变量之间的关系，那么不同bootstrap样本生成的树应该具有类似的结构（特别是在树顶部分），因为它们背后的关系是相近的。这一特点被称为树相关性，它会使得装袋法不能最大限度地减少预测值的方差。这说明，装袋法对方差的缩减还可以进一步通过减小树之间的相关性得以提升。对树相关现象的数学解释，可以参见<span class="citation">[<a href="#ref-Hastie2008">73</a>]</span>。随机森林就是通过减少树的相关性在装袋树的基础上进行提高的。</p>
-<p>从统计的角度来看，要减小预测变量之间的相关性，可以在建立树的过程中引入一定的随机性，使得每一棵树使用的变量有些不同。在Breiman发明装袋法后，有一些其他的作者通过在训练过程中加入随机性来进一步优化模型算法。由于树是装袋法中一个常见的模型，Dietterich<span class="citation">[<a href="#ref-Dietterich2000">79</a>]</span>提出了随机选择切分点的想法，即在树的每一个分裂点处随机选择<span class="math inline">\(m\)</span>个变量来生成树。另一种方法是随机选择变量的子集来构建整棵树<span class="citation">[<a href="#ref-Ho1998">80</a>, <a href="#ref-amit1997">81</a>]</span>。Breiman同样尝试了在响应变量中加入噪声来对树的结构进行扰动<span class="citation">[<a href="#ref-Breiman2000">82</a>]</span>。在对这些各种升级改版的装袋法进行研究之后，Breiman于2001年提出了随机森林<span class="citation">[<a href="#ref-Breiman2001">83</a>]</span>。随机森林建造树的时候，每个分裂处都会从所有<span class="math inline">\(p\)</span>个变量中随机抽取<span class="math inline">\(m\)</span>个，然后在其中选出最优的<strong>一个</strong>变量用于分裂。</p>
+<p>从统计的角度来看，要减小预测变量之间的相关性，可以在建立树的过程中引入一定的随机性，使得每一棵树使用的变量有些不同。在Breiman发明装袋法后，有一些其他的作者通过在训练过程中加入随机性来进一步优化模型算法。由于树是装袋法中一个常见的模型，Dietterich<span class="citation">[<a href="#ref-Dietterich2000">80</a>]</span>提出了随机选择切分点的想法，即在树的每一个分裂点处随机选择<span class="math inline">\(m\)</span>个变量来生成树。另一种方法是随机选择变量的子集来构建整棵树<span class="citation">[<a href="#ref-Ho1998">81</a>, <a href="#ref-amit1997">82</a>]</span>。Breiman同样尝试了在响应变量中加入噪声来对树的结构进行扰动<span class="citation">[<a href="#ref-Breiman2000">83</a>]</span>。在对这些各种升级改版的装袋法进行研究之后，Breiman于2001年提出了随机森林<span class="citation">[<a href="#ref-Breiman2001">84</a>]</span>。随机森林建造树的时候，每个分裂处都会从所有<span class="math inline">\(p\)</span>个变量中随机抽取<span class="math inline">\(m\)</span>个，然后在其中选出最优的<strong>一个</strong>变量用于分裂。</p>
 <p>通常情况下<span class="math inline">\(m=\sqrt{p}\)</span>。比如这里是10个问卷调查的问题，那么每个分裂点出随机抽取用于候选的变量大约为4。在考虑每个分裂点的时候，算法都会随机挑选新变量，通过这种方式减小树之间的相关性。这对于变量数目多的情况更加有效，这里由于我们一共只有10个变量，大家之后会看到，随机森林算法对结果的改进并不是很明显。这里每次选择变量的个数也是一个调优参数。在数据集合很大变量个数又很多的时候，对该参数调优的过程计算量比较大。这里建议在<span class="math inline">\(m=\sqrt{p}\)</span>附近取5个值先初步调优。森林中树的棵树是另外一个需要调优的参数。由于森林的规模越大，计算量就越大，通常情况下需要至少1000棵树，逐渐增加直到模型的效果没有改进。当模型表现趋于稳定后，增加更多的树没有什么帮助。</p>
 <p>一般的基于树的随机森林算法如下：</p>
 <blockquote>
@@ -810,12 +810,12 @@ rfit =<span class="st"> </span><span class="kw">randomForest</span>(trainy ~<spa
 </div>
 <div id="section-12.6" class="section level2">
 <h2><span class="header-section-number">12.6</span> 助推法</h2>
-<p>助推法最早发明于20世纪80年代<span class="citation">[<a href="#ref-Valiant1984">84</a>, <a href="#ref-KV1989">85</a>]</span>，是用来解决分类问题。其被证明是一种强大的预测工具，被广泛地应用于基因表达<span class="citation">[<a href="#ref-dudoit2002">86</a>, <a href="#ref-ben-dor2000">87</a>]</span>、化学计量学<span class="citation">[<a href="#ref-Varmuza2003">88</a>]</span>、音乐流派识别<span class="citation">[<a href="#ref-Bergstra2006">89</a>]</span>等各个领域中。其大致思想是组合一系列的弱分类器（仅比随机猜测的预测效果好一些的分类器），使总体的误判率有所改进。</p>
-<p>研究者花费了一段时间来寻找一种有效实现助推理论的算法，最后终于在1996年，Yoav Freund和Robert Schapire合作提出了自适助推（AdaBoost）算法<span class="citation">[<a href="#ref-Schapire1999">90</a>]</span>，这是Adaptive Boosting的缩写。在自适助推算法的成功问世之后，一些研究者<span class="citation">[<a href="#ref-Friedman2000">91</a>]</span>开始将自适助推算法与一系列的统计学概念联系起来，如损失函数，可加模型，逻辑回归等，并且指出助推法可以被解释为<strong>最小化指数损失的向前逐步可加模型</strong>。这用一个新的视角理解助推法的本质，使得助推法扩展至回归的问题。助推算法有好几种，这里我们介绍两种主要的方法：<strong>自适助推</strong>和<strong>随机梯度助推</strong>。</p>
+<p>助推法最早发明于20世纪80年代<span class="citation">[<a href="#ref-Valiant1984">85</a>, <a href="#ref-KV1989">86</a>]</span>，是用来解决分类问题。其被证明是一种强大的预测工具，被广泛地应用于基因表达<span class="citation">[<a href="#ref-dudoit2002">87</a>, <a href="#ref-ben-dor2000">88</a>]</span>、化学计量学<span class="citation">[<a href="#ref-Varmuza2003">89</a>]</span>、音乐流派识别<span class="citation">[<a href="#ref-Bergstra2006">90</a>]</span>等各个领域中。其大致思想是组合一系列的弱分类器（仅比随机猜测的预测效果好一些的分类器），使总体的误判率有所改进。</p>
+<p>研究者花费了一段时间来寻找一种有效实现助推理论的算法，最后终于在1996年，Yoav Freund和Robert Schapire合作提出了自适助推（AdaBoost）算法<span class="citation">[<a href="#ref-Schapire1999">91</a>]</span>，这是Adaptive Boosting的缩写。在自适助推算法的成功问世之后，一些研究者<span class="citation">[<a href="#ref-Friedman2000">92</a>]</span>开始将自适助推算法与一系列的统计学概念联系起来，如损失函数，可加模型，逻辑回归等，并且指出助推法可以被解释为<strong>最小化指数损失的向前逐步可加模型</strong>。这用一个新的视角理解助推法的本质，使得助推法扩展至回归的问题。助推算法有好几种，这里我们介绍两种主要的方法：<strong>自适助推</strong>和<strong>随机梯度助推</strong>。</p>
 <ul>
 <li>自适助推（AdaBoost）</li>
 </ul>
-<p>我们从有名的“AdaBoost.M1.”算法开始，其由Yoav Freund和Robert Schapire的<span class="citation">[<a href="#ref-Freund1997">92</a>]</span>提出。该算法考虑二分类问题，应变量编码为<span class="math inline">\(Y \in \{-1, 1\}\)</span>。对于自变量<span class="math inline">\(X\)</span>，对应的分类器<span class="math inline">\(G(X)\)</span>输出的预测值是1或者－1。在训练集样本上的误判率为：</p>
+<p>我们从有名的“AdaBoost.M1.”算法开始，其由Yoav Freund和Robert Schapire的<span class="citation">[<a href="#ref-Freund1997">93</a>]</span>提出。该算法考虑二分类问题，应变量编码为<span class="math inline">\(Y \in \{-1, 1\}\)</span>。对于自变量<span class="math inline">\(X\)</span>，对应的分类器<span class="math inline">\(G(X)\)</span>输出的预测值是1或者－1。在训练集样本上的误判率为：</p>
 <p><span class="math display">\[\bar{err}=\frac{1}{N}\Sigma_{i=1}^NI(y_i\neq G(x_i))\]</span></p>
 <p>对于自适助推生成一系列弱分类器<span class="math inline">\(G_m(x),\ m=1,2,...,M\)</span>，每次迭代，算法都会基于当前样本权重发现最佳的分类器。在第m轮迭代中被误分的样本在m+1轮迭代中将赋予更高的权重，被正确分类的样本在下一轮迭代中权重会降低。这意味着分类困难的样本的权重会不断加大直至算法识别出能正确分类这些样本的模型。因此，该算法要求每轮迭代学习数据的不同方面，着眼于包含难以分类的样本区域。每一次迭代中都会基于误差率计算一个阶段权重。最后的预测是将这些弱分类器通过这些阶段权重进行加权平均：</p>
 <p><span class="math display">\[G(x)=sign ( \Sigma_{m=1}^M \alpha_{m}G_m(x))\]</span> 这里<span class="math inline">\(\alpha_1,\alpha_2,...,\alpha_M\)</span>是每个阶段的权重。</p>
@@ -834,11 +834,11 @@ rfit =<span class="st"> </span><span class="kw">randomForest</span>(trainy ~<spa
 </ul></li>
 <li>通过下面方式计算助推分类器对每个样本的预测：<span class="math inline">\(G(x)=sign[\Sigma_{m=1}^M\alpha_mG_m(x)]\)</span>，<span class="math inline">\(sign(\cdot)\)</span>表示如果<span class="math inline">\(\cdot\)</span>是正数，那么将样本判定为+1类，反之为-1类</li>
 </ol>
-<p>AdaBoost.M1算法也称为“离散AdaBoost”算法，因为迭代产生的分类器<span class="math inline">\(G_m(x)\)</span>返回的是离散的标签，如果分类器返回的是数值，比如一个概率值，可以对上面算法进行适当修改<span class="citation">[<a href="#ref-Friedman2000">91</a>]</span>。助推可应用于任何分类技术，但是分类树是助推的一个常用方法，因为分类树可以通过限制树的深度减少分裂数目制造弱分类器。Breinman<span class="citation">[<a href="#ref-Breiman1998">93</a>]</span>解释了为什么分类树在助推上表现良好。由于分类树是一种低偏差/高方差的技术，树的集合有助于降低方差，产生一个低方差低偏差的结果。助推无法显著改进低方差的模型。因此，助推对诸如LDA或KNN等的改善程度不像其对神经网络<span class="citation">[<a href="#ref-Freund1996">94</a>]</span>和朴素贝叶斯方法那样显著<span class="citation">[<a href="#ref-Bauer1999">95</a>]</span>。</p>
+<p>AdaBoost.M1算法也称为“离散AdaBoost”算法，因为迭代产生的分类器<span class="math inline">\(G_m(x)\)</span>返回的是离散的标签，如果分类器返回的是数值，比如一个概率值，可以对上面算法进行适当修改<span class="citation">[<a href="#ref-Friedman2000">92</a>]</span>。助推可应用于任何分类技术，但是分类树是助推的一个常用方法，因为分类树可以通过限制树的深度减少分裂数目制造弱分类器。Breinman<span class="citation">[<a href="#ref-Breiman1998">94</a>]</span>解释了为什么分类树在助推上表现良好。由于分类树是一种低偏差/高方差的技术，树的集合有助于降低方差，产生一个低方差低偏差的结果。助推无法显著改进低方差的模型。因此，助推对诸如LDA或KNN等的改善程度不像其对神经网络<span class="citation">[<a href="#ref-Freund1996">95</a>]</span>和朴素贝叶斯方法那样显著<span class="citation">[<a href="#ref-Bauer1999">96</a>]</span>。</p>
 <ul>
 <li>随机梯度助推</li>
 </ul>
-<p>Friedman等<span class="citation">[<a href="#ref-Friedman2000">91</a>]</span>提供了自适助推算法的统计学见解，并且指出助推法可以被解释为<strong>最小化指数损失的向前逐步可加模型</strong>。该框架产生了一些泛化算法，如Real AdaBoost、Gentle AdaBoost和LogitBoost。随后，这些算法被统一放入一个称为<strong>梯度助推器</strong>的框架内。本章最后的知识扩展小节介绍了将助推放在向前逐步可加模型框架内，希望有一定数学基础的小伙伴能花些时间理解背后的基本原理。</p>
+<p>Friedman等<span class="citation">[<a href="#ref-Friedman2000">92</a>]</span>提供了自适助推算法的统计学见解，并且指出助推法可以被解释为<strong>最小化指数损失的向前逐步可加模型</strong>。该框架产生了一些泛化算法，如Real AdaBoost、Gentle AdaBoost和LogitBoost。随后，这些算法被统一放入一个称为<strong>梯度助推器</strong>的框架内。本章最后的知识扩展小节介绍了将助推放在向前逐步可加模型框架内，希望有一定数学基础的小伙伴能花些时间理解背后的基本原理。</p>
 <blockquote>
 <p>对二分类问题的简单梯度助推</p>
 </blockquote>
@@ -955,11 +955,16 @@ gbmRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span class="dt
 </div>
 <div id="section-12.7" class="section level2">
 <h2><span class="header-section-number">12.7</span> 知识扩展：助推法的可加模型框架</h2>
-<p>助推法其实没有想象中的那么神秘。如前所述，Friedman<span class="citation">[<a href="#ref-Friedman2000">91</a>]</span>将自适助推算法与一系列的统计学概念联系起来，并且指出助推法可以被解释为<strong>最小化指数损失的向前逐步可加模型</strong>。本小节将介绍可加模型框架下的助推法，理解这一点有助于大家理解该模型的本质。</p>
+<p>助推法其实没有想象中的那么神秘。如前所述，Friedman<span class="citation">[<a href="#ref-Friedman2000">92</a>]</span>将自适助推算法与一系列的统计学概念联系起来，并且指出助推法可以被解释为<strong>最小化指数损失的向前逐步可加模型</strong>。本小节将介绍可加模型框架下的助推法，理解这一点有助于大家理解该模型的本质。</p>
 <p>很多看似不同的模型，其本质都是<strong>基扩展模型</strong>。回顾AdaBoost.M1算法最终得到的分类器：</p>
 <p><span class="math display">\[G(x)=sign ( \Sigma_{m=1}^M \alpha_{m}G_m(x))\]</span></p>
 <p>其实上面式子就符合基扩展模型：</p>
-<p><span class="math display">\[f(x)=\Sigma_{m=1}^M \beta_m b(x,\gamma_m)\]</span> 其中<span class="math inline">\(\beta_m,\ m=1,\dots,M\)</span>是扩展系数，<span class="math inline">\(b(x,\gamma)\in \mathbb{R}\)</span>就是基函数，通常是x的函数，其中<span class="math inline">\(\gamma\)</span>是定义函数的参数。很多常见的方法都可以表达为这种基扩展模型的形式，由于篇幅所限，本书并没有讲到所有的方法，这里列举几个这类模型，感兴趣的小伙伴可以参考相关资料：</p>
+<p><span class="math display">\[
+\begin{equation}
+f(x)=\Sigma_{m=1}^M \beta_m b(x,\gamma_m)
+\label{eq:basisexp}
+\end{equation}
+\]</span> 其中<span class="math inline">\(\beta_m,\ m=1,\dots,M\)</span>是扩展系数，<span class="math inline">\(b(x,\gamma)\in \mathbb{R}\)</span>就是基函数，通常是x的函数，其中<span class="math inline">\(\gamma\)</span>是定义函数的参数。很多常见的方法都可以表达为这种基扩展模型的形式，由于篇幅所限，本书并没有讲到所有的方法，这里列举几个这类模型，感兴趣的小伙伴可以参考相关资料：</p>
 <ul>
 <li>对于单层级神经网络（可参考<span class="citation">[<a href="#ref-Hastie2008">73</a>]</span>的第11章），<span class="math inline">\(b(x;\gamma)=\sigma(\gamma_0+\mathbf{\gamma_1^{T}x})\)</span>，其中<span class="math inline">\(\sigma(t)=\frac{1}{1+e^{-t}}\)</span>是一个S型曲线函数，<span class="math inline">\(\mathbf{\gamma}\)</span>是自变量<span class="math inline">\(\mathbf{x}\)</span>线性组合的参数。</li>
 <li>多元自适应回归样条（MARS）法中（可参考<span class="citation">[<a href="#ref-Hastie2008">73</a>]</span>的9.4小节），其中<span class="math inline">\(b(x;\gamma)=(x_j-\gamma_m)_{+}\)</span>或者<span class="math inline">\(b(x;\gamma)=(\gamma_m-x_j)_{+}\)</span>。</li>
@@ -1031,7 +1036,7 @@ T(x;\Theta)=\Sigma_{j=1}^J\gamma_j I(x\in R_j)
 \label{eq:btree}
 \end{equation}
 \]</span></p>
-<p>这里<span class="math inline">\(\Theta=\{R_j,\gamma_j\}_i^J\)</span>。通常将J视为元参数。我们通过最小化下面的损失函数来估计参数： <span class="math inline">\(\eqref{eq:btree}\)</span></p>
+<p>这里<span class="math inline">\(\Theta=\{R_j,\gamma_j\}_i^J\)</span>。通常将J视为元参数。我们通过最小化下面的损失函数来估计参数：</p>
 <p><span class="math display">\[
 \begin{equation}
 \hat{\Theta}=\underset{\Theta}{argmin}\Sigma_{j=1}^J \Sigma_{x_i\in R_j}L(y_i,\gamma_i)
@@ -1040,8 +1045,31 @@ T(x;\Theta)=\Sigma_{j=1}^J\gamma_j I(x\in R_j)
 <p>之前讲过，这个优化几乎不可能实现。我们只能通过某种算法逼近局部最优解。将这个复杂优化问题拆分成两部分可能有助于理解：</p>
 <ol style="list-style-type: decimal">
 <li><strong>给定<span class="math inline">\(R_j\)</span>的请况下优化<span class="math inline">\(\gamma_j\)</span></strong>：如果给定了<span class="math inline">\(R_j\)</span>，那么估计<span class="math inline">\(\gamma_j\)</span>就是分分钟的事情。对于回归，我们通常取每个区域的训练样本均值<span class="math inline">\(\hat{\gamma}_j=\bar{y}_j\)</span>。对于分类问题，我们就选择对应样本最多的类别。</li>
-<li><strong>寻找<span class="math inline">\(R_j\)</span></strong>：这才是真正困难的部分。</li>
+<li><strong>寻找<span class="math inline">\(R_j\)</span></strong>：这才是真正困难的部分，也是需要设计算法逼近局部最优解的地方。注意在搜索<span class="math inline">\(R_j\)</span>的过程也包含了估计<span class="math inline">\(\gamma_j\)</span>。典型的方法就是我们之前介绍过的从上到下（top-down）的递归贪婪算法。此外，为了逼近<span class="math inline">\(\eqref{eq:theta}\)</span>，我们通常需要选择一个平滑且方便的损失函数来优化<span class="math inline">\(R_j\)</span>：</li>
 </ol>
+<p><span class="math display">\[\begin{equation}
+\tilde{\Theta}=\underset{\Theta}{argmin}\ \Sigma_{i=1}^N\tilde{L}(y_i, T(x_i,\Theta))
+\label{eq:ttheta}
+\end{equation}\]</span></p>
+<p>给定<span class="math inline">\(\hat{R_j}=\tilde{R_j}\)</span>可以得到<span class="math inline">\(\gamma_j\)</span>的估计。这样可能非常抽象，举个例子。对于二分类问题之前讲到过3个用来衡量节点杂合度的度量，它们都可以在这种情境下作为损失函数：</p>
+<ol style="list-style-type: decimal">
+<li>误判率：<span class="math inline">\(\frac{1}{N_m}\Sigma_{i\in R_m}I(y\neq k(m))=1-\hat{p}_{mk(m)}\)</span>（<span class="math inline">\(k(m)=argmax_k\hat{p}_{mk}\)</span>，也就是节点m中的样本观测频数最多的类）</li>
+<li>Gini系数：<span class="math inline">\(\Sigma_{k\neq k^{&#39;}}\hat{p}_{mk}\)</span></li>
+<li>熵：<span class="math inline">\(-\Sigma_{k=1}^K \hat{p}_{mk}log(\hat{p}_{mk})\)</span></li>
+</ol>
+<p>在二分类的情况下，如果<span class="math inline">\(p\)</span>是其中某类样本的比例，对应3个损失函数值分别是：<span class="math inline">\(1-max(p,1-p)\)</span>，<span class="math inline">\(2p(1-p)\)</span>和$-plog(p)-(1-p)log(1-p) $。可以看到，后两者是连续可导的，这大大方便了优化。所以我们通常使用Gini系数或者熵，而不用误判率来优化。</p>
+<p>之前讲过，助推其实就是对这些树求和，这符合基扩展模型<span class="math inline">\(\eqref{eq:basisexp}\)</span>：</p>
+<p><span class="math display">\[
+\begin{equation}
+f_M(x)=\Sigma_{m=1}^M T(x;\Theta_m)
+\label{eq:btree}
+\end{equation}
+\]</span> 在向前逐步可加模型算法中的每一步迭代，都在当前模型<span class="math inline">\(f_{m-1}(x)\)</span>的条件下，计算下一棵树对应的<span class="math inline">\(\Theta_m=\{R_{jm}, \gamma_{jm}\}_1^{J_{m}}\)</span>：</p>
+<p><span class="math display">\[
+\begin{equation}
+\tilde{\Theta}_m=\underset{\Theta_m}{argmin}\Sigma_{i=1}^N L(y_i, f_{m-1}(x_i)+T(x_i;\Theta_m))
+\label{eq:gb}
+\end{equation}\]</span></p>
 </div>
 <div id="section-12.9" class="section level2">
 <h2><span class="header-section-number">12.9</span> 其它树话题</h2>
@@ -1071,59 +1099,62 @@ T(x;\Theta)=\Sigma_{j=1}^J\gamma_j I(x\in R_j)
 <div id="ref-ISLR15">
 <p>78. Gareth James, T.H., Daniela Witten, Tibshirani, R.: An introduction to statistical learning. Springer (2015).</p>
 </div>
+<div id="ref-Efron1986">
+<p>79. B, E., R, T.: Bootstrap methods for standard errors, con- fidence intervals, and other measures of statistical accuracy. Statistical Science. 54–75 (1986).</p>
+</div>
 <div id="ref-APM">
 <p>13. Max Kuhn, K.J.: Applied predictive modeling. Springer (2013).</p>
 </div>
 <div id="ref-Dietterich2000">
-<p>79. T, D.: An experimental comparison of three methods for constructing ensembles of decision trees: Bagging, boosting, and randomization. Machine Learning. 40, 139–158 (2000).</p>
+<p>80. T, D.: An experimental comparison of three methods for constructing ensembles of decision trees: Bagging, boosting, and randomization. Machine Learning. 40, 139–158 (2000).</p>
 </div>
 <div id="ref-Ho1998">
-<p>80. T, H.: The random subspace method for constructing decision forests. IEEE Transactions on Pattern Analysis and Machine Intelligence. 13, 340–354 (1998).</p>
+<p>81. T, H.: The random subspace method for constructing decision forests. IEEE Transactions on Pattern Analysis and Machine Intelligence. 13, 340–354 (1998).</p>
 </div>
 <div id="ref-amit1997">
-<p>81. Y, A., D, G.: Shape quantization and recognition with randomized trees. Neural Computation. 9, 1545–1588 (1997).</p>
+<p>82. Y, A., D, G.: Shape quantization and recognition with randomized trees. Neural Computation. 9, 1545–1588 (1997).</p>
 </div>
 <div id="ref-Breiman2000">
-<p>82. L, B.: Randomizing outputs to increase prediction accuracy. Machine Learning. 40, 229–242 (2000).</p>
+<p>83. L, B.: Randomizing outputs to increase prediction accuracy. Machine Learning. 40, 229–242 (2000).</p>
 </div>
 <div id="ref-Breiman2001">
-<p>83. L, B.: Random forests. Machine Learning. 45, 5–32 (2001).</p>
+<p>84. L, B.: Random forests. Machine Learning. 45, 5–32 (2001).</p>
 </div>
 <div id="ref-Valiant1984">
-<p>84. L, V.: A theory of the learnable. Communications of the ACM. 27, 1134–1142 (1984).</p>
+<p>85. L, V.: A theory of the learnable. Communications of the ACM. 27, 1134–1142 (1984).</p>
 </div>
 <div id="ref-KV1989">
-<p>85. M, K., L, V.: Cryptographic limitations on learning boolean formulae and finite automata, (1989).</p>
+<p>86. M, K., L, V.: Cryptographic limitations on learning boolean formulae and finite automata, (1989).</p>
 </div>
 <div id="ref-dudoit2002">
-<p>86. Dudoit S, F.J., T, S.: Comparison of discrimination meth- ods for the classification of tumors using gene expression data. Journal of the American Statistical Association. 97, 77–87 (2002).</p>
+<p>87. Dudoit S, F.J., T, S.: Comparison of discrimination meth- ods for the classification of tumors using gene expression data. Journal of the American Statistical Association. 97, 77–87 (2002).</p>
 </div>
 <div id="ref-ben-dor2000">
-<p>87. Ben-Dor A, F.N., Bruhn L, Z, Y.: Tissue classification with gene expression profiles. Journal of Computational Biology. 7, 559–583 (2000).</p>
+<p>88. Ben-Dor A, F.N., Bruhn L, Z, Y.: Tissue classification with gene expression profiles. Journal of Computational Biology. 7, 559–583 (2000).</p>
 </div>
 <div id="ref-Varmuza2003">
-<p>88. Varmuza K, H.P., K, F.: Boosting applied to classification of mass spectral data. Journal of Data Science. 1, (2003).</p>
+<p>89. Varmuza K, H.P., K, F.: Boosting applied to classification of mass spectral data. Journal of Data Science. 1, (2003).</p>
 </div>
 <div id="ref-Bergstra2006">
-<p>89. Bergstra J, E.D., Casagrande N, B, K. ́egl: Aggregate features and adaboost for music classification. Machine Learning. 65, 473–484 (2006).</p>
+<p>90. Bergstra J, E.D., Casagrande N, B, K. ́egl: Aggregate features and adaboost for music classification. Machine Learning. 65, 473–484 (2006).</p>
 </div>
 <div id="ref-Schapire1999">
-<p>90. YFR, S.: Adaptive game playing using multiplicative weights. Games and Economic Behavior. 29, 79–103 (1999).</p>
+<p>91. YFR, S.: Adaptive game playing using multiplicative weights. Games and Economic Behavior. 29, 79–103 (1999).</p>
 </div>
 <div id="ref-Friedman2000">
-<p>91. Friedman J, H.T., R, T.: Additive logistic regression: A statistical view of boosting. Annals of Statistics. 38, 337–374 (2000).</p>
+<p>92. Friedman J, H.T., R, T.: Additive logistic regression: A statistical view of boosting. Annals of Statistics. 38, 337–374 (2000).</p>
 </div>
 <div id="ref-Freund1997">
-<p>92. Freund, Y., Schapire, R.: A decision-theoretic generalization of online learning and an application to boosting. Journal of Computer and System Sciences. 55, 119–139 (1997).</p>
+<p>93. Freund, Y., Schapire, R.: A decision-theoretic generalization of online learning and an application to boosting. Journal of Computer and System Sciences. 55, 119–139 (1997).</p>
 </div>
 <div id="ref-Breiman1998">
-<p>93. L, B.: Arcing classifiers. The Annals of Statistics. 26, 123–140 (1998).</p>
+<p>94. L, B.: Arcing classifiers. The Annals of Statistics. 26, 123–140 (1998).</p>
 </div>
 <div id="ref-Freund1996">
-<p>94. Y, F., R, S.: Experiments with a new boosting algorithm, (1996).</p>
+<p>95. Y, F., R, S.: Experiments with a new boosting algorithm, (1996).</p>
 </div>
 <div id="ref-Bauer1999">
-<p>95. E, B., R, K.: An empirical comparison of voting classifica- tion algorithms: Bagging, boosting, and variants. Machine Learning. 36, 105–142.</p>
+<p>96. E, B., R, K.: An empirical comparison of voting classifica- tion algorithms: Bagging, boosting, and variants. Machine Learning. 36, 105–142.</p>
 </div>
 </div>
             </section>
