@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-11-26">
+<meta name="date" content="2016-11-27">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -1058,7 +1058,7 @@ T(x;\Theta)=\Sigma_{j=1}^J\gamma_j I(x\in R_j)
 <li>熵：<span class="math inline">\(-\Sigma_{k=1}^K \hat{p}_{mk}log(\hat{p}_{mk})\)</span></li>
 </ol>
 <p>在二分类的情况下，如果<span class="math inline">\(p\)</span>是其中某类样本的比例，对应3个损失函数值分别是：<span class="math inline">\(1-max(p,1-p)\)</span>，<span class="math inline">\(2p(1-p)\)</span>和<span class="math inline">\(-plog(p)-(1-p)log(1-p)\)</span>。可以看到，后两者是连续可导的，这大大方便了优化。所以我们通常使用Gini系数或者熵，而不用误判率来优化。</p>
-<p>之前讲过，助推其实就是对这些树求和，这符合基扩展模型<span class="math inline">\(\eqref{eq:basisexp}\)</span>：</p>
+<p>之前讲过，助推符合基扩展模型<span class="math inline">\(\eqref{eq:basisexp}\)</span>,其是对树的求和：</p>
 <p><span class="math display">\[
 \begin{equation}
 f_M(x)=\Sigma_{m=1}^M T(x;\Theta_m)
@@ -1079,7 +1079,23 @@ f_M(x)=\Sigma_{m=1}^M T(x;\Theta_m)
 \label{eq:gamma}
 \end{equation}
 \]</span> 优化<span class="math inline">\(R_{jm}\)</span>是困难的。对于平方误差损失，<span class="math inline">\(\eqref{eq:gb}\)</span>其实就是对当前残差<span class="math inline">\(y_i-f_{m-1}(x_i)\)</span>拟合回归树，且<span class="math inline">\(\hat{\gamma}_{jm}\)</span>是当前每个区域对应的训练样本均值。</p>
-<p>对于二分类回归问题，当</p>
+<p>对于使用指数损失的二分类问题，当我们将<span class="math inline">\(T(x;\Theta_m)\)</span>的取值限定在<span class="math inline">\(\{1,-1\}\)</span>上时，我们在前一个知识扩展小节已经证明过，逐步可加算法就是自适助推。用当前的表达就是寻找优化下面加权错误率的树：</p>
+<p><span class="math display">\[\Sigma_{i=1}^N\ w_i^m I(y_i\neq T(x_i;\Theta_m))\]</span></p>
+<p>其中<span class="math inline">\(w_i^m=e^{-y_if_{m-1}(x_i)}\)</span>，这里应变量的取值被标度化了，即<span class="math inline">\(\gamma_{jm}\in \{-1,1\}\)</span>。这里即使不标度化，在指数损失的情况下<span class="math inline">\(\eqref{eq:gb}\)</span>仍然能够简化成一个对指数加权和的优化：</p>
+<p><span class="math display">\[\begin{array}{ccl}
+\hat{\Theta}_{m} &amp; = &amp; \underset{\Theta}{argmin}\Sigma_{i=1}^{N}exp\{-y_{i}[f_{m-1}(x_{i})+T(x_{i};\Theta_{m})]\}\\
+ &amp; = &amp; \underset{\Theta}{argmin}\Sigma_{i=1}^{N}exp\{-y_{i}f_{m-1}(x_{i})\}\cdot exp\{-y_{i}T(x_{i};\Theta_{m})\}\\
+ &amp; = &amp; \underset{\Theta}{argmin}\Sigma_{i=1}^{N}w_{i}^{m}exp\{-y_{i}T(x_{i};\Theta_{m})\}
+\end{array}\]</span></p>
+<p>使用上面加权指数损失为分裂准则，应用贪婪递归算法，对于每个<span class="math inline">\(R_{jm}\)</span>，<span class="math inline">\(\hat{\gamma}_{jm}\)</span>的估计为：</p>
+<p><span class="math display">\[\begin{array}{ccl}
+\hat{\gamma}_{jm} &amp; = &amp; \underset{\gamma_{jm}}{argmin}\Sigma_{x_{i}\in R_{jm}}exp\{-y_{i}[f_{m-1}(x_{i})+\gamma_{jm}]\}\\
+ &amp; = &amp; \underset{\gamma_{jm}}{argmin}\Sigma_{x_{i}\in R_{jm}}exp\{-y_{i}f_{m-1}(x_{i})\}\cdot exp\{-y_{i}\gamma_{jm}\}\\
+ &amp; = &amp; \underset{\gamma_{jm}}{argmin}\Sigma_{x_{i}\in R_{jm}}w_{i}^{m}exp\{-y_{i}\gamma_{jm}\}\\
+ &amp; = &amp; \underset{\gamma_{jm}}{argmin}\left\{ \left[\Sigma_{x_{i}\in R_{jm}}w_{i}^{m}I(y_{i}=1)\right]e^{-\gamma_{jm}}+\left[\Sigma_{x_{i}\in R_{jm}}w_{i}^{m}I(y_{i}=-1)\right]e^{\gamma_{jm}}\right\}
+\end{array}\]</span></p>
+<p>假设<span class="math inline">\(Q(\gamma_{jm})=\left\{ \left[\Sigma_{x_{i}\in R_{jm}}w_{i}^{m}I(y_{i}=1)\right]e^{-\gamma_{jm}}+\left[\Sigma_{x_{i}\in R_{jm}}w_{i}^{m}I(y_{i}=-1)\right]e^{\gamma_{jm}}\right\}\)</span>。通过求解<span class="math inline">\(\frac{\partial Q}{\partial\gamma_{jm}}=0\)</span>可以得到：</p>
+<p><span class="math display">\[\hat{\gamma}_{jm}=\frac{1}{2}ln\frac{\Sigma_{x_i\in R_{jm}}w_i^mI(y_i=1)}{\Sigma_{x_i\in R_{jm}}w_i^mI(y_i=-1)}\]</span></p>
 </div>
 <div id="section-12.9" class="section level2">
 <h2><span class="header-section-number">12.9</span> 其它树话题</h2>
