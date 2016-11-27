@@ -1062,7 +1062,7 @@ T(x;\Theta)=\Sigma_{j=1}^J\gamma_j I(x\in R_j)
 <p><span class="math display">\[
 \begin{equation}
 f_M(x)=\Sigma_{m=1}^M T(x;\Theta_m)
-\label{eq:btree}
+\label{eq:btree2}
 \end{equation}
 \]</span></p>
 <p>在向前逐步可加模型算法中的每一步迭代，都在当前模型<span class="math inline">\(f_{m-1}(x)\)</span>的条件下，计算下一棵树对应的<span class="math inline">\(\Theta_m=\{R_{jm}, \gamma_{jm}\}_1^{J_{m}}\)</span>：</p>
@@ -1096,6 +1096,8 @@ f_M(x)=\Sigma_{m=1}^M T(x;\Theta_m)
 \end{array}\]</span></p>
 <p>假设<span class="math inline">\(Q(\gamma_{jm})=\left\{ \left[\Sigma_{x_{i}\in R_{jm}}w_{i}^{m}I(y_{i}=1)\right]e^{-\gamma_{jm}}+\left[\Sigma_{x_{i}\in R_{jm}}w_{i}^{m}I(y_{i}=-1)\right]e^{\gamma_{jm}}\right\}\)</span>。通过求解<span class="math inline">\(\frac{\partial Q}{\partial\gamma_{jm}}=0\)</span>可以得到：</p>
 <p><span class="math display">\[\hat{\gamma}_{jm}=\frac{1}{2}ln\frac{\Sigma_{x_i\in R_{jm}}w_i^mI(y_i=1)}{\Sigma_{x_i\in R_{jm}}w_i^mI(y_i=-1)}\]</span></p>
+<p>对于回归的情况，用Huber损失函数（绝对值损失）取代平方误差损失。对于分类情况，用</p>
+<p><span class="math display">\[L(y,p(x))=-\Sigma_{k=1}^K I(Y=G_k)\frac{e^{f_k(x)}}{\Sigma_{l=1}^ke^{f_l(x)}}\]</span> 作为损失函数取代指数损失得到的助推树更加稳定。但是用这些损失函数并不能加速助推算法。对于一般的损失函数，给定<span class="math inline">\(R_{jm}\)</span>的情况下<span class="math inline">\(\eqref{eq:gamma}\)</span>的解只不过是一个给定区域的位置估计，很容易得到。对于绝对值误差，这只不过是每个划分区域内相应样本残差的中位数。对于其它损失函数，也很能有迭代算法很快的得出相应区域的最优<span class="math inline">\(\gamma\)</span>取值。这里困难的依旧是寻找相应的划分区域<span class="math inline">\(R_{jm}\)</span>。对于更加一般的损失函数，没有简单快速的求解<span class="math inline">\(\eqref{eq:gb}\)</span>的算法。因此我们需要用一种尽量逼近解的算法。</p>
 </div>
 <div id="section-12.9" class="section level2">
 <h2><span class="header-section-number">12.9</span> 其它树话题</h2>
