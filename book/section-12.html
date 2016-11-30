@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-11-27">
+<meta name="date" content="2016-11-30">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -234,7 +234,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="12.5" data-path="section-12.html"><a href="section-12.html#section-12.5"><i class="fa fa-check"></i><b>12.5</b> 随机森林</a></li>
 <li class="chapter" data-level="12.6" data-path="section-12.html"><a href="section-12.html#section-12.6"><i class="fa fa-check"></i><b>12.6</b> 助推法</a></li>
 <li class="chapter" data-level="12.7" data-path="section-12.html"><a href="section-12.html#section-12.7"><i class="fa fa-check"></i><b>12.7</b> 知识扩展：助推法的可加模型框架</a></li>
-<li class="chapter" data-level="12.8" data-path="section-12.html"><a href="section-12.html#section-12.8"><i class="fa fa-check"></i><b>12.8</b> 知识扩展：助推树的数学框架</a></li>
+<li class="chapter" data-level="12.8" data-path="section-12.html"><a href="section-12.html#section-12.8"><i class="fa fa-check"></i><b>12.8</b> 知识扩展：助推树的数学框架</a><ul>
+<li class="chapter" data-level="12.8.1" data-path="section-12.html"><a href="section-12.html#section-12.8.1"><i class="fa fa-check"></i><b>12.8.1</b> 数学表达</a></li>
+<li class="chapter" data-level="12.8.2" data-path="section-12.html"><a href="section-12.html#section-12.8.2"><i class="fa fa-check"></i><b>12.8.2</b> 梯度助推数值优化</a></li>
+</ul></li>
 <li class="chapter" data-level="12.9" data-path="section-12.html"><a href="section-12.html#section-12.9"><i class="fa fa-check"></i><b>12.9</b> 其它树话题</a></li>
 </ul></li>
 <li class="chapter" data-level="13" data-path="section-13.html"><a href="section-13.html"><i class="fa fa-check"></i><b>13</b> 深度学习</a><ul>
@@ -455,8 +458,13 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </div>
 <p>在R中有好几个包能够用来建造回归树，如<code>ctree</code>、<code>rpart</code>和<code>tree</code>。<code>rpart</code>是广为使用的一个建造单棵树的包，切分方法基于<code>CART</code>，使用<code>rpart()</code>函数，用公式表达法。<code>rpart()</code>有若干调节参数，可以通过<code>rpart.control</code>选项设定。或者你可以使用之前反复讲到的神器<code>caret</code>包的<code>train()</code>函数，通过其为接口调用<code>rpart()</code>函数，方便进行交互校验。 <code>train()</code>在此情况下常用的函数设定的参数是复杂度参数（<code>cp</code>）和最大节点深度（<code>maxdepth</code>）。为了对 <code>CART</code>树的复杂度参数进行调优，<code>train()</code>中的方法选项应该设定为<code>method = &quot;rpart&quot;</code>。为了对最大深度进行调优，方法选项则应为<code>method = &quot;rpart2&quot;</code>：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(rpart)
-<span class="kw">library</span>(tree)
-dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/SegData.csv&quot;</span>)
+<span class="kw">library</span>(tree)</code></pre></div>
+<pre><code>## 
+## Attaching package: &#39;tree&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:igraph&#39;:
+## 
+##     tree</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/SegData.csv&quot;</span>)
 <span class="co"># 对数据进行一些清理，删除错误的样本观测，消费金额不能为负数</span>
 dat &lt;-<span class="st"> </span><span class="kw">subset</span>(dat, store_exp &gt;<span class="st"> </span><span class="dv">0</span> &amp;<span class="st"> </span>online_exp &gt;<span class="st"> </span><span class="dv">0</span>)
 <span class="co"># 将10个问卷调查变量当作自变量</span>
@@ -1027,6 +1035,8 @@ w_i^{m+1} &amp; = &amp; exp[-y_if_m (x_i)]\\
 </div>
 <div id="section-12.8" class="section level2">
 <h2><span class="header-section-number">12.8</span> 知识扩展：助推树的数学框架</h2>
+<div id="section-12.8.1" class="section level3">
+<h3><span class="header-section-number">12.8.1</span> 数学表达</h3>
 <p>之前介绍简单回归和分类树时讲过，建立树的目的是找到自变量区域的划分<span class="math inline">\(R_j,\ j=1,2,\dots,J\)</span>，对每个划分区域内的样本指定一个拟合值<span class="math inline">\(\gamma_j\)</span>：</p>
 <p><span class="math display">\[x\in R_j \Rightarrow f(x)=\gamma_j\]</span></p>
 <p>树模型可以用如下方式表达：</p>
@@ -1098,6 +1108,46 @@ f_M(x)=\Sigma_{m=1}^M T(x;\Theta_m)
 <p><span class="math display">\[\hat{\gamma}_{jm}=\frac{1}{2}ln\frac{\Sigma_{x_i\in R_{jm}}w_i^mI(y_i=1)}{\Sigma_{x_i\in R_{jm}}w_i^mI(y_i=-1)}\]</span></p>
 <p>对于回归的情况，用Huber损失函数（绝对值损失）取代平方误差损失。对于分类情况，用</p>
 <p><span class="math display">\[L(y,p(x))=-\Sigma_{k=1}^K I(Y=G_k)\frac{e^{f_k(x)}}{\Sigma_{l=1}^ke^{f_l(x)}}\]</span> 作为损失函数取代指数损失得到的助推树更加稳定。但是用这些损失函数并不能加速助推算法。对于一般的损失函数，给定<span class="math inline">\(R_{jm}\)</span>的情况下<span class="math inline">\(\eqref{eq:gamma}\)</span>的解只不过是一个给定区域的位置估计，很容易得到。对于绝对值误差，这只不过是每个划分区域内相应样本残差的中位数。对于其它损失函数，也很能有迭代算法很快的得出相应区域的最优<span class="math inline">\(\gamma\)</span>取值。这里困难的依旧是寻找相应的划分区域<span class="math inline">\(R_{jm}\)</span>。对于更加一般的损失函数，没有简单快速的求解<span class="math inline">\(\eqref{eq:gb}\)</span>的算法。因此我们需要用一种尽量逼近解的算法。</p>
+</div>
+<div id="section-12.8.2" class="section level3">
+<h3><span class="header-section-number">12.8.2</span> 梯度助推数值优化</h3>
+<p>对于任何可微的损失函数，我们可以用类似于传统梯度优化的方法来逼近<span class="math inline">\(\eqref{eq:gb}\)</span>。假设在训练集上用<span class="math inline">\(f(x)\)</span>来预测变量<span class="math inline">\(y\)</span>，那么需要优化的就是如下损失函数:</p>
+<p><span class="math display">\[
+\begin{equation}
+L(f)=\Sigma_{i=1}^N L(y_i, f(x_i))
+\label{eq:generalLf}
+\end{equation}
+\]</span></p>
+<p>我们需要最小化<span class="math inline">\(L(f)\)</span>。在助推树中，<span class="math inline">\(f\)</span>是一系列树的和：</p>
+<p><span class="math display">\[f_{M}=\Sigma_{m=0}^M h_m\  h_m\in R^N\]</span></p>
+<p>设定一个初始值<span class="math inline">\(f_0=h_0\)</span>，接下来的每一次迭代中的<span class="math inline">\(f_m\)</span>都是基于之前得到的<span class="math inline">\(f_{m-1}\)</span>推导而来。不同的优化逼近的方法的差异就在于计算每一次迭代中的增量<span class="math inline">\(h_m\)</span>。梯度下降法是非常流行的一种优化逼近算法，通常也称为最速下降法。该算法非常贪婪，要使用梯度下降法找到一个函数的局部极小值，必须向函数上当前点对应梯度（或者是近似梯度）的反方向的规定步长距离点进行迭代搜索。这里的每一步选择：</p>
+<p><span class="math display">\[h_m=-\rho_m g_m\]</span></p>
+<p>其中<span class="math inline">\(\rho_m\)</span>是一个标量，<span class="math inline">\(g_m\in R^N\)</span>是损失函数<span class="math inline">\(L(f)\)</span>在当前值<span class="math inline">\(f=f_{m-1}\)</span>时的梯度：</p>
+<p><span class="math display">\[
+\begin{equation}
+g_{im}=\left[\frac{\partial L(y_{i},f(x_{i}))}{\partial f(x_{i})}\right]_{f(x_{i})=f_{m-1}(x_{i})}
+\label{eq:gradienm}
+\end{equation}
+\]</span></p>
+<p>每一步乘的标量<span class="math inline">\(\rho_m\)</span>通过如下式子得到：</p>
+<p><span class="math display">\[
+\begin{equation}
+\rho_{m}=\underset{\rho}{argmin}L(f_{m-1}-\rho g_{m})
+\label{eq:rhom}
+\end{equation}
+\]</span></p>
+<p>于是当前迭代更新为：</p>
+<p><span class="math display">\[
+\begin{equation}
+f_m=f_{m-1}-\rho_m g_m
+\label{eq:fm}
+\end{equation}
+\]</span></p>
+<p>向前逐步助推（在二分类问题中，当使用指数损失且将结果限定在{-1,1}上时就是自适助推）也是一种非常贪婪的算法。每一步迭代都力图最大程度的拟合当前残差。因此该过程可以类比于<span class="math inline">\(\eqref{eq:gradienm}\)</span>。向前逐步助推和梯度助推的主要不同在于，逐步助推中最后组成结果的树是不独立的：</p>
+<p><span class="math display">\[t_{m}=\{T(x_{1};\Theta_{m}),\dots,T(x_{N};\Theta_{m})\}^{T}\]</span></p>
+<p>这里的<span class="math inline">\(\Theta_{m}=\{R_{jm},\gamma_{jm}\}_{1}^{Jm}\)</span>的估计有个限制，就是终结点的数目是<span class="math inline">\(J_m\)</span>个。而梯度助推没有这样的限定，该方法只是寻找最快速的下降路径。</p>
+<p>通过逐步可加算法求解<span class="math inline">\(\eqref{eq:gamma}\)</span>的思想可以类比于通过<span class="math inline">\(\eqref{eq:rhom}\)</span>寻找最快速的下降路径。不同在于<span class="math inline">\(\eqref{eq:gamma}\)</span>是在不同的区域<span class="math inline">\(R_{jm}\)</span>分别搜寻。如果最小化训练集上的损失<span class="math inline">\(\eqref{eq:generalLf}\)</span>是唯一目标的话，梯度下降法是很好的选择。对于任何可微的损失函数<span class="math inline">\(L(y,f(x))\)</span>，梯度<span class="math inline">\(\eqref{eq:gradienm}\)</span>都很容易计算。</p>
+</div>
 </div>
 <div id="section-12.9" class="section level2">
 <h2><span class="header-section-number">12.9</span> 其它树话题</h2>
