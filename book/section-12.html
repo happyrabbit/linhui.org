@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-11-30">
+<meta name="date" content="2016-12-01">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -458,13 +458,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </div>
 <p>在R中有好几个包能够用来建造回归树，如<code>ctree</code>、<code>rpart</code>和<code>tree</code>。<code>rpart</code>是广为使用的一个建造单棵树的包，切分方法基于<code>CART</code>，使用<code>rpart()</code>函数，用公式表达法。<code>rpart()</code>有若干调节参数，可以通过<code>rpart.control</code>选项设定。或者你可以使用之前反复讲到的神器<code>caret</code>包的<code>train()</code>函数，通过其为接口调用<code>rpart()</code>函数，方便进行交互校验。 <code>train()</code>在此情况下常用的函数设定的参数是复杂度参数（<code>cp</code>）和最大节点深度（<code>maxdepth</code>）。为了对 <code>CART</code>树的复杂度参数进行调优，<code>train()</code>中的方法选项应该设定为<code>method = &quot;rpart&quot;</code>。为了对最大深度进行调优，方法选项则应为<code>method = &quot;rpart2&quot;</code>：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(rpart)
-<span class="kw">library</span>(tree)</code></pre></div>
-<pre><code>## 
-## Attaching package: &#39;tree&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:igraph&#39;:
-## 
-##     tree</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/SegData.csv&quot;</span>)
+<span class="kw">library</span>(tree)
+dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/SegData.csv&quot;</span>)
 <span class="co"># 对数据进行一些清理，删除错误的样本观测，消费金额不能为负数</span>
 dat &lt;-<span class="st"> </span><span class="kw">subset</span>(dat, store_exp &gt;<span class="st"> </span><span class="dv">0</span> &amp;<span class="st"> </span>online_exp &gt;<span class="st"> </span><span class="dv">0</span>)
 <span class="co"># 将10个问卷调查变量当作自变量</span>
@@ -1147,6 +1142,29 @@ f_m=f_{m-1}-\rho_m g_m
 <p><span class="math display">\[t_{m}=\{T(x_{1};\Theta_{m}),\dots,T(x_{N};\Theta_{m})\}^{T}\]</span></p>
 <p>这里的<span class="math inline">\(\Theta_{m}=\{R_{jm},\gamma_{jm}\}_{1}^{Jm}\)</span>的估计有个限制，就是终结点的数目是<span class="math inline">\(J_m\)</span>个。而梯度助推没有这样的限定，该方法只是寻找最快速的下降路径。</p>
 <p>通过逐步可加算法求解<span class="math inline">\(\eqref{eq:gamma}\)</span>的思想可以类比于通过<span class="math inline">\(\eqref{eq:rhom}\)</span>寻找最快速的下降路径。不同在于<span class="math inline">\(\eqref{eq:gamma}\)</span>是在不同的区域<span class="math inline">\(R_{jm}\)</span>分别搜寻。如果最小化训练集上的损失<span class="math inline">\(\eqref{eq:generalLf}\)</span>是唯一目标的话，梯度下降法是很好的选择。对于任何可微的损失函数<span class="math inline">\(L(y,f(x))\)</span>，梯度<span class="math inline">\(\eqref{eq:gradienm}\)</span>都很容易计算。</p>
+<p>不幸的是，这里梯度<span class="math inline">\(\refeq{eq:gradienm}\)</span>仅仅在训练集数据上定义，然而我们的最终目标是能够预测新样本。一个解决方法是我们在第m次迭代中建立树<span class="math inline">\(T(x;\Theta_m)\)</span>来拟合基于训练集样本得出的负梯度。这里树的建造使用的是平方误差：</p>
+<p><span class="math display">\[
+\begin{equation}
+\hat{\Theta}_{m}=\underset{\Theta}{argmin}\Sigma_{i=1}^{N}(-g_{im}-T(x_{i};\Theta))^{2}
+\label{eq:negradient}
+\end{equation}
+\]</span></p>
+<p>存在能够快速建立最小二乘回归树的算法。这里要特别注意一点，得到树之后我们使用的是推导出的划分区域<span class="math inline">\(R_{jm}\)</span>，之后在该划分区域上继续沿用可加模型算法的思想。虽然<span class="math inline">\(\eqref{eq:negradient}\)</span>得到的划分区域和<span class="math inline">\(\eqref{eq:theta}\)</span>得到的划分区域不同，但通常很相近。下面是一般的梯度助推回归树算法：</p>
+<blockquote>
+<p>梯度助推回归树</p>
+</blockquote>
+<ol style="list-style-type: decimal">
+<li>设置初始<span class="math inline">\(f_0(x)=\underset{\gamma}{argmin}\Sigma_{i=1}^{N}L(y_{i},\gamma)\)</span></li>
+<li>对<span class="math inline">\(m=1\dots M\)</span>：
+<ul>
+<li>对<span class="math inline">\(i=1\dots N\)</span>，计算<span class="math inline">\(-g_{im}=-\left[\frac{\partial L(y_{i};f(x_{i}))}{\partial f(x_{i})}\right]_{f=f_{m-1}}\)</span></li>
+<li>对<span class="math inline">\(-g_{im}\)</span>拟合回归树，得到终结点划分区域<span class="math inline">\(R_{jm},\ j=1,2,\dots,J_m\)</span></li>
+<li>对<span class="math inline">\(j=1,2,\dots,J_m\)</span>，计算<span class="math inline">\(\gamma_{jm}=\underset{\gamma}{argmin}\Sigma_{x_{i}\in R_{jm}}L(y_{i},f_{m-1}(x_{i})+\gamma)\)</span></li>
+<li>更新<span class="math inline">\(f_{m(x)}=f_{m-1}(x)+\Sigma_{j=1}^{J_{m}}\gamma_{jm}I(x\in R_{jm})\)</span></li>
+</ul></li>
+<li>输出<span class="math inline">\(\hat{f}(x)=f_M(x)\)</span></li>
+</ol>
+<p>对于分类的情况算法也类似，只是损失函数不同。如果类别数目<span class="math inline">\(K&gt;2\)</span>，那么在每次迭代m内都需要对各个类别分别建立<span class="math inline">\(K\)</span>棵树，即最后我们会得到<span class="math inline">\(f_{kM},\ k=1,\dots,K\)</span>。</p>
 </div>
 </div>
 <div id="section-12.9" class="section level2">
