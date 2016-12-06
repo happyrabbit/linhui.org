@@ -25,7 +25,7 @@
 
 <meta name="author" content="林荟">
 
-<meta name="date" content="2016-12-01">
+<meta name="date" content="2016-12-06">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -238,7 +238,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="12.8.1" data-path="section-12.html"><a href="section-12.html#section-12.8.1"><i class="fa fa-check"></i><b>12.8.1</b> 数学表达</a></li>
 <li class="chapter" data-level="12.8.2" data-path="section-12.html"><a href="section-12.html#section-12.8.2"><i class="fa fa-check"></i><b>12.8.2</b> 梯度助推数值优化</a></li>
 </ul></li>
-<li class="chapter" data-level="12.9" data-path="section-12.html"><a href="section-12.html#section-12.9"><i class="fa fa-check"></i><b>12.9</b> 其它树话题</a></li>
 </ul></li>
 <li class="chapter" data-level="13" data-path="section-13.html"><a href="section-13.html"><i class="fa fa-check"></i><b>13</b> 深度学习</a><ul>
 <li class="chapter" data-level="13.1" data-path="section-6.html"><a href="section-6.html#-1"><i class="fa fa-check"></i><b>13.1</b> 介绍</a></li>
@@ -368,6 +367,7 @@ dat=<span class="kw">data.frame</span>(x,fx)
 <p><img src="DS_R_files/figure-html/unnamed-chunk-84-1.png" width="672" /></p>
 <p>由于我们通常使用训练集进行参数估计，如果训练集不同，得到的参数估计也会不同。直观的讲，估计方差表示如果我们用不同的数据集拟合相同的模型，得到估计值的变化，理想的情况是估计值的变化不会太大。对于高方差的模型，训练集的微小变化会导致很不相同的估计值。通常情况下，灵活度高的模型方差也更高，比如树模型，以及最初的助推法，后来在此基础上的随机森林模型和梯度助推法这样的集成方法的重要目标之一，就是通过汇总不同样本上得到的结果来降低估计方差。下图中的蓝色曲线是用平滑方法对上面的非线性观测进行拟合得到的，该曲线的灵活性很高，能够高度拟合当前数据：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(dat,<span class="kw">aes</span>(x,fx))+<span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)</code></pre></div>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39;</code></pre>
 <p><img src="DS_R_files/figure-html/unnamed-chunk-85-1.png" width="672" /></p>
 <p>但是该方法有很高的方差，如果我们随机抽取不同的样本子集，得到的拟合曲线会有明显变化：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 设置随机种子</span>
@@ -390,6 +390,10 @@ idx4=<span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">l
 dat4=<span class="kw">data.frame</span>(<span class="dt">x4=</span>x[idx4],<span class="dt">fx4=</span>fx[idx4])
 p4=<span class="kw">ggplot</span>(dat4,<span class="kw">aes</span>(x4,fx4))+<span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)
 <span class="kw">multiplot</span>(p1,p2,p3,p4,<span class="dt">cols=</span><span class="dv">2</span>)</code></pre></div>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39;
+## `geom_smooth()` using method = &#39;loess&#39;
+## `geom_smooth()` using method = &#39;loess&#39;
+## `geom_smooth()` using method = &#39;loess&#39;</code></pre>
 <p><img src="DS_R_files/figure-html/unnamed-chunk-86-1.png" width="672" /></p>
 <p>对相同的4个子集拟合线性模型，变化非常小：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p1=<span class="kw">ggplot</span>(dat1,<span class="kw">aes</span>(x1,fx1))+<span class="st"> </span>
