@@ -25,7 +25,7 @@
 
 <meta name="author" content="Hui Lin and Ming Li">
 
-<meta name="date" content="2017-02-07">
+<meta name="date" content="2017-02-08">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -128,11 +128,14 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="3.3" data-path="section-3.html"><a href="section-3.html#section-3.3"><i class="fa fa-check"></i><b>3.3</b> 生猪疫情风险预测数据</a></li>
 </ul></li>
 <li class="chapter" data-level="4" data-path="data-wrangling.html"><a href="data-wrangling.html"><i class="fa fa-check"></i><b>4</b> Data Wrangling</a><ul>
-<li class="chapter" data-level="4.1" data-path="data-wrangling.html"><a href="data-wrangling.html#tidy-data"><i class="fa fa-check"></i><b>4.1</b> Tidy data</a></li>
-<li class="chapter" data-level="4.2" data-path="data-wrangling.html"><a href="data-wrangling.html#reshape-data"><i class="fa fa-check"></i><b>4.2</b> Reshape data</a></li>
-<li class="chapter" data-level="4.3" data-path="data-wrangling.html"><a href="data-wrangling.html#subset-data"><i class="fa fa-check"></i><b>4.3</b> Subset data</a></li>
-<li class="chapter" data-level="4.4" data-path="data-wrangling.html"><a href="data-wrangling.html#summarize-data"><i class="fa fa-check"></i><b>4.4</b> Summarize data</a></li>
-<li class="chapter" data-level="4.5" data-path="data-wrangling.html"><a href="data-wrangling.html#combine-data"><i class="fa fa-check"></i><b>4.5</b> Combine data</a></li>
+<li class="chapter" data-level="4.1" data-path="data-wrangling.html"><a href="data-wrangling.html#read-and-write-data"><i class="fa fa-check"></i><b>4.1</b> Read and write data</a><ul>
+<li class="chapter" data-level="4.1.1" data-path="data-wrangling.html"><a href="data-wrangling.html#tibble-a-data-frame-substitute"><i class="fa fa-check"></i><b>4.1.1</b> <code>tibble</code> – a data frame substitute</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="data-wrangling.html"><a href="data-wrangling.html#tidy-data"><i class="fa fa-check"></i><b>4.2</b> Tidy data</a></li>
+<li class="chapter" data-level="4.3" data-path="data-wrangling.html"><a href="data-wrangling.html#reshape-data"><i class="fa fa-check"></i><b>4.3</b> Reshape data</a></li>
+<li class="chapter" data-level="4.4" data-path="data-wrangling.html"><a href="data-wrangling.html#subset-data"><i class="fa fa-check"></i><b>4.4</b> Subset data</a></li>
+<li class="chapter" data-level="4.5" data-path="data-wrangling.html"><a href="data-wrangling.html#summarize-data"><i class="fa fa-check"></i><b>4.5</b> Summarize data</a></li>
+<li class="chapter" data-level="4.6" data-path="data-wrangling.html"><a href="data-wrangling.html#combine-data"><i class="fa fa-check"></i><b>4.6</b> Combine data</a></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="data-pre-processing.html"><a href="data-pre-processing.html"><i class="fa fa-check"></i><b>5</b> Data Pre-processing</a><ul>
 <li class="chapter" data-level="5.1" data-path="data-pre-processing.html"><a href="data-pre-processing.html#start"><i class="fa fa-check"></i><b>5.1</b> Start</a></li>
@@ -196,20 +199,32 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
             <section class="normal" id="section-">
 <div id="data-wrangling" class="section level1">
 <h1><span class="header-section-number">Chapter 4</span> Data Wrangling</h1>
+<p>This chapter focuses on some of the most frequently used data manipulations and shows how to implement them in R. It is important to explore the data set with descriptive statistics (mean, standard deviation, etc.) and data visualization prior to analysis. Transform data so that the data structure is in line with the requirements of the model. You also need to summarize the results after analysis.</p>
+<p>Here we assume the readers are already familiar with some of the traditional R data operations, such as subsetting data frame, deleting variables, read and write functions (<code>read.csv ()</code>, <code>write.csv ()</code>, etc.) in base R. We will also skip some basic descriptive functions in R. For example, for discrete variables, we often use the frequency table to look at the frequency (<code>table ()</code>) of the variable at various levels as needed, or a crosstab of two variables. You can also draw a bar chart for discrete variables (<code>bar()</code>). For continuous variables, we need to look at the mean (<code>mean ()</code>), standard deviation (<code>sd()</code>), quantile (<code>quantile()</code>) of a variable from time to time. There are also functions like <code>summary()</code>, <code>str()</code> and <code>describe()</code> (a functions in the ‘psych’ package) that give a summary of a data frame.</p>
+<!--
+These are some of the most basic methods of exploring data at all stages (including model results). But only these are not enough, the flexibility of these methods is not high, the output of the information is fixed. We may not want the `summary ()` function to output all of the information, and some of the information we want is not. For example, if we want to know the mean of customer revenue, online spend, and so on for each category, or if we want to find the highest-earning people in each category, then extract them together, or we want a The new variable indicates whether the channel was purchased (online or in-store) and used this for modeling, where the data needs to be reshaped, the records for online purchases and the records for physical store purchases are row by row rather than now Of the column. These operations can be cumbersome and inefficient when used only with primitive functions. There are some other packages in R that can be very efficient and succinct to accomplish these seemingly complex tasks. The first contact with these functions of the small partners will feel that they are not very studious, it is natural, more flexible tools need to learn to master the natural longer, but this is a ** practice makes perfect process.
+-->
+<p>The focus here is to introduce some of the more efficient data wrangling methods in R.</p>
+<div id="read-and-write-data" class="section level2">
+<h2><span class="header-section-number">4.1</span> Read and write data</h2>
+<div id="tibble-a-data-frame-substitute" class="section level3">
+<h3><span class="header-section-number">4.1.1</span> <code>tibble</code> – a data frame substitute</h3>
+</div>
+</div>
 <div id="tidy-data" class="section level2">
-<h2><span class="header-section-number">4.1</span> Tidy data</h2>
+<h2><span class="header-section-number">4.2</span> Tidy data</h2>
 </div>
 <div id="reshape-data" class="section level2">
-<h2><span class="header-section-number">4.2</span> Reshape data</h2>
+<h2><span class="header-section-number">4.3</span> Reshape data</h2>
 </div>
 <div id="subset-data" class="section level2">
-<h2><span class="header-section-number">4.3</span> Subset data</h2>
+<h2><span class="header-section-number">4.4</span> Subset data</h2>
 </div>
 <div id="summarize-data" class="section level2">
-<h2><span class="header-section-number">4.4</span> Summarize data</h2>
+<h2><span class="header-section-number">4.5</span> Summarize data</h2>
 </div>
 <div id="combine-data" class="section level2">
-<h2><span class="header-section-number">4.5</span> Combine data</h2>
+<h2><span class="header-section-number">4.6</span> Combine data</h2>
 
 </div>
 </div>
