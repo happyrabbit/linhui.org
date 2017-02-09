@@ -150,7 +150,7 @@ library(tidyr)</code></pre>
 
 <h2>数据清理</h2>
 <p>当你得到上述技术上正确的数据后，第一步就是检查数据，看看都有哪些变量，这些变量分布如何，是不是存在错误的观测。我们先读取并且检查服装消费者数据：</p>
-<pre class="r"><code>sim.dat&lt;-read.csv(&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/SegData.csv&quot;)
+<pre class="r"><code>sim.dat&lt;-read.csv(&quot;https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv&quot;)
 summary(sim.dat)</code></pre>
 <pre><code>##       age            gender        income       house    
 ##  Min.   : 16.00   Female:554   Min.   : 41776   No :432  
