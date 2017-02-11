@@ -1,5 +1,5 @@
 ---
-title: Customer Based Corporate Valuation：Modeling with Limited, Aggregated, Missing Data (Online Workshop)
+title: Customer Based Corporate Valuation (Online Workshop)
 layout: post
 ---
 
