@@ -26,6 +26,11 @@ variable models for customer behavior.
 
 About the speaker: 
 
+<p align="center">
+  <img src="http://scientistcafe.com/images/DanMcCarthy.png" width="20%" />
+</p>
+
+
 **Dan McCarthy**, fifth year Ph.D. candidate in the Statistics Department at the Wharton School of the University of 
 Pennsylvania, and resident data scientist for the Wharton Customer Analytics Initiative. His research specialty 
 is the application of leading-edge statistical methodology to contemporary empirical marketing problems. 
