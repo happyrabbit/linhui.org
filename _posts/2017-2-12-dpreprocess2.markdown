@@ -205,7 +205,7 @@ plot(density(x1),family =&quot;Songti SC&quot;,main=paste(&quot;右偏，偏度�
 有偏分布展示
 </p>
 </div>
-<p>分布是否有偏可以很容易从图上看到。图@ref(fig:skew)显示了两种类型的不对称分布。分布对称时偏度=0，分布左偏时偏度&lt;0，分布右偏时偏度&gt;0，且偏离程度越大，偏度统计量的绝对值越大。有很多变换有助于去除偏度，如log变换，平方根或者取倒数。但是仅仅靠观察图形无法知道哪种变换方法最好。大家有没有注意到，常用的一些变换都和指数函数有关，如 <span class="math inline">\(log(x)\)</span>（这个是对数函数，但也是指数函数的近亲嘛：））、<span class="math inline">\(x^2\)</span> 和 <span class="math inline">\(\frac{1}{x}\)</span>。于是Box和Cox（1964）<span class="citation">(Box G 1964)</span>提出了含有一个参数<span class="math inline">\(\lambda\)</span>的指数变换族：</p>
+<p>分布是否有偏可以很容易从图上看到。上图显示了两种类型的不对称分布。分布对称时偏度=0，分布左偏时偏度&lt;0，分布右偏时偏度&gt;0，且偏离程度越大，偏度统计量的绝对值越大。有很多变换有助于去除偏度，如log变换，平方根或者取倒数。但是仅仅靠观察图形无法知道哪种变换方法最好。大家有没有注意到，常用的一些变换都和指数函数有关，如 <span class="math inline">\(log(x)\)</span>（这个是对数函数，但也是指数函数的近亲嘛：））、<span class="math inline">\(x^2\)</span> 和 <span class="math inline">\(\frac{1}{x}\)</span>。于是Box和Cox（1964）<span class="citation">(Box G 1964)</span>提出了含有一个参数<span class="math inline">\(\lambda\)</span>的指数变换族：</p>
 <p><span class="math display">\[x^{*}=\begin{cases}
 \begin{array}{c}
 \frac{x^{\lambda}-1}{\lambda}\\
@@ -280,7 +280,7 @@ hist(transformed$store_trans,main=&quot;变换后商店消费次数&quot;,xlab=&
 Box-Cox变换展示
 </p>
 </div>
-<p>从图@ref(fig:bc)可以看到，变换前商店消费量分布明显右偏，变换后情况显著改善，基本对称。<code>BoxCoxTrans()</code> 也可以进行Box-Cox变换，使用方法类似。但要注意的是<code>BoxCoxTrans()</code>只能作用于单个数值变量，不能像之前那样对一个数据框中的列一次性进行变换。</p>
+<p>从Box-Cox变换展示图可以看到，变换前商店消费量分布明显右偏，变换后情况显著改善，基本对称。<code>BoxCoxTrans()</code> 也可以进行Box-Cox变换，使用方法类似。但要注意的是<code>BoxCoxTrans()</code>只能作用于单个数值变量，不能像之前那样对一个数据框中的列一次性进行变换。</p>
 <pre class="r"><code>(trans&lt;-BoxCoxTrans(dat_bc$store_trans))</code></pre>
 <pre><code>## Box-Cox Transformation
 ## 
