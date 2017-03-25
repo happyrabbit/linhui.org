@@ -41,7 +41,7 @@ Data Science doesn't come out of the blue. Its predecessor is data analysis. Bac
 
 It deeply shocked his academic readers. Aren’t you supposed to present something mathematically precise, such as definitions, theorems and proofs? If we use one sentence to summarize what John said, it is :
 
-> data analysis is more than mathematics.
+> Data analysis is more than mathematics.
 
 In Sep 2015, the University of Michigan plans to invest $100 million over the next five years in a new [Data Science Initiative](http://www.ns.umich.edu/new/releases/23105-u-michigan-launches-100-million-data-science-initiative) that will enhance opportunities for student and faculty researchers across the university to tap into the enormous potential of big data. U-M Provost Martha Pollack said:
 
@@ -51,7 +51,8 @@ How they define Data science here? The web site for DSI gives us an idea what Da
 
 > “This coupling of scientific discovery and practice involves the collection, management, processing, analysis, visualization, and interpretation of vast amounts of heterogeneous data associated with a diverse array of scientific, translational, and interdisciplinary applications.”
 
-With the data science hype picking up stream, many professionals changed their titles to Data Scientist without any of the necessary qualifications. But at that time, data scientist title was not well defined which lead to confusion in the market, obfuscation in resumes and exaggeration of skills. Here is a list of definitions for a “data scientist”:
+With the data science hype picking up stream, many professionals changed their titles to Data Scientist without 
+any of the necessary qualifications. But data scientist title was not well defined which lead to confusion in the market, obfuscation in resumes and exaggeration of skills. Here is a list of definitions for a “data scientist”:
 
 - “A data scientist is a data analyst who lives in California”
 - “A data scientist is someone who is better at statistics than any software engineer and better - at software engineering than any statistician.”
