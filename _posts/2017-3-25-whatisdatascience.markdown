@@ -6,6 +6,13 @@ layout: post
 ---
 
 
+<p align="center">
+  <img src="http://linhui.org/images/Jokes/datascientist.png"  width="70%" />
+</p>
+
+
+
+
 Data science and Data scientist have become buzz words. Allow me to reiterate what you may have already heard a million times in the media: **data scientists are in demand and continue to grow**. A study by the McKinsey Global Institute concludes,
 
 > "a shortage of the analytical and managerial talent necessary to make the most of Big Data is a significant and pressing challenge (for the U.S.)."
@@ -23,8 +30,6 @@ What is wrong? The activities that preoccupied statistics over centuries are now
 The first two are linked together which leads to statisticians’ current position on data science. I assume everyone has heard the 3V definition of big data. The media hasn’t taken a minute break from touting “big” data. Data science trainees now need the skills to cope with such big datasets. What are those skills? You may already hear those:  Hadoop, a variant of Map/Reduce for use with datasets distributed across a cluster of computers. The new skills are for dealing with organizational artifacts of large-scale cluster computing but not for better solving the real problem. A lot of data, on its own is worthless. It isn’t the size of the data that’s important. It’s what you do with it. The big data skills that so many are touting today are not skills for better solving the real problem of inference from data. 
 
 Some media think they sense the trends in hiring and government funding. We are transiting to universal connectivity with a deluge of data filling telecom servers. But these facts don’t immediately create a science. The statisticians have been laying the groundwork of data science at least 50 years ago. Today’s data science is an enlargement of traditional academic statistics rather than a brand new discipline.
-
-Our goal is to help you enlarge your background to be data scientist in US enterprise environments. We will use case studies to cover how to leverage big data distributed platform (Hadoop / Hive / Spark), data wrangling, modeling, dynamic report (R markdown) and interactive dashboard (R-Shiny) to tackle real-world data science problems. One typical skill gap for statistician is data ETL (extraction, transformation and load) in production environments, and we will cover this topic as well. Data science is a combination of science and art with data as the foundation. We will also cover the “art” part to guide participant to learn soft skills to define data science problems and to effectively communicate with business stakeholders. The prerequisite knowledge is MS level education in statistics and entry level of R-Studio.
 
 ## What is data science?
 
