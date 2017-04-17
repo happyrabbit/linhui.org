@@ -24,7 +24,7 @@
   
 
 
-<meta name="date" content="2017-04-12">
+<meta name="date" content="2017-04-17">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -88,6 +88,7 @@ MathJax.Hub.Config({
 <li class="chapter" data-level="4.2.1" data-path="section-4.html"><a href="section-4.html#section-4.2.1"><i class="fa fa-check"></i><b>4.2.1</b> 列表（伪阵列）</a></li>
 <li class="chapter" data-level="4.2.2" data-path="section-4.html"><a href="section-4.html#tuples"><i class="fa fa-check"></i><b>4.2.2</b> 元组（Tuples）对象</a></li>
 <li class="chapter" data-level="4.2.3" data-path="section-4.html"><a href="section-4.html#section-4.2.3"><i class="fa fa-check"></i><b>4.2.3</b> 字符串</a></li>
+<li class="chapter" data-level="4.2.4" data-path="section-4.html"><a href="section-4.html#section-4.2.4"><i class="fa fa-check"></i><b>4.2.4</b> 对序列排序</a></li>
 </ul></li>
 </ul></li>
 <li class="divider"></li>
@@ -570,8 +571,99 @@ x.pop() # 会出现错误提示 ，因为元组是不可修改的
 <p>字符串本质上就是字符元组。只不过它们是用引号定义的而非括号，且灵活度比字符元组高。</p>
 <div id="section-4.2.3.1" class="section level4">
 <h4><span class="header-section-number">4.2.3.1</span> 压缩的元组</h4>
-
+<pre>
+1 >>> x = ’abcde’
+2 >>> x[2]
+3 ’c’
+4 >>> x[2] = ’q’ # 会出现错误提示，因为字符串不能替换元素
+5 Traceback (most recent call last):
+6 File "<stdin>", line 1, in ?
+7 TypeError: object doesn’t support item assignment
+8 >>> x = x[0:2] + ’q’ + x[3:5]
+9 >>> x
+10 ’abqde’
+ </pre>
+<p>你可能会觉得奇怪，为什么最后一条命令：</p>
+<pre>
+>>> x = x[0:2] + ’q’ + x[3:5]
+</pre>
+<p>没有违反不可替换的原则。因为这里x只是索引源，我们只是通过截取x中的元素然后拼凑成一个新的字符串，而并未更改x。</p>
+<p>如前所述，字符串和字符元组还有不同：</p>
+<pre>
+>>> x.index(’d’) # 结果在意料之中
+3
+>>> ’d’ in x # 结果在意料之中
+1
+>>> x.index(’de’) # 结果有些出乎意料不是么？
+3
+</pre>
+<p>如我们所见， <code>str</code>类中的<code>index()</code>函数具有很强的灵活性，可以扩展到字符串上。</p>
+<p><code>str</code>类中还有许多方便的函数。例如，我们之前看到的<code>split()</code>函数。与其相反的函数是<code>join()</code>。你可以在字符串上应用该函数，一个字符串组成的序列。结果是将其中所有的字符串连接起来，而函数前面的字符串将用于连接这些元素【这里展示的是<code>join()</code>函数的新用法，之后会有关于函数新旧用法的讨论】：</p>
+<pre>
+>>> ’---’.join([’abc’,’de’,’xyz’])
+’abc---de---xyz’
+>>> q = ’\n’.join((’abc’,’de’,’xyz’))
+>>> q
+’abc\nde\nxyz’
+>>> print q
+abc
+de
+xyz
+</pre>
+<p>这里是更多的例子：</p>
+<pre>
+>>> x = ’abc’
+>>> x.upper()
+’ABC’
+>>> ’abc’.upper()
+’ABC’
+>>> ’abc’.center(5) # 将原始字符串放在一个具有5个字符位置的字符串中央
+’ abc ’
+>>> ’abc de f’.replace(’ ’,’+’)
+’abc+de+f’
+>>> x = ’abc123’
+>>> x.find(’c1’) # 找到'c1'出现的最初位置
+2
+>>> x.find(’3’)
+5
+>>> x.find(’1a’)
+-1
+</pre>
+<p>关于字符操作的函数很多，在正则表达的模块包（<code>re</code>）中也有很多这样的操作函数。<code>str</code>类函数是较新版本Python中内置的，对于之前的版本，你需要用下面的代码导入：</p>
+<pre>
+import string
+</pre>
 </div>
+<div id="section-4.2.3.2" class="section level4">
+<h4><span class="header-section-number">4.2.3.2</span> 成形的字符串操作</h4>
+<p>字符串操作在许多情况下都很有用，其中之一就是和Python中的<strong>print</strong>命令联合使用，例如：</p>
+<pre>
+print('the factors of 15 are %d and %d' % (3,5))
+</pre>
+<p>输出结果为：</p>
+<pre>
+the factors of 15 are 3 and 5
+</pre>
+<p>其中<strong>%d</strong>来自于C/C++中的整数对象。但事实上，该操作是字符串操作，而非输出（print）操作。我们看看为什么：</p>
+<pre>
+print('the factors of 15 are %d and %d' % (3,5))
+</pre>
+<p>中的部分：</p>
+<pre>
+'the factors of 15 are %d and %d' % (3,5)
+</pre>
+<p>是一个字符串操作，其结果产生了一个新的字符串，而<strong>print</strong>函数只是将新生成的字符串输出而已。例如：</p>
+<pre>
+>>> x = "%d years old" % 12
+</pre>
+<p>这里的变量<strong>x</strong>现在是字符串‘12 years old’。</p>
+<p>这是另外一常见的用法，很强大【一些C/C++程序员可能意识到这个和C中的<strong>sprintf()</strong>类似】。</p>
+<p>注意，上面我们用<code>(3,5)</code>而不是<code>3,5</code>。如果不加括号，<strong>%</strong>操作符会认为其对象只有3而不是有着2个元素的元组。记得之前我们讲过，定义元组时不一定要括号，但在会产生歧义的时候一定更要使用，这里就是这样的情况。</p>
+</div>
+</div>
+<div id="section-4.2.4" class="section level3">
+<h3><span class="header-section-number">4.2.4</span> 对序列排序</h3>
+
 </div>
 </div>
 </div>
