@@ -492,7 +492,7 @@ rpartTune &lt;-<span class="st"> </span><span class="kw">train</span>(trainx, tr
                    <span class="dt">tuneLength =</span> <span class="dv">10</span>,
                    <span class="dt">trControl =</span> <span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>))
 <span class="kw">plot</span>(rpartTune)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-251-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-253-1.png" width="672" /></p>
 <p>最大树的深度大于2貌似RMSE就不再变化了。这里我们就用深度为2来建立树：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rpartTree &lt;-<span class="st"> </span><span class="kw">rpart</span>(trainy ~<span class="st"> </span>., <span class="dt">data =</span> trainx, <span class="dt">maxdepth =</span> <span class="dv">2</span>)</code></pre></div>
 <p>你可以通过<code>print()</code>查看相应的规则：</p>
@@ -511,7 +511,7 @@ rpartTune &lt;-<span class="st"> </span><span class="kw">train</span>(trainx, tr
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(partykit)
 rpartTree2 &lt;-<span class="st"> </span><span class="kw">as.party</span>(rpartTree)
 <span class="kw">plot</span>(rpartTree2)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-254-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-256-1.png" width="672" /></p>
 </div>
 <div id="section-15.3.2" class="section level3">
 <h3><span class="header-section-number">15.3.2</span> 决策树</h3>
@@ -657,7 +657,7 @@ rpartFactorRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span c
        <span class="dt">lwd =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>),
        <span class="dt">col =</span> <span class="kw">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;red&quot;</span>),
        <span class="dt">pch =</span> <span class="kw">c</span>(<span class="dv">16</span>, <span class="dv">3</span>))</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-258-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-260-1.png" width="672" /></p>
 <p>可以看到，对于使用CART构建的树，对消费者类别变量编码或者不编码并不影响对受访者性别做预测。同样也可以通过<code>partykit</code>包对最终的模型绘制图形。这里不展示结果：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(partykit)
 <span class="kw">plot</span>(<span class="kw">as.party</span>(rpartTune1$finalModel))</code></pre></div>
@@ -827,7 +827,7 @@ rfit =<span class="st"> </span><span class="kw">randomForest</span>(trainy ~<spa
 ## segment        13.228502</code></pre>
 <p>这里对于分类的情况，重要性的衡量基于预测袋外数据时基尼系数减小的均值。可以用<code>varImpPlot()</code>函数对重要性绘图：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">varImpPlot</span>(rfit)</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-268-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-270-1.png" width="672" /></p>
 <p>可以看到，平均考虑所有的树，变量<code>segment</code>和<code>Q4</code>最重要对于区分用户性别最重要。</p>
 </div>
 <div id="section-15.6" class="section level2">
@@ -964,7 +964,7 @@ gbmRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span class="dt
        <span class="dt">lwd =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>),
        <span class="dt">col =</span> <span class="kw">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;red&quot;</span>, <span class="st">&quot;green&quot;</span>, <span class="st">&quot;blue&quot;</span>),
        <span class="dt">pch =</span> <span class="kw">c</span>(<span class="dv">16</span>, <span class="dv">3</span>, <span class="dv">1</span>, <span class="dv">10</span>))</code></pre></div>
-<p><img src="DS_R_files/figure-html/unnamed-chunk-271-1.png" width="672" /></p>
+<p><img src="DS_R_files/figure-html/unnamed-chunk-273-1.png" width="672" /></p>
 <p>这里由于数据集中的变量并不多，各个模型的差异并不是那么明显，但是集成方法还是优于单棵树。在很多实际应用中，集成方法通常远好于单棵树。树模型还有一个作用，就是能很快的给你一个模型表现的基准线。也就是说在你刚拿到数据时，可以运行一个随机森林模型看看精确度如何，这可以给你一个大致模型可能表现的概念。之后可以探索不同的模型在此基础上进行精度优化。倘若随机森林给出的模型精度和随机猜测差不多，那你可能需要考虑收集更多的数据，或者重新审视商业问题了。因为在这种情况下，即使你找到更好的模型，精度也未必能够高出太多。这个诀窍可以让你避免很多不必要的模型探索时间。</p>
 <p>想要了解助推方法更多理论背景的小伙伴可以花时间阅读知识扩展小节，这些小节要求一定的数学背景。</p>
 </div>
