@@ -226,9 +226,9 @@ These are some of the most basic methods of exploring data at all stages (includ
 <li><p>It is 10x faster. The trick is that <code>readr</code> uses C++ to process the data quickly.</p></li>
 <li><p>It doesn’t change the column names. The names can start with number and “<code>.</code>” will not be substitued to “<code>_</code>”. For example:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(readr)
-<span class="kw">read_csv</span>(<span class="st">&quot;2015,2016,2017</span>
+<span class="kw">print</span>(<span class="kw">read_csv</span>(<span class="st">&quot;2015,2016,2017</span>
 <span class="st">1,2,3</span>
-<span class="st">4,5,6&quot;</span>)</code></pre></div></li>
+<span class="st">4,5,6&quot;</span>))</code></pre></div></li>
 <li><p><code>readr</code> functions do not convert strings to factors by default, are able to parse dates and times and can automatically determine the data types in each column.</p></li>
 <li><p>The killing character in my opinion is that <code>readr</code> provides <strong>progress bar</strong>. What makes you feel worse than waiting is not knowing how long you have to wait. Without “progress bar” might be the No.1 reason that people break up with the one they have been dating.</p></li>
 </ol>
@@ -249,7 +249,14 @@ These are some of the most basic methods of exploring data at all stages (includ
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(readr)
 sim.dat &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv &quot;</span>)
 <span class="kw">head</span>(sim.dat)</code></pre></div>
-<p>The function reads the file to R as a <code>tibble</code>. When you run <code>read_csv()</code> it prints out a column specification that gives the name and type of each column. In order to better understanding how <code>readr</code> works, it is helpful to type in some baby data set and check the results:</p>
+<p>The function reads the file to R as a <code>tibble</code>. You can consider <code>tibble</code> as next iteration of data frame. They are different with data frame for the following aspects:</p>
+<ul>
+<li>It never changes an input’s type (i.e., no more <code>stringsAsFactors = FALSE</code>!)</li>
+<li>It never adjusts the names of variables</li>
+<li>It has a refined print method that shows only the first 10 rows, and all the columns that fit on screen. You can also control the default print behavior by setting options.</li>
+</ul>
+<p>Refer to <a href="http://r4ds.had.co.nz/tibbles.html" class="uri">http://r4ds.had.co.nz/tibbles.html</a> for more information about ‘tibble’.</p>
+<p>When you run <code>read_csv()</code> it prints out a column specification that gives the name and type of each column. In order to better understanding how <code>readr</code> works, it is helpful to type in some baby data set and check the results:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat=<span class="kw">read_csv</span>(<span class="st">&quot;2015,2016,2017</span>
 <span class="st">100,200,300</span>
 <span class="st">canola,soybean,corn&quot;</span>)
@@ -267,24 +274,13 @@ sim.dat &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span cla
 <span class="st">          Sunday,carrot,extremely happy&quot;</span>, <span class="dt">skip =</span> <span class="dv">2</span>)
 <span class="kw">print</span>(dat)</code></pre></div>
 <p>If you don’t have column names, set <code>col_names = FALSE</code> then R will assign names “<code>X1</code>”,“<code>X2</code>”… to the columns:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat=<span class="kw">read_csv</span>(<span class="st">&quot;</span>
-<span class="st">          Saturday,carrot,extremely happy</span>
-<span class="st">          Sunday,carrot,extremely happy&quot;</span>, <span class="dt">col_names=</span><span class="ot">FALSE</span>)</code></pre></div>
-<pre><code>## Warning: 2 parsing failures.
-## row col  expected    actual
-##   2  -- 1 columns 3 columns
-##   3  -- 1 columns 3 columns</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(dat)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat=<span class="kw">read_csv</span>(<span class="st">&quot;Saturday,carrot,extremely happy</span>
+<span class="st">          Sunday,carrot,extremely happy&quot;</span>, <span class="dt">col_names=</span><span class="ot">FALSE</span>)
+<span class="kw">print</span>(dat)</code></pre></div>
 <p>You can also pass <code>col_names</code> a character vector which will be used as the column names. Try to replace <code>col_names=FALSE</code> with <code>col_names=c(&quot;Date&quot;,&quot;Food&quot;,&quot;Mood&quot;)</code> and see what happen.</p>
 <p>As mentioned before, you can use <code>read_csv2()</code> to read semicolon separated files:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat=<span class="kw">read_csv2</span>(<span class="st">&quot;</span>
-<span class="st">          Saturday; carrot; extremely happy </span><span class="ch">\n</span>
-<span class="st">          Sunday; carrot; extremely happy&quot;</span>, <span class="dt">col_names=</span><span class="ot">FALSE</span>)</code></pre></div>
-<pre><code>## Warning: 2 parsing failures.
-## row col  expected    actual
-##   2  -- 1 columns 3 columns
-##   4  -- 1 columns 3 columns</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(dat)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat=<span class="kw">read_csv2</span>(<span class="st">&quot;Saturday; carrot; extremely happy </span><span class="ch">\n</span><span class="st"> Sunday; carrot; extremely happy&quot;</span>, <span class="dt">col_names=</span><span class="ot">FALSE</span>)
+<span class="kw">print</span>(dat)</code></pre></div>
 <p>Here “<code>\n</code>” is a convenient shortcut for adding a new line.</p>
 <p>You can use <code>read_tsv()</code> to read tab delimited files：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat=<span class="kw">read_tsv</span>(<span class="st">&quot;every</span><span class="ch">\t</span><span class="st">man</span><span class="ch">\t</span><span class="st">is</span><span class="ch">\t</span><span class="st">a</span><span class="ch">\t</span><span class="st">poet</span><span class="ch">\t</span><span class="st">when</span><span class="ch">\t</span><span class="st">he</span><span class="ch">\t</span><span class="st">is</span><span class="ch">\t</span><span class="st">in</span><span class="ch">\t</span><span class="st">love</span><span class="ch">\n</span><span class="st">&quot;</span>, <span class="dt">col_names =</span> <span class="ot">FALSE</span>)
