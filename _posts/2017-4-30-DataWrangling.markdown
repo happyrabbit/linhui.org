@@ -67,37 +67,27 @@ code > span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Ann
 code > span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
 code > span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
 </style>
-<style type="text/css">
-  pre:not([class]) {
-    background-color: white;
-  }
-</style>
 
 
 <style type="text/css">
-h1 {
-  font-size: 34px;
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
 }
-h1.title {
-  font-size: 38px;
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
 }
-h2 {
-  font-size: 30px;
+img {
+  max-width:100%;
+  height: auto;
 }
-h3 {
-  font-size: 24px;
+.tabbed-pane {
+  padding-top: 12px;
 }
-h4 {
-  font-size: 18px;
-}
-h5 {
-  font-size: 16px;
-}
-h6 {
-  font-size: 12px;
-}
-.table th:not([align]) {
-  text-align: left;
+button.code-folding-btn:focus {
+  outline: none;
 }
 </style>
 
