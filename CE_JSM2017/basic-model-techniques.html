@@ -25,7 +25,7 @@
 
 <meta name="author" content="Hui Lin and Ming Li">
 
-<meta name="date" content="2017-04-28">
+<meta name="date" content="2017-04-30">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -136,7 +136,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="4.3" data-path="introduction-to-the-data.html"><a href="introduction-to-the-data.html#swine-disease-breakout-data"><i class="fa fa-check"></i><b>4.3</b> Swine Disease Breakout Data</a></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="data-wrangling.html"><a href="data-wrangling.html"><i class="fa fa-check"></i><b>5</b> Data Wrangling</a><ul>
-<li class="chapter" data-level="5.1" data-path="data-wrangling.html"><a href="data-wrangling.html#read-and-write-data"><i class="fa fa-check"></i><b>5.1</b> Read and write data</a></li>
+<li class="chapter" data-level="5.1" data-path="data-wrangling.html"><a href="data-wrangling.html#read-and-write-data"><i class="fa fa-check"></i><b>5.1</b> Read and write data</a><ul>
+<li class="chapter" data-level="5.1.1" data-path="data-wrangling.html"><a href="data-wrangling.html#readr"><i class="fa fa-check"></i><b>5.1.1</b> <code>readr</code></a></li>
+<li class="chapter" data-level="5.1.2" data-path="data-wrangling.html"><a href="data-wrangling.html#data.table-enhanced-data.frame"><i class="fa fa-check"></i><b>5.1.2</b> <code>data.table</code>— enhanced <code>data.frame</code></a></li>
+</ul></li>
 <li class="chapter" data-level="5.2" data-path="data-wrangling.html"><a href="data-wrangling.html#summarize-data"><i class="fa fa-check"></i><b>5.2</b> Summarize data</a><ul>
 <li class="chapter" data-level="5.2.1" data-path="data-wrangling.html"><a href="data-wrangling.html#apply-lapply-and-sapply-in-base-r"><i class="fa fa-check"></i><b>5.2.1</b> <code>apply()</code>, <code>lapply()</code> and <code>sapply()</code> in base R</a></li>
 <li class="chapter" data-level="5.2.2" data-path="data-wrangling.html"><a href="data-wrangling.html#ddply-in-plyr-package"><i class="fa fa-check"></i><b>5.2.2</b> <code>ddply()</code> in <code>plyr</code> package</a></li>
@@ -314,11 +317,11 @@ dat=<span class="kw">data.frame</span>(x,fx)
 <span class="kw">ggplot</span>(dat,<span class="kw">aes</span>(x,fx))+<span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_point</span>() +
 <span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)</code></pre></div>
-<p><img src="CE_JSM2017_files/figure-html/unnamed-chunk-89-1.png" width="672" /></p>
+<p><img src="CE_JSM2017_files/figure-html/unnamed-chunk-96-1.png" width="672" /></p>
 <p>由于我们通常使用训练集进行参数估计，如果训练集不同，得到的参数估计也会不同。直观的讲，估计方差表示如果我们用不同的数据集拟合相同的模型，得到估计值的变化，理想的情况是估计值的变化不会太大。对于高方差的模型，训练集的微小变化会导致很不相同的估计值。通常情况下，灵活度高的模型方差也更高，比如树模型，以及最初的助推法，后来在此基础上的随机森林模型和梯度助推法这样的集成方法的重要目标之一，就是通过汇总不同样本上得到的结果来降低估计方差。下图中的蓝色曲线是用平滑方法对上面的非线性观测进行拟合得到的，该曲线的灵活性很高，能够高度拟合当前数据：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(dat,<span class="kw">aes</span>(x,fx))+<span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)</code></pre></div>
 <pre><code>## `geom_smooth()` using method = &#39;loess&#39;</code></pre>
-<p><img src="CE_JSM2017_files/figure-html/unnamed-chunk-90-1.png" width="672" /></p>
+<p><img src="CE_JSM2017_files/figure-html/unnamed-chunk-97-1.png" width="672" /></p>
 <p>但是该方法有很高的方差，如果我们随机抽取不同的样本子集，得到的拟合曲线会有明显变化：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 设置随机种子</span>
 <span class="kw">set.seed</span>(<span class="dv">2016</span>)
@@ -344,7 +347,7 @@ p4=<span class="kw">ggplot</span>(dat4,<span class="kw">aes</span>(x4,fx4))+<spa
 ## `geom_smooth()` using method = &#39;loess&#39;
 ## `geom_smooth()` using method = &#39;loess&#39;
 ## `geom_smooth()` using method = &#39;loess&#39;</code></pre>
-<p><img src="CE_JSM2017_files/figure-html/unnamed-chunk-91-1.png" width="672" /></p>
+<p><img src="CE_JSM2017_files/figure-html/unnamed-chunk-98-1.png" width="672" /></p>
 <p>对相同的4个子集拟合线性模型，变化非常小：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p1=<span class="kw">ggplot</span>(dat1,<span class="kw">aes</span>(x1,fx1))+<span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_point</span>() +
@@ -359,7 +362,7 @@ p4=<span class="kw">ggplot</span>(dat4,<span class="kw">aes</span>(x4,fx4))+<spa
 <span class="st">  </span><span class="kw">geom_point</span>() +
 <span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)
 <span class="kw">multiplot</span>(p1,p2,p3,p4,<span class="dt">cols=</span><span class="dv">2</span>)</code></pre></div>
-<p><img src="CE_JSM2017_files/figure-html/unnamed-chunk-92-1.png" width="672" /></p>
+<p><img src="CE_JSM2017_files/figure-html/unnamed-chunk-99-1.png" width="672" /></p>
 <p>总体说来，方差随着模型灵活度的增加而增加，偏差随着模型的灵活度增加而降低。在方差和偏差的变化共同决定了系统误差（或者均方误差，MSE）的变化。当我们提高模型的灵活性，偏差减小的速度开始时会超过方差增大的速度，MSE随之减小。但到了一定程度以后，提高模型的灵活性对偏差的影响不大但是方差大幅度增加，MSE随之增加。在之后的章节我们会看到，对于那些有一个控制模型灵活性的调优参数的模型，随着调优参数的减小（参数越大灵活度越低），模型误差先升高，后降低。</p>
 <p>模型选择向来是非常困难的，这种困难不是数据分析行业特有的，很多专业领域都有类似的情况，比如医生判断病人所患的疾病，并在众多治疗方案中选择最合适的，这不是答案一目了然的选择题，决策的过程需要很多权衡和妥协。模型选择也类似，在选择过程中需要考虑具体的情况：项目目的，客户要求的精确度（这点很重要），计算量等等。这个选择的过程很难白纸黑字的像食谱一样写下来，这里我们只是尽己所能的介绍模型选择过程中需要考虑的点，以及评估不同模型的辅助性技术。具体的应用和“数据科学思维”还需要大家在从业过程中通过实践思考不断学习打磨。</p>
 </div>

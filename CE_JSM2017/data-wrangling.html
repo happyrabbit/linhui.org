@@ -25,7 +25,7 @@
 
 <meta name="author" content="Hui Lin and Ming Li">
 
-<meta name="date" content="2017-04-28">
+<meta name="date" content="2017-04-30">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -136,7 +136,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="4.3" data-path="introduction-to-the-data.html"><a href="introduction-to-the-data.html#swine-disease-breakout-data"><i class="fa fa-check"></i><b>4.3</b> Swine Disease Breakout Data</a></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="data-wrangling.html"><a href="data-wrangling.html"><i class="fa fa-check"></i><b>5</b> Data Wrangling</a><ul>
-<li class="chapter" data-level="5.1" data-path="data-wrangling.html"><a href="data-wrangling.html#read-and-write-data"><i class="fa fa-check"></i><b>5.1</b> Read and write data</a></li>
+<li class="chapter" data-level="5.1" data-path="data-wrangling.html"><a href="data-wrangling.html#read-and-write-data"><i class="fa fa-check"></i><b>5.1</b> Read and write data</a><ul>
+<li class="chapter" data-level="5.1.1" data-path="data-wrangling.html"><a href="data-wrangling.html#readr"><i class="fa fa-check"></i><b>5.1.1</b> <code>readr</code></a></li>
+<li class="chapter" data-level="5.1.2" data-path="data-wrangling.html"><a href="data-wrangling.html#data.table-enhanced-data.frame"><i class="fa fa-check"></i><b>5.1.2</b> <code>data.table</code>— enhanced <code>data.frame</code></a></li>
+</ul></li>
 <li class="chapter" data-level="5.2" data-path="data-wrangling.html"><a href="data-wrangling.html#summarize-data"><i class="fa fa-check"></i><b>5.2</b> Summarize data</a><ul>
 <li class="chapter" data-level="5.2.1" data-path="data-wrangling.html"><a href="data-wrangling.html#apply-lapply-and-sapply-in-base-r"><i class="fa fa-check"></i><b>5.2.1</b> <code>apply()</code>, <code>lapply()</code> and <code>sapply()</code> in base R</a></li>
 <li class="chapter" data-level="5.2.2" data-path="data-wrangling.html"><a href="data-wrangling.html#ddply-in-plyr-package"><i class="fa fa-check"></i><b>5.2.2</b> <code>ddply()</code> in <code>plyr</code> package</a></li>
@@ -221,14 +224,16 @@ These are some of the most basic methods of exploring data at all stages (includ
 <p>The focus here is to introduce some of the more efficient data wrangling methods in R.</p>
 <div id="read-and-write-data" class="section level2">
 <h2><span class="header-section-number">5.1</span> Read and write data</h2>
+<div id="readr" class="section level3">
+<h3><span class="header-section-number">5.1.1</span> <code>readr</code></h3>
 <p>You must be familar with <code>read.csv()</code>, <code>read.table()</code> and <code>write.csv()</code> in base R. Here we will introduce a more efficient package from RStudio in 2015 for reading and writing data: <code>readr</code> package. The corresponding functions are <code>read_csv()</code>, <code>read_table()</code> and <code>write_csv()</code>. The commands look quite similar, but <code>readr</code> is different in the following respects:</p>
 <ol style="list-style-type: decimal">
 <li><p>It is 10x faster. The trick is that <code>readr</code> uses C++ to process the data quickly.</p></li>
 <li><p>It doesn’t change the column names. The names can start with number and “<code>.</code>” will not be substitued to “<code>_</code>”. For example:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(readr)
-<span class="kw">print</span>(<span class="kw">read_csv</span>(<span class="st">&quot;2015,2016,2017</span>
+<span class="kw">read_csv</span>(<span class="st">&quot;2015,2016,2017</span>
 <span class="st">1,2,3</span>
-<span class="st">4,5,6&quot;</span>))</code></pre></div></li>
+<span class="st">4,5,6&quot;</span>)</code></pre></div></li>
 <li><p><code>readr</code> functions do not convert strings to factors by default, are able to parse dates and times and can automatically determine the data types in each column.</p></li>
 <li><p>The killing character in my opinion is that <code>readr</code> provides <strong>progress bar</strong>. What makes you feel worse than waiting is not knowing how long you have to wait. Without “progress bar” might be the No.1 reason that people break up with the one they have been dating.</p></li>
 </ol>
@@ -311,6 +316,177 @@ sim.dat &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span cla
 <li><a href="https://cran.r-project.org/doc/manuals/r-release/R-data.html#Acknowledgements">R data import/export manual</a></li>
 <li><code>rio</code> package：<a href="https://github.com/leeper/rio" class="uri">https://github.com/leeper/rio</a></li>
 </ul>
+</div>
+<div id="data.table-enhanced-data.frame" class="section level3">
+<h3><span class="header-section-number">5.1.2</span> <code>data.table</code>— enhanced <code>data.frame</code></h3>
+<p>What is <code>data.table</code>? It is an R package that provides an enhanced version of <code>data.frame</code>. The most used object in R is <code>data frame</code>. Before we move on, let’s briefly review some basic characters and manipulations of data.frame:</p>
+<ul>
+<li>It is a set of rows and columns.</li>
+<li>Each row is of the same length and data type</li>
+<li>Every column is of the same length but can be of differing data types</li>
+<li>It has characteristics of both a matrix and a list</li>
+<li>It uses <code>[]</code> to subset data</li>
+</ul>
+<p>I will use the clothes customer data to illustrate. There are two dimensions in <code>[]</code>. The first one indicates row and second one indicates column. It uses comma to separate them.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># read data</span>
+sim.dat&lt;-<span class="kw">read.csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv&quot;</span>)
+<span class="co"># subset the first two rows</span>
+sim.dat[<span class="dv">1</span>:<span class="dv">2</span>,]</code></pre></div>
+<pre><code>##   age gender   income house store_exp online_exp store_trans online_trans
+## 1  57 Female 120963.4   Yes  529.1344   303.5125           2            2
+## 2  63 Female 122008.1   Yes  478.0058   109.5297           4            2
+##   Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9 Q10 segment
+## 1  4  2  1  2  1  4  1  4  2   4   Price
+## 2  4  1  1  2  1  4  1  4  1   4   Price</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># subset the first two rows and column 3 and 5</span>
+sim.dat[<span class="dv">1</span>:<span class="dv">2</span>,<span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">5</span>)]</code></pre></div>
+<pre><code>##     income store_exp
+## 1 120963.4  529.1344
+## 2 122008.1  478.0058</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get all rows with age&gt;70</span>
+sim.dat[sim.dat$age&gt;<span class="dv">70</span>,]</code></pre></div>
+<pre><code>##     age gender   income house store_exp online_exp store_trans
+## 288 300   Male 208017.5   Yes  5076.801   6053.485          12
+##     online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9 Q10     segment
+## 288           11  1  4  5  4  4  4  4  1  4   2 Conspicuous</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get rows with age&gt; 60 and gender is Male</span>
+<span class="co"># select column 3 and 4</span>
+sim.dat[sim.dat$age&gt;<span class="dv">68</span> &amp;<span class="st"> </span>sim.dat$gender ==<span class="st"> &quot;Male&quot;</span>, <span class="dv">3</span>:<span class="dv">4</span>]</code></pre></div>
+<pre><code>##       income house
+## 204 119552.0    No
+## 288 208017.5   Yes</code></pre>
+<p>Remember that there are usually different ways to conduct the same manipulation. For example, the following code presents three ways to calculate average number of online transactions for male and female:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tapply</span>(sim.dat$online_trans, sim.dat$gender, mean )</code></pre></div>
+<pre><code>##   Female     Male 
+## 15.38448 11.26233</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">aggregate</span>(online_trans ~<span class="st"> </span>gender, <span class="dt">data =</span> sim.dat, mean)</code></pre></div>
+<pre><code>##   gender online_trans
+## 1 Female     15.38448
+## 2   Male     11.26233</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)
+sim.dat%&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">group_by</span>(gender)%&gt;%
+<span class="st">  </span><span class="kw">summarise</span>(<span class="dt">Avg_online_trans=</span><span class="kw">mean</span>(online_trans))</code></pre></div>
+<p>There is no gold standard to choose a specific function to manipulate data. The goal is to solve real problem not the tool itself. So just use whatever tool that is convenient for you.</p>
+<p>The way to use <code>[]</code> is straightforward. But the manipulations are limited. If you need more complicated data reshaping or aggregation, there are other packages to use such as <code>dplyr</code>, <code>reshape2</code>, <code>tidyr</code> etc. But the usage of those packages are not as straightforward as <code>[]</code>. You often need to change functions. Keeping related operations together, such as subset, group, update, join etc, will allow for:</p>
+<ul>
+<li>concise, consistent and readable syntax irrespective of the set of operations you would like to perform to achieve your end goal</li>
+<li>performing data manipulation fluidly without the cognitive burden of having to change among different functions</li>
+<li>by knowing precisely the data required for each operation, you can automatically optimize operations effectively</li>
+</ul>
+<p><code>data.table</code> is the package for that. If you are not familiar with other data manipulating packages and are interested in reducing programming time tremendously, then this package is for you.</p>
+<p>Other than extending the function of <code>[]</code>, <code>data.table</code> has the following advantages:</p>
+<p>Offers fast import, subset, grouping, update, and joins for large data files It is easy to turn data frame to data table Can behave just like a data frame</p>
+<p>You need to install and load the package:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># If you haven&#39;t install it, use the code to instal</span>
+<span class="co"># install.packages(&quot;data.table&quot;)</span>
+<span class="co"># load packagw</span>
+<span class="kw">library</span>(data.table)</code></pre></div>
+<p>Use <code>data.table()</code> to covert the existing data frame <code>sim.dat</code> to data table:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dt &lt;-<span class="st"> </span><span class="kw">data.table</span>(sim.dat)
+<span class="kw">class</span>(dt)</code></pre></div>
+<pre><code>## [1] &quot;data.table&quot; &quot;data.frame&quot;</code></pre>
+<p>Calculate mean for counts of online transactions:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dt[, <span class="kw">mean</span>(online_trans)]</code></pre></div>
+<pre><code>## [1] 13.546</code></pre>
+<p>You can’t do the same thing using data frame:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sim.dat[,<span class="kw">mean</span>(online_trans)]</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode html"><code class="sourceCode html">Error in mean(online_trans) : object &#39;online_trans&#39; not found</code></pre></div>
+<p>If you want to calculate mean by a categories as before, set “<code>by =</code>” argument:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dt[ , <span class="kw">mean</span>(online_trans), by =<span class="st"> </span>gender]</code></pre></div>
+<p>You can group by more than one variables. For example, group by “<code>gender</code>” and “<code>house</code>”:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dt[ , <span class="kw">mean</span>(online_trans), by =<span class="st"> </span>.(gender, house)]</code></pre></div>
+<p>Assign column names for aggregated variables:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dt[ , .(<span class="dt">avg =</span> <span class="kw">mean</span>(online_trans)), by =<span class="st"> </span>.(gender, house)]</code></pre></div>
+<p><code>data.table</code> can accomplish all operations that <code>aggregate()</code> and <code>tapply()</code>can do for data frame.</p>
+<ul>
+<li>General setting of <code>data.table</code></li>
+</ul>
+<p>Different from data frame, there are three arguments for data table:</p>
+<center>
+<img src="http://scientistcafe.com/book/Figure/datable1.png" />
+</center>
+<p>It is analogous to SQL. You don’t have to know SQL to learn data table. But experience with SQL will help you understand data table. In SQL, you select column <code>j</code> (use command <code>SELECT</code>) for row <code>i</code> (using command <code>WHERE</code>). <code>GROUP BY</code> in SQL will assign the variable to group the observations.</p>
+<center>
+<img src="http://scientistcafe.com/book/Figure/rSQL.png" />
+</center>
+<p>Let’s review our previous code:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dt[ , <span class="kw">mean</span>(online_trans), by =<span class="st"> </span>gender]</code></pre></div>
+<p>The code above is equal to the following SQL：</p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span>  gender, <span class="fu">avg</span>(online_trans) <span class="kw">FROM</span> sim.dat <span class="kw">GROUP</span> <span class="kw">BY</span> gender</code></pre></div>
+<p>R code:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dt[ , .(<span class="dt">avg =</span> <span class="kw">mean</span>(online_trans)), by =<span class="st"> </span>.(gender, house)]</code></pre></div>
+<p>is equal to SQL：</p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> gender, house, <span class="fu">avg</span>(online_trans) <span class="kw">AS</span> <span class="fu">avg</span> <span class="kw">FROM</span> sim.dat <span class="kw">GROUP</span> <span class="kw">BY</span> gender, house</code></pre></div>
+<p>R code：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dt[ age &lt;<span class="st"> </span><span class="dv">40</span>, .(<span class="dt">avg =</span> <span class="kw">mean</span>(online_trans)), by =<span class="st"> </span>.(gender, house)]</code></pre></div>
+<p>is equal to SQL：</p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> gender, house, <span class="fu">avg</span>(online_trans) <span class="kw">AS</span> <span class="fu">avg</span> <span class="kw">FROM</span> sim.dat <span class="kw">WHERE</span> age &lt; <span class="dv">40</span> <span class="kw">GROUP</span> <span class="kw">BY</span> gender, house</code></pre></div>
+<p>You can see the analogy between <code>data.table</code> and <code>SQL</code>. Now let’s focus on operations in data table.</p>
+<ul>
+<li>select row</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># select rows with age&lt;20 and income &gt; 80000</span>
+dt[age &lt;<span class="st"> </span><span class="dv">20</span> &amp;<span class="st"> </span>income &gt;<span class="st"> </span><span class="dv">80000</span>]
+<span class="co"># select the first two rows</span>
+dt[<span class="dv">1</span>:<span class="dv">2</span>]</code></pre></div>
+<ul>
+<li>select column</li>
+</ul>
+<p>Selecting columns in <code>data.table</code> don’t need <code>$</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># select column “age” but return it as a vector</span>
+<span class="co"># the argument for row is empty so the result will return all observations</span>
+ans &lt;-<span class="st"> </span>dt[, age]
+<span class="kw">head</span>(ans)</code></pre></div>
+<pre><code>## [1] 57 63 59 60 51 59</code></pre>
+<p>To return <code>data.table</code> object, put column names in <code>list()</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Select age and online_exp columns and return as a data.table instead</span>
+ans &lt;-<span class="st"> </span>dt[, <span class="kw">list</span>(age, online_exp)]
+<span class="kw">head</span>(ans)</code></pre></div>
+<p>Or you can also put column names in <code>.()</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ans &lt;-<span class="st"> </span>dt[, .(age, online_exp)]
+<span class="co"># head(ans)</span></code></pre></div>
+<p>To select all columns from “<code>age</code>” to “<code>income</code>”:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ans &lt;-<span class="st"> </span>dt[, age:income, with =<span class="st"> </span><span class="ot">FALSE</span>]
+<span class="kw">head</span>(ans,<span class="dv">2</span>)</code></pre></div>
+<p>Delete columns using <code>-</code> or <code>!</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># delete columns from  age to online_exp</span>
+ans &lt;-<span class="st"> </span>dt[, -(age:online_exp), with =<span class="st"> </span><span class="ot">FALSE</span>]
+ans &lt;-<span class="st"> </span>dt[, !(age:online_exp), with =<span class="st"> </span><span class="ot">FALSE</span>]</code></pre></div>
+<ul>
+<li>tabulation</li>
+</ul>
+<p>In data table. <code>.N</code> means to count。</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># row count</span>
+dt[, .N] </code></pre></div>
+<pre><code>## [1] 1000</code></pre>
+<p>If you assign the group variable, then it will count by groups:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># counts by gender</span>
+dt[, .N, by=<span class="st"> </span>gender]  
+<span class="co"># for those younger than 30, count by gender</span>
+ dt[age &lt;<span class="st"> </span><span class="dv">30</span>, .(<span class="dt">count=</span>.N), by=<span class="st"> </span>gender] </code></pre></div>
+<p>Order table:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get records with the highest 5 online expense:</span>
+<span class="kw">head</span>(dt[<span class="kw">order</span>(-online_exp)],<span class="dv">5</span>) </code></pre></div>
+<p>Since data table keep some characters of data frame, they share some operations:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dt[<span class="kw">order</span>(-online_exp)][<span class="dv">1</span>:<span class="dv">5</span>]</code></pre></div>
+<p>You can also order the table by more than one variable. The following code will order the table by <code>gender</code>, then order within <code>gender</code> by <code>online_exp</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dt[<span class="kw">order</span>(gender, -online_exp)][<span class="dv">1</span>:<span class="dv">5</span>]</code></pre></div>
+<ul>
+<li>Use <code>fread()</code> to import dat</li>
+</ul>
+<p>Other than <code>read.csv</code> in base R, we have introduced ‘read_csv’ in ‘readr’. <code>read_csv</code> is much faster and will provide progress bar which makes user feel much better (at least make me feel better). <code>fread()</code> in <code>data.table</code> further increase the efficiency of reading data. The following are three examples of reading the same data file <code>topic.csv</code>. The file includes text data scraped from an agriculture forum with 209670 rows and 6 columns:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">system.time</span>(topic&lt;-<span class="kw">read.csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/topic.csv&quot;</span>))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode html"><code class="sourceCode html">  user  system elapsed 
+  4.313   0.027   4.340</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">system.time</span>(topic&lt;-readr::<span class="kw">read_csv</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/topic.csv&quot;</span>))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode html"><code class="sourceCode html">   user  system elapsed 
+  0.267   0.008   0.274 </code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">system.time</span>(topic&lt;-data.table::<span class="kw">fread</span>(<span class="st">&quot;/Users/happyrabbit/Documents/GitHub/DataScientistR/Data/topic.csv&quot;</span>))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode html"><code class="sourceCode html">   user  system elapsed 
+  0.217   0.005   0.221 </code></pre></div>
+<p>It is clear that <code>read_csv()</code> is much faster than <code>read.csv()</code>. <code>fread()</code> is a little faster than <code>read_csv()</code>. As the size increasing, the difference will become for significant. Note that <code>fread()</code> will read file as <code>data.table</code> by default.</p>
+</div>
 </div>
 <div id="summarize-data" class="section level2">
 <h2><span class="header-section-number">5.2</span> Summarize data</h2>
@@ -413,8 +589,19 @@ sdat&lt;-sim.dat[,!<span class="kw">lapply</span>(sim.dat,class)==<span class="s
 <p><em><code>dplyr</code> is a set of clean and consistent tools that implement the split-apply-combine pattern in R. This is an extremely common pattern in data analysis: you solve a complex problem by breaking it down into small pieces, doing something to each piece and then combining the results back together again. [From package description]</em></p>
 <p>You may find the description sounds familiar. The package is sort of a wrapper of apply family. We will only introduce the main function <code>ddply()</code>. Because the package has next iteration which is <code>dplyr</code> package. We will introduce <code>dplyr</code> in more details. The reason we still want to spend some time on the older version is because they have similar idea and knowing the lineage will deeper your understanding of the whole family.</p>
 <p>We will use the same data frame <code>sim.dat</code> to illustrate. Run the following command:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(plyr)
-<span class="kw">ddply</span>(sim.dat,<span class="st">&quot;segment&quot;</span>,summarize, <span class="dt">Age=</span><span class="kw">round</span>(<span class="kw">mean</span>(<span class="kw">na.omit</span>(age)),<span class="dv">0</span>),
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(plyr)</code></pre></div>
+<pre><code>## -------------------------------------------------------------------------</code></pre>
+<pre><code>## You have loaded plyr after dplyr - this is likely to cause problems.
+## If you need functions from both plyr and dplyr, please load plyr first, then dplyr:
+## library(plyr); library(dplyr)</code></pre>
+<pre><code>## -------------------------------------------------------------------------</code></pre>
+<pre><code>## 
+## Attaching package: &#39;plyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:dplyr&#39;:
+## 
+##     arrange, count, desc, failwith, id, mutate, rename, summarise,
+##     summarize</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ddply</span>(sim.dat,<span class="st">&quot;segment&quot;</span>,summarize, <span class="dt">Age=</span><span class="kw">round</span>(<span class="kw">mean</span>(<span class="kw">na.omit</span>(age)),<span class="dv">0</span>),
       <span class="dt">FemalePct=</span><span class="kw">round</span>(<span class="kw">mean</span>(gender==<span class="st">&quot;Female&quot;</span>),<span class="dv">2</span>),
       <span class="dt">HouseYes=</span><span class="kw">round</span>(<span class="kw">mean</span>(house==<span class="st">&quot;Yes&quot;</span>),<span class="dv">2</span>),
       <span class="dt">store_exp=</span><span class="kw">round</span>(<span class="kw">mean</span>(<span class="kw">na.omit</span>(store_exp),<span class="dt">trim=</span><span class="fl">0.1</span>),<span class="dv">0</span>),
@@ -470,8 +657,10 @@ sdat&lt;-sim.dat[,!<span class="kw">lapply</span>(sim.dat,class)==<span class="s
 ## 4       Style      92.83    121.07</code></pre>
 <p>Price group has the lowest averaged one time purchasing price. The Conspicuous group will pay the highest price. When we build profile in real life, we will need to look at the survey results too. Those simple data manipulations can provide you lots of information already. As mentioned before, other than “<code>summarize</code>” there are other functions such as “<code>transform</code>” and “<code>subset</code>”.</p>
 <p>For simplicity, I draw 11 random samples and 3 variables (<code>age</code>, <code>store_exp</code> and <code>segment</code>) from the original data according to the different segments. We will explain stratified sampling later. Here we just do it without explanation.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(caret)
-<span class="kw">set.seed</span>(<span class="dv">2016</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(caret)</code></pre></div>
+<pre><code>## Loading required package: lattice</code></pre>
+<pre><code>## Loading required package: ggplot2</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">2016</span>)
 trainIndex&lt;-<span class="kw">createDataPartition</span>(sim.dat$segment,<span class="dt">p=</span><span class="fl">0.01</span>,<span class="dt">list=</span>F,<span class="dt">times=</span><span class="dv">1</span>)
 examp&lt;-sim.dat[trainIndex,<span class="kw">c</span>(<span class="st">&quot;age&quot;</span>,<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;segment&quot;</span>)]</code></pre></div>
 <p>Now data frame <code>examp</code> only has 11 rows and 3 columns. Let’s look at the function of <code>transform</code>:</p>
@@ -686,8 +875,13 @@ dplyr::<span class="kw">mutate_each</span>(sim.dat, <span class="kw">funs</span>
 <li>Use <code>melt()</code> to convert an object into a molten data frame, i.e. from wide to long</li>
 <li>Use <code>dcast()</code> to cast a molten data frame into the shape you want, i.e. from long to wide</li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(reshape2)
-(mdat &lt;-<span class="st"> </span><span class="kw">melt</span>(sdat, <span class="dt">measure.vars=</span><span class="kw">c</span>(<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>),
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(reshape2)</code></pre></div>
+<pre><code>## 
+## Attaching package: &#39;reshape2&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:data.table&#39;:
+## 
+##     dcast, melt</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(mdat &lt;-<span class="st"> </span><span class="kw">melt</span>(sdat, <span class="dt">measure.vars=</span><span class="kw">c</span>(<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>),
               <span class="dt">variable.name =</span> <span class="st">&quot;Channel&quot;</span>,
               <span class="dt">value.name =</span> <span class="st">&quot;Expense&quot;</span>))</code></pre></div>
 <pre><code>##    age gender   income house    Channel  Expense
