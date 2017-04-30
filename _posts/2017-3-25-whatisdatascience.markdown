@@ -1,5 +1,5 @@
 ---
-title: What is data science?
+title: The Art and Science of Data---What is data science?
 author: "Hui Lin"
 date: "Mar 25, 2017"
 layout: post
