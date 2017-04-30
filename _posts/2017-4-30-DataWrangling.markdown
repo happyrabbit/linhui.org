@@ -1,4 +1,9 @@
-<!DOCTYPE html>
+---
+title: The Art and Science of Data—Data Wrangling
+author: "Hui Lin"
+date: "Apr 30, 2017"
+layout: post
+---
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 
