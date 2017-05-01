@@ -315,7 +315,7 @@ sim.dat%&gt;%<span class="st"> </span>
 <p>You can’t do the same thing using data frame:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sim.dat[,<span class="kw">mean</span>(online_trans)]</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode html"><code class="sourceCode html">Error in mean(online_trans) : object 'online_trans' not found</code></pre></div>
-<p>If you want to calculate mean by a categories as before, set “<code>by =</code>” argument:</p>
+<p>If you want to calculate mean by group as before, set “<code>by =</code>” argument:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dt[ , <span class="kw">mean</span>(online_trans), by =<span class="st"> </span>gender]</code></pre></div>
 <pre><code>##    gender       V1
 ## 1: Female 15.38448
