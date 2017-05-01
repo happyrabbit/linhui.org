@@ -114,7 +114,11 @@ These are some of the most basic methods of exploring data at all stages (includ
 <li><p><code>readr</code> functions do not convert strings to factors by default, are able to parse dates and times and can automatically determine the data types in each column.</p></li>
 <li><p>The killing character in my opinion is that <code>readr</code> provides <strong>progress bar</strong>. What makes you feel worse than waiting is not knowing how long you have to wait. Without “progress bar” might be the No.1 reason that people break up with the one they have been dating.</p></li>
 </ol>
-<p>(add progress bar)</p>
+
+<p align="center">
+<img src="http://scientistcafe.com/book/Figure/prograssbar.png" width="70%" />
+</p>
+
 <p>The major functions of readr is to turn flat files into data frames:</p>
 <ul>
 <li><code>read_csv()</code>: reads comma delimited files</li>
