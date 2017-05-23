@@ -25,7 +25,7 @@
 
 <meta name="author" content="Hui Lin and Ming Li">
 
-<meta name="date" content="2017-05-18">
+<meta name="date" content="2017-05-23">
 
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
@@ -248,147 +248,64 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul>
 <div id="customer-data-for-clothing-company" class="section level2">
 <h2><span class="header-section-number">5.1</span> Customer data for clothing company</h2>
-<p>我们先模拟一个关于某品牌服装消费者的数据，这个数据会在之后的章节中反复用到。数据中包含N=1000个观测，我们将模拟3类变量（括号内是变量对应的模拟数据框中的列标签名）：</p>
-<p>（1）人口统计学变量。</p>
-<ul>
-<li>年龄（age）</li>
-<li>性别（gender）</li>
-<li>有房还是租房（house）</li>
-</ul>
-<p>（2）消费者行为变量。</p>
-<ul>
-<li>2015年实体店购买该品牌服装花销（store_exp）</li>
-<li>2015年在线购买该品牌服装花销（online_exp）</li>
-<li>2015年实体店交易次数（store_trans）</li>
-<li>2015年在线交易次数（online_trans）</li>
-</ul>
-<p>（3）客户认知问卷调查。为了进一步了解消费者，商家时常对消费者进行问卷调查，然后对调查结果进行分组，其目标是寻找在产品兴趣，市场参与度或营销反应的重要方面有显著差异的客户群。通过了解组间的不同，市场营销人员可以优化产品定位，进行更加精准的营销。这里我们假设该服装品牌对消费者进行了下面的调查，并模拟该调查问卷的回复。</p>
-<p>你是否同意下面的申明？</p>
-<table>
-<thead>
-<tr class="header">
-<th>问题</th>
-<th align="left">1（非常不同意）</th>
-<th align="left">2（有点不同意）</th>
-<th align="left">3（中立/不知道）</th>
-<th align="left">4（有点同意）</th>
-<th align="left">5（非常同意）</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>（Q1）：我喜欢买不同品牌的服装，比较它们</td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td>（Q2）：我喜欢买同一个品牌的服装</td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td>（Q3）：品牌的知名度对我来说非常重要</td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td>（Q4）：服装质量对我来说非常重要</td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td>（Q5）：我有特定喜欢的风格</td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td>（Q6）：我喜欢在实体店购买</td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td>（Q7）：我喜欢在网上购买</td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td>（Q8）：价格对我来说很重要</td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td>（Q9）：我喜欢不同风格的衣服</td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td>（Q10）：我喜欢自己挑选服装，不需要周围人的建议</td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-</tbody>
-</table>
-<p>我们进一步假设这些根据问卷调查的结果可以将消费者分成4组：价格敏感（Price），炫耀性消费（Conspicuous），质量（Quality），风格（Style）。 （本章我们不会提到如何得到这些分组；我们假设这些已知。我们会在第9章中介绍聚类分析时会更详细的说明。）</p>
-<p>你也可以重复下面的代码，自己创建该数据。我们强烈建议读者重复数据模拟的过程，这样能加深对模型方法的理解。如果你对此不感兴趣，也可以从本书网站上直接下载数据：</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sim.dat&lt;-<span class="kw">read.csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv&quot;</span>)</code></pre></div>
-<p>获得该数据集后你可以跳过本小节后半部分直接跳到下一节对分析流程的讲解。否则，继续本节。</p>
-<p>模拟该数据的过程有些复杂，我们先模拟描述客户的变量。模拟该数据的代码分为3部分：</p>
+<p>Our first data set represents customers of a clothing company who sells products in stores and online. This data is typical of what one might get from a company’s marketing data base (the data base will have more data that the one we show here). This data includes 1000 customers for whom we have 3 types of data:</p>
 <ol style="list-style-type: decimal">
-<li>定义数据结构：定义变量名，变量类型，消费者分组名，各组大小。</li>
-<li>变量分布参数，如各自的均值和方差。</li>
-<li>在各组和各个变量上迭代，基于定义和参数设置抽取随机数。</li>
+<li>Demography
+<ul>
+<li><code>age</code>: age of the respondent</li>
+<li><code>gender</code>: male/female</li>
+<li><code>house</code>: 0/1 variable indicating if the customer owns a house or not</li>
+</ul></li>
+<li>Sales in the past year
+<ul>
+<li><code>store_exp</code>: expense in store</li>
+<li><code>online_exp</code>: expense online</li>
+<li><code>store_trans</code>: times of store purchase</li>
+<li><code>online_trans</code>: times of online purchase</li>
+</ul></li>
+<li>Survey on product preference</li>
 </ol>
-<p>通过这种方式组织代码，如果我们要改变部分模拟方式重新抽取数据就比较容易。例如，如果我们想要加一个组，或者改变其中某个人口统计变量的均值，只要稍微改变代码就好。我们也想通过这个结构介绍新的R代码，生成数据的第3个步骤中将用到这些代码。</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 设置随机种子，使数据模拟过程可重复</span>
+<p>It is common for companies to survey their customers and draw insights from it to guide future marketing activities. The survey is as below:</p>
+<p>How strongly do you agree or disagree with the following statements:</p>
+<ol style="list-style-type: decimal">
+<li>Strong disagree</li>
+<li>Disagree</li>
+<li>Neither agree nor disagree</li>
+<li>Agree</li>
+<li>Strongly agree</li>
+</ol>
+<p>Q1. I like to buy clothes from different brands Q2. I buy almost all my clothes from some of my favorite brands Q3. I like to buy good brand Q4. Quality is the most important factor in my purchasing decision Q5. Style is the most important factor in my purchasing decision Q6. I prefer to buy clothes in store Q7. I prefer to buy clothes online Q8. Price is important Q9. I like to try different style Q10. I like to make a choice by myself and don’t need too much of others’ suggestions</p>
+<p>There are 4 segments of customers:</p>
+<ol style="list-style-type: decimal">
+<li>Price</li>
+<li>Conspicuous</li>
+<li>Quality</li>
+<li>Style</li>
+</ol>
+<p>The simulation is not very straightforward and I will break it to three parts:</p>
+<ol style="list-style-type: decimal">
+<li>Define data structure: variable names, variable distribution, customer segment names, segment size</li>
+<li>Variable distribution parameters: mean and variance</li>
+<li>Iterate across segments and variables. Simulate data according to specific parameters assigned</li>
+</ol>
+<p>By organizing code this way, it makes easy for us to change specific parts of the simulation. For example, if we want to change the distribution of one variable, we can just change the corresponding part of the code.</p>
+<p>Here is code to define data structure:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># set a random number seed to make the process repeatable</span>
 <span class="kw">set.seed</span>(<span class="dv">12345</span>)
-<span class="co"># 定义观测数目</span>
+<span class="co"># define the number of observations</span>
 ncust&lt;-<span class="dv">1000</span>
-<span class="co"># 建立数据框存放模拟观测，初始数据框中只有一列id，即消费者编号</span>
+<span class="co"># create a data frmae for simulated data</span>
 seg_dat&lt;-<span class="kw">data.frame</span>(<span class="dt">id=</span><span class="kw">as.factor</span>(<span class="kw">c</span>(<span class="dv">1</span>:ncust)))
-<span class="co"># 指定要生成的变量，并为变量命名</span>
+<span class="co"># assign the variable names</span>
 vars&lt;-<span class="kw">c</span>(<span class="st">&quot;age&quot;</span>,<span class="st">&quot;gender&quot;</span>,<span class="st">&quot;income&quot;</span>,<span class="st">&quot;house&quot;</span>,<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>,<span class="st">&quot;store_trans&quot;</span>,<span class="st">&quot;online_trans&quot;</span>)
-<span class="co"># 每个变量对应的数据类型</span>
-<span class="co"># norm： 正态分布</span>
-<span class="co"># binom: 二项分布</span>
-<span class="co"># pois： 泊松分布</span>
+<span class="co"># assign distribution for each variable</span>
 vartype&lt;-<span class="kw">c</span>(<span class="st">&quot;norm&quot;</span>,<span class="st">&quot;binom&quot;</span>,<span class="st">&quot;norm&quot;</span>,<span class="st">&quot;binom&quot;</span>,<span class="st">&quot;norm&quot;</span>,<span class="st">&quot;norm&quot;</span>,<span class="st">&quot;pois&quot;</span>,<span class="st">&quot;pois&quot;</span>)
-<span class="co"># 四个消费者分组的名称</span>
+<span class="co"># names of 4 segments</span>
 group_name&lt;-<span class="kw">c</span>(<span class="st">&quot;Price&quot;</span>,<span class="st">&quot;Conspicuous&quot;</span>,<span class="st">&quot;Quality&quot;</span>,<span class="st">&quot;Style&quot;</span>)
-<span class="co"># 各消费者群组的大小</span>
-group_size&lt;-<span class="kw">c</span>(<span class="dv">250</span>,<span class="dv">200</span>,<span class="dv">200</span>,<span class="dv">350</span>)
-<span class="co"># group_name和group_size的第一个元素表明，对于“Price”这组消费者，我们将模拟N=250个观测。</span></code></pre></div>
-<p>定义好了数据的基本结构之后，我们下一步是定义分布参数，用这些参数来抽取相应数据。 这里我们要 模拟的数据有4个样本类，8个非抽样调查变量，因此我们创建一个4×8的均值矩阵，因为不同类别的 消费者对应不同的分布参数。下面代码用来创建均值矩阵：</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 定义均值矩阵</span>
+<span class="co"># size of each segments</span>
+group_size&lt;-<span class="kw">c</span>(<span class="dv">250</span>,<span class="dv">200</span>,<span class="dv">200</span>,<span class="dv">350</span>)</code></pre></div>
+<p>The next step is to define variable distribution parameters. There are 4 segments of customers and 8 parameters. Different segments correspond to different parameters. Let’s store the parameters in a 4×8 matrix:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># matrix for mean</span>
 mus &lt;-<span class="st"> </span><span class="kw">matrix</span>( <span class="kw">c</span>(
   <span class="co"># 价格敏感（Price）类对应均值</span>
   <span class="dv">60</span>, <span class="fl">0.5</span>, <span class="dv">120000</span>,<span class="fl">0.9</span>, <span class="dv">500</span>,<span class="dv">200</span>,<span class="dv">5</span>,<span class="dv">2</span>,
@@ -398,9 +315,7 @@ mus &lt;-<span class="st"> </span><span class="kw">matrix</span>( <span class="k
   <span class="dv">36</span>, <span class="fl">0.5</span>, <span class="dv">70000</span>, <span class="fl">0.4</span>, <span class="dv">300</span>, <span class="dv">2000</span>,<span class="dv">2</span>,<span class="dv">15</span>,
   <span class="co"># 风格（Style）类对应均值</span>
   <span class="dv">25</span>, <span class="fl">0.2</span>, <span class="dv">90000</span>, <span class="fl">0.2</span>, <span class="dv">200</span>, <span class="dv">2000</span>,<span class="dv">2</span>,<span class="dv">20</span>), <span class="dt">ncol=</span><span class="kw">length</span>(vars), <span class="dt">byrow=</span><span class="ot">TRUE</span>)</code></pre></div>
-<p>具体过程是怎样的？ 均值矩阵<code>mus</code>指定，例如，价格敏感（Price）类群体的第一个变量（这里是年龄age）均值为60，炫耀性消费（Conspicuous）类群体的年龄均值为40依次类推。正态分布变量需要指定均值和方差，如年龄（<code>age</code>）， 实体店花销（<code>store_exp</code>）和在线花销（<code>online_exp</code>）。对于二项分布（只有两个可能取值）和泊松分布变量，我们只需要规定均值。其中，性别（<code>gender</code>），有房还是租房（<code>house</code>）是二项数据，生成这样的数据需要指定得到其中某一观测值的概率，比如矩阵<code>mus</code>中。实体店交易次数（<code>store_trans</code>）和线交易次数（<code>online_trans</code>）是泊松变量（频数），泊松分布只有一个参数——分布均值。所以在下面的标准差矩阵<code>sds</code>中，非正态分布变量对应的标准差为缺失值<code>NA</code>。（注意这里我们只是用这些分布为例生成数据，并不意味着这些是最好的拟合变量观测的分布。例如，真实的收入数据更可能是一个有偏的分布而非正态）。</p>
-<p>下面我们对正态分布变量创建标准差矩阵：</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 每类的标准差 (NA = 标准差无定义)</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># matrix for variance</span>
 sds&lt;-<span class="st"> </span><span class="kw">matrix</span>( <span class="kw">c</span>(
   <span class="co"># 价格敏感（Price）类对应均值</span>
   <span class="dv">3</span>,<span class="ot">NA</span>,<span class="dv">8000</span>,<span class="ot">NA</span>,<span class="dv">100</span>,<span class="dv">50</span>,<span class="ot">NA</span>,<span class="ot">NA</span>,
@@ -410,119 +325,109 @@ sds&lt;-<span class="st"> </span><span class="kw">matrix</span>( <span class="kw
   <span class="dv">7</span>,<span class="ot">NA</span>,<span class="dv">10000</span>,<span class="ot">NA</span>,<span class="dv">50</span>,<span class="dv">200</span>,<span class="ot">NA</span>,<span class="ot">NA</span>,
   <span class="co"># 风格（Style）类对应均值</span>
   <span class="dv">2</span>,<span class="ot">NA</span>,<span class="dv">5000</span>,<span class="ot">NA</span>,<span class="dv">10</span>,<span class="dv">500</span>,<span class="ot">NA</span>,<span class="ot">NA</span>), <span class="dt">ncol=</span><span class="kw">length</span>(vars), <span class="dt">byrow=</span><span class="ot">TRUE</span>)</code></pre></div>
-<p>将这两个矩阵加在一起我们就能够完全定义各个类的分布了。例如，我们来看下每个矩阵的第1行，其代表第1类群体（价格敏感）的分布参数。这些值规定该类群体的年龄（age）均值为60（见第一个矩阵第1行第1列），标准差为3（第二个矩阵第1行第1列）。另外，其中大约有50%的男性（第一个矩阵第1行第2列），年收入（income）均值为120000元，标准差为8000元。将这些设置分开存在不同表格中，将来想要修改十分容易。将数据定义和抽样过程分开是个很好的习惯。下面开始抽取数据：</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 抽取非抽样调查数据</span>
+<p>Now we are ready to simulate data using the parameters defined above:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># simulate non-survey data</span>
 sim.dat&lt;-<span class="ot">NULL</span>
 <span class="kw">set.seed</span>(<span class="dv">2016</span>)
-<span class="co"># 对消费者类别进行循环（i）</span>
+<span class="co"># loop on customer segment (i)</span>
  for (i in <span class="kw">seq_along</span>(group_name)){
-   <span class="co"># 为了核实代码，展示循环运行过程，我们在循环中添加了这样一行代码</span>
-   <span class="co"># 函数运行时会打印出正在抽取的样本类名</span>
+ 
+   <span class="co"># add this line in order to moniter the process</span>
    <span class="kw">cat</span> (i, group_name[i],<span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)
-  <span class="co"># 创建一个空矩阵用于存放该类消费者相关数据</span>
+ 
+  <span class="co"># create an empty matrix to store relevent data</span>
   seg&lt;-<span class="kw">data.frame</span>(<span class="kw">matrix</span>(<span class="ot">NA</span>,<span class="dt">nrow=</span>group_size[i], <span class="dt">ncol=</span><span class="kw">length</span>(vars)))  
-  <span class="co"># 在这个类之内，对不同变量迭代，抽取相应的随机数据</span>
+ 
+  <span class="co"># Simulate data within segment i</span>
   for (j in <span class="kw">seq_along</span>(vars)){
-    <span class="co"># 在每个变量上迭代</span>
+ 
+    <span class="co"># loop on every variable (j)</span>
     if (vartype[j]==<span class="st">&quot;norm&quot;</span>){
-      <span class="co"># 抽取正态分布变量</span>
+      <span class="co"># simulate normal distribution</span>
       seg[,j]&lt;-<span class="kw">rnorm</span>(group_size[i], <span class="dt">mean=</span>mus[i,j], <span class="dt">sd=</span>sds[i,j])
     } else if (vartype[j]==<span class="st">&quot;pois&quot;</span>) {
-      <span class="co"># 抽取泊松分布变量</span>
+      <span class="co"># simulate poisson distribution</span>
       seg[,j]&lt;-<span class="kw">rpois</span>(group_size[i], <span class="dt">lambda=</span>mus[i,j])
     } else if (vartype[j]==<span class="st">&quot;binom&quot;</span>){
-      <span class="co"># 抽取二项分布变量</span>
+      <span class="co"># simulate binomial distribution</span>
       seg[,j]&lt;-<span class="kw">rbinom</span>(group_size[i],<span class="dt">size=</span><span class="dv">1</span>,<span class="dt">prob=</span>mus[i,j])
     } else{
-      <span class="co"># 如果变量类型不是上述几种，程序停止运行并提示信息</span>
+      <span class="co"># if the distribution name is not one of the above, stop and return a message</span>
       <span class="kw">stop</span> (<span class="st">&quot;Don&#39;t have type:&quot;</span>,vartype[j])
     }        
   }
-  <span class="co"># 将该消费者类的数据依行添加到总数据集</span>
   sim.dat&lt;-<span class="kw">rbind</span>(sim.dat,seg)
  }</code></pre></div>
-<p>上面的代码是随机抽样的主要过程，其中<code>cat()</code>函数使得循环运行时会打印出正在抽取的样本类名，最后得到的<code>sim.dat</code>是初始描述客户的变量部分的数据，在对数据进行润色前，提醒大家注意两个关于R的技巧：</p>
-<p>第一、在i循环内，我们事先定义一个有着相应行数和列数的没有元素值的数据框<code>seg</code>，之后每迭代一次就将样本赋值到事先定义的<code>seg</code>的特定行。这么做的原因是由于只要R在某个对象上添加东西——如在数据框上增加一行——它都会将原对象拷贝一份。这将使用两倍的内存，减慢运行速度。通过这种方法可以避免对内存的浪费。对这里的小数据可能感觉不出差别，但对于大数据，运行速度会有极大不同。</p>
-<p>第二、对循环指针范围的设定用的是<code>seq_along()</code>而非<code>1:length()</code>。这是为了够避免一些常见的错误，如指针向量长度为0或者不经意将向量方向弄反了。</p>
-<p>之后我们对描述客户的这部分数据进行完善，添加合适的列标签，将二项（0/1）变量转化为贴有标签的因子变量。</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 指定数据框的列名为我们定义的变量名</span>
+<p>Now let’s furbish the data we just simulated a little by adding tags to 0/1 binomial variables:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># assign variable names</span>
 <span class="kw">names</span>(sim.dat)&lt;-vars
-<span class="co"># 加上一个因子列表明每个观测的对应的消费者类别</span>
+<span class="co"># assign factor levels to segment variable</span>
 sim.dat$segment&lt;-<span class="kw">factor</span>(<span class="kw">rep</span>(group_name,<span class="dt">times=</span>group_size))
-<span class="co"># 将二项变量转化为贴有标签的因子变量</span>
-<span class="co"># Female: 女性</span>
-<span class="co"># Male: 男性</span>
+<span class="co"># recode gender and house variable</span>
 sim.dat$gender&lt;-<span class="kw">factor</span>(sim.dat$gender, <span class="dt">labels=</span><span class="kw">c</span>(<span class="st">&quot;Female&quot;</span>,<span class="st">&quot;Male&quot;</span>))
 sim.dat$house&lt;-<span class="kw">factor</span>(sim.dat$house, <span class="dt">labels=</span><span class="kw">c</span>(<span class="st">&quot;No&quot;</span>,<span class="st">&quot;Yes&quot;</span>))
-<span class="co"># 假设在线购买和在实体店购买的次数至少为1，所以这里在原随机值上加1</span>
+<span class="co"># store_trans and online_trans are at least 1</span>
 sim.dat$store_trans&lt;-sim.dat$store_trans<span class="dv">+1</span>
 sim.dat$online_trans&lt;-sim.dat$online_trans<span class="dv">+1</span>
-<span class="co"># 年龄为整数</span>
+<span class="co"># age is integer</span>
 sim.dat$age&lt;-<span class="kw">floor</span>(sim.dat$age)</code></pre></div>
-<p>真实市场营销数据往往没有这么干净，数据缺失，以及错误输入等问题常常发生。我们最后对模拟的数据做一点“破坏”，使其更像真实的数据。我们假设一些人不愿意给出关于收入（<code>income</code>）的信息。我们建立一个逻辑变量<code>idxm</code>，然后将逻辑变量<code>idxm</code>值为真的对应位置消费者收入观测设为缺失值<code>NA</code>（R用<code>NA</code>表示缺失值）。我们假设年龄（age）越大的消费者对应缺失值的概率越大：</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 加入缺失值</span>
+<p>In real world, the data always includes some noise such as missing, wrong imputation. So we will add some noise to the data:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># add missing values</span>
 idxm &lt;-<span class="st"> </span><span class="kw">as.logical</span>(<span class="kw">rbinom</span>(ncust, <span class="dt">size=</span><span class="dv">1</span>, <span class="dt">prob=</span>sim.dat$age/<span class="dv">200</span>))
-sim.dat$income[idxm]&lt;-<span class="ot">NA</span></code></pre></div>
-<p>真实的数据中可能有错误的输入，或者离群点：</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 错误输入，离群点</span>
+sim.dat$income[idxm]&lt;-<span class="ot">NA</span>
+<span class="co"># add wrong imputations and outliers</span>
 <span class="kw">set.seed</span>(<span class="dv">123</span>)
 idx&lt;-<span class="kw">sample</span>(<span class="dv">1</span>:ncust,<span class="dv">5</span>)
 sim.dat$age[idx[<span class="dv">1</span>]]&lt;-<span class="dv">300</span>
 sim.dat$store_exp[idx[<span class="dv">2</span>]]&lt;-<span class="st"> </span>-<span class="dv">500</span>
 sim.dat$store_exp[idx[<span class="dv">3</span>:<span class="dv">5</span>]]&lt;-<span class="kw">c</span>(<span class="dv">50000</span>,<span class="dv">30000</span>,<span class="dv">30000</span>)</code></pre></div>
-<p>到目前为止我们已经建立了一部分数据，你可以通过<code>summary(sim.dat)</code>检查数据。下面我们接着抽取问卷调查回复数据。我们先通过<code>rnorm()</code>生成正态分布随机数。但从上面的问卷调查表格中可以看到，这是一个1-5分量级的问卷，1代表非常不同意，5代表非常同意。于是接下来我们通过<code>floor()</code>函数将连续值转化成离散整数。</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 抽取问卷调查回复</span>
-<span class="co"># 问卷问题数目</span>
+<p>So far we have created part of the data. You can check it using <code>summary(sim.dat)</code>. Next we will move on to simulate survey data.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># number of survey questions</span>
 nq&lt;-<span class="dv">10</span>
-<span class="co"># 各类消费者对问卷回复的正态分布均值矩阵</span>
+<span class="co"># mean matrix for different segments </span>
 mus2 &lt;-<span class="st"> </span><span class="kw">matrix</span>( <span class="kw">c</span>(
-  <span class="co"># 价格敏感（Price）类对应均值</span>
+  <span class="co"># Price</span>
  <span class="dv">5</span>,<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">2</span>,<span class="dv">4</span>,
-  <span class="co"># 炫耀性消费（Conspicuous）类对应均值</span>
+  <span class="co"># Conspicuous</span>
  <span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">4</span>,<span class="dv">4</span>,<span class="dv">4</span>,<span class="dv">4</span>,<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">2</span>,
-  <span class="co"># 质量（Quality）类对应均值</span>
+  <span class="co"># Quality</span>
  <span class="dv">5</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">3</span>,<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">3</span>,
-  <span class="co"># 风格（Style）类对应均值</span>
+  <span class="co"># Style</span>
  <span class="dv">3</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">1</span>,<span class="dv">5</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">2</span>), <span class="dt">ncol=</span>nq, <span class="dt">byrow=</span><span class="ot">TRUE</span>)
 
-<span class="co"># 方差假设都是0.2</span>
+<span class="co"># assume the variance is 0.2 for all</span>
 sd2&lt;-<span class="fl">0.2</span>
 sim.dat2&lt;-<span class="ot">NULL</span>
 <span class="kw">set.seed</span>(<span class="dv">1000</span>)
-<span class="co"># 对消费者类别进行循环（i）</span>
+<span class="co"># loop for customer segment (i)</span>
 for (i in <span class="kw">seq_along</span>(group_name)){
-  <span class="co"># 为了核实代码，展示循环运行过程，我们在循环中添加了这样一行代码</span>
-  <span class="co"># 函数运行时会打印出正在抽取的样本类名，这里不再显示输出</span>
+  <span class="co"># the following line is used for checking the progress</span>
   <span class="co"># cat (i, group_name[i],&quot;\n&quot;)</span>
-  <span class="co"># 创建一个空矩阵用于存放该类消费者相关数据</span>
+  <span class="co"># create an empty data frame to store data</span>
   seg&lt;-<span class="kw">data.frame</span>(<span class="kw">matrix</span>(<span class="ot">NA</span>,<span class="dt">nrow=</span>group_size[i], <span class="dt">ncol=</span>nq))  
-  <span class="co"># 在这个类之内，对不同变量迭代，抽取相应的随机数据</span>
+  <span class="co"># simulate data within segment</span>
   for (j in <span class="dv">1</span>:nq){
-    <span class="co"># 抽取正态分布变量</span>
+    <span class="co"># simulate normal distribution</span>
     res&lt;-<span class="kw">rnorm</span>(group_size[i], <span class="dt">mean=</span>mus2[i,j], <span class="dt">sd=</span>sd2)
-    <span class="co"># 设置上下限度</span>
+    <span class="co"># set upper and lower limit</span>
     res[res&gt;<span class="dv">5</span>]&lt;-<span class="dv">5</span>
     res[res&lt;<span class="dv">1</span>]&lt;-<span class="dv">1</span>
-    <span class="co"># 通过 floor()函数将连续值转化成离散整数。</span>
+    <span class="co"># convert continuous values to discrete integers</span>
     seg[,j]&lt;-<span class="kw">floor</span>(res)
   }
-  <span class="co"># 将该消费者类的数据添加到总数据集</span>
   sim.dat2&lt;-<span class="kw">rbind</span>(sim.dat2,seg)
 }
 
-<span class="co"># 为数据框添加列标签</span>
 <span class="kw">names</span>(sim.dat2)&lt;-<span class="kw">paste</span>(<span class="st">&quot;Q&quot;</span>,<span class="dv">1</span>:<span class="dv">10</span>,<span class="dt">sep=</span><span class="st">&quot;&quot;</span>)
-<span class="co"># 合并两部分数据</span>
 sim.dat&lt;-<span class="kw">cbind</span>(sim.dat,sim.dat2)
-<span class="co"># 加上一个因子列表明每个观测的对应的消费者类别</span>
 sim.dat$segment&lt;-<span class="kw">factor</span>(<span class="kw">rep</span>(group_name,<span class="dt">times=</span>group_size))</code></pre></div>
-<p>至此为止我们得到了需要的数据集。让我们检查一下抽取的数据集：</p>
+<p>So far we have gotten all the data. Let’s check it:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(sim.dat,<span class="dt">vec.len=</span><span class="dv">3</span>)</code></pre></div>
-<pre><code>## &#39;data.frame&#39;:    1000 obs. of  19 variables:
+<pre><code>## Classes &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;:    1000 obs. of  19 variables:
 ##  $ age         : int  57 63 59 60 51 59 57 57 ...
-##  $ gender      : Factor w/ 2 levels &quot;Female&quot;,&quot;Male&quot;: 1 1 2 2 2 2 2 2 ...
+##  $ gender      : chr  &quot;Female&quot; &quot;Female&quot; &quot;Male&quot; ...
 ##  $ income      : num  120963 122008 114202 113616 ...
-##  $ house       : Factor w/ 2 levels &quot;No&quot;,&quot;Yes&quot;: 2 2 2 2 2 2 2 2 ...
+##  $ house       : chr  &quot;Yes&quot; &quot;Yes&quot; &quot;Yes&quot; ...
 ##  $ store_exp   : num  529 478 491 348 ...
 ##  $ online_exp  : num  304 110 279 142 ...
 ##  $ store_trans : int  2 4 7 10 4 4 5 11 ...
@@ -537,39 +442,41 @@ sim.dat$segment&lt;-<span class="kw">factor</span>(<span class="kw">rep</span>(g
 ##  $ Q8          : int  4 4 4 4 4 4 4 4 ...
 ##  $ Q9          : int  2 1 1 2 2 1 1 2 ...
 ##  $ Q10         : int  4 4 4 4 4 4 4 4 ...
-##  $ segment     : Factor w/ 4 levels &quot;Conspicuous&quot;,..: 2 2 2 2 2 2 2 2 ...</code></pre>
-<p>可以看到，服装消费者数据有1000个观测，19个变量。前8个变量是关于样本的人口统计学和购买行为描述。Q1-Q10是关于消费者选择偏好的问卷调查回复，问卷分值量表为1-5分（最常见的市场调查设计）。最后一列是消费者类别，样本观测的模拟是根据消费者类别进行的，因此这些可以当作“真实”的消费者类别。使用随机模拟的一个重要优点就是能够通过这种方式验证模型的效果。而实际生活中的数据样本真正所属类别通常是未知的。我们在之后对聚类和判别分析进行介绍的时候会使用样本类别信息。下面我们会反复用该数据集为例。</p>
+##  $ segment     : chr  &quot;Price&quot; &quot;Price&quot; &quot;Price&quot; ...</code></pre>
 </div>
 <div id="customer-satisfaction-survey-data-from-airline-company" class="section level2">
 <h2><span class="header-section-number">5.2</span> Customer Satisfaction Survey Data from Airline Company</h2>
-<p>这一小节我们模拟一个航空公司满意度调查数据。数据中包含N=1000个受访者，每个受访者基于最近一次航班体验对3个航空公司进行评分，问卷调查一共15项，每项评分从1-9，分值越大满意度越高。这15个调查项分为4类（括号中为相应数据集中的变量名）：</p>
+<p>We will simulate a customer satisfaction survey for three airline companies. There are <code>N=1000</code> respondents and 15 questions. Market researcher asked respondents to recall the experience with different airline companies and assign a score (1-9) to each airline company for all the 15 questions. The higher the score, the more satisfied the customer to the specific item. The 15 questions are of 4 types (the variable names are in the parentheses):</p>
+<ul>
+<li>How satisfied are you with your______?</li>
+</ul>
 <ol style="list-style-type: decimal">
-<li>购票体验
+<li>Ticketing
 <ul>
-<li>购票容易度（Easy_Reservation）</li>
-<li>座椅选择（Preferred_Seats）</li>
-<li>航班选择（Flight_Options）</li>
-<li>票价（Ticket_Prices）</li>
+<li>Ease of making reservation（Easy_Reservation）</li>
+<li>Availability of preferred seats（Preferred_Seats）</li>
+<li>Variety of flight options（Flight_Options）</li>
+<li>Ticket prices（Ticket_Prices）</li>
 </ul></li>
-<li>机舱设施
+<li>Aircraft
 <ul>
-<li>座椅舒适度（Seat_Comfort）</li>
-<li>位置前后空间（Seat_Roominess）</li>
-<li>随机行李存放（Overhead_Storage）</li>
-<li>机舱清洁（Clean_Aircraft）</li>
+<li>Seat comfort（Seat_Comfort）</li>
+<li>Roominess of seat area（Seat_Roominess）</li>
+<li>Availability of Overhead（Overhead_Storage）</li>
+<li>Cleanliness of aircraft（Clean_Aircraft）</li>
 </ul></li>
 <li>空航服务
 <ul>
-<li>礼貌（Courtesy）</li>
-<li>友善（Friendliness）</li>
-<li>能够提供需要的帮助（Helpfulness）</li>
-<li>食物饮料服务（Service）</li>
+<li>Courtesy of flight attendant（Courtesy）</li>
+<li>Friendliness（Friendliness）</li>
+<li>Helpfulness（Helpfulness）</li>
+<li>Food and drinks（Service）</li>
 </ul></li>
 <li>总体指数
 <ul>
-<li>总体满意度（Satisfaction）</li>
-<li>再次选择次航空公司（Fly_Again）</li>
-<li>向朋友推荐此航空公司（Recommend）</li>
+<li>Overall satisfaction（Satisfaction）</li>
+<li>Purchase again（Fly_Again）</li>
+<li>Willingness to recommend（Recommend）</li>
 </ul></li>
 </ol>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 先建立因子载荷矩阵</span>
