@@ -1,0 +1,44 @@
+---
+title: "Tabset Column"
+output: flexdashboard::flex_dashboard
+---
+
+Column 1 
+-----------------------------------------------------------------------
+
+### Summary Table by Segment
+
+```{r}
+library(DataScienceR)
+library(dplyr)
+library(ggplot2)
+library(DT)
+data("SegData")
+SegData%>%
+  group_by(segment)%>%
+  summarise( store_exp=round(mean(na.omit(store_exp),trim=0.1),0),
+      online_exp=round(mean(online_exp),0),
+      store_trans=round(mean(store_trans),1),
+      online_trans=round(mean(online_trans),1))%>%
+  datatable()
+```
+
+Column 2 {.tabset}
+-----------------------------------------------------------------------
+
+### Customer Age v.s Online Expense
+
+```{r}
+SegData%>%
+  filter(age<100 & online_exp > 0)%>%
+  ggplot(aes(age,online_exp))+geom_smooth()
+```
+
+### Customer Age v.s Income
+
+```{r}
+SegData%>%
+  filter(age<100 & online_exp > 0)%>%
+  ggplot(aes(age,income))+geom_smooth()
+```
+
