@@ -1,0 +1,230 @@
+---
+title: "HTML Widgets Showcase"
+output: 
+  flexdashboard::flex_dashboard:
+    storyboard: true
+    social: menu
+    source: embed
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+```
+
+###  DT provides an R interface to the JavaScript library DataTables. 
+
+```{r}
+library(DT)
+library(dplyr)
+
+sim.dat<-read.csv("https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv")
+seg<-sim.dat%>%
+  filter(age < 100)%>%
+  group_by(segment)%>%
+  summarise(Age=round(mean(na.omit(age)),0),
+      FemalePct=round(mean(gender=="Female"),2),
+      HouseYes=round(mean(house=="Yes"),2),
+      store_exp=round(mean(na.omit(store_exp),trim=0.1),0),
+      online_exp=round(mean(online_exp),0),
+      store_trans=round(mean(store_trans),1),
+      online_trans=round(mean(online_trans),1))%>%
+  data.frame()
+  datatable( seg, rownames = FALSE,
+             caption = 'Table 1: Segment Summary Table',
+             options = list(
+  pageLength = 4, 
+  autoWidth = TRUE)
+  )
+
+```
+
+***
+
+https://rstudio.github.io/DT/
+
+- Interactive table on html pages
+
+- Provide filtering, pagination, sorting, and many other features in the table
+
+- Easy to render a table widget in shiny
+
+### Leaflet is a JavaScript library for creating dynamic maps that support panning and zooming along with various annotations.
+
+```{r}
+library(leaflet)
+leaflet() %>%
+  addTiles() %>%
+  addMarkers(lng= -76.6171, lat=39.2854, popup="JSM 2017: Baltimore Convention Center")
+
+```
+
+***
+
+https://rstudio.github.io/leaflet/
+
+- Interactive panning/zooming
+
+- Compose maps using arbitrary combinations of map tiles, markers, polygons, lines, popups, and GeoJSON.
+
+- Create maps right from the R console or RStudio
+
+- Embed maps in knitr/R Markdown documents and Shiny apps
+
+- Easily render Spatial objects from the sp package, or data frames with latitude/longitude columns
+
+- Use map bounds and mouse events to drive Shiny logic
+
+
+### d3heatmap creates interactive D3 heatmaps including support for row/column highlighting and zooming.
+
+```{r}
+library(d3heatmap)
+row.names(seg)<-seg$segment
+seg<-select(seg,-segment)
+d3heatmap(seg, scale="column", colors="Blues")
+```
+
+***
+
+https://github.com/rstudio/d3heatmap/
+
+- Highlight rows/columns by clicking axis labels
+
+- Click and drag over colormap to zoom in (click on colormap to zoom out)
+
+- Optional clustering and dendrograms, courtesy of base::heatmap
+
+
+### Dygraphs provides rich facilities for charting time-series data in R and includes support for many interactive features.
+
+```{r}
+library(dygraphs)
+## ------ get wiki view data
+#library(pageviews)
+#trump_views <- article_pageviews(project = "en.wikipedia", article = "Donald Trump", user_type = "user", start = "20160601", end = "20170601")
+#head(trump_views)
+#clinton_views <- article_pageviews(project = "en.wikipedia", article = "Hillary Clinton", user_type = "user", start = "20160601", end =  "20170601")
+#ivanka_views <- article_pageviews(project = "en.wikipedia", article = "Ivanka Trump", user_type = "user", start = "20160601", end = "20170601")
+#kushner_views <- article_pageviews(project = "en.wikipedia", article = "Jared Kushner", user_type = "user", start = "20160601", end = "20170601")
+
+#wikiview<-rbind(trump_views, clinton_views)
+#wikiview <- rbind(wikiview, ivanka_views)
+#wikiview <- rbind(wikiview, kushner_views)
+#write.csv(wikiview,"wikiview.csv",row.names = F)
+wikiview<-read.csv("C:/Users/linhu/Desktop/wikiview.csv")
+
+tr<-wikiview%>%
+  filter(article == "Donald_Trump")%>%
+  select(timestamp, Donald_Trump = views)
+
+iv<-wikiview%>%
+  filter(article == "Ivanka_Trump")%>%
+  select(timestamp, Ivanka_Trump = views)
+
+ku<-wikiview%>%
+  filter(article == "Jared_Kushner")%>%
+  select(timestamp, Jared_Kushner = views)
+
+cl<-wikiview%>%
+  filter(article == "Hillary_Clinton")%>%
+  select(timestamp, Hillary_Clinton = views)
+
+#dplot<- cbind(Donald_Trump = ts(tr$Donald_Trump, frequency = 365, start=c(2016,01,01)),
+#Ivanka_Trump = ts(iv$Ivanka_Trump, frequency = 365, start=c(2016,01,01)),
+#Jared_Kushner = ts(ku$Jared_Kushner, frequency = 365, start=c(2016,01,01)),
+#Hillary_Clinton = ts(cl$Hillary_Clinton, frequency = 365, start=c(2016,01,01)))
+library(xts)
+library(lubridate)
+dplot<-merge(tr,iv)
+dplot<-merge(dplot,ku)
+dplot<-merge(dplot,cl)
+dplot$timestamp<-ymd(dplot$timestamp/100)
+
+dplot <- xts(select(dplot, -timestamp), order.by = dplot$timestamp)
+dygraph(dplot, main = "Wikipedia Views")%>% 
+  dyRangeSelector()
+```
+
+***
+
+https://rstudio.github.io/dygraphs/
+
+- Automatically plots xts time series objects (or any object convertible to xts).
+
+- Highly configurable axis and series display (including optional second Y-axis).
+
+- Rich interactive features including zoom/pan and series/point highlighting.
+
+- Display upper/lower bars (e.g. prediction intervals) around series.
+- Various graph overlays including shaded regions, event lines, and point annotations.
+
+
+### Plotly provides bindings to the plotly.js library and allows you to easily translate your ggplot2 graphics into an interactive web-based version.
+
+
+```{r}
+library(plotly)
+library(tidyr)
+airline<-read.csv("https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/AirlineRating.csv")
+airline_mean<-dplyr::select(airline,-ID)%>%
+  group_by(Airline)%>%
+  summarise_each(funs(mean))
+
+airline_mean<-airline_mean%>%
+  gather("Question","Ave_Score",2:16)
+
+p <- ggplot(data = airline_mean, aes(x = Question, y= Ave_Score, fill = Airline)) +
+            geom_bar(stat="identity",position = "dodge")+ 
+  coord_flip()
+ggplotly(p)
+```
+
+***
+
+https://plot.ly/ggplot2/
+
+If you use ggplot2, `ggplotly()` converts your plots to an interactive, web-based version! It also provides sensible tooltips, which assists decoding of values encoded as visual properties in the plot.
+
+plotly supports some chart types that ggplot2 doesn't (such as 3D surface, point, and line plots). You can create these (or any other plotly) charts using `plot_ly()`.
+
+
+### MetricsGraphics enables easy creation of D3 scatterplots, line charts, and histograms.
+
+```{r}
+library(metricsgraphics)
+dplot<-sim.dat%>%
+  filter(!is.na(income) & age<100)
+mjs_plot(dplot, x= age, y=online_exp) %>%
+  mjs_point(color_accessor=income, size_accessor=income) %>%
+  mjs_labs(x="Age", y="Online Expense")
+```
+
+***
+
+https://hrbrmstr.github.io/metricsgraphics/
+
+This makes it possible to avoid one giant function with a ton of parameters and facilitates breaking out the chart building into logical steps. 
+
+While MetricsGraphics.js charts may not have the flexibility of ggplot2, you can build functional, interactive [multi-]line, scatterplot, bar charts & histograms and + even link charts together.
+
+
+###  rbokeh is a visualization library that provides a flexible and powerful declarative framework for creating web-based plots
+
+```{r}
+library(rbokeh)
+dplot<-sim.dat%>%
+  filter(!is.na(income) & age<100)
+p <- figure() %>%
+  ly_points(age, income, data = dplot,
+    color = segment, glyph = segment)
+p
+```
+
+*** 
+
+https://hafen.github.io/rbokeh/
+
+- `rbokeh` renders plots using HTML canvas and provides many mechanisms for interactivity
+
+- Plots in `rbokeh` are build by layering plot elements, called `glyphs`, to create the desired visualization
+
