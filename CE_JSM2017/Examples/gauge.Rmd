@@ -1,0 +1,66 @@
+---
+title: "Gauges"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+---
+
+Row 1
+-----------------------------------------------------------------------
+
+### Conspicuous
+
+```{r}
+library(flexdashboard)
+library(DataScienceR)
+library(dplyr)
+library(DT)
+data("SegData")
+value <- table(SegData$segment)
+value <- as.vector(round(value/sum(value),2)*100)
+
+gauge(value[1], min = 0, max = 100,  symbol = '%', gaugeSectors(
+  success = c(30, 100),warning = c(21, 29), danger = c(0, 20)
+))
+```
+
+### Price Sensitive
+
+```{r}
+gauge(value[2], min = 0, max = 100, symbol = '%', gaugeSectors(
+  success = c(30, 100),warning = c(21, 29), danger = c(0, 20)
+))
+```
+
+### Quality
+
+```{r}
+gauge(value[3], min = 0, max = 100, symbol = '%', gaugeSectors(
+  success = c(30, 100),warning = c(21, 29), danger = c(0, 20)
+))
+```
+
+### Style
+
+```{r}
+gauge(value[4], min = 0, max = 100, symbol = '%', gaugeSectors(
+ success = c(30, 100),warning = c(21, 29), danger = c(0, 20)
+))
+```
+
+
+Row 2 {data-height=500}
+-----------------------------------------------------------------------
+
+### Summary Table by Segment
+
+```{r}
+SegData%>%
+  group_by(segment)%>%
+  summarise( store_exp=round(mean(na.omit(store_exp),trim=0.1),0),
+      online_exp=round(mean(online_exp),0),
+      store_trans=round(mean(store_trans),1),
+      online_trans=round(mean(online_trans),1))%>%
+  datatable()
+```
+
