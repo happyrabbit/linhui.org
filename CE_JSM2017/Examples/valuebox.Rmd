@@ -1,0 +1,56 @@
+---
+title: "Value Boxes"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+---
+
+Row 1
+-----------------------------------------------------------------------
+
+### Conspicuous
+
+```{r}
+library(flexdashboard)
+library(DataScienceR)
+library(dplyr)
+library(DT)
+data("SegData")
+value<-table(SegData$segment)
+valueBox(value[1], icon = "fa-pencil", color = "success")
+```
+
+### Price Sensitive
+
+```{r}
+valueBox(value[2], icon = "fa-pencil", color = "warning")
+```
+
+### Quality
+
+```{r}
+valueBox(value[3], icon = "fa-pencil", color = "primary")
+```
+
+### Style
+
+```{r}
+valueBox(value[4], icon = "fa-pencil",  color = "info")
+```
+
+
+Row 2 {data-height=500}
+-----------------------------------------------------------------------
+
+### Summary Table by Segment
+
+```{r}
+SegData%>%
+  group_by(segment)%>%
+  summarise( store_exp=round(mean(na.omit(store_exp),trim=0.1),0),
+      online_exp=round(mean(online_exp),0),
+      store_trans=round(mean(store_trans),1),
+      online_trans=round(mean(online_trans),1))%>%
+  datatable()
+```
+
