@@ -1,5 +1,6 @@
 library(shiny)
 library(dplyr)
+library(DT)
 library(metricsgraphics)
 
 sim.dat<-readr::read_csv("https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv")%>%
@@ -17,7 +18,9 @@ ui <- pageWithSidebar(
     ),
     
     mainPanel(
-      metricsgraphicsOutput('plot1')
+      metricsgraphicsOutput('plot1'),
+      
+      dataTableOutput("summary")
     )
     )
     
@@ -35,7 +38,28 @@ ui <- pageWithSidebar(
           mjs_labs(x=input$xcol, y=input$ycol)
       })
       
+      # Generate a summary of the dataset
+      output$summary <- renderDataTable({
+        sim.dat%>%
+          group_by(segment)%>%
+          summarise(Age=round(mean(na.omit(age)),0),
+                    FemalePct=round(mean(gender=="Female"),2),
+                    HouseYes=round(mean(house=="Yes"),2),
+                    store_exp=round(mean(na.omit(store_exp),trim=0.1),0),
+                    online_exp=round(mean(online_exp),0),
+                    store_trans=round(mean(store_trans),1),
+                    online_trans=round(mean(online_trans),1))%>%
+          data.frame()%>%
+        datatable( rownames = FALSE,
+                   caption = 'Table 1: Segment Summary Table',
+                   options = list(
+                     pageLength = 4, 
+                     autoWidth = TRUE)
+        )
+        
+      })
+      
     }
     
     # Run the application 
-    # shinyApp(ui = ui, server = server)
+    shinyApp(ui = ui, server = server)
