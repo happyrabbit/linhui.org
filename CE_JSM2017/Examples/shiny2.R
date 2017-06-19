@@ -38,4 +38,4 @@ ui <- pageWithSidebar(
     }
     
     # Run the application 
-    shinyApp(ui = ui, server = server)
+    # shinyApp(ui = ui, server = server)
