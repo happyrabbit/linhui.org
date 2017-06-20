@@ -11,6 +11,8 @@ Here we assume the readers are already familiar with some of the traditional R d
 
 The focus here is to introduce some of the more efficient data wrangling methods in R.
 
-#### [Read and write data](http://scientistcafe.com/post/DataWrangling.html#11_read_and_write_data)
-#### [Summarize data](http://scientistcafe.com/post/DataWrangling.html#12_summarize_data)
-#### [Tidy and Reshape Data](http://scientistcafe.com/post/DataWrangling.html#13_tidy_and_reshape_data)
+- [Read and write data](http://scientistcafe.com/post/DataWrangling.html#11_read_and_write_data)
+    - [readr](http://scientistcafe.com/post/DataWrangling.html#111_readr)
+    - [data.table— enhanced data.frame](http://scientistcafe.com/post/DataWrangling.html#112_datatable—_enhanced_dataframe)
+- [Summarize data](http://scientistcafe.com/post/DataWrangling.html#12_summarize_data)
+- [Tidy and Reshape Data](http://scientistcafe.com/post/DataWrangling.html#13_tidy_and_reshape_data)
