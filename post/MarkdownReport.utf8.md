@@ -1,7 +1,7 @@
 ---
 title: "Reproducible Report, HTML5 Slides and Shiny Dashboard"
 author: "Hui Lin (@gossip_rabbit)"
-date: "`r Sys.Date()`"
+date: "2017-06-26"
 output:
   html_document:
     highlight: textmate
@@ -13,9 +13,7 @@ output:
       smooth_scroll: false
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+
 
 [Back to Homepage](http://scientistcafe.com)
 
@@ -353,7 +351,7 @@ When you render your `.Rmd` file, R Markdown will run each code chunk and embed 
     Output:
 
     <pre>
-    The current time is `r Sys.time()`
+    The current time is 2017-06-26 20:41:07
     </pre>
   
   
@@ -452,9 +450,7 @@ install.packages("flexdashboard")
 
 Then you can create an R Markdown document with the `flexdashboard::flex_dashboard` output format within RStudio using the New R Markdown dialog:
 
-```{r, fig.retina=NULL, out.width=400, echo=FALSE, fig.align='center'}
-knitr::include_graphics("http://scientistcafe.com/CE_JSM2017/Examples/createdashboard.PNG")
-```
+<img src="http://scientistcafe.com/CE_JSM2017/Examples/createdashboard.PNG" width="400" style="display: block; margin: auto;" />
 
 ### Layouts
 
@@ -1025,15 +1021,41 @@ width=100% }
 
 The control part of the source code is (analogy to `ui` in `shiny`): 
 
-```{r comment='',echo=FALSE}
-cat(readLines('segmentdb_ui.csv'), sep = '\n')
+
+````
+Sidebar {.sidebar data-width=350}
+======================================================================
+
+```{r}
+selectInput('seg', 'Segment', unique(sim.dat$segment))
+selectInput('xcol', 'X Variable', c("age"))
+selectInput('ycol', 'Y Variable', c("store_exp","online_exp","store_trans","online_trans"))
 ```
+````
 
 The reactive expressions are  (analogy to `server` in `shiny`): 
 
-```{r comment='',echo=FALSE}
-cat(readLines('segmentdb_server.csv'), sep = '\n')
+
+````
+Row {data-width=650}
+-----------------------------------------------------------------------
+
+### Transactional Behavior by Age
+
+```{r}
+
+selectedData <- reactive({
+    dplyr::filter(sim.dat, segment == input$seg)
+  })
+  
+renderMetricsgraphics({
+    mjs_plot(selectedData(), x= input$xcol, y=input$ycol) %>%
+      mjs_point(color_accessor=income, size_accessor=income) %>%
+      mjs_labs(x=input$xcol, y=input$ycol)
+  })
+
 ```
+````
 
 Click [here](https://raw.githubusercontent.com/happyrabbit/linhui.org/gh-pages/CE_JSM2017/Examples/segmentdb.Rmd) to download the complete source code.
 
@@ -1049,7 +1071,8 @@ The R package DT provides an R interface to the JavaScript library DataTables. R
 
 Here is a simple example using our clothes customer data:
 
-```{r,message=FALSE}
+
+```r
 library(DT)
 library(dplyr)
 
@@ -1088,6 +1111,8 @@ seg<-sim.dat%>%
             )
 ```
 
+preserveb80fbfa1d888f590
+
 </br>
 
 The `class` argument specifies the CSS classes. Here we assigned `cell-border stripe` to the `class`. Refer to [default styling options](https://datatables.net/manual/styling/classes) for possible values. You can customize many other features. Refer to https://rstudio.github.io/DT/ for more details.
@@ -1099,12 +1124,15 @@ The `class` argument specifies the CSS classes. Here we assigned `cell-border st
 The JaveScript library [`Leaflet`](http://leafletjs.com/) is one of the most popular JaveScript libraries for interactive maps. The R package `leaflet` makes it easy for R users to integrate Leaflet maps. It is one of the most used visualization tools in my work. 
 
 
-```{r}
+
+```r
 library(leaflet)
 leaflet() %>%
   addTiles() %>%
   addMarkers(lng= -76.6171, lat=39.2854, popup="JSM 2017: Baltimore Convention Center")
 ```
+
+preserveaa330d51ed46b30e
 
 See https://rstudio.github.io/leaflet/ for more details.
 
@@ -1112,7 +1140,8 @@ See https://rstudio.github.io/leaflet/ for more details.
 
 The dygraphs package is an R interface to the dygraphs JavaScript charting library. It provides rich facilities for charting time-series data in R, including highly configurable series and axis display and interactive features like zoom/pan and series/point highlighting. See https://rstudio.github.io/dygraphs/ for more details.
 
-```{r, message=FALSE}
+
+```r
 library(dygraphs)
 wikiview<-read.csv("https://raw.githubusercontent.com/happyrabbit/linhui.org/gh-pages/CE_JSM2017/Slides/wikiview.csv")
 
@@ -1148,10 +1177,24 @@ dygraph(dplot, main = "Wikipedia Views")%>%
   dyRangeSelector()
 ```
 
+preserve333163c29fc99b8c
+
 ### `highcharter`: a rich R interface to the popular Highcharts JavaScript graphics library
 
-```{r}
+
+```r
 library(highcharter)
+```
+
+```
+## Highcharts (www.highcharts.com) is a Highsoft software product which is
+```
+
+```
+## not free for commercial and Governmental use
+```
+
+```r
 library(dplyr)
 
 sim.dat<-read.csv("https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv")
@@ -1164,9 +1207,18 @@ highchart() %>%
                         round(dplot$income,0), dplot$income)
 ```
 
+```
+## Warning: 'hc_add_series_scatter' is deprecated.
+## Use 'hc_add_series' instead.
+## See help("Deprecated")
+```
+
+preserve90509dc9d7af3d3c
+
 ###  `rbokeh` is a visualization library that provides a flexible and powerful declarative framework for creating web-based plots
 
-```{r}
+
+```r
 library(rbokeh)
 dplot<-sim.dat%>%
   filter(!is.na(income) & age<100)
@@ -1175,6 +1227,8 @@ p <- figure() %>%
     color = segment, glyph = segment)
 p
 ```
+
+preserve990f3ae754d69421
 
 *** 
 
@@ -1186,7 +1240,8 @@ https://hafen.github.io/rbokeh/
 
 ### `metricsgraphics` enables easy creation of D3 scatterplots, line charts, and histograms.
 
-```{r}
+
+```r
 library(metricsgraphics)
 dplot<-sim.dat%>%
   filter(!is.na(income) & age<100)
@@ -1194,6 +1249,8 @@ mjs_plot(dplot, x= age, y=online_exp) %>%
   mjs_point(color_accessor=income, size_accessor=income) %>%
   mjs_labs(x="Age", y="Online Expense")
 ```
+
+preservec5243dcc9fc66c0b
 
 ***
 
@@ -1207,13 +1264,16 @@ While MetricsGraphics.js charts may not have the flexibility of ggplot2, you can
 
 Package  networkD3  provides tools for creating D3 JavaScript network graphs from R.
 
-```{r, message=FALSE}
+
+```r
 library(networkD3)
 data(MisLinks, MisNodes)
 forceNetwork(Links = MisLinks, Nodes = MisNodes, Source = "source",
              Target = "target", Value = "value", NodeID = "name",
              Group = "group", opacity = 0.4)
 ```
+
+preserve00828a972690b6d7
 
 
 ### `threejs`: Interactive 3D Scatter Plots and Globes 
@@ -1222,7 +1282,8 @@ Package threejs provides interactive 3D scatterplots and globe plots. Here is a 
 
 Here is an example of R Markdown ducument including interactive figure/table from the packages mentioned. Run the following and you can get this interactive webpage http://linhui.org/Hui s_files/SampleForInteractiveReport.html
 
-```{r}
+
+```r
 library(threejs)
 data(world.cities, package="maps")
 cities <- world.cities[order(world.cities$pop,decreasing=TRUE)[1:1000],]
@@ -1231,5 +1292,7 @@ value  <- 100 * cities$pop / max(cities$pop)
 earth <- texture(system.file("images/world.jpg",package="threejs"))
 globejs(img=earth, lat=cities$lat, long=cities$long, value=value)
 ```
+
+preserve795dbbca3155ab67
 
 As mentioned before, there are over 40 packages on CRAN which provide htmlwdgets. There are more than 80 packages in total. You can browse all available widgets in the [gallery](http://gallery.htmlwidgets.org/) and find example uses of popular htmlwidgets in the [showcase website](http://www.htmlwidgets.org/showcase_leaflet.html).
