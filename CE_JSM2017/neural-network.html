@@ -294,6 +294,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="8.4" data-path="neural-network.html"><a href="neural-network.html#model-training"><i class="fa fa-check"></i><b>8.4</b> Model Training</a></li>
 <li class="chapter" data-level="8.5" data-path="neural-network.html"><a href="neural-network.html#computation-in-r"><i class="fa fa-check"></i><b>8.5</b> Computation in R</a><ul>
 <li class="chapter" data-level="8.5.1" data-path="neural-network.html"><a href="neural-network.html#general-neural-network"><i class="fa fa-check"></i><b>8.5.1</b> General Neural Network</a></li>
+<li class="chapter" data-level="8.5.2" data-path="neural-network.html"><a href="neural-network.html#averaged-neural-network"><i class="fa fa-check"></i><b>8.5.2</b> Averaged Neural Network</a></li>
+<li class="chapter" data-level="8.5.3" data-path="neural-network.html"><a href="neural-network.html#model-comparison"><i class="fa fa-check"></i><b>8.5.3</b> Model Comparison</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="9" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>9</b> References</a></li>
@@ -503,6 +505,186 @@ numWts &lt;-<span class="st"> </span><span class="dv">1</span>*(maxSize *<span c
                    <span class="dt">MaxNWts =</span> numWts,  <span class="co"># maximum number of weight</span>
                    <span class="dt">maxit =</span> <span class="dv">500</span> <span class="co"># maximum iteration</span>
 )</code></pre></div>
+<p>The results show that the optimum number of hidden units is 1 and the decay parameter is 0.1：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">nnetTune</code></pre></div>
+<pre><code>## Neural Network 
+## 
+## 800 samples
+## 240 predictors
+##   2 classes: &#39;BREAK0&#39;, &#39;BREAK1&#39; 
+## 
+## Pre-processing: centered (240), scaled (240) 
+## Resampling: Cross-Validated (10 fold) 
+## Summary of sample sizes: 720, 720, 720, 720, 720, 720, ... 
+## Resampling results across tuning parameters:
+## 
+##   decay  size  ROC        Sens       Spec     
+##   0.00    1    0.8795739  0.8071429  0.8000000
+##   0.00    2    0.8847744  0.8190476  0.8263158
+##   0.00    3    0.8710526  0.8142857  0.7894737
+##   0.00    4    0.8666667  0.8166667  0.8078947
+##   0.00    5    0.8128759  0.7547619  0.7552632
+##   0.00    6    0.8096491  0.7785714  0.7473684
+##   0.00    7    0.8179825  0.7642857  0.7894737
+##   0.00    8    0.8029449  0.8023810  0.7526316
+##   0.00    9    0.8017544  0.7738095  0.7447368
+##   0.00   10    0.8314536  0.7880952  0.7578947
+##   0.01    1    0.9323308  0.8738095  0.8236842
+##   0.01    2    0.9334586  0.8690476  0.8263158
+##   0.01    3    0.9329574  0.8690476  0.8210526
+##   0.01    4    0.9121554  0.8428571  0.8000000
+##   0.01    5    0.9318922  0.8642857  0.8105263
+##   0.01    6    0.9289474  0.8642857  0.8105263
+##   0.01    7    0.9305764  0.8690476  0.8131579
+##   0.01    8    0.9281328  0.8690476  0.7973684
+##   0.01    9    0.9303885  0.8785714  0.7921053
+##   0.01   10    0.9320175  0.8666667  0.8184211
+##   0.10    1    0.9344612  0.8642857  0.8263158
+##   0.10    2    0.9332080  0.8666667  0.8236842
+##   0.10    3    0.9325188  0.8690476  0.8184211
+##   0.10    4    0.9322055  0.8785714  0.8131579
+##   0.10    5    0.9285088  0.8619048  0.8078947
+##   0.10    6    0.9311404  0.8714286  0.7921053
+##   0.10    7    0.9308271  0.8714286  0.8052632
+##   0.10    8    0.9317043  0.8785714  0.8078947
+##   0.10    9    0.9327694  0.8690476  0.8052632
+##   0.10   10    0.9296366  0.8738095  0.8052632
+## 
+## ROC was used to select the optimal model using  the largest value.
+## The final values used for the model were size = 1 and decay = 0.1.</code></pre>
+<p>You can directly apply <code>plot()</code> function to get a visualization of the whole process:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(nnetTune)</code></pre></div>
+<p><img src="CE_JSM2017_files/figure-html/unnamed-chunk-114-1.png" width="672" /></p>
+</div>
+<div id="averaged-neural-network" class="section level3">
+<h3><span class="header-section-number">8.5.2</span> Averaged Neural Network</h3>
+<p>Multiple local minimums will lead to unstable results. A solution is to use bootstrap samples and average the results. We can use the same function <code>train()</code> to train the averaged neural network with <code>method = &quot;avNNet&quot;</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># it takes some time to run</span>
+trainx =<span class="st"> </span>dplyr::<span class="kw">select</span>(sim1_da1, -y)
+trainy =<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;BREAK&quot;</span>,sim1_da1$y)
+
+avnnetGrid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">decay =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">0.01</span>, .<span class="dv">1</span>),
+                        <span class="dt">size =</span> <span class="kw">c</span>(<span class="dv">1</span>:<span class="dv">10</span>),
+                        <span class="dt">bag =</span> <span class="ot">TRUE</span> <span class="co"># indicate that we will use bootstrap</span>
+)
+                        
+avnnetTune &lt;-<span class="st"> </span><span class="kw">train</span>(trainx, trainy,
+                   <span class="dt">method =</span> <span class="st">&quot;avNNet&quot;</span>,
+                   <span class="dt">tuneGrid =</span> avnnetGrid,
+                   <span class="dt">trControl =</span> ctrl,
+                   <span class="dt">preProc =</span> <span class="kw">c</span>(<span class="st">&quot;center&quot;</span>, <span class="st">&quot;scale&quot;</span>),
+                   <span class="dt">trace =</span> <span class="ot">FALSE</span>,
+                   <span class="dt">MaxNWts =</span> numWts, 
+                   <span class="dt">maxit =</span> <span class="dv">500</span>)</code></pre></div>
+<p>When the number of hidden units is 10, there are too many parameters in the model, so you will have the following warning:</p>
+<pre>
+In eval(expr, envir, enclos) :
+  model fit failed for Fold10: decay=0.00, size=10, bag=TRUE Error in { : task 1 failed - "too many (2432) weights"
+</pre>
+<p>But it won’t hurt the model tuning from size=1 to 9. We can see the optimum estimates are <code>size = 3</code> and <code>decay = 0.01</code>：</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">avnnetTune</code></pre></div>
+<pre><code>## Model Averaged Neural Network 
+## 
+## 800 samples
+## 240 predictors
+##   2 classes: &#39;BREAK0&#39;, &#39;BREAK1&#39; 
+## 
+## Pre-processing: centered (240), scaled (240) 
+## Resampling: Cross-Validated (10 fold) 
+## Summary of sample sizes: 720, 720, 720, 720, 720, 720, ... 
+## Resampling results across tuning parameters:
+## 
+##   decay  size  ROC        Sens       Spec     
+##   0.00    1    0.7805138  0.7333333  0.7000000
+##   0.00    2    0.7957393  0.7238095  0.7263158
+##   0.00    3    0.7912281  0.7380952  0.7000000
+##   0.00    4    0.8109962  0.7738095  0.6947368
+##   0.00    5    0.8039474  0.7547619  0.6815789
+##   0.00    6    0.8094925  0.7452381  0.7263158
+##   0.00    7    0.8208647  0.7523810  0.7289474
+##   0.00    8    0.8104323  0.7928571  0.6973684
+##   0.00    9    0.7916040  0.7380952  0.6947368
+##   0.00   10          NaN        NaN        NaN
+##   0.01    1    0.9124687  0.8476190  0.8263158
+##   0.01    2    0.9010652  0.8357143  0.7973684
+##   0.01    3    0.9213659  0.8523810  0.8157895
+##   0.01    4    0.9173559  0.8357143  0.8342105
+##   0.01    5    0.9153509  0.8309524  0.8210526
+##   0.01    6    0.9058271  0.8380952  0.7894737
+##   0.01    7    0.9166667  0.8476190  0.8157895
+##   0.01    8    0.9065789  0.8309524  0.8157895
+##   0.01    9    0.9167293  0.8309524  0.8289474
+##   0.01   10          NaN        NaN        NaN
+##   0.10    1    0.9125313  0.8380952  0.8078947
+##   0.10    2    0.9124687  0.8571429  0.8078947
+##   0.10    3    0.9136591  0.8404762  0.8105263
+##   0.10    4    0.9124687  0.8285714  0.8157895
+##   0.10    5    0.9170426  0.8428571  0.8184211
+##   0.10    6    0.9103383  0.8285714  0.8052632
+##   0.10    7    0.9119674  0.8547619  0.7921053
+##   0.10    8    0.9036341  0.8404762  0.8052632
+##   0.10    9    0.9117794  0.8380952  0.8184211
+##   0.10   10          NaN        NaN        NaN
+## 
+## Tuning parameter &#39;bag&#39; was held constant at a value of TRUE
+## ROC was used to select the optimal model using  the largest value.
+## The final values used for the model were size = 3, decay = 0.01 and bag
+##  = TRUE.</code></pre>
+</div>
+<div id="model-comparison" class="section level3">
+<h3><span class="header-section-number">8.5.3</span> Model Comparison</h3>
+<p>Let’s apply other models on the same dataset and compare the model results.</p>
+<ul>
+<li>Stochastic Gradient Boosting</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">trainx =<span class="st"> </span>dplyr::<span class="kw">select</span>(sim1_da1, -y)
+trainy =<span class="st"> </span>sim1_da1$y
+
+gbmGrid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">interaction.depth =</span> <span class="kw">seq</span>(<span class="dv">1</span>, <span class="dv">7</span>, <span class="dt">by =</span> <span class="dv">2</span>), 
+                       <span class="dt">n.trees =</span> <span class="kw">seq</span>(<span class="dv">100</span>, <span class="dv">1000</span>, <span class="dt">by =</span> <span class="dv">50</span>),
+                       <span class="dt">shrinkage =</span> <span class="kw">c</span>(<span class="fl">0.01</span>, <span class="fl">0.1</span>),
+                       <span class="dt">n.minobsinnode =</span> <span class="dv">5</span>)
+<span class="kw">set.seed</span>(<span class="dv">2017</span>)
+gbmTune &lt;-<span class="st"> </span><span class="kw">train</span>(trainx, trainy,
+                 <span class="dt">method=</span><span class="st">&quot;gbm&quot;</span>,
+                 <span class="dt">tuneGrid =</span> gbmGrid,
+                 <span class="dt">verbose =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(pROC)
+pregbm &lt;-<span class="st"> </span><span class="kw">predict</span>(gbmTune, trainx)
+<span class="kw">roc</span>(pregbm, trainy)</code></pre></div>
+<pre><code>## 
+## Call:
+## roc.default(response = pregbm, predictor = trainy)
+## 
+## Data: trainy in 426 controls (pregbm BREAK0) &lt; 374 cases (pregbm BREAK1).
+## Area under the curve: 0.9503</code></pre>
+<p>The optimum result is <code>AUC=0.9503</code>.</p>
+<ul>
+<li>Group lasso logistic regression</li>
+</ul>
+<p>The third model to try is group lasso logistic regression. It adds a group indicator to the lasso logistics regression which allows selecting variables within and across groups.</p>
+<p>You can use <code>cv_glasso()</code> function from <code>DataScienceR</code> pacakge to tuning group lasso logistic regression:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># trainx contains the independent variables</span>
+trainx =<span class="st"> </span>dplyr::<span class="kw">select</span>(sim1_da1, -y)
+<span class="co"># trainy is the response variable</span>
+trainy =<span class="st"> </span>sim1_da1$y
+<span class="co"># get group index</span>
+index &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;</span><span class="ch">\\</span><span class="st">..*&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="kw">names</span>(trainx))
+<span class="co"># tune over 100 parameter values</span>
+nlam &lt;-<span class="st"> </span><span class="dv">100</span>
+<span class="co"># set the model response</span>
+<span class="co"># - `link`：return value of link function</span>
+<span class="co"># - `response`：return the probability response (note:  the real pobability number doesn&#39;t make sense but the rank does)</span>
+<span class="co"># number of cross-validation folds</span>
+kfold &lt;-<span class="st"> </span><span class="dv">10</span>
+cv_fit &lt;-<span class="st"> </span><span class="kw">cv_glasso</span>(trainx, trainy, <span class="dt">nlam =</span> nlam, <span class="dt">kfold =</span> kfold)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cv_fit$lambda.max.auc </code></pre></div>
+<div class="sourceCode"><pre class="sourceCode html"><code class="sourceCode html">   lambda       auc 
+1.0009576 0.9453094 </code></pre></div>
+<p>The optimum tuning parameter is <code>lambda=1</code>，the optimum <code>AUC=0.945</code>. It is a little better than neural network. But it runs much faster and is interpretable. Here is a summary of the three models:</p>
+<pre><code>##  nnet   gbm lasso 
+##  0.93  0.95  0.95</code></pre>
+<p>The three models perform similarly on this dataset. Stochastic gradient boosting and lasso is slightly better than neural network. Considering the computation time and model interpretability, I will choose group lasso logistic regression.</p>
 
 </div>
 </div>
