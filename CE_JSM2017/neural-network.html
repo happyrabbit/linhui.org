@@ -292,6 +292,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="8.2" data-path="neural-network.html"><a href="neural-network.html#neural-networks"><i class="fa fa-check"></i><b>8.2</b> Neural Networks</a></li>
 <li class="chapter" data-level="8.3" data-path="neural-network.html"><a href="neural-network.html#fitting-neural-network"><i class="fa fa-check"></i><b>8.3</b> Fitting Neural Network</a></li>
 <li class="chapter" data-level="8.4" data-path="neural-network.html"><a href="neural-network.html#model-training"><i class="fa fa-check"></i><b>8.4</b> Model Training</a></li>
+<li class="chapter" data-level="8.5" data-path="neural-network.html"><a href="neural-network.html#computation-in-r"><i class="fa fa-check"></i><b>8.5</b> Computation in R</a><ul>
+<li class="chapter" data-level="8.5.1" data-path="neural-network.html"><a href="neural-network.html#general-neural-network"><i class="fa fa-check"></i><b>8.5.1</b> General Neural Network</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="9" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>9</b> References</a></li>
 </ul>
@@ -360,7 +363,7 @@ g3 &lt;-<span class="st"> </span><span class="kw">exp</span>(v^<span class="dv">
 v &lt;-<span class="st"> </span>x1
 g4 &lt;-<span class="st"> </span>(v<span class="fl">+0.1</span>)*<span class="kw">sin</span>(<span class="dv">1</span>/(v/<span class="dv">3</span><span class="fl">+0.1</span>))
 <span class="kw">surf3D</span>(x1,x2,g4,<span class="dt">colvar =</span> g4, <span class="dt">border =</span> <span class="st">&quot;black&quot;</span>, <span class="dt">colkey =</span> <span class="ot">FALSE</span>, <span class="dt">box =</span> <span class="ot">FALSE</span>, <span class="dt">main =</span> <span class="st">&quot;Setting 4&quot;</span>)</code></pre></div>
-<p><img src="CE_JSM2017_files/figure-html/unnamed-chunk-106-1.png" width="672" /></p>
+<p><img src="CE_JSM2017_files/figure-html/unnamed-chunk-108-1.png" width="672" /></p>
 <p>You can see that this framework can be very flexible. In essence, it is to do a non-linear transformation of the linear combination. You can use this way to capture varies of relationships. For example,<span class="math inline">\(x_{1}x_{2}\)</span> can be written as <span class="math inline">\(\frac{(x_{1}+x_{2})^{2}-(x_{1}-x_{2})^{2}}{4}\)</span>, where <span class="math inline">\(M=2\)</span>. All the higher order factors of <span class="math inline">\(x_1\)</span> and <span class="math inline">\(x_2\)</span> can be represented similarly. If <span class="math inline">\(M\)</span> is large enough, this frame can approximate any continuous function on <span class="math inline">\(\mathbb{R}^{p}\)</span>. So the model family covers a board area, but with a price. That is the interpretability. Because the number of parameters increases with M and the mode is nested.</p>
 <p>Since the advent of the PPR in 1981, it has not been widely used. It is due to the limitation of computational capability then. But this is a new idea which leads to the debut of the neural network model.</p>
 </div>
@@ -385,7 +388,7 @@ h3 &lt;-<span class="st"> </span><span class="dv">1</span>/(<span class="dv">1</
 <span class="kw">lines</span>(v,h2,<span class="dt">col=</span><span class="dv">2</span>, <span class="dt">lty =</span> <span class="dv">2</span>)
 <span class="kw">lines</span>(v,h3,<span class="dt">col=</span><span class="dv">3</span>, <span class="dt">lty =</span> <span class="dv">3</span>)
 <span class="kw">legend</span>(<span class="st">&quot;topleft&quot;</span>, <span class="kw">c</span>(<span class="st">&quot;s=1&quot;</span>,<span class="st">&quot;s=0.3&quot;</span>,<span class="st">&quot;s=20&quot;</span>), <span class="dt">lty =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>), <span class="dt">col =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>))</code></pre></div>
-<p><img src="CE_JSM2017_files/figure-html/unnamed-chunk-107-1.png" width="672" /></p>
+<p><img src="CE_JSM2017_files/figure-html/unnamed-chunk-109-1.png" width="672" /></p>
 <p>It is easy to see that the smaller <span class="math inline">\(s\)</span> is, the more linear the line is; the larger <span class="math inline">\(s\)</span> is, the closer the line is to a piecewise function. Understanding the role of <span class="math inline">\(s\)</span> is critical to choose the starting values of the model.</p>
 <p>The next step is from <span class="math inline">\(\mathbf{Z}\)</span> to <span class="math inline">\(Y\)</span>:</p>
 <p><span class="math display">\[Y=g(\beta_{0}+\mathbf{\beta^{T}Z})=f(\mathbf{X})\]</span></p>
@@ -453,7 +456,7 @@ h3 &lt;-<span class="st"> </span><span class="dv">1</span>/(<span class="dv">1</
 </ul>
 <p>In penalized models, one should standardize the input variables so that the penalty applies equally instead of applying to different degrees based on the scale of the variables.</p>
 <ul>
-<li>Number of layers and hidden variables</li>
+<li>Number of layers and hidden units</li>
 </ul>
 <p>Theoretically speaking, the more hidden levels, the better. Model with more the levels has higher ability to capture non-linear relationships in the data. However, the number of parameters also increases. We can control the parameters by adding a penalty. Deep learning is a neural network with multiple layers. Another tuning parameter to decide is the number of hidden.</p>
 <ul>
@@ -461,7 +464,47 @@ h3 &lt;-<span class="st"> </span><span class="dv">1</span>/(<span class="dv">1</
 </ul>
 <p>Another problem with model fitting is that <span class="math inline">\(R(\Theta)\)</span> is not a perfect convex function, that is, there is more than one local extremum. Which one the algorithm reaches depends on the initial value. This poses instability to model predictions. There are usually two ways to solve: (1) select a series of different initial values, and then average the model weight. (2) Use the bagging method. Fit model using bootstrap samples, and then average the results.</p>
 <p>The idea behind these two approaches is first to introduce some randomness at a certain stage, and then stabilize the results by averaging.</p>
+</div>
+<div id="computation-in-r" class="section level2">
+<h2><span class="header-section-number">8.5</span> Computation in R</h2>
+<div id="general-neural-network" class="section level3">
+<h3><span class="header-section-number">8.5.1</span> General Neural Network</h3>
+<p>Swine Disease Breakout Data to show how to train neural network models using <code>caret</code> package.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># run the next line to install DataScienceR package</span>
+<span class="co"># devtools::install_github(&quot;happyrabbit/DataScienceR&quot;)</span>
+<span class="kw">library</span>(DataScienceR)
+<span class="kw">data</span>(<span class="st">&quot;sim1_da1&quot;</span>)
+trainx =<span class="st"> </span>dplyr::<span class="kw">select</span>(sim1_da1, -y)
+trainy =<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;BREAK&quot;</span>,sim1_da1$y)</code></pre></div>
+<p>Set the tuning grid. The tuning parameters are weight, the number of hidden layers and the number of hidden units. <code>decay</code> is the weight decay, and there are three tuning values. <code>size</code> is the number of hidden units.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(caret)
+nnetGrid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">decay =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">0.01</span>, .<span class="dv">1</span>),
+                        <span class="dt">size =</span> <span class="kw">c</span>(<span class="dv">1</span>:<span class="dv">10</span>))
+<span class="co"># get the maximum number of hidden units</span>
+maxSize &lt;-<span class="st"> </span><span class="kw">max</span>(nnetGrid$size)
+<span class="co"># compute the maximum number of parameters</span>
+<span class="co"># there are M(p+1)+M+1 parameters in total</span>
+numWts &lt;-<span class="st"> </span><span class="dv">1</span>*(maxSize *<span class="st"> </span>(<span class="kw">length</span>(trainx) +<span class="st"> </span><span class="dv">1</span>) +<span class="st"> </span>maxSize +<span class="st"> </span><span class="dv">1</span>)
+<span class="co"># set a random seed to ensure repeatability</span>
+<span class="kw">set.seed</span>(<span class="dv">2017</span>)</code></pre></div>
+<p>You can use <code>trainControl()</code> function to customize the process of selecting tuning/complexity parameters and building the final model. More information about <code>trainControl</code> see “<a href="https://topepo.github.io/caret/model-training-and-tuning.html#custom">Customizing the Tuning Process</a>.”</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ctrl &lt;-<span class="st"> </span><span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>,  <span class="co"># corss-validation</span>
+                     <span class="dt">number =</span> <span class="dv">10</span>,  <span class="co"># 10 folds</span>
+                     <span class="dt">classProbs =</span> <span class="ot">TRUE</span>, <span class="co"># report class probability</span>
+                     <span class="dt">summaryFunction =</span> twoClassSummary <span class="co"># return AUC</span>
+)</code></pre></div>
+<p>Next, past those control setting to <code>train()</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">nnetTune &lt;-<span class="st"> </span><span class="kw">train</span>(trainx, trainy,
+                   <span class="dt">method =</span> <span class="st">&quot;nnet&quot;</span>, <span class="co"># train neural network using `nnet` package </span>
+                   <span class="dt">tuneGrid =</span> nnetGrid, <span class="co"># tuning grid</span>
+                   <span class="dt">trControl =</span> ctrl, <span class="co"># process customization set before</span>
+                   <span class="dt">preProc =</span> <span class="kw">c</span>(<span class="st">&quot;center&quot;</span>, <span class="st">&quot;scale&quot;</span>), <span class="co"># standardize data</span>
+                   <span class="dt">trace =</span> <span class="ot">FALSE</span>,  <span class="co"># hide the training trace</span>
+                   <span class="dt">MaxNWts =</span> numWts,  <span class="co"># maximum number of weight</span>
+                   <span class="dt">maxit =</span> <span class="dv">500</span> <span class="co"># maximum iteration</span>
+)</code></pre></div>
 
+</div>
 </div>
 </div>
             </section>
