@@ -321,12 +321,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>Before tackling analytics problem, we start by creating data to be analyzed in later chapters. Why do we simulate data instead of using real data set?</p>
 <ul>
 <li>Going through the simulation code helps you practice R skills.</li>
-<li>It makes the book less dependent on vagaties of finding and downloading online data set</li>
+<li>It makes the book less dependent on downloading online data set</li>
 <li>It allows you manipulate the synthetic data, run analysis and examine how the results change</li>
 </ul>
 <div id="customer-data-for-clothing-company" class="section level2">
 <h2><span class="header-section-number">3.1</span> Customer Data for Clothing Company</h2>
-<p>Our first data set represents customers of a clothing company who sells products in stores and online. This data is typical of what one might get from a company’s marketing data base (the data base will have more data that the one we show here). This data includes 1000 customers for whom we have 3 types of data:</p>
+<p>Our first data set represents customers of a clothing company who sells products in stores and online. This data is typical of what one might get from a company’s marketing data base (the data base will have more data than the one we show here). This data includes 1000 customers for whom we have 3 types of data:</p>
 <ol style="list-style-type: decimal">
 <li>Demography
 <ul>
@@ -371,7 +371,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li>Quality</li>
 <li>Style</li>
 </ol>
-<p>The simulation is not very straightforward and I will break it to three parts:</p>
+<p>The simulation is not very straightforward and I will break it into three parts:</p>
 <ol style="list-style-type: decimal">
 <li>Define data structure: variable names, variable distribution, customer segment names, segment size</li>
 <li>Variable distribution parameters: mean and variance</li>
@@ -447,7 +447,7 @@ sim.dat&lt;-<span class="ot">NULL</span>
   }
   sim.dat&lt;-<span class="kw">rbind</span>(sim.dat,seg)
  }</code></pre></div>
-<p>Now let’s furbish the data we just simulated a little by adding tags to 0/1 binomial variables:</p>
+<p>Now let’s edit the data we just simulated a little by adding tags to 0/1 binomial variables:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># assign variable names</span>
 <span class="kw">names</span>(sim.dat)&lt;-vars
 <span class="co"># assign factor levels to segment variable</span>
@@ -460,7 +460,7 @@ sim.dat$store_trans&lt;-sim.dat$store_trans<span class="dv">+1</span>
 sim.dat$online_trans&lt;-sim.dat$online_trans<span class="dv">+1</span>
 <span class="co"># age is integer</span>
 sim.dat$age&lt;-<span class="kw">floor</span>(sim.dat$age)</code></pre></div>
-<p>In real world, the data always includes some noise such as missing, wrong imputation. So we will add some noise to the data:</p>
+<p>In the real world, the data always includes some noise such as missing, wrong imputation. So we will add some noise to the data:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># add missing values</span>
 idxm &lt;-<span class="st"> </span><span class="kw">as.logical</span>(<span class="kw">rbinom</span>(ncust, <span class="dt">size=</span><span class="dv">1</span>, <span class="dt">prob=</span>sim.dat$age/<span class="dv">200</span>))
 sim.dat$income[idxm]&lt;-<span class="ot">NA</span>
@@ -470,7 +470,7 @@ idx&lt;-<span class="kw">sample</span>(<span class="dv">1</span>:ncust,<span cla
 sim.dat$age[idx[<span class="dv">1</span>]]&lt;-<span class="dv">300</span>
 sim.dat$store_exp[idx[<span class="dv">2</span>]]&lt;-<span class="st"> </span>-<span class="dv">500</span>
 sim.dat$store_exp[idx[<span class="dv">3</span>:<span class="dv">5</span>]]&lt;-<span class="kw">c</span>(<span class="dv">50000</span>,<span class="dv">30000</span>,<span class="dv">30000</span>)</code></pre></div>
-<p>So far we have created part of the data. You can check it using <code>summary(sim.dat)</code>. Next we will move on to simulate survey data.</p>
+<p>So far we have created part of the data. You can check it using `summary(sim.dat).’ Next, we will move on to simulate survey data.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># number of survey questions</span>
 nq&lt;-<span class="dv">10</span>
 <span class="co"># mean matrix for different segments </span>
@@ -535,7 +535,7 @@ sim.dat$segment&lt;-<span class="kw">factor</span>(<span class="kw">rep</span>(g
 </div>
 <div id="customer-satisfaction-survey-data-from-airline-company" class="section level2">
 <h2><span class="header-section-number">3.2</span> Customer Satisfaction Survey Data from Airline Company</h2>
-<p>We will simulate a customer satisfaction survey for three airline companies. There are <code>N=1000</code> respondents and 15 questions. Market researcher asked respondents to recall the experience with different airline companies and assign a score (1-9) to each airline company for all the 15 questions. The higher the score, the more satisfied the customer to the specific item. The 15 questions are of 4 types (the variable names are in the parentheses):</p>
+<p>We will simulate a customer satisfaction survey for three airline companies. There are <code>N=1000</code> respondents and 15 questions. The market researcher asked respondents to recall the experience with different airline companies and assign a score (1-9) to each airline company for all the 15 questions. The higher the score, the more satisfied the customer to the specific item. The 15 questions are of 4 types (the variable names are in the parentheses):</p>
 <ul>
 <li>How satisfied are you with your______?</li>
 </ul>
@@ -689,7 +689,7 @@ rating&lt;-<span class="kw">rbind</span>(rating1,rating2,rating3)
 <h2><span class="header-section-number">3.3</span> Swine Disease Breakout Data</h2>
 <p>In this section, we are going to simulate a data set about swine disease. We simulate 800 farms (i.e. n=800) and 120 survey questions (i.e. G=120) in each data set. There are three possible answers for each question. The outbreak status for the <span class="math inline">\(i^{th}\)</span> farm is generated from a <span class="math inline">\(Bernoulli(1, p_i)\)</span> distribution with <span class="math inline">\(p_i\)</span> being a function of the question answers:</p>
 <p><span class="math display">\[ln(\frac{p_i}{1-p_i})=\beta_0 + \Sigma_{g=1}^G\mathbf{x_{i,g}^T\beta_{g}}\]</span></p>
-<p>where <span class="math inline">\(\beta_0\)</span> is the intercept, <span class="math inline">\(\mathbf{x_{i,g}}\)</span> is a three dimensional indication vector for question answer and <span class="math inline">\(\mathbf(\beta_g)\)</span> is the parameter vector corresponding to the <span class="math inline">\(g^{th}\)</span> predictor. Three types of questions are considered regarding their effects on the outcome. The first forty survey questions are important questions such that the coefficients of the three answers to these questions are all different:</p>
+<p>where <span class="math inline">\(\beta_0\)</span> is the intercept, <span class="math inline">\(\mathbf{x_{i,g}}\)</span> is a three-dimensional indication vector for question answer and <span class="math inline">\(\mathbf(\beta_g)\)</span> is the parameter vector corresponding to the <span class="math inline">\(g^{th}\)</span> predictor. Three types of questions are considered regarding their effects on the outcome. The first forty survey questions are important questions such that the coefficients of the three answers to these questions are all different:</p>
 <p><span class="math display">\[\mathbf{\beta_g}=(1,0,-1)\times \gamma,\ g=1,\dots,40\]</span> The second forty survey questions are also important questions but only one answer has a coefficient that is different from the other two answers:</p>
 <p><span class="math display">\[\mathbf{\beta_g}=(1,0,0)\times \gamma,\ g=41,\dots,80\]</span></p>
 <p>The last forty survey questions are also unimportant questions such that all three answers have the same coefficients:</p>
@@ -700,7 +700,7 @@ rating&lt;-<span class="kw">rbind</span>(rating1,rating2,rating3)
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">disease_dat&lt;-<span class="kw">read_csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/sim1_da1.csv&quot;</span>)
 <span class="co"># only show the last 7 columns here</span>
 <span class="kw">head</span>(<span class="kw">subset</span>(disease_dat,<span class="dt">select=</span><span class="kw">c</span>( <span class="st">&quot;Q118.A&quot;</span>,<span class="st">&quot;Q118.B&quot;</span>,<span class="st">&quot;Q119.A&quot;</span>,<span class="st">&quot;Q119.B&quot;</span>,<span class="st">&quot;Q120.A&quot;</span>,<span class="st">&quot;Q120.B&quot;</span>,<span class="st">&quot;y&quot;</span>))) </code></pre></div>
-<p>Here <code>y</code> indicates the outbreak situation of the farms. <code>y=1</code> means there is an outbreak in 5 years after the survey. The rest columns indicate survey responses. For example <code>Q120.A = 1</code> means the respondent chose <code>A</code> in Q120. We consider <code>C</code> as baseline.</p>
+<p>Here <code>y</code> indicates the outbreak situation of the farms. <code>y=1</code> means there is an outbreak in 5 years after the survey. The rest columns indicate survey responses. For example <code>Q120.A = 1</code> means the respondent chose <code>A</code> in Q120. We consider <code>C</code> as the baseline.</p>
 
 </div>
 </div>
