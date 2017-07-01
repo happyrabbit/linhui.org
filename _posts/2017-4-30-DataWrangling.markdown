@@ -5,7 +5,7 @@ date: "Apr 30, 2017"
 layout: post
 ---
 
-<p style="font-family: serif; margin:0; font-size:14pt; font-style:italic">Hui Lin (@gossip_rabbit); </p>
+<p style="font-family: serif; margin:0; font-size:14pt; font-style:italic">Hui Lin; </p>
 <p style="font-family: serif; margin:0; font-size:14pt; font-style:italic">
 <a href="https://twitter.com/gossip_rabbit">
 Follow me on Twitter;</a></p>
