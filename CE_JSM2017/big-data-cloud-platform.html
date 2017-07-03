@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2017-07-01">
+<meta name="date" content="2017-07-03">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -236,7 +236,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="5.1" data-path="data-pre-processing.html"><a href="data-pre-processing.html#data-cleaning"><i class="fa fa-check"></i><b>5.1</b> Data Cleaning</a></li>
 <li class="chapter" data-level="5.2" data-path="data-pre-processing.html"><a href="data-pre-processing.html#missing-values"><i class="fa fa-check"></i><b>5.2</b> Missing Values</a><ul>
 <li class="chapter" data-level="5.2.1" data-path="data-pre-processing.html"><a href="data-pre-processing.html#impute-missing-values-with-medianmode"><i class="fa fa-check"></i><b>5.2.1</b> Impute missing values with median/mode</a></li>
-<li class="chapter" data-level="5.2.2" data-path="data-pre-processing.html"><a href="data-pre-processing.html#impute-missing-values-based-on-k-nearest-neighbors"><i class="fa fa-check"></i><b>5.2.2</b> Impute missing values based on K-nearest neighbors</a></li>
+<li class="chapter" data-level="5.2.2" data-path="data-pre-processing.html"><a href="data-pre-processing.html#k-nearest-neighbors"><i class="fa fa-check"></i><b>5.2.2</b> K-nearest neighbors</a></li>
+<li class="chapter" data-level="5.2.3" data-path="data-pre-processing.html"><a href="data-pre-processing.html#bagging-tree"><i class="fa fa-check"></i><b>5.2.3</b> Bagging Tree</a></li>
 </ul></li>
 <li class="chapter" data-level="5.3" data-path="data-pre-processing.html"><a href="data-pre-processing.html#centering-and-scaling"><i class="fa fa-check"></i><b>5.3</b> Centering and Scaling</a></li>
 <li class="chapter" data-level="5.4" data-path="data-pre-processing.html"><a href="data-pre-processing.html#resolve-skewness"><i class="fa fa-check"></i><b>5.4</b> Resolve Skewness</a></li>
@@ -437,11 +438,11 @@ sc &lt;-<span class="st"> </span><span class="kw">spark_connect</span>(<span cla
 </div>
 <div id="fit-regression-to-sparkdataframe" class="section level3">
 <h3><span class="header-section-number">2.8.7</span> Fit Regression to SparkDataFrame</h3>
-<p>One of the largest advantages is that, within Spark system, there are already many statistical and machine learning algorithms developed to run parallel across many CPUs with data across many memory units. So, we can easily fit a linear regression for big dataset far beyond the memory limit of one single computer. Below is an illustration of how to fit a linear regression to SparkDataFrame using R notebook:</p>
+<p>One of the largest advantages is that, within Spark system, there are already many statistical and machine learning algorithms developed to run parallelly across many CPUs with data across many memory units. In this example, we have already uploaded the data to Spark system, and the data in the Spark system can be referred through iris_tbl. The linear regression implemented in Spark system can be called through <code>ml_linear_regression()</code> function. The syntax to call the function is to define the Spark Data Frame (i.e. iris_tbl), response variable (i.e. y-variable in linear regression in the Spark data frame iris_tbl) and features (i.e. the x-variable in linear regression in the Spark data frame iris_tbl). So, we can easily fit a linear regression for large dataset far beyond the memory limit of one single computer, and it is truly scalable and only constrained by the resource of the Spark cluster. Below is an illustration of how to fit a linear regression to SparkDataFrame using R notebook:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit1 &lt;-<span class="st">  </span><span class="kw">ml_linear_regression</span>(<span class="dt">x =</span> iris_tbl, <span class="dt">response =</span> <span class="st">&quot;Sepal_Length&quot;</span>, 
                               <span class="dt">features =</span> <span class="kw">c</span>(<span class="st">&quot;Sepal_Width&quot;</span>, <span class="st">&quot;Petal_Length&quot;</span>, <span class="st">&quot;Petal_Width&quot;</span>))
 <span class="kw">summary</span>(fit1)</code></pre></div>
-<p>In the above code, x is the R object wrapping the SparkDataFrame; the response is y-variable, features is the collection of explanatory variables.</p>
+<p>In the above code, x is the R object wrapping the SparkDataFrame; the response is y-variable, features are the collection of explanatory variables. For this function, both the data and computation are in the Spark cluster which leverages multiple CPUs and distributed memories.</p>
 </div>
 <div id="fit-a-k-means-cluster" class="section level3">
 <h3><span class="header-section-number">2.8.8</span> Fit a K-means Cluster</h3>
