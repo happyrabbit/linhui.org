@@ -344,6 +344,32 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>It is highly recommended to store each step of the data and the R code, making the whole process as repeatable as possible. The R markdown reproducible report will be extremely helpful for that. If the data changes, it is easy to rerun the process. In the remainder of this chapter, we will show the most common data preprocessing methods.</p>
 <p>Load the R packages first:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">source</span>(<span class="st">&quot;https://raw.githubusercontent.com/happyrabbit/CE_JSM2017/master/Rcode/00Require.R&quot;</span>)</code></pre></div>
+<pre><code>## 
+## Attaching package: &#39;gridExtra&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     combine</code></pre>
+<pre><code>## 
+## Attaching package: &#39;imputeMissings&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:e1071&#39;:
+## 
+##     impute</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     compute</code></pre>
+<pre><code>## 
+## Attaching package: &#39;car&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     recode</code></pre>
+<pre><code>## 
+## Attaching package: &#39;psych&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:car&#39;:
+## 
+##     logit</code></pre>
+<pre><code>## The following objects are masked from &#39;package:ggplot2&#39;:
+## 
+##     %+%, alpha</code></pre>
 <div id="data-cleaning" class="section level2">
 <h2><span class="header-section-number">5.1</span> Data Cleaning</h2>
 <p>After you load the data, the first thing is to check how many variables are there, the type of variables, the distributions, and data errors. Let’s read and check the data:</p>
@@ -417,24 +443,6 @@ sim.dat$store_exp[<span class="kw">which</span>(sim.dat$store_exp&lt;<span class
 <p>Missing value imputation can be the topic for a book. This section will show some of the commonly used methods without getting too deep into the topic. Chapter 7 of the book by De Waal, Pannekoek and Scholtus <span class="citation">(Ton de Waal <a href="#ref-impute1">2011</a>)</span> makes a concise overview of some of the existing imputation methods. The choice of specific method depends on the actual situation. There is no method always better than the others.</p>
 <p>One question to ask before imputation: Is there any auxiliary information? Being aware of any auxiliary information is critical. For example, if the system set customer who did not purchase as missing, then the real purchasing amount should be 0. Is missing a random occurrence? If so, it may be reasonable to imput with mean or median. If not, what is the potential mechanism for the missing? For example, older people are more reluctant to disclose their ages in the questionnaire, so that the absence of age is not completely random. In this case, the missing values need to be estimated using the relationship between age and other independent variables. For example, use variables such as whether they have children, income, and other survey questions to build a model to predict age.</p>
 <p>Also, the purpose of modeling is important for selecting imputation methods. If the goal is to interpret the parameter estimate or statistical inference, then it is important to study the missing mechanism carefully and to estimate the missing values using non-missing information as much as possible. If the goal is to predict, people usually will not study the absence mechanism rigorously (but sometimes the mechanism is obvious). If the absence mechanism is not clear, treat it as missing at random and use mean, median, or k-nearest neighbor to imput. Since statistical inference is sensitive to missing values, researchers from survey statistics have conducted in-depth studies of various imputation schemes which focus on valid statistical inference. The problem of missing values in the prediction model is different from that in the traditional survey. Therefore, there are not many papers on missing value imputation in the prediction model. Those who want to study further can refer to Saar-Tsechansky and Provost’s comparison of different imputation methods <span class="citation">(Saar-Tsechansky M 2007b)</span>and De Waal, Pannekoek and Scholtus’ book <span class="citation">(Ton de Waal <a href="#ref-impute1">2011</a>)</span>.</p>
-<p>The following code randomly assigns some missing values to the previous data <code>demo</code> and names the new data set <code>demo_missing</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">100</span>)
-id1&lt;-<span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">nrow</span>(demo),<span class="dv">15</span>)
-id2&lt;-<span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">nrow</span>(demo),<span class="dv">10</span>)
-id3&lt;-<span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">nrow</span>(demo),<span class="dv">10</span>)
-demo_missing&lt;-demo
-demo_missing$age[id1]&lt;-<span class="ot">NA</span>
-demo_missing$income[id2]&lt;-<span class="ot">NA</span>
-demo_missing$education[id3]&lt;-<span class="ot">NA</span>
-<span class="kw">summary</span>(demo_missing)</code></pre></div>
-<pre><code>##      income            age              education 
-##  Min.   : 15000   Min.   :20.00   Bachelor   :13  
-##  1st Qu.: 77125   1st Qu.:30.25   Doctor     : 2  
-##  Median : 98750   Median :44.25   High School:70  
-##  Mean   :102811   Mean   :44.43   Master     : 5  
-##  3rd Qu.:125250   3rd Qu.:56.25   NA&#39;s       :10  
-##  Max.   :300000   Max.   :95.00                   
-##  NA&#39;s   :10       NA&#39;s   :15</code></pre>
 <div id="impute-missing-values-with-medianmode" class="section level3">
 <h3><span class="header-section-number">5.2.1</span> Impute missing values with median/mode</h3>
 <p>In the case of missing at random, a common method is to imput with the mean (continuous variable) or median (categorical variables). You can use <code>impute ()</code> function in <code>imputeMissings</code> package.</p>
