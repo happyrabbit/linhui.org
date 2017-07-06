@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2017-07-05">
+<meta name="date" content="2017-07-06">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -460,8 +460,6 @@ sim.dat[sim.dat$age&gt;<span class="dv">68</span> &amp;<span class="st"> </span>
 sim.dat%&gt;%<span class="st"> </span>
 <span class="st">  </span><span class="kw">group_by</span>(gender)%&gt;%
 <span class="st">  </span><span class="kw">summarise</span>(<span class="dt">Avg_online_trans=</span><span class="kw">mean</span>(online_trans))</code></pre></div>
-<pre><code>##   Avg_online_trans
-## 1           13.546</code></pre>
 <p>There is no gold standard to choose a specific function to manipulate data. The goal is to solve the real problem, not the tool itself. So just use whatever tool that is convenient for you.</p>
 <p>The way to use <code>[]</code> is straightforward. But the manipulations are limited. If you need more complicated data reshaping or aggregation, there are other packages to use such as <code>dplyr</code>, <code>reshape2</code>, <code>tidyr</code> etc. But the usage of those packages are not as straightforward as <code>[]</code>. You often need to change functions. Keeping related operations together, such as subset, group, update, join etc, will allow for:</p>
 <ul>
@@ -687,8 +685,19 @@ sdat&lt;-sim.dat[,!<span class="kw">lapply</span>(sim.dat,class)==<span class="s
 <p><em><code>dplyr</code> is a set of clean and consistent tools that implement the split-apply-combine pattern in R. This is an extremely common pattern in data analysis: you solve a complex problem by breaking it down into small pieces, doing something to each piece and then combining the results back together again. [From package description]</em></p>
 <p>You may find the description sounds familiar. The package is sort of a wrapper of apply family. We will only introduce the main function <code>ddply()</code>. Because the package has next iteration which is <code>dplyr</code> package. We will introduce <code>dplyr</code> in more details. The reason we still want to spend some time on the older version is that they have the similar idea and knowing the lineage will deeper your understanding of the whole family.</p>
 <p>We will use the same data frame <code>sim.dat</code> to illustrate. Run the following command:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(plyr)
-<span class="kw">ddply</span>(sim.dat,<span class="st">&quot;segment&quot;</span>,summarize, <span class="dt">Age=</span><span class="kw">round</span>(<span class="kw">mean</span>(<span class="kw">na.omit</span>(age)),<span class="dv">0</span>),
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(plyr)</code></pre></div>
+<pre><code>## -----------------------------------------------------</code></pre>
+<pre><code>## You have loaded plyr after dplyr - this is likely to cause problems.
+## If you need functions from both plyr and dplyr, please load plyr first, then dplyr:
+## library(plyr); library(dplyr)</code></pre>
+<pre><code>## -----------------------------------------------------</code></pre>
+<pre><code>## 
+## Attaching package: &#39;plyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:dplyr&#39;:
+## 
+##     arrange, count, desc, failwith, id, mutate,
+##     rename, summarise, summarize</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ddply</span>(sim.dat,<span class="st">&quot;segment&quot;</span>,summarize, <span class="dt">Age=</span><span class="kw">round</span>(<span class="kw">mean</span>(<span class="kw">na.omit</span>(age)),<span class="dv">0</span>),
       <span class="dt">FemalePct=</span><span class="kw">round</span>(<span class="kw">mean</span>(gender==<span class="st">&quot;Female&quot;</span>),<span class="dv">2</span>),
       <span class="dt">HouseYes=</span><span class="kw">round</span>(<span class="kw">mean</span>(house==<span class="st">&quot;Yes&quot;</span>),<span class="dv">2</span>),
       <span class="dt">store_exp=</span><span class="kw">round</span>(<span class="kw">mean</span>(<span class="kw">na.omit</span>(store_exp),<span class="dt">trim=</span><span class="fl">0.1</span>),<span class="dv">0</span>),
@@ -744,8 +753,10 @@ sdat&lt;-sim.dat[,!<span class="kw">lapply</span>(sim.dat,class)==<span class="s
 ## 4       Style      92.83    121.07</code></pre>
 <p>Price group has the lowest averaged one-time purchasing price. The Conspicuous group will pay the highest price. When we build the profile in real life, we will need to look at the survey results too. Those simple data manipulations can provide you lots of information already. As mentioned before, other than “<code>summarize</code>” there are other functions such as “<code>transform</code>” and “<code>subset</code>”.</p>
 <p>For simplicity, we draw 11 random samples and 3 variables (<code>age</code>, <code>store_exp</code> and <code>segment</code>) from the original data according to the different segments. We will explain stratified sampling later. Here we just do it without explanation.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(caret)
-<span class="kw">set.seed</span>(<span class="dv">2016</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(caret)</code></pre></div>
+<pre><code>## Loading required package: lattice</code></pre>
+<pre><code>## Loading required package: ggplot2</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">2016</span>)
 trainIndex&lt;-<span class="kw">createDataPartition</span>(sim.dat$segment,<span class="dt">p=</span><span class="fl">0.01</span>,<span class="dt">list=</span>F,<span class="dt">times=</span><span class="dv">1</span>)
 examp&lt;-sim.dat[trainIndex,<span class="kw">c</span>(<span class="st">&quot;age&quot;</span>,<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;segment&quot;</span>)]</code></pre></div>
 <p>Now data frame <code>examp</code> only has 11 rows and 3 columns. Let’s look at the function of <code>transform</code>:</p>
@@ -968,8 +979,13 @@ dplyr::<span class="kw">mutate_each</span>(sim.dat, <span class="kw">funs</span>
 <li>Use <code>melt()</code> to convert an object into a molten data frame, i.e. from wide to long</li>
 <li>Use <code>dcast()</code> to cast a molten data frame into the shape you want, i.e. from long to wide</li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(reshape2)
-(mdat &lt;-<span class="st"> </span><span class="kw">melt</span>(sdat, <span class="dt">measure.vars=</span><span class="kw">c</span>(<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>),
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(reshape2)</code></pre></div>
+<pre><code>## 
+## Attaching package: &#39;reshape2&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:data.table&#39;:
+## 
+##     dcast, melt</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(mdat &lt;-<span class="st"> </span><span class="kw">melt</span>(sdat, <span class="dt">measure.vars=</span><span class="kw">c</span>(<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>),
               <span class="dt">variable.name =</span> <span class="st">&quot;Channel&quot;</span>,
               <span class="dt">value.name =</span> <span class="st">&quot;Expense&quot;</span>))</code></pre></div>
 <pre><code>##    age gender   income house    Channel  Expense

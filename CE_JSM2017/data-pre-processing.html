@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2017-07-05">
+<meta name="date" content="2017-07-06">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -339,12 +339,38 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li>…</li>
 </ul>
 <p>Most of the time, you need to clean the data so that R can import them. Some data format requires a specific package. Technically correct data is the data, after preliminary cleaning or format conversion, that R (or another tool you use) can successfully import it.</p>
-<p>Assume we have loaded the data into R with reasonable column names, variable format and so on. That does not mean the data is entirely correct. There may be some observations that do not make sense, such as age is negative, the discount percentage is greater than 1, or data is missing. Depending on the situation, there may be a variety of problems with the data. It is necessary to clean the data before modeling. Moreover, different models have different requirements on the data. For example, some model may require the variables are of consistent; some may be susceptible to outliers or collinearity, some may not be able to handle categorical variables and so on. The modeler has to preprocess the data to make it proper for the specific model.</p>
+<p>Assume we have loaded the data into R with reasonable column names, variable format and so on. That does not mean the data is entirely correct. There may be some observations that do not make sense, such as age is negative, the discount percentage is greater than 1, or data is missing. Depending on the situation, there may be a variety of problems with the data. It is necessary to clean the data before modeling. Moreover, different models have different requirements on the data. For example, some model may require the variables are of consistent scale; some may be susceptible to outliers or collinearity, some may not be able to handle categorical variables and so on. The modeler has to preprocess the data to make it proper for the specific model.</p>
 <p>Sometimes we need to aggregate the data. For example, add up the daily sales to get annual sales of a product at different locations. In customer segmentation, it is common practice to build a profile for each segment. It requires calculating some statistics such as average age, average income, age standard deviation, etc. Data aggregation is also necessary for presentation, or for data visualization.</p>
 <p>The final table results for clients need to be in a nicer format than what used in the analysis. Usually, data analysts will take the results from data scientists and adjust the format, such as labels, cell color, highlight. It is important for a data scientist to make sure the results look consistent which makes the next step easier for data analysts.</p>
 <p>It is highly recommended to store each step of the data and the R code, making the whole process as repeatable as possible. The R markdown reproducible report will be extremely helpful for that. If the data changes, it is easy to rerun the process. In the remainder of this chapter, we will show the most common data preprocessing methods.</p>
 <p>Load the R packages first:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">source</span>(<span class="st">&quot;https://raw.githubusercontent.com/happyrabbit/CE_JSM2017/master/Rcode/00Require.R&quot;</span>)</code></pre></div>
+<pre><code>## 
+## Attaching package: &#39;gridExtra&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     combine</code></pre>
+<pre><code>## 
+## Attaching package: &#39;imputeMissings&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:e1071&#39;:
+## 
+##     impute</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     compute</code></pre>
+<pre><code>## 
+## Attaching package: &#39;car&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     recode</code></pre>
+<pre><code>## 
+## Attaching package: &#39;psych&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:car&#39;:
+## 
+##     logit</code></pre>
+<pre><code>## The following objects are masked from &#39;package:ggplot2&#39;:
+## 
+##     %+%, alpha</code></pre>
 <div id="data-cleaning" class="section level2">
 <h2><span class="header-section-number">5.1</span> Data Cleaning</h2>
 <p>After you load the data, the first thing is to check how many variables are there, the type of variables, the distributions, and data errors. Let’s read and check the data:</p>
@@ -413,7 +439,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li>There is a negative value ( -500) in <code>store_exp</code> which is not logical.</li>
 <li>Someone is 300 years old.</li>
 </ul>
-<p>How to deal with that? Depending on the real situation, if the sample size is large enough, it will not hurt to delete those problematic samples. Here we have 1000 observations. Since marketing survey is usually expensive, it is better to set these values as missing and imput them instead of deleting the rows.</p>
+<p>How to deal with that? Depending on the real situation, if the sample size is large enough, it will not hurt to delete those problematic samples. Here we have 1000 observations. Since marketing survey is usually expensive, it is better to set these values as missing and impute them instead of deleting the rows.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># set problematic values as missings</span>
 sim.dat$age[<span class="kw">which</span>(sim.dat$age&gt;<span class="dv">100</span>)]&lt;-<span class="ot">NA</span>
 sim.dat$store_exp[<span class="kw">which</span>(sim.dat$store_exp&lt;<span class="dv">0</span>)]&lt;-<span class="ot">NA</span>
@@ -432,8 +458,8 @@ sim.dat$store_exp[<span class="kw">which</span>(sim.dat$store_exp&lt;<span class
 <div id="missing-values" class="section level2">
 <h2><span class="header-section-number">5.2</span> Missing Values</h2>
 <p>Missing value imputation can be the topic for a book. This section will show some of the commonly used methods without getting too deep into the topic. Chapter 7 of the book by De Waal, Pannekoek and Scholtus <span class="citation">(Ton de Waal <a href="#ref-impute1">2011</a>)</span> makes a concise overview of some of the existing imputation methods. The choice of specific method depends on the actual situation. There is no method always better than the others.</p>
-<p>One question to ask before imputation: Is there any auxiliary information? Being aware of any auxiliary information is critical. For example, if the system set customer who did not purchase as missing, then the real purchasing amount should be 0. Is missing a random occurrence? If so, it may be reasonable to imput with mean or median. If not, what is the potential mechanism for the missing? For example, older people are more reluctant to disclose their ages in the questionnaire, so that the absence of age is not completely random. In this case, the missing values need to be estimated using the relationship between age and other independent variables. For example, use variables such as whether they have children, income, and other survey questions to build a model to predict age.</p>
-<p>Also, the purpose of modeling is important for selecting imputation methods. If the goal is to interpret the parameter estimate or statistical inference, then it is important to study the missing mechanism carefully and to estimate the missing values using non-missing information as much as possible. If the goal is to predict, people usually will not study the absence mechanism rigorously (but sometimes the mechanism is obvious). If the absence mechanism is not clear, treat it as missing at random and use mean, median, or k-nearest neighbor to imput. Since statistical inference is sensitive to missing values, researchers from survey statistics have conducted in-depth studies of various imputation schemes which focus on valid statistical inference. The problem of missing values in the prediction model is different from that in the traditional survey. Therefore, there are not many papers on missing value imputation in the prediction model. Those who want to study further can refer to Saar-Tsechansky and Provost’s comparison of different imputation methods <span class="citation">(Saar-Tsechansky M 2007b)</span>and De Waal, Pannekoek and Scholtus’ book <span class="citation">(Ton de Waal <a href="#ref-impute1">2011</a>)</span>.</p>
+<p>One question to ask before imputation: Is there any auxiliary information? Being aware of any auxiliary information is critical. For example, if the system set customer who did not purchase as missing, then the real purchasing amount should be 0. Is missing a random occurrence? If so, it may be reasonable to impute with mean or median. If not, is there a potential mechanism for the missing data? For example, older people are more reluctant to disclose their ages in the questionnaire, so that the absence of age is not completely random. In this case, the missing values need to be estimated using the relationship between age and other independent variables. For example, use variables such as whether they have children, income, and other survey questions to build a model to predict age.</p>
+<p>Also, the purpose of modeling is important for selecting imputation methods. If the goal is to interpret the parameter estimate or statistical inference, then it is important to study the missing mechanism carefully and to estimate the missing values using non-missing information as much as possible. If the goal is to predict, people usually will not study the absence mechanism rigorously (but sometimes the mechanism is obvious). If the absence mechanism is not clear, treat it as missing at random and use mean, median, or k-nearest neighbor to impute. Since statistical inference is sensitive to missing values, researchers from survey statistics have conducted in-depth studies of various imputation schemes which focus on valid statistical inference. The problem of missing values in the prediction model is different from that in the traditional survey. Therefore, there are not many papers on missing value imputation in the prediction model. Those who want to study further can refer to Saar-Tsechansky and Provost’s comparison of different imputation methods <span class="citation">(Saar-Tsechansky M 2007b)</span>and De Waal, Pannekoek and Scholtus’ book <span class="citation">(Ton de Waal <a href="#ref-impute1">2011</a>)</span>.</p>
 <div id="impute-missing-values-with-medianmode" class="section level3">
 <h3><span class="header-section-number">5.2.1</span> Impute missing values with median/mode</h3>
 <p>In the case of missing at random, a common method is to imput with the mean (continuous variable) or median (categorical variables). You can use <code>impute ()</code> function in <code>imputeMissings</code> package.</p>
@@ -515,7 +541,7 @@ demo_imp&lt;-<span class="kw">predict</span>(imp,sim.dat[,-idx])
 ## 
 ## $income
 ## [1] &quot;numeric&quot;</code></pre>
-<p>Comparing the KNN result with the previous median imputation, the two are very different. This is because when you tell the <code>preProcess ()</code> function to use KNN (the option <code>method =&quot; knnImpute&quot;</code>), it will automatically standardize the data. Another way is to use Bagging tree (in the next section). Note that KNN can not imput sample with the entire row missing. The reason is straightforward. Since the algorithm uses the average of its neighbors if none of them has a value, what does it use to calculate the mean? Let’s append a new row with all values missing to the original data frame to get a new object called <code>temp</code>. Then apply KNN to <code>temp</code> and see what happens:</p>
+<p>Comparing the KNN result with the previous median imputation, the two are very different. This is because when you tell the <code>preProcess ()</code> function to use KNN (the option <code>method =&quot; knnImpute&quot;</code>), it will automatically standardize the data. Another way is to use Bagging tree (in the next section). Note that KNN can not impute samples with the entire row missing. The reason is straightforward. Since the algorithm uses the average of its neighbors if none of them has a value, what does it use to calculate the mean? Let’s append a new row with all values missing to the original data frame to get a new object called <code>temp</code>. Then apply KNN to <code>temp</code> and see what happens:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">temp&lt;-<span class="kw">rbind</span>(sim.dat,<span class="kw">rep</span>(<span class="ot">NA</span>,<span class="kw">ncol</span>(sim.dat)))
 imp&lt;-<span class="kw">preProcess</span>(sim.dat,<span class="dt">method=</span><span class="st">&quot;knnImpute&quot;</span>,<span class="dt">k=</span><span class="dv">5</span>)
 idx&lt;-<span class="kw">which</span>(<span class="kw">lapply</span>(temp,class)==<span class="st">&quot;factor&quot;</span>)</code></pre></div>
@@ -795,7 +821,7 @@ Figure 5.3: spatial sign transformation
 </div>
 <div id="collinearity" class="section level2">
 <h2><span class="header-section-number">5.6</span> Collinearity</h2>
-<p>It is probably a technical term that many un-technical people also know. There is an excellent function in <code>corrplot</code> package with the same name <code>corrplot()</code> that can visualize correlation structure of a set of predictors. The function has the option to reorder the variables in a way that reveals clusters of highly correlated ones.</p>
+<p>It is probably a technical term that many un-technical people also know. When two predictors are very strongly correlated, including both in a model may lead to confusion or problem with a singular matrix. There is an excellent function in <code>corrplot</code> package with the same name <code>corrplot()</code> that can visualize correlation structure of a set of predictors. The function has the option to reorder the variables in a way that reveals clusters of highly correlated ones.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># select non-survey numerical variables</span>
 sdat&lt;-<span class="kw">subset</span>(sim.dat,<span class="dt">select=</span><span class="kw">c</span>(<span class="st">&quot;age&quot;</span>,<span class="st">&quot;income&quot;</span>,<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>,<span class="st">&quot;store_trans&quot;</span>,<span class="st">&quot;online_trans&quot;</span> ))
 <span class="co"># use bagging imputation here</span>
@@ -838,7 +864,7 @@ sdat&lt;-sdat[-highCorr]
 ## online_exp     0.4420638    0.2256370
 ## store_trans    1.0000000   -0.4367544
 ## online_trans  -0.4367544    1.0000000</code></pre>
-<p>The absolute value of the elements in the correlation matrix after removal are all below 0.75.</p>
+<p>The absolute value of the elements in the correlation matrix after removal are all below 0.75. How strong does a correlation have to get, before you should start worrying about multicollinearity? There is no easy answer to that question. You can treat the threshold as a tuning parameter and pick one that gives you best prediction accuracy.</p>
 </div>
 <div id="sparse-variables" class="section level2">
 <h2><span class="header-section-number">5.7</span> Sparse Variables</h2>
@@ -916,6 +942,7 @@ zero_demo$zero2&lt;-<span class="kw">c</span>(<span class="dv">1</span>,<span cl
 ## 5 124252.6                  0.0           124252.6
 ## 6 107661.5                  0.0           107661.5</code></pre>
 <p>If you think the impact income levels on purchasing behavior is different for male and female, then you may add the interaction term between <code>income</code> and <code>gender</code>. You can do this by adding <code>income: gender</code> in the formula.</p>
+<p>[[[Any thoughts on including topics about feature building for ML? Often some complicated transformation on raw data is done before it is used as a feature in a ML model. Also special types of data such as pictures or text need some basic preprocessing to be represented correctly for ML algorithms.]]]</p>
 
 </div>
 </div>
