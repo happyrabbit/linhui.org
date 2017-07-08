@@ -5,10 +5,17 @@ date: "Jul 8, 2017"
 layout: post
 ---
 
+<p style="font-family: serif; margin:0; font-size:14pt; font-style:italic">Hui Lin; </p>
+<p style="font-family: serif; margin:0; font-size:14pt; font-style:italic">
+<a href="https://twitter.com/gossip_rabbit">
+Follow me on Twitter;</a></p>
+<p style="font-family: serif; margin:0; font-size:14pt; font-style:italic">2017-04-30 ; </p>
+
 
 ![](http://scientistcafe.com/book/Figure/AlogrithmTypes.png)
 
-The summary of various algorithms for data science is based on Jason Brownlee's blog "(A Tour of Machine Learning Algorithms)[http://machinelearningmastery.com/a-tour-of-machine-learning-algorithms/]." 
+The summary of various algorithms for data science is based on Jason Brownlee's blog 
+"[A Tour of Machine Learning Algorithms](http://machinelearningmastery.com/a-tour-of-machine-learning-algorithms/)." 
 I added and subtracted some algorithms in each category and gave additional comments.  
 The categorization here is based on the structure (such as tree model, Regularization Methods) or type of question to answer 
 (such as regression). It is far less than perfect but will help to show a bigger map of different algorithms. 
@@ -123,11 +130,6 @@ The term neural network has evolved to encompass a repertoire of models and lear
 11. Deep Learning
 
 The name is a little misleading. As mentioned before, it is multilayer neural network. It is hyped tremendously especially after AlphaGO defeated Li Shishi at the board game Go. We don't have too much experience with the application of deep learning and are not in the right position to talk more about it. Here are some of the common algorithms:
-
-<!--Many of the deep learning algorithms are semi-supervised learning algorithms that deal with large data sets with a few unlabeled samples. -->
-
-<!-- Alex's comments:
-There are many different types of deep learning applications, some are supervised (computer vision image classification), some are reinforment learning (I think I read that a lot of game AIs use this, such as bots to beat games like super mario), and can also be used to build features in an unsupervised way (autoencoders).  There is a lot of hype in this topic but I think deep learning differentiates itself from earlier ANN because of many recent advacements that make it possible to have very large and very deep networks: backprop, new ways to initialize weights, dropout etc.-->
 
 - Restricted Boltzmann Machine (RBN)
 - Deep Belief Networks (DBN)
