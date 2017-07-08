@@ -5,6 +5,9 @@ date: "Jul 8, 2017"
 layout: post
 ---
 
+
+![](http://scientistcafe.com/book/Figure/AlogrithmTypes.png)
+
 The summary of various algorithms for data science is based on Jason Brownlee's blog "(A Tour of Machine Learning Algorithms)[http://machinelearningmastery.com/a-tour-of-machine-learning-algorithms/]." 
 I added and subtracted some algorithms in each category and gave additional comments.  
 The categorization here is based on the structure (such as tree model, Regularization Methods) or type of question to answer 
@@ -151,4 +154,3 @@ Ensemble method made its debut in the 1990s. The idea is to build a prediction m
 - Random Forest
 - Gradient Boosting Machine (GBM)
 
-![](http://scientistcafe.com/book/Figure/AlogrithmTypes.png)
