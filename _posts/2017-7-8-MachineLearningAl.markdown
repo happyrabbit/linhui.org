@@ -9,7 +9,7 @@ layout: post
 <p style="font-family: serif; margin:0; font-size:14pt; font-style:italic">
 <a href="https://twitter.com/gossip_rabbit">
 Follow me on Twitter;</a></p>
-<p style="font-family: serif; margin:0; font-size:14pt; font-style:italic">2017-04-30 ; </p>
+<p style="font-family: serif; margin:0; font-size:14pt; font-style:italic">2017-07-08 ; </p>
 
 
 ![](http://scientistcafe.com/book/Figure/AlogrithmTypes.png)
