@@ -11,6 +11,7 @@ layout: post
 Follow me on Twitter;</a></p>
 <p style="font-family: serif; margin:0; font-size:14pt; font-style:italic">2017-07-08 ; </p>
 
+# Types of Machine Learning Algorithm
 
 ![](http://scientistcafe.com/book/Figure/AlogrithmTypes.png)
 
