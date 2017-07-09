@@ -154,7 +154,7 @@ PCA attempts to find uncorrelated linear combinations of original variables that
 
 (13) Ensemble Methods
 
-Ensemble method made its debut in the 1990s. The idea is to build a prediction model by combining the strengths of a collection of simpler base models.  Bagging, originally proposed by Leo Breiman, is one of the earliest ensemble methods. After that, people developed Random Forest [@Ho1998; @amit1997] and Boosting method [@Valiant1984; @KV1989]. This is a class of powerful and effective algorithms.
+Ensemble method made its debut in the 1990s. The idea is to build a prediction model by combining the strengths of a collection of simpler base models.  Bagging, originally proposed by Leo Breiman, is one of the earliest ensemble methods. After that, people developed Random Forest and Boosting method. This is a class of powerful and effective algorithms.
 
 - Bootstrapped Aggregation (Bagging)
 - Random Forest
