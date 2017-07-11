@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2017-07-08">
+<meta name="date" content="2017-07-10">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -256,7 +256,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="7" data-path="model-error.html"><a href="model-error.html"><i class="fa fa-check"></i><b>7</b> Model Error</a><ul>
-<li class="chapter" data-level="7.1" data-path="model-error.html"><a href="model-error.html#systematic-error-and-random-error"><i class="fa fa-check"></i><b>7.1</b> Systematic Error and Random Error</a></li>
+<li class="chapter" data-level="7.1" data-path="model-error.html"><a href="model-error.html#systematic-error-and-random-error"><i class="fa fa-check"></i><b>7.1</b> Systematic Error and Random Error</a><ul>
+<li class="chapter" data-level="7.1.1" data-path="model-error.html"><a href="model-error.html#measurement-error-in-the-response"><i class="fa fa-check"></i><b>7.1.1</b> Measurement Error in the Response</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="8" data-path="neural-network.html"><a href="neural-network.html"><i class="fa fa-check"></i><b>8</b> Neural Network</a><ul>
 <li class="chapter" data-level="8.1" data-path="neural-network.html"><a href="neural-network.html#projection-pursuit-regression"><i class="fa fa-check"></i><b>8.1</b> Projection Pursuit Regression</a></li>
@@ -343,7 +345,106 @@ E[f(\mathbf{X})-\hat{f}(\mathbf{X})]^{2} &amp; = &amp; E\left(f(\mathbf{X})-E[\h
  &amp; = &amp; [Bias(\hat{f}(\mathbf{X}))]^{2}+Var(\hat{f}(\mathbf{X}))
 \end{array}
 \]</span></p>
+<p>The systematic error consists of two parts, $ Bias(())$ and <span class="math inline">\(Var (\hat{f} (\mathbf{X}))\)</span>. To minimize the systematic error, we need to minimize the bias and variance. The bias represents the error caused by the approximation of the reality of the model, which may be very complex. For example, linear regression assumes that there is a linear relationship between the independent variable and the response, but the perfect linear relationship in real life is not common. The relationship between x and fx in the following figure is non-linear. Therefore, despite a large sample size, linear regression can not give the accurate prediction. In other words, in this case, the prediction of the linear regression model has a high bias.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(grid)
+<span class="kw">library</span>(lattice)
+<span class="kw">library</span>(ggplot2)
+<span class="kw">source</span>(<span class="st">&quot;https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/R_Code/multiplot.r&quot;</span>)
+<span class="co"># randomly simulate some non-linear samples</span>
+x=<span class="kw">seq</span>(<span class="dv">1</span>,<span class="dv">10</span>,<span class="fl">0.01</span>)*pi
+e=<span class="kw">rnorm</span>(<span class="kw">length</span>(x),<span class="dt">mean=</span><span class="dv">0</span>,<span class="dt">sd=</span><span class="fl">0.2</span>)
+fx&lt;-<span class="kw">sin</span>(x)+e+<span class="kw">sqrt</span>(x)
+dat=<span class="kw">data.frame</span>(x,fx)
+<span class="co"># plot fitting result</span>
+<span class="kw">ggplot</span>(dat,<span class="kw">aes</span>(x,fx))+<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_point</span>() +
+<span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<p><img src="CE_JSM2017_files/figure-html/unnamed-chunk-100-1.png" width="672" /></p>
+<p>The estimated parameters will be different for the different training data. Intuitively, the estimated variance indicates that if we fit the same model with different data sets, how much the estimated results will change. Ideally, the change is small. For high variance models, small changes in the training data result in very different estimates. In general, a model with high flexibility also has high variance., such as the CART tree, and the initial boosting method. The Random Forest and Gradient Boosting Model aim to reduce the variance by summarizing the results obtained on different samples.</p>
+<p>The blue curve in the figure below is obtained by fitting the above nonlinear observations by a smoothing method, which is highly flexible and can fit the current data tightly:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(dat,<span class="kw">aes</span>(x,fx))+<span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)</code></pre></div>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
+<p><img src="CE_JSM2017_files/figure-html/unnamed-chunk-101-1.png" width="672" /></p>
+<p>However, this method has a high variance, and if we simulate different subsets of the sample, the result curve will change significantly:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># set random seed</span>
+<span class="kw">set.seed</span>(<span class="dv">2016</span>)
+<span class="co"># sample part of the data to fit model</span>
+<span class="co"># sample 1</span>
+idx1=<span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">length</span>(x),<span class="dv">100</span>)
+dat1=<span class="kw">data.frame</span>(<span class="dt">x1=</span>x[idx1],<span class="dt">fx1=</span>fx[idx1])
+p1=<span class="kw">ggplot</span>(dat1,<span class="kw">aes</span>(x1,fx1))+<span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)
+<span class="co"># sample 2</span>
+idx2=<span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">length</span>(x),<span class="dv">100</span>)
+dat2=<span class="kw">data.frame</span>(<span class="dt">x2=</span>x[idx2],<span class="dt">fx2=</span>fx[idx2])
+p2=<span class="kw">ggplot</span>(dat2,<span class="kw">aes</span>(x2,fx2))+<span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)
+<span class="co"># sample 3</span>
+idx3=<span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">length</span>(x),<span class="dv">100</span>)
+dat3=<span class="kw">data.frame</span>(<span class="dt">x3=</span>x[idx3],<span class="dt">fx3=</span>fx[idx3])
+p3=<span class="kw">ggplot</span>(dat3,<span class="kw">aes</span>(x3,fx3))+<span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)
+<span class="co"># sample 4</span>
+idx4=<span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">length</span>(x),<span class="dv">100</span>)
+dat4=<span class="kw">data.frame</span>(<span class="dt">x4=</span>x[idx4],<span class="dt">fx4=</span>fx[idx4])
+p4=<span class="kw">ggplot</span>(dat4,<span class="kw">aes</span>(x4,fx4))+<span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)
+<span class="kw">multiplot</span>(p1,p2,p3,p4,<span class="dt">cols=</span><span class="dv">2</span>)</code></pre></div>
+<pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;
+## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;
+## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;
+## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
+<p><img src="CE_JSM2017_files/figure-html/unnamed-chunk-102-1.png" width="672" /></p>
+<p>Fitting the linear model using the same four subsets, the result barely changes:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p1=<span class="kw">ggplot</span>(dat1,<span class="kw">aes</span>(x1,fx1))+<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_point</span>() +
+<span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)
+p2=<span class="kw">ggplot</span>(dat2,<span class="kw">aes</span>(x2,fx2))+<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_point</span>() +
+<span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)
+p3=<span class="kw">ggplot</span>(dat3,<span class="kw">aes</span>(x3,fx3))+<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_point</span>() +
+<span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)
+p4=<span class="kw">ggplot</span>(dat4,<span class="kw">aes</span>(x4,fx4))+<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_point</span>() +
+<span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)
+<span class="kw">multiplot</span>(p1,p2,p3,p4,<span class="dt">cols=</span><span class="dv">2</span>)</code></pre></div>
+<p><img src="CE_JSM2017_files/figure-html/unnamed-chunk-103-1.png" width="672" /></p>
+<p>In general, the variance (<span class="math inline">\(Var(\hat{f}(\mathbf{X}))\)</span>) <strong>increases</strong> and the bias (<span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span>) <strong>decreases</strong> as the model flexibility increases. Variance and bias together determine the systematic error (or mean square error, MSE). As we increase the flexibility of the model, at first the rate at which <span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span> decreases is faster than <span class="math inline">\(Var (\hat{f} (\mathbf{X}))\)</span>, so the MSE decreases. However, to some degree, higher flexibility has little effect on <span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span> but <span class="math inline">\(Var (\hat{f} (\mathbf{X}))\)</span> increases significantly, so the MSE increases.</p>
+<div id="measurement-error-in-the-response" class="section level3">
+<h3><span class="header-section-number">7.1.1</span> Measurement Error in the Response</h3>
+<p>The random error (<span class="math inline">\(\mathbf{\epsilon}\)</span>) reflects the measurement error in the response. This part of the error is irreducible, and so it makes the root mean square error (RMSE) and <span class="math inline">\(R^2\)</span> have the corresponding upper and lower limits. RMSE and <span class="math inline">\(R^2\)</span> are commonly used performance measures for the regression model which we will talk in more detail later. Therefore, the random error term not only represents the part of fluctuations the model can not explain but also contains measurement error in the response variables. Section 20.2 of Applied Predictive Modeling <span class="citation">(Max Kuhn <a href="#ref-APM">2013</a>)</span> has an example that shows the effect of the measurement error in the response variable on the model performance (RMSE and <span class="math inline">\(R^2\)</span>).</p>
+<p>The authors increased the error in the response proportional to a base level error which was gotten using the original data without introducing extra noise. Then fit a set of models repeatedly using the “contaminated” data sets to study the change of <span class="math inline">\(RMSE\)</span> and $R^2 $ as the level of noise. Here we use clothing consumer data for a similar illustration. Suppose many people do not want to disclose their income and so we need to use other variables to establish a model to predict income. We set up the following model:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># load data</span>
+sim.dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv &quot;</span>)
+ymad&lt;-<span class="kw">mad</span>(<span class="kw">na.omit</span>(sim.dat$income))
+<span class="co"># calculate z-score</span>
+zs&lt;-(sim.dat$income-<span class="kw">mean</span>(<span class="kw">na.omit</span>(sim.dat$income)))/ymad
+<span class="co"># which(na.omit(zs&gt;3.5)): identify outliers</span>
+<span class="co"># which(is.na(zs)): identify missing values</span>
+idex&lt;-<span class="kw">c</span>(<span class="kw">which</span>(<span class="kw">na.omit</span>(zs&gt;<span class="fl">3.5</span>)),<span class="kw">which</span>(<span class="kw">is.na</span>(zs)))
+<span class="co"># delete rows with outliers and missing values</span>
+sim.dat&lt;-sim.dat[-idex,]
+fit&lt;-<span class="kw">lm</span>(income~store_exp+online_exp+store_trans+online_trans,<span class="dt">data=</span>sim.dat)</code></pre></div>
+<p>The output shows that without additional noise, the root mean square error (RMSE) of the model is 29567, <span class="math inline">\(R^2\)</span> is 0.6.</p>
+<p>Let’s add various degrees of noise (0 to 3 times the RMSE) to the variable <code>income</code>:</p>
+<p><span class="math display">\[ RMSE \times (0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0) \]</span></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">noise&lt;-<span class="kw">matrix</span>(<span class="kw">rep</span>(<span class="ot">NA</span>,<span class="dv">7</span>*<span class="kw">nrow</span>(sim.dat)),<span class="dt">nrow=</span><span class="kw">nrow</span>(sim.dat),<span class="dt">ncol=</span><span class="dv">7</span>)
+for (i in <span class="dv">1</span>:<span class="kw">nrow</span>(sim.dat)){
+noise[i,]&lt;-<span class="kw">rnorm</span>(<span class="dv">7</span>,<span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">7</span>),<span class="kw">summary</span>(fit)$sigma*<span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">3</span>,<span class="dt">by=</span><span class="fl">0.5</span>))
+}</code></pre></div>
+<p>We then examine the effect of noise intensity on <span class="math inline">\(R^2\)</span> for models with different complexity. The models with complexity from low to high are ordinary linear regression, partial least square regression(PLS), multivariate adaptive regression spline, support vector machine (kernel function is radial basis function), and random forest.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># fit ordinary linear regression</span>
+rsq_linear&lt;-<span class="kw">rep</span>(<span class="dv">0</span>,<span class="kw">ncol</span>(noise))
+for (i in <span class="dv">1</span>:<span class="dv">7</span>){
+withnoise&lt;-sim.dat$income+noise[,i]
+fit0&lt;-<span class="kw">lm</span>(withnoise~store_exp+online_exp+store_trans+online_trans,<span class="dt">data=</span>sim.dat)
+rsq_linear[i]&lt;-<span class="kw">summary</span>(fit0)$adj.r.squared
+}</code></pre></div>
 
+</div>
+</div>
+</div>
+<h3> References</h3>
+<div id="refs" class="references">
+<div id="ref-APM">
+<p>Max Kuhn, Kjell Johnston. 2013. <em>Applied Predictive Modeling</em>. Springer.</p>
 </div>
 </div>
             </section>
