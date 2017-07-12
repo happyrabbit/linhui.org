@@ -5,7 +5,15 @@ date: "Mar 25, 2017"
 layout: post
 ---
 
-## What is data science?
+<p style="font-family: serif; margin:0; font-size:14pt; font-style:italic">Hui Lin </p>
+<p style="font-family: serif; margin:0; font-size:14pt; font-style:italic">
+<a href="https://twitter.com/gossip_rabbit">Follow me on Twitter</a></p>
+<p style="font-family: serif; margin:0; font-size:14pt; font-style:italic">
+<a href="https://github.com/happyrabbit">Github</a></p>
+<p style="font-family: serif; margin:0; font-size:14pt; font-style:italic">2017-03-25</p>
+
+
+# What is data science?
 
 <p align="center">
   <img src="http://linhui.org/images/Jokes/datascientist.png"  width="70%" />
