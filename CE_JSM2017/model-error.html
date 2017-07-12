@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2017-07-10">
+<meta name="date" content="2017-07-11">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -437,6 +437,51 @@ withnoise&lt;-sim.dat$income+noise[,i]
 fit0&lt;-<span class="kw">lm</span>(withnoise~store_exp+online_exp+store_trans+online_trans,<span class="dt">data=</span>sim.dat)
 rsq_linear[i]&lt;-<span class="kw">summary</span>(fit0)$adj.r.squared
 }</code></pre></div>
+<p>PLS is a method of linearizing nonlinear relationships through hidden layers. It is similar to the principal component regression (PCR), except that PCR does not take into account the information of the dependent variable when selecting the components, and its purpose is to find the linear combinations (i.e., unsupervised) that capture the most variance of the independent variables. When the independent variables and response variables are related, PCR can well identify the systematic relationship between them. However, when there exist independent variables not related to response variable, it will undermine PCR’s performance. And PLS maximizes the linear combination of dependencies with the response variable. In the current case, the more complex PLS does not perform better than simple linear regression.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># pls: conduct PLS and PCR</span>
+<span class="kw">library</span>(pls)
+rsq_pls&lt;-<span class="kw">rep</span>(<span class="dv">0</span>,<span class="kw">ncol</span>(noise))
+<span class="co"># fit PLS</span>
+for (i in <span class="dv">1</span>:<span class="dv">7</span>){
+withnoise&lt;-sim.dat$income+noise[,i]
+fit0&lt;-<span class="kw">plsr</span>(withnoise~store_exp+online_exp+store_trans+online_trans,<span class="dt">data=</span>sim.dat)
+rsq_pls[i]&lt;-<span class="kw">max</span>(<span class="kw">drop</span>(<span class="kw">R2</span>(fit0, <span class="dt">estimate =</span> <span class="st">&quot;train&quot;</span>,<span class="dt">intercept =</span> <span class="ot">FALSE</span>)$val))
+}</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># earth: fit mars </span>
+<span class="kw">library</span>(earth)
+rsq_mars&lt;-<span class="kw">rep</span>(<span class="dv">0</span>,<span class="kw">ncol</span>(noise))
+for (i in <span class="dv">1</span>:<span class="dv">7</span>){
+withnoise&lt;-sim.dat$income+noise[,i]
+fit0&lt;-<span class="kw">earth</span>(withnoise~store_exp+online_exp+store_trans+online_trans,<span class="dt">data=</span>sim.dat)
+rsq_mars[i]&lt;-fit0$rsq
+}</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># caret: awesome package for tuning predictive model</span>
+<span class="kw">library</span>(caret)
+rsq_svm&lt;-<span class="kw">rep</span>(<span class="dv">0</span>,<span class="kw">ncol</span>(noise))
+<span class="co"># Need some time to run</span>
+for (i in <span class="dv">1</span>:<span class="dv">7</span>){
+idex&lt;-<span class="kw">which</span>(<span class="kw">is.na</span>(sim.dat$income))
+withnoise&lt;-sim.dat$income+noise[,i]
+trainX&lt;-sim.dat[,<span class="kw">c</span>(<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>,<span class="st">&quot;store_trans&quot;</span>,<span class="st">&quot;online_trans&quot;</span>)]
+trainY&lt;-withnoise
+fit0&lt;-<span class="kw">train</span>(trainX,trainY,<span class="dt">method=</span><span class="st">&quot;svmRadial&quot;</span>,
+            <span class="dt">tuneLength=</span><span class="dv">15</span>,
+            <span class="dt">trControl=</span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;cv&quot;</span>))
+rsq_svm[i]&lt;-<span class="kw">max</span>(fit0$results$Rsquared)
+}</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># randomForest: random forest model</span>
+<span class="kw">library</span>(randomForest)
+rsq_rf&lt;-<span class="kw">rep</span>(<span class="dv">0</span>,<span class="kw">ncol</span>(noise))
+<span class="co"># ntree=500 number of trees</span>
+<span class="co"># na.action = na.omit  ignore missing value</span>
+for (i in <span class="dv">1</span>:<span class="dv">7</span>){
+withnoise&lt;-sim.dat$income+noise[,i]
+fit0&lt;-<span class="kw">randomForest</span>(withnoise~store_exp+online_exp+store_trans+online_trans,<span class="dt">data=</span>sim.dat,<span class="dt">ntree=</span><span class="dv">500</span>,<span class="dt">na.action =</span> na.omit)
+rsq_rf[i]&lt;-<span class="kw">tail</span>(fit0$rsq,<span class="dv">1</span>)
+}
+<span class="kw">library</span>(reshape2)
+rsq&lt;-<span class="kw">data.frame</span>(<span class="kw">cbind</span>(<span class="dt">Noise=</span><span class="kw">c</span>(<span class="fl">0.0</span>, <span class="fl">0.5</span>, <span class="fl">1.0</span>, <span class="fl">1.5</span>, <span class="fl">2.0</span>, <span class="fl">2.5</span>, <span class="fl">3.0</span>),rsq_linear,rsq_pls,rsq_mars,rsq_svm,rsq_rf))
+rsq&lt;-<span class="kw">melt</span>(rsq,<span class="dt">id.vars=</span><span class="st">&quot;Noise&quot;</span>,<span class="dt">measure.vars=</span><span class="kw">c</span>(<span class="st">&quot;rsq_linear&quot;</span>,<span class="st">&quot;rsq_pls&quot;</span>,<span class="st">&quot;rsq_mars&quot;</span>,<span class="st">&quot;rsq_svm&quot;</span>,<span class="st">&quot;rsq_rf&quot;</span>))</code></pre></div>
 
 </div>
 </div>
