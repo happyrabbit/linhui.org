@@ -16,7 +16,7 @@ layout: post
 
 ![](http://scientistcafe.com/book/Figure/DataScienceQuestion.png)
 
-### Prerequisites
+## Prerequisites
 
 Data science is not a panacea, and data scientists are not magicians. There are problems data science can't help. It is best to make a judgment as early in the analytical cycle as possible. Tell your clients honestly and clearly when you figure data analytics can't give the answer they want. What kind of questions can data science solve? What are the requirements for our question?
 
@@ -41,7 +41,7 @@ The data has to be helpful for the question. If you want to predict which produc
 
 Often the quality of the data is more important than the quantity, but the quantity can not be overlooked. In the premise of guaranteeing quality, usually the more data, the better.  If you have a specific and reasonable question, also sound and relevant data, then congratulations, you can start playing data science!
 
-### Problem type
+## Problem type
 
 Many of the data science books classify the various models from a technical point of view. Such as supervised vs. unsupervised models, linear vs. nonlinear models, parametric models vs. non-parametric models, and so on. Here we will continue on "problem-oriented" track. We first introduce different groups of real problems and then present which models can be used to answer the corresponding category of questions. 
 
