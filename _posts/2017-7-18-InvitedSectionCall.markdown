@@ -10,7 +10,7 @@ layout: post
  
 Section on Statistics in Marketing is soliciting proposals for invited sessions. The theme for JSM 2018 is “**#LeadWithStatistics**,” but not all sessions have to adhere to this theme. Formats vary for invited sessions; however, all are 110 minutes in length and have a session chair. The sessions typically include 2–6 participants, including the chair. There are two of the most popular and successful formats: 
 
-(1) 2–3 speakers with a discussant;
+(1) 2–3 speakers with a discussant;  
 (2) A panel discussion of 3–5 panelists
 
 Please reference the call for invited sessions published in Amstat News: http://magazine.amstat.org/blog/2017/07/01/jsm2018proposals/.  The online submission process is open on **Tuesday, July 18, 2017, and will close on Wednesday, September 6, 2017 (11:59 p.m. EST)**.
