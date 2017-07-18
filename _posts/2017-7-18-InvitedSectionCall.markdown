@@ -5,6 +5,7 @@ date: "Jul 18, 2017"
 layout: post
 ---
 
+# JSM 2018 Invited Session Proposals Sought - Section on Statistics in Marketing
  
 2018 Joint Statistical Meetings (JSM) will be in Vancouver, British Columbia, Canada, from July 28 - August 2, 2018. 
  
