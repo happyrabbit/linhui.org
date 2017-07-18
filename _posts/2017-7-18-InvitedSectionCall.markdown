@@ -5,7 +5,7 @@ date: "Jul 18, 2017"
 layout: post
 ---
 
-<p><strong><font size="10">JSM 2018 Invited Session Proposals Sought - Section on Statistics in Marketing
+<p><strong><font size="6">JSM 2018 Invited Session Proposals Sought - Section on Statistics in Marketing
 </font></strong></p>
 
  
