@@ -13,7 +13,7 @@ Section on Statistics in Marketing is soliciting proposals for invited sessions.
 (1) 2–3 speakers with a discussant;  
 (2) A panel discussion of 3–5 panelists
 
-Please reference the call for invited sessions published in Amstat News: http://magazine.amstat.org/blog/2017/07/01/jsm2018proposals/.  The online submission process is open on **Tuesday, July 18, 2017, and will close on Wednesday, September 6, 2017 (11:59 p.m. EST)**.
+Please reference the call for invited sessions published in [Amstat News](http://magazine.amstat.org/blog/2017/07/01/jsm2018proposals/).  The online submission process is open on **Tuesday, July 18, 2017, and will close on Wednesday, September 6, 2017 (11:59 p.m. EST)**.
  
 If you have an idea, feel free to contact me at hui.lin@pioneer.com, and we can coordinate a possible submission. I look forward to hearing from you soon.
  
