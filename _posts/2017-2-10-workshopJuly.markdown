@@ -65,8 +65,6 @@ About the speaker:
 </p>
 
 
-**Dan McCarthy**, fifth year Ph.D. candidate in the Statistics Department at the Wharton School of the University of 
-Pennsylvania, and resident data scientist for the Wharton Customer Analytics Initiative. His research specialty 
-is the application of leading-edge statistical methodology to contemporary empirical marketing problems. 
-His research interests include customer lifetime value (CLV), Bayesian computation, missing data problems, 
-the marketing/finance interface, digital marketing analytics, and online advertising.
+**Dan McCarthy**
+
+Dan will be an Assistant Professor of Marketing at Emory's Goizueta School of Business in Fall 2017. He completed his PhD in Statistics at the Wharton School of the University of Pennsylvania. Dan's research interests include customer lifetime value (CLV), Bayesian computation, the marketing/finance interface, customer-based corporate valuation, and digital marketing analytics. His research has been published in the Journal of Marketing, the Journal of the American Statistical Association: Theory and Methods, Statistica Sinica, and the Annals of Applied Statistics. Dan's work has also been featured in media outlets such as the Wall Street Journal, Barron's, CBS, Slate, and Fortune. Dan is also Co-Founder and Chief Statistician of Zodiac, a predictive analytics firm. 
