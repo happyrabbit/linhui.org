@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2017-07-12">
+<meta name="date" content="2017-07-18">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -255,9 +255,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="6.3.2" data-path="data-wrangling.html"><a href="data-wrangling.html#tidyr-package"><i class="fa fa-check"></i><b>6.3.2</b> <code>tidyr</code> package</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="7" data-path="model-error.html"><a href="model-error.html"><i class="fa fa-check"></i><b>7</b> Model Error</a><ul>
-<li class="chapter" data-level="7.1" data-path="model-error.html"><a href="model-error.html#systematic-error-and-random-error"><i class="fa fa-check"></i><b>7.1</b> Systematic Error and Random Error</a><ul>
-<li class="chapter" data-level="7.1.1" data-path="model-error.html"><a href="model-error.html#measurement-error-in-the-response"><i class="fa fa-check"></i><b>7.1.1</b> Measurement Error in the Response</a></li>
+<li class="chapter" data-level="7" data-path="model-tuning-technique.html"><a href="model-tuning-technique.html"><i class="fa fa-check"></i><b>7</b> Model Tuning Technique</a><ul>
+<li class="chapter" data-level="7.1" data-path="model-tuning-technique.html"><a href="model-tuning-technique.html#systematic-error-and-random-error"><i class="fa fa-check"></i><b>7.1</b> Systematic Error and Random Error</a><ul>
+<li class="chapter" data-level="7.1.1" data-path="model-tuning-technique.html"><a href="model-tuning-technique.html#measurement-error-in-the-response"><i class="fa fa-check"></i><b>7.1.1</b> Measurement Error in the Response</a></li>
+<li class="chapter" data-level="7.1.2" data-path="model-tuning-technique.html"><a href="model-tuning-technique.html#measurement-error-in-the-independent-variables"><i class="fa fa-check"></i><b>7.1.2</b> Measurement Error in the Independent Variables</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="8" data-path="neural-network.html"><a href="neural-network.html"><i class="fa fa-check"></i><b>8</b> Neural Network</a><ul>
@@ -350,6 +351,161 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>It is highly recommended to store each step of the data and the R code, making the whole process as repeatable as possible. The R markdown reproducible report will be extremely helpful for that. If the data changes, it is easy to rerun the process. In the remainder of this chapter, we will show the most common data preprocessing methods.</p>
 <p>Load the R packages first:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">source</span>(<span class="st">&quot;https://raw.githubusercontent.com/happyrabbit/CE_JSM2017/master/Rcode/00-course-setup.R&quot;</span>)</code></pre></div>
+<pre><code>## Loading required package: plyr</code></pre>
+<pre><code>## 
+## Attaching package: &#39;plyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:plotly&#39;:
+## 
+##     arrange, mutate, rename, summarise</code></pre>
+<pre><code>## Loading required package: dplyr</code></pre>
+<pre><code>## 
+## Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:plyr&#39;:
+## 
+##     arrange, count, desc, failwith, id, mutate,
+##     rename, summarise, summarize</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     filter, lag</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     intersect, setdiff, setequal, union</code></pre>
+<pre><code>## Loading required package: caret</code></pre>
+<pre><code>## Loading required package: lattice</code></pre>
+<pre><code>## Loading required package: e1071</code></pre>
+<pre><code>## Loading required package: gridExtra</code></pre>
+<pre><code>## 
+## Attaching package: &#39;gridExtra&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     combine</code></pre>
+<pre><code>## Loading required package: imputeMissings</code></pre>
+<pre><code>## 
+## Attaching package: &#39;imputeMissings&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:e1071&#39;:
+## 
+##     impute</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     compute</code></pre>
+<pre><code>## Loading required package: RANN</code></pre>
+<pre><code>## Loading required package: corrplot</code></pre>
+<pre><code>## Loading required package: nnet</code></pre>
+<pre><code>## Loading required package: car</code></pre>
+<pre><code>## 
+## Attaching package: &#39;car&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     recode</code></pre>
+<pre><code>## Loading required package: gpairs</code></pre>
+<pre><code>## Loading required package: reshape2</code></pre>
+<pre><code>## Loading required package: psych</code></pre>
+<pre><code>## 
+## Attaching package: &#39;psych&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:car&#39;:
+## 
+##     logit</code></pre>
+<pre><code>## The following objects are masked from &#39;package:ggplot2&#39;:
+## 
+##     %+%, alpha</code></pre>
+<pre><code>## Loading required package: tidyr</code></pre>
+<pre><code>## 
+## Attaching package: &#39;tidyr&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:reshape2&#39;:
+## 
+##     smiths</code></pre>
+<pre><code>## Loading required package: sparklyr</code></pre>
+<pre><code>## 
+## Attaching package: &#39;sparklyr&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     top_n</code></pre>
+<pre><code>## Loading required package: mvtnorm</code></pre>
+<pre><code>## Loading required package: MASS</code></pre>
+<pre><code>## 
+## Attaching package: &#39;MASS&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     select</code></pre>
+<pre><code>## The following object is masked from &#39;package:plotly&#39;:
+## 
+##     select</code></pre>
+<pre><code>## Loading required package: data.table</code></pre>
+<pre><code>## data.table 1.9.6  For help type ?data.table or https://github.com/Rdatatable/data.table/wiki</code></pre>
+<pre><code>## The fastest way to learn (by data.table authors): https://www.datacamp.com/courses/data-analysis-the-data-table-way</code></pre>
+<pre><code>## 
+## Attaching package: &#39;data.table&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:reshape2&#39;:
+## 
+##     dcast, melt</code></pre>
+<pre><code>## The following objects are masked from &#39;package:dplyr&#39;:
+## 
+##     between, last</code></pre>
+<pre><code>## Loading required package: magrittr</code></pre>
+<pre><code>## 
+## Attaching package: &#39;magrittr&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:tidyr&#39;:
+## 
+##     extract</code></pre>
+<pre><code>## Loading required package: shiny</code></pre>
+<pre><code>## 
+## Attaching package: &#39;shiny&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:DT&#39;:
+## 
+##     dataTableOutput, renderDataTable</code></pre>
+<pre><code>## Loading required package: metricsgraphics</code></pre>
+<pre><code>## Loading required package: leaflet</code></pre>
+<pre><code>## Loading required package: dygraphs</code></pre>
+<pre><code>## Loading required package: xts</code></pre>
+<pre><code>## Loading required package: zoo</code></pre>
+<pre><code>## 
+## Attaching package: &#39;zoo&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     as.Date, as.Date.numeric</code></pre>
+<pre><code>## 
+## Attaching package: &#39;xts&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:data.table&#39;:
+## 
+##     last</code></pre>
+<pre><code>## The following objects are masked from &#39;package:dplyr&#39;:
+## 
+##     first, last</code></pre>
+<pre><code>## Loading required package: lubridate</code></pre>
+<pre><code>## 
+## Attaching package: &#39;lubridate&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:data.table&#39;:
+## 
+##     hour, mday, month, quarter, wday, week,
+##     yday, year</code></pre>
+<pre><code>## The following object is masked from &#39;package:plyr&#39;:
+## 
+##     here</code></pre>
+<pre><code>## The following object is masked from &#39;package:base&#39;:
+## 
+##     date</code></pre>
+<pre><code>## Loading required package: highcharter</code></pre>
+<pre><code>## Highcharts (www.highcharts.com) is a Highsoft software product which is</code></pre>
+<pre><code>## not free for commercial and Governmental use</code></pre>
+<pre><code>## Loading required package: rbokeh</code></pre>
+<pre><code>## Loading required package: networkD3</code></pre>
+<pre><code>## 
+## Attaching package: &#39;networkD3&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:highcharter&#39;:
+## 
+##     JS</code></pre>
+<pre><code>## The following object is masked from &#39;package:leaflet&#39;:
+## 
+##     JS</code></pre>
+<pre><code>## The following object is masked from &#39;package:metricsgraphics&#39;:
+## 
+##     JS</code></pre>
+<pre><code>## The following object is masked from &#39;package:DT&#39;:
+## 
+##     JS</code></pre>
+<pre><code>## Loading required package: threejs</code></pre>
+<pre><code>## Loading required package: knitr</code></pre>
+<pre><code>## Loading required package: formatR</code></pre>
 <div id="data-cleaning" class="section level2">
 <h2><span class="header-section-number">5.1</span> Data Cleaning</h2>
 <p>After you load the data, the first thing is to check how many variables are there, the type of variables, the distributions, and data errors. Let’s read and check the data:</p>
