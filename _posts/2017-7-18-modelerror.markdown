@@ -20,6 +20,6 @@ The model error consists of two parts:  (1) systematic error, it is the part of 
 
 We will delve deeper into model error and study the impact of measurement error in response variable and independent variables. 
 
-### [Systematic Error and Random Error](http://scientistcafe.com/post/ModelError.html)
-#### [Measurement Error in the Response](http://scientistcafe.com/post/ModelError.html#011_measurement_error_in_the_response)
-#### [Measurement Error in the Independent Variables](http://scientistcafe.com/post/ModelError.html#012_measurement_error_in_the_independent_variables)
+-  [Systematic Error and Random Error](http://scientistcafe.com/post/ModelError.html)
+    - [Measurement Error in the Response](http://scientistcafe.com/post/ModelError.html#011_measurement_error_in_the_response)
+    - [Measurement Error in the Independent Variables](http://scientistcafe.com/post/ModelError.html#012_measurement_error_in_the_independent_variables)
