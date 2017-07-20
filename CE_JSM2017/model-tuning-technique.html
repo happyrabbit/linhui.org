@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2017-07-19">
+<meta name="date" content="2017-07-20">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -362,12 +362,12 @@ dat=<span class="kw">data.frame</span>(x,fx)
 <span class="kw">ggplot</span>(dat,<span class="kw">aes</span>(x,fx))+<span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_point</span>() +
 <span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)</code></pre></div>
-<p><img src="CE_JSM2017_files/figure-html/unnamed-chunk-101-1.png" width="672" /></p>
+<p><img src="CE_JSM2017_files/figure-html/unnamed-chunk-100-1.png" width="672" /></p>
 <p>The estimated parameters will be different for the different training data. Intuitively, the estimated variance indicates that if we fit the same model with different data sets, how much the estimated results will change. Ideally, the change is small. For high variance models, small changes in the training data result in very different estimates. In general, a model with high flexibility also has high variance., such as the CART tree, and the initial boosting method. The Random Forest and Gradient Boosting Model aim to reduce the variance by summarizing the results obtained on different samples.</p>
 <p>The blue curve in the figure below is obtained by fitting the above nonlinear observations by a smoothing method, which is highly flexible and can fit the current data tightly:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(dat,<span class="kw">aes</span>(x,fx))+<span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)</code></pre></div>
 <pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
-<p><img src="CE_JSM2017_files/figure-html/unnamed-chunk-102-1.png" width="672" /></p>
+<p><img src="CE_JSM2017_files/figure-html/unnamed-chunk-101-1.png" width="672" /></p>
 <p>However, this method has a high variance, and if we simulate different subsets of the sample, the result curve will change significantly:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># set random seed</span>
 <span class="kw">set.seed</span>(<span class="dv">2016</span>)
@@ -393,7 +393,7 @@ p4=<span class="kw">ggplot</span>(dat4,<span class="kw">aes</span>(x4,fx4))+<spa
 ## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;
 ## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;
 ## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
-<p><img src="CE_JSM2017_files/figure-html/unnamed-chunk-103-1.png" width="672" /></p>
+<p><img src="CE_JSM2017_files/figure-html/unnamed-chunk-102-1.png" width="672" /></p>
 <p>Fitting the linear model using the same four subsets, the result barely changes:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p1=<span class="kw">ggplot</span>(dat1,<span class="kw">aes</span>(x1,fx1))+<span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_point</span>() +
@@ -408,7 +408,7 @@ p4=<span class="kw">ggplot</span>(dat4,<span class="kw">aes</span>(x4,fx4))+<spa
 <span class="st">  </span><span class="kw">geom_point</span>() +
 <span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)
 <span class="kw">multiplot</span>(p1,p2,p3,p4,<span class="dt">cols=</span><span class="dv">2</span>)</code></pre></div>
-<p><img src="CE_JSM2017_files/figure-html/unnamed-chunk-104-1.png" width="672" /></p>
+<p><img src="CE_JSM2017_files/figure-html/unnamed-chunk-103-1.png" width="672" /></p>
 <p>In general, the variance (<span class="math inline">\(Var(\hat{f}(\mathbf{X}))\)</span>) <strong>increases</strong> and the bias (<span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span>) <strong>decreases</strong> as the model flexibility increases. Variance and bias together determine the systematic error (or mean square error, MSE). As we increase the flexibility of the model, at first the rate at which <span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span> decreases is faster than <span class="math inline">\(Var (\hat{f} (\mathbf{X}))\)</span>, so the MSE decreases. However, to some degree, higher flexibility has little effect on <span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span> but <span class="math inline">\(Var (\hat{f} (\mathbf{X}))\)</span> increases significantly, so the MSE increases.</p>
 <div id="measurement-error-in-the-response" class="section level3">
 <h3><span class="header-section-number">7.1.1</span> Measurement Error in the Response</h3>
@@ -523,8 +523,23 @@ Figure 7.2: Test set <span class="math inline">\(R^2\)</span> profiles for incom
 <div id="data-splitting-and-resampling" class="section level2">
 <h2><span class="header-section-number">7.2</span> Data Splitting and Resampling</h2>
 <p>Those highly adaptable models can model complex relationships. However, they tend to overfit which leads to the poor prediction by learning too much from the data. It means that the model is very sensitive to the exact sample used to fit it. When future data is not exactly like the past data, the model prediction may have large mistakes. A simple model like ordinary linear regression tends instead to underfit which leads to the poor prediction by learning too little from the data. It systematically over-predicts or under-predicts the data regardless of how well future data resemble past data. Without evaluating models, the modeler will not know about the problem until the future samples come. Data splitting and resampling are fundamental techniques to build sound models for prediction.</p>
-<p><em>Data splitting</em> is to put part of the data aside as testing set and use the rest for model training. Many models have parameters which cannot be directly estimated from the data, such as <span class="math inline">\(\lambda\)</span> in the lasso, the number of trees in the random forest. This type of model parameter is called <em>tuning parameter</em> and there is no analytical formula available to calculate the optimizing value. Tuning parameters often control the complexity of the model. Poor choice for the values can result in over-fitting or under-fitting. A standard approach to estimate tuning parameters is through cross-validation.</p>
-<p><em>Data resampling</em> involves repeated sampling from the training set and fitting the model on each sample to study model variance. Suppose we want to know the variability of a model’s <span class="math inline">\(R^2\)</span> (you can also use other metrics), you can repeatedly extract different samples and then fit the linear model, check how <span class="math inline">\(R^2\)</span> changes.</p>
+<p><em>Data splitting</em> is to put part of the data aside as testing set (or Hold-outs) and use the rest for model training. Many models have parameters which cannot be directly estimated from the data, such as <span class="math inline">\(\lambda\)</span> in the lasso (penalty parameter), the number of trees in the random forest. This type of model parameter is called tuning parameter, and there is no analytical formula available to calculate the optimizing value. Tuning parameters often control the complexity of the model. Poor choice for the values can result in over-fitting or under-fitting. A standard approach to estimate tuning parameters is through cross-validation which is a data resampling approach.</p>
+<p>Instead of evaluating model on a single test set, more often, people will resample the training set. <em>Data resampling</em> operates similarly: use a subset of samples to fit a model and use the rest to evaluate model performance. This process will repeat multiple times to get a performance profile. In that sense, resampling is based on splitting. The general steps are:</p>
+<ul>
+<li>Define a set of candidate values for tuning parameter(s)
+<ul>
+<li>For each candidate value in the set
+<ul>
+<li>Resample data</li>
+<li>Fit model</li>
+<li>Predict hold-out</li>
+<li>Calculate performance</li>
+</ul></li>
+</ul></li>
+<li>Aggregate the results</li>
+<li>Determine the final tuning parameter</li>
+<li>Refit the model with the entire training set</li>
+</ul>
 
 </div>
 </div>
