@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2017-07-18">
+<meta name="date" content="2017-07-19">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -260,6 +260,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="7.1.1" data-path="model-tuning-technique.html"><a href="model-tuning-technique.html#measurement-error-in-the-response"><i class="fa fa-check"></i><b>7.1.1</b> Measurement Error in the Response</a></li>
 <li class="chapter" data-level="7.1.2" data-path="model-tuning-technique.html"><a href="model-tuning-technique.html#measurement-error-in-the-independent-variables"><i class="fa fa-check"></i><b>7.1.2</b> Measurement Error in the Independent Variables</a></li>
 </ul></li>
+<li class="chapter" data-level="7.2" data-path="model-tuning-technique.html"><a href="model-tuning-technique.html#data-splitting-and-resampling"><i class="fa fa-check"></i><b>7.2</b> Data Splitting and Resampling</a></li>
 </ul></li>
 <li class="chapter" data-level="8" data-path="neural-network.html"><a href="neural-network.html"><i class="fa fa-check"></i><b>8</b> Neural Network</a><ul>
 <li class="chapter" data-level="8.1" data-path="neural-network.html"><a href="neural-network.html#projection-pursuit-regression"><i class="fa fa-check"></i><b>8.1</b> Projection Pursuit Regression</a></li>
@@ -347,7 +348,7 @@ E[f(\mathbf{X})-\hat{f}(\mathbf{X})]^{2} &amp; = &amp; E\left(f(\mathbf{X})-E[\h
  &amp; = &amp; [Bias(\hat{f}(\mathbf{X}))]^{2}+Var(\hat{f}(\mathbf{X}))
 \end{array}
 \]</span></p>
-<p>The systematic error consists of two parts, $ Bias(())$ and <span class="math inline">\(Var (\hat{f} (\mathbf{X}))\)</span>. To minimize the systematic error, we need to minimize the bias and variance. The bias represents the error caused by the approximation of the reality of the model, which may be very complex. For example, linear regression assumes that there is a linear relationship between the independent variable and the response, but the perfect linear relationship in real life is not common. The relationship between x and fx in the following figure is non-linear. Therefore, despite a large sample size, linear regression can not give the accurate prediction. In other words, in this case, the prediction of the linear regression model has a high bias.</p>
+<p>The systematic error consists of two parts, <span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span> and <span class="math inline">\(Var (\hat{f}(\mathbf{X}))\)</span>. To minimize the systematic error, we need to minimize the bias and variance. The bias represents the error caused by the approximation of the reality of the model, which may be very complex. For example, linear regression assumes that there is a linear relationship between the independent variable and the response, but the perfect linear relationship in real life is not common. The relationship between x and fx in the following figure is non-linear. Therefore, despite a large sample size, linear regression can not give the accurate prediction. In other words, in this case, the prediction of the linear regression model has a high bias.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(grid)
 <span class="kw">library</span>(lattice)
 <span class="kw">library</span>(ggplot2)
@@ -516,10 +517,15 @@ noise[i,]&lt;-<span class="kw">rnorm</span>(<span class="dv">7</span>,<span clas
 Figure 7.2: Test set <span class="math inline">\(R^2\)</span> profiles for income models when noise in <code>online_exp</code> increases. <code>rsq_linear</code> is linear regression, <code>rsq_pls</code> is Partial Least Square, <code>rsq_mars</code> is Multiple Adaptive Regression Spline Regression, <code>rsq_svm</code> is Support Vector Machine，<code>rsq_rf</code> is Random Forest
 </p>
 </div>
-<p>Comparing figure <a href="model-tuning-technique.html#fig:errorvariable">7.2</a> and figure <a href="model-tuning-technique.html#fig:error">7.1</a>, the influence of the two types of error is very different. Error in</p>
-<p>The error in response can not be overcome for any model but it is not the case for the independent variables. Imagine an extreme case, if <code>online_exp</code> is completely random, that is, no information in it, the impact on the performance of random forest and support vector machine is marginal. Linear regression and PLS still perform similarly. With the increase of noise, the performance starts to decline faster. After a certain extent, it becomes steady. In general, if an independent variable contains error, other variables associated with it can compensate to some extent.</p>
-
+<p>Comparing figure <a href="model-tuning-technique.html#fig:errorvariable">7.2</a> and figure <a href="model-tuning-technique.html#fig:error">7.1</a>, the influence of the two types of error is very different. The error in response can not be overcome for any model but it is not the case for the independent variables. Imagine an extreme case, if <code>online_exp</code> is completely random, that is, no information in it, the impact on the performance of random forest and support vector machine is marginal. Linear regression and PLS still perform similarly. With the increase of noise, the performance starts to decline faster. After a certain extent, it becomes steady. In general, if an independent variable contains error, other variables associated with it can compensate to some extent.</p>
 </div>
+</div>
+<div id="data-splitting-and-resampling" class="section level2">
+<h2><span class="header-section-number">7.2</span> Data Splitting and Resampling</h2>
+<p>Those highly adaptable models can model complex relationships. However, they tend to overfit which leads to the poor prediction by learning too much from the data. It means that the model is very sensitive to the exact sample used to fit it. When future data is not exactly like the past data, the model prediction may have large mistakes. A simple model like ordinary linear regression tends instead to underfit which leads to the poor prediction by learning too little from the data. It systematically over-predicts or under-predicts the data regardless of how well future data resemble past data. Without evaluating models, the modeler will not know about the problem until the future samples come. Data splitting and resampling are fundamental techniques to build sound models for prediction.</p>
+<p><em>Data splitting</em> is to put part of the data aside as testing set and use the rest for model training. Many models have parameters which cannot be directly estimated from the data, such as <span class="math inline">\(\lambda\)</span> in the lasso, the number of trees in the random forest. This type of model parameter is called <em>tuning parameter</em> and there is no analytical formula available to calculate the optimizing value. Tuning parameters often control the complexity of the model. Poor choice for the values can result in over-fitting or under-fitting. A standard approach to estimate tuning parameters is through cross-validation.</p>
+<p><em>Data resampling</em> involves repeated sampling from the training set and fitting the model on each sample to study model variance. Suppose we want to know the variability of a model’s <span class="math inline">\(R^2\)</span> (you can also use other metrics), you can repeatedly extract different samples and then fit the linear model, check how <span class="math inline">\(R^2\)</span> changes.</p>
+
 </div>
 </div>
 <h3> References</h3>
