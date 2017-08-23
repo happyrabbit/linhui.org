@@ -66,6 +66,9 @@ About the speaker:
   <img src="http://scientistcafe.com/images/Andrey_Simonov.png" width="20%" />
 </p>
 
-**Andrey Simonov**, Ph.D. candidate in Quantitative Marketing at the University of Chicago Booth School of Business. 
-His research interests include Quantitative Marketing, Online Advertising, Media Economics, 
-Economics of Digitization, Applied Industrial Organization
+**Andrey Simonov**
+
+Andrey will be an Assistant Professor of Marketing at Columbia Business School in Fall 2017.
+ He completed his Ph.D. in Quantitative Marketing at Chicago Booth School of Business. 
+ His research interests include Quantitative Marketing, Online Advertising, Media Economics, 
+ Economics of Digitization, Applied Industrial Organization.
