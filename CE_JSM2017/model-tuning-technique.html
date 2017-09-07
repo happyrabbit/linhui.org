@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2017-08-19">
+<meta name="date" content="2017-09-07">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -555,8 +555,17 @@ Figure 8.2: Test set <span class="math inline">\(R^2\)</span> profiles for incom
 <div id="data-splitting-and-resampling" class="section level2">
 <h2><span class="header-section-number">8.2</span> Data Splitting and Resampling</h2>
 <p>Those highly adaptable models can model complex relationships. However, they tend to overfit which leads to the poor prediction by learning too much from the data. It means that the model is very sensitive to the exact sample used to fit it. When future data is not exactly like the past data, the model prediction may have large mistakes. A simple model like ordinary linear regression tends instead to underfit which leads to the poor prediction by learning too little from the data. It systematically over-predicts or under-predicts the data regardless of how well future data resemble past data. Without evaluating models, the modeler will not know about the problem until the future samples come. Data splitting and resampling are fundamental techniques to build sound models for prediction.</p>
-<p><em>Data splitting</em> is to put part of the data aside as testing set (or Hold-outs) and use the rest for model training. Many models have parameters which cannot be directly estimated from the data, such as <span class="math inline">\(\lambda\)</span> in the lasso (penalty parameter), the number of trees in the random forest. This type of model parameter is called tuning parameter, and there is no analytical formula available to calculate the optimizing value. Tuning parameters often control the complexity of the model. Poor choice for the values can result in over-fitting or under-fitting. A standard approach to estimate tuning parameters is through cross-validation which is a data resampling approach.</p>
-<p>Instead of evaluating model on a single test set, more often, people will resample the training set. <em>Data resampling</em> operates similarly: use a subset of samples to fit a model and use the rest to evaluate model performance. This process will repeat multiple times to get a performance profile. In that sense, resampling is based on splitting. The general steps are:</p>
+<p><em>Data splitting</em> is to put part of the data aside as testing set (or Hold-outs, out of bag samples) and use the rest for model training. Training samples are also called in-sample. Model performance metrics evaluated using in-sample are retrodictive not predictive.</p>
+<p>The traditional business intelligence usually handles data description. Answer simple questions by querying and summarizing the data, such as:</p>
+<ul>
+<li>What is the monthly sales of a product in 2015?</li>
+<li>What is the number of visits to our site in the past month?<br />
+</li>
+<li>What is the sales difference in 2015 for two different product designs?</li>
+</ul>
+<p>There is no need to go through the tedious process of splitting the data, tuning and testing model to answer questions of this kind. Instead, people usually use as complete data as possible and then sum or average the parts of interest.</p>
+<p>Many models have parameters which cannot be directly estimated from the data, such as <span class="math inline">\(\lambda\)</span> in the lasso (penalty parameter), the number of trees in the random forest. This type of model parameter is called tuning parameter, and there is no analytical formula available to calculate the optimizing value. Tuning parameters often control the complexity of the model. Poor choice for the values can result in over-fitting or under-fitting. A standard approach to estimate tuning parameters is through cross-validation which is a data resampling approach.</p>
+<p>Since to get reasonable precision of the performance values on a single test set, the size of the test set may need to be large. So more often, people will instead resample the training set. <em>Data resampling</em> operates similarly: use a subset of samples to fit a model and use the rest to evaluate model performance. This process will repeat multiple times to get a performance profile. In that sense, resampling is based on splitting. The general steps are:</p>
 <ul>
 <li>Define a set of candidate values for tuning parameter(s)
 <ul>
@@ -576,6 +585,7 @@ Figure 8.2: Test set <span class="math inline">\(R^2\)</span> profiles for incom
 <img src="http://scientistcafe.com/book/Figure/ParameterTuningProcess.png" style="width:100.0%" />
 
 </div>
+<p>We have outlined above the general procedure to tune parameters. Now let’s focus on the critical part of the process: data splitting.</p>
 
 </div>
 </div>
