@@ -11,6 +11,10 @@ time: '12:30'
   <img src="http://scientistcafe.com/images/dataprotect.png"  width="80%" />
 </p>
 
+ASA Statistics on Marketing will hold monthly online workshop on topics at data science in marketing. 
+It will be online using Google Hangouts On Air. See information for our previous and 
+future workshops at: [http://scientistcafe.com/](http://scientistcafe.com/).  Welcome to join ASA Statistics in Marketing 
+[here](http://community.amstat.org/statisticsinmarketingsection/home).  
 
 We develop a flexible methodology to protect marketing data in the context of a business ecosystem in which data 
 providers seek to meet the information needs of data users, but wish to deter the invalid use of the data by 
