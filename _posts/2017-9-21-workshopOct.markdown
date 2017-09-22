@@ -8,7 +8,7 @@ time: '12:30'
 
 
 <p align="center">
-  <img src="http://scientistcafe.com/images/dataprotect.png"  width="80%" />
+  <img src="http://scientistcafe.com/images/CustomerSearch.png"  width="80%" />
 </p>
 
 ASA Statistics on Marketing will hold monthly online workshop on topics at data science in marketing. 
@@ -80,8 +80,8 @@ He received a B.Tech. degree in Computer Science and Engineering from the Indian
 and a Ph.D. degree in Marketing from the Wharton School of the University of Pennsylvania. 
 Prior to being at Columbia, he was on the faculty of the Tepper School of Business at Carnegie Mellon University.
 
-- Web: www.columbia.edu/~kj2323
-- SSRN: http://ssrn.com/author=589733
-- Google Scholar: http://bit.ly/1F2O95g
+- Web: [www.columbia.edu/~kj2323](www.columbia.edu/~kj2323)
+- SSRN: [http://ssrn.com/author=589733](http://ssrn.com/author=589733)
+- Google Scholar: [http://bit.ly/1F2O95g](http://bit.ly/1F2O95g)
 
 
