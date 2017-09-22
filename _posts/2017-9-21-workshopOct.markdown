@@ -1,10 +1,10 @@
 ---
-title: Data Science in Digital Marketing (Online Workshop)
+title: Customer Analytics in a Multichannel World (Online Workshop)
 layout: post
 time: '12:30'
 ---
 
-## Data Science in Digital Marketing: Customer's "path to purchase" in today’s omnichannel world
+## Customer Analytics in a Multichannel World 
 
 
 <p align="center">
@@ -16,14 +16,8 @@ It will be online using Google Hangouts On Air. See information for our previous
 future workshops at: [http://scientistcafe.com/](http://scientistcafe.com/).  Welcome to join ASA Statistics in Marketing 
 [here](http://community.amstat.org/statisticsinmarketingsection/home).  
 
-In today’s retailing environment, consumers and sellers interact through multiple channels 
-(e.g., online channels include email, search engines, banner ads, affiliate websites, 
-comparison shopping websites, etc.). It is critical for a seller to understand the roles played 
-by different touchpoints on a consumer’s “path to purchase.” 
+In today’s retailing environment, consumers and sellers interact through multiple channels (e.g., online channels include email, search engines, banner ads, affiliate websites, comparison shopping websites, etc.). It is critical for a seller to understand the roles played by different touchpoints on a consumer’s interactions with a firm. In this talk, Prof. Kinshuk Jerath will discuss some of his research on customer analytics in a multichannel world. The talk will include two papers: 
 
-In this talk, Prof. Kinshuk Jerath will discuss some of his research work on digital marketing:
-
-- Consumer Click Behavior at a Search Engine: The Role of Keyword Popularity
 - An Information Stock Model of Customer Behavior in Multichannel Customer Support Services
 - Multichannel Path-to-Purchase: Channels as “Engagers” and “Closers”
 
