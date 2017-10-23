@@ -61,21 +61,25 @@ In today’s retailing environment, consumers and sellers interact through multi
 About the speaker: 
 
 <p align="center">
-  <img src="http://scientistcafe.com/images/KinshukJerath.png" width="20%" />
+  <img src="http://scientistcafe.com/images/AnujKumar.png" width="20%" />
 </p>
 
 
-**Kinshuk Jerath** is Associate Professor of Marketing at Columbia Business School. 
-His research is in the area of technology-enabled marketing, primarily in online advertising, 
-online and offline retailing and customer management, 
-and he focuses on strategy development and measurement with data. 
-He has consulted for several Fortune 500 companies and has served as an expert in legal cases. 
-He received a B.Tech. degree in Computer Science and Engineering from the Indian Institute of Technology Bombay 
-and a Ph.D. degree in Marketing from the Wharton School of the University of Pennsylvania. 
-Prior to being at Columbia, he was on the faculty of the Tepper School of Business at Carnegie Mellon University.
+**Anuj Kumar** is an assistant Professor of Information Systems and Management at the Warrington College of Business,
+ University of Florida. He holds a PhD in Information Systems Management from Heinz School of Information Systems and Management, 
+ Carnegie Mellon University. He also holds a Bachelor’s degree in Mechanical Engineering and a Master’s degree in Thermal Engineering from Indian Institute of Technology, India, and a Master’s degree in management from Indian Institute of Management, India.
 
-- Web: [www.columbia.edu/~kj2323](www.columbia.edu/~kj2323)
-- SSRN: [http://ssrn.com/author=589733](http://ssrn.com/author=589733)
-- Google Scholar: [http://bit.ly/1F2O95g](http://bit.ly/1F2O95g)
+Professor Kumar research focuses on understanding how information technology affects the behavior of organizations, 
+individuals, and the interactions between them. Specifically, his research has examined the role of information technology 
+in three areas – (1) How customers use technology mediated channels with traditional channels in multichannel sales and after sales 
+services settings, such as retail of traditional goods (apparel and home goods), digital goods (digital movies and music), and after 
+sales services in insurance sector. (2) How online product recommendation network affects customers demand. (3) How technology can be
+ utilized to remedy societal problems, such as remedying education with the use of personalization technologies. To answer these questions,
+  Professor Kumar has designed natural, quasi-natural, and large scale randomized experiments in real-life field settings. 
+  Professor Kumar has published his research in top tier journals like Management Science, Information Systems Research, 
+  Manufacturing & Service Operations Management, and Management Information Systems Quarterly.
+
+- Web: [akumar1@ufl.edu](akumar1@ufl.edu)
+- SSRN: [https://site.warrington.ufl.edu/kumar/](https://site.warrington.ufl.edu/kumar/)
 
 
