@@ -124,7 +124,17 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="2.3.1" data-path="working-with-unix.html"><a href="working-with-unix.html#regular-expressions"><i class="fa fa-check"></i><b>2.3.1</b> Regular Expressions</a></li>
 <li class="chapter" data-level="2.3.2" data-path="working-with-unix.html"><a href="working-with-unix.html#metacharacters"><i class="fa fa-check"></i><b>2.3.2</b> Metacharacters</a></li>
 <li class="chapter" data-level="2.3.3" data-path="working-with-unix.html"><a href="working-with-unix.html#character-sets"><i class="fa fa-check"></i><b>2.3.3</b> Character Sets</a></li>
+<li class="chapter" data-level="2.3.4" data-path="working-with-unix.html"><a href="working-with-unix.html#escaping-anchors-odds-and-ends"><i class="fa fa-check"></i><b>2.3.4</b> Escaping, Anchors, Odds and Ends</a></li>
+<li class="chapter" data-level="2.3.5" data-path="working-with-unix.html"><a href="working-with-unix.html#find"><i class="fa fa-check"></i><b>2.3.5</b> Find</a></li>
+<li class="chapter" data-level="2.3.6" data-path="working-with-unix.html"><a href="working-with-unix.html#summary-2"><i class="fa fa-check"></i><b>2.3.6</b> Summary</a></li>
 </ul></li>
+<li class="chapter" data-level="2.4" data-path="working-with-unix.html"><a href="working-with-unix.html#configure"><i class="fa fa-check"></i><b>2.4</b> Configure</a><ul>
+<li class="chapter" data-level="2.4.1" data-path="working-with-unix.html"><a href="working-with-unix.html#history"><i class="fa fa-check"></i><b>2.4.1</b> History</a></li>
+<li class="chapter" data-level="2.4.2" data-path="working-with-unix.html"><a href="working-with-unix.html#customizing-bash"><i class="fa fa-check"></i><b>2.4.2</b> Customizing Bash</a></li>
+</ul></li>
+<li class="chapter" data-level="2.5" data-path="working-with-unix.html"><a href="working-with-unix.html#differentiate"><i class="fa fa-check"></i><b>2.5</b> Differentiate</a></li>
+<li class="chapter" data-level="2.6" data-path="working-with-unix.html"><a href="working-with-unix.html#pipes"><i class="fa fa-check"></i><b>2.6</b> Pipes</a></li>
+<li class="chapter" data-level="2.7" data-path="working-with-unix.html"><a href="working-with-unix.html#make"><i class="fa fa-check"></i><b>2.7</b> Make</a></li>
 </ul></li>
 </ul>
 
@@ -360,8 +370,123 @@ Mach-O(5)                - Mach-O assembler and link editor output</code></pre>
 ## rhythms
 ## tragedy + time = humor
 ## http://www.jhsph.edu/</code></pre>
-
 </div>
+<div id="escaping-anchors-odds-and-ends" class="section level3">
+<h3><span class="header-section-number">2.3.4</span> Escaping, Anchors, Odds and Ends</h3>
+<p>How to search for certain punctuation marks in text considering that those same symbols are used as metacharacters? For example, how would you find a plus sign (<code>+</code>) in a line of text since the plus sign is also a metacharacter? The answer is simply using a backslash (<code>\</code>) before the plus sign in a regex, in order to “escape” the metacharacter functionality. Here are a few examples:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">egrep</span> <span class="st">&quot;\+&quot;</span> small.txt</code></pre></div>
+<pre class="pre"><code>## tragedy + time = humor</code></pre>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">egrep</span> <span class="st">&quot;\.&quot;</span> small.txt</code></pre></div>
+<pre class="pre"><code>## http://www.jhsph.edu/</code></pre>
+<p>There are three more metacharacters that we should discuss, and two of them come as a pair:</p>
+<ul>
+<li>caret (<code>^</code>), which represents the start of a line</li>
+<li>dollar sign (<code>$</code>) which represents the end of line</li>
+</ul>
+<blockquote>
+<p>These “anchor characters” only match the beginning and ends of lines when coupled with other regular expressions.</p>
+</blockquote>
+<p>The following command will search for all strings that begin with “A” :</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">egrep</span> <span class="st">&quot;^A&quot;</span> small.txt</code></pre></div>
+<pre class="pre"><code>## ABCDEFGHIJKLMNOPQRSTUVWXYZ</code></pre>
+<p>There’s a mnemonic for remembering which metacharacter to use for each anchor:</p>
+<blockquote>
+<p>“First you get the power, then you get the money.”</p>
+</blockquote>
+<ul>
+<li><strong>pipe character “<code>|</code>”</strong></li>
+</ul>
+<p>Now let’s talk about “or” metacharacter (<code>|</code>), which is also called the “<strong>pipe</strong>” character. This metacharacter allows you to match <strong>either</strong> the regex on the right or on the left side of the pipe. Let’s take a look at a small example:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">egrep</span> <span class="st">&quot;A|bc&quot;</span> small.txt</code></pre></div>
+<pre class="pre"><code>## abcdefghijklmnopqrstuvwxyz
+## ABCDEFGHIJKLMNOPQRSTUVWXYZ
+## abc</code></pre>
+<p>You can also use multiple pipe characters to, for example, search for lines that contain the words for all of the cardinal directions:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">egrep</span> <span class="st">&quot;North|South|East|West&quot;</span> states.txt</code></pre></div>
+<pre class="pre"><code>## North Carolina
+## North Dakota
+## South Carolina
+## South Dakota
+## West Virginia</code></pre>
+<p>Just two more notes on <code>grep</code>: you can display the line number that a match occurs on using the <code>-n</code> flag:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">egrep</span> -n <span class="st">&quot;t$&quot;</span> states.txt</code></pre></div>
+<pre class="pre"><code>## 7:Connecticut
+## 45:Vermont</code></pre>
+<p>And you can also grep multiple files at once by providing multiple file arguments:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">egrep</span> <span class="st">&quot;New&quot;</span> states.txt canada.txt</code></pre></div>
+<pre class="pre"><code>## states.txt:New Hampshire
+## states.txt:New Jersey
+## states.txt:New Mexico
+## states.txt:New York
+## canada.txt:Newfoundland and Labrador
+## canada.txt:New Brunswick</code></pre>
+<p>If you wanted to search for all strings that begin with a vowel and end with character {a, b, c}:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">egrep</span> <span class="st">&quot;^[aeiou]{1}.+[a-c]{1}$&quot;</span> small.txt</code></pre></div>
+<pre class="pre"><code>## aa bb cc
+## abc</code></pre>
+<p>** Table of Metacharacters**</p>
+<p>Metacharacter | Meaning |<br />
+— |: — |<br />
+. | Any Character |<br />
+| A Word |<br />
+| Not a Word |<br />
+| A Digit |<br />
+| Not a Digit |<br />
+| Whitespace |<br />
+| Not Whitespace |<br />
+[def] | A Set of Characters |<br />
+[^def] | Negation of Set |<br />
+[e-q] | A Range of Characters |<br />
+^ | Beginning of String |<br />
+$ | End of String |<br />
+| Newline |<br />
++ | One or More of Previous |<br />
+* | Zero or More of Previous |<br />
+? | Zero or One of Previous |<br />
+| | Either the Previous or the Following |<br />
+{6} | Exactly 6 of Previous |<br />
+{4, 6} | Between 4 and 6 or Previous |<br />
+{4, } | More than 4 of Previous |</p>
+<p>If you want to experiment with writing regular expressions before you use them I highly recommend playing around with <a href="http://regexr.com/" class="uri">http://regexr.com/</a>.</p>
+</div>
+<div id="find" class="section level3">
+<h3><span class="header-section-number">2.3.5</span> Find</h3>
+<p>If you want to find the location of a file or the location of a group of files you can use the <code>find</code> command. This command has a specific structure where the first argument is the directory where you want to begin the search, and all directories contained within that directory will also be searched. The first argument is then followed by a flag that describes the method you want to use to search. In this case we’ll only be searching for a file by its name, so we’ll use the <code>-name</code> flag. The <code>-name</code> flag itself then takes an argument, the name of the file that you’re looking for. Let’s go back to the home directory and look for some files from there:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">find</span> . -name <span class="st">&quot;small.txt&quot;</span></code></pre></div>
+<pre class="pre"><code>## ./Documents/GitHub/Unix/files/small.txt</code></pre>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">find</span> ./Documents -name <span class="st">&quot;*loop.sh&quot;</span></code></pre></div>
+<pre class="pre"><code>## ./Documents/GitHub/Unix/files/foreverloop.sh
+## ./Documents/GitHub/Unix/files/whileloop.sh
+## ./Documents/GitHub/Unix/files/forloop.sh
+## ./Documents/GitHub/Unix/files/ifloop.sh</code></pre>
+</div>
+<div id="summary-2" class="section level3">
+<h3><span class="header-section-number">2.3.6</span> Summary</h3>
+<ul>
+<li><code>grep</code> and <code>egrep</code> can be used along with regular expressions to search for patterns of text in a file.</li>
+<li>Metacharacters are used in regular expressions to describe patterns of characters.</li>
+<li><code>find</code> can be used to search for the names of files in a directory.</li>
+</ul>
+</div>
+</div>
+<div id="configure" class="section level2">
+<h2><span class="header-section-number">2.4</span> Configure</h2>
+<div id="history" class="section level3">
+<h3><span class="header-section-number">2.4.1</span> History</h3>
+</div>
+<div id="customizing-bash" class="section level3">
+<h3><span class="header-section-number">2.4.2</span> Customizing Bash</h3>
+</div>
+</div>
+<div id="differentiate" class="section level2">
+<h2><span class="header-section-number">2.5</span> Differentiate</h2>
+</div>
+<div id="pipes" class="section level2">
+<h2><span class="header-section-number">2.6</span> Pipes</h2>
+</div>
+<div id="make" class="section level2">
+<h2><span class="header-section-number">2.7</span> Make</h2>
+
 </div>
 </div>
             </section>
