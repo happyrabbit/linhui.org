@@ -131,9 +131,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="2.4" data-path="working-with-unix.html"><a href="working-with-unix.html#configure"><i class="fa fa-check"></i><b>2.4</b> Configure</a><ul>
 <li class="chapter" data-level="2.4.1" data-path="working-with-unix.html"><a href="working-with-unix.html#history"><i class="fa fa-check"></i><b>2.4.1</b> History</a></li>
 <li class="chapter" data-level="2.4.2" data-path="working-with-unix.html"><a href="working-with-unix.html#customizing-bash"><i class="fa fa-check"></i><b>2.4.2</b> Customizing Bash</a></li>
+<li class="chapter" data-level="2.4.3" data-path="working-with-unix.html"><a href="working-with-unix.html#summary-3"><i class="fa fa-check"></i><b>2.4.3</b> Summary</a></li>
 </ul></li>
 <li class="chapter" data-level="2.5" data-path="working-with-unix.html"><a href="working-with-unix.html#differentiate"><i class="fa fa-check"></i><b>2.5</b> Differentiate</a><ul>
-<li class="chapter" data-level="2.5.1" data-path="working-with-unix.html"><a href="working-with-unix.html#summary-3"><i class="fa fa-check"></i><b>2.5.1</b> Summary</a></li>
+<li class="chapter" data-level="2.5.1" data-path="working-with-unix.html"><a href="working-with-unix.html#summary-4"><i class="fa fa-check"></i><b>2.5.1</b> Summary</a></li>
 </ul></li>
 <li class="chapter" data-level="2.6" data-path="working-with-unix.html"><a href="working-with-unix.html#pipes"><i class="fa fa-check"></i><b>2.6</b> Pipes</a></li>
 <li class="chapter" data-level="2.7" data-path="working-with-unix.html"><a href="working-with-unix.html#make"><i class="fa fa-check"></i><b>2.7</b> Make</a></li>
@@ -475,9 +476,35 @@ $ | End of String |<br />
 <h2><span class="header-section-number">2.4</span> Configure</h2>
 <div id="history" class="section level3">
 <h3><span class="header-section-number">2.4.1</span> History</h3>
+<p>Near the start of this book we discussed how you can browse the commands that you recently entered into the prompt using the Up and Down arrow keys. Bash keeps track of all of your recent commands, and you can browse your command history two different ways. The commands that we’ve used since opening our terminal can be accessed via the history command. Let’s try it out:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">history</span></code></pre></div>
+<p>Whenever we close a terminal our recent commands are written to the <code>~/.bash_history</code> file. Let’s a take a look at the beginning of this file:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">head</span> -n 5 ~/.bash_history</code></pre></div>
+<p>Searching your <code>~/.bash_history</code> file can be particularly useful if you’re trying to recall a command you’ve used in the past. The <code>~/.bash_history</code> file is just a regular text file, so you can search it with <code>grep</code>. Here’s a simple example:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">grep</span> <span class="st">&quot;canada&quot;</span> ~/.bash_history</code></pre></div>
+<pre class="pre"><code>## egrep &quot;New&quot; states.txt canada.txt</code></pre>
 </div>
 <div id="customizing-bash" class="section level3">
 <h3><span class="header-section-number">2.4.2</span> Customizing Bash</h3>
+<p>Besides <code>~/.bash_history</code>, another text file in our home directory that we should be aware of is <code>~/.bash_profile</code>. The <code>~/.bash_profile</code> is a list of Unix commands that are run every time we open our terminal, usually with a different command on every line. One of the most common commands used in a <code>~/.bash_profile</code> is the alias command, which creates a shorter name for a command. Let’s take a look at a <code>~/.bash_profile</code>:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">alias</span> docs=<span class="st">&#39;cd ~/Documents&#39;</span>
+<span class="kw">alias</span> edbp=<span class="st">&#39;nano ~/.bash_profile&#39;</span></code></pre></div>
+<p>The first alias creates a new command <code>docs</code>. Now entering <code>docs</code> into the command line is the equivalent of entering <code>cd ~/Documents</code> into the comamnd line. let’s edit our <code>~/.bash_profile</code> with <code>nano</code>. If there’s anything in your <code>~/.bash_profile</code> already then start adding lines at the end of the file. Add the line alias <code>docs='cd ~/Documents'</code>, then save the file and quit <code>nano</code>. In order to make the changes to our <code>~/.bash_profile</code> take effect we need to run <code>source ~/.bash_profile</code> in the console:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">source</span> ~/.bash_profile</code></pre></div>
+<p>Now let’s try using docs:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">docs</span>
+<span class="kw">pwd</span></code></pre></div>
+<pre class="pre"><code>## /Users/sean/Documents</code></pre>
+<p>It works! Setting different aliases allows you to save time if there are long commands that use often. In the example <code>~/.bash_profile</code> above, the second line, <code>alias edbp='nano ~/.bash_profile'</code> creates the command <code>edbp</code> (edit bash profile) so that you can quickly add aliases. Try adding it to your <code>~/.bash_profile</code> and take your new command for a spin!</p>
+<p>There are a few other details about the <code>~/.bash_profile</code> that are important when you’re writing software which we’ll discuss in the Bash Programming chapter.</p>
+</div>
+<div id="summary-3" class="section level3">
+<h3><span class="header-section-number">2.4.3</span> Summary</h3>
+<ul>
+<li><code>history</code> displays what commands we’ve entered into the console since opening our current terminal.</li>
+<li>The <code>~/.bash_history</code> file lists commands we’ve used in the past. <code>alias</code> creates a command that can be used as a substitute for a longer command that we use often.</li>
+<li>The <code>~/.bash_profile</code> is a text file that is run every time we start a shell, and it’s the best place to assign aliases.</li>
+</ul>
 </div>
 </div>
 <div id="differentiate" class="section level2">
@@ -516,7 +543,7 @@ $ | End of String |<br />
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">head</span> -n 5 small_copy.txt <span class="kw">&gt;</span> small_copy.txt
 <span class="kw">shasum</span> small_copy.txt</code></pre></div>
 <pre class="pre"><code>## da39a3ee5e6b4b0d3255bfef95601890afd80709  small_copy.txt</code></pre>
-<div id="summary-3" class="section level3">
+<div id="summary-4" class="section level3">
 <h3><span class="header-section-number">2.5.1</span> Summary</h3>
 <p>The <code>md5</code> and <code>shasum</code> commands use different algorithms to create codes (called hashes or checksums) that are unique to the contents of a file. These hashes can be used to ensure that a file is genuine.</p>
 </div>
