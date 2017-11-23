@@ -133,8 +133,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="2.4.2" data-path="working-with-unix.html"><a href="working-with-unix.html#customizing-bash"><i class="fa fa-check"></i><b>2.4.2</b> Customizing Bash</a></li>
 </ul></li>
 <li class="chapter" data-level="2.5" data-path="working-with-unix.html"><a href="working-with-unix.html#differentiate"><i class="fa fa-check"></i><b>2.5</b> Differentiate</a></li>
-<li class="chapter" data-level="2.6" data-path="working-with-unix.html"><a href="working-with-unix.html#pipes"><i class="fa fa-check"></i><b>2.6</b> Pipes</a></li>
-<li class="chapter" data-level="2.7" data-path="working-with-unix.html"><a href="working-with-unix.html#make"><i class="fa fa-check"></i><b>2.7</b> Make</a></li>
+<li class="chapter" data-level="2.6" data-path="working-with-unix.html"><a href="working-with-unix.html#summary-3"><i class="fa fa-check"></i><b>2.6</b> Summary</a></li>
+<li class="chapter" data-level="2.7" data-path="working-with-unix.html"><a href="working-with-unix.html#pipes"><i class="fa fa-check"></i><b>2.7</b> Pipes</a></li>
+<li class="chapter" data-level="2.8" data-path="working-with-unix.html"><a href="working-with-unix.html#make"><i class="fa fa-check"></i><b>2.8</b> Make</a></li>
 </ul></li>
 </ul>
 
@@ -480,14 +481,74 @@ $ | End of String |<br />
 </div>
 <div id="differentiate" class="section level2">
 <h2><span class="header-section-number">2.5</span> Differentiate</h2>
+<p>It’s important to be able to examine differences between files. First let’s make two small simple text files in the <code>Documents/GitHub/Unix/files/</code> directory.</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">cd</span> ./Documents/GitHub/Unix/files/
+<span class="kw">head</span> -n 4 small.txt <span class="kw">&gt;</span> four.txt
+<span class="kw">head</span> -n 6 small.txt <span class="kw">&gt;</span> six.txt</code></pre></div>
+<p>If we want to look at which lines in these files are different we can use the <code>diff</code> command:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">diff</span> four.txt six.txt</code></pre></div>
+<pre class="pre"><code>## 4a5,6
+## &gt; rhythms
+## &gt; xyz</code></pre>
+<p>Only the differing lines are printed to the console. We could also compare differing lines in a side-by-side comparison using <code>sdiff</code>:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">sdiff</span> four.txt six.txt</code></pre></div>
+<pre class="pre"><code>## abcdefghijklmnopqrstuvwxyz       abcdefghijklmnopqrstuvwxyz
+## ABCDEFGHIJKLMNOPQRSTUVWXYZ       ABCDEFGHIJKLMNOPQRSTUVWXYZ
+## 0123456789                       0123456789
+## aa bb cc                         aa bb cc
+##                                &gt; rhythms
+##                                &gt; xyz</code></pre>
+<p>In a common situation you might be sent a file, or you might download a file from the internet that comes with code known as a <code>checksum</code> or a <code>hash</code>. Hashing programs generate a unique code based on the contents of a file.<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> People distribute hashes with files so that we can be sure that the file we think we’ve downloaded is the genuine file. <strong>One way we can prevent malicious individuals from sending us harmful files is to check to make sure the computed hash matches the provided hash.</strong> There are a few commonly used file hashes but we’ll talk about two called <code>MD5</code> and <code>SHA-1</code>.</p>
+<p>Since <strong>hashes are generated based on file contents</strong>, then two identical files should have the same hash. Let’s test this my making a copy of states.txt.</p>
+<pre class="pre"><code>cp small.txt small_copy.txt</code></pre>
+<p>To compute the MD5 hash of a file we can use the <code>md5</code> command:</p>
+<pre>
+md5 small.txt
+MD5 (small.txt) = 45ea2935d11b9d6057b8c8f901a37822
+</pre>
+<pre>
+md5 small_copy.txt
+## MD5 (small_copy.txt) = 45ea2935d11b9d6057b8c8f901a37822
+</pre>
+<p>As we expected they’re the same! We can compute the SHA-1 hash using the <code>shasum</code> command:</p>
+<pre>
+shasum small.txt
+## 542a81f4556b79a0e1f8b6639657609437835fad  small.txtshasum states_copy.txt
+</pre>
+<pre>
+shasum small_copy.txt
+## 542a81f4556b79a0e1f8b6639657609437835fad  small_copy.txt
+</pre>
+<p>Once again, both copies produce the same hash. Let’s make a change to one of the files, just to illustrate the fact that the hash changes if file contents are different:</p>
+<pre>
+head -n 5 small_copy.txt > small_copy.txt
+shasum small_copy.txt
+## da39a3ee5e6b4b0d3255bfef95601890afd80709  small_copy.txt
+</pre>
+</div>
+<div id="summary-3" class="section level2">
+<h2><span class="header-section-number">2.6</span> Summary</h2>
+<p>The <code>md5</code> and <code>shasum</code> commands use different algorithms to create codes (called hashes or checksums) that are unique to the contents of a file. These hashes can be used to ensure that a file is genuine.</p>
 </div>
 <div id="pipes" class="section level2">
-<h2><span class="header-section-number">2.6</span> Pipes</h2>
+<h2><span class="header-section-number">2.7</span> Pipes</h2>
 </div>
 <div id="make" class="section level2">
-<h2><span class="header-section-number">2.7</span> Make</h2>
+<h2><span class="header-section-number">2.8</span> Make</h2>
 
 </div>
+</div>
+
+
+
+
+
+
+<div class="footnotes">
+<hr />
+<ol start="1">
+<li id="fn1"><p>Hashing is the transformation of a string of characters into a usually shorter fixed-length value or key that represents the original string. Hashing is used to index and retrieve items in a database because it is faster to find the item using the shorter hashed key than to find it using the original value.<a href="working-with-unix.html#fnref1">↩</a></p></li>
+</ol>
 </div>
             </section>
 
