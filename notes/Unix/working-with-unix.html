@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin">
 
 
-<meta name="date" content="2017-11-23">
+<meta name="date" content="2017-11-24">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -136,7 +136,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="2.5" data-path="working-with-unix.html"><a href="working-with-unix.html#differentiate"><i class="fa fa-check"></i><b>2.5</b> Differentiate</a><ul>
 <li class="chapter" data-level="2.5.1" data-path="working-with-unix.html"><a href="working-with-unix.html#summary-4"><i class="fa fa-check"></i><b>2.5.1</b> Summary</a></li>
 </ul></li>
-<li class="chapter" data-level="2.6" data-path="working-with-unix.html"><a href="working-with-unix.html#pipes"><i class="fa fa-check"></i><b>2.6</b> Pipes</a></li>
+<li class="chapter" data-level="2.6" data-path="working-with-unix.html"><a href="working-with-unix.html#pipes"><i class="fa fa-check"></i><b>2.6</b> Pipes</a><ul>
+<li class="chapter" data-level="2.6.1" data-path="working-with-unix.html"><a href="working-with-unix.html#summary-5"><i class="fa fa-check"></i><b>2.6.1</b> Summary</a></li>
+</ul></li>
 <li class="chapter" data-level="2.7" data-path="working-with-unix.html"><a href="working-with-unix.html#make"><i class="fa fa-check"></i><b>2.7</b> Make</a></li>
 </ul></li>
 </ul>
@@ -550,6 +552,51 @@ $ | End of String |<br />
 </div>
 <div id="pipes" class="section level2">
 <h2><span class="header-section-number">2.6</span> Pipes</h2>
+<p>Pipe (<code>|</code>) is one of the most powerful features of the command line. <strong>It allows us to take the output of a command, which would normally be printed to the console, and use it as the input to another command.</strong> It’s like fitting an actual pipe between the end of one program and connecting it to the beginning of another program! Let’s take a look at a basic example. We know the cat command takes the contents of a text file and prints it to the console:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">cd</span> Documents/GitHub/Unix/files/
+<span class="kw">cat</span> canada.txt</code></pre></div>
+<pre class="pre"><code>## Nunavut
+## Quebec
+## Northwest Territories
+## Ontario
+## British Columbia
+## Alberta
+## Saskatchewan
+## Manitoba
+## Yukon
+## Newfoundland and Labrador
+## New Brunswick
+## Nova Scotia
+## Prince Edward Island</code></pre>
+<p>This output from cat canada.txt will go into our pipe, and we will look at the first few lines of a file:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">cat</span> canada.txt <span class="kw">|</span> <span class="kw">head</span> -n 5</code></pre></div>
+<pre class="pre"><code>## Nunavut
+## Quebec
+## Northwest Territories
+## Ontario
+## British Columbia</code></pre>
+<p>Notice that this is the same result we would get from head -n 5 canada.txt, we just used cat to illustrate how the pipe works. The general syntax of the pipe is <code>[program that produces output] | [program uses pipe output as input instead of a file]</code>.</p>
+<p>A more common and useful example where we could use the pipe is answering the question: “How many US states end in a vowel?” We could use <code>grep</code> and regular expressions to list all of the state names that end with a vowel, then we could use <code>wc</code> to count all of the matching state names:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">grep</span> <span class="st">&quot;[aeiou]$&quot;</span> states.txt <span class="kw">|</span> <span class="kw">wc</span> -l</code></pre></div>
+<pre class="pre"><code>## 32</code></pre>
+<p>The pipe can also be used multiple times in one command in order to take the output from one piped command and use it as the input to yet another program! For example we could use three pipes with <code>ls</code>, <code>grep</code>, and <code>less</code> so that we could scroll through the files in the current directory that were created in October:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">ls</span> -al <span class="kw">|</span> <span class="kw">grep</span> <span class="st">&quot;Oct&quot;</span> <span class="kw">|</span> <span class="kw">less</span></code></pre></div>
+<pre class="pre"><code>## drwxr-xr-x   2 happyrabbit  staff    64 Oct 31 17:00 .ipynb_checkpoints
+## -rw-r--r--   1 happyrabbit  staff    74 Oct 29 16:28 four.txt
+## -rw-r--r--@  1 happyrabbit  staff   106 Oct 29 20:19 iago.txt
+## -rw-r--r--   1 happyrabbit  staff    82 Oct 29 22:39 math.sh
+## -rw-r--r--   1 happyrabbit  staff    86 Oct 29 16:28 six.txt
+## -rw-r--r--   1 happyrabbit  staff   149 Oct 28 07:46 small.txt
+## -rw-r--r--   1 happyrabbit  staff     0 Oct 29 16:54 small_copy.txt
+## -rw-r--r--@  1 happyrabbit  staff   472 Oct 13 18:19 states.txt
+## -rw-r--r--   1 happyrabbit  staff   944 Oct 29 20:32 states2.txt
+## -rw-r--r--   1 happyrabbit  staff     0 Oct 30 06:53 var_exe1.sh
+## -rw-r--r--   1 happyrabbit  staff   111 Oct 30 06:51 vars.sh</code></pre>
+<p>Remember you can use the <code>Q</code> key to quit <code>less</code> and return to the prompt.</p>
+<div id="summary-5" class="section level3">
+<h3><span class="header-section-number">2.6.1</span> Summary</h3>
+<p>The pipe (<code>|</code>) takes the output of the program on its left side and directs the output to be the input for the program on its right side.</p>
+</div>
 </div>
 <div id="make" class="section level2">
 <h2><span class="header-section-number">2.7</span> Make</h2>
