@@ -139,7 +139,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="2.6" data-path="working-with-unix.html"><a href="working-with-unix.html#pipes"><i class="fa fa-check"></i><b>2.6</b> Pipes</a><ul>
 <li class="chapter" data-level="2.6.1" data-path="working-with-unix.html"><a href="working-with-unix.html#summary-5"><i class="fa fa-check"></i><b>2.6.1</b> Summary</a></li>
 </ul></li>
-<li class="chapter" data-level="2.7" data-path="working-with-unix.html"><a href="working-with-unix.html#make"><i class="fa fa-check"></i><b>2.7</b> Make</a></li>
+<li class="chapter" data-level="2.7" data-path="working-with-unix.html"><a href="working-with-unix.html#make"><i class="fa fa-check"></i><b>2.7</b> Make</a><ul>
+<li class="chapter" data-level="2.7.1" data-path="working-with-unix.html"><a href="working-with-unix.html#summary-6"><i class="fa fa-check"></i><b>2.7.1</b> Summary</a></li>
+</ul></li>
 </ul></li>
 </ul>
 
@@ -600,7 +602,116 @@ $ | End of String |<br />
 </div>
 <div id="make" class="section level2">
 <h2><span class="header-section-number">2.7</span> Make</h2>
+<p>Once upon a time there were no web browsers, file browsers, start menus, or search bars. When somebody booted up a computer all they got was a shell prompt, and all of the work they did started from that prompt. Back then there was always the problem of how software should be installed. The <code>make</code> program is the best attempt at solving this problem and still in wide use today. The guiding design goal of <code>make</code> is that in order to install some new piece of software one would:</p>
+<ol style="list-style-type: decimal">
+<li>Download all of the files required for installation into a directory.</li>
+<li><code>cd</code> into that directory.</li>
+<li>Run <code>make</code>.</li>
+</ol>
+<p>This is accomplished by specifying a file called <code>makefile</code>, which <strong>describes the relationships between different files and programs</strong>. In addition to installing programs, <code>make</code> is also useful for creating documents automatically. Let’s build up a <code>makefile</code> that creates a <code>readme.txt</code> file which is automatically populated with some information about our current directory.</p>
+<p>Let’s start by creating a very basic <code>makefile</code> with <code>nano</code>:</p>
+<pre class="pre"><code>cd Documents/GitHub/Unix/Journal/
+nano makefile
+draft_journal_entry.txt:
+  touch draft_journal_entry.txt</code></pre>
+<p>The simple <code>makefile</code> above shows a rule that has the following general format:</p>
+<pre class="pre"><code>[target]: [dependencies...]
+  [commands...]</code></pre>
+<p>In the simple example, <code>draft_journal_entry.txt</code> is the target, a file which is created as the result of the command(s).</p>
+<p><strong>It’s very important to note that any commands under a target must be indented with a Tab. If we don’t use Tabs to indent the commands then <code>make</code> will fail. </strong></p>
+<p>Let’s save and close the <code>makefile</code>, then we can run the following in the console:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">ls</span></code></pre></div>
+<pre class="pre"><code>## makefile</code></pre>
+<p>Let’s use the <code>make</code> command with the target we want to be “made” as the only argument:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">make</span> draft_journal_entry.txt</code></pre></div>
+<pre class="pre"><code>## touch draft_journal_entry.txt</code></pre>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">ls</span></code></pre></div>
+<pre class="pre"><code>## draft_journal_entry.txt
+## makefile</code></pre>
+<p>The commands that are indented under our definition of the rule for the <code>draft_journal_entry.txt</code> target were executed, so now <code>draft_journal_entry.txt</code> exists! Let’s try running the same <code>make</code> command again:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">make</span> draft_journal_entry.txt</code></pre></div>
+<pre class="pre"><code>## make: &#39;draft_journal_entry.txt&#39; is up to date.</code></pre>
+<p>Since the target file already exists no action is taken, and instead we’re informed that the rule for <code>draft_journal_entry.txt</code> is “up to date” (there’s nothing to be done).</p>
+<p>If we look at the general rule format we previously sketched out, we can see that we didn’t specify any dependencies for this rule. A dependency is a file that the target depends on in order to be built. If a dependency has been updated since the last time <code>make</code> was run for a target then the target is not “up to date.” This means that the commands for that target will be run the next time <code>make</code> is run for that target. This way, the changes to the dependency are incorperated into the target. The commands are only run when the dependencies change, or when the target doesn’t exist at all, in order to avoid running commands unnecessarily.</p>
+<p>Let’s update our <code>makefile</code> to include a <code>readme.txt</code> that is built automatically. First, let’s add a table of contents for our journal:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">echo</span> <span class="st">&quot;1. 2017-06-15-In-Boston&quot;</span> <span class="kw">&gt;</span> toc.txt</code></pre></div>
+<p>Now let’s update our <code>makefile</code> with <code>nano</code> to automatically generate a <code>readme.txt</code>:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">nano</span> makefile</code></pre></div>
+<pre class="pre"><code>draft_journal_entry.txt:
+  touch draft_journal_entry.txt
 
+readme.txt: toc.txt
+  echo &quot;This journal contains the following number of entries:&quot; &gt; readme.txt
+  wc -l toc.txt | egrep -o &quot;[0-9]+&quot; &gt;&gt; readme.txt</code></pre>
+<p>Take note that the <code>-o</code> flag provided to <code>egrep</code> above extracts the regular expression match from the matching line, so that only the number of lines is appended to <code>readme.txt</code>. Now let’s run <code>make</code> with <code>readme.txt</code> as the target:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">make</span> readme.txt</code></pre></div>
+<pre class="pre"><code>## echo &quot;This journal contains the following number of entries:&quot; &gt; readme.txt
+## wc -l toc.txt | egrep -o &quot;[0-9]+&quot; &gt;&gt; readme.txt</code></pre>
+<p>Now let’s take a look at <code>readme.txt</code>:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">cat</span> readme.txt</code></pre></div>
+<pre class="pre"><code>## This journal contains the following number of entries:
+## 1</code></pre>
+<p>Looks like it worked! What do you think will happen if we run make <code>readme.txt</code> again?</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">make</span> readme.txt</code></pre></div>
+<pre class="pre"><code>## make: &#39;readme.txt&#39; is up to date.</code></pre>
+<p>You guessed it: nothing happened! Since the <code>readme.txt</code> file still exists and no changes were made to any of the dependencies for readme.txt (<code>toc.txt</code> is the only dependency) <code>make</code> doesn’t run the commands for the <code>readme.txt</code> rule. Now let’s modify <code>toc.txt</code> then we’ll try running <code>make</code> again.</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">echo</span> <span class="st">&quot;2. 2017-06-16-IQSS-Talk&quot;</span> <span class="kw">&gt;&gt;</span> toc.txt
+<span class="kw">make</span> readme.txt</code></pre></div>
+<pre class="pre"><code>## echo &quot;This journal contains the following number of entries:&quot; &gt; readme.txt
+## wc -l toc.txt | egrep -o &quot;[0-9]+&quot; &gt;&gt; readme.txt</code></pre>
+<p>Looks like it ran! Let’s check <code>readme.txt</code> to make sure.</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">cat</span> readme.txt</code></pre></div>
+<pre class="pre"><code>## This journal contains the following number of entries:
+## 2</code></pre>
+<p>It looks like make successfully updated <code>readme.txt</code>! With every change to <code>toc.txt</code>, running make <code>readme.txt</code> will programmatically update <code>readme.txt</code>.</p>
+<p>In order to simplify the <code>make</code> experience, we can create a rule at the top of our <code>makefile</code> called “<code>all</code>” where we can list all of the files that are built by the <code>makefile</code>. By adding the <code>all</code> target we can simply run <code>make</code> without any arguments in order to build all of the targets in the <code>makefile</code>. Let’s open up <code>nano</code> and add this rule:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">nano</span> makefile</code></pre></div>
+<pre class="pre"><code>all: draft_journal_entry.txt readme.txt
+draft_journal_entry.txt:
+  touch draft_journal_entry.txt
+  
+readme.txt: toc.txt
+  echo &quot;This journal contains the following number of entries:&quot; &gt; readme.txt
+  wc -l toc.txt | egrep -o &quot;[0-9]+&quot; &gt;&gt; readme.txt</code></pre>
+<p>While we have <code>nano</code> open let’s add another special rule at the end of our makefile called <code>clean</code> which destroys the files created by our makefile:</p>
+<pre class="pre"><code>all: draft_journal_entry.txt readme.txt
+draft_journal_entry.txt:
+  touch draft_journal_entry.txt
+  
+readme.txt: toc.txt
+  echo &quot;This journal contains the following number of entries:&quot; &gt; readme.txt
+  wc -l toc.txt | egrep -o &quot;[0-9]+&quot; &gt;&gt; readme.txt
+  
+clean:
+  rm draft_journal_entry.txt
+  rm readme.txt</code></pre>
+<p>Let’s save and close our <code>makefile</code> then let’s test it out.</p>
+<p>First let’s clean up our repository:</p>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">make</span> clean</code></pre></div>
+<pre class="pre"><code>## rm draft_journal_entry.txt
+## rm readme.txt</code></pre>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">ls</span></code></pre></div>
+<pre class="pre"><code>## makefile
+## toc.txt</code></pre>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">make</span></code></pre></div>
+<pre class="pre"><code>## touch draft_journal_entry.txt
+## echo &quot;This journal contains the following number of entries:&quot; &gt; readme.txt
+## wc -l toc.txt | egrep -o &quot;[0-9]+&quot; &gt;&gt; readme.txt</code></pre>
+<div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">ls</span></code></pre></div>
+<pre class="pre"><code>## draft_journal_entry.txt
+## readme.txt
+## makefile
+## toc.txt</code></pre>
+<p>Looks like our <code>makefile</code> works! The make command is extremely powerful, and this section is meant to just be an introduction. For more in-depth reading about make I recommend Karl Broman’s tutorial or Chase Lambert’s makefiletutorial.com.</p>
+<div id="summary-6" class="section level3">
+<h3><span class="header-section-number">2.7.1</span> Summary</h3>
+<ul>
+<li><code>make</code> is a tool for creating relationships between files and programs, so that files that depend on other files can be automatically rebuilt.</li>
+<li><code>makefiles</code> are text files that contain a list of rules.</li>
+<li>Rules are made up of targets (files to be built), commands (a list of bash commands that build the target), and dependencies (files that the target depends on to be built).</li>
+</ul>
+
+</div>
 </div>
 </div>
 
