@@ -108,6 +108,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="2.1" data-path="data-models-and-diagrams.html"><a href="data-models-and-diagrams.html#think-before-code"><i class="fa fa-check"></i><b>2.1</b> Think before code</a></li>
 <li class="chapter" data-level="2.2" data-path="data-models-and-diagrams.html"><a href="data-models-and-diagrams.html#what-is-data-model"><i class="fa fa-check"></i><b>2.2</b> What is data model?</a></li>
 <li class="chapter" data-level="2.3" data-path="data-models-and-diagrams.html"><a href="data-models-and-diagrams.html#retrive-data-with-select"><i class="fa fa-check"></i><b>2.3</b> Retrive data with <code>SELECT</code></a></li>
+<li class="chapter" data-level="2.4" data-path="data-models-and-diagrams.html"><a href="data-models-and-diagrams.html#create-table"><i class="fa fa-check"></i><b>2.4</b> Create table</a></li>
 </ul></li>
 </ul>
 
@@ -231,6 +232,61 @@ Toothbrush</code></pre>
 
 </div>
 <p>If you are using SQLite and understand it’s <code>LIMIT 5</code>. When switch over to a DB2 system, you can easily Google in terms of the syntax in DB2.</p>
+</div>
+<div id="create-table" class="section level2">
+<h2><span class="header-section-number">2.4</span> Create table</h2>
+<p>As a data scientist, you are always building models and making predictions. You may want to take those predictions that you create and write them back to a database. This ensures that someone else could then pick up those predictions and use them in a dashboard. Or you may want to create a dashboard or visualize it with another tool that can be hooked up and used with that database. It’s also helpful if you’re extracting data off the web or scraping it from somewhere and you want to store this data in a database. As we have previously discussed, the data scientist isn’t usually the one in charge of managing the entire database, that usually left to the DBA or some type of administrator. Even so, it’s helpful to have a basic understanding of how this works. You can use the statement <code>CREATE TABLE</code> to do this.</p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">CREATE</span> <span class="kw">TABLE</span> Shoes
+(
+<span class="kw">Id</span>     <span class="dt">char</span>(<span class="dv">10</span>)     <span class="kw">PRIMARY</span> <span class="kw">KEY</span>,
+Brand  <span class="dt">char</span>(<span class="dv">10</span>)     <span class="kw">NOT</span> <span class="kw">NULL</span>,
+<span class="kw">Types</span>  <span class="dt">char</span>(<span class="dv">250</span>)    <span class="kw">NOT</span> <span class="kw">NULL</span>,
+Color  <span class="dt">char</span>(<span class="dv">250</span>)    <span class="kw">NOT</span> <span class="kw">NULL</span>,
+Price  <span class="dt">decimal</span>(<span class="dv">8</span>,<span class="dv">2</span>) <span class="kw">NOT</span> <span class="kw">NULL</span>,
+Descp  <span class="dt">Varchar</span>(<span class="dv">750</span>) <span class="kw">NULL</span>
+);</code></pre></div>
+<p>In the above example, you create a table named “<code>Shoes</code>” by putting the name after <code>CREATE TABLE</code>. Then define the list of columns in the brackets. The first column is <code>Id</code>. It is a character with lenth 10. And the <code>Id</code> is going to be primary key. So you define data type (how many characters or decimals you allow to be inserted into this column), whether or not you allow null values. By default, it assumes that null values are accepted.</p>
+<p>The syntax for creating these tables varies greatly by relational database management system that you’re using. The above example exhibits the basic structure to create a table. However, it’s important to check the specifications and syntax of the relational database management system you’re using. An important thing to note when creating a table is to define whether a column can contain a null value or is a primary key. There are several things to pay special attention here:</p>
+<ol style="list-style-type: decimal">
+<li>Don’t confuse null value with empty string. Null value is the absence of everything, whereas empty string is a value there, such as space.</li>
+<li>A primary key cannot accept null values. The <code>Id</code> in the example can never have an empty value or not any value.</li>
+<li>If you indicate that a column cannot be null, then you will get an error if there is any missing value in that column.</li>
+</ol>
+<p>There are two ways to incert data to the table after defining the variables:</p>
+<ol style="list-style-type: decimal">
+<li>Use <code>INSERT INTO</code> statement</li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">INSERT</span> <span class="kw">INTO</span> Shoes
+<span class="kw">VALUES</span> ( <span class="st">&#39;14535974&#39;</span>,
+<span class="st">&#39;Gucci&#39;</span>,
+<span class="st">&#39;Slippers&#39;</span>,
+<span class="st">&#39;Pink&#39;</span>,
+<span class="st">&#39;695.00&#39;</span>,
+<span class="kw">NULL</span>
+);</code></pre></div>
+<p>The first method will take the first value indicated and put it in the first column; the second value will go to the second column, and so on and so forth. It works. However, a potential problem of this method is that you have no guarantee that data is going into the correct column. It is better to be more specific.</p>
+<ol start="2" style="list-style-type: decimal">
+<li>Use <code>INSERT INTO</code> and <code>VALUES</code></li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">INSERT</span> <span class="kw">INTO</span> Shoes
+(<span class="kw">Id</span>, 
+Brand,
+<span class="kw">Types</span>,
+Color,
+Price,
+Descp
+)
+<span class="kw">VALUES</span> 
+( 
+<span class="st">&#39;14535974&#39;</span>,
+<span class="st">&#39;Gucci&#39;</span>,
+<span class="st">&#39;Slippers&#39;</span>,
+<span class="st">&#39;Pink&#39;</span>,
+<span class="st">&#39;695.00&#39;</span>,
+<span class="kw">NULL</span>
+);</code></pre></div>
+<p>The second method also lists the columns. This can be really beneficial if you want to insert values into some columns but not all. I will recommend using this method. It’s a little safer because you have more control and know exactly which value is going and into which column.</p>
+<p>Now you have learned how to create tables using SQL. There’s another thing you can do with tables which is to create a temporary table.</p>
 
 </div>
 </div>
