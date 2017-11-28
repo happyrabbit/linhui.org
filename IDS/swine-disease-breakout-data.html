@@ -32,8 +32,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="about-the-authors.html">
-<link rel="next" href="the-art-of-data-science.html">
+<link rel="prev" href="customer-satisfaction-survey-data-from-airline-company.html">
+<link rel="next" href="data-pre-processing.html">
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
@@ -180,18 +180,134 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="acknowledgements" class="section level1 unnumbered">
-<h1>Acknowledgements</h1>
-<p>We want to give special thanks to Alex Shum and David Body for their editing and comments on the sections of this book.</p>
+<div id="swine-disease-breakout-data" class="section level2">
+<h2><span class="header-section-number">3.3</span> Swine Disease Breakout Data</h2>
+<p>In this section, we are going to simulate a data set about swine disease. We simulate 800 farms (i.e. n=800) and 120 survey questions (i.e. G=120) in each data set. There are three possible answers for each question. The outbreak status for the <span class="math inline">\(i^{th}\)</span> farm is generated from a <span class="math inline">\(Bernoulli(1, p_i)\)</span> distribution with <span class="math inline">\(p_i\)</span> being a function of the question answers:</p>
+<p><span class="math display">\[ln(\frac{p_i}{1-p_i})=\beta_0 + \Sigma_{g=1}^G\mathbf{x_{i,g}^T\beta_{g}}\]</span></p>
+<p>where <span class="math inline">\(\beta_0\)</span> is the intercept, <span class="math inline">\(\mathbf{x_{i,g}}\)</span> is a three-dimensional indication vector for question answer and <span class="math inline">\(\mathbf(\beta_g)\)</span> is the parameter vector corresponding to the <span class="math inline">\(g^{th}\)</span> predictor. Three types of questions are considered regarding their effects on the outcome. The first forty survey questions are important questions such that the coefficients of the three answers to these questions are all different:</p>
+<p><span class="math display">\[\mathbf{\beta_g}=(1,0,-1)\times \gamma,\ g=1,\dots,40\]</span> The second forty survey questions are also important questions but only one answer has a coefficient that is different from the other two answers:</p>
+<p><span class="math display">\[\mathbf{\beta_g}=(1,0,0)\times \gamma,\ g=41,\dots,80\]</span></p>
+<p>The last forty survey questions are also unimportant questions such that all three answers have the same coefficients:</p>
+<p><span class="math display">\[\mathbf{\beta_g}=(0,0,0)\times \gamma,\ g=81,\dots,120\]</span></p>
+<p>The baseline coefficient <span class="math inline">\(\beta_0\)</span> is set to be <span class="math inline">\(-\frac{40}{3}\gamma\)</span> so that on average a farm have <span class="math inline">\(50%\)</span> of chance to have an outbreak. The parameter <span class="math inline">\(\gamma\)</span> in the above simulation is set to control the strength of the questions’ effect on the outcome. In this simulation study, we consider the situations where <span class="math inline">\(\gamma = 0.1, 0.25, 0.5, 1, 2\)</span>. So the parameter settings are:</p>
+<p><span class="math display">\[\mathbf{\beta^{T}}=\left(\underset{question\ 1}{\frac{40}{3},\underbrace{1,0,-1}},...,\underset{question\ 40}{\underbrace{1,0,-1}},\underset{question\ 41}{\underbrace{1,0,0}},...,\underset{question\ 80}{\underbrace{1,0,0}},\underset{question\ 81}{\underbrace{0,0,0}},...,\underset{question\ 120}{\underbrace{0,0,0}}\right)*\gamma\]</span></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># sim1_da1.csv  the 1st simulated data</span>
+<span class="co"># similar sim1_da2 and sim1_da3</span>
+<span class="co"># sim1.csv  simulated data, the first simulation</span>
+<span class="co"># dummy.sim1.csv dummy variables for the first simulated data with all the baseline in</span>
+<span class="co">#code for simulation</span>
+
+<span class="co"># setwd(dirname(file.choose()))</span>
+<span class="co"># library(grplasso)</span>
+
+nf&lt;-<span class="dv">800</span>
+for (j in <span class="dv">1</span>:<span class="dv">20</span>){
+<span class="kw">set.seed</span>(<span class="dv">19870</span>+j)
+x&lt;-<span class="kw">c</span>(<span class="st">&#39;A&#39;</span>,<span class="st">&#39;B&#39;</span>,<span class="st">&#39;C&#39;</span>)
+sim.da1&lt;-<span class="ot">NULL</span>
+for (i in <span class="dv">1</span>:nf){
+<span class="co"># sample(x, 120, replace=TRUE)-&gt;sam</span>
+sim.da1&lt;-<span class="kw">rbind</span>(sim.da1,<span class="kw">sample</span>(x, <span class="dv">120</span>, <span class="dt">replace=</span><span class="ot">TRUE</span>))
+}
+
+<span class="kw">data.frame</span>(sim.da1)-&gt;sim.da1
+<span class="kw">paste</span>(<span class="st">&quot;Q&quot;</span>, <span class="dv">1</span>:<span class="dv">120</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)-&gt;col
+<span class="kw">paste</span>(<span class="st">&quot;Farm&quot;</span>, <span class="dv">1</span>:nf, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)-&gt;row
+<span class="kw">colnames</span>(sim.da1)&lt;-col
+<span class="kw">rownames</span>(sim.da1)&lt;-row
+
+<span class="co"># use class.ind() function in nnet package to encode dummy variables</span>
+<span class="kw">library</span>(nnet)
+dummy.sim1&lt;-<span class="ot">NULL</span>
+for (k in <span class="dv">1</span>:<span class="kw">ncol</span>(sim.da1)) {
+tmp=<span class="kw">class.ind</span>(sim.da1[,k])
+<span class="kw">colnames</span>(tmp)=<span class="kw">paste</span>(col[k],<span class="kw">colnames</span>(tmp))
+dummy.sim1=<span class="kw">cbind</span>(dummy.sim1,tmp)
+}
+<span class="kw">data.frame</span>(dummy.sim1)-&gt;dummy.sim1
+
+<span class="co"># set &quot;C&quot; as the baseline</span>
+<span class="co"># delete baseline dummy variable</span>
+
+base.idx&lt;-<span class="dv">3</span>*<span class="kw">c</span>(<span class="dv">1</span>:<span class="dv">120</span>)
+dummy1&lt;-dummy.sim1[,-base.idx]
+
+<span class="co"># simulate independent variable for different values of r</span>
+<span class="co"># simulate based on one value of r each time</span>
+<span class="co"># r=0.1, get the link function</span>
+<span class="kw">c</span>(<span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">1</span>/<span class="dv">10</span>,<span class="dv">0</span>,-<span class="dv">1</span>/<span class="dv">10</span>),<span class="dv">40</span>),<span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">1</span>/<span class="dv">10</span>,<span class="dv">0</span>,<span class="dv">0</span>),<span class="dv">40</span>),<span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">0</span>),<span class="dv">40</span>))-&gt;s1
+<span class="kw">as.matrix</span>(dummy.sim1)%*%s1<span class="dv">-40</span>/<span class="dv">3</span>/<span class="dv">10</span>-&gt;link1
+
+<span class="co"># r=0.25 </span>
+<span class="co"># c(rep(c(1/4,0,-1/4),40),rep(c(1/4,0,0),40),rep(c(0,0,0),40))-&gt;s1</span>
+<span class="co"># as.matrix(dummy.sim1)%*%s1-40/3/4-&gt;link1</span>
+
+<span class="co"># r=0.5 </span>
+<span class="co"># c(rep(c(1/2,0,-1/2),40),rep(c(1/2,0,0),40),rep(c(0,0,0),40))-&gt;s1</span>
+<span class="co"># as.matrix(dummy.sim1)%*%s1-40/3/2-&gt;link1</span>
+
+<span class="co"># r=1</span>
+<span class="co"># c(rep(c(1,0,-1),40),rep(c(1,0,0),40),rep(c(0,0,0),40))-&gt;s1</span>
+<span class="co"># as.matrix(dummy.sim1)%*%s1-40/3-&gt;link1</span>
+
+<span class="co"># r=2</span>
+<span class="co"># c(rep(c(2,0,-2),40),rep(c(2,0,0),40),rep(c(0,0,0),40))-&gt;s1</span>
+<span class="co"># as.matrix(dummy.sim1)%*%s1-40/3/0.5-&gt;link1</span>
+
+
+<span class="co"># calculate the outbreak probability</span>
+<span class="kw">exp</span>(link1)/(<span class="kw">exp</span>(link1)+<span class="dv">1</span>)-&gt;hp1
+
+<span class="co"># based on the probability hp1, simulate response variable: res</span>
+res&lt;-<span class="kw">rep</span>(<span class="dv">9</span>,nf)
+for (i in <span class="dv">1</span>:nf){
+<span class="kw">sample</span>( <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">0</span>),<span class="dv">1</span>,<span class="dt">prob=</span><span class="kw">c</span>(hp1[i],<span class="dv">1</span>-hp1[i]))-&gt;res[i]
+}
+
+<span class="co"># da1 with response variable, without group indicator</span>
+<span class="co"># da2 without response variable, with group indicator</span>
+<span class="co"># da3 without response variable, without group indicator</span>
+
+dummy1$y&lt;-res
+da1&lt;-dummy1
+y&lt;-da1$y
+ind&lt;-<span class="ot">NULL</span>
+for (i in <span class="dv">1</span>:<span class="dv">120</span>){
+<span class="kw">c</span>(ind,<span class="kw">rep</span>(i,<span class="dv">2</span>))-&gt;ind
+}
+
+da2&lt;-<span class="kw">rbind</span>(da1[,<span class="dv">1</span>:<span class="dv">240</span>],ind)
+da3&lt;-da1[,<span class="dv">1</span>:<span class="dv">240</span>]
+
+<span class="co"># save simulated data</span>
+<span class="kw">write.csv</span>(da1,<span class="kw">paste</span>(<span class="st">&#39;sim&#39;</span>,j,<span class="st">&#39;_da&#39;</span>,<span class="dv">1</span>,<span class="st">&#39;.csv&#39;</span>,<span class="dt">sep=</span><span class="st">&#39;&#39;</span>),<span class="dt">row.names=</span>F)
+<span class="kw">write.csv</span>(da2,<span class="kw">paste</span>(<span class="st">&#39;sim&#39;</span>,j,<span class="st">&#39;_da&#39;</span>,<span class="dv">2</span>,<span class="st">&#39;.csv&#39;</span>,<span class="dt">sep=</span><span class="st">&#39;&#39;</span>),<span class="dt">row.names=</span>F)
+<span class="kw">write.csv</span>(da3,<span class="kw">paste</span>(<span class="st">&#39;sim&#39;</span>,j,<span class="st">&#39;_da&#39;</span>,<span class="dv">3</span>,<span class="st">&#39;.csv&#39;</span>,<span class="dt">sep=</span><span class="st">&#39;&#39;</span>),<span class="dt">row.names=</span>F)
+<span class="kw">write.csv</span>(sim.da1,<span class="kw">paste</span>(<span class="st">&#39;sim&#39;</span>,j,<span class="st">&#39;.csv&#39;</span>,<span class="dt">sep=</span><span class="st">&#39;&#39;</span>),<span class="dt">row.names=</span>F)
+<span class="kw">write.csv</span>(dummy.sim1,<span class="kw">paste</span>(<span class="st">&#39;dummy.sim&#39;</span>,j,<span class="st">&#39;.csv&#39;</span>,<span class="dt">sep=</span><span class="st">&#39;&#39;</span>),<span class="dt">row.names=</span>F)
+}</code></pre></div>
+<p>For each value of <span class="math inline">\(\gamma\)</span>, 20 data sets are simulated. The bigger <span class="math inline">\(\gamma\)</span> is, the larger the corresponding parameter. We provided the data sets with <span class="math inline">\(\gamma = 2\)</span>. Let’s check the data:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">disease_dat&lt;-<span class="kw">read.csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/sim1_da1.csv&quot;</span>)
+<span class="co"># only show the last 7 columns here</span>
+<span class="kw">head</span>(<span class="kw">subset</span>(disease_dat,<span class="dt">select=</span><span class="kw">c</span>( <span class="st">&quot;Q118.A&quot;</span>,<span class="st">&quot;Q118.B&quot;</span>,<span class="st">&quot;Q119.A&quot;</span>,<span class="st">&quot;Q119.B&quot;</span>,<span class="st">&quot;Q120.A&quot;</span>,<span class="st">&quot;Q120.B&quot;</span>,<span class="st">&quot;y&quot;</span>))) </code></pre></div>
+<pre><code>##   Q118.A Q118.B Q119.A Q119.B Q120.A Q120.B y
+## 1      1      0      0      0      0      1 1
+## 2      0      1      0      1      0      0 1
+## 3      1      0      0      0      1      0 1
+## 4      1      0      0      0      0      1 1
+## 5      1      0      0      0      1      0 0
+## 6      1      0      0      1      1      0 1</code></pre>
+<p>Here <code>y</code> indicates the outbreak situation of the farms. <code>y=1</code> means there is an outbreak in 5 years after the survey. The rest columns indicate survey responses. For example <code>Q120.A = 1</code> means the respondent chose <code>A</code> in Q120. We consider <code>C</code> as the baseline.</p>
 
 </div>
+<!-- </div> -->
             </section>
 
           </div>
         </div>
       </div>
-<a href="about-the-authors.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="the-art-of-data-science.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="customer-satisfaction-survey-data-from-airline-company.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="data-pre-processing.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -220,7 +336,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/happyrabbit/IntroDataScience/index.rmd",
+"link": "https://github.com/happyrabbit/IntroDataScience/03-Dataset.Rmd",
 "text": "Edit"
 },
 "download": ["IDS.pdf", "IDS.epub", "IDS.mobi"],

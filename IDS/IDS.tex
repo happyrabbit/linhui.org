@@ -1,0 +1,396 @@
+\documentclass[12pt,]{krantz}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+    \setmonofont[Mapping=tex-ansi,Scale=0.7]{Source Code Pro}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[unicode=true]{hyperref}
+\PassOptionsToPackage{usenames,dvipsnames}{color} % color is loaded by hyperref
+\hypersetup{
+            pdftitle={Introduction to Data Science},
+            pdfauthor={Hui Lin and Ming Li},
+            colorlinks=true,
+            linkcolor=Maroon,
+            citecolor=Blue,
+            urlcolor=Blue,
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{natbib}
+\bibliographystyle{apalike}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{{#1}}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{{#1}}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{{#1}}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{{#1}}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{{#1}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{{#1}}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{{#1}}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{{#1}}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{{#1}}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{{#1}}}
+\newcommand{\ImportTok}[1]{{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{{#1}}}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{{#1}}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{{#1}}}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{{#1}}}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{{#1}}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{{#1}}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{{#1}}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{{#1}}}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{{#1}}}}
+\newcommand{\BuiltInTok}[1]{{#1}}
+\newcommand{\ExtensionTok}[1]{{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{{#1}}}
+\newcommand{\RegionMarkerTok}[1]{{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{{#1}}}}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{{#1}}}}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{{#1}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{{#1}}}}
+\newcommand{\NormalTok}[1]{{#1}}
+\usepackage{longtable,booktabs}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage[bf,singlelinecheck=off]{caption}
+
+\setmainfont[UprightFeatures={SmallCapsFont=AlegreyaSC-Regular}]{Alegreya}
+
+\usepackage{framed,color}
+\definecolor{shadecolor}{RGB}{248,248,248}
+
+\renewcommand{\textfraction}{0.05}
+\renewcommand{\topfraction}{0.8}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\floatpagefraction}{0.75}
+
+\renewenvironment{quote}{\begin{VF}}{\end{VF}}
+\let\oldhref\href
+\renewcommand{\href}[2]{#2\footnote{\url{#1}}}
+
+\ifxetex
+  \usepackage{letltxmacro}
+  \setlength{\XeTeXLinkMargin}{1pt}
+  \LetLtxMacro\SavedIncludeGraphics\includegraphics
+  \def\includegraphics#1#{% #1 catches optional stuff (star/opt. arg.)
+    \IncludeGraphicsAux{#1}%
+  }%
+  \newcommand*{\IncludeGraphicsAux}[2]{%
+    \XeTeXLinkBox{%
+      \SavedIncludeGraphics#1{#2}%
+    }%
+  }%
+\fi
+
+\makeatletter
+\newenvironment{kframe}{%
+\medskip{}
+\setlength{\fboxsep}{.8em}
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\renewenvironment{Shaded}{\begin{kframe}}{\end{kframe}}
+
+\newenvironment{rmdblock}[1]
+  {
+  \begin{itemize}
+  \renewcommand{\labelitemi}{
+    \raisebox{-.7\height}[0pt][0pt]{
+      {\setkeys{Gin}{width=3em,keepaspectratio}\includegraphics{images/#1}}
+    }
+  }
+  \setlength{\fboxsep}{1em}
+  \begin{kframe}
+  \item
+  }
+  {
+  \end{kframe}
+  \end{itemize}
+  }
+\newenvironment{rmdnote}
+  {\begin{rmdblock}{note}}
+  {\end{rmdblock}}
+\newenvironment{rmdcaution}
+  {\begin{rmdblock}{caution}}
+  {\end{rmdblock}}
+\newenvironment{rmdimportant}
+  {\begin{rmdblock}{important}}
+  {\end{rmdblock}}
+\newenvironment{rmdtip}
+  {\begin{rmdblock}{tip}}
+  {\end{rmdblock}}
+\newenvironment{rmdwarning}
+  {\begin{rmdblock}{warning}}
+  {\end{rmdblock}}
+
+\usepackage{makeidx}
+\makeindex
+
+\urlstyle{tt}
+
+\usepackage{amsthm}
+\makeatletter
+\def\thm@space@setup{%
+  \thm@preskip=8pt plus 2pt minus 4pt
+  \thm@postskip=\thm@preskip
+}
+\makeatother
+
+\frontmatter
+
+\title{Introduction to Data Science}
+\author{\href{http://scientistcafe.com}{Hui Lin} and Ming Li}
+\date{2017-11-27}
+
+\usepackage{amsthm}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}{Lemma}[section]
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{corollary}{Corollary}[section]
+\newtheorem{proposition}{Proposition}[section]
+\theoremstyle{definition}
+\newtheorem{example}{Example}[section]
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\begin{document}
+\maketitle
+
+%\cleardoublepage\newpage\thispagestyle{empty}\null
+%\cleardoublepage\newpage\thispagestyle{empty}\null
+%\cleardoublepage\newpage
+\thispagestyle{empty}
+\begin{center}
+%\includegraphics{images/dedication.pdf}
+\end{center}
+
+\setlength{\abovedisplayskip}{-5pt}
+\setlength{\abovedisplayshortskip}{-5pt}
+
+{
+\hypersetup{linkcolor=black}
+\setcounter{tocdepth}{3}
+\tableofcontents
+}
+\listoftables
+\listoffigures
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Sys.setenv(TZ="UTC")}
+\KeywordTok{options}\NormalTok{(}\DataTypeTok{formatR.indent =} \DecValTok{2}\NormalTok{, }\DataTypeTok{width =} \DecValTok{55}\NormalTok{)}
+\CommentTok{#bookdown::render_book("index.Rmd", "bookdown::gitbook")}
+\CommentTok{#bookdown::render_book("index.Rmd", "bookdown::pdf_book")}
+\end{Highlighting}
+\end{Shaded}
+
+\section*{Copyright Statement}\label{copyright-statement}
+
+
+This work by Hui Lin and Ming Li is licensed under a
+\href{https://creativecommons.org/licenses/by-nc-sa/3.0/us/}{Creative
+Commons Attribution-NonCommercial-ShareAlike 3.0 United States License}.
+
+Please note that this work is being written under a
+\href{https://github.com/happyrabbit/IntroDataScience/blob/master/CONDUCT.md}{Contributor
+Code of Conduct} and released under a
+\href{https://creativecommons.org/licenses/by-nc-sa/3.0/us/}{CC-BY-NC-SA
+license}. By participating in this project (for example, by submitting a
+\href{https://github.com/happyrabbit/IntroDataScience/issues}{pull
+request} with suggestions or edits) you agree to abide by its terms.
+
+\section*{About the Authors}\label{about-the-authors}
+
+
+\textbf{Hui Lin} is currently Data Scientist at DuPont Pioneer. She is a
+leader within DuPont at applying advanced data science to enhance
+Marketing and Sales effectiveness. She has been providing statistical
+leadership for a broad range of predictive analytics and market research
+analysis since 2013. She is the co-founder of Central Iowa R User Group,
+blogger of scientistcafe.com and program Chair of Statistics in
+Marketing Section of ASA for 2018. She enjoys making analytics
+accessible to a broad audience and teaches tutorials and workshops for
+practitioners on data science.
+
+She holds MS and Ph.D.~in statistics from Iowa State University, BS in
+mathematical statistics from Beijing Normal University.
+
+\textbf{Ming Li} is currently a Sr. Data Scientist at Amazon. He was
+Data Scientist at Wal-Mart and an Adjunct Faculty of Department and
+Marketing and Business Analytics in TAMU -- Commerce. He is also the
+Chair of Quality \& Productivity Section of ASA for 2016. He was a
+Statistical Leader at General Electric Global Research Center and
+Research Statistician at SAS Institute. He obtained his Ph.D.~in
+Statistics from Iowa State University at 2010. With deep statistics
+background and a few years' experience in data science, he has trained
+and mentored numerous junior data scientist with different backgrounds
+such as statistics, computer science, and business analytics.
+
+\section*{Acknowledgements}\label{acknowledgements}
+
+
+We want to give special thanks to Alex Shum and David Body for their
+editing and comments on the sections of this book.
+
+\section{The art of data science}\label{the-art-of-data-science}
+
+Data science and data scientist have become buzz words. Allow me to
+reiterate what you may have already heard a million times in the media:
+\textbf{data scientists are in demand and demand continues to grow}. A
+study by the McKinsey Global Institute concludes,
+
+\begin{quote}
+``a shortage of the analytical and managerial talent necessary to make
+the most of Big Data is a significant and pressing challenge (for the
+U.S.).''
+\end{quote}
+
+You may expect that statisticians and graduate students from traditional
+statistics departments are great data scientist candidates. But the
+situation is that the majority of current data scientists do not have a
+statistical background. As David Donoho pointed out:
+
+\begin{quote}
+``statistics is being marginalized here; the implicit message is that
+statistics is a part of what goes on in data science but not a very big
+part.'' ( from
+``\href{http://pages.cs.wisc.edu/~anhai/courses/784-fall15/50YearsDataScience.pdf}{50
+years of Data Science}'').
+\end{quote}
+
+What is wrong? The activities that preoccupied statistics over centuries
+are now in the limelight, but those activities are claimed to belong to
+a new discipline and are practiced by professionals from various
+backgrounds. Various professional statistics organizations are reacting
+to this confusing situation. (Page 5-7, ``50 Years of Data Science'')
+From those discussions, Donoho summarizes the main recurring ``Memes''
+about data sciences:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  The `Big Data' Meme
+\item
+  The `Skills' Meme
+\item
+  The `Jobs' Meme
+\end{enumerate}
+
+The first two are linked together which leads to statisticians' current
+position on data science. We assume everyone has heard the 3V (volume,
+variety and velocity) definition of big data. The media hasn't taken a
+minute break from touting ``big'' data. Data science trainees now need
+the skills to cope with such big data sets. What are those skills? You
+may hear about: Hadoop, system using Map/Reduce to process large data
+sets distributed across a cluster of computers. The new skills are for
+dealing with organizational artifacts of large-scale cluster computing
+but not for better solving the real problem. A lot of data on its own is
+worthless. It isn't the size of the data that's important. It's what you
+do with it. The big data skills that so many are touting today are not
+skills for better solving the real problem of inference from data.
+
+Some media think they sense the trends in hiring and government funding.
+We are transiting to universal connectivity with a deluge of data
+filling telecom servers. But these facts don't immediately create a
+science. The statisticians have been laying the groundwork of data
+science for at least 50 years. Today's data science is an enlargement of
+traditional academic statistics rather than a brand new discipline.
+
+\subsection{What is data science?}\label{what-is-data-science}
+
+This question is not new. When you tell people ``I am a data
+scientist''. ``Ah, data scientist!'' Yes, who doesn't know that data
+scientist is the sexist job in 21th century? If they ask further what is
+data science and what exactly do data scientists do, it may effectively
+kill the conversation.
+
+Data Science doesn't come out of the blue. Its predecessor is data
+analysis. Back in 1962, John Tukey wrote in ``The Future of Data
+Analysis'':
+
+\begin{quote}
+For a long time I have thought I was a statistician, interested in
+inferences from the particular to the general. But as I have watched
+mathematical statistics evolve, I have had cause to wonder and to doubt.
+\ldots{} All in all, I have come to feel that my central interest is in
+data analysis, which I take to include, among other things: procedures
+for analyzing data, techniques for interpreting the results of such
+procedures, ways of planning the gathering of data to make its analysis
+easier, more precise or more accurate, and all the machinery and results
+of (mathematical) statistics which apply to analyzing data.
+\end{quote}
+
+It deeply shocked his academic readers. Aren't you supposed to present
+something mathematically precise, such as definitions, theorems and
+proofs? If we use one sentence to summarize what John said, it is:
+
+\begin{quote}
+data analysis is more than mathematics.
+\end{quote}
+
+\section{References}\label{references}
+
+\bibliography{bibliography.bib}
+
+\backmatter
+\printindex
+
+\end{document}

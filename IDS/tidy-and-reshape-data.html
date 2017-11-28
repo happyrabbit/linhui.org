@@ -32,8 +32,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="about-the-authors.html">
-<link rel="next" href="the-art-of-data-science.html">
+<link rel="prev" href="summarize-data.html">
+<link rel="next" href="references.html">
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
@@ -180,18 +180,183 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="acknowledgements" class="section level1 unnumbered">
-<h1>Acknowledgements</h1>
-<p>We want to give special thanks to Alex Shum and David Body for their editing and comments on the sections of this book.</p>
+<div id="tidy-and-reshape-data" class="section level2">
+<h2><span class="header-section-number">5.3</span> Tidy and Reshape Data</h2>
+<p>“Tidy data” represent the information from a dataset as data frames where each row is an observation and each column contains the values of a variable (i.e. an attribute of what we are observing). Depending on the situation, the requirements on what to present as rows and columns may change. In order to make data easy to work with for the problem at hand, in practice, we often need to convert data between the “wide” and the “long” format. The process feels like playing with a dough.</p>
+<p>There are two commonly used packages for this kind of manipulations: <code>tidyr</code> and <code>reshape2</code>. We will show how to tidy and reshape data using the two packages. By comparing the functions to show how they overlap and where they differ.</p>
+<div id="reshape2-package" class="section level3">
+<h3><span class="header-section-number">5.3.1</span> <code>reshape2</code> package</h3>
+<p>It is a reboot of the previous package <code>reshape</code>. Why? Here is what we got from Stack Overflow:</p>
+<p><em>“<code>reshape2</code> let Hadley make a rebooted reshape that was way, way faster, while avoiding busting up people’s dependencies and habits.”</em></p>
+<p>Take a baby subset of our exemplary clothes consumers data to illustrate:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(sdat&lt;-sim.dat[<span class="dv">1</span>:<span class="dv">5</span>,<span class="dv">1</span>:<span class="dv">6</span>])</code></pre></div>
+<pre><code>##   age gender income house store_exp online_exp
+## 1  57 Female 120963   Yes     529.1      303.5
+## 2  63 Female 122008   Yes     478.0      109.5
+## 3  59   Male 114202   Yes     490.8      279.2
+## 4  60   Male 113616   Yes     347.8      141.7
+## 5  51   Male 124253   Yes     379.6      112.2</code></pre>
+<p>For the above data <code>sdat</code>, what if we want to have a variable indicating the purchasing channel (i.e. online or in-store) and another column with the corresponding expense amount? Assume we want to keep the rest of the columns the same. It is a task to change data from “wide” to “long”. There are two general ways to shape data:</p>
+<ul>
+<li>Use <code>melt()</code> to convert an object into a molten data frame, i.e. from wide to long</li>
+<li>Use <code>dcast()</code> to cast a molten data frame into the shape you want, i.e. from long to wide</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(reshape2)
+(mdat &lt;-<span class="st"> </span><span class="kw">melt</span>(sdat, <span class="dt">measure.vars=</span><span class="kw">c</span>(<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>),
+              <span class="dt">variable.name =</span> <span class="st">&quot;Channel&quot;</span>,
+              <span class="dt">value.name =</span> <span class="st">&quot;Expense&quot;</span>))</code></pre></div>
+<pre><code>##    age gender income house    Channel Expense
+## 1   57 Female 120963   Yes  store_exp   529.1
+## 2   63 Female 122008   Yes  store_exp   478.0
+## 3   59   Male 114202   Yes  store_exp   490.8
+## 4   60   Male 113616   Yes  store_exp   347.8
+## 5   51   Male 124253   Yes  store_exp   379.6
+## 6   57 Female 120963   Yes online_exp   303.5
+## 7   63 Female 122008   Yes online_exp   109.5
+## 8   59   Male 114202   Yes online_exp   279.2
+## 9   60   Male 113616   Yes online_exp   141.7
+## 10  51   Male 124253   Yes online_exp   112.2</code></pre>
+<p>You melted the data frame <code>sdat</code> by two variables: <code>store_exp</code> and <code>online_exp</code> (<code>measure.vars=c(&quot;store_exp&quot;,&quot;online_exp&quot;)</code>). The new variable name is <code>Channel</code> set by command <code>variable.name = &quot;Channel&quot;</code>. The value name is <code>Expense</code> set by command <code>value.name = &quot;Expense&quot;</code>.</p>
+<p>You can run a regression to study the effect of purchasing channel:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Here we use all observations from sim.dat</span>
+mdat&lt;-<span class="kw">melt</span>(sim.dat[,<span class="dv">1</span>:<span class="dv">6</span>], <span class="dt">measure.vars=</span><span class="kw">c</span>(<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>),
+            <span class="dt">variable.name =</span> <span class="st">&quot;Channel&quot;</span>,
+              <span class="dt">value.name =</span> <span class="st">&quot;Expense&quot;</span>)
+fit&lt;-<span class="kw">lm</span>(Expense~gender+house+income+Channel+age,<span class="dt">data=</span>mdat)
+<span class="kw">summary</span>(fit)</code></pre></div>
+<pre><code>## 
+## Call:
+## lm(formula = Expense ~ gender + house + income + Channel + age, 
+##     data = mdat)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+##  -4208   -821   -275    533  44353 
+## 
+## Coefficients:
+##                    Estimate Std. Error t value
+## (Intercept)       -9.13e+02   1.56e+02   -5.86
+## genderMale         3.57e+02   1.03e+02    3.48
+## houseYes          -5.69e+01   1.14e+02   -0.50
+## income             2.83e-02   1.08e-03   26.27
+## Channelonline_exp  8.30e+02   9.77e+01    8.49
+## age               -2.79e+01   3.36e+00   -8.32
+##                   Pr(&gt;|t|)    
+## (Intercept)        5.8e-09 ***
+## genderMale         0.00052 ***
+## houseYes           0.61727    
+## income             &lt; 2e-16 ***
+## Channelonline_exp  &lt; 2e-16 ***
+## age                &lt; 2e-16 ***
+## ---
+## Signif. codes:  
+## 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1970 on 1626 degrees of freedom
+##   (368 observations deleted due to missingness)
+## Multiple R-squared:  0.348,  Adjusted R-squared:  0.346 
+## F-statistic:  174 on 5 and 1626 DF,  p-value: &lt;2e-16</code></pre>
+<p>You can <code>melt()</code> list, matrix, table too. The syntax is similar and we won’t go through every situation. Sometimes we want to convert the data from “long” to “wide”. For example, <strong>you want to compare the online and in store expense between male and female based on the house ownership. </strong></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dcast</span>(mdat, house +<span class="st"> </span>gender ~<span class="st"> </span>Channel, sum)</code></pre></div>
+<pre><code>## Using &#39;Expense&#39; as value column. Use &#39;value.var&#39; to override</code></pre>
+<pre><code>##   house gender store_exp online_exp
+## 1    No Female    171102     583492
+## 2    No   Male    133131     332500
+## 3   Yes Female    355320     500857
+## 4   Yes   Male    697297     703332</code></pre>
+<p>In the above code, what is the left side of <code>~</code> are variables that you want to group by. The right side is the variable you want to spread as columns. It will use the column indicating value from <code>melt()</code> before. Here is “<code>Expense</code>” .</p>
+</div>
+<div id="tidyr-package" class="section level3">
+<h3><span class="header-section-number">5.3.2</span> <code>tidyr</code> package</h3>
+<p>The other package that will do similar manipulations is <code>tidyr</code>. Let’s get a subset to illustrate the usage.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)
+<span class="co"># practice functions we learnt before</span>
+sdat&lt;-sim.dat[<span class="dv">1</span>:<span class="dv">5</span>,]%&gt;%
+<span class="st">  </span>dplyr::<span class="kw">select</span>(age,gender,store_exp,store_trans)
+sdat %&gt;%<span class="st"> </span><span class="kw">tbl_df</span>()</code></pre></div>
+<pre><code>## # A tibble: 5 x 4
+##     age gender store_exp store_trans
+## * &lt;int&gt; &lt;fctr&gt;     &lt;dbl&gt;       &lt;int&gt;
+## 1    57 Female     529.1           2
+## 2    63 Female     478.0           4
+## 3    59   Male     490.8           7
+## 4    60   Male     347.8          10
+## 5    51   Male     379.6           4</code></pre>
+<p><code>gather()</code> function in <code>tidyr</code> is analogous to <code>melt()</code> in <code>reshape2</code>. The following code will do the same thing as we did before using <code>melt()</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyr)
+msdat&lt;-tidyr::<span class="kw">gather</span>(sdat,<span class="st">&quot;variable&quot;</span>,<span class="st">&quot;value&quot;</span>,store_exp,store_trans)
+msdat %&gt;%<span class="st"> </span><span class="kw">tbl_df</span>()</code></pre></div>
+<pre><code>## # A tibble: 10 x 4
+##      age gender    variable value
+##    &lt;int&gt; &lt;fctr&gt;       &lt;chr&gt; &lt;dbl&gt;
+##  1    57 Female   store_exp 529.1
+##  2    63 Female   store_exp 478.0
+##  3    59   Male   store_exp 490.8
+##  4    60   Male   store_exp 347.8
+##  5    51   Male   store_exp 379.6
+##  6    57 Female store_trans   2.0
+##  7    63 Female store_trans   4.0
+##  8    59   Male store_trans   7.0
+##  9    60   Male store_trans  10.0
+## 10    51   Male store_trans   4.0</code></pre>
+<p>Or if we use the pipe operation, we can write the above code as:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sdat%&gt;%<span class="kw">gather</span>(<span class="st">&quot;variable&quot;</span>,<span class="st">&quot;value&quot;</span>,store_exp,store_trans)</code></pre></div>
+<p>It is identical with the following code using <code>melt()</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">melt</span>(sdat, <span class="dt">measure.vars=</span><span class="kw">c</span>(<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;store_trans&quot;</span>),
+            <span class="dt">variable.name =</span> <span class="st">&quot;variable&quot;</span>,
+              <span class="dt">value.name =</span> <span class="st">&quot;value&quot;</span>)</code></pre></div>
+<p>The opposite operation to <code>gather()</code> is <code>spread()</code>. The previous one stacks columns and the latter one spread the columns.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">msdat %&gt;%<span class="st"> </span><span class="kw">spread</span>(variable,value)</code></pre></div>
+<pre><code>##   age gender store_exp store_trans
+## 1  51   Male     379.6           4
+## 2  57 Female     529.1           2
+## 3  59   Male     490.8           7
+## 4  60   Male     347.8          10
+## 5  63 Female     478.0           4</code></pre>
+<p>Another pair of functions that do opposite manipulations are <code>separate()</code> and <code>unite()</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sepdat&lt;-<span class="st"> </span>msdat %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">separate</span>(variable,<span class="kw">c</span>(<span class="st">&quot;Source&quot;</span>,<span class="st">&quot;Type&quot;</span>))
+sepdat %&gt;%<span class="st"> </span><span class="kw">tbl_df</span>()</code></pre></div>
+<pre><code>## # A tibble: 10 x 5
+##      age gender Source  Type value
+##  * &lt;int&gt; &lt;fctr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt;
+##  1    57 Female  store   exp 529.1
+##  2    63 Female  store   exp 478.0
+##  3    59   Male  store   exp 490.8
+##  4    60   Male  store   exp 347.8
+##  5    51   Male  store   exp 379.6
+##  6    57 Female  store trans   2.0
+##  7    63 Female  store trans   4.0
+##  8    59   Male  store trans   7.0
+##  9    60   Male  store trans  10.0
+## 10    51   Male  store trans   4.0</code></pre>
+<p>You can see that the function separates the original column “<code>variable</code>” to two new columns “<code>Source</code>” and “<code>Type</code>”. You can use <code>sep=</code> to set the string or regular expression to separate the column. By default, it is “<code>_</code>”.</p>
+<p>The <code>unite()</code> function will do the opposite: combining two columns. It is the generalization of <code>paste()</code> to a data frame.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sepdat %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">unite</span>(<span class="st">&quot;variable&quot;</span>,Source,Type,<span class="dt">sep=</span><span class="st">&quot;_&quot;</span>)</code></pre></div>
+<pre><code>##    age gender    variable value
+## 1   57 Female   store_exp 529.1
+## 2   63 Female   store_exp 478.0
+## 3   59   Male   store_exp 490.8
+## 4   60   Male   store_exp 347.8
+## 5   51   Male   store_exp 379.6
+## 6   57 Female store_trans   2.0
+## 7   63 Female store_trans   4.0
+## 8   59   Male store_trans   7.0
+## 9   60   Male store_trans  10.0
+## 10  51   Male store_trans   4.0</code></pre>
+<p>The reshaping manipulations may be the trickiest part. You have to practice a lot to get familiar with those functions. Unfortunately, there is no shortcut.</p>
 
 </div>
+</div>
+<!-- </div> -->
             </section>
 
           </div>
         </div>
       </div>
-<a href="about-the-authors.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="the-art-of-data-science.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="summarize-data.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="references.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -220,7 +385,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/happyrabbit/IntroDataScience/index.rmd",
+"link": "https://github.com/happyrabbit/IntroDataScience/06-DataWrangling.Rmd",
 "text": "Edit"
 },
 "download": ["IDS.pdf", "IDS.epub", "IDS.mobi"],

@@ -32,8 +32,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="about-the-authors.html">
-<link rel="next" href="the-art-of-data-science.html">
+<link rel="prev" href="centering-and-scaling.html">
+<link rel="next" href="resolve-outliers.html">
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
@@ -180,18 +180,155 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="acknowledgements" class="section level1 unnumbered">
-<h1>Acknowledgements</h1>
-<p>We want to give special thanks to Alex Shum and David Body for their editing and comments on the sections of this book.</p>
-
+<div id="resolve-skewness" class="section level2">
+<h2><span class="header-section-number">4.4</span> Resolve Skewness</h2>
+<p><a href="https://en.wikipedia.org/wiki/Skewness">Skewness</a> is defined to be the third standardized central moment. The formula for the sample skewness statistics is: <span class="math display">\[ skewness=\frac{\sum(x_{i}-\bar{x})^{3}}{(n-1)v^{3/2}}\]</span> <span class="math display">\[v=\frac{\sum(x_{i}-\bar{x})^{2}}{(n-1)}\]</span> Skewness=0 means that the destribution is symmetric, i.e. the probability of falling on either side of the distribution’s mean is equal.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># need skewness() function from e1071 package</span>
+<span class="kw">set.seed</span>(<span class="dv">1000</span>)
+<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>),<span class="dt">oma=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>))
+<span class="co"># random sample 1000 chi-square distribution with df=2</span>
+<span class="co"># right skew</span>
+x1&lt;-<span class="kw">rchisq</span>(<span class="dv">1000</span>,<span class="dv">2</span>, <span class="dt">ncp =</span> <span class="dv">0</span>)
+<span class="co"># get left skew variable x2 from x1</span>
+x2&lt;-<span class="kw">max</span>(x1)-x1
+<span class="kw">plot</span>(<span class="kw">density</span>(x2),<span class="dt">main=</span><span class="kw">paste</span>(<span class="st">&quot;left skew, skewnwss =&quot;</span>,<span class="kw">round</span>(<span class="kw">skewness</span>(x2),<span class="dv">2</span>)), <span class="dt">xlab=</span><span class="st">&quot;X2&quot;</span>)
+<span class="kw">plot</span>(<span class="kw">density</span>(x1),<span class="dt">main=</span><span class="kw">paste</span>(<span class="st">&quot;right skew, skewness =&quot;</span>,<span class="kw">round</span>(<span class="kw">skewness</span>(x1),<span class="dv">2</span>)), <span class="dt">xlab=</span><span class="st">&quot;X1&quot;</span>)</code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:skew"></span>
+<img src="IDS_files/figure-html/skew-1.svg" alt="Shewed Distribution" width="80%" />
+<p class="caption">
+FIGURE 4.1: Shewed Distribution
+</p>
+</div>
+<p>You can easily tell if a distribution is skewed by simple visualization(Figure<a href="resolve-skewness.html#fig:skew">4.1</a>). There are different ways may help to remove skewness such as log, square root or inverse. However it is often difficult to determine from plots which transformation is most appropriate for correcting skewness. The Box-Cox procedure automatically identified a transformation from the family of power transformations that are indexed by a parameter <span class="math inline">\(\lambda\)</span><span class="citation">(Box G <a href="#ref-BOXCOX1">1964</a>)</span>.</p>
+<p><span class="math display">\[
+x^{*}=\begin{cases}
+\begin{array}{c}
+\frac{x^{\lambda}-1}{\lambda}\\
+log(x)
+\end{array} &amp; \begin{array}{c}
+if\ \lambda\neq0\\
+if\ \lambda=0
+\end{array}\end{cases}
+\]</span></p>
+<p>It is easy to see that this family includes log transformation (<span class="math inline">\(\lambda=0\)</span>), square transformation (<span class="math inline">\(\lambda=2\)</span>), square root (<span class="math inline">\(\lambda=0.5\)</span>), inverse (<span class="math inline">\(\lambda=-1\)</span>) and others in-between. We can still use function <code>preProcess()</code> in package <code>caret</code> to apply this transformation by chaning the <code>method</code> argument.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">describe</span>(sim.dat)</code></pre></div>
+<pre><code>##              vars    n      mean       sd  median
+## age             1  999     38.58    14.19    36.0
+## gender*         2 1000      1.45     0.50     1.0
+## income          3  816 113543.07 49842.29 93868.7
+## house*          4 1000      1.57     0.50     2.0
+## store_exp       5  999   1358.71  2775.17   329.8
+## online_exp      6 1000   2120.18  1731.22  1941.9
+## store_trans     7 1000      5.35     3.70     4.0
+## online_trans    8 1000     13.55     7.96    14.0
+## Q1              9 1000      3.10     1.45     3.0
+## Q2             10 1000      1.82     1.17     1.0
+## Q3             11 1000      1.99     1.40     1.0
+## Q4             12 1000      2.76     1.16     3.0
+## Q5             13 1000      2.94     1.28     4.0
+## Q6             14 1000      2.45     1.44     2.0
+## Q7             15 1000      3.43     1.46     4.0
+## Q8             16 1000      2.40     1.15     2.0
+## Q9             17 1000      3.08     1.12     4.0
+## Q10            18 1000      2.32     1.14     2.0
+## segment*       19 1000      2.70     1.15     3.0
+##                trimmed      mad      min    max  range
+## age              37.67    16.31    16.00     69     53
+## gender*           1.43     0.00     1.00      2      1
+## income       104841.94 28989.47 41775.64 319704 277929
+## house*            1.58     0.00     1.00      2      1
+## store_exp       845.14   197.47   155.81  50000  49844
+## online_exp     1874.51  1015.21    68.82   9479   9411
+## store_trans       4.89     2.97     1.00     20     19
+## online_trans     13.42    10.38     1.00     36     35
+## Q1                3.13     1.48     1.00      5      4
+## Q2                1.65     0.00     1.00      5      4
+## Q3                1.75     0.00     1.00      5      4
+## Q4                2.83     1.48     1.00      5      4
+## Q5                3.05     0.00     1.00      5      4
+## Q6                2.43     1.48     1.00      5      4
+## Q7                3.54     0.00     1.00      5      4
+## Q8                2.36     1.48     1.00      5      4
+## Q9                3.23     0.00     1.00      5      4
+## Q10               2.27     1.48     1.00      5      4
+## segment*          2.75     1.48     1.00      4      3
+##               skew kurtosis      se
+## age           0.47    -1.18    0.45
+## gender*       0.22    -1.95    0.02
+## income        1.69     2.57 1744.83
+## house*       -0.27    -1.93    0.02
+## store_exp     8.08   115.04   87.80
+## online_exp    1.18     1.31   54.75
+## store_trans   1.11     0.69    0.12
+## online_trans  0.03    -0.98    0.25
+## Q1           -0.12    -1.36    0.05
+## Q2            1.13    -0.32    0.04
+## Q3            1.06    -0.40    0.04
+## Q4           -0.18    -1.46    0.04
+## Q5           -0.60    -1.40    0.04
+## Q6            0.11    -1.89    0.05
+## Q7           -0.90    -0.79    0.05
+## Q8            0.21    -1.33    0.04
+## Q9           -0.68    -1.10    0.04
+## Q10           0.39    -1.23    0.04
+## segment*     -0.20    -1.41    0.04</code></pre>
+<p>It is easy to see the skewed variables. If <code>mean</code> and <code>trimmed</code> differ a lot, there is very likely outliers. By default, <code>trimmed</code> reports mean by dropping the top and bottom 10%. It can be adjusted by setting argument <code>trim=</code>. It is clear that <code>store_exp</code> has outliers.</p>
+<p>As an example, we will apply Box-Cox transformation on <code>store_trans</code> and <code>online_trans</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># select the two columns and save them as dat_bc</span>
+dat_bc&lt;-<span class="kw">subset</span>(sim.dat,<span class="dt">select=</span><span class="kw">c</span>(<span class="st">&quot;store_trans&quot;</span>,<span class="st">&quot;online_trans&quot;</span>))
+(trans&lt;-<span class="kw">preProcess</span>(dat_bc,<span class="dt">method=</span><span class="kw">c</span>(<span class="st">&quot;BoxCox&quot;</span>)))</code></pre></div>
+<pre><code>## Created from 1000 samples and 2 variables
+## 
+## Pre-processing:
+##   - Box-Cox transformation (2)
+##   - ignored (0)
+## 
+## Lambda estimates for Box-Cox transformation:
+## 0.1, 0.7</code></pre>
+<p>The last line of the output shows the estimates of <span class="math inline">\(\lambda\)</span> for each variable. As before, use <code>predict()</code> to get the transformed result:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">transformed&lt;-<span class="kw">predict</span>(trans,dat_bc)
+<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>),<span class="dt">oma=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>))
+<span class="kw">hist</span>(dat_bc$store_trans,<span class="dt">main=</span><span class="st">&quot;Before Transformation&quot;</span>,<span class="dt">xlab=</span><span class="st">&quot;store_trans&quot;</span>)
+<span class="kw">hist</span>(transformed$store_trans,<span class="dt">main=</span><span class="st">&quot;After Transformation&quot;</span>,<span class="dt">xlab=</span><span class="st">&quot;store_trans&quot;</span>)</code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:bc"></span>
+<img src="IDS_files/figure-html/bc-1.svg" alt="Box-Cox Transformation" width="80%" />
+<p class="caption">
+FIGURE 4.2: Box-Cox Transformation
+</p>
+</div>
+<p>Before the transformation, the <code>stroe_trans</code> is skewed right. The situation is significantly improved after (figure<a href="resolve-skewness.html#fig:bc">4.2</a>). <code>BoxCoxTrans ()</code> can also conduct Box-Cox transform. But note that <code>BoxCoxTrans ()</code> can only be applied to a single variable, and it is not possible to transform difference columns in a data frame at the same time.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(trans&lt;-<span class="kw">BoxCoxTrans</span>(dat_bc$store_trans))</code></pre></div>
+<pre><code>## Box-Cox Transformation
+## 
+## 1000 data points used to estimate Lambda
+## 
+## Input data summary:
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    1.00    3.00    4.00    5.35    7.00   20.00 
+## 
+## Largest/Smallest: 20 
+## Sample Skewness: 1.11 
+## 
+## Estimated Lambda: 0.1 
+## With fudge factor, Lambda = 0 will be used for transformations</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">transformed&lt;-<span class="kw">predict</span>(trans,dat_bc$store_trans)
+<span class="kw">skewness</span>(transformed)</code></pre></div>
+<pre><code>## [1] -0.2155</code></pre>
+<p>The estimate of <span class="math inline">\(\lambda\)</span> is the same as before (0.1). The skewness of the original observation is 1.1, and -0.2 after transformation. Although it is not strictly 0, it is greatly improved.</p>
+</div>
+<h3> References</h3>
+<div id="refs" class="references">
+<div id="ref-BOXCOX1">
+<p>Box G, Cox D. 1964. “An Analysis of Transformations.” <em>Journal of the Royal Statistical Society</em> Series B (Methodological): 211–52.</p>
+</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="about-the-authors.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="the-art-of-data-science.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="centering-and-scaling.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="resolve-outliers.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -220,7 +357,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/happyrabbit/IntroDataScience/index.rmd",
+"link": "https://github.com/happyrabbit/IntroDataScience/05-DataPreprocessing.Rmd",
 "text": "Edit"
 },
 "download": ["IDS.pdf", "IDS.epub", "IDS.mobi"],

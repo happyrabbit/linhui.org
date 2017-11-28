@@ -32,8 +32,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="about-the-authors.html">
-<link rel="next" href="the-art-of-data-science.html">
+<link rel="prev" href="collinearity.html">
+<link rel="next" href="re-encode-dummy-variables.html">
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
@@ -180,18 +180,36 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="acknowledgements" class="section level1 unnumbered">
-<h1>Acknowledgements</h1>
-<p>We want to give special thanks to Alex Shum and David Body for their editing and comments on the sections of this book.</p>
-
+<div id="sparse-variables" class="section level2">
+<h2><span class="header-section-number">4.7</span> Sparse Variables</h2>
+<p>Other than the highly related predictors, predictors with degenerate distributions can cause the problem too. Removing those variables can significantly improve some models’ performance and stability (such as linear regression and logistic regression but the tree based model is impervious to this type of predictors). One extreme example is a variable with a single value which is called zero-variance variable. Variables with very low frequency of unique values are near-zero variance predictors. In general, detecting those variables follows two rules:</p>
+<ul>
+<li>The fraction of unique values over the sample size</li>
+<li>The ratio of the frequency of the most prevalent value to the frequency of the second most prevalent value.</li>
+</ul>
+<p><code>nearZeroVar()</code> function in the <code>caret</code> package can filter near-zero variance predictors according to the above rules. In order to show the useage of the function, let’s arbitaryly add some problematic variables to the origional data <code>sim.dat</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># make a copy</span>
+zero_demo&lt;-sim.dat
+<span class="co"># add two sparse variable</span>
+<span class="co"># zero1 only has one unique value</span>
+<span class="co"># zero2 is a vector with the first element 1 and the rest are 0s</span>
+zero_demo$zero1&lt;-<span class="kw">rep</span>(<span class="dv">1</span>,<span class="kw">nrow</span>(zero_demo))
+zero_demo$zero2&lt;-<span class="kw">c</span>(<span class="dv">1</span>,<span class="kw">rep</span>(<span class="dv">0</span>,<span class="kw">nrow</span>(zero_demo)-<span class="dv">1</span>))</code></pre></div>
+<p>The function will return a vector of integers indicating which columns to remove:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">nearZeroVar</span>(zero_demo,<span class="dt">freqCut =</span> <span class="dv">95</span>/<span class="dv">5</span>, <span class="dt">uniqueCut =</span> <span class="dv">10</span>)</code></pre></div>
+<p>As expected, it returns the two columns we generated. You can go ahead to remove them. Note the two arguments in the function <code>freqCut =</code> and <code>uniqueCut =</code> are corresponding to the previous two rules.</p>
+<ul>
+<li><code>freqCut</code>: the cutoff for the ratio of the most common value to the second most common value</li>
+<li><code>uniqueCut</code>: the cutoff for the percentage of distinct values out of the number of total samples</li>
+</ul>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="about-the-authors.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="the-art-of-data-science.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="collinearity.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="re-encode-dummy-variables.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -220,7 +238,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/happyrabbit/IntroDataScience/index.rmd",
+"link": "https://github.com/happyrabbit/IntroDataScience/05-DataPreprocessing.Rmd",
 "text": "Edit"
 },
 "download": ["IDS.pdf", "IDS.epub", "IDS.mobi"],

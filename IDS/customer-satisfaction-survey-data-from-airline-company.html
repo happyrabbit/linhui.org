@@ -32,8 +32,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="about-the-authors.html">
-<link rel="next" href="the-art-of-data-science.html">
+<link rel="prev" href="customer-data-for-clothing-company.html">
+<link rel="next" href="swine-disease-breakout-data.html">
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
@@ -180,18 +180,165 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="acknowledgements" class="section level1 unnumbered">
-<h1>Acknowledgements</h1>
-<p>We want to give special thanks to Alex Shum and David Body for their editing and comments on the sections of this book.</p>
+<div id="customer-satisfaction-survey-data-from-airline-company" class="section level2">
+<h2><span class="header-section-number">3.2</span> Customer Satisfaction Survey Data from Airline Company</h2>
+<p>We will simulate a customer satisfaction survey for three airline companies. There are <code>N=1000</code> respondents and 15 questions. The market researcher asked respondents to recall the experience with different airline companies and assign a score (1-9) to each airline company for all the 15 questions. The higher the score, the more satisfied the customer to the specific item. The 15 questions are of 4 types (the variable names are in the parentheses):</p>
+<ul>
+<li>How satisfied are you with your______?</li>
+</ul>
+<ol style="list-style-type: decimal">
+<li>Ticketing
+<ul>
+<li>Ease of making reservation（Easy_Reservation）</li>
+<li>Availability of preferred seats（Preferred_Seats）</li>
+<li>Variety of flight options（Flight_Options）</li>
+<li>Ticket prices（Ticket_Prices）</li>
+</ul></li>
+<li>Aircraft
+<ul>
+<li>Seat comfort（Seat_Comfort）</li>
+<li>Roominess of seat area（Seat_Roominess）</li>
+<li>Availability of Overhead（Overhead_Storage）</li>
+<li>Cleanliness of aircraft（Clean_Aircraft）</li>
+</ul></li>
+<li>Service
+<ul>
+<li>Courtesy of flight attendant（Courtesy）</li>
+<li>Friendliness（Friendliness）</li>
+<li>Helpfulness（Helpfulness）</li>
+<li>Food and drinks（Service）</li>
+</ul></li>
+<li>General
+<ul>
+<li>Overall satisfaction（Satisfaction）</li>
+<li>Purchase again（Fly_Again）</li>
+<li>Willingness to recommend（Recommend）</li>
+</ul></li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Create a matrix of factor loadings</span>
+<span class="co"># This pattern is called bifactor because it has a general factor for separate components.</span>
+<span class="co"># For example, &quot;Ease of making reservation&quot; has general factor loading 0.33, specific factor loading 0.58</span>
+<span class="co"># The outcome variables are formed as combinations of these general and specific factors</span>
 
+loadings &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span> (
+  <span class="co"># Ticketing</span>
+  .<span class="dv">33</span>, .<span class="dv">58</span>, .<span class="dv">00</span>, .<span class="dv">00</span>,  <span class="co"># Ease of making reservation </span>
+  .<span class="dv">35</span>, .<span class="dv">55</span>, .<span class="dv">00</span>, .<span class="dv">00</span>,  <span class="co"># Availability of preferred seats</span>
+  .<span class="dv">30</span>, .<span class="dv">52</span>, .<span class="dv">00</span>, .<span class="dv">00</span>,  <span class="co"># Variety of flight options</span>
+  .<span class="dv">40</span>, .<span class="dv">50</span>, .<span class="dv">00</span>, .<span class="dv">00</span>,  <span class="co"># Ticket prices</span>
+  <span class="co"># Aircraft</span>
+  .<span class="dv">50</span>, .<span class="dv">00</span>, .<span class="dv">55</span>, .<span class="dv">00</span>,  <span class="co"># Seat comfort</span>
+  .<span class="dv">41</span>, .<span class="dv">00</span>, .<span class="dv">51</span>, .<span class="dv">00</span>,  <span class="co"># Roominess of seat area</span>
+  .<span class="dv">45</span>, .<span class="dv">00</span>, .<span class="dv">57</span>, .<span class="dv">00</span>,  <span class="co"># Availability of Overhead</span>
+  .<span class="dv">32</span>, .<span class="dv">00</span>, .<span class="dv">54</span>, .<span class="dv">00</span>,  <span class="co"># Cleanliness of aircraft</span>
+  <span class="co"># Service</span>
+  .<span class="dv">35</span>, .<span class="dv">00</span>, .<span class="dv">00</span>, .<span class="dv">50</span>,  <span class="co"># Courtesy of flight attendant</span>
+  .<span class="dv">38</span>, .<span class="dv">00</span>, .<span class="dv">00</span>, .<span class="dv">57</span>,  <span class="co"># Friendliness</span>
+  .<span class="dv">60</span>, .<span class="dv">00</span>, .<span class="dv">00</span>, .<span class="dv">50</span>,  <span class="co"># Helpfulness</span>
+  .<span class="dv">52</span>, .<span class="dv">00</span>, .<span class="dv">00</span>, .<span class="dv">58</span>,  <span class="co"># Food and drinks</span>
+  <span class="co"># General   </span>
+  .<span class="dv">43</span>, .<span class="dv">10</span>, .<span class="dv">30</span>, .<span class="dv">30</span>,  <span class="co"># Overall satisfaction</span>
+  .<span class="dv">35</span>, .<span class="dv">50</span>, .<span class="dv">40</span>, .<span class="dv">20</span>,  <span class="co"># Purchase again</span>
+  .<span class="dv">25</span>, .<span class="dv">50</span>, .<span class="dv">50</span>, .<span class="dv">20</span>), <span class="co"># Willingness to recommend</span>
+  <span class="dt">nrow=</span><span class="dv">15</span>,<span class="dt">ncol=</span><span class="dv">4</span>, <span class="dt">byrow=</span><span class="ot">TRUE</span>)
+  
+<span class="co"># Matrix multiplication produces the correlation matrix except for the diagonal</span>
+cor_matrix&lt;-loadings %*%<span class="st"> </span><span class="kw">t</span>(loadings)
+<span class="co"># Diagonal set to ones</span>
+<span class="kw">diag</span>(cor_matrix)&lt;-<span class="dv">1</span>
+
+<span class="co"># use the mvtnorm package to randomly generate a data set with a given correlation pattern</span>
+
+<span class="kw">library</span>(mvtnorm)
+<span class="co"># mean vectors of the 3 airline companies</span>
+mu1=<span class="kw">c</span>(<span class="dv">5</span>,<span class="dv">6</span>,<span class="dv">5</span>,<span class="dv">6</span>, <span class="dv">7</span>,<span class="dv">8</span>,<span class="dv">6</span>,<span class="dv">7</span>, <span class="dv">5</span>,<span class="dv">5</span>,<span class="dv">5</span>,<span class="dv">5</span>, <span class="dv">6</span>,<span class="dv">6</span>,<span class="dv">6</span>)
+mu2=<span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">2</span>,<span class="dv">3</span>, <span class="dv">5</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>, <span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">8</span>, <span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">3</span>)
+mu3=<span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>, <span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">8</span>, <span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">8</span>, <span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">8</span>)
+
+<span class="co"># set random seed</span>
+<span class="kw">set.seed</span>(<span class="dv">123456</span>) 
+<span class="co"># respondent ID</span>
+resp.id &lt;-<span class="st"> </span><span class="dv">1</span>:<span class="dv">1000</span> 
+
+<span class="kw">library</span>(MASS) 
+rating1 &lt;-<span class="st"> </span><span class="kw">mvrnorm</span>(<span class="kw">length</span>(resp.id),
+                     <span class="dt">mu=</span>mu1,
+                     <span class="dt">Sigma=</span>cor_matrix)
+rating2 &lt;-<span class="st"> </span><span class="kw">mvrnorm</span>(<span class="kw">length</span>(resp.id),
+                   <span class="dt">mu=</span>mu2,
+                   <span class="dt">Sigma=</span>cor_matrix)
+rating3 &lt;-<span class="st"> </span><span class="kw">mvrnorm</span>(<span class="kw">length</span>(resp.id),
+                   <span class="dt">mu=</span>mu3,
+                   <span class="dt">Sigma=</span>cor_matrix)
+
+
+<span class="co"># truncates scale to be between 1 and 9</span>
+rating1[rating1&gt;<span class="dv">9</span>]&lt;-<span class="dv">9</span>
+rating1[rating1&lt;<span class="dv">1</span>]&lt;-<span class="dv">1</span>
+rating2[rating2&gt;<span class="dv">9</span>]&lt;-<span class="dv">9</span>
+rating2[rating2&lt;<span class="dv">1</span>]&lt;-<span class="dv">1</span>
+rating3[rating3&gt;<span class="dv">9</span>]&lt;-<span class="dv">9</span>
+rating3[rating3&lt;<span class="dv">1</span>]&lt;-<span class="dv">1</span>
+
+<span class="co"># Round to single digit</span>
+rating1&lt;-<span class="kw">data.frame</span>(<span class="kw">round</span>(rating1,<span class="dv">0</span>))
+rating2&lt;-<span class="kw">data.frame</span>(<span class="kw">round</span>(rating2,<span class="dv">0</span>))
+rating3&lt;-<span class="kw">data.frame</span>(<span class="kw">round</span>(rating3,<span class="dv">0</span>))
+rating1$ID&lt;-resp.id
+rating2$ID&lt;-resp.id
+rating3$ID&lt;-resp.id
+rating1$Airline&lt;-<span class="kw">rep</span>(<span class="st">&quot;AirlineCo.1&quot;</span>,<span class="kw">length</span>(resp.id))
+rating2$Airline&lt;-<span class="kw">rep</span>(<span class="st">&quot;AirlineCo.2&quot;</span>,<span class="kw">length</span>(resp.id))
+rating3$Airline&lt;-<span class="kw">rep</span>(<span class="st">&quot;AirlineCo.3&quot;</span>,<span class="kw">length</span>(resp.id))
+rating&lt;-<span class="kw">rbind</span>(rating1,rating2,rating3)
+
+<span class="co"># assign names to the variables in the data frame</span>
+<span class="kw">names</span>(rating)&lt;-<span class="kw">c</span>(
+  <span class="st">&quot;Easy_Reservation&quot;</span>,
+  <span class="st">&quot;Preferred_Seats&quot;</span>,
+  <span class="st">&quot;Flight_Options&quot;</span>,
+  <span class="st">&quot;Ticket_Prices&quot;</span>,
+  <span class="st">&quot;Seat_Comfort&quot;</span>,
+  <span class="st">&quot;Seat_Roominess&quot;</span>,
+  <span class="st">&quot;Overhead_Storage&quot;</span>,
+  <span class="st">&quot;Clean_Aircraft&quot;</span>,
+  <span class="st">&quot;Courtesy&quot;</span>,
+  <span class="st">&quot;Friendliness&quot;</span>,
+  <span class="st">&quot;Helpfulness&quot;</span>,
+  <span class="st">&quot;Service&quot;</span>,
+  <span class="st">&quot;Satisfaction&quot;</span>,
+  <span class="st">&quot;Fly_Again&quot;</span>,
+  <span class="st">&quot;Recommend&quot;</span>,
+  <span class="st">&quot;ID&quot;</span>,
+  <span class="st">&quot;Airline&quot;</span>)</code></pre></div>
+<p>Now check the data frame we have:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(rating,<span class="dt">vec.len=</span><span class="dv">3</span>)</code></pre></div>
+<pre><code>## Classes &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;:    3000 obs. of  17 variables:
+##  $ Easy_Reservation: int  6 5 6 5 4 5 6 4 ...
+##  $ Preferred_Seats : int  5 7 6 6 5 6 6 6 ...
+##  $ Flight_Options  : int  4 7 5 5 3 4 6 3 ...
+##  $ Ticket_Prices   : int  5 6 6 5 6 5 5 5 ...
+##  $ Seat_Comfort    : int  5 6 7 7 6 6 6 4 ...
+##  $ Seat_Roominess  : int  7 8 6 8 7 8 6 5 ...
+##  $ Overhead_Storage: int  5 5 7 6 5 4 4 4 ...
+##  $ Clean_Aircraft  : int  7 6 7 7 7 7 6 4 ...
+##  $ Courtesy        : int  5 6 6 4 2 5 5 4 ...
+##  $ Friendliness    : int  4 6 6 6 3 4 5 5 ...
+##  $ Helpfulness     : int  6 5 6 4 4 5 5 4 ...
+##  $ Service         : int  6 5 6 5 3 5 5 5 ...
+##  $ Satisfaction    : int  6 7 7 5 4 6 5 5 ...
+##  $ Fly_Again       : int  6 6 6 7 4 5 3 4 ...
+##  $ Recommend       : int  3 6 5 5 4 5 6 5 ...
+##  $ ID              : int  1 2 3 4 5 6 7 8 ...
+##  $ Airline         : chr  &quot;AirlineCo.1&quot; &quot;AirlineCo.1&quot; &quot;AirlineCo.1&quot; ...</code></pre>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="about-the-authors.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="the-art-of-data-science.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="customer-data-for-clothing-company.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="swine-disease-breakout-data.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -220,7 +367,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/happyrabbit/IntroDataScience/index.rmd",
+"link": "https://github.com/happyrabbit/IntroDataScience/03-Dataset.Rmd",
 "text": "Edit"
 },
 "download": ["IDS.pdf", "IDS.epub", "IDS.mobi"],

@@ -32,8 +32,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="about-the-authors.html">
-<link rel="next" href="the-art-of-data-science.html">
+<link rel="prev" href="sparse-variables.html">
+<link rel="next" href="data-wrangling.html">
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
@@ -180,18 +180,62 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="acknowledgements" class="section level1 unnumbered">
-<h1>Acknowledgements</h1>
-<p>We want to give special thanks to Alex Shum and David Body for their editing and comments on the sections of this book.</p>
+<div id="re-encode-dummy-variables" class="section level2">
+<h2><span class="header-section-number">4.8</span> Re-encode Dummy Variables</h2>
+<p>A dummy variable is a binary variable (0/1) to represent subgroups of the sample. Sometimes we need to recode categories to smaller bits of information named “dummy variables”. For example, some questionnaires have five options for each question, A, B, C, D, and E. After you get the data, you will usually convert the corresponding categorical variables for each question into five nominal variables, and then use one of the options as the baseline.</p>
+<p>Let’s encode <code>gender</code> and <code>house</code> from <code>sim.dat</code> to dummy variables. There are two ways to implement this. The first is to use <code>class.ind()</code> from <code>nnet</code> package. However, it only works on one variable at a time.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dumVar&lt;-<span class="kw">class.ind</span>(sim.dat$gender)
+<span class="kw">head</span>(dumVar)</code></pre></div>
+<pre><code>##      Female Male
+## [1,]      1    0
+## [2,]      1    0
+## [3,]      0    1
+## [4,]      0    1
+## [5,]      0    1
+## [6,]      0    1</code></pre>
+<p>Since it is redundant to keep both, we need to remove one of them when modeling. Another more powerful function is <code>dummyVars()</code> from <code>caret</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dumMod&lt;-<span class="kw">dummyVars</span>(~gender+house+income,
+                  <span class="dt">data=</span>sim.dat,
+                  <span class="co"># use &quot;origional variable name + level&quot; as new name</span>
+                  <span class="dt">levelsOnly=</span>F)
+<span class="kw">head</span>(<span class="kw">predict</span>(dumMod,sim.dat))</code></pre></div>
+<pre><code>##   gender.Female gender.Male house.No house.Yes income
+## 1             1           0        0         1 120963
+## 2             1           0        0         1 122008
+## 3             0           1        0         1 114202
+## 4             0           1        0         1 113616
+## 5             0           1        0         1 124253
+## 6             0           1        0         1 107661</code></pre>
+<p><code>dummyVars()</code> can also use formula format. The variable on the right-hand side can be both categorical and numeric. For numerical variable, the function will keep the variable unchanged. The advantage is that you can apply the function to a data frame without removing numerical variables. Other than that, the function can create interaction term:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dumMod&lt;-<span class="kw">dummyVars</span>(~gender+house+income+income:gender,
+                  <span class="dt">data=</span>sim.dat,
+                  <span class="dt">levelsOnly=</span>F)
+<span class="kw">head</span>(<span class="kw">predict</span>(dumMod,sim.dat))</code></pre></div>
+<pre><code>##   gender.Female gender.Male house.No house.Yes income
+## 1             1           0        0         1 120963
+## 2             1           0        0         1 122008
+## 3             0           1        0         1 114202
+## 4             0           1        0         1 113616
+## 5             0           1        0         1 124253
+## 6             0           1        0         1 107661
+##   gender.Female:income gender.Male:income
+## 1               120963                  0
+## 2               122008                  0
+## 3                    0             114202
+## 4                    0             113616
+## 5                    0             124253
+## 6                    0             107661</code></pre>
+<p>If you think the impact income levels on purchasing behavior is different for male and female, then you may add the interaction term between <code>income</code> and <code>gender</code>. You can do this by adding <code>income: gender</code> in the formula.</p>
 
 </div>
+<!-- </div> -->
             </section>
 
           </div>
         </div>
       </div>
-<a href="about-the-authors.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="the-art-of-data-science.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="sparse-variables.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="data-wrangling.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -220,7 +264,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/happyrabbit/IntroDataScience/index.rmd",
+"link": "https://github.com/happyrabbit/IntroDataScience/05-DataPreprocessing.Rmd",
 "text": "Edit"
 },
 "download": ["IDS.pdf", "IDS.epub", "IDS.mobi"],

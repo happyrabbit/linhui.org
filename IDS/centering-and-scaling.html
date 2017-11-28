@@ -32,8 +32,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="about-the-authors.html">
-<link rel="next" href="the-art-of-data-science.html">
+<link rel="prev" href="missing-values.html">
+<link rel="next" href="resolve-skewness.html">
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
@@ -180,18 +180,81 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="acknowledgements" class="section level1 unnumbered">
-<h1>Acknowledgements</h1>
-<p>We want to give special thanks to Alex Shum and David Body for their editing and comments on the sections of this book.</p>
-
+<div id="centering-and-scaling" class="section level2">
+<h2><span class="header-section-number">4.3</span> Centering and Scaling</h2>
+<p>It is the most straightforward data transformation. It centers and scales a variable to mean 0 and standard deviation 1. It ensures that the criterion for finding linear combinations of the predictors is based on how much variation they explain and therefore improves the numerical stability. Models involving finding linear combinations of the predictors to explain response/predictors variation need data centering and scaling, such as PCA <span class="citation">(Jolliffe <a href="#ref-pca1">2002</a>)</span>, PLS <span class="citation">(Geladi P <a href="#ref-PLS1">1986</a>)</span> and EFA <span class="citation">(Mulaik <a href="#ref-EFA1">2009</a>)</span>. You can easily writing code yourself to conduct this transformation.</p>
+<p>Let’s standarize the variable <code>income</code> from <code>sim.dat</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">income&lt;-sim.dat$income
+<span class="co"># calculate the mean of income</span>
+mux&lt;-<span class="kw">mean</span>(income,<span class="dt">na.rm=</span>T)
+<span class="co"># calculate the standard deviation of income</span>
+sdx&lt;-<span class="kw">sd</span>(income,<span class="dt">na.rm=</span>T)
+<span class="co"># centering</span>
+tr1&lt;-income-mux
+<span class="co"># scaling</span>
+tr2&lt;-tr1/sdx</code></pre></div>
+<p>Or the function <code>preProcess()</code> in package <code>caret</code> can apply this transformation to a set of predictors.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sdat&lt;-<span class="kw">subset</span>(sim.dat,<span class="dt">select=</span><span class="kw">c</span>(<span class="st">&quot;age&quot;</span>,<span class="st">&quot;income&quot;</span>))
+<span class="co"># set the &quot;method&quot; option</span>
+trans&lt;-<span class="kw">preProcess</span>(sdat,<span class="dt">method=</span><span class="kw">c</span>(<span class="st">&quot;center&quot;</span>,<span class="st">&quot;scale&quot;</span>))
+<span class="co"># use predict() function to get the final result</span>
+transformed&lt;-<span class="kw">predict</span>(trans,sdat)</code></pre></div>
+<p>Now the two variables are in the same scale:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(transformed)</code></pre></div>
+<pre><code>##       age             income     
+##  Min.   :-1.591   Min.   :-1.44  
+##  1st Qu.:-0.957   1st Qu.:-0.56  
+##  Median :-0.182   Median :-0.39  
+##  Mean   : 0.000   Mean   : 0.00  
+##  3rd Qu.: 1.016   3rd Qu.: 0.22  
+##  Max.   : 2.144   Max.   : 4.14  
+##  NA&#39;s   :1        NA&#39;s   :184</code></pre>
+<p>Sometimes you only need to scale the variable. For example, if the model adds penalty to the parameter estimates (such as <span class="math inline">\(L_2\)</span> penalty is ridge regression and <span class="math inline">\(L_1\)</span> penalty in LASSO), the variables need to have similar scale to ensure a fair variable selection. We are heavy user of this kind of penalty-based model in my work and we used the following quantile transformation:</p>
+<p><span class="math display">\[
+x_{ij}^{*}=\frac{x_{ij}-quantile(x_{.j},0.01)}{quantile(x_{.j}-0.99)-quantile(x_{-j},0.01)}
+\]</span></p>
+<p>The reason to use 99% and 1% quantile instead of maximum and minimum values is to resist the impact of outliers.</p>
+<p>It is easy to write a function to do it:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">qscale&lt;-function(dat){
+  for (i in <span class="dv">1</span>:<span class="kw">ncol</span>(dat)){
+    up&lt;-<span class="kw">quantile</span>(dat[,i],<span class="fl">0.99</span>)
+    low&lt;-<span class="kw">quantile</span>(dat[,i],<span class="fl">0.01</span>)
+    diff&lt;-up-low
+    dat[,i]&lt;-(dat[,i]-low)/diff
+  }
+  <span class="kw">return</span>(dat)
+}</code></pre></div>
+<p>In order to illustrate, let’s apply it to some variables from `demo_imp2:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">demo_imp3&lt;-<span class="kw">qscale</span>(<span class="kw">subset</span>(demo_imp2,<span class="dt">select=</span><span class="kw">c</span>(<span class="st">&quot;income&quot;</span>,<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>)))
+<span class="kw">summary</span>(demo_imp3)</code></pre></div>
+<pre><code>##      income          store_exp        online_exp     
+##  Min.   :-0.0578   Min.   :-0.003   Min.   :-0.0060  
+##  1st Qu.: 0.1574   1st Qu.: 0.004   1st Qu.: 0.0427  
+##  Median : 0.1852   Median : 0.023   Median : 0.2537  
+##  Mean   : 0.2601   Mean   : 0.177   Mean   : 0.2784  
+##  3rd Qu.: 0.3046   3rd Qu.: 0.063   3rd Qu.: 0.3229  
+##  Max.   : 1.2386   Max.   : 7.477   Max.   : 1.2988</code></pre>
+<p>After transformation, most of the variables are between 0-1.</p>
+</div>
+<h3> References</h3>
+<div id="refs" class="references">
+<div id="ref-pca1">
+<p>Jolliffe, I.T. 2002. <em>Principla Component Analysis</em>. 2nd ed. New York: Springer.</p>
+</div>
+<div id="ref-PLS1">
+<p>Geladi P, Kowalski B. 1986. “Partial Least-Squares Regression: A Tutorial.” <em>Analytica Chimica Acta</em>, no. 185: 1–17.</p>
+</div>
+<div id="ref-EFA1">
+<p>Mulaik, S.A. 2009. <em>Foundations of Factor Analysis</em>. 2ND ed. Boca Raton: Chapman&amp;Hall/CRC.</p>
+</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="about-the-authors.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="the-art-of-data-science.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="missing-values.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="resolve-skewness.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -220,7 +283,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/happyrabbit/IntroDataScience/index.rmd",
+"link": "https://github.com/happyrabbit/IntroDataScience/05-DataPreprocessing.Rmd",
 "text": "Edit"
 },
 "download": ["IDS.pdf", "IDS.epub", "IDS.mobi"],
