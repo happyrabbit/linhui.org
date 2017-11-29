@@ -32,8 +32,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="index.html">
-<link rel="next" href="what-is-sql.html">
+<link rel="prev" href="retrive-data-with-select.html">
+<link rel="next" href="sql-comments.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -130,29 +130,75 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="getting-started" class="section level1">
-<h1><span class="header-section-number">Chapter 1</span> Getting Started</h1>
-<p>In this section, you will be able to define SQL and discuss how SQL differs from other computer languages. You will be able to compare and contrast the roles of a database administrator and a data scientist, and explain the differences between one-to-one, one-to-many and many-to-many relationships with databases. You will be able to use the <code>SELECT</code> statement and talk about some basic syntax rules. You will be able to add comments in your code and synthesize its importance.</p>
-<p><strong>Learning Objectives</strong></p>
-<ul>
-<li>Distinguish between use of SQL for data science applications and SQL for more common data management operations.</li>
-<li>Use an Entity Relationship diagram, describing the data elements, their relationships and inter-dependencies and determine if the existent data is sufficient to address a business question.</li>
-<li>Identify a subset of data needed from a column or set of columns and write and SQL query to limit to those results.</li>
-<li>Create an analysis environment and use <code>INSERT</code> to put data into a table</li>
-<li>Add effective comments in your queries so that:
+<div id="create-table" class="section level2">
+<h2><span class="header-section-number">2.4</span> Create Table</h2>
+<p>As a data scientist, you are always building models and making predictions. You may want to take those predictions that you create and write them back to a database. This ensures that someone else could then pick up those predictions and use them in a dashboard. Or you may want to create a dashboard or visualize it with another tool that can be hooked up and used with that database. It’s also helpful if you’re extracting data off the web or scraping it from somewhere and you want to store this data in a database. As we have previously discussed, the data scientist isn’t usually the one in charge of managing the entire database, that usually left to the DBA or some type of administrator. Even so, it’s helpful to have a basic understanding of how this works. You can use the statement <code>CREATE TABLE</code> to do this.</p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">CREATE</span> <span class="kw">TABLE</span> Shoes
+(
+<span class="kw">Id</span>     <span class="dt">char</span>(<span class="dv">10</span>)     <span class="kw">PRIMARY</span> <span class="kw">KEY</span>,
+Brand  <span class="dt">char</span>(<span class="dv">10</span>)     <span class="kw">NOT</span> <span class="kw">NULL</span>,
+ShoeTypes  <span class="dt">char</span>(<span class="dv">250</span>)    <span class="kw">NOT</span> <span class="kw">NULL</span>,
+Color  <span class="dt">char</span>(<span class="dv">250</span>)    <span class="kw">NOT</span> <span class="kw">NULL</span>,
+Price  <span class="dt">decimal</span>(<span class="dv">8</span>,<span class="dv">2</span>) <span class="kw">NOT</span> <span class="kw">NULL</span>,
+Descp  <span class="dt">Varchar</span>(<span class="dv">750</span>) <span class="kw">NULL</span>
+);</code></pre></div>
+<p>In the above example, you create a table named “<code>Shoes</code>” by putting the name after <code>CREATE TABLE</code>. Then define the list of columns in the brackets. The first column is <code>Id</code>. It is a character with lenth 10. And the <code>Id</code> is going to be primary key. So you define data type (how many characters or decimals you allow to be inserted into this column), whether or not you allow null values. By default, it assumes that null values are accepted.</p>
+<p>The syntax for creating these tables varies greatly by relational database management system that you’re using. The above example exhibits the basic structure to create a table. However, it’s important to check the specifications and syntax of the relational database management system you’re using. An important thing to note when creating a table is to define whether a column can contain a null value or is a primary key. There are several things to pay special attention here:</p>
 <ol style="list-style-type: decimal">
-<li>You can remember what you are doing</li>
-<li>others can review your work</li>
-</ol></li>
-</ul> 
+<li>Don’t confuse null value with empty string. Null value is the absence of everything, whereas empty string is a value there, such as space.</li>
+<li>A primary key cannot accept null values. The <code>Id</code> in the example can never have an empty value or not any value.</li>
+<li>If you indicate that a column cannot be null, then you will get an error if there is any missing value in that column.</li>
+</ol>
+<p>There are two ways to incert data to the table after defining the variables:</p>
+<ol style="list-style-type: decimal">
+<li>Use <code>INSERT INTO</code> statement</li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">INSERT</span> <span class="kw">INTO</span> Shoes
+<span class="kw">VALUES</span> ( <span class="st">&#39;14535974&#39;</span>,
+<span class="st">&#39;Gucci&#39;</span>,
+<span class="st">&#39;Slippers&#39;</span>,
+<span class="st">&#39;Pink&#39;</span>,
+<span class="st">&#39;695.00&#39;</span>,
+<span class="kw">NULL</span>
+);</code></pre></div>
+<p>The first method will take the first value indicated and put it in the first column; the second value will go to the second column, and so on and so forth. It works. However, a potential problem of this method is that you have no guarantee that data is going into the correct column. It is better to be more specific.</p>
+<ol start="2" style="list-style-type: decimal">
+<li>Use <code>INSERT INTO</code> and <code>VALUES</code></li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">INSERT</span> <span class="kw">INTO</span> Shoes
+(<span class="kw">Id</span>, 
+Brand,
+ShoeTypes,
+Color,
+Price,
+Descp
+)
+<span class="kw">VALUES</span> 
+( 
+<span class="st">&#39;14535974&#39;</span>,
+<span class="st">&#39;Gucci&#39;</span>,
+<span class="st">&#39;Slippers&#39;</span>,
+<span class="st">&#39;Pink&#39;</span>,
+<span class="st">&#39;695.00&#39;</span>,
+<span class="kw">NULL</span>
+);</code></pre></div>
+<p>The second method also lists the columns. This can be really beneficial if you want to insert values into some columns but not all. I will recommend using this method. It’s a little safer because you have more control and know exactly which value is going and into which column.</p>
+<p>Now you have learned how to create tables using SQL. Another option is to create a copy or get a subset of an existing table. A table created this way is a <strong>temporary table</strong>. The most important thing to know about temporary tables is that they will be deleted when the current client session is terminated. That’s why they’re called temporary tables. Why do we need temporary table? Because it is mush faster than creating a real table. If you have complex queries and you want to simplify it a bit by creating a subset and then joining to that subset and driving a new calculation from that, then temporary table is a great option. You can use the statement <code>CREATE TEMPORARY TABLE</code> to do this:</p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">CREATE</span> <span class="kw">TEMPORARY</span> <span class="kw">TABLE</span> Sandals <span class="kw">AS</span>
+(
+<span class="kw">SELECT</span> *
+<span class="kw">FROM</span> Shoes
+<span class="kw">WHERE</span> ShoeTypes = <span class="st">&#39;sandals&#39;</span>
+)</code></pre></div>
+<p>In this case, we create a subset of data from <code>Shoes</code> table and name the new table <code>Sandals</code>. The new table is all records with shoe type sandals.</p>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="index.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="what-is-sql.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="retrive-data-with-select.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="sql-comments.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
