@@ -32,8 +32,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="sql-comments.html">
-<link rel="next" href="filter.html">
+<link rel="prev" href="filter.html">
+<link rel="next" href="in-or-and-not.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -133,33 +133,108 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="summary" class="section level2">
-<h2><span class="header-section-number">2.6</span> Summary</h2>
-<p>In this chapter, we went over many materials. We began by defining SQL. You should know now that SQL stands for Structured Query Language which is a standard language to communicate with relational database management systems (RDMS). You should also know the difference between a transactional and a relational database. We also introduced important concept of primary key, foreign key, and table relationship. Make sure you are familiar with these concepts because we’re going to revisit them a lot in more detail later when we start talking about Joints. We also discussed some basic SQL Syntax. And you should now be able to write basic queries statements using <code>SELECT</code> and <code>FROM</code>. Finally, we wrapped up by going over how to write comments in your code which are essential to include so that both you and your colleagues can follow what you were doing and reuse your code. It’s a really good habit to get into as you’re starting out. So be sure to keep practicing that aspect as you begin to write your first query statement.</p>
-<p>Here are some resources for further learning:</p>
+<div id="where" class="section level2">
+<h2><span class="header-section-number">3.1</span> <code>WHERE</code></h2>
+<!-- Summary
+Now that you've began writing your first SQL statements, you're probably really starting to see just how much data you can pull down from databases. So far what you've been experimenting with only has been a few thousand records, but many databases have a lot more data in them. Someday you might work with databases with the millions or even tens of millions of records in it. It almost boggles the mind, right? Well clearly, we're never going to want to look at all of that data at once. So thankfully, SQL gives us several methods to pair down and sort our data so we can quickly get the results we want. That's what we're going to discuss in this module. I'm going to introduce you to several methods for filtering data. At the end of this module, you'll know how to use several more clauses and operators including WHERE, BETWEEN, IN, OR, NOT, LIKE, ORDER BY, and GROUP BY. In addition, I'm going to tell you about wildcards which allow us to search for more specific or parts of record, including their disadvantages and advantages, and how we can best use these wildcards. We'll also discuss how to use some basic math operators as well as aggregate functions like, AVERAGE, COUNT, MIN, and MAX. And we'll start to begin analyzing our data. Obviously, this module's jam packed with new information. So let's not waste any more time, and go ahead and get started. -->
+<p><strong>Learning Objectives</strong></p>
 <ul>
-<li><a href="https://www.thebalance.com/what-is-sql-and-uses-2071909">What is SQL and How is it Used?</a></li>
-<li><a href="https://www.ntchosting.com/encyclopedia/databases/structured-query-language/">NTC Hosting: Structured Query Language</a></li>
-<li><a href="https://www.tutorialspoint.com/sqlite/index.htm">SQLite Tutorial</a></li>
-<li><a href="http://www.information-management-architect.com/entity-relationship-diagram.html">Entity Relationship Diagram</a></li>
-<li><a href="https://www.youtube.com/watch?v=c0_9Y8QAstg">Norwalk Aberdeen: Entity-Relationsip Diagrams (9 Minute YouTube Video)</a></li>
-<li><a href="http://www.vertabelo.com/blog/technical-articles/data-warehouse-modeling-star-schema-vs-snowflake-schema">Star Schema vs. Snowflake Schema</a></li>
-<li><a href="https://www.youtube.com/watch?v=KUwOcip7Zzc">Explain Star Schema &amp; Snow Flake Design (5 Minute YouTube Video)</a></li>
-<li><a href="http://www.agiledata.org/essays/dataModeling101.html">Data Modeling 101</a></li>
-<li><a href="http://business-analysis-excellence.com/what-is-data-modeling/">What is Data Modeling - An Introduction for Business Analysts</a></li>
-<li><a href="https://en.wikipedia.org/wiki/Data_modeling">Wikipedia: Data Modeling</a></li>
+<li>Describe the basics of filtering your data</li>
+<li>Use the <code>WHERE</code> clause with common operators</li>
+<li>Use <code>BETWEEN</code> clause</li>
+<li>Explain the concept of a <code>NULL</code> value</li>
 </ul>
-<!--In the next section, we're going to go over the methods for sorting, filtering, and paring down your data results. As you've probably seen by now, some data sets contain millions of records, and it would be crazy to try and look at all of them. So this is an important skill to have. -->
-
+<p>Filtering allows us to narrow the data we want to retrieve. Filtering is also used when you’re doing analysis to get very specific about the data you want to analyze as part of your model. To do this we use what’s called the <code>WHERE</code> clause. And the <code>WHERE</code> clause comes after <code>SELECT</code> and <code>FROM</code></p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> column_name, column_name
+<span class="kw">FROM</span> table_name
+<span class="kw">WHERE</span> column_name <span class="kw">operator</span> <span class="fu">value</span>;</code></pre></div>
+<p>Here is a table of common operators:</p>
+<table style="width:33%;">
+<colgroup>
+<col width="13%" />
+<col width="19%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Operator</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>=</code></td>
+<td>Equal</td>
+</tr>
+<tr class="even">
+<td><code>&lt;&gt;</code></td>
+<td>Not equal. Note: In some versions of SQL this operator may be written as <code>!=</code></td>
+</tr>
+<tr class="odd">
+<td><code>&gt;</code></td>
+<td>Greater than</td>
+</tr>
+<tr class="even">
+<td><code>&lt;</code></td>
+<td>Less than</td>
+</tr>
+<tr class="odd">
+<td><code>&gt;=</code></td>
+<td>Greater than or equal</td>
+</tr>
+<tr class="even">
+<td><code>&lt;=</code></td>
+<td>Less than or equal</td>
+</tr>
+<tr class="odd">
+<td>BETWEEN</td>
+<td>Between an inclusive range</td>
+</tr>
+<tr class="even">
+<td>IS NULL</td>
+<td>Is a null value</td>
+</tr>
+</tbody>
+</table>
+<p>Let’s look at some examples.</p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> ProductName,
+UnitPrice,
+SupplierID
+<span class="kw">FROM</span> Products
+<span class="kw">WHERE</span> ProductName = <span class="st">&#39;Tofu&#39;</span>;</code></pre></div>
+<p>In the above example, we filter on a single condition. We look at ProductName, UnitPrice and SupplierID for tofu. You can similarly look at products whose prices are greater than or equal to 75.</p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> ProductName,
+UnitPrice,
+SupplierID
+<span class="kw">FROM</span> Products
+<span class="kw">WHERE</span> UnitPrice &gt;= <span class="dv">75</span>;</code></pre></div>
+<p>Or you can filter out all records except one value:</p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> ProductName,
+UnitPrice,
+SupplierID
+<span class="kw">FROM</span> Products
+<span class="kw">WHERE</span> ProductName &lt;&gt; <span class="st">&#39;Tofu&#39;</span>;</code></pre></div>
+<p>You can filter for a range of values:</p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> ProductName,
+Unitprice,
+SupplierID,
+UnitsInStock,
+<span class="kw">FROM</span> Products
+<span class="kw">WHERE</span> UnitsInStock <span class="kw">BETWEEN</span> <span class="dv">15</span> <span class="kw">AND</span> <span class="dv">80</span>;</code></pre></div>
+<p>You can filter <code>NULL</code> values by <code>IS NULL</code></p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> ProductName,
+UnitPrice,
+SupplierID,
+UnitsInStock
+<span class="kw">FROM</span> Products
+<span class="kw">WHERE</span> ProductName <span class="kw">IS</span> <span class="kw">NULL</span>;</code></pre></div>
 </div>
-<!-- </div> -->
             </section>
 
           </div>
         </div>
       </div>
-<a href="sql-comments.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="filter.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="filter.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="in-or-and-not.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

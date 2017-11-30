@@ -32,8 +32,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="sql-comments.html">
-<link rel="next" href="filter.html">
+<link rel="prev" href="where.html">
+
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -133,23 +133,63 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="summary" class="section level2">
-<h2><span class="header-section-number">2.6</span> Summary</h2>
-<p>In this chapter, we went over many materials. We began by defining SQL. You should know now that SQL stands for Structured Query Language which is a standard language to communicate with relational database management systems (RDMS). You should also know the difference between a transactional and a relational database. We also introduced important concept of primary key, foreign key, and table relationship. Make sure you are familiar with these concepts because we’re going to revisit them a lot in more detail later when we start talking about Joints. We also discussed some basic SQL Syntax. And you should now be able to write basic queries statements using <code>SELECT</code> and <code>FROM</code>. Finally, we wrapped up by going over how to write comments in your code which are essential to include so that both you and your colleagues can follow what you were doing and reuse your code. It’s a really good habit to get into as you’re starting out. So be sure to keep practicing that aspect as you begin to write your first query statement.</p>
-<p>Here are some resources for further learning:</p>
+<div id="in-or-and-not" class="section level2">
+<h2><span class="header-section-number">3.2</span> <code>IN</code>, <code>OR</code> and <code>NOT</code></h2>
+<p><strong>Learning Objectives</strong></p>
 <ul>
-<li><a href="https://www.thebalance.com/what-is-sql-and-uses-2071909">What is SQL and How is it Used?</a></li>
-<li><a href="https://www.ntchosting.com/encyclopedia/databases/structured-query-language/">NTC Hosting: Structured Query Language</a></li>
-<li><a href="https://www.tutorialspoint.com/sqlite/index.htm">SQLite Tutorial</a></li>
-<li><a href="http://www.information-management-architect.com/entity-relationship-diagram.html">Entity Relationship Diagram</a></li>
-<li><a href="https://www.youtube.com/watch?v=c0_9Y8QAstg">Norwalk Aberdeen: Entity-Relationsip Diagrams (9 Minute YouTube Video)</a></li>
-<li><a href="http://www.vertabelo.com/blog/technical-articles/data-warehouse-modeling-star-schema-vs-snowflake-schema">Star Schema vs. Snowflake Schema</a></li>
-<li><a href="https://www.youtube.com/watch?v=KUwOcip7Zzc">Explain Star Schema &amp; Snow Flake Design (5 Minute YouTube Video)</a></li>
-<li><a href="http://www.agiledata.org/essays/dataModeling101.html">Data Modeling 101</a></li>
-<li><a href="http://business-analysis-excellence.com/what-is-data-modeling/">What is Data Modeling - An Introduction for Business Analysts</a></li>
-<li><a href="https://en.wikipedia.org/wiki/Data_modeling">Wikipedia: Data Modeling</a></li>
+<li>Use the <code>IN</code> and <code>OR</code> operators to filter your data and get results you want</li>
+<li>Differentiate between use of the <code>IN</code> and <code>BETWEEN</code> operators</li>
+<li>Discuss importance of order of operations</li>
+<li>Explain how and when to use the <code>NOT</code> operator</li>
 </ul>
-<!--In the next section, we're going to go over the methods for sorting, filtering, and paring down your data results. As you've probably seen by now, some data sets contain millions of records, and it would be crazy to try and look at all of them. So this is an important skill to have. -->
+<p>Let’s start from<code>IN</code>. To use the IN operator, we need to specify a range of conditions or a set of values.</p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span>
+ProductID,
+UnitPrice,
+SupplierID,
+<span class="kw">FROM</span> Products
+<span class="kw">WHERE</span> SupplierID <span class="kw">IN</span> (<span class="dv">9</span>, <span class="dv">10</span>, <span class="dv">11</span>);</code></pre></div>
+<p>Another operator is the <code>OR</code> operator. An important thing to know about this is that a database management system will not evaluate the second condition in a <code>WHERE</code> clause if the first condition is met.</p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span>
+ProductName,
+ProductID,
+UnitPrice,
+SupplierID,
+ProductName
+<span class="kw">FROM</span> Products
+<span class="kw">WHERE</span> ProductName = <span class="st">&#39;Tofu&#39;</span> <span class="kw">OR</span> <span class="st">&#39;Konbu&#39;</span>;</code></pre></div>
+<p>You can use <code>OR</code> with <code>AND</code>. There is somthing you need to pay extra attention. Look at the following two examples:</p>
+<ul>
+<li>Example1:</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span>
+ProductID,
+UnitPrice,
+SupplierID,
+<span class="kw">FROM</span> Products
+<span class="kw">WHERE</span> SupplierID = <span class="dv">9</span> <span class="kw">OR</span>
+SupplierID = <span class="dv">11</span>
+<span class="kw">AND</span> UnitPrice &gt; <span class="dv">15</span>;</code></pre></div>
+<div class="figure">
+<img src="images/ex1.png" style="width:40.0%" />
+
+</div>
+<ul>
+<li>Example2:</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span>
+ProductID,
+UnitPrice,
+SupplierID
+<span class="kw">FROM</span> Products
+<span class="kw">WHERE</span> (SupplierID = <span class="dv">9</span> <span class="kw">OR</span>
+SupplierID = <span class="dv">11</span>)
+<span class="kw">AND</span> UnitPrice &gt; <span class="dv">15</span>;</code></pre></div>
+<div class="figure">
+<img src="images/ex2.png" style="width:40.0%" />
+
+</div>
+<p>Since SQL processes the <code>OR</code> before the <code>AND</code>, in example1, SQL will stop after processing <code>OR</code>, so it won’t even get to the operation after <code>AND</code>. In order to solve that, you need to use parentheses.</p>
 
 </div>
 <!-- </div> -->
@@ -158,8 +198,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
           </div>
         </div>
       </div>
-<a href="sql-comments.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="filter.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="where.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
