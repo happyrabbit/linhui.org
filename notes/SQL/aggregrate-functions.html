@@ -32,8 +32,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="filter.html">
-<link rel="next" href="in-or-and-not.html">
+<link rel="prev" href="math-operations.html">
+
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -136,108 +136,78 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="where" class="section level2">
-<h2><span class="header-section-number">3.1</span> <code>WHERE</code></h2>
-<!-- Summary
-Now that you've began writing your first SQL statements, you're probably really starting to see just how much data you can pull down from databases. So far what you've been experimenting with only has been a few thousand records, but many databases have a lot more data in them. Someday you might work with databases with the millions or even tens of millions of records in it. It almost boggles the mind, right? Well clearly, we're never going to want to look at all of that data at once. So thankfully, SQL gives us several methods to pair down and sort our data so we can quickly get the results we want. That's what we're going to discuss in this module. I'm going to introduce you to several methods for filtering data. At the end of this module, you'll know how to use several more clauses and operators including WHERE, BETWEEN, IN, OR, NOT, LIKE, ORDER BY, and GROUP BY. In addition, I'm going to tell you about wildcards which allow us to search for more specific or parts of record, including their disadvantages and advantages, and how we can best use these wildcards. We'll also discuss how to use some basic math operators as well as aggregate functions like, AVERAGE, COUNT, MIN, and MAX. And we'll start to begin analyzing our data. Obviously, this module's jam packed with new information. So let's not waste any more time, and go ahead and get started. -->
+<div id="aggregrate-functions" class="section level1">
+<h1><span class="header-section-number">Chapter 6</span> Aggregrate Functions</h1>
 <p><strong>Learning Objectives</strong></p>
 <ul>
-<li>Describe the basics of filtering your data</li>
-<li>Use the <code>WHERE</code> clause with common operators</li>
-<li>Use <code>BETWEEN</code> clause</li>
-<li>Explain the concept of a <code>NULL</code> value</li>
+<li>Describe various aggregate functions</li>
+<li>Use various aggregate functions: <code>AVERAGE</code>, <code>COUNT</code>, <code>MIN</code>, <code>MAX</code> and <code>SUM</code> to summarize and analyze data</li>
+<li>Describe the <code>DISTINCT</code> function</li>
 </ul>
-<p>Filtering allows us to narrow the data we want to retrieve. Filtering is also used when you’re doing analysis to get very specific about the data you want to analyze as part of your model. To do this we use what’s called the <code>WHERE</code> clause. And the <code>WHERE</code> clause comes after <code>SELECT</code> and <code>FROM</code></p>
-<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> column_name, column_name
-<span class="kw">FROM</span> table_name
-<span class="kw">WHERE</span> column_name <span class="kw">operator</span> <span class="fu">value</span>;</code></pre></div>
-<p>Here is a table of common operators:</p>
-<table style="width:33%;">
-<colgroup>
-<col width="13%" />
-<col width="19%" />
-</colgroup>
+<p>Aggregate functions are used for various things such as finding the highest or lowest values, total number of records, average value, etc. We’re going to use a lot of these different types of aggregate functions to get descriptive statistics. The aggregate functions we can use are <code>AVG</code>, <code>COUNT</code>, <code>MIN</code>, <code>MAX</code>, and <code>SUM</code> and all of these are pretty self explanatory.</p>
+<table>
 <thead>
 <tr class="header">
-<th>Operator</th>
+<th>Function</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>=</code></td>
-<td>Equal</td>
+<td><code>AVG()</code></td>
+<td>Averages a column of values</td>
 </tr>
 <tr class="even">
-<td><code>&lt;&gt;</code></td>
-<td>Not equal. Note: In some versions of SQL this operator may be written as <code>!=</code></td>
+<td><code>COUNT()</code></td>
+<td>Counts the number of values</td>
 </tr>
 <tr class="odd">
-<td><code>&gt;</code></td>
-<td>Greater than</td>
+<td><code>MIN()</code></td>
+<td>Finds the minimum value</td>
 </tr>
 <tr class="even">
-<td><code>&lt;</code></td>
-<td>Less than</td>
+<td><code>MAX()</code></td>
+<td>Finds the maximum value</td>
 </tr>
 <tr class="odd">
-<td><code>&gt;=</code></td>
-<td>Greater than or equal</td>
-</tr>
-<tr class="even">
-<td><code>&lt;=</code></td>
-<td>Less than or equal</td>
-</tr>
-<tr class="odd">
-<td>BETWEEN</td>
-<td>Between an inclusive range</td>
-</tr>
-<tr class="even">
-<td>IS NULL</td>
-<td>Is a null value</td>
+<td><code>SUM()</code></td>
+<td>Sums the column values</td>
 </tr>
 </tbody>
 </table>
-<p>Let’s look at some examples.</p>
-<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> ProductName,
-UnitPrice,
-SupplierID
+<ul>
+<li><code>AVG()</code></li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> <span class="fu">AVG</span>(UnitPrice) <span class="kw">AS</span> avg_price
+<span class="kw">FROM</span> Products;</code></pre></div>
+<ul>
+<li><code>COUNT(*)</code>: Counts all the rows in a table containing <code>NULL</code> values</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> <span class="fu">COUNT</span>(*) <span class="kw">AS</span> total_customers
+<span class="kw">FROM</span> Customers;</code></pre></div>
+<ul>
+<li><code>COUNT(column)</code>: Counts all the rows in a specific column ignoring <code>NULL</code> values</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> <span class="fu">COUNT</span>(CustomerID) <span class="kw">AS</span> total_customers
+<span class="kw">FROM</span> Customers;</code></pre></div>
+<ul>
+<li><code>SUM()</code></li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> <span class="fu">SUM</span>(UnitPrice*UnitsInStock) <span class="kw">AS</span> total_price
 <span class="kw">FROM</span> Products
-<span class="kw">WHERE</span> ProductName = <span class="st">&#39;Tofu&#39;</span>;</code></pre></div>
-<p>In the above example, we filter on a single condition. We look at ProductName, UnitPrice and SupplierID for tofu. You can similarly look at products whose prices are greater than or equal to 75.</p>
-<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> ProductName,
-UnitPrice,
-SupplierID
-<span class="kw">FROM</span> Products
-<span class="kw">WHERE</span> UnitPrice &gt;= <span class="dv">75</span>;</code></pre></div>
-<p>Or you can filter out all records except one value:</p>
-<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> ProductName,
-UnitPrice,
-SupplierID
-<span class="kw">FROM</span> Products
-<span class="kw">WHERE</span> ProductName &lt;&gt; <span class="st">&#39;Tofu&#39;</span>;</code></pre></div>
-<p>You can filter for a range of values:</p>
-<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> ProductName,
-Unitprice,
-SupplierID,
-UnitsInStock,
-<span class="kw">FROM</span> Products
-<span class="kw">WHERE</span> UnitsInStock <span class="kw">BETWEEN</span> <span class="dv">15</span> <span class="kw">AND</span> <span class="dv">80</span>;</code></pre></div>
-<p>You can filter <code>NULL</code> values by <code>IS NULL</code></p>
-<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> ProductName,
-UnitPrice,
-SupplierID,
-UnitsInStock
-<span class="kw">FROM</span> Products
-<span class="kw">WHERE</span> ProductName <span class="kw">IS</span> <span class="kw">NULL</span>;</code></pre></div>
+<span class="kw">WHERE</span> SupplierID = <span class="dv">23</span>;</code></pre></div>
+<p>One important thing to use with aggregate functions is the word <code>DISTINCT</code>. If the word <code>DISTINCT</code> isn’t specific in a statement, SQL will always assume you want all the data. For example, you may have a customer who’s in a table multiple times. If you’re counting customer IDs, you may count duplicate records in there. And this is really helpful to run queries where you’re counting distinct and to see if there are duplicates in a column. There are some things to keep in mind when using <code>DISTINCT</code> with our aggregate function of <code>COUNT</code> You can’t use <code>DISTINCT</code> on the <code>COUNT(*)</code>.</p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> CustomerID)
+<span class="kw">FROM</span> Customers;</code></pre></div>
+
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="filter.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="in-or-and-not.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="math-operations.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
