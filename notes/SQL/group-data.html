@@ -32,8 +32,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="what-is-sql.html">
-<link rel="next" href="think-before-code.html">
+<link rel="prev" href="aggregrate-functions.html">
+
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -139,25 +139,46 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="data-models-and-diagrams" class="section level1">
-<h1><span class="header-section-number">Chapter 2</span> Data Models and Diagrams</h1>
+<div id="group-data" class="section level2">
+<h2><span class="header-section-number">3.5</span> Group Data</h2>
 <p><strong>Learning Objectives</strong></p>
 <ul>
-<li>Explain why thinking beforing coding is important</li>
-<li>Explain why it is important to understand how the data in a database relates to one another</li>
-<li>Describe what a databse is at its core</li>
-<li>Describe data models</li>
-<li>Define relational database system</li>
-<li>Discuss advent of relational databases in SQL</li>
-</ul> 
+<li>perform additional aggregations using <code>GROUP BY</code> and <code>HAVING</code> clause</li>
+<li>discuss how <code>NULL</code>s are or aren’t affected by the <code>GROUP BY</code> and <code>HAVING</code> clauses</li>
+<li>use the <code>GROUP BY</code> and <code>ORDER BY</code> clauses together to better sort your data</li>
+</ul>
+<p>A lot of times, we’ll be looking at the average price for different types of products, or total perchasing for different customer segments. Then we need to aggregate data by groups. In this example, assume we want to know the number of customers we have by each region.</p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> Region, <span class="fu">COUNT</span>(CustomerID) <span class="kw">AS</span> total_customers
+<span class="kw">FROM</span> Customers
+<span class="kw">GROUP</span> <span class="kw">BY</span> Region;</code></pre></div>
+<p>If we were to just have our <code>SELECT</code> statement with <code>Region, COUNT(CustomerID) AS total_customers</code>, but without specifying the variable to <code>GROUP BY</code>, we’re going to get an error return. Because the computer doesn’t know how to count the customer IDs. So we put the <code>GROUP BY</code> clause in the end. There are three things to pay attention:</p>
+<ol style="list-style-type: decimal">
+<li><code>GROUP BY</code> clauses can contain multiple columns.</li>
+<li>Every column in your <code>SELECT</code> statement must be present in a <code>GROUP BY</code> clause, except for aggregated calculations.</li>
+<li><code>NULL</code>s will be grouped together if your <code>GROUP BY</code> column contains <code>NULL</code>s.</li>
+</ol>
+<p><code>HAVING</code> clause works for groups. But <code>WHERE</code> filters on rows not groups.</p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> CustomerID, <span class="fu">COUNT</span> (*) <span class="kw">AS</span> orders
+<span class="kw">FROM</span> Orders
+<span class="kw">GROUP</span> <span class="kw">BY</span> CustomerID
+<span class="kw">HAVING</span> <span class="fu">COUNT</span> (*) &gt;=<span class="dv">2</span>;</code></pre></div>
+<p>To sum up, <code>WHERE</code> filters before the data is grouped and then <code>HAVING</code> filters after the data is grouped. Rows eliminated by the <code>WHERE</code> clause will not be included in the <code>GROUP BY</code> clause. It is important to know when you should use <code>WHERE</code> versus <code>HAVING</code>.</p>
+<p>Another thing to note about <code>GROUP BY</code> is that it’s always a good practice to use the <code>ORDER BY</code> clause. The <code>GROUP BY</code> does not sort the data in any fashion. It only groups it together. In our previous examples, we have a list of states, a list of regions. It’s not going to sort those regions in alphabetical order. It’s just going to group them by different regions. It is recommended to use <code>ORDER BY</code> in this situation. It makes the results a little easier to read.</p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> SupplierID, <span class="fu">COUNT</span>(*) <span class="kw">AS</span> Num_Prod
+<span class="kw">FROM</span> Products
+<span class="kw">WHERE</span> UnitPrice &gt;= <span class="dv">4</span>
+<span class="kw">GROUP</span> <span class="kw">BY</span> SupplierID
+<span class="kw">HAVING</span> <span class="fu">COUNT</span> (*) &gt;= <span class="dv">2</span>;</code></pre></div>
+
 </div>
+<!-- </div> -->
             </section>
 
           </div>
         </div>
       </div>
-<a href="what-is-sql.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="think-before-code.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="aggregrate-functions.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
