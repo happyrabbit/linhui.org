@@ -32,8 +32,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="where-data-science-team-fits.html">
-<link rel="next" href="data-scientist-as-a-leader.html">
+<link rel="prev" href="sparse-variables.html">
+<link rel="next" href="references.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -132,7 +132,21 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="3.1" data-path="customer-data-for-clothing-company.html"><a href="customer-data-for-clothing-company.html"><i class="fa fa-check"></i><b>3.1</b> Customer Data for Clothing Company</a></li>
 <li class="chapter" data-level="3.2" data-path="customer-satisfaction-survey-data-from-airline-company.html"><a href="customer-satisfaction-survey-data-from-airline-company.html"><i class="fa fa-check"></i><b>3.2</b> Customer Satisfaction Survey Data from Airline Company</a></li>
 </ul></li>
-<li class="chapter" data-level="4" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>4</b> References</a></li>
+<li class="chapter" data-level="4" data-path="data-pre-processing.html"><a href="data-pre-processing.html"><i class="fa fa-check"></i><b>4</b> Data Pre-processing</a><ul>
+<li class="chapter" data-level="4.1" data-path="data-cleaning.html"><a href="data-cleaning.html"><i class="fa fa-check"></i><b>4.1</b> Data Cleaning</a></li>
+<li class="chapter" data-level="4.2" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>4.2</b> Missing Values</a><ul>
+<li class="chapter" data-level="4.2.1" data-path="missing-values.html"><a href="missing-values.html#impute-missing-values-with-medianmode"><i class="fa fa-check"></i><b>4.2.1</b> Impute missing values with median/mode</a></li>
+<li class="chapter" data-level="4.2.2" data-path="missing-values.html"><a href="missing-values.html#k-nearest-neighbors"><i class="fa fa-check"></i><b>4.2.2</b> K-nearest neighbors</a></li>
+<li class="chapter" data-level="4.2.3" data-path="missing-values.html"><a href="missing-values.html#bagging-tree"><i class="fa fa-check"></i><b>4.2.3</b> Bagging Tree</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="centering-and-scaling.html"><a href="centering-and-scaling.html"><i class="fa fa-check"></i><b>4.3</b> Centering and Scaling</a></li>
+<li class="chapter" data-level="4.4" data-path="resolve-skewness.html"><a href="resolve-skewness.html"><i class="fa fa-check"></i><b>4.4</b> Resolve Skewness</a></li>
+<li class="chapter" data-level="4.5" data-path="resolve-outliers.html"><a href="resolve-outliers.html"><i class="fa fa-check"></i><b>4.5</b> Resolve Outliers</a></li>
+<li class="chapter" data-level="4.6" data-path="collinearity.html"><a href="collinearity.html"><i class="fa fa-check"></i><b>4.6</b> Collinearity</a></li>
+<li class="chapter" data-level="4.7" data-path="sparse-variables.html"><a href="sparse-variables.html"><i class="fa fa-check"></i><b>4.7</b> Sparse Variables</a></li>
+<li class="chapter" data-level="4.8" data-path="re-encode-dummy-variables.html"><a href="re-encode-dummy-variables.html"><i class="fa fa-check"></i><b>4.8</b> Re-encode Dummy Variables</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>5</b> References</a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
 
@@ -153,26 +167,69 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="beyond-data-and-analytics" class="section level2">
-<h2><span class="header-section-number">2.3</span> Beyond Data and Analytics</h2>
-<p>Data scientists usually have a good sense of data and analytics, but data scientist project is more than just data and analytics. A data science project may involve people with many different roles:</p>
-<ul>
-<li>a business owner or leader to identify opportunities in business value; program managers to ensure each data science project fit into the overall technical program development;</li>
-<li>data owners and computation resource and infrastructure owners from IT department;</li>
-<li>dedicated team to make sure the data and model are under model governance and privacy guidelines;</li>
-<li>a team to implement, maintain and refresh the model;</li>
-<li>project managers to coordinate all parties to set periodical tasks so that the project meets the preset milestones and delivery results;</li>
-<li>multiple rounds of discussion of resource allocation (i.e. who will pay for the data science project).</li>
-</ul>
-<p>Effective communication and in-depth domain knowledge about the business problem are essential requirements for a successful data scientist. A data scientist will interact with people at various levels ranging from senior leaders who are setting the corporate strategies to front-line employees who are doing the daily work. A data scientist needs to have the capability to view the problem from 10,000 feet above ground, as well as down to the detail to the very bottom. To convert a business question into a data problem, a data scientist needs to communicate using the language the other people can understand and obtain the required information.</p>
+<div id="re-encode-dummy-variables" class="section level2">
+<h2><span class="header-section-number">4.8</span> Re-encode Dummy Variables</h2>
+<p>A dummy variable is a binary variable (0/1) to represent subgroups of the sample. Sometimes we need to recode categories to smaller bits of information named “dummy variables”. For example, some questionnaires have five options for each question, A, B, C, D, and E. After you get the data, you will usually convert the corresponding categorical variables for each question into five nominal variables, and then use one of the options as the baseline.</p>
+<p>Let’s encode <code>gender</code> and <code>house</code> from <code>sim.dat</code> to dummy variables. There are two ways to implement this. The first is to use <code>class.ind()</code> from <code>nnet</code> package. However, it only works on one variable at a time.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dumVar&lt;-nnet::<span class="kw">class.ind</span>(sim.dat$gender)
+<span class="kw">head</span>(dumVar)</code></pre></div>
+<pre><code>##      Female Male
+## [1,]      1    0
+## [2,]      1    0
+## [3,]      0    1
+## [4,]      0    1
+## [5,]      0    1
+## [6,]      0    1</code></pre>
+<p>Since it is redundant to keep both, we need to remove one of them when modeling. Another more powerful function is <code>dummyVars()</code> from <code>caret</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dumMod&lt;-<span class="kw">dummyVars</span>(~gender+house+income,
+                  <span class="dt">data=</span>sim.dat,
+                  <span class="co"># use &quot;origional variable name + level&quot; as new name</span>
+                  <span class="dt">levelsOnly=</span>F)
+<span class="kw">head</span>(<span class="kw">predict</span>(dumMod,sim.dat))</code></pre></div>
+<pre><code>##   gender.Female gender.Male house.No house.Yes
+## 1             1           0        0         1
+## 2             1           0        0         1
+## 3             0           1        0         1
+## 4             0           1        0         1
+## 5             0           1        0         1
+## 6             0           1        0         1
+##     income
+## 1 120963.4
+## 2 122008.1
+## 3 114202.3
+## 4 113616.3
+## 5 124252.6
+## 6 107661.5</code></pre>
+<p><code>dummyVars()</code> can also use formula format. The variable on the right-hand side can be both categorical and numeric. For numerical variable, the function will keep the variable unchanged. The advantage is that you can apply the function to a data frame without removing numerical variables. Other than that, the function can create interaction term:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dumMod&lt;-<span class="kw">dummyVars</span>(~gender+house+income+income:gender,
+                  <span class="dt">data=</span>sim.dat,
+                  <span class="dt">levelsOnly=</span>F)
+<span class="kw">head</span>(<span class="kw">predict</span>(dumMod,sim.dat))</code></pre></div>
+<pre><code>##   gender.Female gender.Male house.No house.Yes
+## 1             1           0        0         1
+## 2             1           0        0         1
+## 3             0           1        0         1
+## 4             0           1        0         1
+## 5             0           1        0         1
+## 6             0           1        0         1
+##     income gender.Female:income gender.Male:income
+## 1 120963.4             120963.4                0.0
+## 2 122008.1             122008.1                0.0
+## 3 114202.3                  0.0           114202.3
+## 4 113616.3                  0.0           113616.3
+## 5 124252.6                  0.0           124252.6
+## 6 107661.5                  0.0           107661.5</code></pre>
+<p>If you think the impact income levels on purchasing behavior is different for male and female, then you may add the interaction term between <code>income</code> and <code>gender</code>. You can do this by adding <code>income: gender</code> in the formula.</p>
+
 </div>
+<!-- </div> -->
             </section>
 
           </div>
         </div>
       </div>
-<a href="where-data-science-team-fits.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="data-scientist-as-a-leader.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="sparse-variables.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="references.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
@@ -201,7 +258,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/happyrabbit/IntroDataScience/02-SoftSkills.Rmd",
+"link": "https://github.com/happyrabbit/IntroDataScience/05-DataPreprocessing.Rmd",
 "text": "Edit"
 },
 "download": ["IDS.pdf", "IDS.epub", "IDS.mobi"],

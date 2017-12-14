@@ -32,8 +32,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="where-data-science-team-fits.html">
-<link rel="next" href="data-scientist-as-a-leader.html">
+<link rel="prev" href="missing-values.html">
+<link rel="next" href="resolve-skewness.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -132,7 +132,21 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="3.1" data-path="customer-data-for-clothing-company.html"><a href="customer-data-for-clothing-company.html"><i class="fa fa-check"></i><b>3.1</b> Customer Data for Clothing Company</a></li>
 <li class="chapter" data-level="3.2" data-path="customer-satisfaction-survey-data-from-airline-company.html"><a href="customer-satisfaction-survey-data-from-airline-company.html"><i class="fa fa-check"></i><b>3.2</b> Customer Satisfaction Survey Data from Airline Company</a></li>
 </ul></li>
-<li class="chapter" data-level="4" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>4</b> References</a></li>
+<li class="chapter" data-level="4" data-path="data-pre-processing.html"><a href="data-pre-processing.html"><i class="fa fa-check"></i><b>4</b> Data Pre-processing</a><ul>
+<li class="chapter" data-level="4.1" data-path="data-cleaning.html"><a href="data-cleaning.html"><i class="fa fa-check"></i><b>4.1</b> Data Cleaning</a></li>
+<li class="chapter" data-level="4.2" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>4.2</b> Missing Values</a><ul>
+<li class="chapter" data-level="4.2.1" data-path="missing-values.html"><a href="missing-values.html#impute-missing-values-with-medianmode"><i class="fa fa-check"></i><b>4.2.1</b> Impute missing values with median/mode</a></li>
+<li class="chapter" data-level="4.2.2" data-path="missing-values.html"><a href="missing-values.html#k-nearest-neighbors"><i class="fa fa-check"></i><b>4.2.2</b> K-nearest neighbors</a></li>
+<li class="chapter" data-level="4.2.3" data-path="missing-values.html"><a href="missing-values.html#bagging-tree"><i class="fa fa-check"></i><b>4.2.3</b> Bagging Tree</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="centering-and-scaling.html"><a href="centering-and-scaling.html"><i class="fa fa-check"></i><b>4.3</b> Centering and Scaling</a></li>
+<li class="chapter" data-level="4.4" data-path="resolve-skewness.html"><a href="resolve-skewness.html"><i class="fa fa-check"></i><b>4.4</b> Resolve Skewness</a></li>
+<li class="chapter" data-level="4.5" data-path="resolve-outliers.html"><a href="resolve-outliers.html"><i class="fa fa-check"></i><b>4.5</b> Resolve Outliers</a></li>
+<li class="chapter" data-level="4.6" data-path="collinearity.html"><a href="collinearity.html"><i class="fa fa-check"></i><b>4.6</b> Collinearity</a></li>
+<li class="chapter" data-level="4.7" data-path="sparse-variables.html"><a href="sparse-variables.html"><i class="fa fa-check"></i><b>4.7</b> Sparse Variables</a></li>
+<li class="chapter" data-level="4.8" data-path="re-encode-dummy-variables.html"><a href="re-encode-dummy-variables.html"><i class="fa fa-check"></i><b>4.8</b> Re-encode Dummy Variables</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>5</b> References</a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
 
@@ -153,26 +167,88 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="beyond-data-and-analytics" class="section level2">
-<h2><span class="header-section-number">2.3</span> Beyond Data and Analytics</h2>
-<p>Data scientists usually have a good sense of data and analytics, but data scientist project is more than just data and analytics. A data science project may involve people with many different roles:</p>
-<ul>
-<li>a business owner or leader to identify opportunities in business value; program managers to ensure each data science project fit into the overall technical program development;</li>
-<li>data owners and computation resource and infrastructure owners from IT department;</li>
-<li>dedicated team to make sure the data and model are under model governance and privacy guidelines;</li>
-<li>a team to implement, maintain and refresh the model;</li>
-<li>project managers to coordinate all parties to set periodical tasks so that the project meets the preset milestones and delivery results;</li>
-<li>multiple rounds of discussion of resource allocation (i.e. who will pay for the data science project).</li>
-</ul>
-<p>Effective communication and in-depth domain knowledge about the business problem are essential requirements for a successful data scientist. A data scientist will interact with people at various levels ranging from senior leaders who are setting the corporate strategies to front-line employees who are doing the daily work. A data scientist needs to have the capability to view the problem from 10,000 feet above ground, as well as down to the detail to the very bottom. To convert a business question into a data problem, a data scientist needs to communicate using the language the other people can understand and obtain the required information.</p>
+<div id="centering-and-scaling" class="section level2">
+<h2><span class="header-section-number">4.3</span> Centering and Scaling</h2>
+<p>It is the most straightforward data transformation. It centers and scales a variable to mean 0 and standard deviation 1. It ensures that the criterion for finding linear combinations of the predictors is based on how much variation they explain and therefore improves the numerical stability. Models involving finding linear combinations of the predictors to explain response/predictors variation need data centering and scaling, such as PCA <span class="citation">(Jolliffe <a href="#ref-pca1">2002</a>)</span>, PLS <span class="citation">(Geladi P <a href="#ref-PLS1">1986</a>)</span> and EFA <span class="citation">(Mulaik <a href="#ref-EFA1">2009</a>)</span>. You can easily writing code yourself to conduct this transformation.</p>
+<p>Let’s standarize the variable <code>income</code> from <code>sim.dat</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">income&lt;-sim.dat$income
+<span class="co"># calculate the mean of income</span>
+mux&lt;-<span class="kw">mean</span>(income,<span class="dt">na.rm=</span>T)
+<span class="co"># calculate the standard deviation of income</span>
+sdx&lt;-<span class="kw">sd</span>(income,<span class="dt">na.rm=</span>T)
+<span class="co"># centering</span>
+tr1&lt;-income-mux
+<span class="co"># scaling</span>
+tr2&lt;-tr1/sdx</code></pre></div>
+<p>Or the function <code>preProcess()</code> in package <code>caret</code> can apply this transformation to a set of predictors.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sdat&lt;-<span class="kw">subset</span>(sim.dat,<span class="dt">select=</span><span class="kw">c</span>(<span class="st">&quot;age&quot;</span>,<span class="st">&quot;income&quot;</span>))
+<span class="co"># set the &quot;method&quot; option</span>
+trans&lt;-<span class="kw">preProcess</span>(sdat,<span class="dt">method=</span><span class="kw">c</span>(<span class="st">&quot;center&quot;</span>,<span class="st">&quot;scale&quot;</span>))
+<span class="co"># use predict() function to get the final result</span>
+transformed&lt;-<span class="kw">predict</span>(trans,sdat)</code></pre></div>
+<p>Now the two variables are in the same scale:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(transformed)</code></pre></div>
+<pre><code>##       age              income       
+##  Min.   :-1.5911   Min.   :-1.4399  
+##  1st Qu.:-0.9569   1st Qu.:-0.5560  
+##  Median :-0.1817   Median :-0.3947  
+##  Mean   : 0.0000   Mean   : 0.0000  
+##  3rd Qu.: 1.0163   3rd Qu.: 0.2213  
+##  Max.   : 2.1438   Max.   : 4.1363  
+##  NA&#39;s   :1         NA&#39;s   :184</code></pre>
+<p>Sometimes you only need to scale the variable. For example, if the model adds penalty to the parameter estimates (such as <span class="math inline">\(L_2\)</span> penalty is ridge regression and <span class="math inline">\(L_1\)</span> penalty in LASSO), the variables need to have similar scale to ensure a fair variable selection. We are heavy user of this kind of penalty-based model in my work and we used the following quantile transformation:</p>
+<p><span class="math display">\[
+x_{ij}^{*}=\frac{x_{ij}-quantile(x_{.j},0.01)}{quantile(x_{.j}-0.99)-quantile(x_{-j},0.01)}
+\]</span></p>
+<p>The reason to use 99% and 1% quantile instead of maximum and minimum values is to resist the impact of outliers.</p>
+<p>It is easy to write a function to do it:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">qscale&lt;-function(dat){
+  for (i in <span class="dv">1</span>:<span class="kw">ncol</span>(dat)){
+    up&lt;-<span class="kw">quantile</span>(dat[,i],<span class="fl">0.99</span>)
+    low&lt;-<span class="kw">quantile</span>(dat[,i],<span class="fl">0.01</span>)
+    diff&lt;-up-low
+    dat[,i]&lt;-(dat[,i]-low)/diff
+  }
+  <span class="kw">return</span>(dat)
+}</code></pre></div>
+<p>In order to illustrate, let’s apply it to some variables from `demo_imp2:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">demo_imp3&lt;-<span class="kw">qscale</span>(<span class="kw">subset</span>(demo_imp2,<span class="dt">select=</span><span class="kw">c</span>(<span class="st">&quot;income&quot;</span>,<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>)))
+<span class="kw">summary</span>(demo_imp3)</code></pre></div>
+<pre><code>##      income           store_exp        
+##  Min.   :-0.05776   Min.   :-0.003407  
+##  1st Qu.: 0.15736   1st Qu.: 0.003984  
+##  Median : 0.18521   Median : 0.022704  
+##  Mean   : 0.26009   Mean   : 0.176965  
+##  3rd Qu.: 0.30456   3rd Qu.: 0.062849  
+##  Max.   : 1.23857   Max.   : 7.476996  
+##    online_exp       
+##  Min.   :-0.006023  
+##  1st Qu.: 0.042719  
+##  Median : 0.253691  
+##  Mean   : 0.278417  
+##  3rd Qu.: 0.322871  
+##  Max.   : 1.298845</code></pre>
+<p>After transformation, most of the variables are between 0-1.</p>
+</div>
+<h3> References</h3>
+<div id="refs" class="references">
+<div id="ref-pca1">
+<p>Jolliffe, I.T. 2002. <em>Principla Component Analysis</em>. 2nd ed. New York: Springer.</p>
+</div>
+<div id="ref-PLS1">
+<p>Geladi P, Kowalski B. 1986. “Partial Least-Squares Regression: A Tutorial.” <em>Analytica Chimica Acta</em>, no. 185: 1–17.</p>
+</div>
+<div id="ref-EFA1">
+<p>Mulaik, S.A. 2009. <em>Foundations of Factor Analysis</em>. 2ND ed. Boca Raton: Chapman&amp;Hall/CRC.</p>
+</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="where-data-science-team-fits.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="data-scientist-as-a-leader.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="missing-values.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="resolve-skewness.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
@@ -201,7 +277,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/happyrabbit/IntroDataScience/02-SoftSkills.Rmd",
+"link": "https://github.com/happyrabbit/IntroDataScience/05-DataPreprocessing.Rmd",
 "text": "Edit"
 },
 "download": ["IDS.pdf", "IDS.epub", "IDS.mobi"],

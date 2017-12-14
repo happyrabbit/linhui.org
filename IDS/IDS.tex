@@ -35,6 +35,46 @@
 \urlstyle{same}  % don't use monospace font for urls
 \usepackage{natbib}
 \bibliographystyle{apalike}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{{#1}}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{{#1}}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{{#1}}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{{#1}}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{{#1}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{{#1}}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{{#1}}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{{#1}}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{{#1}}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{{#1}}}
+\newcommand{\ImportTok}[1]{{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{{#1}}}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{{#1}}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{{#1}}}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{{#1}}}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{{#1}}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{{#1}}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{{#1}}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{{#1}}}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{{#1}}}}
+\newcommand{\BuiltInTok}[1]{{#1}}
+\newcommand{\ExtensionTok}[1]{{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{{#1}}}
+\newcommand{\RegionMarkerTok}[1]{{#1}}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{{#1}}}}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{{#1}}}}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{{#1}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{{#1}}}}
+\newcommand{\NormalTok}[1]{{#1}}
 \usepackage{longtable,booktabs}
 \usepackage{graphicx,grffile}
 \makeatletter
@@ -167,7 +207,7 @@
 
 \title{Introduction to Data Science}
 \author{Hui Lin and Ming Li}
-\date{2017-12-11}
+\date{2017-12-14}
 
 \usepackage{amsthm}
 \newtheorem{theorem}{Theorem}[chapter]
@@ -282,7 +322,7 @@ Interest in data science is at an all-time high and has exploded in
 popularity in the last couple of years. Data scientists today are from
 various backgrounds. If someone ran into you asked what data science was
 all about, what would you tell them? It is not easy to answer. Data
-science is one of the areas where you ask ten people who will give ten
+science is one of the areas where if you ask ten people you get ten
 different answers. It is not well-defined as an academic subject but
 broadly used in the industry. Media has been hyping about ``Data
 Science'' ``Big Data'' and ``Artificial Intelligence'' over the fast few
@@ -1548,6 +1588,250 @@ them.
   not stuck with one idea or one approach for a long time to avoid
   taking too long to fail.
 \end{itemize}
+
+\chapter{Introduction to the data}\label{introduction-to-the-data}
+
+Before tackling analytics problem, we start by introducing data to be
+analyzed in later chapters.
+
+\section{Customer Data for Clothing
+Company}\label{customer-data-for-clothing-company}
+
+Our first data set represents customers of a clothing company who sells
+products in stores and online. This data is typical of what one might
+get from a company's marketing data base (the data base will have more
+data than the one we show here). This data includes 1000 customers for
+whom we have 3 types of data:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Demography
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{age}: age of the respondent
+  \item
+    \texttt{gender}: male/female
+  \item
+    \texttt{house}: 0/1 variable indicating if the customer owns a house
+    or not
+  \end{itemize}
+\item
+  Sales in the past year
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \texttt{store\_exp}: expense in store
+  \item
+    \texttt{online\_exp}: expense online
+  \item
+    \texttt{store\_trans}: times of store purchase
+  \item
+    \texttt{online\_trans}: times of online purchase
+  \end{itemize}
+\item
+  Survey on product preference
+\end{enumerate}
+
+It is common for companies to survey their customers and draw insights
+to guide future marketing activities. The survey is as below:
+
+How strongly do you agree or disagree with the following statements:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Strong disagree
+\item
+  Disagree
+\item
+  Neither agree nor disagree
+\item
+  Agree
+\item
+  Strongly agree
+\end{enumerate}
+
+\begin{itemize}
+\tightlist
+\item
+  Q1. I like to buy clothes from different brands
+\item
+  Q2. I buy almost all my clothes from some of my favorite brands
+\item
+  Q3. I like to buy premium brands
+\item
+  Q4. Quality is the most important factor in my purchasing decision
+\item
+  Q5. Style is the most important factor in my purchasing decision
+\item
+  Q6. I prefer to buy clothes in store
+\item
+  Q7. I prefer to buy clothes online
+\item
+  Q8. Price is important
+\item
+  Q9. I like to try different styles
+\item
+  Q10. I like to make a choice by myself and don't need too much of
+  others' suggestions
+\end{itemize}
+
+There are 4 segments of customers:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Price
+\item
+  Conspicuous
+\item
+  Quality
+\item
+  Style
+\end{enumerate}
+
+Let's check it:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{str}\NormalTok{(sim.dat,}\DataTypeTok{vec.len=}\DecValTok{3}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 'data.frame':    1000 obs. of  19 variables:
+##  $ age         : int  57 63 59 60 51 59 57 57 ...
+##  $ gender      : Factor w/ 2 levels "Female","Male": 1 1 2 2 2 2 2 2 ...
+##  $ income      : num  120963 122008 114202 113616 ...
+##  $ house       : Factor w/ 2 levels "No","Yes": 2 2 2 2 2 2 2 2 ...
+##  $ store_exp   : num  529 478 491 348 ...
+##  $ online_exp  : num  304 110 279 142 ...
+##  $ store_trans : int  2 4 7 10 4 4 5 11 ...
+##  $ online_trans: int  2 2 2 2 4 5 3 5 ...
+##  $ Q1          : int  4 4 5 5 4 4 4 5 ...
+##  $ Q2          : int  2 1 2 2 1 2 1 2 ...
+##  $ Q3          : int  1 1 1 1 1 1 1 1 ...
+##  $ Q4          : int  2 2 2 3 3 2 2 3 ...
+##  $ Q5          : int  1 1 1 1 1 1 1 1 ...
+##  $ Q6          : int  4 4 4 4 4 4 4 4 ...
+##  $ Q7          : int  1 1 1 1 1 1 1 1 ...
+##  $ Q8          : int  4 4 4 4 4 4 4 4 ...
+##  $ Q9          : int  2 1 1 2 2 1 1 2 ...
+##  $ Q10         : int  4 4 4 4 4 4 4 4 ...
+##  $ segment     : Factor w/ 4 levels "Conspicuous",..: 2 2 2 2 2 2 2 2 ...
+\end{verbatim}
+
+\section{Customer Satisfaction Survey Data from Airline
+Company}\label{customer-satisfaction-survey-data-from-airline-company}
+
+This data set is from a customer satisfaction survey for three airline
+companies. There are \texttt{N=1000} respondents and 15 questions. The
+market researcher asked respondents to recall the experience with
+different airline companies and assign a score (1-9) to each airline
+company for all the 15 questions. The higher the score, the more
+satisfied the customer to the specific item. The 15 questions are of 4
+types (the variable names are in the parentheses):
+
+\begin{itemize}
+\tightlist
+\item
+  How satisfied are you with your\_\_\_\_\_\_?
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Ticketing
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Ease of making reservation（Easy\_Reservation）
+  \item
+    Availability of preferred seats（Preferred\_Seats）
+  \item
+    Variety of flight options（Flight\_Options）
+  \item
+    Ticket prices（Ticket\_Prices）
+  \end{itemize}
+\item
+  Aircraft
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Seat comfort（Seat\_Comfort）
+  \item
+    Roominess of seat area（Seat\_Roominess）
+  \item
+    Availability of Overhead（Overhead\_Storage）
+  \item
+    Cleanliness of aircraft（Clean\_Aircraft）
+  \end{itemize}
+\item
+  Service
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Courtesy of flight attendant（Courtesy）
+  \item
+    Friendliness（Friendliness）
+  \item
+    Helpfulness（Helpfulness）
+  \item
+    Food and drinks（Service）
+  \end{itemize}
+\item
+  General
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Overall satisfaction（Satisfaction）
+  \item
+    Purchase again（Fly\_Again）
+  \item
+    Willingness to recommend（Recommend）
+  \end{itemize}
+\end{enumerate}
+
+Now check the data frame we have:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{str}\NormalTok{(rating,}\DataTypeTok{vec.len=}\DecValTok{3}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Classes 'tbl_df', 'tbl' and 'data.frame':    3000 obs. of  17 variables:
+##  $ Easy_Reservation: int  6 5 6 5 4 5 6 4 ...
+##  $ Preferred_Seats : int  5 7 6 6 5 6 6 6 ...
+##  $ Flight_Options  : int  4 7 5 5 3 4 6 3 ...
+##  $ Ticket_Prices   : int  5 6 6 5 6 5 5 5 ...
+##  $ Seat_Comfort    : int  5 6 7 7 6 6 6 4 ...
+##  $ Seat_Roominess  : int  7 8 6 8 7 8 6 5 ...
+##  $ Overhead_Storage: int  5 5 7 6 5 4 4 4 ...
+##  $ Clean_Aircraft  : int  7 6 7 7 7 7 6 4 ...
+##  $ Courtesy        : int  5 6 6 4 2 5 5 4 ...
+##  $ Friendliness    : int  4 6 6 6 3 4 5 5 ...
+##  $ Helpfulness     : int  6 5 6 4 4 5 5 4 ...
+##  $ Service         : int  6 5 6 5 3 5 5 5 ...
+##  $ Satisfaction    : int  6 7 7 5 4 6 5 5 ...
+##  $ Fly_Again       : int  6 6 6 7 4 5 3 4 ...
+##  $ Recommend       : int  3 6 5 5 4 5 6 5 ...
+##  $ ID              : int  1 2 3 4 5 6 7 8 ...
+##  $ Airline         : chr  "AirlineCo.1" "AirlineCo.1" "AirlineCo.1" ...
+\end{verbatim}
 
 \chapter{References}\label{references}
 
