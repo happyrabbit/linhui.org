@@ -2064,6 +2064,112 @@ into the topic. Chapter 7 of the book by De Waal, Pannekoek and Scholtus
 imputation methods. The choice of specific method depends on the actual
 situation. There is no best way.
 
+One question to ask before imputation: Is there any auxiliary
+information? Being aware of any auxiliary information is critical. For
+example, if the system set customer who did not purchase as missing,
+then the real purchasing amount should be 0. Is missing a random
+occurrence? If so, it may be reasonable to impute with mean or median.
+If not, is there a potential mechanism for the missing data? For
+example, older people are more reluctant to disclose their ages in the
+questionnaire, so that the absence of age is not completely random. In
+this case, the missing values need to be estimated using the
+relationship between age and other independent variables. For example,
+use variables such as whether they have children, income, and other
+survey questions to build a model to predict age.
+
+Also, the purpose of modeling is important for selecting imputation
+methods. If the goal is to interpret the parameter estimate or
+statistical inference, then it is important to study the missing
+mechanism carefully and to estimate the missing values using non-missing
+information as much as possible. If the goal is to predict, people
+usually will not study the absence mechanism rigorously (but sometimes
+the mechanism is obvious). If the absence mechanism is not clear, treat
+it as missing at random and use mean, median, or k-nearest neighbor to
+impute. Since statistical inference is sensitive to missing values,
+researchers from survey statistics have conducted in-depth studies of
+various imputation schemes which focus on valid statistical inference.
+The problem of missing values in the prediction model is different from
+that in the traditional survey. Therefore, there are not many papers on
+missing value imputation in the prediction model. Those who want to
+study further can refer to Saar-Tsechansky and Provost's comparison of
+different imputation methods \citep{missing1} and De Waal, Pannekoek and
+Scholtus' book \citep{Ton2011}.
+
+\subsection{Impute missing values with
+median/mode}\label{impute-missing-values-with-medianmode}
+
+In the case of missing at random, a common method is to impute with the
+mean (continuous variable) or median (categorical variables). You can
+use \texttt{impute()} function in \texttt{imputeMissings} package.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# save the result as another object}
+\NormalTok{demo_imp<-}\KeywordTok{impute}\NormalTok{(sim.dat,}\DataTypeTok{method=}\StringTok{"median/mode"}\NormalTok{)}
+\CommentTok{# check the first 5 columns, there is no missing values in other columns}
+\KeywordTok{summary}\NormalTok{(demo_imp[,}\DecValTok{1}\NormalTok{:}\DecValTok{5}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##       age           gender        income      
+##  Min.   :16.00   Female:554   Min.   : 41776  
+##  1st Qu.:25.00   Male  :446   1st Qu.: 87896  
+##  Median :36.00                Median : 93869  
+##  Mean   :38.58                Mean   :109923  
+##  3rd Qu.:53.00                3rd Qu.:119456  
+##  Max.   :69.00                Max.   :319704  
+##  house       store_exp      
+##  No :432   Min.   :  155.8  
+##  Yes:568   1st Qu.:  205.1  
+##            Median :  329.8  
+##            Mean   : 1357.7  
+##            3rd Qu.:  597.3  
+##            Max.   :50000.0
+\end{verbatim}
+
+After imputation, \texttt{demo\_imp} has no missing value. This method
+is straightforward and widely used. The disadvantage is that it does not
+take into account the relationship between the variables. When there is
+a significant proportion of missing, it will distort the data. In this
+case, it is better to consider the relationship between variables and
+study the missing mechanism. In the example here, the missing variables
+are numeric. If the missing variable is a categorical/factor variable,
+the \texttt{impute()} function will impute with the mode.
+
+You can also use \texttt{preProcess()} function, but it is only for
+numeric variables, and can not impute categorical variables. Since
+missing values here are numeric, we can use the \texttt{preProcess()}
+function. The result is the same as the \texttt{impute()} function.
+\texttt{PreProcess()} is a powerful function that can link to a variety
+of data preprocessing methods. We will use the function later for other
+data preprocessing.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{imp<-}\KeywordTok{preProcess}\NormalTok{(sim.dat,}\DataTypeTok{method=}\StringTok{"medianImpute"}\NormalTok{)}
+\NormalTok{demo_imp2<-}\KeywordTok{predict}\NormalTok{(imp,sim.dat)}
+\KeywordTok{summary}\NormalTok{(demo_imp2[,}\DecValTok{1}\NormalTok{:}\DecValTok{5}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##       age           gender        income      
+##  Min.   :16.00   Female:554   Min.   : 41776  
+##  1st Qu.:25.00   Male  :446   1st Qu.: 87896  
+##  Median :36.00                Median : 93869  
+##  Mean   :38.58                Mean   :109923  
+##  3rd Qu.:53.00                3rd Qu.:119456  
+##  Max.   :69.00                Max.   :319704  
+##  house       store_exp      
+##  No :432   Min.   :  155.8  
+##  Yes:568   1st Qu.:  205.1  
+##            Median :  329.8  
+##            Mean   : 1357.7  
+##            3rd Qu.:  597.3  
+##            Max.   :50000.0
+\end{verbatim}
+
 \chapter{References}\label{references}
 
 \bibliography{bibliography.bib}
