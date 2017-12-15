@@ -2170,6 +2170,169 @@ data preprocessing.
 ##            Max.   :50000.0
 \end{verbatim}
 
+\subsection{K-nearest neighbors}\label{k-nearest-neighbors}
+
+K-nearest neighbor (KNN) will find the k closest samples (Euclidian
+distance) in the training set and impute the mean of those
+``neighbors.''
+
+Use \texttt{preProcess()} to conduct KNN:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{imp<-}\KeywordTok{preProcess}\NormalTok{(sim.dat,}\DataTypeTok{method=}\StringTok{"knnImpute"}\NormalTok{,}\DataTypeTok{k=}\DecValTok{5}\NormalTok{)}
+\CommentTok{# need to use predict() to get KNN result}
+\NormalTok{demo_imp<-}\KeywordTok{predict}\NormalTok{(imp,sim.dat)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Error in `[.data.frame`(old, , non_missing_cols, drop = FALSE) : 
+  undefined columns selected
+\end{verbatim}
+
+Now we get an error saying ``undefined columns selected.'' It is because
+\texttt{sim.dat} has non-numeric variables. The \texttt{preProcess()} in
+the first line will automatically ignore non-numeric columns, so there
+is no error. However, there is a problem when using \texttt{predict()}
+to get the result. Removing those variable will solve the problem.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# find factor columns}
+\NormalTok{imp<-}\KeywordTok{preProcess}\NormalTok{(sim.dat,}\DataTypeTok{method=}\StringTok{"knnImpute"}\NormalTok{,}\DataTypeTok{k=}\DecValTok{5}\NormalTok{)}
+\NormalTok{idx<-}\KeywordTok{which}\NormalTok{(}\KeywordTok{lapply}\NormalTok{(sim.dat,class)==}\StringTok{"factor"}\NormalTok{)}
+\NormalTok{demo_imp<-}\KeywordTok{predict}\NormalTok{(imp,sim.dat[,-idx])}
+\KeywordTok{summary}\NormalTok{(demo_imp[,}\DecValTok{1}\NormalTok{:}\DecValTok{3}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##       age                 income        
+##  Min.   :-1.5910972   Min.   :-1.43989  
+##  1st Qu.:-0.9568733   1st Qu.:-0.53732  
+##  Median :-0.1817107   Median :-0.37606  
+##  Mean   : 0.0000156   Mean   : 0.02389  
+##  3rd Qu.: 1.0162678   3rd Qu.: 0.21540  
+##  Max.   : 2.1437770   Max.   : 4.13627  
+##    store_exp       
+##  Min.   :-0.43345  
+##  1st Qu.:-0.41574  
+##  Median :-0.37105  
+##  Mean   :-0.00042  
+##  3rd Qu.:-0.27437  
+##  Max.   :17.52734
+\end{verbatim}
+
+\texttt{lapply(data,class)} can return a list of column class. Here the
+data frame is \texttt{sim.dat}, and the following code will give the
+list of column class:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# only show the first three elements}
+\KeywordTok{lapply}\NormalTok{(sim.dat,class)[}\DecValTok{1}\NormalTok{:}\DecValTok{3}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## $age
+## [1] "integer"
+## 
+## $gender
+## [1] "factor"
+## 
+## $income
+## [1] "numeric"
+\end{verbatim}
+
+Comparing the KNN result with the previous median imputation, the two
+are very different. This is because when you tell the
+\texttt{preProcess()} function to use KNN (the option
+\texttt{method\ ="\ knnImpute"}), it will automatically standardize the
+data. Another way is to use Bagging tree (in the next section). Note
+that KNN can not impute samples with the entire row missing. The reason
+is straightforward. Since the algorithm uses the average of its
+neighbors if none of them has a value, what does it apply to calculate
+the mean? Let's append a new row with all values missing to the original
+data frame to get a new object called \texttt{temp}. Then apply KNN to
+\texttt{temp} and see what happens:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{temp<-}\KeywordTok{rbind}\NormalTok{(sim.dat,}\KeywordTok{rep}\NormalTok{(}\OtherTok{NA}\NormalTok{,}\KeywordTok{ncol}\NormalTok{(sim.dat)))}
+\NormalTok{imp<-}\KeywordTok{preProcess}\NormalTok{(sim.dat,}\DataTypeTok{method=}\StringTok{"knnImpute"}\NormalTok{,}\DataTypeTok{k=}\DecValTok{5}\NormalTok{)}
+\NormalTok{idx<-}\KeywordTok{which}\NormalTok{(}\KeywordTok{lapply}\NormalTok{(temp,class)==}\StringTok{"factor"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{demo_imp<-}\KeywordTok{predict}\NormalTok{(imp,temp[,-idx])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Error in FUN(newX[, i], ...) : 
+  cannot impute when all predictors are missing in the new data point
+\end{verbatim}
+
+There is an error saying ``cannot impute when all predictors are missing
+in the new data point''. It is easy to fix by finding and removing the
+problematic row:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{idx<-}\KeywordTok{apply}\NormalTok{(temp,}\DecValTok{1}\NormalTok{,function(x) }\KeywordTok{sum}\NormalTok{(}\KeywordTok{is.na}\NormalTok{(x)) )}
+\KeywordTok{as.vector}\NormalTok{(}\KeywordTok{which}\NormalTok{(idx==}\KeywordTok{ncol}\NormalTok{(temp)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1001
+\end{verbatim}
+
+It shows that row 1001 is problematic. You can go ahead to delete it.
+
+\subsection{Bagging Tree}\label{bagging-tree}
+
+Bagging (Bootstrap aggregating) was originally proposed by Leo Breiman.
+It is one of the earliest ensemble methods \citep{bag1}. When used in
+missing value imputation, it will use the remaining variables as
+predictors to train a bagging tree and then use the tree to predict the
+missing values. Although theoretically, the method is powerful, the
+computation is much more intense than KNN. In practice, there is a
+trade-off between computation time and the effect. If a median or mean
+meet the modeling needs, even bagging tree may improve the accuracy a
+little, but the upgrade is so marginal that it does not deserve the
+extra time. The bagging tree itself is a model for regression and
+classification. Here we use \texttt{preProcess()} to impute
+\texttt{sim.dat}:
+
+\section{Python Computing}\label{python-computing}
+
+\textbf{Environmental Setup}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ImportTok{from} \NormalTok{IPython.core.interactiveshell }\ImportTok{import} \NormalTok{InteractiveShell}
+\NormalTok{InteractiveShell.ast_node_interactivity }\OperatorTok{=} \StringTok{"all"}
+
+\ImportTok{import} \NormalTok{numpy }\ImportTok{as} \NormalTok{np}
+\ImportTok{import} \NormalTok{scipy }\ImportTok{as} \NormalTok{sp}
+\ImportTok{import} \NormalTok{pandas }\ImportTok{as} \NormalTok{pd}
+\ImportTok{import} \NormalTok{math}
+
+\ImportTok{from} \NormalTok{sklearn.preprocessing }\ImportTok{import} \NormalTok{Imputer}
+\ImportTok{from} \NormalTok{sklearn.preprocessing }\ImportTok{import} \NormalTok{StandardScaler}
+
+\ImportTok{from} \NormalTok{pandas.plotting }\ImportTok{import} \NormalTok{scatter_matrix}
+\ImportTok{import} \NormalTok{matplotlib.pyplot }\ImportTok{as} \NormalTok{plt}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Data Cleaning}\label{data-cleaning-1}
+
 \chapter{References}\label{references}
 
 \bibliography{bibliography.bib}
