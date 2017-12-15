@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2017-12-14">
+<meta name="date" content="2017-12-15">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -142,9 +142,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="4.3" data-path="centering-and-scaling.html"><a href="centering-and-scaling.html"><i class="fa fa-check"></i><b>4.3</b> Centering and Scaling</a></li>
 <li class="chapter" data-level="4.4" data-path="resolve-skewness.html"><a href="resolve-skewness.html"><i class="fa fa-check"></i><b>4.4</b> Resolve Skewness</a></li>
 <li class="chapter" data-level="4.5" data-path="resolve-outliers.html"><a href="resolve-outliers.html"><i class="fa fa-check"></i><b>4.5</b> Resolve Outliers</a></li>
-<li class="chapter" data-level="4.6" data-path="collinearity.html"><a href="collinearity.html"><i class="fa fa-check"></i><b>4.6</b> Collinearity</a></li>
-<li class="chapter" data-level="4.7" data-path="sparse-variables.html"><a href="sparse-variables.html"><i class="fa fa-check"></i><b>4.7</b> Sparse Variables</a></li>
-<li class="chapter" data-level="4.8" data-path="re-encode-dummy-variables.html"><a href="re-encode-dummy-variables.html"><i class="fa fa-check"></i><b>4.8</b> Re-encode Dummy Variables</a></li>
+<li class="chapter" data-level="4.6" data-path="python-computing.html"><a href="python-computing.html"><i class="fa fa-check"></i><b>4.6</b> Python Computing</a><ul>
+<li class="chapter" data-level="4.6.1" data-path="python-computing.html"><a href="python-computing.html#data-cleaning-1"><i class="fa fa-check"></i><b>4.6.1</b> Data Cleaning</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>5</b> References</a></li>
 <li class="divider"></li>
@@ -169,8 +169,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
             <section class="normal" id="section-">
 <div id="centering-and-scaling" class="section level2">
 <h2><span class="header-section-number">4.3</span> Centering and Scaling</h2>
-<p>It is the most straightforward data transformation. It centers and scales a variable to mean 0 and standard deviation 1. It ensures that the criterion for finding linear combinations of the predictors is based on how much variation they explain and therefore improves the numerical stability. Models involving finding linear combinations of the predictors to explain response/predictors variation need data centering and scaling, such as PCA <span class="citation">(Jolliffe <a href="#ref-pca1">2002</a>)</span>, PLS <span class="citation">(Geladi P <a href="#ref-PLS1">1986</a>)</span> and EFA <span class="citation">(Mulaik <a href="#ref-EFA1">2009</a>)</span>. You can easily writing code yourself to conduct this transformation.</p>
-<p>Let’s standarize the variable <code>income</code> from <code>sim.dat</code>:</p>
+<p>It is the most straightforward data transformation. It centers and scales a variable to mean 0 and standard deviation 1. It ensures that the criterion for finding linear combinations of the predictors is based on how much variation they explain and therefore improves the numerical stability. Models involving finding linear combinations of the predictors to explain response/predictors variation need data centering and scaling, such as PCA <span class="citation">(Jolliffe <a href="#ref-pca1">2002</a>)</span>, PLS <span class="citation">(Geladi P <a href="#ref-PLS1">1986</a>)</span> and EFA <span class="citation">(Mulaik <a href="#ref-EFA1">2009</a>)</span>. You can quickly write code yourself to conduct this transformation.</p>
+<p>Let’s standardize the variable <code>income</code> from <code>sim.dat</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">income&lt;-sim.dat$income
 <span class="co"># calculate the mean of income</span>
 mux&lt;-<span class="kw">mean</span>(income,<span class="dt">na.rm=</span>T)
@@ -196,7 +196,7 @@ transformed&lt;-<span class="kw">predict</span>(trans,sdat)</code></pre></div>
 ##  3rd Qu.: 1.0163   3rd Qu.: 0.2213  
 ##  Max.   : 2.1438   Max.   : 4.1363  
 ##  NA&#39;s   :1         NA&#39;s   :184</code></pre>
-<p>Sometimes you only need to scale the variable. For example, if the model adds penalty to the parameter estimates (such as <span class="math inline">\(L_2\)</span> penalty is ridge regression and <span class="math inline">\(L_1\)</span> penalty in LASSO), the variables need to have similar scale to ensure a fair variable selection. We are heavy user of this kind of penalty-based model in my work and we used the following quantile transformation:</p>
+<p>Sometimes you only need to scale the variable. For example, if the model adds a penalty to the parameter estimates (such as <span class="math inline">\(L_2\)</span> penalty is ridge regression and <span class="math inline">\(L_1\)</span> penalty in LASSO), the variables need to have a similar scale to ensure a fair variable selection. I am a heavy user of this kind of penalty-based model in my work, and I used the following quantile transformation:</p>
 <p><span class="math display">\[
 x_{ij}^{*}=\frac{x_{ij}-quantile(x_{.j},0.01)}{quantile(x_{.j}-0.99)-quantile(x_{-j},0.01)}
 \]</span></p>
@@ -233,13 +233,13 @@ x_{ij}^{*}=\frac{x_{ij}-quantile(x_{.j},0.01)}{quantile(x_{.j}-0.99)-quantile(x_
 <h3> References</h3>
 <div id="refs" class="references">
 <div id="ref-pca1">
-<p>Jolliffe, I.T. 2002. <em>Principla Component Analysis</em>. 2nd ed. New York: Springer.</p>
+<p>Jolliffe, I.T. 2002. <em>Principla Component Analysis</em>. 2nd ed. Springer.</p>
 </div>
 <div id="ref-PLS1">
-<p>Geladi P, Kowalski B. 1986. “Partial Least-Squares Regression: A Tutorial.” <em>Analytica Chimica Acta</em>, no. 185: 1–17.</p>
+<p>Geladi P, Kowalski B. 1986. “Partial Least Squares Regression: A Tutorial.” <em>Analytica Chimica Acta</em>, no. 185: 1–17.</p>
 </div>
 <div id="ref-EFA1">
-<p>Mulaik, S.A. 2009. <em>Foundations of Factor Analysis</em>. 2ND ed. Boca Raton: Chapman&amp;Hall/CRC.</p>
+<p>Mulaik, S.A. 2009. <em>Foundations of Factor Analysis</em>. 2ND ed. Boca Raton: Chapman &amp; Hall/CRC.</p>
 </div>
 </div>
             </section>
@@ -277,7 +277,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/happyrabbit/IntroDataScience/05-DataPreprocessing.Rmd",
+"link": "https://github.com/happyrabbit/IntroDataScience/04-DataPreprocessing.Rmd",
 "text": "Edit"
 },
 "download": ["IDS.pdf", "IDS.epub", "IDS.mobi"],

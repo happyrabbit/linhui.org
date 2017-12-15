@@ -207,7 +207,7 @@
 
 \title{Introduction to Data Science}
 \author{Hui Lin and Ming Li}
-\date{2017-12-14}
+\date{2017-12-15}
 
 \usepackage{amsthm}
 \newtheorem{theorem}{Theorem}[chapter]
@@ -2308,6 +2308,405 @@ little, but the upgrade is so marginal that it does not deserve the
 extra time. The bagging tree itself is a model for regression and
 classification. Here we use \texttt{preProcess()} to impute
 \texttt{sim.dat}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{imp<-}\KeywordTok{preProcess}\NormalTok{(sim.dat,}\DataTypeTok{method=}\StringTok{"bagImpute"}\NormalTok{)}
+\NormalTok{demo_imp<-}\KeywordTok{predict}\NormalTok{(imp,sim.dat)}
+\KeywordTok{summary}\NormalTok{(demo_imp[,}\DecValTok{1}\NormalTok{:}\DecValTok{5}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+      age           gender        income       house       store_exp      
+ Min.   :16.00   Female:554   Min.   : 41776   No :432   Min.   :  155.8  
+ 1st Qu.:25.00   Male  :446   1st Qu.: 86762   Yes:568   1st Qu.:  205.1  
+ Median :36.00                Median : 94739             Median :  329.0  
+ Mean   :38.58                Mean   :114665             Mean   : 1357.7  
+ 3rd Qu.:53.00                3rd Qu.:123726             3rd Qu.:  597.3  
+ Max.   :69.00                Max.   :319704             Max.   :50000.0  
+\end{verbatim}
+
+\section{Centering and Scaling}\label{centering-and-scaling}
+
+It is the most straightforward data transformation. It centers and
+scales a variable to mean 0 and standard deviation 1. It ensures that
+the criterion for finding linear combinations of the predictors is based
+on how much variation they explain and therefore improves the numerical
+stability. Models involving finding linear combinations of the
+predictors to explain response/predictors variation need data centering
+and scaling, such as PCA \citep{pca1}, PLS \citep{PLS1} and EFA
+\citep{EFA1}. You can quickly write code yourself to conduct this
+transformation.
+
+Let's standardize the variable \texttt{income} from \texttt{sim.dat}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{income<-sim.dat$income}
+\CommentTok{# calculate the mean of income}
+\NormalTok{mux<-}\KeywordTok{mean}\NormalTok{(income,}\DataTypeTok{na.rm=}\NormalTok{T)}
+\CommentTok{# calculate the standard deviation of income}
+\NormalTok{sdx<-}\KeywordTok{sd}\NormalTok{(income,}\DataTypeTok{na.rm=}\NormalTok{T)}
+\CommentTok{# centering}
+\NormalTok{tr1<-income-mux}
+\CommentTok{# scaling}
+\NormalTok{tr2<-tr1/sdx}
+\end{Highlighting}
+\end{Shaded}
+
+Or the function \texttt{preProcess()} in package \texttt{caret} can
+apply this transformation to a set of predictors.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sdat<-}\KeywordTok{subset}\NormalTok{(sim.dat,}\DataTypeTok{select=}\KeywordTok{c}\NormalTok{(}\StringTok{"age"}\NormalTok{,}\StringTok{"income"}\NormalTok{))}
+\CommentTok{# set the "method" option}
+\NormalTok{trans<-}\KeywordTok{preProcess}\NormalTok{(sdat,}\DataTypeTok{method=}\KeywordTok{c}\NormalTok{(}\StringTok{"center"}\NormalTok{,}\StringTok{"scale"}\NormalTok{))}
+\CommentTok{# use predict() function to get the final result}
+\NormalTok{transformed<-}\KeywordTok{predict}\NormalTok{(trans,sdat)}
+\end{Highlighting}
+\end{Shaded}
+
+Now the two variables are in the same scale:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{summary}\NormalTok{(transformed)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##       age              income       
+##  Min.   :-1.5911   Min.   :-1.4399  
+##  1st Qu.:-0.9569   1st Qu.:-0.5560  
+##  Median :-0.1817   Median :-0.3947  
+##  Mean   : 0.0000   Mean   : 0.0000  
+##  3rd Qu.: 1.0163   3rd Qu.: 0.2213  
+##  Max.   : 2.1438   Max.   : 4.1363  
+##  NA's   :1         NA's   :184
+\end{verbatim}
+
+Sometimes you only need to scale the variable. For example, if the model
+adds a penalty to the parameter estimates (such as \(L_2\) penalty is
+ridge regression and \(L_1\) penalty in LASSO), the variables need to
+have a similar scale to ensure a fair variable selection. I am a heavy
+user of this kind of penalty-based model in my work, and I used the
+following quantile transformation:
+
+\[
+x_{ij}^{*}=\frac{x_{ij}-quantile(x_{.j},0.01)}{quantile(x_{.j}-0.99)-quantile(x_{-j},0.01)}
+\]
+
+The reason to use 99\% and 1\% quantile instead of maximum and minimum
+values is to resist the impact of outliers.
+
+It is easy to write a function to do it:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{qscale<-function(dat)\{}
+  \NormalTok{for (i in }\DecValTok{1}\NormalTok{:}\KeywordTok{ncol}\NormalTok{(dat))\{}
+    \NormalTok{up<-}\KeywordTok{quantile}\NormalTok{(dat[,i],}\FloatTok{0.99}\NormalTok{)}
+    \NormalTok{low<-}\KeywordTok{quantile}\NormalTok{(dat[,i],}\FloatTok{0.01}\NormalTok{)}
+    \NormalTok{diff<-up-low}
+    \NormalTok{dat[,i]<-(dat[,i]-low)/diff}
+  \NormalTok{\}}
+  \KeywordTok{return}\NormalTok{(dat)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+In order to illustrate, let's apply it to some variables from
+`demo\_imp2:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{demo_imp3<-}\KeywordTok{qscale}\NormalTok{(}\KeywordTok{subset}\NormalTok{(demo_imp2,}\DataTypeTok{select=}\KeywordTok{c}\NormalTok{(}\StringTok{"income"}\NormalTok{,}\StringTok{"store_exp"}\NormalTok{,}\StringTok{"online_exp"}\NormalTok{)))}
+\KeywordTok{summary}\NormalTok{(demo_imp3)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      income           store_exp        
+##  Min.   :-0.05776   Min.   :-0.003407  
+##  1st Qu.: 0.15736   1st Qu.: 0.003984  
+##  Median : 0.18521   Median : 0.022704  
+##  Mean   : 0.26009   Mean   : 0.176965  
+##  3rd Qu.: 0.30456   3rd Qu.: 0.062849  
+##  Max.   : 1.23857   Max.   : 7.476996  
+##    online_exp       
+##  Min.   :-0.006023  
+##  1st Qu.: 0.042719  
+##  Median : 0.253691  
+##  Mean   : 0.278417  
+##  3rd Qu.: 0.322871  
+##  Max.   : 1.298845
+\end{verbatim}
+
+After transformation, most of the variables are between 0-1.
+
+\section{Resolve Skewness}\label{resolve-skewness}
+
+\href{https://en.wikipedia.org/wiki/Skewness}{Skewness} is defined to be
+the third standardized central moment. The formula for the sample
+skewness statistics is:
+\[ skewness=\frac{\sum(x_{i}-\bar{x})^{3}}{(n-1)v^{3/2}}\]
+\[v=\frac{\sum(x_{i}-\bar{x})^{2}}{(n-1)}\] Skewness=0 means that the
+destribution is symmetric, i.e.~the probability of falling on either
+side of the distribution's mean is equal.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# need skewness() function from e1071 package}
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{1000}\NormalTok{)}
+\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow=}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{),}\DataTypeTok{oma=}\KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{))}
+\CommentTok{# random sample 1000 chi-square distribution with df=2}
+\CommentTok{# right skew}
+\NormalTok{x1<-}\KeywordTok{rchisq}\NormalTok{(}\DecValTok{1000}\NormalTok{,}\DecValTok{2}\NormalTok{, }\DataTypeTok{ncp =} \DecValTok{0}\NormalTok{)}
+\CommentTok{# get left skew variable x2 from x1}
+\NormalTok{x2<-}\KeywordTok{max}\NormalTok{(x1)-x1}
+\KeywordTok{plot}\NormalTok{(}\KeywordTok{density}\NormalTok{(x2),}\DataTypeTok{main=}\KeywordTok{paste}\NormalTok{(}\StringTok{"left skew, skewnwss ="}\NormalTok{,}\KeywordTok{round}\NormalTok{(}\KeywordTok{skewness}\NormalTok{(x2),}\DecValTok{2}\NormalTok{)), }\DataTypeTok{xlab=}\StringTok{"X2"}\NormalTok{)}
+\KeywordTok{plot}\NormalTok{(}\KeywordTok{density}\NormalTok{(x1),}\DataTypeTok{main=}\KeywordTok{paste}\NormalTok{(}\StringTok{"right skew, skewness ="}\NormalTok{,}\KeywordTok{round}\NormalTok{(}\KeywordTok{skewness}\NormalTok{(x1),}\DecValTok{2}\NormalTok{)), }\DataTypeTok{xlab=}\StringTok{"X1"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.8\linewidth]{IDS_files/figure-latex/skew-1} 
+
+}
+
+\caption{Shewed Distribution}\label{fig:skew}
+\end{figure}
+
+You can easily tell if a distribution is skewed by simple
+visualization(Figure\ref{fig:skew}). There are different ways may help
+to remove skewness such as log, square root or inverse. However, it is
+often difficult to determine from plots which transformation is most
+appropriate for correcting skewness. The Box-Cox procedure automatically
+identified a transformation from the family of power transformations
+that are indexed by a parameter \(\lambda\)\citep{BOXCOX1}.
+
+\[
+x^{*}=\begin{cases}
+\begin{array}{c}
+\frac{x^{\lambda}-1}{\lambda}\\
+log(x)
+\end{array} & \begin{array}{c}
+if\ \lambda\neq0\\
+if\ \lambda=0
+\end{array}\end{cases}
+\]
+
+It is easy to see that this family includes log transformation
+(\(\lambda=0\)), square transformation (\(\lambda=2\)), square root
+(\(\lambda=0.5\)), inverse (\(\lambda=-1\)) and others in-between. We
+can still use function \texttt{preProcess()} in package \texttt{caret}
+to apply this transformation by chaning the \texttt{method} argument.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{describe}\NormalTok{(sim.dat)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##              vars    n      mean       sd   median
+## age             1  999     38.58    14.19    36.00
+## gender*         2 1000      1.45     0.50     1.00
+## income          3  816 113543.07 49842.29 93868.68
+## house*          4 1000      1.57     0.50     2.00
+## store_exp       5  999   1358.71  2775.17   329.80
+## online_exp      6 1000   2120.18  1731.22  1941.86
+## store_trans     7 1000      5.35     3.70     4.00
+## online_trans    8 1000     13.55     7.96    14.00
+## Q1              9 1000      3.10     1.45     3.00
+## Q2             10 1000      1.82     1.17     1.00
+## Q3             11 1000      1.99     1.40     1.00
+## Q4             12 1000      2.76     1.16     3.00
+## Q5             13 1000      2.94     1.28     4.00
+## Q6             14 1000      2.45     1.44     2.00
+## Q7             15 1000      3.43     1.46     4.00
+## Q8             16 1000      2.40     1.15     2.00
+## Q9             17 1000      3.08     1.12     4.00
+## Q10            18 1000      2.32     1.14     2.00
+## segment*       19 1000      2.70     1.15     3.00
+##                trimmed      mad      min       max
+## age              37.67    16.31    16.00     69.00
+## gender*           1.43     0.00     1.00      2.00
+## income       104841.94 28989.47 41775.64 319704.34
+## house*            1.58     0.00     1.00      2.00
+## store_exp       845.14   197.47   155.81  50000.00
+## online_exp     1874.51  1015.21    68.82   9479.44
+## store_trans       4.89     2.97     1.00     20.00
+## online_trans     13.42    10.38     1.00     36.00
+## Q1                3.13     1.48     1.00      5.00
+## Q2                1.65     0.00     1.00      5.00
+## Q3                1.75     0.00     1.00      5.00
+## Q4                2.83     1.48     1.00      5.00
+## Q5                3.05     0.00     1.00      5.00
+## Q6                2.43     1.48     1.00      5.00
+## Q7                3.54     0.00     1.00      5.00
+## Q8                2.36     1.48     1.00      5.00
+## Q9                3.23     0.00     1.00      5.00
+## Q10               2.27     1.48     1.00      5.00
+## segment*          2.75     1.48     1.00      4.00
+##                  range  skew kurtosis      se
+## age              53.00  0.47    -1.18    0.45
+## gender*           1.00  0.22    -1.95    0.02
+## income       277928.70  1.69     2.57 1744.83
+## house*            1.00 -0.27    -1.93    0.02
+## store_exp     49844.19  8.08   115.04   87.80
+## online_exp     9410.63  1.18     1.31   54.75
+## store_trans      19.00  1.11     0.69    0.12
+## online_trans     35.00  0.03    -0.98    0.25
+## Q1                4.00 -0.12    -1.36    0.05
+## Q2                4.00  1.13    -0.32    0.04
+## Q3                4.00  1.06    -0.40    0.04
+## Q4                4.00 -0.18    -1.46    0.04
+## Q5                4.00 -0.60    -1.40    0.04
+## Q6                4.00  0.11    -1.89    0.05
+## Q7                4.00 -0.90    -0.79    0.05
+## Q8                4.00  0.21    -1.33    0.04
+## Q9                4.00 -0.68    -1.10    0.04
+## Q10               4.00  0.39    -1.23    0.04
+## segment*          3.00 -0.20    -1.41    0.04
+\end{verbatim}
+
+It is easy to see the skewed variables. If \texttt{mean} and
+\texttt{trimmed} differ a lot, there is very likely outliers. By
+default, \texttt{trimmed} reports mean by dropping the top and bottom
+10\%. It can be adjusted by setting argument \texttt{trim=}. It is clear
+that \texttt{store\_exp} has outliers.
+
+As an example, we will apply Box-Cox transformation on
+\texttt{store\_trans} and \texttt{online\_trans}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# select the two columns and save them as dat_bc}
+\NormalTok{dat_bc<-}\KeywordTok{subset}\NormalTok{(sim.dat,}\DataTypeTok{select=}\KeywordTok{c}\NormalTok{(}\StringTok{"store_trans"}\NormalTok{,}\StringTok{"online_trans"}\NormalTok{))}
+\NormalTok{(trans<-}\KeywordTok{preProcess}\NormalTok{(dat_bc,}\DataTypeTok{method=}\KeywordTok{c}\NormalTok{(}\StringTok{"BoxCox"}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Created from 1000 samples and 2 variables
+## 
+## Pre-processing:
+##   - Box-Cox transformation (2)
+##   - ignored (0)
+## 
+## Lambda estimates for Box-Cox transformation:
+## 0.1, 0.7
+\end{verbatim}
+
+The last line of the output shows the estimates of \(\lambda\) for each
+variable. As before, use \texttt{predict()} to get the transformed
+result:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{transformed<-}\KeywordTok{predict}\NormalTok{(trans,dat_bc)}
+\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow=}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{),}\DataTypeTok{oma=}\KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{))}
+\KeywordTok{hist}\NormalTok{(dat_bc$store_trans,}\DataTypeTok{main=}\StringTok{"Before Transformation"}\NormalTok{,}\DataTypeTok{xlab=}\StringTok{"store_trans"}\NormalTok{)}
+\KeywordTok{hist}\NormalTok{(transformed$store_trans,}\DataTypeTok{main=}\StringTok{"After Transformation"}\NormalTok{,}\DataTypeTok{xlab=}\StringTok{"store_trans"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.8\linewidth]{IDS_files/figure-latex/bc-1} 
+
+}
+
+\caption{Box-Cox Transformation}\label{fig:bc}
+\end{figure}
+
+Before the transformation, the \texttt{stroe\_trans} is skewed right.
+The situation is significantly improved after (figure\ref{fig:bc}).
+\texttt{BoxCoxTrans\ ()} can also conduct Box-Cox transform. But note
+that \texttt{BoxCoxTrans\ ()} can only be applied to a single variable,
+and it is not possible to transform difference columns in a data frame
+at the same time.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(trans<-}\KeywordTok{BoxCoxTrans}\NormalTok{(dat_bc$store_trans))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Box-Cox Transformation
+## 
+## 1000 data points used to estimate Lambda
+## 
+## Input data summary:
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    1.00    3.00    4.00    5.35    7.00   20.00 
+## 
+## Largest/Smallest: 20 
+## Sample Skewness: 1.11 
+## 
+## Estimated Lambda: 0.1 
+## With fudge factor, Lambda = 0 will be used for transformations
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{transformed<-}\KeywordTok{predict}\NormalTok{(trans,dat_bc$store_trans)}
+\KeywordTok{skewness}\NormalTok{(transformed)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] -0.2154708
+\end{verbatim}
+
+The estimate of \(\lambda\) is the same as before (0.1). The skewness of
+the original observation is 1.1, and -0.2 after transformation. Although
+it is not strictly 0, it is greatly improved.
+
+\section{Resolve Outliers}\label{resolve-outliers}
+
+Even under certain assumptions we can statistically define outliers, it
+can be hard to define in some situations. Box plot, histogram and some
+other basic visualizations can be used to initially check whether there
+are outliers. For example, we can visualize numerical non-survey
+variables in \texttt{sim.dat}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# select numerical non-survey data}
+\NormalTok{sdat<-}\KeywordTok{subset}\NormalTok{(sim.dat,}\DataTypeTok{select=}\KeywordTok{c}\NormalTok{(}\StringTok{"age"}\NormalTok{,}\StringTok{"income"}\NormalTok{,}\StringTok{"store_exp"}\NormalTok{,}\StringTok{"online_exp"}\NormalTok{,}\StringTok{"store_trans"}\NormalTok{,}\StringTok{"online_trans"} \NormalTok{))}
+\CommentTok{# use scatterplotMatrix() function from car package}
+\KeywordTok{par}\NormalTok{(}\DataTypeTok{oma=}\KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{))}
+\KeywordTok{scatterplotMatrix}\NormalTok{(sdat,}\DataTypeTok{diagonal=}\StringTok{"boxplot"}\NormalTok{,}\DataTypeTok{smoother=}\OtherTok{FALSE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\includegraphics[width=0.8\linewidth]{IDS_files/figure-latex/scm-1} \end{center}
+
+As figure \ref{fig:scm} shows, \texttt{store\_exp} has outliers. It is
+also easy to observe the pair relationship from the plot. \texttt{age}
+is negatively correlated with \texttt{online\_trans} but positively
+correlated with \texttt{store\_trans}. It seems that older people tend
+to purchase from the local store. The amount of expense is positively
+correlated with income. Scatterplot matrix like this can reveal lots of
+information before modeling.
+
+In addition to visualization, there are some statistical methods to
+define outliers, such as the commonly used Z-score. The Z-score for
+variable \(\mathbf{Y}\) is defined as:
+
+\[Z_{i}=\frac{Y_{i}-\bar{Y}}{s}\]
+
+where \(\bar{Y}\) and \(s\) are mean and standard deviation for \(Y\).
+Z-score is a measurement of the distance between each observation and
+the mean. This method may be misleading, especially when the sample size
+is small. Iglewicz and Hoaglin proposed to use the modified Z-score to
+determine the outlier\citep{mad1}：
 
 \section{Python Computing}\label{python-computing}
 

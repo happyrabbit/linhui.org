@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2017-12-14">
+<meta name="date" content="2017-12-15">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -33,7 +33,7 @@
   
   
 <link rel="prev" href="resolve-skewness.html">
-<link rel="next" href="collinearity.html">
+<link rel="next" href="python-computing.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -142,9 +142,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="4.3" data-path="centering-and-scaling.html"><a href="centering-and-scaling.html"><i class="fa fa-check"></i><b>4.3</b> Centering and Scaling</a></li>
 <li class="chapter" data-level="4.4" data-path="resolve-skewness.html"><a href="resolve-skewness.html"><i class="fa fa-check"></i><b>4.4</b> Resolve Skewness</a></li>
 <li class="chapter" data-level="4.5" data-path="resolve-outliers.html"><a href="resolve-outliers.html"><i class="fa fa-check"></i><b>4.5</b> Resolve Outliers</a></li>
-<li class="chapter" data-level="4.6" data-path="collinearity.html"><a href="collinearity.html"><i class="fa fa-check"></i><b>4.6</b> Collinearity</a></li>
-<li class="chapter" data-level="4.7" data-path="sparse-variables.html"><a href="sparse-variables.html"><i class="fa fa-check"></i><b>4.7</b> Sparse Variables</a></li>
-<li class="chapter" data-level="4.8" data-path="re-encode-dummy-variables.html"><a href="re-encode-dummy-variables.html"><i class="fa fa-check"></i><b>4.8</b> Re-encode Dummy Variables</a></li>
+<li class="chapter" data-level="4.6" data-path="python-computing.html"><a href="python-computing.html"><i class="fa fa-check"></i><b>4.6</b> Python Computing</a><ul>
+<li class="chapter" data-level="4.6.1" data-path="python-computing.html"><a href="python-computing.html#data-cleaning-1"><i class="fa fa-check"></i><b>4.6.1</b> Data Cleaning</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>5</b> References</a></li>
 <li class="divider"></li>
@@ -180,49 +180,11 @@ sdat&lt;-<span class="kw">subset</span>(sim.dat,<span class="dt">select=</span><
 <p>In addition to visualization, there are some statistical methods to define outliers, such as the commonly used Z-score. The Z-score for variable <span class="math inline">\(\mathbf{Y}\)</span> is defined as:</p>
 <p><span class="math display">\[Z_{i}=\frac{Y_{i}-\bar{Y}}{s}\]</span></p>
 <p>where <span class="math inline">\(\bar{Y}\)</span> and <span class="math inline">\(s\)</span> are mean and standard deviation for <span class="math inline">\(Y\)</span>. Z-score is a measurement of the distance between each observation and the mean. This method may be misleading, especially when the sample size is small. Iglewicz and Hoaglin proposed to use the modified Z-score to determine the outlier<span class="citation">(Iglewicz and Hoaglin <a href="#ref-mad1">1993</a>)</span>：</p>
-<p><span class="math display">\[M_{i}=\frac{0.6745(Y_{i}-\bar{Y})}{MAD}\]</span></p>
-<p>Where MAD is the median of a series of $| Y_ {i} - {Y} | $, called the median of the absolute dispersion. Iglewicz and Hoaglin suggest that the points with the Z-score greater than 3.5 corrected above are possible outliers. Let’s apply it to <code>income</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate median of the absolute dispersion for income</span>
-ymad&lt;-<span class="kw">mad</span>(<span class="kw">na.omit</span>(sdat$income))
-<span class="co"># calculate z-score</span>
-zs&lt;-(sdat$income-<span class="kw">mean</span>(<span class="kw">na.omit</span>(sdat$income)))/ymad
-<span class="co"># count the number of outliers</span>
-<span class="kw">sum</span>(<span class="kw">na.omit</span>(zs&gt;<span class="fl">3.5</span>))</code></pre></div>
-<pre><code>## [1] 59</code></pre>
-<p>According to modified Z-score, variable income has 59 outliers. Refer to <span class="citation">(Iglewicz and Hoaglin <a href="#ref-mad1">1993</a>)</span> for other ways of detecting outliers.</p>
-<p>The impact of outliers depends on the model. Some models are sensitive to outliers, such as linear regression, logistic regression. Some are pretty robust to outliers, such as tree models, support vector machine. Also, the outlier is not wrong data. It is real observation so can not be deleted at will. If a model is sensitive to outliers, we can use <em>spatial sign transformation</em> <span class="citation">(Serneels S <a href="#ref-ssp">2006</a>)</span> to minimize the problem. It projects the original sample points to the surface of a sphere by:</p>
-<p><span class="math display">\[x_{ij}^{*}=\frac{x_{ij}}{\sqrt{\sum_{j=1}^{p}x_{ij}^{2}}}\]</span></p>
-<p>where <span class="math inline">\(x_{ij}\)</span> represents the <span class="math inline">\(i^{th}\)</span> observation and <span class="math inline">\(j^{th}\)</span> variable. As shown in the equation, every observation for sample <span class="math inline">\(i\)</span> is divided by its square mode. The denominator is the Euclidean distance to the center of the p-dimensional predictor space. Three things to pay attention here:</p>
-<ol style="list-style-type: decimal">
-<li>It is important to center and scale the predictor data before using this transformation</li>
-<li>Unlike centering or scaling, this manipulation of the predictors transforms them as a group</li>
-<li>If there are some variables to remove (for example, highly correlated variables), do it before the transformation</li>
-</ol>
-<p>Function <code>spatialSign()</code> <code>caret</code> package can conduct the transformation. Take <code>income</code> and <code>age</code> as an example:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># KNN imputation</span>
-sdat&lt;-sim.dat[,<span class="kw">c</span>(<span class="st">&quot;income&quot;</span>,<span class="st">&quot;age&quot;</span>)]
-imp&lt;-<span class="kw">preProcess</span>(sdat,<span class="dt">method=</span><span class="kw">c</span>(<span class="st">&quot;knnImpute&quot;</span>),<span class="dt">k=</span><span class="dv">5</span>)
-sdat&lt;-<span class="kw">predict</span>(imp,sdat)
-transformed &lt;-<span class="st"> </span><span class="kw">spatialSign</span>(sdat)
-transformed &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(transformed)
-<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>),<span class="dt">oma=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>))
-<span class="kw">plot</span>(income ~<span class="st"> </span>age,<span class="dt">data =</span> sdat,<span class="dt">col=</span><span class="st">&quot;blue&quot;</span>,<span class="dt">main=</span><span class="st">&quot;Before&quot;</span>)
-<span class="kw">plot</span>(income ~<span class="st"> </span>age,<span class="dt">data =</span> transformed,<span class="dt">col=</span><span class="st">&quot;blue&quot;</span>,<span class="dt">main=</span><span class="st">&quot;After&quot;</span>)</code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:sst"></span>
-<img src="IDS_files/figure-html/sst-1.svg" alt="spatial sign transformation" width="80%" />
-<p class="caption">
-FIGURE 4.3: spatial sign transformation
-</p>
-</div>
-<p>Some readers may have found that the above code does not seem to standardize the data before transformation. Recall the introduction of KNN, <code>preProcess ()</code> with <code>method=&quot;knnImpute&quot;</code> by default will standardize data.</p>
 </div>
 <h3> References</h3>
 <div id="refs" class="references">
 <div id="ref-mad1">
 <p>Iglewicz, Boris, and David Hoaglin. 1993. “How to Detect and Handle Outliers.” <em>The ASQC Basic References in Quality Control: Statistical Techniques</em> 16.</p>
-</div>
-<div id="ref-ssp">
-<p>Serneels S, Espen PV, Nolf ED. 2006. “Spatial Sign Pre-Processing: A Simple Way to Impart Moderate Robustness to Multivariate Estimators.” <em>Journal of Chemical Information and Modeling</em> 46 (3): 1402–9.</p>
 </div>
 </div>
             </section>
@@ -231,7 +193,7 @@ FIGURE 4.3: spatial sign transformation
         </div>
       </div>
 <a href="resolve-skewness.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="collinearity.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="python-computing.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
@@ -260,7 +222,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/happyrabbit/IntroDataScience/05-DataPreprocessing.Rmd",
+"link": "https://github.com/happyrabbit/IntroDataScience/04-DataPreprocessing.Rmd",
 "text": "Edit"
 },
 "download": ["IDS.pdf", "IDS.epub", "IDS.mobi"],
