@@ -2708,6 +2708,92 @@ the mean. This method may be misleading, especially when the sample size
 is small. Iglewicz and Hoaglin proposed to use the modified Z-score to
 determine the outlier\citep{mad1}：
 
+\[M_{i}=\frac{0.6745(Y_{i}-\bar{Y})}{MAD}\]
+
+Where MAD is the median of a series of \(|Y_ {i} - \bar{Y}|\), called
+the median of the absolute dispersion. Iglewicz and Hoaglin suggest that
+the points with the Z-score greater than 3.5 corrected above are
+possible outliers. Let's apply it to \texttt{income}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# calculate median of the absolute dispersion for income}
+\NormalTok{ymad<-}\KeywordTok{mad}\NormalTok{(}\KeywordTok{na.omit}\NormalTok{(sdat$income))}
+\CommentTok{# calculate z-score}
+\NormalTok{zs<-(sdat$income-}\KeywordTok{mean}\NormalTok{(}\KeywordTok{na.omit}\NormalTok{(sdat$income)))/ymad}
+\CommentTok{# count the number of outliers}
+\KeywordTok{sum}\NormalTok{(}\KeywordTok{na.omit}\NormalTok{(zs>}\FloatTok{3.5}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 59
+\end{verbatim}
+
+According to modified Z-score, variable income has 59 outliers. Refer to
+\citep{mad1} for other ways of detecting outliers.
+
+The impact of outliers depends on the model. Some models are sensitive
+to outliers, such as linear regression, logistic regression. Some are
+pretty robust to outliers, such as tree models, support vector machine.
+Also, the outlier is not wrong data. It is real observation so cannot be
+deleted at will. If a model is sensitive to outliers, we can use
+\emph{spatial sign transformation} \citep{ssp} to minimize the problem.
+It projects the original sample points to the surface of a sphere by:
+
+\[x_{ij}^{*}=\frac{x_{ij}}{\sqrt{\sum_{j=1}^{p}x_{ij}^{2}}}\]
+
+where \(x_{ij}\) represents the \(i^{th}\) observation and \(j^{th}\)
+variable. As shown in the equation, every observation for sample \(i\)
+is divided by its square mode. The denominator is the Euclidean distance
+to the center of the p-dimensional predictor space. Three things to pay
+attention here:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  It is important to center and scale the predictor data before using
+  this transformation
+\item
+  Unlike centering or scaling, this manipulation of the predictors
+  transforms them as a group
+\item
+  If there are some variables to remove (for example, highly correlated
+  variables), do it before the transformation
+\end{enumerate}
+
+Function \texttt{spatialSign()} \texttt{caret} package can conduct the
+transformation. Take \texttt{income} and \texttt{age} as an example:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# KNN imputation}
+\NormalTok{sdat<-sim.dat[,}\KeywordTok{c}\NormalTok{(}\StringTok{"income"}\NormalTok{,}\StringTok{"age"}\NormalTok{)]}
+\NormalTok{imp<-}\KeywordTok{preProcess}\NormalTok{(sdat,}\DataTypeTok{method=}\KeywordTok{c}\NormalTok{(}\StringTok{"knnImpute"}\NormalTok{),}\DataTypeTok{k=}\DecValTok{5}\NormalTok{)}
+\NormalTok{sdat<-}\KeywordTok{predict}\NormalTok{(imp,sdat)}
+\NormalTok{transformed <-}\StringTok{ }\KeywordTok{spatialSign}\NormalTok{(sdat)}
+\NormalTok{transformed <-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(transformed)}
+\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow=}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{),}\DataTypeTok{oma=}\KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{))}
+\KeywordTok{plot}\NormalTok{(income ~}\StringTok{ }\NormalTok{age,}\DataTypeTok{data =} \NormalTok{sdat,}\DataTypeTok{col=}\StringTok{"blue"}\NormalTok{,}\DataTypeTok{main=}\StringTok{"Before"}\NormalTok{)}
+\KeywordTok{plot}\NormalTok{(income ~}\StringTok{ }\NormalTok{age,}\DataTypeTok{data =} \NormalTok{transformed,}\DataTypeTok{col=}\StringTok{"blue"}\NormalTok{,}\DataTypeTok{main=}\StringTok{"After"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.8\linewidth]{IDS_files/figure-latex/sst-1} 
+
+}
+
+\caption{spatial sign transformation}\label{fig:sst}
+\end{figure}
+
+Some readers may have found that the above code does not seem to
+standardize the data before transformation. Recall the introduction of
+KNN, \texttt{preProcess()} with \texttt{method="knnImpute"} by default
+will standardize data.
+
 \section{Python Computing}\label{python-computing}
 
 \textbf{Environmental Setup}
