@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2017-12-15">
+<meta name="date" content="2017-12-27">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -34,12 +34,12 @@
   
 <link rel="prev" href="resolve-outliers.html">
 <link rel="next" href="sparse-variables.html">
-<script src="libs/jquery-2.2.3/jquery.min.js"></script>
-<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
-<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
-<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
-<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
-<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<script src="libs/jquery/jquery.min.js"></script>
+<link href="libs/gitbook/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-fontsettings.css" rel="stylesheet" />
 
 
 
@@ -149,7 +149,14 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="4.9.1" data-path="python-computing.html"><a href="python-computing.html#data-cleaning-1"><i class="fa fa-check"></i><b>4.9.1</b> Data Cleaning</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>5</b> References</a></li>
+<li class="chapter" data-level="5" data-path="model-tuning-strategy.html"><a href="model-tuning-strategy.html"><i class="fa fa-check"></i><b>5</b> Model Tuning Strategy</a><ul>
+<li class="chapter" data-level="5.1" data-path="systematic-error-and-random-error.html"><a href="systematic-error-and-random-error.html"><i class="fa fa-check"></i><b>5.1</b> Systematic Error and Random Error</a><ul>
+<li class="chapter" data-level="5.1.1" data-path="systematic-error-and-random-error.html"><a href="systematic-error-and-random-error.html#measurement-error-in-the-response"><i class="fa fa-check"></i><b>5.1.1</b> Measurement Error in the Response</a></li>
+<li class="chapter" data-level="5.1.2" data-path="systematic-error-and-random-error.html"><a href="systematic-error-and-random-error.html#measurement-error-in-the-independent-variables"><i class="fa fa-check"></i><b>5.1.2</b> Measurement Error in the Independent Variables</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="data-splitting-and-resampling.html"><a href="data-splitting-and-resampling.html"><i class="fa fa-check"></i><b>5.2</b> Data Splitting and Resampling</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>6</b> References</a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
 
@@ -190,7 +197,7 @@ FIGURE 4.5: Correlation Matrix
 </p>
 </div>
 <p>Here use <code>corrplot.mixed()</code> function to visualize the correlation matrix (figure <a href="collinearity.html#fig:corp">4.5</a>). The closer the correlation is to 0, the lighter the color is and the closer the shape is to a circle. The elliptical means the correlation is not equal to 0 (because we set the <code>upper = &quot;ellipse&quot;</code>), the greater the correlation, the narrower the ellipse. Blue represents a positive correlation; red represents a negative correlation. The direction of the ellipse also changes with the correlation. The correlation coefficient is shown in the lower triangle of the matrix. The variables relationship from previous scatter matrix (figure @ref(fig: scm)) are clear here: the negative correlation between age and online shopping, the positive correlation between income and amount of purchasing. Some correlation is very strong ( such as the correlation between <code>online_trans</code> and<code>age</code> is -0.85) which means the two variables contain duplicate information.</p>
-<p>Section 3.5 of “Applied Predictive Modeling” <span class="citation">(Max Kuhn <a href="#ref-APM">2013</a>)</span> presents a heuristic algorithm to remove a minimum number of predictors to ensure all pairwise correlations are below a certain threshold:</p>
+<p>Section 3.5 of “Applied Predictive Modeling” <span class="citation">(Kuhn and Johnston <a href="#ref-APM">2013</a>)</span> presents a heuristic algorithm to remove a minimum number of predictors to ensure all pairwise correlations are below a certain threshold:</p>
 <blockquote>
 <ol style="list-style-type: decimal">
 <li>Calculate the correlation matrix of the predictors.</li>
@@ -208,24 +215,24 @@ FIGURE 4.5: Correlation Matrix
 sdat&lt;-sdat[-highCorr]
 <span class="co"># check the new correlation matrix</span>
 <span class="kw">cor</span>(sdat)</code></pre></div>
-<pre><code>##                  income  store_exp online_exp
-## income        1.0000000  0.6004006  0.5198623
-## store_exp     0.6004006  1.0000000  0.5349527
-## online_exp    0.5198623  0.5349527  1.0000000
-## store_trans   0.7069595  0.5399121  0.4420638
-## online_trans -0.3572884 -0.1367411  0.2256370
-##              store_trans online_trans
-## income         0.7069595   -0.3572884
-## store_exp      0.5399121   -0.1367411
-## online_exp     0.4420638    0.2256370
-## store_trans    1.0000000   -0.4367544
-## online_trans  -0.4367544    1.0000000</code></pre>
+<pre><code>##               income store_exp online_exp store_trans
+## income        1.0000    0.6004     0.5199      0.7070
+## store_exp     0.6004    1.0000     0.5350      0.5399
+## online_exp    0.5199    0.5350     1.0000      0.4421
+## store_trans   0.7070    0.5399     0.4421      1.0000
+## online_trans -0.3573   -0.1367     0.2256     -0.4368
+##              online_trans
+## income            -0.3573
+## store_exp         -0.1367
+## online_exp         0.2256
+## store_trans       -0.4368
+## online_trans       1.0000</code></pre>
 <p>The absolute value of the elements in the correlation matrix after removal are all below 0.75. How strong does a correlation have to get, before you should start worrying about multicollinearity? There is no easy answer to that question. You can treat the threshold as a tuning parameter and pick one that gives you best prediction accuracy.</p>
 </div>
 <h3> References</h3>
 <div id="refs" class="references">
 <div id="ref-APM">
-<p>Max Kuhn, Kjell Johnston. 2013. <em>Applied Predictive Modeling</em>. Springer.</p>
+<p>Kuhn, Max, and Kjell Johnston. 2013. <em>Applied Predictive Modeling</em>. Springer.</p>
 </div>
 </div>
             </section>
@@ -237,13 +244,13 @@ sdat&lt;-sdat[-highCorr]
 <a href="sparse-variables.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
-<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
-<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
-<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
-<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
-<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
-<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
-<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook/js/app.min.js"></script>
+<script src="libs/gitbook/js/lunr.js"></script>
+<script src="libs/gitbook/js/plugin-search.js"></script>
+<script src="libs/gitbook/js/plugin-sharing.js"></script>
+<script src="libs/gitbook/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook/js/jquery.highlight.js"></script>
 <script>
 require(["gitbook"], function(gitbook) {
 gitbook.start({

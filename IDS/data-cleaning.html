@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2017-12-15">
+<meta name="date" content="2017-12-27">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -34,12 +34,12 @@
   
 <link rel="prev" href="data-pre-processing.html">
 <link rel="next" href="missing-values.html">
-<script src="libs/jquery-2.2.3/jquery.min.js"></script>
-<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
-<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
-<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
-<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
-<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<script src="libs/jquery/jquery.min.js"></script>
+<link href="libs/gitbook/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-fontsettings.css" rel="stylesheet" />
 
 
 
@@ -149,7 +149,14 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="4.9.1" data-path="python-computing.html"><a href="python-computing.html#data-cleaning-1"><i class="fa fa-check"></i><b>4.9.1</b> Data Cleaning</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>5</b> References</a></li>
+<li class="chapter" data-level="5" data-path="model-tuning-strategy.html"><a href="model-tuning-strategy.html"><i class="fa fa-check"></i><b>5</b> Model Tuning Strategy</a><ul>
+<li class="chapter" data-level="5.1" data-path="systematic-error-and-random-error.html"><a href="systematic-error-and-random-error.html"><i class="fa fa-check"></i><b>5.1</b> Systematic Error and Random Error</a><ul>
+<li class="chapter" data-level="5.1.1" data-path="systematic-error-and-random-error.html"><a href="systematic-error-and-random-error.html#measurement-error-in-the-response"><i class="fa fa-check"></i><b>5.1.1</b> Measurement Error in the Response</a></li>
+<li class="chapter" data-level="5.1.2" data-path="systematic-error-and-random-error.html"><a href="systematic-error-and-random-error.html#measurement-error-in-the-independent-variables"><i class="fa fa-check"></i><b>5.1.2</b> Measurement Error in the Independent Variables</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="data-splitting-and-resampling.html"><a href="data-splitting-and-resampling.html"><i class="fa fa-check"></i><b>5.2</b> Data Splitting and Resampling</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>6</b> References</a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
 
@@ -175,54 +182,54 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>After you load the data, the first thing is to check how many variables are there, the type of variables, the distributions, and data errors. Let’s read and check the data:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sim.dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv &quot;</span>)
 <span class="kw">summary</span>(sim.dat)</code></pre></div>
-<pre><code>##       age            gender        income      
-##  Min.   : 16.00   Female:554   Min.   : 41776  
-##  1st Qu.: 25.00   Male  :446   1st Qu.: 85832  
-##  Median : 36.00                Median : 93869  
-##  Mean   : 38.84                Mean   :113543  
-##  3rd Qu.: 53.00                3rd Qu.:124572  
-##  Max.   :300.00                Max.   :319704  
-##                                NA&#39;s   :184     
-##  house       store_exp         online_exp     
-##  No :432   Min.   : -500.0   Min.   :  68.82  
-##  Yes:568   1st Qu.:  205.0   1st Qu.: 420.34  
-##            Median :  329.0   Median :1941.86  
-##            Mean   : 1356.8   Mean   :2120.18  
-##            3rd Qu.:  597.3   3rd Qu.:2440.78  
-##            Max.   :50000.0   Max.   :9479.44  
-##                                               
-##   store_trans     online_trans         Q1       
-##  Min.   : 1.00   Min.   : 1.00   Min.   :1.000  
-##  1st Qu.: 3.00   1st Qu.: 6.00   1st Qu.:2.000  
-##  Median : 4.00   Median :14.00   Median :3.000  
-##  Mean   : 5.35   Mean   :13.55   Mean   :3.101  
-##  3rd Qu.: 7.00   3rd Qu.:20.00   3rd Qu.:4.000  
-##  Max.   :20.00   Max.   :36.00   Max.   :5.000  
-##                                                 
-##        Q2              Q3              Q4       
-##  Min.   :1.000   Min.   :1.000   Min.   :1.000  
-##  1st Qu.:1.000   1st Qu.:1.000   1st Qu.:2.000  
-##  Median :1.000   Median :1.000   Median :3.000  
-##  Mean   :1.823   Mean   :1.992   Mean   :2.763  
-##  3rd Qu.:2.000   3rd Qu.:3.000   3rd Qu.:4.000  
-##  Max.   :5.000   Max.   :5.000   Max.   :5.000  
-##                                                 
-##        Q5              Q6              Q7       
-##  Min.   :1.000   Min.   :1.000   Min.   :1.000  
-##  1st Qu.:1.750   1st Qu.:1.000   1st Qu.:2.500  
-##  Median :4.000   Median :2.000   Median :4.000  
-##  Mean   :2.945   Mean   :2.448   Mean   :3.434  
-##  3rd Qu.:4.000   3rd Qu.:4.000   3rd Qu.:4.000  
-##  Max.   :5.000   Max.   :5.000   Max.   :5.000  
-##                                                 
-##        Q8              Q9             Q10      
-##  Min.   :1.000   Min.   :1.000   Min.   :1.00  
-##  1st Qu.:1.000   1st Qu.:2.000   1st Qu.:1.00  
-##  Median :2.000   Median :4.000   Median :2.00  
-##  Mean   :2.396   Mean   :3.085   Mean   :2.32  
-##  3rd Qu.:3.000   3rd Qu.:4.000   3rd Qu.:3.00  
-##  Max.   :5.000   Max.   :5.000   Max.   :5.00  
-##                                                
+<pre><code>##       age           gender        income      
+##  Min.   : 16.0   Female:554   Min.   : 41776  
+##  1st Qu.: 25.0   Male  :446   1st Qu.: 85832  
+##  Median : 36.0                Median : 93869  
+##  Mean   : 38.8                Mean   :113543  
+##  3rd Qu.: 53.0                3rd Qu.:124572  
+##  Max.   :300.0                Max.   :319704  
+##                               NA&#39;s   :184     
+##  house       store_exp       online_exp  
+##  No :432   Min.   : -500   Min.   :  69  
+##  Yes:568   1st Qu.:  205   1st Qu.: 420  
+##            Median :  329   Median :1942  
+##            Mean   : 1357   Mean   :2120  
+##            3rd Qu.:  597   3rd Qu.:2441  
+##            Max.   :50000   Max.   :9479  
+##                                          
+##   store_trans     online_trans        Q1     
+##  Min.   : 1.00   Min.   : 1.0   Min.   :1.0  
+##  1st Qu.: 3.00   1st Qu.: 6.0   1st Qu.:2.0  
+##  Median : 4.00   Median :14.0   Median :3.0  
+##  Mean   : 5.35   Mean   :13.6   Mean   :3.1  
+##  3rd Qu.: 7.00   3rd Qu.:20.0   3rd Qu.:4.0  
+##  Max.   :20.00   Max.   :36.0   Max.   :5.0  
+##                                              
+##        Q2             Q3             Q4      
+##  Min.   :1.00   Min.   :1.00   Min.   :1.00  
+##  1st Qu.:1.00   1st Qu.:1.00   1st Qu.:2.00  
+##  Median :1.00   Median :1.00   Median :3.00  
+##  Mean   :1.82   Mean   :1.99   Mean   :2.76  
+##  3rd Qu.:2.00   3rd Qu.:3.00   3rd Qu.:4.00  
+##  Max.   :5.00   Max.   :5.00   Max.   :5.00  
+##                                              
+##        Q5             Q6             Q7      
+##  Min.   :1.00   Min.   :1.00   Min.   :1.00  
+##  1st Qu.:1.75   1st Qu.:1.00   1st Qu.:2.50  
+##  Median :4.00   Median :2.00   Median :4.00  
+##  Mean   :2.94   Mean   :2.45   Mean   :3.43  
+##  3rd Qu.:4.00   3rd Qu.:4.00   3rd Qu.:4.00  
+##  Max.   :5.00   Max.   :5.00   Max.   :5.00  
+##                                              
+##        Q8            Q9            Q10      
+##  Min.   :1.0   Min.   :1.00   Min.   :1.00  
+##  1st Qu.:1.0   1st Qu.:2.00   1st Qu.:1.00  
+##  Median :2.0   Median :4.00   Median :2.00  
+##  Mean   :2.4   Mean   :3.08   Mean   :2.32  
+##  3rd Qu.:3.0   3rd Qu.:4.00   3rd Qu.:3.00  
+##  Max.   :5.0   Max.   :5.00   Max.   :5.00  
+##                                             
 ##         segment   
 ##  Conspicuous:200  
 ##  Price      :250  
@@ -244,14 +251,14 @@ sim.dat$age[<span class="kw">which</span>(sim.dat$age&gt;<span class="dv">100</s
 sim.dat$store_exp[<span class="kw">which</span>(sim.dat$store_exp&lt;<span class="dv">0</span>)]&lt;-<span class="ot">NA</span>
 <span class="co"># see the results</span>
 <span class="kw">summary</span>(<span class="kw">subset</span>(sim.dat,<span class="dt">select=</span><span class="kw">c</span>(<span class="st">&quot;age&quot;</span>,<span class="st">&quot;income&quot;</span>)))</code></pre></div>
-<pre><code>##       age            income      
-##  Min.   :16.00   Min.   : 41776  
-##  1st Qu.:25.00   1st Qu.: 85832  
-##  Median :36.00   Median : 93869  
-##  Mean   :38.58   Mean   :113543  
-##  3rd Qu.:53.00   3rd Qu.:124572  
-##  Max.   :69.00   Max.   :319704  
-##  NA&#39;s   :1       NA&#39;s   :184</code></pre>
+<pre><code>##       age           income      
+##  Min.   :16.0   Min.   : 41776  
+##  1st Qu.:25.0   1st Qu.: 85832  
+##  Median :36.0   Median : 93869  
+##  Mean   :38.6   Mean   :113543  
+##  3rd Qu.:53.0   3rd Qu.:124572  
+##  Max.   :69.0   Max.   :319704  
+##  NA&#39;s   :1      NA&#39;s   :184</code></pre>
 <p>Now we will deal with the missing values in the data.</p>
 </div>
             </section>
@@ -263,13 +270,13 @@ sim.dat$store_exp[<span class="kw">which</span>(sim.dat$store_exp&lt;<span class
 <a href="missing-values.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
-<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
-<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
-<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
-<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
-<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
-<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
-<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook/js/app.min.js"></script>
+<script src="libs/gitbook/js/lunr.js"></script>
+<script src="libs/gitbook/js/plugin-search.js"></script>
+<script src="libs/gitbook/js/plugin-sharing.js"></script>
+<script src="libs/gitbook/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook/js/jquery.highlight.js"></script>
 <script>
 require(["gitbook"], function(gitbook) {
 gitbook.start({

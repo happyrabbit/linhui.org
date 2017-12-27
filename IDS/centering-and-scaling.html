@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2017-12-15">
+<meta name="date" content="2017-12-27">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -34,12 +34,12 @@
   
 <link rel="prev" href="missing-values.html">
 <link rel="next" href="resolve-skewness.html">
-<script src="libs/jquery-2.2.3/jquery.min.js"></script>
-<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
-<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
-<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
-<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
-<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<script src="libs/jquery/jquery.min.js"></script>
+<link href="libs/gitbook/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-fontsettings.css" rel="stylesheet" />
 
 
 
@@ -149,7 +149,14 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="4.9.1" data-path="python-computing.html"><a href="python-computing.html#data-cleaning-1"><i class="fa fa-check"></i><b>4.9.1</b> Data Cleaning</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>5</b> References</a></li>
+<li class="chapter" data-level="5" data-path="model-tuning-strategy.html"><a href="model-tuning-strategy.html"><i class="fa fa-check"></i><b>5</b> Model Tuning Strategy</a><ul>
+<li class="chapter" data-level="5.1" data-path="systematic-error-and-random-error.html"><a href="systematic-error-and-random-error.html"><i class="fa fa-check"></i><b>5.1</b> Systematic Error and Random Error</a><ul>
+<li class="chapter" data-level="5.1.1" data-path="systematic-error-and-random-error.html"><a href="systematic-error-and-random-error.html#measurement-error-in-the-response"><i class="fa fa-check"></i><b>5.1.1</b> Measurement Error in the Response</a></li>
+<li class="chapter" data-level="5.1.2" data-path="systematic-error-and-random-error.html"><a href="systematic-error-and-random-error.html#measurement-error-in-the-independent-variables"><i class="fa fa-check"></i><b>5.1.2</b> Measurement Error in the Independent Variables</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="data-splitting-and-resampling.html"><a href="data-splitting-and-resampling.html"><i class="fa fa-check"></i><b>5.2</b> Data Splitting and Resampling</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>6</b> References</a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
 
@@ -191,14 +198,14 @@ trans&lt;-<span class="kw">preProcess</span>(sdat,<span class="dt">method=</span
 transformed&lt;-<span class="kw">predict</span>(trans,sdat)</code></pre></div>
 <p>Now the two variables are in the same scale:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(transformed)</code></pre></div>
-<pre><code>##       age              income       
-##  Min.   :-1.5911   Min.   :-1.4399  
-##  1st Qu.:-0.9569   1st Qu.:-0.5560  
-##  Median :-0.1817   Median :-0.3947  
-##  Mean   : 0.0000   Mean   : 0.0000  
-##  3rd Qu.: 1.0163   3rd Qu.: 0.2213  
-##  Max.   : 2.1438   Max.   : 4.1363  
-##  NA&#39;s   :1         NA&#39;s   :184</code></pre>
+<pre><code>##       age             income     
+##  Min.   :-1.591   Min.   :-1.44  
+##  1st Qu.:-0.957   1st Qu.:-0.56  
+##  Median :-0.182   Median :-0.39  
+##  Mean   : 0.000   Mean   : 0.00  
+##  3rd Qu.: 1.016   3rd Qu.: 0.22  
+##  Max.   : 2.144   Max.   : 4.14  
+##  NA&#39;s   :1        NA&#39;s   :184</code></pre>
 <p>Sometimes you only need to scale the variable. For example, if the model adds a penalty to the parameter estimates (such as <span class="math inline">\(L_2\)</span> penalty is ridge regression and <span class="math inline">\(L_1\)</span> penalty in LASSO), the variables need to have a similar scale to ensure a fair variable selection. I am a heavy user of this kind of penalty-based model in my work, and I used the following quantile transformation:</p>
 <p><span class="math display">\[
 x_{ij}^{*}=\frac{x_{ij}-quantile(x_{.j},0.01)}{quantile(x_{.j}-0.99)-quantile(x_{-j},0.01)}
@@ -217,20 +224,13 @@ x_{ij}^{*}=\frac{x_{ij}-quantile(x_{.j},0.01)}{quantile(x_{.j}-0.99)-quantile(x_
 <p>In order to illustrate, let’s apply it to some variables from `demo_imp2:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">demo_imp3&lt;-<span class="kw">qscale</span>(<span class="kw">subset</span>(demo_imp2,<span class="dt">select=</span><span class="kw">c</span>(<span class="st">&quot;income&quot;</span>,<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>)))
 <span class="kw">summary</span>(demo_imp3)</code></pre></div>
-<pre><code>##      income           store_exp        
-##  Min.   :-0.05776   Min.   :-0.003407  
-##  1st Qu.: 0.15736   1st Qu.: 0.003984  
-##  Median : 0.18521   Median : 0.022704  
-##  Mean   : 0.26009   Mean   : 0.176965  
-##  3rd Qu.: 0.30456   3rd Qu.: 0.062849  
-##  Max.   : 1.23857   Max.   : 7.476996  
-##    online_exp       
-##  Min.   :-0.006023  
-##  1st Qu.: 0.042719  
-##  Median : 0.253691  
-##  Mean   : 0.278417  
-##  3rd Qu.: 0.322871  
-##  Max.   : 1.298845</code></pre>
+<pre><code>##      income          store_exp        online_exp     
+##  Min.   :-0.0578   Min.   :-0.003   Min.   :-0.0060  
+##  1st Qu.: 0.1574   1st Qu.: 0.004   1st Qu.: 0.0427  
+##  Median : 0.1852   Median : 0.023   Median : 0.2537  
+##  Mean   : 0.2601   Mean   : 0.177   Mean   : 0.2784  
+##  3rd Qu.: 0.3046   3rd Qu.: 0.063   3rd Qu.: 0.3229  
+##  Max.   : 1.2386   Max.   : 7.477   Max.   : 1.2988</code></pre>
 <p>After transformation, most of the variables are between 0-1.</p>
 </div>
 <h3> References</h3>
@@ -254,13 +254,13 @@ x_{ij}^{*}=\frac{x_{ij}-quantile(x_{.j},0.01)}{quantile(x_{.j}-0.99)-quantile(x_
 <a href="resolve-skewness.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
-<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
-<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
-<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
-<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
-<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
-<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
-<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook/js/app.min.js"></script>
+<script src="libs/gitbook/js/lunr.js"></script>
+<script src="libs/gitbook/js/plugin-search.js"></script>
+<script src="libs/gitbook/js/plugin-sharing.js"></script>
+<script src="libs/gitbook/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook/js/jquery.highlight.js"></script>
 <script>
 require(["gitbook"], function(gitbook) {
 gitbook.start({

@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2017-12-15">
+<meta name="date" content="2017-12-27">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -34,12 +34,12 @@
   
 <link rel="prev" href="centering-and-scaling.html">
 <link rel="next" href="resolve-outliers.html">
-<script src="libs/jquery-2.2.3/jquery.min.js"></script>
-<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
-<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
-<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
-<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
-<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<script src="libs/jquery/jquery.min.js"></script>
+<link href="libs/gitbook/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-fontsettings.css" rel="stylesheet" />
 
 
 
@@ -149,7 +149,14 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="4.9.1" data-path="python-computing.html"><a href="python-computing.html#data-cleaning-1"><i class="fa fa-check"></i><b>4.9.1</b> Data Cleaning</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>5</b> References</a></li>
+<li class="chapter" data-level="5" data-path="model-tuning-strategy.html"><a href="model-tuning-strategy.html"><i class="fa fa-check"></i><b>5</b> Model Tuning Strategy</a><ul>
+<li class="chapter" data-level="5.1" data-path="systematic-error-and-random-error.html"><a href="systematic-error-and-random-error.html"><i class="fa fa-check"></i><b>5.1</b> Systematic Error and Random Error</a><ul>
+<li class="chapter" data-level="5.1.1" data-path="systematic-error-and-random-error.html"><a href="systematic-error-and-random-error.html#measurement-error-in-the-response"><i class="fa fa-check"></i><b>5.1.1</b> Measurement Error in the Response</a></li>
+<li class="chapter" data-level="5.1.2" data-path="systematic-error-and-random-error.html"><a href="systematic-error-and-random-error.html#measurement-error-in-the-independent-variables"><i class="fa fa-check"></i><b>5.1.2</b> Measurement Error in the Independent Variables</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="data-splitting-and-resampling.html"><a href="data-splitting-and-resampling.html"><i class="fa fa-check"></i><b>5.2</b> Data Splitting and Resampling</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>6</b> References</a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
 
@@ -202,66 +209,66 @@ if\ \lambda=0
 \]</span></p>
 <p>It is easy to see that this family includes log transformation (<span class="math inline">\(\lambda=0\)</span>), square transformation (<span class="math inline">\(\lambda=2\)</span>), square root (<span class="math inline">\(\lambda=0.5\)</span>), inverse (<span class="math inline">\(\lambda=-1\)</span>) and others in-between. We can still use function <code>preProcess()</code> in package <code>caret</code> to apply this transformation by chaning the <code>method</code> argument.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">describe</span>(sim.dat)</code></pre></div>
-<pre><code>##              vars    n      mean       sd   median
-## age             1  999     38.58    14.19    36.00
-## gender*         2 1000      1.45     0.50     1.00
-## income          3  816 113543.07 49842.29 93868.68
-## house*          4 1000      1.57     0.50     2.00
-## store_exp       5  999   1358.71  2775.17   329.80
-## online_exp      6 1000   2120.18  1731.22  1941.86
-## store_trans     7 1000      5.35     3.70     4.00
-## online_trans    8 1000     13.55     7.96    14.00
-## Q1              9 1000      3.10     1.45     3.00
-## Q2             10 1000      1.82     1.17     1.00
-## Q3             11 1000      1.99     1.40     1.00
-## Q4             12 1000      2.76     1.16     3.00
-## Q5             13 1000      2.94     1.28     4.00
-## Q6             14 1000      2.45     1.44     2.00
-## Q7             15 1000      3.43     1.46     4.00
-## Q8             16 1000      2.40     1.15     2.00
-## Q9             17 1000      3.08     1.12     4.00
-## Q10            18 1000      2.32     1.14     2.00
-## segment*       19 1000      2.70     1.15     3.00
-##                trimmed      mad      min       max
-## age              37.67    16.31    16.00     69.00
-## gender*           1.43     0.00     1.00      2.00
-## income       104841.94 28989.47 41775.64 319704.34
-## house*            1.58     0.00     1.00      2.00
-## store_exp       845.14   197.47   155.81  50000.00
-## online_exp     1874.51  1015.21    68.82   9479.44
-## store_trans       4.89     2.97     1.00     20.00
-## online_trans     13.42    10.38     1.00     36.00
-## Q1                3.13     1.48     1.00      5.00
-## Q2                1.65     0.00     1.00      5.00
-## Q3                1.75     0.00     1.00      5.00
-## Q4                2.83     1.48     1.00      5.00
-## Q5                3.05     0.00     1.00      5.00
-## Q6                2.43     1.48     1.00      5.00
-## Q7                3.54     0.00     1.00      5.00
-## Q8                2.36     1.48     1.00      5.00
-## Q9                3.23     0.00     1.00      5.00
-## Q10               2.27     1.48     1.00      5.00
-## segment*          2.75     1.48     1.00      4.00
-##                  range  skew kurtosis      se
-## age              53.00  0.47    -1.18    0.45
-## gender*           1.00  0.22    -1.95    0.02
-## income       277928.70  1.69     2.57 1744.83
-## house*            1.00 -0.27    -1.93    0.02
-## store_exp     49844.19  8.08   115.04   87.80
-## online_exp     9410.63  1.18     1.31   54.75
-## store_trans      19.00  1.11     0.69    0.12
-## online_trans     35.00  0.03    -0.98    0.25
-## Q1                4.00 -0.12    -1.36    0.05
-## Q2                4.00  1.13    -0.32    0.04
-## Q3                4.00  1.06    -0.40    0.04
-## Q4                4.00 -0.18    -1.46    0.04
-## Q5                4.00 -0.60    -1.40    0.04
-## Q6                4.00  0.11    -1.89    0.05
-## Q7                4.00 -0.90    -0.79    0.05
-## Q8                4.00  0.21    -1.33    0.04
-## Q9                4.00 -0.68    -1.10    0.04
-## Q10               4.00  0.39    -1.23    0.04
-## segment*          3.00 -0.20    -1.41    0.04</code></pre>
+<pre><code>##              vars    n      mean       sd  median
+## age             1  999     38.58    14.19    36.0
+## gender*         2 1000      1.45     0.50     1.0
+## income          3  816 113543.07 49842.29 93868.7
+## house*          4 1000      1.57     0.50     2.0
+## store_exp       5  999   1358.71  2775.17   329.8
+## online_exp      6 1000   2120.18  1731.22  1941.9
+## store_trans     7 1000      5.35     3.70     4.0
+## online_trans    8 1000     13.55     7.96    14.0
+## Q1              9 1000      3.10     1.45     3.0
+## Q2             10 1000      1.82     1.17     1.0
+## Q3             11 1000      1.99     1.40     1.0
+## Q4             12 1000      2.76     1.16     3.0
+## Q5             13 1000      2.94     1.28     4.0
+## Q6             14 1000      2.45     1.44     2.0
+## Q7             15 1000      3.43     1.46     4.0
+## Q8             16 1000      2.40     1.15     2.0
+## Q9             17 1000      3.08     1.12     4.0
+## Q10            18 1000      2.32     1.14     2.0
+## segment*       19 1000      2.70     1.15     3.0
+##                trimmed      mad      min    max  range
+## age              37.67    16.31    16.00     69     53
+## gender*           1.43     0.00     1.00      2      1
+## income       104841.94 28989.47 41775.64 319704 277929
+## house*            1.58     0.00     1.00      2      1
+## store_exp       845.14   197.47   155.81  50000  49844
+## online_exp     1874.51  1015.21    68.82   9479   9411
+## store_trans       4.89     2.97     1.00     20     19
+## online_trans     13.42    10.38     1.00     36     35
+## Q1                3.13     1.48     1.00      5      4
+## Q2                1.65     0.00     1.00      5      4
+## Q3                1.75     0.00     1.00      5      4
+## Q4                2.83     1.48     1.00      5      4
+## Q5                3.05     0.00     1.00      5      4
+## Q6                2.43     1.48     1.00      5      4
+## Q7                3.54     0.00     1.00      5      4
+## Q8                2.36     1.48     1.00      5      4
+## Q9                3.23     0.00     1.00      5      4
+## Q10               2.27     1.48     1.00      5      4
+## segment*          2.75     1.48     1.00      4      3
+##               skew kurtosis      se
+## age           0.47    -1.18    0.45
+## gender*       0.22    -1.95    0.02
+## income        1.69     2.57 1744.83
+## house*       -0.27    -1.93    0.02
+## store_exp     8.08   115.04   87.80
+## online_exp    1.18     1.31   54.75
+## store_trans   1.11     0.69    0.12
+## online_trans  0.03    -0.98    0.25
+## Q1           -0.12    -1.36    0.05
+## Q2            1.13    -0.32    0.04
+## Q3            1.06    -0.40    0.04
+## Q4           -0.18    -1.46    0.04
+## Q5           -0.60    -1.40    0.04
+## Q6            0.11    -1.89    0.05
+## Q7           -0.90    -0.79    0.05
+## Q8            0.21    -1.33    0.04
+## Q9           -0.68    -1.10    0.04
+## Q10           0.39    -1.23    0.04
+## segment*     -0.20    -1.41    0.04</code></pre>
 <p>It is easy to see the skewed variables. If <code>mean</code> and <code>trimmed</code> differ a lot, there is very likely outliers. By default, <code>trimmed</code> reports mean by dropping the top and bottom 10%. It can be adjusted by setting argument <code>trim=</code>. It is clear that <code>store_exp</code> has outliers.</p>
 <p>As an example, we will apply Box-Cox transformation on <code>store_trans</code> and <code>online_trans</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># select the two columns and save them as dat_bc</span>
@@ -303,7 +310,7 @@ FIGURE 4.2: Box-Cox Transformation
 ## With fudge factor, Lambda = 0 will be used for transformations</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">transformed&lt;-<span class="kw">predict</span>(trans,dat_bc$store_trans)
 <span class="kw">skewness</span>(transformed)</code></pre></div>
-<pre><code>## [1] -0.2154708</code></pre>
+<pre><code>## [1] -0.2155</code></pre>
 <p>The estimate of <span class="math inline">\(\lambda\)</span> is the same as before (0.1). The skewness of the original observation is 1.1, and -0.2 after transformation. Although it is not strictly 0, it is greatly improved.</p>
 </div>
 <h3> References</h3>
@@ -321,13 +328,13 @@ FIGURE 4.2: Box-Cox Transformation
 <a href="resolve-outliers.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
-<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
-<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
-<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
-<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
-<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
-<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
-<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook/js/app.min.js"></script>
+<script src="libs/gitbook/js/lunr.js"></script>
+<script src="libs/gitbook/js/plugin-search.js"></script>
+<script src="libs/gitbook/js/plugin-sharing.js"></script>
+<script src="libs/gitbook/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook/js/jquery.highlight.js"></script>
 <script>
 require(["gitbook"], function(gitbook) {
 gitbook.start({
