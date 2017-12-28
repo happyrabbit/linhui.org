@@ -207,7 +207,7 @@
 
 \title{Introduction to Data Science}
 \author{Hui Lin and Ming Li}
-\date{2017-12-16}
+\date{2017-12-28}
 
 \usepackage{amsthm}
 \newtheorem{theorem}{Theorem}[chapter]
@@ -817,10 +817,9 @@ Programming skills are critical for data scientists. According to a 2017
 survey from
 \href{http://www.burtchworks.com/2017/06/19/2017-sas-r-python-flash-survey-results/}{Burtch
 Works}, 97\% of the data scientists today using R or Python. We will
-focus on R in this book, but both are great tools for data science.
-There is not one ``have-to-use'' tool. The goal is to solve the problem
-not which tool to choose. However, a good tool needs to be flexible and
-scalable.
+provide exemplary code for both in this book. There is not one
+``have-to-use'' tool. The goal is to solve the problem not which tool to
+choose. However, a good tool needs to be flexible and scalable.
 
 \begin{itemize}
 \tightlist
@@ -858,8 +857,8 @@ school. Learning is happening increasingly outside of formal educational
 settings and in unsupervised environments. An excellent data scientist
 must be a lifetime learner. Fortunately, technological advantages
 provide new tools and opportunities for lifetime learners, MOOC, online
-data science workshops and various online tutorials. So above all,
-\textbf{self-learning ability} is the most critical skill.
+data science workshops and various online tutorials. So above all, being
+a \textbf{life-time learner} is the most critical.
 
 \begin{itemize}
 \tightlist
@@ -3088,7 +3087,23 @@ between \texttt{income} and \texttt{gender}. You can do this by adding
 
 \subsection{Data Cleaning}\label{data-cleaning-1}
 
-\chapter{Model Tuning Technique}\label{model-tuning-technique}
+\chapter{Model Tuning Strategy}\label{model-tuning-strategy}
+
+When training a machine learning model, there are many decisions to
+make. For example, when training a random forest, you need to decide the
+number trees and the number of variables to enter the model. For lasso
+method, you need to determine the penalty parameter. There may be
+standard settings for some of the parameters, but it's unlikely to guess
+the right values for all of these correctly. Other than that, making
+good choices on how you split the data into training and testing sets
+can make a huge difference in helping you find a high-performance model
+efficiently.
+
+This chapter will illustrate the practical aspects of model tuning. We
+will talk about different types of model error, sources of model error,
+hyperparameter tuning, how to set up your data and how to make sure your
+model implementation is correct. In practice applying machine learning
+is a highly iterative process.
 
 \section{Systematic Error and Random
 Error}\label{systematic-error-and-random-error}
@@ -3100,9 +3115,9 @@ Assume \(\mathbf{X}\) is \(n \times p\) observation matrix and
 
 where \(\mathbf{\epsilon}\) is the random error with a mean of zero. The
 function \(f(\cdot)\) is our modeling target, which represents the
-information of Y that can be explained by X. The main goals of
-estimating \(f(\cdot)\) are inference and prediction, or sometimes both.
-In general, there is a trade-off between flexibility and
+information in the response variable that predictors can explain. The
+main goal of estimating \(f(\cdot)\) is inference or prediction, or
+sometimes both. In general, there is a trade-off between flexibility and
 interpretability of the model. So data scientists need to comprehend the
 delicate balance between the two.
 
@@ -3110,42 +3125,61 @@ Depending on the modeling purposes, the requirement for interpretability
 varies. If the prediction is the only goal, then as long as the
 prediction is accurate enough, the interpretability is not under
 consideration. In this case, people often use ``black box'' model, such
-as random forest, boosting tree, neural network, support vector machine
-and so on. These models are very flexible but nearly impossible to
-explain. Their predictive accuracy is usually higher on the training
-set, but not necessary when it predicts. It is not surprising since
-those models have a huge number of parameters and high flexibility that
-they can memorize the entire training data. A paper by Chiyuan Zhang et.
-al. in 2017 pointed out that ``Deep neural networks (even just two-layer
-net) easily fit random labels'' \citep{rethinkDL}. The traditional forms
-of regularization, such as weight decay, dropout, and data augmentation,
-fail to control generalization error. It poses a conceptual challenge to
-statistical theory and also calls our attention when we use such
-black-box models.
+as random forest, boosting tree, neural network and so on. These models
+are very flexible but nearly impossible to explain. Their predictive
+accuracy is usually higher on the training set, but not necessary when
+it predicts. It is not surprising since those models have a huge number
+of parameters and high flexibility that they can memorize the entire
+training data. A paper by Chiyuan Zhang et al. in 2017 pointed out that
+``Deep neural networks (even just two-layer net) easily fit random
+labels'' \citep{rethinkDL}. The traditional forms of regularization,
+such as weight decay, dropout, and data augmentation, fail to control
+generalization error. It poses a conceptual challenge to statistical
+theory and also calls our attention when we use such black-box models.
+
+There are two kinds of application problems: complete information
+problem and incomplete information problem. The complete information
+problem has all the information you need to know the correct response.
+Take the famous cat recognition, for example, all the information you
+need to identify a cat is in the picture. In this situation, the
+algorithm that penetrates the data the most wins. There are some other
+similar problems such as the self-driving car, chess game, facial
+recognition and speech recognition. But in most of the data science
+applications, the information is incomplete. If you want to know whether
+a customer is going to purchase again or not, it is unlikely to have
+360-degree of the customer's information. You may have their historical
+purchasing record, discounts and service received. But you don't know if
+the customer sees your ad, or has a friend recommends competitor's
+product, or encounters some unhappy purchasing experience somewhere.
+There could be a myriad of factors that will influence the customer's
+purchase decision while what you have as data is only a small part. To
+make things worse, in many cases, you don't even know what you don't
+know. Deep learning doesn't have any advantage in solving those
+problems. Instead, some parametric models often work better in this
+situation. You will comprehend this more after learning the different
+types of model error.
 
 Assume we have \(\hat{f}\) which is an estimator of \(f\). Then we can
 further get \(\mathbf{\hat{y}}=\hat(f)(\mathbf(X))\). The predicted
-error is divided into two parts, systematic error and random error:
+error is divided into two parts, systematic error, and random error:
 
-\[
-E(\mathbf{y}-\hat{\mathbf{y}})^{2}=E[f(\mathbf{X})+\mathbf{\epsilon}-\hat{f}(\mathbf{X})]^{2}=\underset{\text{(1)}}{\underbrace{E[f(\mathbf{X})-\hat{f}(\mathbf{X})]^{2}}}+\underset{\text{(2)}}{\underbrace{Var(\mathbf{\epsilon})}}
-  \label{eq:error}\]
+\[E(\mathbf{y}-\hat{\mathbf{y}})^{2}=E[f(\mathbf{X})+\mathbf{\epsilon}-\hat{f}(\mathbf{X})]^{2}=\underset{\text{(1)}}{\underbrace{E[f(\mathbf{X})-\hat{f}(\mathbf{X})]^{2}}}+\underset{\text{(2)}}{\underbrace{Var(\mathbf{\epsilon})}}
+\label{eq:error}\]
 
-In the above equation, (1) is the systematic error, It exists because
-\(\hat{f}\) usually does not completely model the ``systematic
-relation'' between X and y, where the system relation refers to the
-stable relationship that exists on different samples. This part of the
-error can be improved by improving the model; (2) is the random error
-which represents the part of the response that can not be explained by
-current input data. A more complex model does not reduce the error. The
-biggest problem with black-box models is to fit random error as well,
-i.e., over-fitting. The notable feature of random error is that it can
-not be repeated on different samples. So a way to determine whether
-there is overfitting is to reserve a part of the sample as a test set
-and then check the performance of the trained model on the test data.
-Note that overfitting is a general problem, and any model may be overly
-fitted. Because black-box model usually has a large number of
-parameters, it is more suspectable to over-fitting.
+In the above equation, (1) is the systematic error. It exists because
+\(\hat{f}\) usually does not entirely describe the ``systematic
+relation'' between X and y which refers to the stable relationship that
+exists across different samples. Using a better model can reduce this
+kind of the error; (2) is the random error which represents the part of
+y that cannot be explained by X. A more complex model does not reduce
+the error. The biggest problem with the black-box model is that it fits
+random error, i.e., over-fitting. The notable feature of random error is
+that it varies over different samples. So one way to determine whether
+overfitting happens is to reserve a part of the data as the test set and
+then check the performance of the trained model on the test data. Note
+that overfitting is a general problem from which any model could suffer.
+However, since black-box models usually have a large number of
+parameters, it is much more suspectable to over-fitting.
 
 \begin{figure}[htbp]
 \centering
@@ -3165,16 +3199,21 @@ E[f(\mathbf{X})-\hat{f}(\mathbf{X})]^{2} & = & E\left(f(\mathbf{X})-E[\hat{f}(\m
 
 The systematic error consists of two parts,
 \(Bias(\hat{f}(\mathbf{X}))\) and \(Var (\hat{f}(\mathbf{X}))\). To
-minimize the systematic error, we need to minimize the bias and
-variance. The bias represents the error caused by the approximation of
-the reality of the model, which may be very complex. For example, linear
-regression assumes that there is a linear relationship between the
-independent variable and the response, but the perfect linear
-relationship in real life is not common. The relationship between x and
-fx in the following figure is non-linear. Therefore, despite a large
-sample size, linear regression can not give the accurate prediction. In
-other words, in this case, the prediction of the linear regression model
-has a high bias.
+minimize the systematic error, we need to minimize both. The bias
+represents the error caused by the model's approximation of the reality,
+i.e., systematic relation, which may be very complex. For example,
+linear regression assumes a linear relationship between the predictors
+and the response, but rarely is there a perfect linear relationship in
+real life. So linear regression is more likely to have a high bias.
+
+To explore bias and variance, let's begin with a simple simulation. We
+will simulate a data with a non-linear relationship and fit different
+models on it.
+
+The relationship between \(x\) and \(f(x)\) in the following figure is
+non-linear. Therefore, despite a large sample size, linear regression
+can not give the accurate prediction. In other words, in this case, the
+prediction of the linear regression model has a high bias.
 
 \begin{Shaded}
 \begin{Highlighting}[]
