@@ -207,7 +207,7 @@
 
 \title{Introduction to Data Science}
 \author{Hui Lin and Ming Li}
-\date{2017-12-28}
+\date{2017-12-29}
 
 \usepackage{amsthm}
 \newtheorem{theorem}{Theorem}[chapter]
@@ -3208,46 +3208,64 @@ real life. So linear regression is more likely to have a high bias.
 
 To explore bias and variance, let's begin with a simple simulation. We
 will simulate a data with a non-linear relationship and fit different
-models on it.
+models on it. An intuitive way to show these is to compare the plots of
+various models.
 
-The relationship between \(x\) and \(f(x)\) in the following figure is
-non-linear. Therefore, despite a large sample size, linear regression
-can not give the accurate prediction. In other words, in this case, the
-prediction of the linear regression model has a high bias.
+The code below simulates one predictor (\texttt{x}) and one response
+variable (\texttt{fx}). The relationship between \texttt{x} and
+\texttt{fx} is non-linear.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{library}\NormalTok{(grid)}
-\KeywordTok{library}\NormalTok{(lattice)}
-\KeywordTok{library}\NormalTok{(ggplot2)}
 \KeywordTok{source}\NormalTok{(}\StringTok{"https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/R/multiplot.r"}\NormalTok{)}
 \CommentTok{# randomly simulate some non-linear samples}
 \NormalTok{x=}\KeywordTok{seq}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{10}\NormalTok{,}\FloatTok{0.01}\NormalTok{)*pi}
 \NormalTok{e=}\KeywordTok{rnorm}\NormalTok{(}\KeywordTok{length}\NormalTok{(x),}\DataTypeTok{mean=}\DecValTok{0}\NormalTok{,}\DataTypeTok{sd=}\FloatTok{0.2}\NormalTok{)}
 \NormalTok{fx<-}\KeywordTok{sin}\NormalTok{(x)+e+}\KeywordTok{sqrt}\NormalTok{(x)}
 \NormalTok{dat=}\KeywordTok{data.frame}\NormalTok{(x,fx)}
+\end{Highlighting}
+\end{Shaded}
+
+Then fit a simple linear regression on these data:
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \CommentTok{# plot fitting result}
+\KeywordTok{library}\NormalTok{(ggplot2)}
 \KeywordTok{ggplot}\NormalTok{(dat,}\KeywordTok{aes}\NormalTok{(x,fx))+}\StringTok{ }
 \StringTok{  }\KeywordTok{geom_point}\NormalTok{() +}
 \StringTok{  }\KeywordTok{geom_smooth}\NormalTok{(}\DataTypeTok{method =} \StringTok{"lm"}\NormalTok{, }\DataTypeTok{se =} \OtherTok{FALSE}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-31-1.pdf}
+\begin{figure}
 
-The estimated parameters will be different for the different training
-data. Intuitively, the estimated variance indicates that if we fit the
-same model with different data sets, how much the estimated results will
-change. Ideally, the change is small. For high variance models, small
-changes in the training data result in very different estimates. In
-general, a model with high flexibility also has high variance., such as
-the CART tree, and the initial boosting method. The Random Forest and
-Gradient Boosting Model aim to reduce the variance by summarizing the
-results obtained on different samples.
+{\centering \includegraphics[width=0.8\linewidth]{IDS_files/figure-latex/linearbias-1} 
 
-The blue curve in the figure below is obtained by fitting the above
-nonlinear observations by a smoothing method, which is highly flexible
-and can fit the current data tightly:
+}
+
+\caption{High bias model}\label{fig:linearbias}
+\end{figure}
+
+Despite a large sample size, trained linear regression cannot describe
+the relationship very well. In other words, in this case, the model has
+a high bias (Fig. \ref{fig:linearbias}). People also call it
+underfitting.
+
+Since the estimated parameters will be somewhat different for the
+different samples, there is the variance of estimates. Intuitively, it
+gives you some sense that if we fit the same model with different
+samples (presumably, they are from the same population), how much will
+the estimates change. Ideally, the change is trivial. For high variance
+models, small changes in the training data result in very different
+estimates. In general, a model with high flexibility also has high
+variance., such as the CART tree, and the initial boosting method. To
+overcome that problem, the Random Forest and Gradient Boosting Model aim
+to reduce the variance by summarizing the results obtained from
+different samples.
+
+Let's fit the above data using a smoothing method which is highly
+flexible and can fit the current data tightly:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3255,14 +3273,19 @@ and can fit the current data tightly:
 \end{Highlighting}
 \end{Shaded}
 
-\begin{verbatim}
-## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
-\end{verbatim}
+\begin{figure}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-32-1.pdf}
+{\centering \includegraphics[width=0.8\linewidth]{IDS_files/figure-latex/linearvar-1} 
 
-However, this method has a high variance, and if we simulate different
-subsets of the sample, the result curve will change significantly:
+}
+
+\caption{High variance model}\label{fig:linearvar}
+\end{figure}
+
+The resulting plot (Fig. \ref{fig:linearvar}) indicates the smoothing
+method fit the data much better so it has a much smaller bias. However,
+this method has a high variance. If we simulate different subsets of the
+sample, the result curve will change significantly:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3289,7 +3312,7 @@ subsets of the sample, the result curve will change significantly:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-33-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-32-1.pdf}
 
 Fitting the linear model using the same four subsets, the result barely
 changes:
@@ -3312,7 +3335,7 @@ changes:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-34-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-33-1.pdf}
 
 In general, the variance (\(Var(\hat{f}(\mathbf{X}))\))
 \textbf{increases} and the bias (\(Bias(\hat{f}(\mathbf{X}))\))
