@@ -216,18 +216,23 @@ dat=<span class="kw">data.frame</span>(x,fx)</code></pre></div>
 <span class="st">  </span><span class="kw">geom_point</span>() +
 <span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:linearbias"></span>
-<img src="IDS_files/figure-html/linearbias-1.svg" alt="High bias regression" width="80%" />
+<img src="IDS_files/figure-html/linearbias-1.svg" alt="High bias model" width="80%" />
 <p class="caption">
-FIGURE 5.1: High bias regression
+FIGURE 5.1: High bias model
 </p>
 </div>
 <p>Despite a large sample size, trained linear regression cannot describe the relationship very well. In other words, in this case, the model has a high bias (Fig. <a href="systematic-error-and-random-error.html#fig:linearbias">5.1</a>). People also call it underfitting.</p>
-<p>The estimated parameters will be different for the different training data. Intuitively, the estimated variance indicates that if we fit the same model with different data sets, how much the estimated results will change. Ideally, the change is small. For high variance models, small changes in the training data result in very different estimates. In general, a model with high flexibility also has high variance., such as the CART tree, and the initial boosting method. The Random Forest and Gradient Boosting Model aim to reduce the variance by summarizing the results obtained on different samples.</p>
-<p>The blue curve in the figure below is obtained by fitting the above nonlinear observations by a smoothing method, which is highly flexible and can fit the current data tightly:</p>
+<p>Since the estimated parameters will be somewhat different for the different samples, there is the variance of estimates. Intuitively, it gives you some sense that if we fit the same model with different samples (presumably, they are from the same population), how much will the estimates change. Ideally, the change is trivial. For high variance models, small changes in the training data result in very different estimates. In general, a model with high flexibility also has high variance., such as the CART tree, and the initial boosting method. To overcome that problem, the Random Forest and Gradient Boosting Model aim to reduce the variance by summarizing the results obtained from different samples.</p>
+<p>Let’s fit the above data using a smoothing method which is highly flexible and can fit the current data tightly:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(dat,<span class="kw">aes</span>(x,fx))+<span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)</code></pre></div>
 <pre><code>## `geom_smooth()` using method = &#39;loess&#39; and formula &#39;y ~ x&#39;</code></pre>
-<p><img src="IDS_files/figure-html/unnamed-chunk-32-1.svg" width="672" /></p>
-<p>However, this method has a high variance, and if we simulate different subsets of the sample, the result curve will change significantly:</p>
+<div class="figure" style="text-align: center"><span id="fig:linearvar"></span>
+<img src="IDS_files/figure-html/linearvar-1.svg" alt="High variance model" width="80%" />
+<p class="caption">
+FIGURE 5.2: High variance model
+</p>
+</div>
+<p>The resulting plot (Fig. <a href="systematic-error-and-random-error.html#fig:linearvar">5.2</a>) indicates the smoothing method fit the data much better so it has a much smaller bias. However, this method has a high variance. If we simulate different subsets of the sample, the result curve will change significantly:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># set random seed</span>
 <span class="kw">set.seed</span>(<span class="dv">2016</span>)
 <span class="co"># sample part of the data to fit model</span>
@@ -248,7 +253,7 @@ idx4=<span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">l
 dat4=<span class="kw">data.frame</span>(<span class="dt">x4=</span>x[idx4],<span class="dt">fx4=</span>fx[idx4])
 p4=<span class="kw">ggplot</span>(dat4,<span class="kw">aes</span>(x4,fx4))+<span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)
 <span class="kw">multiplot</span>(p1,p2,p3,p4,<span class="dt">cols=</span><span class="dv">2</span>)</code></pre></div>
-<p><img src="IDS_files/figure-html/unnamed-chunk-33-1.svg" width="672" /></p>
+<p><img src="IDS_files/figure-html/unnamed-chunk-32-1.svg" width="672" /></p>
 <p>Fitting the linear model using the same four subsets, the result barely changes:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p1=<span class="kw">ggplot</span>(dat1,<span class="kw">aes</span>(x1,fx1))+<span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_point</span>() +
@@ -263,7 +268,7 @@ p4=<span class="kw">ggplot</span>(dat4,<span class="kw">aes</span>(x4,fx4))+<spa
 <span class="st">  </span><span class="kw">geom_point</span>() +
 <span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)
 <span class="kw">multiplot</span>(p1,p2,p3,p4,<span class="dt">cols=</span><span class="dv">2</span>)</code></pre></div>
-<p><img src="IDS_files/figure-html/unnamed-chunk-34-1.svg" width="672" /></p>
+<p><img src="IDS_files/figure-html/unnamed-chunk-33-1.svg" width="672" /></p>
 <p>In general, the variance (<span class="math inline">\(Var(\hat{f}(\mathbf{X}))\)</span>) <strong>increases</strong> and the bias (<span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span>) <strong>decreases</strong> as the model flexibility increases. Variance and bias together determine the systematic error (or mean square error, MSE). As we increase the flexibility of the model, at first the rate at which <span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span> decreases is faster than <span class="math inline">\(Var (\hat{f} (\mathbf{X}))\)</span>, so the MSE decreases. However, to some degree, higher flexibility has little effect on <span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span> but <span class="math inline">\(Var(\hat{f} (\mathbf{X}))\)</span> increases significantly, so the MSE increases.</p>
 <div id="measurement-error-in-the-response" class="section level3">
 <h3><span class="header-section-number">5.1.1</span> Measurement Error in the Response</h3>
@@ -349,10 +354,10 @@ rsq&lt;-<span class="kw">melt</span>(rsq,<span class="dt">id.vars=</span><span c
 <div class="figure" style="text-align: center"><span id="fig:error"></span>
 <img src="IDS_files/figure-html/error-1.svg" alt="Test set \(R^2\) profiles for income models when measurement system noise increases. rsq_linear: linear regression, rsq_pls: Partial Least Square, rsq_mars: Multiple Adaptive Regression Spline Regression, rsq_svm: Support Vector Machine，rsq_rf: Random Forest" width="80%" />
 <p class="caption">
-FIGURE 5.2: Test set <span class="math inline">\(R^2\)</span> profiles for income models when measurement system noise increases. <code>rsq_linear</code>: linear regression, <code>rsq_pls</code>: Partial Least Square, <code>rsq_mars</code>: Multiple Adaptive Regression Spline Regression, <code>rsq_svm</code>: Support Vector Machine，<code>rsq_rf</code>: Random Forest
+FIGURE 5.3: Test set <span class="math inline">\(R^2\)</span> profiles for income models when measurement system noise increases. <code>rsq_linear</code>: linear regression, <code>rsq_pls</code>: Partial Least Square, <code>rsq_mars</code>: Multiple Adaptive Regression Spline Regression, <code>rsq_svm</code>: Support Vector Machine，<code>rsq_rf</code>: Random Forest
 </p>
 </div>
-<p>Fig. <a href="systematic-error-and-random-error.html#fig:error">5.2</a> shows that:</p>
+<p>Fig. <a href="systematic-error-and-random-error.html#fig:error">5.3</a> shows that:</p>
 <p>All model performance decreases sharply with increasing noise intensity. To better anticipate model performance, it helps to understand the way variable is measured. It is something need to make clear at the beginning of an analytical project. A data scientist should be aware of the quality of the data in the database. For data from the clients, it is an important to understand the quality of the data by communication.</p>
 <p>More complex model is not necessarily better. The best model in this situation is MARS, not random forests or SVM. Simple linear regression and PLS perform the worst when noise is low. MARS is more complicated than the linear regression and PLS, but it is simpler and easier to explain than random forest and SVM.</p>
 <p>When noise increases to a certain extent, the potential structure becomes vaguer, and complex random forest model starts to fail. When the systematic measurement error is significant, a more straightforward but not naive model may be a better choice. It is always a good practice to try different models, and select the simplest model in the case of similar performance. Model evaluation and selection represent the career “maturity” of a data scientist.</p>
@@ -371,10 +376,10 @@ noise[i,]&lt;-<span class="kw">rnorm</span>(<span class="dv">7</span>,<span clas
 <div class="figure" style="text-align: center"><span id="fig:errorvariable"></span>
 <img src="IDS_files/figure-html/errorvariable-1.svg" alt="Test set \(R^2\) profiles for income models when noise in online_exp increases. rsq_linear : linear regression, rsq_pls : Partial Least Square, rsq_mars: Multiple Adaptive Regression Spline Regression, rsq_svm: Support Vector Machine，rsq_rf: Random Forest" width="80%" />
 <p class="caption">
-FIGURE 5.3: Test set <span class="math inline">\(R^2\)</span> profiles for income models when noise in <code>online_exp</code> increases. <code>rsq_linear</code> : linear regression, <code>rsq_pls</code> : Partial Least Square, <code>rsq_mars</code>: Multiple Adaptive Regression Spline Regression, <code>rsq_svm</code>: Support Vector Machine，<code>rsq_rf</code>: Random Forest
+FIGURE 5.4: Test set <span class="math inline">\(R^2\)</span> profiles for income models when noise in <code>online_exp</code> increases. <code>rsq_linear</code> : linear regression, <code>rsq_pls</code> : Partial Least Square, <code>rsq_mars</code>: Multiple Adaptive Regression Spline Regression, <code>rsq_svm</code>: Support Vector Machine，<code>rsq_rf</code>: Random Forest
 </p>
 </div>
-<p>Comparing Fig. <a href="systematic-error-and-random-error.html#fig:errorvariable">5.3</a> and Fig. <a href="systematic-error-and-random-error.html#fig:error">5.2</a>, the influence of the two types of error is very different. The error in response cannot be overcome for any model, but it is not the case for the independent variables. Imagine an extreme case, if <code>online_exp</code> is completely random, that is, no information in it, the impact on the performance of random forest and support vector machine is marginal. Linear regression and PLS still perform similarly. With the increase of noise, the performance starts to decline faster. To a certain extent, it becomes steady. In general, if an independent variable contains error, other variables associated with it can compensate to some extent.</p>
+<p>Comparing Fig. <a href="systematic-error-and-random-error.html#fig:errorvariable">5.4</a> and Fig. <a href="systematic-error-and-random-error.html#fig:error">5.3</a>, the influence of the two types of error is very different. The error in response cannot be overcome for any model, but it is not the case for the independent variables. Imagine an extreme case, if <code>online_exp</code> is completely random, that is, no information in it, the impact on the performance of random forest and support vector machine is marginal. Linear regression and PLS still perform similarly. With the increase of noise, the performance starts to decline faster. To a certain extent, it becomes steady. In general, if an independent variable contains error, other variables associated with it can compensate to some extent.</p>
 </div>
 </div>
 <h3> References</h3>
