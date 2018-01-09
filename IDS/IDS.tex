@@ -207,7 +207,7 @@
 
 \title{Introduction to Data Science}
 \author{Hui Lin and Ming Li}
-\date{2018-01-05}
+\date{2018-01-09}
 
 \usepackage{amsthm}
 \newtheorem{theorem}{Theorem}[chapter]
@@ -2877,7 +2877,7 @@ between \texttt{income} and \texttt{gender}. You can do this by adding
 
 When training a machine learning model, there are many decisions to
 make. For example, when training a random forest, you need to decide the
-number trees and the number of variables to enter the model. For lasso
+number of trees and the number of variables at each node. For lasso
 method, you need to determine the penalty parameter. There may be
 standard settings for some of the parameters, but it's unlikely to guess
 the right values for all of these correctly. Other than that, making
@@ -2905,21 +2905,21 @@ information in the response variable that predictors can explain. The
 main goal of estimating \(f(\cdot)\) is inference or prediction, or
 sometimes both. In general, there is a trade-off between flexibility and
 interpretability of the model. So data scientists need to comprehend the
-delicate balance between the two.
+delicate balance between these two.
 
 Depending on the modeling purposes, the requirement for interpretability
 varies. If the prediction is the only goal, then as long as the
 prediction is accurate enough, the interpretability is not under
-consideration. In this case, people often use ``black box'' model, such
-as random forest, boosting tree, neural network and so on. These models
-are very flexible but nearly impossible to explain. Their predictive
-accuracy is usually higher on the training set, but not necessary when
-it predicts. It is not surprising since those models have a huge number
-of parameters and high flexibility that they can memorize the entire
-training data. A paper by Chiyuan Zhang et al. in 2017 pointed out that
-``Deep neural networks (even just two-layer net) easily fit random
-labels'' \citep{rethinkDL}. The traditional forms of regularization,
-such as weight decay, dropout, and data augmentation, fail to control
+consideration. In this case, people can use ``black box'' model, such as
+random forest, boosting tree, neural network and so on. These models are
+very flexible but nearly impossible to explain. Their accuracy is
+usually higher on the training set, but not necessary when it predicts.
+It is not surprising since those models have a huge number of parameters
+and high flexibility that they can ``memorize'' the entire training
+data. A paper by Chiyuan Zhang et al. in 2017 pointed out that ``Deep
+neural networks (even just two-layer net) easily fit random labels''
+\citep{rethinkDL}. The traditional forms of regularization, such as
+weight decay, dropout, and data augmentation, fail to control
 generalization error. It poses a conceptual challenge to statistical
 theory and also calls our attention when we use such black-box models.
 
@@ -2935,37 +2935,58 @@ applications, the information is incomplete. If you want to know whether
 a customer is going to purchase again or not, it is unlikely to have
 360-degree of the customer's information. You may have their historical
 purchasing record, discounts and service received. But you don't know if
-the customer sees your ad, or has a friend recommends competitor's
-product, or encounters some unhappy purchasing experience somewhere.
-There could be a myriad of factors that will influence the customer's
-purchase decision while what you have as data is only a small part. To
-make things worse, in many cases, you don't even know what you don't
-know. Deep learning doesn't have any advantage in solving those
+the customer sees your advertisement, or has a friend recommends
+competitor's product, or encounters some unhappy purchasing experience
+somewhere. There could be a myriad of factors that will influence the
+customer's purchase decision while what you have as data is only a small
+part. To make things worse, in many cases, you don't even know what you
+don't know. Deep learning doesn't have any advantage in solving those
 problems. Instead, some parametric models often work better in this
 situation. You will comprehend this more after learning the different
-types of model error.
-
-Assume we have \(\hat{f}\) which is an estimator of \(f\). Then we can
-further get \(\mathbf{\hat{y}}=\hat(f)(\mathbf(X))\). The predicted
-error is divided into two parts, systematic error, and random error:
+types of model error. Assume we have \(\hat{f}\) which is an estimator
+of \(f\). Then we can further get
+\(\mathbf{\hat{y}}=\hat{f}(\mathbf{X})\). The predicted error is divided
+into two parts, systematic error, and random error:
 
 \[E(\mathbf{y}-\hat{\mathbf{y}})^{2}=E[f(\mathbf{X})+\mathbf{\epsilon}-\hat{f}(\mathbf{X})]^{2}=\underset{\text{(1)}}{\underbrace{E[f(\mathbf{X})-\hat{f}(\mathbf{X})]^{2}}}+\underset{\text{(2)}}{\underbrace{Var(\mathbf{\epsilon})}}
 \label{eq:error}\]
 
-In the above equation, (1) is the systematic error. It exists because
-\(\hat{f}\) usually does not entirely describe the ``systematic
-relation'' between X and y which refers to the stable relationship that
-exists across different samples. Using a better model can reduce this
-kind of the error; (2) is the random error which represents the part of
-y that cannot be explained by X. A more complex model does not reduce
-the error. The biggest problem with the black-box model is that it fits
-random error, i.e., over-fitting. The notable feature of random error is
-that it varies over different samples. So one way to determine whether
-overfitting happens is to reserve a part of the data as the test set and
-then check the performance of the trained model on the test data. Note
-that overfitting is a general problem from which any model could suffer.
-However, since black-box models usually have a large number of
-parameters, it is much more suspectable to over-fitting.
+It is also called Mean Square Error (MSE) where (1) is the systematic
+error. It exists because \(\hat{f}\) usually does not entirely describe
+the ``systematic relation'' between X and y which refers to the stable
+relationship that exists across different samples or time. Model
+improvement can help reduce this kind of error; (2) is the random error
+which represents the part of y that cannot be explained by X. A more
+complex model does not reduce the error. There are three reasons for
+random error:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  the current sample is not representative, so the pattern in one sample
+  set does not generalize to a broader scale.
+\item
+  The information is incomplete. In other words, you don't have all
+  variables needed to explain the response.
+\item
+  Measurement error in the variables.
+\end{enumerate}
+
+Deep learning has significant success solving problems with complete
+information and usually low measurement error. As mentioned before, in a
+task like image recognition, all you need are the pixels in the
+pictures. So in deep learning applications, increasing the sample size
+can improve the model performance significantly. But it may not perform
+well in problems with incomplete information. The biggest problem with
+the black-box model is that it fits random error, i.e., over-fitting.
+The notable feature of random error is that it varies over different
+samples. So one way to determine whether overfitting happens is to
+reserve a part of the data as the test set and then check the
+performance of the trained model on the test data. Note that overfitting
+is a general problem from which any model could suffer. However, since
+black-box models usually have a large number of parameters, it is much
+more suspectable to over-fitting.
 
 \begin{figure}[htbp]
 \centering
@@ -3127,28 +3148,27 @@ using the same four subsets, the result barely changes:
 In general, the variance (\(Var(\hat{f}(\mathbf{X}))\))
 \textbf{increases} and the bias (\(Bias(\hat{f}(\mathbf{X}))\))
 \textbf{decreases} as the model flexibility increases. Variance and bias
-together determine the systematic error (or mean square error, MSE). As
-we increase the flexibility of the model, at first the rate at which
-\(Bias(\hat{f}(\mathbf{X}))\) decreases is faster than
-\(Var (\hat{f} (\mathbf{X}))\), so the MSE decreases. However, to some
-degree, higher flexibility has little effect on
-\(Bias(\hat{f}(\mathbf{X}))\) but \(Var(\hat{f} (\mathbf{X}))\)
+together determine the systematic error. As we increase the flexibility
+of the model, at first the rate at which \(Bias(\hat{f}(\mathbf{X}))\)
+decreases is faster than \(Var (\hat{f} (\mathbf{X}))\), so the MSE
+decreases. However, to some degree, higher flexibility has little effect
+on \(Bias(\hat{f}(\mathbf{X}))\) but \(Var(\hat{f} (\mathbf{X}))\)
 increases significantly, so the MSE increases.
 
 \subsection{Measurement Error in the
 Response}\label{measurement-error-in-the-response}
 
-The random error (\(\mathbf{\epsilon}\)) reflects the measurement error
-in the response. This part of the error is irreducible, and so it makes
-the root mean square error (RMSE) and \(R^2\) have the corresponding
-upper and lower limits. RMSE and \(R^2\) are commonly used performance
-measures for the regression model which we will talk in more detail
-later. Therefore, the random error term not only represents the part of
-fluctuations the model cannot explain but also contains measurement
-error in the response variables. Section 20.2 of Applied Predictive
-Modeling \citep{APM} has an example that shows the effect of the
-measurement error in the response variable on the model performance
-(RMSE and \(R^2\)).
+The measurement error in the response contributes to the random error
+(\(\mathbf{\epsilon}\)). This part of the error is irreducible if you
+change the data collection mechanism, and so it makes the root mean
+square error (RMSE) and \(R^2\) have the corresponding upper and lower
+limits. RMSE and \(R^2\) are commonly used performance measures for the
+regression model which we will talk in more detail later. Therefore, the
+random error term not only represents the part of fluctuations the model
+cannot explain but also contains measurement error in the response
+variables. Section 20.2 of Applied Predictive Modeling \citep{APM} has
+an example that shows the effect of the measurement error in the
+response variable on the model performance (RMSE and \(R^2\)).
 
 The authors increased the error in the response proportional to a base
 level error which was gotten using the original data without introducing
@@ -3450,19 +3470,17 @@ Many models have parameters which cannot be directly estimated from the
 data, such as \(\lambda\) in the lasso (penalty parameter), the number
 of trees in the random forest. This type of model parameter is called
 tuning parameter, and there is no analytical formula available to
-calculate the optimizing value. Tuning parameters often control the
-complexity of the model. Poor choice for the values can result in
-over-fitting or under-fitting. A standard approach to estimate tuning
-parameters is through cross-validation which is a data resampling
-approach.
+calculate the optimized value. Tuning parameters often control the
+complexity of the model. A poor choice can result in over-fitting or
+under-fitting. A standard approach to estimate tuning parameters is
+through cross-validation which is a data resampling approach.
 
-Since to get reasonable precision of the performance values on a single
-test set, the size of the test set may need to be large. So more often,
-people will instead resample the training set. \emph{Data resampling}
-operates similarly: use a subset of samples to fit a model and use the
-rest to evaluate model performance. This process will repeat multiple
-times to get a performance profile. In that sense, resampling is based
-on splitting. The general steps are:
+To get a reasonable precision of the performance based on a single test
+set, the size of the test set may need to be large. So a conventional
+approach is to use a subset of samples to fit the model and use the rest
+to evaluate model performance. This process will repeat multiple times
+to get a performance profile. In that sense, resampling is based on
+splitting. The general steps are:
 
 \begin{itemize}
 \tightlist
@@ -3491,7 +3509,7 @@ on splitting. The general steps are:
 \item
   Determine the final tuning parameter
 \item
-  Refit the model with the entire training set
+  Refit the model with the entire data set
 \end{itemize}
 
 \begin{figure}[htbp]
@@ -3499,9 +3517,6 @@ on splitting. The general steps are:
 \includegraphics[width=0.80000\textwidth]{images/ParameterTuningProcess.png}
 \caption{Parameter Tuning Process}
 \end{figure}
-
-We have outlined above the general procedure to tune parameters. Now
-let's focus on the critical part of the process: data splitting.
 
 \chapter{References}\label{references}
 
