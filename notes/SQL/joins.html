@@ -32,8 +32,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="filter.html">
-<link rel="next" href="math-operations.html">
+<link rel="prev" href="subqueries.html">
+<link rel="next" href="leftrightfull-outer-joins.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -147,31 +147,79 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="sort" class="section level2">
-<h2><span class="header-section-number">3.2</span> Sort</h2>
-<p><strong>Learning Objectives</strong></p>
+<div id="joins" class="section level2">
+<h2><span class="header-section-number">4.2</span> Joins</h2>
+<p>Benefits of breaking data into tables:</p>
 <ul>
-<li>Explain some of the rules related to using the <code>ORDER BY</code> clause</li>
-<li>Use the <code>ORDER BY</code> clause to sort data either in ascending or descending order</li>
+<li>Efficient storage</li>
+<li>Easier manipulation</li>
+<li>Greater scalability</li>
+<li>Logically models a process</li>
+<li>Tables are linked by common values (keys)</li>
 </ul>
-<p><code>ORDER BY</code> allows us to sort data by particular columns. Now there are a few rules when using <code>ORDER BY</code>:</p>
-<ol style="list-style-type: decimal">
-<li>It can take multiple column names.</li>
-<li>If you’re doing multiple columns, you just want to make sure you’re adding a comma after that.</li>
-<li>You can sort by a column that you didn’t retrieve.</li>
-<li>It must always be the last clause in the select statement.</li>
-</ol>
-<p>You can sort by column position. For example, sort by column 2 and 3:</p>
-<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">ORDER</span> <span class="kw">BY</span> <span class="dv">2</span>,<span class="dv">3</span></code></pre></div>
-<p>There are also some directions as with any type of sorting, either in ascending, <code>ASC</code>, or descending order, <code>DESC</code>. This is only applied to the column name it directly proceeds. If you’re using order by descending and have unit price, it’s not going to do it for all of columns after the <code>DESC</code>. You have to specify each individual columns for ascending and descending, if you want it that way.</p>
+<p>Joins associate corrects from each table and allow data retrieval from multiple tables in one query. Note that joins are not physical. They persist for the duration of the query execution.</p>
+<ul>
+<li>Cartesian (cross) joins: each row from the first table joins with all the rows of another table</li>
+</ul>
+<p>If table 1 has <span class="math inline">\(n_1\)</span> rows and table 2 has <span class="math inline">\(n_2\)</span> rows, then after cartesian join, the resulted table will have <span class="math inline">\(n_1 \times n_2\)</span> rows. It is not frequently used and is computationally taxing.</p>
+<p>Example: - Table 1: vendor_name - Table 2: product_name, product_price</p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> vender_name, product_name, product_price
+<span class="kw">FROM</span> Vendors, Products
+<span class="kw">WHERE</span> Vendors.vendor_id = Products.vendor_id;</code></pre></div>
+<p>It does not match anything. It’s just multiplying what you had in the first table with those records in the second table.</p>
+<ul>
+<li>Inner joins: selects records that have matching values in both tables</li>
+</ul>
+<p>It is one of the most frequently used joins in SQL.</p>
+<p>Example:</p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> suppliers.CompanyName, ProductName, UnitPrice
+<span class="kw">FROM</span> Suppliers <span class="kw">INNER</span> <span class="kw">JOIN</span> Products 
+<span class="kw">ON</span> Suppliers.supplierid = Products.supplierid</code></pre></div>
+<p>Inner join syntax:</p>
+<ul>
+<li>Join type is specified (INNER JOIN)</li>
+<li>Join condition is in the FROM clause and uses the On clause</li>
+<li>Joining more tables together affects overall database performance</li>
+<li>You can join multiple tables, no limit</li>
+<li>List all the tables, then define conditions</li>
+</ul>
+<p>Example:</p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> o.OrderID, c.CompanyName, e.LastName
+<span class="kw">FROM</span> ( (Orders o <span class="kw">INNER</span> <span class="kw">JOIN</span> Customer c <span class="kw">ON</span> o.CustomerID = c.CustomerID)
+<span class="kw">INNER</span> <span class="kw">JOIN</span> Employees e <span class="kw">ON</span> o.EmployeeID = e.EmployeeID
+);</code></pre></div>
+<p>Be careful about the names and make sure you don’t make unnecessary joins.</p>
+<p>Aliases and self-joins</p>
+<p>SQL aliases give a table or column a temporary name. It can make column names more readable. An alias only exists for the duration of the query.</p>
+<ul>
+<li>WITHOUT alias</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> vendor_name, product_name, product_price
+<span class="kw">FROM</span> Vendors, Products
+<span class="kw">WHERE</span> Vendors.vendor_id = Products.vendor_id;</code></pre></div>
+<ul>
+<li>WITH alias</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> vendor_name, product_name, product_price
+<span class="kw">FROM</span> Vendors <span class="kw">AS</span> v, Products <span class="kw">AS</span> p
+<span class="kw">WHERE</span> v.vendor_id = p.vendor_id;</code></pre></div>
+<p>Self-join is to join table to itself. For example, assume you want to match customers from the same city. You can take the table and treat it like two separate tables. Join the original table to itself.</p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> column_name(s)
+<span class="kw">FROM</span> table1 T1, table2 T2 
+<span class="kw">WHERE</span> condition;</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> A.CustomerName <span class="kw">AS</span> CustomerName1, B.CustomerName <span class="kw">AS</span> CustomerName2, A.City
+<span class="kw">FROM</span> Customers A, Customers B
+<span class="kw">WHERE</span> A.CustomerID = B.CustomerID
+<span class="kw">AND</span> A.City = B.City
+<span class="kw">ORDER</span> <span class="kw">BY</span> A.City;</code></pre></div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="filter.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="math-operations.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="subqueries.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="leftrightfull-outer-joins.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

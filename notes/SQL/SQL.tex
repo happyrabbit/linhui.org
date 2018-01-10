@@ -202,7 +202,7 @@
 
 \title{SQL for Data Science}
 \author{Hui Lin}
-\date{2017-12-06}
+\date{2018-01-10}
 
 \usepackage{amsthm}
 \newtheorem{theorem}{Theorem}[chapter]
@@ -1718,6 +1718,256 @@ aggregates by group\tabularnewline
     Documentation}
   \end{itemize}
 \end{itemize}
+
+\chapter{Subqueries and Joins}\label{subqueries-and-joins}
+
+\section{Subqueries}\label{subqueries}
+
+\begin{itemize}
+\tightlist
+\item
+  Define subqueries
+\item
+  Discuss advantages and disadvantages of using subqueries
+\item
+  Explain how subqueries help us merge data from two or more tables
+\item
+  Write more efficient subqueries
+\end{itemize}
+
+Subqueries are queries embedded into other queries. Since data is stored
+in multiple tables, you may need to get information from multiple
+sources. Data scientists often use subqueries to:
+
+\begin{itemize}
+\tightlist
+\item
+  Select specific records or columns and then use the criteria as
+  filtering criteria for the next thing they want to select.
+\item
+  Add additional criteria like filtering criteria that are not in your
+  current table from another table into your query.
+\end{itemize}
+
+Example: Need to know the region each customer is from who has had an
+order with freight over 100. The freight information is in table
+\texttt{Orders} and the customer information is in table
+\texttt{Customers}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT} \NormalTok{customerID, CompanyName, Region}
+\KeywordTok{FROM} \NormalTok{Customers}
+\KeywordTok{WHERE} \NormalTok{customerID }\KeywordTok{in} \NormalTok{(}\KeywordTok{SELECT} \NormalTok{customerID }\KeywordTok{FROM} \NormalTok{Orders }\KeywordTok{WHERE} \NormalTok{Freight > }\DecValTok{100}\NormalTok{);}
+\end{Highlighting}
+\end{Shaded}
+
+DBMS is performing two operations:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Get the customer ID for the orders selected
+\item
+  Pass that to the \texttt{WHERE} clause and processing the overall
+  \texttt{SELECT} statement
+\end{enumerate}
+
+\textbf{Note that it always perform the innermost \texttt{SELECT}
+portion first. }
+
+\subsection{Best Practices and
+Considerations}\label{best-practices-and-considerations}
+
+\begin{itemize}
+\tightlist
+\item
+  There is no limit to the number of subqueries you can have
+\item
+  Performance slows when you nest too deeply.
+\item
+  Subquery selects can only retrieve a single column
+\end{itemize}
+
+Also, when you use subqueries, the code gets harder to understand. One
+of the best practices for writing subqueries is to be clear and
+consistent with indenting to make it easier to read. This website will
+pre-format SQL code for you: www.poorsql.com
+
+Subqueries can also be used as calculations.
+
+Example: Get the total number of orders by each customer
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT} \NormalTok{customer_name,}
+    \NormalTok{customer_state (}\KeywordTok{SELECT} \FunctionTok{COUNT}\NormalTok{(*) }\KeywordTok{AS} \NormalTok{orders }\KeywordTok{FROM} \NormalTok{Orders }\KeywordTok{WHERE} 
+        \NormalTok{Orders.customer_id = Customer.customer_id) }\KeywordTok{AS} \NormalTok{orders}
+\KeywordTok{FROM} \NormalTok{customers}
+\KeywordTok{ORDER} \KeywordTok{BY} \NormalTok{Customer_name}
+\end{Highlighting}
+\end{Shaded}
+
+As you can see, we're selecting customer name, the region and then just
+as if we were going to select a different column name we have a whole
+subquery in there. We have
+\texttt{(SELECT\ COUNT(*)\ AS\ orders\ FROM\ Orders}, and count these
+based on the customer IDs. It's aggregating the orders based on the
+customer IDs ( \texttt{Orders.customer\_id\ =\ Customer.customer\_id}).
+In the end, we order the table by customer name.
+
+\section{Joins}\label{joins}
+
+Benefits of breaking data into tables:
+
+\begin{itemize}
+\tightlist
+\item
+  Efficient storage
+\item
+  Easier manipulation
+\item
+  Greater scalability
+\item
+  Logically models a process
+\item
+  Tables are linked by common values (keys)
+\end{itemize}
+
+Joins associate corrects from each table and allow data retrieval from
+multiple tables in one query. Note that joins are not physical. They
+persist for the duration of the query execution.
+
+\begin{itemize}
+\tightlist
+\item
+  Cartesian (cross) joins: each row from the first table joins with all
+  the rows of another table
+\end{itemize}
+
+If table 1 has \(n_1\) rows and table 2 has \(n_2\) rows, then after
+cartesian join, the resulted table will have \(n_1 \times n_2\) rows. It
+is not frequently used and is computationally taxing.
+
+Example: - Table 1: vendor\_name - Table 2: product\_name,
+product\_price
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT} \NormalTok{vender_name, product_name, product_price}
+\KeywordTok{FROM} \NormalTok{Vendors, Products}
+\KeywordTok{WHERE} \NormalTok{Vendors.vendor_id = Products.vendor_id;}
+\end{Highlighting}
+\end{Shaded}
+
+It does not match anything. It's just multiplying what you had in the
+first table with those records in the second table.
+
+\begin{itemize}
+\tightlist
+\item
+  Inner joins: selects records that have matching values in both tables
+\end{itemize}
+
+It is one of the most frequently used joins in SQL.
+
+Example:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT} \NormalTok{suppliers.CompanyName, ProductName, UnitPrice}
+\KeywordTok{FROM} \NormalTok{Suppliers }\KeywordTok{INNER} \KeywordTok{JOIN} \NormalTok{Products }
+\KeywordTok{ON} \NormalTok{Suppliers.supplierid = Products.supplierid}
+\end{Highlighting}
+\end{Shaded}
+
+Inner join syntax:
+
+\begin{itemize}
+\tightlist
+\item
+  Join type is specified (INNER JOIN)
+\item
+  Join condition is in the FROM clause and uses the On clause
+\item
+  Joining more tables together affects overall database performance
+\item
+  You can join multiple tables, no limit
+\item
+  List all the tables, then define conditions
+\end{itemize}
+
+Example:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT} \NormalTok{o.OrderID, c.CompanyName, e.LastName}
+\KeywordTok{FROM} \NormalTok{( (Orders o }\KeywordTok{INNER} \KeywordTok{JOIN} \NormalTok{Customer c }\KeywordTok{ON} \NormalTok{o.CustomerID = c.CustomerID)}
+\KeywordTok{INNER} \KeywordTok{JOIN} \NormalTok{Employees e }\KeywordTok{ON} \NormalTok{o.EmployeeID = e.EmployeeID}
+\NormalTok{);}
+\end{Highlighting}
+\end{Shaded}
+
+Be careful about the names and make sure you don't make unnecessary
+joins.
+
+Aliases and self-joins
+
+SQL aliases give a table or column a temporary name. It can make column
+names more readable. An alias only exists for the duration of the query.
+
+\begin{itemize}
+\tightlist
+\item
+  WITHOUT alias
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT} \NormalTok{vendor_name, product_name, product_price}
+\KeywordTok{FROM} \NormalTok{Vendors, Products}
+\KeywordTok{WHERE} \NormalTok{Vendors.vendor_id = Products.vendor_id;}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
+\item
+  WITH alias
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT} \NormalTok{vendor_name, product_name, product_price}
+\KeywordTok{FROM} \NormalTok{Vendors }\KeywordTok{AS} \NormalTok{v, Products }\KeywordTok{AS} \NormalTok{p}
+\KeywordTok{WHERE} \NormalTok{v.vendor_id = p.vendor_id;}
+\end{Highlighting}
+\end{Shaded}
+
+Self-join is to join table to itself. For example, assume you want to
+match customers from the same city. You can take the table and treat it
+like two separate tables. Join the original table to itself.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT} \NormalTok{column_name(s)}
+\KeywordTok{FROM} \NormalTok{table1 T1, table2 T2 }
+\KeywordTok{WHERE} \NormalTok{condition;}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT} \NormalTok{A.CustomerName }\KeywordTok{AS} \NormalTok{CustomerName1, B.CustomerName }\KeywordTok{AS} \NormalTok{CustomerName2, A.City}
+\KeywordTok{FROM} \NormalTok{Customers A, Customers B}
+\KeywordTok{WHERE} \NormalTok{A.CustomerID = B.CustomerID}
+\KeywordTok{AND} \NormalTok{A.City = B.City}
+\KeywordTok{ORDER} \KeywordTok{BY} \NormalTok{A.City;}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Left/Right/Full outer joins}\label{leftrightfull-outer-joins}
 
 \bibliography{book.bib}
 
