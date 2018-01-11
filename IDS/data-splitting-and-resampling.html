@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2018-01-10">
+<meta name="date" content="2018-01-11">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -207,7 +207,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>The first decision to make for data splitting is to decide the proportion of data in the test set. There are two factors to consider here: (1) sample size; (2) computation intensity. If the sample size is large enough which is the most common situation according to my experience, you can try to use 20%, 30% and 40% of the data as the test set, and see which one works the best. If the model is computationally intense, then you may consider starting from a smaller sample of data to train the model hence will have a higher portion of data in the test set. Depending on how it performs, you may need to increase the training set. If the sample size is small, you can use cross-validation or bootstrap which is the topic in the next section.</p>
 <p>The next decision is to decide which samples are in the test set. There is a desire to make the training and test sets as similar as possible. A simple way is to split data by random sampling which, however, does not control for any of the data attributes, such as the percentage of the retained customer in the data. So it is possible that the distribution of outcomes is substantially different between the training and test sets. There are three main ways to split the data that account for the similarity of resulted data sets. We will describe the three approaches using the clothing company customer data as examples.</p>
 <ol style="list-style-type: decimal">
-<li>Divide data according to the outcome variable</li>
+<li>Split data according to the outcome variable</li>
 </ol>
 <p>Assume the outcome variable is customer segment (column <code>segment</code>) and we decide to use 80% as training and 20% test. The goal is to make the proportions of the categories in the two sets as similar as possible. The <code>createDataPartition()</code> function in <code>caret</code> will return a balanced splitting based on assigned variable.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># load data</span>
@@ -246,9 +246,55 @@ datTest &lt;-<span class="st"> </span>sim.dat[-trainIndex,]</code></pre></div>
 ## 3     Quality    40       0.20
 ## 4       Style    70       0.35</code></pre>
 <p>The percentages are the same for these two sets. In practice, it is possible that the distributions are not exactly identical but should be close.</p>
+<ol start="2" style="list-style-type: decimal">
+<li>Divide data according to predictors</li>
+</ol>
+<p>An alternative way is to split data based on the predictors. The goal is to get a diverse subset from a dataset so that the sample is representative. In other words, we need an algorithm to identify the <span class="math inline">\(n\)</span> most diverse samples from a dataset with size <span class="math inline">\(N\)</span>. However, the task is generally infeasible for non-trivial values of <span class="math inline">\(n\)</span> and <span class="math inline">\(N\)</span> <span class="citation">(Willett <a href="#ref-willett">2004</a>)</span>. And hence practicable approaches to dissimilarity-based selection involve approximate methods that are sub-optimal. A major class of algorithms split the data on <em>maximum dissimilarity sampling</em>. The process starts from:</p>
+<ul>
+<li>Initialize a single sample as starting test set</li>
+<li>Calculate the dissimilarity between this initial sample and each remaining samples in the dataset</li>
+<li>Add the most dissimilar unallocated sample to the test set</li>
+</ul>
+<p>To move forward, we need to define the dissimilarity between groups. Each definition results in a different version of the algorithm and hence a different subset. It is the same problem as in hierarchical clustering where you need to define a way to measure the distance between clusters. The possible approaches are to use minimum, maximum, sum of all distances, the average of all distances, etc. Unfortunately, there is not a single best choice, and you may have to try multiple methods and check the resulted sample sets. R users can implement the algorithm using <code>maxDissim()</code> function from <code>caret</code> package. The <code>obj</code> argument is to set the definition of dissimilarity. Refer to the help documentation for more details (<code>?maxDissim</code>).</p>
+<p>Let’s use two variables (<code>age</code> and <code>income</code>) from the customer data as an example to illustrate how it works in R and compare maximum dissimilarity sampling with random sampling.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(lattice)
+<span class="co"># select variables</span>
+testing&lt;-<span class="kw">subset</span>(sim.dat,<span class="dt">select=</span><span class="kw">c</span>(<span class="st">&quot;age&quot;</span>,<span class="st">&quot;income&quot;</span> ))</code></pre></div>
+<p>Random select 5 samples as initial subset (<code>start</code>) , the rest will be in <code>samplePool</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">5</span>)
+<span class="co"># select 5 random samples</span>
+startSet &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">dim</span>(testing)[<span class="dv">1</span>], <span class="dv">5</span>)
+start &lt;-<span class="st"> </span>testing[startSet,]
+<span class="co"># save the rest in data frame &quot;samplePool&quot;</span>
+samplePool &lt;-<span class="st"> </span>testing[-startSet,]</code></pre></div>
+<p>Use <code>maxDissim()</code> to select another 5 samples from <code>samplePool</code> that are as different as possible with the initical set <code>start</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">selectId &lt;-<span class="st"> </span><span class="kw">maxDissim</span>(start, samplePool,<span class="dt">obj =</span> minDiss, <span class="dt">n =</span> <span class="dv">5</span>)
+minDissSet &lt;-samplePool[selectId, ]</code></pre></div>
+<p>The <code>obj = minDiss</code> in the above code tells R to use minimum dissimilarity to define the distance between groups. Next, random select 5 samples from <code>samplePool</code> in data frame <code>RandomSet</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">selectId &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">dim</span>(samplePool)[<span class="dv">1</span>], <span class="dv">5</span>)
+RandomSet&lt;-samplePool[selectId, ]</code></pre></div>
+<p>Plot the resulted set to compare different sampling methods:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">start$group&lt;-<span class="kw">rep</span>(<span class="st">&quot;start&quot;</span>,<span class="kw">nrow</span>(start))
+minDissSet $group&lt;-<span class="kw">rep</span>(<span class="st">&quot;Maximum Dissimilarity Sampling&quot;</span>,<span class="kw">nrow</span>(minDissSet))
+RandomSet$group&lt;-<span class="kw">rep</span>(<span class="st">&quot;Random Sampling&quot;</span>,<span class="kw">nrow</span>(RandomSet))
+<span class="kw">xyplot</span>(age~income,<span class="dt">data=</span><span class="kw">rbind</span>(start, minDissSet, RandomSet),<span class="dt">grid =</span> <span class="ot">TRUE</span>,
+       <span class="dt">group =</span> group, <span class="dt">auto.key =</span> <span class="ot">TRUE</span>
+)</code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:maxdis"></span>
+<img src="IDS_files/figure-html/maxdis-1.svg" alt="Compare Maximum Dissimilarity Sampling with  Random Sampling" width="80%" />
+<p class="caption">
+FIGURE 4.5: Compare Maximum Dissimilarity Sampling with Random Sampling
+</p>
+</div>
 
 </div>
 <!-- </div> -->
+<h3> References</h3>
+<div id="refs" class="references">
+<div id="ref-willett">
+<p>Willett, Peter. 2004. “Dissimilarity-Based Algorithms for Selecting Structurally Diverse Sets of Compounds.” <em>Journal of Computational Biology</em> 6(3-4) (doi:10.1089/106652799318382): 447–57.</p>
+</div>
+</div>
             </section>
 
           </div>
