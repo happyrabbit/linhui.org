@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2018-01-11">
+<meta name="date" content="2018-01-12">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -211,11 +211,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ol>
 <p>Assume the outcome variable is customer segment (column <code>segment</code>) and we decide to use 80% as training and 20% test. The goal is to make the proportions of the categories in the two sets as similar as possible. The <code>createDataPartition()</code> function in <code>caret</code> will return a balanced splitting based on assigned variable.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># load data</span>
-sim.dat&lt;-<span class="kw">read.csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv&quot;</span>)
+sim.dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv&quot;</span>)
 <span class="kw">library</span>(caret)
 <span class="co"># set random seed to make sure reproducibility</span>
 <span class="kw">set.seed</span>(<span class="dv">3456</span>)
-trainIndex &lt;-<span class="st"> </span><span class="kw">createDataPartition</span>(sim.dat$segment, <span class="dt">p =</span> .<span class="dv">8</span>, <span class="dt">list =</span> <span class="ot">FALSE</span>, <span class="dt">times =</span> <span class="dv">1</span>)
+trainIndex &lt;-<span class="st"> </span><span class="kw">createDataPartition</span>(sim.dat$segment, <span class="dt">p =</span> <span class="fl">0.8</span>, <span class="dt">list =</span> <span class="ot">FALSE</span>, 
+    <span class="dt">times =</span> <span class="dv">1</span>)
 <span class="kw">head</span>(trainIndex)</code></pre></div>
 <pre><code>##      Resample1
 ## [1,]         1
@@ -226,20 +227,20 @@ trainIndex &lt;-<span class="st"> </span><span class="kw">createDataPartition</s
 ## [6,]         7</code></pre>
 <p>The <code>list = FALSE</code> in the call to <code>createDataPartition</code> is to return a data frame. The <code>times = 1</code> tells R how many times you want to split the data. Here we only do it once, but you can repeat the splitting multiple times. In that case, the function will return multiple vectors indicating the rows to training/test. You can set <code>times＝2</code> and rerun the above code to see the result. Then we can use the returned indicator vector <code>trainIndex</code> to get training and test sets:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get training set</span>
-datTrain &lt;-<span class="st"> </span>sim.dat[ trainIndex,]
+datTrain &lt;-<span class="st"> </span>sim.dat[trainIndex, ]
 <span class="co"># get test set</span>
-datTest &lt;-<span class="st"> </span>sim.dat[-trainIndex,]</code></pre></div>
+datTest &lt;-<span class="st"> </span>sim.dat[-trainIndex, ]</code></pre></div>
 <p>According to the setting, there are 800 samples in the training set and 200 in test set. Let’s check the distribution of the two sets:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(plyr)
-<span class="kw">ddply</span>(datTrain,<span class="st">&quot;segment&quot;</span>,summarise,<span class="dt">count=</span><span class="kw">length</span>(segment),
-     <span class="dt">percentage=</span><span class="kw">round</span>( <span class="kw">length</span>(segment)/<span class="kw">nrow</span>(datTrain),<span class="dv">2</span>))</code></pre></div>
+<span class="kw">ddply</span>(datTrain, <span class="st">&quot;segment&quot;</span>, summarise, <span class="dt">count =</span> <span class="kw">length</span>(segment), 
+    <span class="dt">percentage =</span> <span class="kw">round</span>(<span class="kw">length</span>(segment)/<span class="kw">nrow</span>(datTrain), <span class="dv">2</span>))</code></pre></div>
 <pre><code>##       segment count percentage
 ## 1 Conspicuous   160       0.20
 ## 2       Price   200       0.25
 ## 3     Quality   160       0.20
 ## 4       Style   280       0.35</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ddply</span>(datTest,<span class="st">&quot;segment&quot;</span>,summarise,<span class="dt">count=</span><span class="kw">length</span>(segment),
-      <span class="dt">percentage=</span><span class="kw">round</span>(<span class="kw">length</span>(segment)/<span class="kw">nrow</span>(datTest),<span class="dv">2</span>))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ddply</span>(datTest, <span class="st">&quot;segment&quot;</span>, summarise, <span class="dt">count =</span> <span class="kw">length</span>(segment), 
+    <span class="dt">percentage =</span> <span class="kw">round</span>(<span class="kw">length</span>(segment)/<span class="kw">nrow</span>(datTest), <span class="dv">2</span>))</code></pre></div>
 <pre><code>##       segment count percentage
 ## 1 Conspicuous    40       0.20
 ## 2       Price    50       0.25
@@ -259,27 +260,26 @@ datTest &lt;-<span class="st"> </span>sim.dat[-trainIndex,]</code></pre></div>
 <p>Let’s use two variables (<code>age</code> and <code>income</code>) from the customer data as an example to illustrate how it works in R and compare maximum dissimilarity sampling with random sampling.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(lattice)
 <span class="co"># select variables</span>
-testing&lt;-<span class="kw">subset</span>(sim.dat,<span class="dt">select=</span><span class="kw">c</span>(<span class="st">&quot;age&quot;</span>,<span class="st">&quot;income&quot;</span> ))</code></pre></div>
+testing &lt;-<span class="st"> </span><span class="kw">subset</span>(sim.dat, <span class="dt">select =</span> <span class="kw">c</span>(<span class="st">&quot;age&quot;</span>, <span class="st">&quot;income&quot;</span>))</code></pre></div>
 <p>Random select 5 samples as initial subset (<code>start</code>) , the rest will be in <code>samplePool</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">5</span>)
 <span class="co"># select 5 random samples</span>
 startSet &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">dim</span>(testing)[<span class="dv">1</span>], <span class="dv">5</span>)
-start &lt;-<span class="st"> </span>testing[startSet,]
-<span class="co"># save the rest in data frame &quot;samplePool&quot;</span>
-samplePool &lt;-<span class="st"> </span>testing[-startSet,]</code></pre></div>
+start &lt;-<span class="st"> </span>testing[startSet, ]
+<span class="co"># save the rest in data frame &#39;samplePool&#39;</span>
+samplePool &lt;-<span class="st"> </span>testing[-startSet, ]</code></pre></div>
 <p>Use <code>maxDissim()</code> to select another 5 samples from <code>samplePool</code> that are as different as possible with the initical set <code>start</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">selectId &lt;-<span class="st"> </span><span class="kw">maxDissim</span>(start, samplePool,<span class="dt">obj =</span> minDiss, <span class="dt">n =</span> <span class="dv">5</span>)
-minDissSet &lt;-samplePool[selectId, ]</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">selectId &lt;-<span class="st"> </span><span class="kw">maxDissim</span>(start, samplePool, <span class="dt">obj =</span> minDiss, <span class="dt">n =</span> <span class="dv">5</span>)
+minDissSet &lt;-<span class="st"> </span>samplePool[selectId, ]</code></pre></div>
 <p>The <code>obj = minDiss</code> in the above code tells R to use minimum dissimilarity to define the distance between groups. Next, random select 5 samples from <code>samplePool</code> in data frame <code>RandomSet</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">selectId &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">dim</span>(samplePool)[<span class="dv">1</span>], <span class="dv">5</span>)
-RandomSet&lt;-samplePool[selectId, ]</code></pre></div>
+RandomSet &lt;-<span class="st"> </span>samplePool[selectId, ]</code></pre></div>
 <p>Plot the resulted set to compare different sampling methods:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">start$group&lt;-<span class="kw">rep</span>(<span class="st">&quot;start&quot;</span>,<span class="kw">nrow</span>(start))
-minDissSet $group&lt;-<span class="kw">rep</span>(<span class="st">&quot;Maximum Dissimilarity Sampling&quot;</span>,<span class="kw">nrow</span>(minDissSet))
-RandomSet$group&lt;-<span class="kw">rep</span>(<span class="st">&quot;Random Sampling&quot;</span>,<span class="kw">nrow</span>(RandomSet))
-<span class="kw">xyplot</span>(age~income,<span class="dt">data=</span><span class="kw">rbind</span>(start, minDissSet, RandomSet),<span class="dt">grid =</span> <span class="ot">TRUE</span>,
-       <span class="dt">group =</span> group, <span class="dt">auto.key =</span> <span class="ot">TRUE</span>
-)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">start$group &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="st">&quot;Initial Set&quot;</span>, <span class="kw">nrow</span>(start))
+minDissSet$group &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="st">&quot;Maximum Dissimilarity Sampling&quot;</span>, <span class="kw">nrow</span>(minDissSet))
+RandomSet$group &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="st">&quot;Random Sampling&quot;</span>, <span class="kw">nrow</span>(RandomSet))
+<span class="kw">xyplot</span>(age ~<span class="st"> </span>income, <span class="dt">data =</span> <span class="kw">rbind</span>(start, minDissSet, RandomSet), <span class="dt">grid =</span> <span class="ot">TRUE</span>, 
+    <span class="dt">group =</span> group, <span class="dt">auto.key =</span> <span class="ot">TRUE</span>)</code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:maxdis"></span>
 <img src="IDS_files/figure-html/maxdis-1.svg" alt="Compare Maximum Dissimilarity Sampling with  Random Sampling" width="80%" />
 <p class="caption">

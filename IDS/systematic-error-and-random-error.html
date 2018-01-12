@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2018-01-11">
+<meta name="date" content="2018-01-12">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -203,16 +203,14 @@ E[f(\mathbf{X})-\hat{f}(\mathbf{X})]^{2} &amp; = &amp; E\left(f(\mathbf{X})-E[\h
 <p>The code below simulates one predictor (<code>x</code>) and one response variable (<code>fx</code>). The relationship between <code>x</code> and <code>fx</code> is non-linear.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">source</span>(<span class="st">&quot;https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/R/multiplot.r&quot;</span>)
 <span class="co"># randomly simulate some non-linear samples</span>
-x=<span class="kw">seq</span>(<span class="dv">1</span>,<span class="dv">10</span>,<span class="fl">0.01</span>)*pi
-e=<span class="kw">rnorm</span>(<span class="kw">length</span>(x),<span class="dt">mean=</span><span class="dv">0</span>,<span class="dt">sd=</span><span class="fl">0.2</span>)
-fx&lt;-<span class="kw">sin</span>(x)+e+<span class="kw">sqrt</span>(x)
-dat=<span class="kw">data.frame</span>(x,fx)</code></pre></div>
+x =<span class="st"> </span><span class="kw">seq</span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="fl">0.01</span>) *<span class="st"> </span>pi
+e =<span class="st"> </span><span class="kw">rnorm</span>(<span class="kw">length</span>(x), <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="fl">0.2</span>)
+fx &lt;-<span class="st"> </span><span class="kw">sin</span>(x) +<span class="st"> </span>e +<span class="st"> </span><span class="kw">sqrt</span>(x)
+dat =<span class="st"> </span><span class="kw">data.frame</span>(x, fx)</code></pre></div>
 <p>Then fit a simple linear regression on these data:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># plot fitting result</span>
 <span class="kw">library</span>(ggplot2)
-<span class="kw">ggplot</span>(dat,<span class="kw">aes</span>(x,fx))+<span class="st"> </span>
-<span class="st">  </span><span class="kw">geom_point</span>() +
-<span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<span class="kw">ggplot</span>(dat, <span class="kw">aes</span>(x, fx)) +<span class="st"> </span><span class="kw">geom_point</span>() +<span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:linearbias"></span>
 <img src="IDS_files/figure-html/linearbias-1.svg" alt="High bias model" width="80%" />
 <p class="caption">
@@ -222,7 +220,7 @@ FIGURE 4.1: High bias model
 <p>Despite a large sample size, trained linear regression cannot describe the relationship very well. In other words, in this case, the model has a high bias (Fig. <a href="systematic-error-and-random-error.html#fig:linearbias">4.1</a>). People also call it underfitting.</p>
 <p>Since the estimated parameters will be somewhat different for the different samples, there is the variance of estimates. Intuitively, it gives you some sense that if we fit the same model with different samples (presumably, they are from the same population), how much will the estimates change. Ideally, the change is trivial. For high variance models, small changes in the training data result in very different estimates. In general, a model with high flexibility also has high variance., such as the CART tree, and the initial boosting method. To overcome that problem, the Random Forest and Gradient Boosting Model aim to reduce the variance by summarizing the results obtained from different samples.</p>
 <p>Let’s fit the above data using a smoothing method which is highly flexible and can fit the current data tightly:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(dat,<span class="kw">aes</span>(x,fx))+<span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(dat, <span class="kw">aes</span>(x, fx)) +<span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)</code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:linearvar"></span>
 <img src="IDS_files/figure-html/linearvar-1.svg" alt="High variance model" width="80%" />
 <p class="caption">
@@ -232,39 +230,34 @@ FIGURE 4.2: High variance model
 <p>The resulting plot (Fig. <a href="systematic-error-and-random-error.html#fig:linearvar">4.2</a>) indicates the smoothing method fit the data much better so it has a much smaller bias. However, this method has a high variance. If we simulate different subsets of the sample, the result curve will change significantly:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># set random seed</span>
 <span class="kw">set.seed</span>(<span class="dv">2016</span>)
-<span class="co"># sample part of the data to fit model</span>
-<span class="co"># sample 1</span>
-idx1=<span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">length</span>(x),<span class="dv">100</span>)
-dat1=<span class="kw">data.frame</span>(<span class="dt">x1=</span>x[idx1],<span class="dt">fx1=</span>fx[idx1])
-p1=<span class="kw">ggplot</span>(dat1,<span class="kw">aes</span>(x1,fx1))+<span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)
+<span class="co"># sample part of the data to fit model sample 1</span>
+idx1 =<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">length</span>(x), <span class="dv">100</span>)
+dat1 =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x1 =</span> x[idx1], <span class="dt">fx1 =</span> fx[idx1])
+p1 =<span class="st"> </span><span class="kw">ggplot</span>(dat1, <span class="kw">aes</span>(x1, fx1)) +<span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)
 <span class="co"># sample 2</span>
-idx2=<span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">length</span>(x),<span class="dv">100</span>)
-dat2=<span class="kw">data.frame</span>(<span class="dt">x2=</span>x[idx2],<span class="dt">fx2=</span>fx[idx2])
-p2=<span class="kw">ggplot</span>(dat2,<span class="kw">aes</span>(x2,fx2))+<span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)
+idx2 =<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">length</span>(x), <span class="dv">100</span>)
+dat2 =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x2 =</span> x[idx2], <span class="dt">fx2 =</span> fx[idx2])
+p2 =<span class="st"> </span><span class="kw">ggplot</span>(dat2, <span class="kw">aes</span>(x2, fx2)) +<span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)
 <span class="co"># sample 3</span>
-idx3=<span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">length</span>(x),<span class="dv">100</span>)
-dat3=<span class="kw">data.frame</span>(<span class="dt">x3=</span>x[idx3],<span class="dt">fx3=</span>fx[idx3])
-p3=<span class="kw">ggplot</span>(dat3,<span class="kw">aes</span>(x3,fx3))+<span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)
+idx3 =<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">length</span>(x), <span class="dv">100</span>)
+dat3 =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x3 =</span> x[idx3], <span class="dt">fx3 =</span> fx[idx3])
+p3 =<span class="st"> </span><span class="kw">ggplot</span>(dat3, <span class="kw">aes</span>(x3, fx3)) +<span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)
 <span class="co"># sample 4</span>
-idx4=<span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">length</span>(x),<span class="dv">100</span>)
-dat4=<span class="kw">data.frame</span>(<span class="dt">x4=</span>x[idx4],<span class="dt">fx4=</span>fx[idx4])
-p4=<span class="kw">ggplot</span>(dat4,<span class="kw">aes</span>(x4,fx4))+<span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)
-<span class="kw">multiplot</span>(p1,p2,p3,p4,<span class="dt">cols=</span><span class="dv">2</span>)</code></pre></div>
+idx4 =<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span>:<span class="kw">length</span>(x), <span class="dv">100</span>)
+dat4 =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x4 =</span> x[idx4], <span class="dt">fx4 =</span> fx[idx4])
+p4 =<span class="st"> </span><span class="kw">ggplot</span>(dat4, <span class="kw">aes</span>(x4, fx4)) +<span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)
+<span class="kw">multiplot</span>(p1, p2, p3, p4, <span class="dt">cols =</span> <span class="dv">2</span>)</code></pre></div>
 <p><img src="IDS_files/figure-html/unnamed-chunk-32-1.svg" width="672" /></p>
 <p>The fitted lines (blue) change over different samples which means it has high variance. People also call it overfitting. Fitting the linear model using the same four subsets, the result barely changes:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p1=<span class="kw">ggplot</span>(dat1,<span class="kw">aes</span>(x1,fx1))+<span class="st"> </span>
-<span class="st">  </span><span class="kw">geom_point</span>() +
-<span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)
-p2=<span class="kw">ggplot</span>(dat2,<span class="kw">aes</span>(x2,fx2))+<span class="st"> </span>
-<span class="st">  </span><span class="kw">geom_point</span>() +
-<span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)
-p3=<span class="kw">ggplot</span>(dat3,<span class="kw">aes</span>(x3,fx3))+<span class="st"> </span>
-<span class="st">  </span><span class="kw">geom_point</span>() +
-<span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)
-p4=<span class="kw">ggplot</span>(dat4,<span class="kw">aes</span>(x4,fx4))+<span class="st"> </span>
-<span class="st">  </span><span class="kw">geom_point</span>() +
-<span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)
-<span class="kw">multiplot</span>(p1,p2,p3,p4,<span class="dt">cols=</span><span class="dv">2</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p1 =<span class="st"> </span><span class="kw">ggplot</span>(dat1, <span class="kw">aes</span>(x1, fx1)) +<span class="st"> </span><span class="kw">geom_point</span>() +<span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, 
+    <span class="dt">se =</span> <span class="ot">FALSE</span>)
+p2 =<span class="st"> </span><span class="kw">ggplot</span>(dat2, <span class="kw">aes</span>(x2, fx2)) +<span class="st"> </span><span class="kw">geom_point</span>() +<span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, 
+    <span class="dt">se =</span> <span class="ot">FALSE</span>)
+p3 =<span class="st"> </span><span class="kw">ggplot</span>(dat3, <span class="kw">aes</span>(x3, fx3)) +<span class="st"> </span><span class="kw">geom_point</span>() +<span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, 
+    <span class="dt">se =</span> <span class="ot">FALSE</span>)
+p4 =<span class="st"> </span><span class="kw">ggplot</span>(dat4, <span class="kw">aes</span>(x4, fx4)) +<span class="st"> </span><span class="kw">geom_point</span>() +<span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, 
+    <span class="dt">se =</span> <span class="ot">FALSE</span>)
+<span class="kw">multiplot</span>(p1, p2, p3, p4, <span class="dt">cols =</span> <span class="dv">2</span>)</code></pre></div>
 <p><img src="IDS_files/figure-html/unnamed-chunk-33-1.svg" width="672" /></p>
 <p>In general, the variance (<span class="math inline">\(Var(\hat{f}(\mathbf{X}))\)</span>) <strong>increases</strong> and the bias (<span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span>) <strong>decreases</strong> as the model flexibility increases. Variance and bias together determine the systematic error. As we increase the flexibility of the model, at first the rate at which <span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span> decreases is faster than <span class="math inline">\(Var (\hat{f} (\mathbf{X}))\)</span>, so the MSE decreases. However, to some degree, higher flexibility has little effect on <span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span> but <span class="math inline">\(Var(\hat{f} (\mathbf{X}))\)</span> increases significantly, so the MSE increases.</p>
 <div id="measurement-error-in-the-response" class="section level3">
@@ -273,81 +266,89 @@ p4=<span class="kw">ggplot</span>(dat4,<span class="kw">aes</span>(x4,fx4))+<spa
 <p>The authors increased the error in the response proportional to a base level error which was gotten using the original data without introducing extra noise. Then fit a set of models repeatedly using the “contaminated” data sets to study the change of <span class="math inline">\(RMSE\)</span> and <span class="math inline">\(R^2\)</span> as the level of noise. Here we use clothing consumer data for a similar illustration. Suppose many people do not want to disclose their income and so we need to use other variables to establish a model to predict income. We set up the following model:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># load data</span>
 sim.dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv &quot;</span>)
-ymad&lt;-<span class="kw">mad</span>(<span class="kw">na.omit</span>(sim.dat$income))
+ymad &lt;-<span class="st"> </span><span class="kw">mad</span>(<span class="kw">na.omit</span>(sim.dat$income))
 <span class="co"># calculate z-score</span>
-zs&lt;-(sim.dat$income-<span class="kw">mean</span>(<span class="kw">na.omit</span>(sim.dat$income)))/ymad
-<span class="co"># which(na.omit(zs&gt;3.5)): identify outliers</span>
-<span class="co"># which(is.na(zs)): identify missing values</span>
-idex&lt;-<span class="kw">c</span>(<span class="kw">which</span>(<span class="kw">na.omit</span>(zs&gt;<span class="fl">3.5</span>)),<span class="kw">which</span>(<span class="kw">is.na</span>(zs)))
+zs &lt;-<span class="st"> </span>(sim.dat$income -<span class="st"> </span><span class="kw">mean</span>(<span class="kw">na.omit</span>(sim.dat$income)))/ymad
+<span class="co"># which(na.omit(zs&gt;3.5)): identify outliers which(is.na(zs)):</span>
+<span class="co"># identify missing values</span>
+idex &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">which</span>(<span class="kw">na.omit</span>(zs &gt;<span class="st"> </span><span class="fl">3.5</span>)), <span class="kw">which</span>(<span class="kw">is.na</span>(zs)))
 <span class="co"># delete rows with outliers and missing values</span>
-sim.dat&lt;-sim.dat[-idex,]
-fit&lt;-<span class="kw">lm</span>(income~store_exp+online_exp+store_trans+online_trans,<span class="dt">data=</span>sim.dat)</code></pre></div>
+sim.dat &lt;-<span class="st"> </span>sim.dat[-idex, ]
+fit &lt;-<span class="st"> </span><span class="kw">lm</span>(income ~<span class="st"> </span>store_exp +<span class="st"> </span>online_exp +<span class="st"> </span>store_trans +<span class="st"> </span>online_trans, 
+    <span class="dt">data =</span> sim.dat)</code></pre></div>
 <p>The output shows that without additional noise, the root mean square error (RMSE) of the model is 29567, <span class="math inline">\(R^2\)</span> is 0.6.</p>
 <p>Let’s add various degrees of noise (0 to 3 times the RMSE) to the variable <code>income</code>:</p>
 <p><span class="math display">\[ RMSE \times (0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0) \]</span></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">noise&lt;-<span class="kw">matrix</span>(<span class="kw">rep</span>(<span class="ot">NA</span>,<span class="dv">7</span>*<span class="kw">nrow</span>(sim.dat)),<span class="dt">nrow=</span><span class="kw">nrow</span>(sim.dat),<span class="dt">ncol=</span><span class="dv">7</span>)
-for (i in <span class="dv">1</span>:<span class="kw">nrow</span>(sim.dat)){
-noise[i,]&lt;-<span class="kw">rnorm</span>(<span class="dv">7</span>,<span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">7</span>),<span class="kw">summary</span>(fit)$sigma*<span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">3</span>,<span class="dt">by=</span><span class="fl">0.5</span>))
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">noise &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rep</span>(<span class="ot">NA</span>, <span class="dv">7</span> *<span class="st"> </span><span class="kw">nrow</span>(sim.dat)), <span class="dt">nrow =</span> <span class="kw">nrow</span>(sim.dat), 
+    <span class="dt">ncol =</span> <span class="dv">7</span>)
+for (i in <span class="dv">1</span>:<span class="kw">nrow</span>(sim.dat)) {
+    noise[i, ] &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">7</span>, <span class="kw">rep</span>(<span class="dv">0</span>, <span class="dv">7</span>), <span class="kw">summary</span>(fit)$sigma *<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, 
+        <span class="dv">3</span>, <span class="dt">by =</span> <span class="fl">0.5</span>))
 }</code></pre></div>
 <p>We then examine the effect of noise intensity on <span class="math inline">\(R^2\)</span> for models with different complexity. The models with complexity from low to high are: ordinary linear regression, partial least square regression(PLS), multivariate adaptive regression spline (MARS), support vector machine (SVM, the kernel function is radial basis function), and random forest.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># fit ordinary linear regression</span>
-rsq_linear&lt;-<span class="kw">rep</span>(<span class="dv">0</span>,<span class="kw">ncol</span>(noise))
-for (i in <span class="dv">1</span>:<span class="dv">7</span>){
-withnoise&lt;-sim.dat$income+noise[,i]
-fit0&lt;-<span class="kw">lm</span>(withnoise~store_exp+online_exp+store_trans+online_trans,<span class="dt">data=</span>sim.dat)
-rsq_linear[i]&lt;-<span class="kw">summary</span>(fit0)$adj.r.squared
+rsq_linear &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">0</span>, <span class="kw">ncol</span>(noise))
+for (i in <span class="dv">1</span>:<span class="dv">7</span>) {
+    withnoise &lt;-<span class="st"> </span>sim.dat$income +<span class="st"> </span>noise[, i]
+    fit0 &lt;-<span class="st"> </span><span class="kw">lm</span>(withnoise ~<span class="st"> </span>store_exp +<span class="st"> </span>online_exp +<span class="st"> </span>store_trans +<span class="st"> </span>
+<span class="st">        </span>online_trans, <span class="dt">data =</span> sim.dat)
+    rsq_linear[i] &lt;-<span class="st"> </span><span class="kw">summary</span>(fit0)$adj.r.squared
 }</code></pre></div>
 <p>PLS is a method of linearizing nonlinear relationships through hidden layers. It is similar to the principal component regression (PCR), except that PCR does not take into account the information of the dependent variable when selecting the components, and its purpose is to find the linear combinations (i.e., unsupervised) that capture the most variance of the independent variables. When the independent variables and response variables are related, PCR can well identify the systematic relationship between them. However, when there exist independent variables not associated with response variable, it will undermine PCR’s performance. And PLS maximizes the linear combination of dependencies with the response variable. In the current case, the more complicated PLS does not perform better than simple linear regression.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># pls: conduct PLS and PCR</span>
 <span class="kw">library</span>(pls)
-rsq_pls&lt;-<span class="kw">rep</span>(<span class="dv">0</span>,<span class="kw">ncol</span>(noise))
+rsq_pls &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">0</span>, <span class="kw">ncol</span>(noise))
 <span class="co"># fit PLS</span>
-for (i in <span class="dv">1</span>:<span class="dv">7</span>){
-withnoise&lt;-sim.dat$income+noise[,i]
-fit0&lt;-<span class="kw">plsr</span>(withnoise~store_exp+online_exp+store_trans+online_trans,<span class="dt">data=</span>sim.dat)
-rsq_pls[i]&lt;-<span class="kw">max</span>(<span class="kw">drop</span>(<span class="kw">R2</span>(fit0, <span class="dt">estimate =</span> <span class="st">&quot;train&quot;</span>,<span class="dt">intercept =</span> <span class="ot">FALSE</span>)$val))
+for (i in <span class="dv">1</span>:<span class="dv">7</span>) {
+    withnoise &lt;-<span class="st"> </span>sim.dat$income +<span class="st"> </span>noise[, i]
+    fit0 &lt;-<span class="st"> </span><span class="kw">plsr</span>(withnoise ~<span class="st"> </span>store_exp +<span class="st"> </span>online_exp +<span class="st"> </span>store_trans +<span class="st"> </span>
+<span class="st">        </span>online_trans, <span class="dt">data =</span> sim.dat)
+    rsq_pls[i] &lt;-<span class="st"> </span><span class="kw">max</span>(<span class="kw">drop</span>(<span class="kw">R2</span>(fit0, <span class="dt">estimate =</span> <span class="st">&quot;train&quot;</span>, <span class="dt">intercept =</span> <span class="ot">FALSE</span>)$val))
 }</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># earth: fit mars </span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># earth: fit mars</span>
 <span class="kw">library</span>(earth)
-rsq_mars&lt;-<span class="kw">rep</span>(<span class="dv">0</span>,<span class="kw">ncol</span>(noise))
-for (i in <span class="dv">1</span>:<span class="dv">7</span>){
-withnoise&lt;-sim.dat$income+noise[,i]
-fit0&lt;-<span class="kw">earth</span>(withnoise~store_exp+online_exp+store_trans+online_trans,<span class="dt">data=</span>sim.dat)
-rsq_mars[i]&lt;-fit0$rsq
+rsq_mars &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">0</span>, <span class="kw">ncol</span>(noise))
+for (i in <span class="dv">1</span>:<span class="dv">7</span>) {
+    withnoise &lt;-<span class="st"> </span>sim.dat$income +<span class="st"> </span>noise[, i]
+    fit0 &lt;-<span class="st"> </span><span class="kw">earth</span>(withnoise ~<span class="st"> </span>store_exp +<span class="st"> </span>online_exp +<span class="st"> </span>store_trans +<span class="st"> </span>
+<span class="st">        </span>online_trans, <span class="dt">data =</span> sim.dat)
+    rsq_mars[i] &lt;-<span class="st"> </span>fit0$rsq
 }</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># caret: awesome package for tuning predictive model</span>
 <span class="kw">library</span>(caret)
-rsq_svm&lt;-<span class="kw">rep</span>(<span class="dv">0</span>,<span class="kw">ncol</span>(noise))
+rsq_svm &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">0</span>, <span class="kw">ncol</span>(noise))
 <span class="co"># Need some time to run</span>
-for (i in <span class="dv">1</span>:<span class="dv">7</span>){
-idex&lt;-<span class="kw">which</span>(<span class="kw">is.na</span>(sim.dat$income))
-withnoise&lt;-sim.dat$income+noise[,i]
-trainX&lt;-sim.dat[,<span class="kw">c</span>(<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>,<span class="st">&quot;store_trans&quot;</span>,<span class="st">&quot;online_trans&quot;</span>)]
-trainY&lt;-withnoise
-fit0&lt;-<span class="kw">train</span>(trainX,trainY,<span class="dt">method=</span><span class="st">&quot;svmRadial&quot;</span>,
-            <span class="dt">tuneLength=</span><span class="dv">15</span>,
-            <span class="dt">trControl=</span><span class="kw">trainControl</span>(<span class="dt">method=</span><span class="st">&quot;cv&quot;</span>))
-rsq_svm[i]&lt;-<span class="kw">max</span>(fit0$results$Rsquared)
+for (i in <span class="dv">1</span>:<span class="dv">7</span>) {
+    idex &lt;-<span class="st"> </span><span class="kw">which</span>(<span class="kw">is.na</span>(sim.dat$income))
+    withnoise &lt;-<span class="st"> </span>sim.dat$income +<span class="st"> </span>noise[, i]
+    trainX &lt;-<span class="st"> </span>sim.dat[, <span class="kw">c</span>(<span class="st">&quot;store_exp&quot;</span>, <span class="st">&quot;online_exp&quot;</span>, <span class="st">&quot;store_trans&quot;</span>, 
+        <span class="st">&quot;online_trans&quot;</span>)]
+    trainY &lt;-<span class="st"> </span>withnoise
+    fit0 &lt;-<span class="st"> </span><span class="kw">train</span>(trainX, trainY, <span class="dt">method =</span> <span class="st">&quot;svmRadial&quot;</span>, <span class="dt">tuneLength =</span> <span class="dv">15</span>, 
+        <span class="dt">trControl =</span> <span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>))
+    rsq_svm[i] &lt;-<span class="st"> </span><span class="kw">max</span>(fit0$results$Rsquared)
 }</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># randomForest: random forest model</span>
 <span class="kw">library</span>(randomForest)
-rsq_rf&lt;-<span class="kw">rep</span>(<span class="dv">0</span>,<span class="kw">ncol</span>(noise))
-<span class="co"># ntree=500 number of trees</span>
-<span class="co"># na.action = na.omit  ignore missing value</span>
-for (i in <span class="dv">1</span>:<span class="dv">7</span>){
-withnoise&lt;-sim.dat$income+noise[,i]
-fit0&lt;-<span class="kw">randomForest</span>(withnoise~store_exp+online_exp+store_trans+online_trans,<span class="dt">data=</span>sim.dat,<span class="dt">ntree=</span><span class="dv">500</span>,<span class="dt">na.action =</span> na.omit)
-rsq_rf[i]&lt;-<span class="kw">tail</span>(fit0$rsq,<span class="dv">1</span>)
+rsq_rf &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">0</span>, <span class="kw">ncol</span>(noise))
+<span class="co"># ntree=500 number of trees na.action = na.omit ignore</span>
+<span class="co"># missing value</span>
+for (i in <span class="dv">1</span>:<span class="dv">7</span>) {
+    withnoise &lt;-<span class="st"> </span>sim.dat$income +<span class="st"> </span>noise[, i]
+    fit0 &lt;-<span class="st"> </span><span class="kw">randomForest</span>(withnoise ~<span class="st"> </span>store_exp +<span class="st"> </span>online_exp +<span class="st"> </span>
+<span class="st">        </span>store_trans +<span class="st"> </span>online_trans, <span class="dt">data =</span> sim.dat, <span class="dt">ntree =</span> <span class="dv">500</span>, 
+        <span class="dt">na.action =</span> na.omit)
+    rsq_rf[i] &lt;-<span class="st"> </span><span class="kw">tail</span>(fit0$rsq, <span class="dv">1</span>)
 }
 <span class="kw">library</span>(reshape2)
-rsq&lt;-<span class="kw">data.frame</span>(<span class="kw">cbind</span>(<span class="dt">Noise=</span><span class="kw">c</span>(<span class="fl">0.0</span>, <span class="fl">0.5</span>, <span class="fl">1.0</span>, <span class="fl">1.5</span>, <span class="fl">2.0</span>, <span class="fl">2.5</span>, <span class="fl">3.0</span>),rsq_linear,rsq_pls,rsq_mars,rsq_svm,rsq_rf))
-rsq&lt;-<span class="kw">melt</span>(rsq,<span class="dt">id.vars=</span><span class="st">&quot;Noise&quot;</span>,<span class="dt">measure.vars=</span><span class="kw">c</span>(<span class="st">&quot;rsq_linear&quot;</span>,<span class="st">&quot;rsq_pls&quot;</span>,<span class="st">&quot;rsq_mars&quot;</span>,<span class="st">&quot;rsq_svm&quot;</span>,<span class="st">&quot;rsq_rf&quot;</span>))</code></pre></div>
+rsq &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(<span class="dt">Noise =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">0.5</span>, <span class="dv">1</span>, <span class="fl">1.5</span>, <span class="dv">2</span>, <span class="fl">2.5</span>, <span class="dv">3</span>), 
+    rsq_linear, rsq_pls, rsq_mars, rsq_svm, rsq_rf))
+rsq &lt;-<span class="st"> </span><span class="kw">melt</span>(rsq, <span class="dt">id.vars =</span> <span class="st">&quot;Noise&quot;</span>, <span class="dt">measure.vars =</span> <span class="kw">c</span>(<span class="st">&quot;rsq_linear&quot;</span>, 
+    <span class="st">&quot;rsq_pls&quot;</span>, <span class="st">&quot;rsq_mars&quot;</span>, <span class="st">&quot;rsq_svm&quot;</span>, <span class="st">&quot;rsq_rf&quot;</span>))</code></pre></div>
 
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ggplot2)
-<span class="kw">ggplot</span>(<span class="dt">data=</span>rsq, <span class="kw">aes</span>(<span class="dt">x=</span>Noise, <span class="dt">y=</span>value, <span class="dt">group=</span>variable, <span class="dt">colour=</span>variable)) +
-<span class="st">    </span><span class="kw">geom_line</span>() +
-<span class="st">    </span><span class="kw">geom_point</span>()+
-<span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;R2&quot;</span>) </code></pre></div>
+<span class="kw">ggplot</span>(<span class="dt">data =</span> rsq, <span class="kw">aes</span>(<span class="dt">x =</span> Noise, <span class="dt">y =</span> value, <span class="dt">group =</span> variable, 
+    <span class="dt">colour =</span> variable)) +<span class="st"> </span><span class="kw">geom_line</span>() +<span class="st"> </span><span class="kw">geom_point</span>() +<span class="st"> </span><span class="kw">ylab</span>(<span class="st">&quot;R2&quot;</span>)</code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:error"></span>
 <img src="IDS_files/figure-html/error-1.svg" alt="Test set \(R^2\) profiles for income models when measurement system noise increases. rsq_linear: linear regression, rsq_pls: Partial Least Square, rsq_mars: Multiple Adaptive Regression Spline Regression, rsq_svm: Support Vector Machine，rsq_rf: Random Forest" width="80%" />
 <p class="caption">
