@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2018-01-12">
+<meta name="date" content="2018-01-16">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -147,7 +147,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="4.1.1" data-path="systematic-error-and-random-error.html"><a href="systematic-error-and-random-error.html#measurement-error-in-the-response"><i class="fa fa-check"></i><b>4.1.1</b> Measurement Error in the Response</a></li>
 <li class="chapter" data-level="4.1.2" data-path="systematic-error-and-random-error.html"><a href="systematic-error-and-random-error.html#measurement-error-in-the-independent-variables"><i class="fa fa-check"></i><b>4.1.2</b> Measurement Error in the Independent Variables</a></li>
 </ul></li>
-<li class="chapter" data-level="4.2" data-path="data-splitting-and-resampling.html"><a href="data-splitting-and-resampling.html"><i class="fa fa-check"></i><b>4.2</b> Data Splitting and Resampling</a></li>
+<li class="chapter" data-level="4.2" data-path="data-splitting-and-resampling.html"><a href="data-splitting-and-resampling.html"><i class="fa fa-check"></i><b>4.2</b> Data Splitting and Resampling</a><ul>
+<li class="chapter" data-level="4.2.1" data-path="data-splitting-and-resampling.html"><a href="data-splitting-and-resampling.html#resampling"><i class="fa fa-check"></i><b>4.2.1</b> Resampling</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>5</b> References</a></li>
 <li class="divider"></li>
@@ -286,13 +288,71 @@ RandomSet$group &lt;-<span class="st"> </span><span class="kw">rep</span>(<span 
 FIGURE 4.5: Compare Maximum Dissimilarity Sampling with Random Sampling
 </p>
 </div>
+<p>The points from maximum dissimilarity sampling are far away from the initial samples ( Fig. <a href="data-splitting-and-resampling.html#fig:maxdis">4.5</a>, while the random samples are much closer to the initial ones. Why do we need a diverse subset? Because we hope the test set to be representative. If all test set samples are from respondents younger than 30, model performance on the test set has a high risk to fail to tell you how the model will perform on more general population.</p>
+<ul>
+<li>Divide data according to time</li>
+</ul>
+<p>For time series data, random sampling is usually not the best way. There is an approach to divide data according to time-series. Since time series is beyond the scope of this book, there is not much discussion here. For more detail of this method, see <span class="citation">(Hyndman and Athanasopoulos <a href="#ref-Hyndman">2013</a>)</span>. We will use a simulated first-order autoregressive model [AR (1)] time-series data with 100 observations to show how to implement using the function <code>createTimeSlices ()</code> in the <code>caret</code> package.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># simulte AR(1) time series samples</span>
+timedata =<span class="st"> </span><span class="kw">arima.sim</span>(<span class="kw">list</span>(<span class="dt">order=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>), <span class="dt">ar=</span>-.<span class="dv">9</span>), <span class="dt">n=</span><span class="dv">100</span>)
+<span class="co"># plot time series</span>
+<span class="kw">plot</span>(timedata, <span class="dt">main=</span>(<span class="kw">expression</span>(<span class="kw">AR</span>(<span class="dv">1</span>)~<span class="er">~~</span>phi==-.<span class="dv">9</span>)))     </code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:times"></span>
+<img src="IDS_files/figure-html/times-1.svg" alt="Divide data according to time" width="80%" />
+<p class="caption">
+FIGURE 4.6: Divide data according to time
+</p>
+</div>
+<p>Fig. <a href="data-splitting-and-resampling.html#fig:maxdis">4.5</a> shows 100 simulated time series observation. The goal is to make sure both training and test set to cover the whole period.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">timeSlices &lt;-<span class="st"> </span><span class="kw">createTimeSlices</span>(<span class="dv">1</span>:<span class="kw">length</span>(timedata), 
+                   <span class="dt">initialWindow =</span> <span class="dv">36</span>, <span class="dt">horizon =</span> <span class="dv">12</span>, <span class="dt">fixedWindow =</span> T)
+<span class="kw">str</span>(timeSlices,<span class="dt">max.level =</span> <span class="dv">1</span>)</code></pre></div>
+<pre><code>## List of 2
+##  $ train:List of 53
+##  $ test :List of 53</code></pre>
+<p>There are three arguments in the above <code>createTimeSlices()</code>.</p>
+<ul>
+<li><code>initialWindow</code>: The initial number of consecutive values in each training set sample</li>
+<li><code>horizon</code>: the number of consecutive values in test set sample</li>
+<li><code>fixedWindow</code>: if FALSE, all training samples start at 1</li>
+</ul>
+<p>The function returns two lists, one for the training set, the other for the test set. Let’s look at the first training sample:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get result for the 1st training set</span>
+trainSlices &lt;-<span class="st"> </span>timeSlices[[<span class="dv">1</span>]]
+<span class="co"># get result for the 1st test set</span>
+testSlices &lt;-<span class="st"> </span>timeSlices[[<span class="dv">2</span>]]
+<span class="co"># check the index for the 1st training and test set</span>
+trainSlices[[<span class="dv">1</span>]]</code></pre></div>
+<pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17
+## [18] 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34
+## [35] 35 36</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">testSlices[[<span class="dv">1</span>]]</code></pre></div>
+<pre><code>##  [1] 37 38 39 40 41 42 43 44 45 46 47 48</code></pre>
+<p>The first training set is consist of sample 1-36 in the dataset (<code>initialWindow = 36</code>). Then sample 37-48 are in the first test set ( <code>horizon = 12</code>). Type <code>head(trainSlices)</code> or <code>head(testSlices)</code> to check the later samples. If you are not clear about the argument <code>fixedWindow =</code>, try to change the setting to be <code>F</code> and check the change in <code>trainSlices</code> and <code>testSlices</code>.</p>
+<p>Understand and implement data splitting is not difficult. But there are two things to note:</p>
+<ol style="list-style-type: decimal">
+<li>The randomness in the splitting process will lead to uncertainty in performance measurement.</li>
+<li>When the dataset is small, it can be too expensive to leave out test set. In this situation, if collecting more data is just not possible, the best shot is to use leave-one-out cross-validation which is in the next section.</li>
+</ol>
+<div id="resampling" class="section level3">
+<h3><span class="header-section-number">4.2.1</span> Resampling</h3>
+<p>You can consider resampling as repeated splitting. The basic idea is: use part of the data to fit model and then use the rest of data to calculate model performance. Repeat the process multiple times and aggregate the results. The differences in resampling techniques usually center around the ways to choose subsamples. There are two main reasons that we may need resampling:</p>
+<ol style="list-style-type: decimal">
+<li><p>Estimate tuning parameters through resampling. Some examples of models with such parameters are Support Vector Machine (SVM), models including the penalty (LASSO) and random forest.</p></li>
+<li><p>For models without tuning parameter, such as ordinary linear regression and partial least square regression, the model fitting doesn’t require resampling. But you can study the model stability through resampling.</p></li>
+</ol>
+<p>We will introduce three most common resampling techniques: k-fold cross-validation, repeated training/test splitting, and bootstrap.</p>
 
+</div>
 </div>
 <!-- </div> -->
 <h3> References</h3>
 <div id="refs" class="references">
 <div id="ref-willett">
 <p>Willett, Peter. 2004. “Dissimilarity-Based Algorithms for Selecting Structurally Diverse Sets of Compounds.” <em>Journal of Computational Biology</em> 6(3-4) (doi:10.1089/106652799318382): 447–57.</p>
+</div>
+<div id="ref-Hyndman">
+<p>Hyndman, R.J., and G. Athanasopoulos. 2013. <em>Forecasting: Principles and Practice</em>. Vol. Section 2/5. OTect: Melbourne, Australia.</p>
 </div>
 </div>
             </section>
