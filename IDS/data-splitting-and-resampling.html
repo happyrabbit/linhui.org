@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2018-01-16">
+<meta name="date" content="2018-01-17">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -148,7 +148,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="4.1.2" data-path="systematic-error-and-random-error.html"><a href="systematic-error-and-random-error.html#measurement-error-in-the-independent-variables"><i class="fa fa-check"></i><b>4.1.2</b> Measurement Error in the Independent Variables</a></li>
 </ul></li>
 <li class="chapter" data-level="4.2" data-path="data-splitting-and-resampling.html"><a href="data-splitting-and-resampling.html"><i class="fa fa-check"></i><b>4.2</b> Data Splitting and Resampling</a><ul>
-<li class="chapter" data-level="4.2.1" data-path="data-splitting-and-resampling.html"><a href="data-splitting-and-resampling.html#resampling"><i class="fa fa-check"></i><b>4.2.1</b> Resampling</a></li>
+<li class="chapter" data-level="4.2.1" data-path="data-splitting-and-resampling.html"><a href="data-splitting-and-resampling.html#data-splitting"><i class="fa fa-check"></i><b>4.2.1</b> Data Splitting</a></li>
+<li class="chapter" data-level="4.2.2" data-path="data-splitting-and-resampling.html"><a href="data-splitting-and-resampling.html#resampling"><i class="fa fa-check"></i><b>4.2.2</b> Resampling</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>5</b> References</a></li>
@@ -175,6 +176,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="data-splitting-and-resampling" class="section level2">
 <h2><span class="header-section-number">4.2</span> Data Splitting and Resampling</h2>
 <p>Those highly adaptable models can model complex relationships. However, they tend to overfit which leads to the poor prediction by learning too much from the data. It means that the model is susceptible to the specific sample used to fit it. When future data is not exactly like the past data, the model prediction may have big mistakes. A simple model like ordinary linear regression tends instead to underfit which leads to a bad prediction by learning too little from the data. It systematically over-predicts or under-predicts the data regardless of how well future data resemble past data. Without evaluating models, the modeler will not know about the problem before the future samples. Data splitting and resampling are fundamental techniques to build sound models for prediction.</p>
+<div id="data-splitting" class="section level3">
+<h3><span class="header-section-number">4.2.1</span> Data Splitting</h3>
 <p><em>Data splitting</em> is to put part of the data aside as testing set (or Hold-outs, out of bag samples) and use the rest for model training. Training samples are also called in-sample. Model performance metrics evaluated using in-sample are retrodictive, not predictive.</p>
 <p>The traditional business intelligence usually handles data description. Answer simple questions by querying and summarizing the data, such as:</p>
 <ul>
@@ -303,7 +306,7 @@ timedata =<span class="st"> </span><span class="kw">arima.sim</span>(<span class
 FIGURE 4.6: Divide data according to time
 </p>
 </div>
-<p>Fig. <a href="data-splitting-and-resampling.html#fig:maxdis">4.5</a> shows 100 simulated time series observation. The goal is to make sure both training and test set to cover the whole period.</p>
+<p>Fig. <a href="data-splitting-and-resampling.html#fig:times">4.6</a> shows 100 simulated time series observation. The goal is to make sure both training and test set to cover the whole period.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">timeSlices &lt;-<span class="st"> </span><span class="kw">createTimeSlices</span>(<span class="dv">1</span>:<span class="kw">length</span>(timedata), 
                    <span class="dt">initialWindow =</span> <span class="dv">36</span>, <span class="dt">horizon =</span> <span class="dv">12</span>, <span class="dt">fixedWindow =</span> T)
 <span class="kw">str</span>(timeSlices,<span class="dt">max.level =</span> <span class="dv">1</span>)</code></pre></div>
@@ -328,21 +331,45 @@ trainSlices[[<span class="dv">1</span>]]</code></pre></div>
 ## [35] 35 36</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">testSlices[[<span class="dv">1</span>]]</code></pre></div>
 <pre><code>##  [1] 37 38 39 40 41 42 43 44 45 46 47 48</code></pre>
-<p>The first training set is consist of sample 1-36 in the dataset (<code>initialWindow = 36</code>). Then sample 37-48 are in the first test set ( <code>horizon = 12</code>). Type <code>head(trainSlices)</code> or <code>head(testSlices)</code> to check the later samples. If you are not clear about the argument <code>fixedWindow =</code>, try to change the setting to be <code>F</code> and check the change in <code>trainSlices</code> and <code>testSlices</code>.</p>
+<p>The first training set is consist of sample 1-36 in the dataset (<code>initialWindow = 36</code>). Then sample 37-48 are in the first test set ( <code>horizon = 12</code>). Type <code>head(trainSlices)</code> or <code>head(testSlices)</code> to check the later samples. If you are not clear about the argument <code>fixedWindow</code>, try to change the setting to be <code>F</code> and check the change in <code>trainSlices</code> and <code>testSlices</code>.</p>
 <p>Understand and implement data splitting is not difficult. But there are two things to note:</p>
 <ol style="list-style-type: decimal">
 <li>The randomness in the splitting process will lead to uncertainty in performance measurement.</li>
 <li>When the dataset is small, it can be too expensive to leave out test set. In this situation, if collecting more data is just not possible, the best shot is to use leave-one-out cross-validation which is in the next section.</li>
 </ol>
+</div>
 <div id="resampling" class="section level3">
-<h3><span class="header-section-number">4.2.1</span> Resampling</h3>
+<h3><span class="header-section-number">4.2.2</span> Resampling</h3>
 <p>You can consider resampling as repeated splitting. The basic idea is: use part of the data to fit model and then use the rest of data to calculate model performance. Repeat the process multiple times and aggregate the results. The differences in resampling techniques usually center around the ways to choose subsamples. There are two main reasons that we may need resampling:</p>
 <ol style="list-style-type: decimal">
 <li><p>Estimate tuning parameters through resampling. Some examples of models with such parameters are Support Vector Machine (SVM), models including the penalty (LASSO) and random forest.</p></li>
 <li><p>For models without tuning parameter, such as ordinary linear regression and partial least square regression, the model fitting doesn’t require resampling. But you can study the model stability through resampling.</p></li>
 </ol>
 <p>We will introduce three most common resampling techniques: k-fold cross-validation, repeated training/test splitting, and bootstrap.</p>
+<div id="k-fold-cross-validation" class="section level4">
+<h4><span class="header-section-number">4.2.2.1</span> k-fold cross-validation</h4>
+<p>k-fold cross-validation is to partition the original sample into <span class="math inline">\(k\)</span> equal size subsamples (folds). Use one of the <span class="math inline">\(k\)</span> folds to validate the model and the rest <span class="math inline">\(k-1\)</span> to train model. Then repeat the process <span class="math inline">\(k\)</span> times with each of the <span class="math inline">\(k\)</span> folds as the test set. Aggregate the results into a performance profile. The following figure represents a 5-fold cross-validation example.</p>
+<div class="figure">
+<img src="images/cv5fold.png" alt="5-fold cross-validation" />
+<p class="caption">5-fold cross-validation</p>
+</div>
+<p>The process of k-fold cross-validation is as follows:</p>
+<blockquote>
+<ol style="list-style-type: decimal">
+<li>Partition the original sample into <span class="math inline">\(k\)</span> equal size folds</li>
+<li>for <span class="math inline">\(i=1…k\)</span></li>
+</ol>
+<ol style="list-style-type: lower-alpha">
+<li>Use data other than fold <span class="math inline">\(i\)</span> to train the model <span class="math inline">\(M_{i}\)</span></li>
+<li>Apply <span class="math inline">\(M_{i}\)</span> to predict fold <span class="math inline">\(i\)</span> to get <span class="math inline">\(R_{i}\)</span></li>
+</ol>
+<ol start="3" style="list-style-type: decimal">
+<li>Aggregate the results <span class="math inline">\(R_{i}\ i=1\dots k\)</span> into a performance profile</li>
+</ol>
+</blockquote>
+<p>It is a standard way to find the value of tuning parameter that gives you the best performance. It is also a way to study the variability of model performance. A special case of k-fold cross-validation is Leave One Out Cross Validation (LOOCV) where <span class="math inline">\(k=1\)</span>. When sample size is small, it is desired to use as many data to train the model. Most of the functions have default setting <span class="math inline">\(k=10\)</span>. The choice is usually 5-10 in practice, but there is no standard rule. The more folds to use, the more samples are used to fit model, and then the performance estimate is closer to the theoretical performance. However, LOOCV has high computational cost since the number of interactions is the same as the sample size and each model fit uses a subset that is nearly the same size of the training set. On the other hand, when k is small (such as 2 or 3), the computation is more efficient, but the bias and uncertainty will increase. When the sample size is big, the impact of <span class="math inline">\(k\)</span> becomes marginal.</p>
 
+</div>
 </div>
 </div>
 <!-- </div> -->
