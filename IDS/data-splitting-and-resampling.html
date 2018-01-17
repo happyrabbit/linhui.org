@@ -348,26 +348,64 @@ trainSlices[[<span class="dv">1</span>]]</code></pre></div>
 <p>We will introduce three most common resampling techniques: k-fold cross-validation, repeated training/test splitting, and bootstrap.</p>
 <div id="k-fold-cross-validation" class="section level4">
 <h4><span class="header-section-number">4.2.2.1</span> k-fold cross-validation</h4>
-<p>k-fold cross-validation is to partition the original sample into <span class="math inline">\(k\)</span> equal size subsamples (folds). Use one of the <span class="math inline">\(k\)</span> folds to validate the model and the rest <span class="math inline">\(k-1\)</span> to train model. Then repeat the process <span class="math inline">\(k\)</span> times with each of the <span class="math inline">\(k\)</span> folds as the test set. Aggregate the results into a performance profile. The following figure represents a 5-fold cross-validation example.</p>
+<p>k-fold cross-validation is to partition the original sample into <span class="math inline">\(k\)</span> equal size subsamples (folds). Use one of the <span class="math inline">\(k\)</span> folds to validate the model and the rest <span class="math inline">\(k-1\)</span> to train model. Then repeat the process <span class="math inline">\(k\)</span> times with each of the <span class="math inline">\(k\)</span> folds as the test set. Aggregate the results into a performance profile.</p>
+<p>Denote by <span class="math inline">\(\hat{f}^{-\kappa}(X)\)</span> the fitted function, computed with the <span class="math inline">\(\kappa^{th}\)</span> fold removed and <span class="math inline">\(x_i^\kappa\)</span> the predictors for samples in left-out fold. The process of k-fold cross-validation is as follows:</p>
+<blockquote>
+<ol style="list-style-type: decimal">
+<li>Partition the original sample into <span class="math inline">\(k\)</span> equal size folds</li>
+<li>for <span class="math inline">\(\kappa=1…k\)</span></li>
+</ol>
+<ul>
+<li>Use data other than fold <span class="math inline">\(\kappa\)</span> to train the model <span class="math inline">\(\hat{f}^{-\kappa}(X)\)</span></li>
+<li>Apply <span class="math inline">\(\hat{f}^{-\kappa}(X)\)</span> to predict fold <span class="math inline">\(\kappa\)</span> to get <span class="math inline">\(\hat{f}^{-\kappa}(x_i^\kappa)\)</span></li>
+</ul>
+<ol start="3" style="list-style-type: decimal">
+<li>Aggregate the results <span class="math display">\[\hat{Error} = \frac{1}{N}\Sigma_{\kappa=1}^k\Sigma_{x_i^{\kappa}}L(y_i^{\kappa},\hat{f}^{-\kappa}(x_i^\kappa))\]</span></li>
+</ol>
+</blockquote>
+<p>It is a standard way to find the value of tuning parameter that gives you the best performance. It is also a way to study the variability of model performance.</p>
+<p>The following figure represents a 5-fold cross-validation example.</p>
 <div class="figure">
 <img src="images/cv5fold.png" alt="5-fold cross-validation" />
 <p class="caption">5-fold cross-validation</p>
 </div>
-<p>The process of k-fold cross-validation is as follows:</p>
-<blockquote>
-<ol style="list-style-type: decimal">
-<li>Partition the original sample into <span class="math inline">\(k\)</span> equal size folds</li>
-<li>for <span class="math inline">\(i=1…k\)</span></li>
-</ol>
-<ol style="list-style-type: lower-alpha">
-<li>Use data other than fold <span class="math inline">\(i\)</span> to train the model <span class="math inline">\(M_{i}\)</span></li>
-<li>Apply <span class="math inline">\(M_{i}\)</span> to predict fold <span class="math inline">\(i\)</span> to get <span class="math inline">\(R_{i}\)</span></li>
-</ol>
-<ol start="3" style="list-style-type: decimal">
-<li>Aggregate the results <span class="math inline">\(R_{i}\ i=1\dots k\)</span> into a performance profile</li>
-</ol>
-</blockquote>
-<p>It is a standard way to find the value of tuning parameter that gives you the best performance. It is also a way to study the variability of model performance. A special case of k-fold cross-validation is Leave One Out Cross Validation (LOOCV) where <span class="math inline">\(k=1\)</span>. When sample size is small, it is desired to use as many data to train the model. Most of the functions have default setting <span class="math inline">\(k=10\)</span>. The choice is usually 5-10 in practice, but there is no standard rule. The more folds to use, the more samples are used to fit model, and then the performance estimate is closer to the theoretical performance. However, LOOCV has high computational cost since the number of interactions is the same as the sample size and each model fit uses a subset that is nearly the same size of the training set. On the other hand, when k is small (such as 2 or 3), the computation is more efficient, but the bias and uncertainty will increase. When the sample size is big, the impact of <span class="math inline">\(k\)</span> becomes marginal.</p>
+<p>A special case of k-fold cross-validation is Leave One Out Cross Validation (LOOCV) where <span class="math inline">\(k=1\)</span>. When sample size is small, it is desired to use as many data to train the model. Most of the functions have default setting <span class="math inline">\(k=10\)</span>. The choice is usually 5-10 in practice, but there is no standard rule. The more folds to use, the more samples are used to fit model, and then the performance estimate is closer to the theoretical performance. Meanwhile, the variance of the performance is larger since the samples to fit model in different iterations are more similar. However, LOOCV has high computational cost since the number of interactions is the same as the sample size and each model fit uses a subset that is nearly the same size of the training set. On the other hand, when k is small (such as 2 or 3), the computation is more efficient, but the bias will increase. When the sample size is large, the impact of <span class="math inline">\(k\)</span> becomes marginal.</p>
+<p>Chapter 7 of <span class="citation">(Hastie T <a href="#ref-Hastie2008">2008</a>)</span> presents a more in-depth and more detailed discussion about the bias-variance trade-off in k-fold cross-validation.</p>
+<p>You can implement k-fold cross-validation using <code>createFolds()</code> in <code>caret</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(caret)
+class&lt;-sim.dat$segment
+<span class="co"># creat k-folds</span>
+<span class="kw">set.seed</span>(<span class="dv">1</span>)
+cv&lt;-<span class="kw">createFolds</span>(class,<span class="dt">k=</span><span class="dv">10</span>,<span class="dt">returnTrain=</span>T)
+<span class="kw">str</span>(cv)</code></pre></div>
+<pre><code>## List of 10
+##  $ Fold01: int [1:900] 1 2 3 4 5 6 7 8 9 10 ...
+##  $ Fold02: int [1:900] 1 2 3 4 5 6 7 9 10 11 ...
+##  $ Fold03: int [1:900] 1 2 3 4 5 6 7 8 10 11 ...
+##  $ Fold04: int [1:900] 1 2 3 4 5 6 7 8 9 11 ...
+##  $ Fold05: int [1:900] 1 3 4 6 7 8 9 10 11 12 ...
+##  $ Fold06: int [1:900] 1 2 3 4 5 6 7 8 9 10 ...
+##  $ Fold07: int [1:900] 2 3 4 5 6 7 8 9 10 11 ...
+##  $ Fold08: int [1:900] 1 2 3 4 5 8 9 10 11 12 ...
+##  $ Fold09: int [1:900] 1 2 4 5 6 7 8 9 10 11 ...
+##  $ Fold10: int [1:900] 1 2 3 5 6 7 8 9 10 11 ...</code></pre>
+<p>The above code creates ten folds (<code>k=10</code>) according to the customer segments (we set <code>class</code> to be the categorical variable <code>segment</code>). The function returns a list of 10 with the index of rows in training set.</p>
+</div>
+<div id="repeated-trainingtest-splits" class="section level4">
+<h4><span class="header-section-number">4.2.2.2</span> Repeated Training/Test Splits</h4>
+<p>In fact, this method is nothing but repeating the training/test set division on the original data. Fit the model with the training set, and evaluate the model with the test set. Unlike k-fold cross-validation, the test set generated by this procedure may have duplicate samples. A sample usually shows up in more than one test sets. There is no standard rule for split ratio and number of repetitions. The most common choice in practice is to use 75% to 80% of the total sample for training. The remaining samples are for validation. The more sample in the training set, the less biased the model performance estimate is. Increasing the repetitions can reduce the uncertainty in the performance estimates. Of course, it is at the cost of computational time when the model is complex. The number of repetitions is also related to the sample size of the test set. If the size is small, the performance estimate is more volatile. In this case, the number of repetitions needs to be higher to deal with the uncertainty of the evaluation results.</p>
+<p>We can use the same function (<code>createDataPartition ()</code>) as before. If you look back, you will see <code>times = 1</code>. The only thing to change is to set it to the number of repetitions.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">trainIndex &lt;-<span class="st"> </span><span class="kw">createDataPartition</span>(sim.dat$segment, <span class="dt">p =</span> .<span class="dv">8</span>, <span class="dt">list =</span> <span class="ot">FALSE</span>, <span class="dt">times =</span> <span class="dv">5</span>)
+dplyr::<span class="kw">glimpse</span>(trainIndex)</code></pre></div>
+<pre><code>##  int [1:800, 1:5] 1 3 4 5 6 7 8 9 10 11 ...
+##  - attr(*, &quot;dimnames&quot;)=List of 2
+##   ..$ : NULL
+##   ..$ : chr [1:5] &quot;Resample1&quot; &quot;Resample2&quot; &quot;Resample3&quot; &quot;Resample4&quot; ...</code></pre>
+<p>Once know how to split the data, the repetition comes naturally.</p>
+</div>
+<div id="bootstrap-methods" class="section level4">
+<h4><span class="header-section-number">4.2.2.3</span> Bootstrap Methods</h4>
+<p>Bootstrap is a powerful statistical tool (a little magic too). It can be used to analyze the uncertainty of parameter estimates <span class="citation">(Efron and Tibshirani <a href="#ref-bootstrap1986">1986</a>)</span> quantitatively. For example, estimate the standard deviation of linear regression coefficients. The power of this method is that it can be easily applied to each model (to put it bluntly, there is a random sampling and fitting process of putting back the data repeatedly), and some models can hardly obtain the standard deviation by using the traditional statistical inference method And confidence interval.</p>
 
 </div>
 </div>
@@ -380,6 +418,12 @@ trainSlices[[<span class="dv">1</span>]]</code></pre></div>
 </div>
 <div id="ref-Hyndman">
 <p>Hyndman, R.J., and G. Athanasopoulos. 2013. <em>Forecasting: Principles and Practice</em>. Vol. Section 2/5. OTect: Melbourne, Australia.</p>
+</div>
+<div id="ref-Hastie2008">
+<p>Hastie T, Friedman J, Tibshirani R. 2008. <em>The Elements of Statistical Learning: Data Mining, Inference and Prediction</em>. 2nd ed. Springer.</p>
+</div>
+<div id="ref-bootstrap1986">
+<p>Efron, B, and R Tibshirani. 1986. “Bootstrap Methods for Standard Errors, Confidence Intervals, and Other Measures of Statistical Accuracy.” <em>Statistical Science</em>, 54–75.</p>
 </div>
 </div>
             </section>
