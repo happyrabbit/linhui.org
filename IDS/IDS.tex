@@ -207,7 +207,7 @@
 
 \title{Introduction to Data Science}
 \author{Hui Lin and Ming Li}
-\date{2018-01-16}
+\date{2018-01-17}
 
 \usepackage{amsthm}
 \newtheorem{theorem}{Theorem}[chapter]
@@ -3443,6 +3443,8 @@ know about the problem before the future samples. Data splitting and
 resampling are fundamental techniques to build sound models for
 prediction.
 
+\subsection{Data Splitting}\label{data-splitting}
+
 \emph{Data splitting} is to put part of the data aside as testing set
 (or Hold-outs, out of bag samples) and use the rest for model training.
 Training samples are also called in-sample. Model performance metrics
@@ -3794,7 +3796,7 @@ with 100 observations to show how to implement using the function
 \caption{Divide data according to time}\label{fig:times}
 \end{figure}
 
-Fig. \ref{fig:maxdis} shows 100 simulated time series observation. The
+Fig. \ref{fig:times} shows 100 simulated time series observation. The
 goal is to make sure both training and test set to cover the whole
 period.
 
@@ -3859,9 +3861,9 @@ The first training set is consist of sample 1-36 in the dataset
 (\texttt{initialWindow\ =\ 36}). Then sample 37-48 are in the first test
 set ( \texttt{horizon\ =\ 12}). Type \texttt{head(trainSlices)} or
 \texttt{head(testSlices)} to check the later samples. If you are not
-clear about the argument \texttt{fixedWindow\ =}, try to change the
-setting to be \texttt{F} and check the change in \texttt{trainSlices}
-and \texttt{testSlices}.
+clear about the argument \texttt{fixedWindow}, try to change the setting
+to be \texttt{F} and check the change in \texttt{trainSlices} and
+\texttt{testSlices}.
 
 Understand and implement data splitting is not difficult. But there are
 two things to note:
@@ -3903,6 +3905,67 @@ that we may need resampling:
 
 We will introduce three most common resampling techniques: k-fold
 cross-validation, repeated training/test splitting, and bootstrap.
+
+\subsubsection{k-fold cross-validation}\label{k-fold-cross-validation}
+
+k-fold cross-validation is to partition the original sample into \(k\)
+equal size subsamples (folds). Use one of the \(k\) folds to validate
+the model and the rest \(k-1\) to train model. Then repeat the process
+\(k\) times with each of the \(k\) folds as the test set. Aggregate the
+results into a performance profile. The following figure represents a
+5-fold cross-validation example.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{images/cv5fold.png}
+\caption{5-fold cross-validation}
+\end{figure}
+
+The process of k-fold cross-validation is as follows:
+
+\begin{quote}
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Partition the original sample into \(k\) equal size folds
+\item
+  for \(i=1…k\)
+\end{enumerate}
+
+\begin{enumerate}
+\def\labelenumi{\alph{enumi}.}
+\tightlist
+\item
+  Use data other than fold \(i\) to train the model \(M_{i}\)
+\item
+  Apply \(M_{i}\) to predict fold \(i\) to get \(R_{i}\)
+\end{enumerate}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  Aggregate the results \(R_{i}\ i=1\dots k\) into a performance profile
+\end{enumerate}
+\end{quote}
+
+It is a standard way to find the value of tuning parameter that gives
+you the best performance. It is also a way to study the variability of
+model performance. A special case of k-fold cross-validation is Leave
+One Out Cross Validation (LOOCV) where \(k=1\). When sample size is
+small, it is desired to use as many data to train the model. Most of the
+functions have default setting \(k=10\). The choice is usually 5-10 in
+practice, but there is no standard rule. The more folds to use, the more
+samples are used to fit model, and then the performance estimate is
+closer to the theoretical performance. However, LOOCV has high
+computational cost since the number of interactions is the same as the
+sample size and each model fit uses a subset that is nearly the same
+size of the training set. On the other hand, when k is small (such as 2
+or 3), the computation is more efficient, but the bias and uncertainty
+will increase. When the sample size is big, the impact of \(k\) becomes
+marginal.
 
 \chapter{References}\label{references}
 
