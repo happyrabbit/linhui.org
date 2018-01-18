@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2018-01-17">
+<meta name="date" content="2018-01-18">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -405,7 +405,12 @@ dplyr::<span class="kw">glimpse</span>(trainIndex)</code></pre></div>
 </div>
 <div id="bootstrap-methods" class="section level4">
 <h4><span class="header-section-number">4.2.2.3</span> Bootstrap Methods</h4>
-<p>Bootstrap is a powerful statistical tool (a little magic too). It can be used to analyze the uncertainty of parameter estimates <span class="citation">(Efron and Tibshirani <a href="#ref-bootstrap1986">1986</a>)</span> quantitatively. For example, estimate the standard deviation of linear regression coefficients. The power of this method is that it can be easily applied to each model (to put it bluntly, there is a random sampling and fitting process of putting back the data repeatedly), and some models can hardly obtain the standard deviation by using the traditional statistical inference method And confidence interval.</p>
+<p>Bootstrap is a powerful statistical tool (a little magic too). It can be used to analyze the uncertainty of parameter estimates <span class="citation">(Efron and Tibshirani <a href="#ref-bootstrap1986">1986</a>)</span> quantitatively. For example, estimate the standard deviation of linear regression coefficients. The power of this method is that the concept is so simple that it can be easily applied to any model as long as the computation allows. However, you can hardly obtain the standard deviation for some models by using the traditional statistical inference.</p>
+<p>Since it is with replacement, a sample can be selected multiple times, and the bootstrap sample size is the same as the original data. So for every bootstrap set, there are some left-out samples, which is also called “out-of-bag samples.” The out-of-bag sample is used to evaluate the model. Efron points out that under normal circumstances <span class="citation">(Efron <a href="#ref-efron1983">1983</a>)</span>, bootstrap estimates the error rate of the model with more certainty.The probability of an observation <span class="math inline">\(i\)</span> in bootstrap sample B is:</p>
+<p><span class="math inline">\(\begin{array}{ccc} Pr{i\in B} &amp; = &amp; 1-\left(1-\frac{1}{N}\right)^{N}\\  &amp; \approx &amp; 1-e^{-1}\\  &amp; = &amp; 0.632 \end{array}\)</span></p>
+<p>On average, 63.2% of the observations appeared at least once in a bootstrap sample, so the estimation bias is similar to 2-fold cross-validation. As mentioned earlier, the smaller the number of folds, the larger the bias. Increasing the sample size will ease the problem. In general, bootstrap has larger bias and smaller uncertainty than cross-validation. Efron came up the following “.632 estimator” to alleviate this bias:</p>
+<p><span class="math display">\[(0.632 × original\ bootstrap\ estimate) + (0.368 × apparent\ error\ rate)\]</span></p>
+<p>The apparent error rate is the error rate when the data is used twice, both to fit the model and to check its accuracy and it is apparently over-optimistic. The modified bootstrap estimate reduces the bias but can be unstable with small samples size. This estimate can also be unduly optimistic when the model severely over-fits since the apparent error rate will be close to zero. Efron and Tibshirani <span class="citation">(Efron and Tibshirani <a href="#ref-b632plus">1997</a>)</span> discuss another technique, called the “632+ method,” for adjusting the bootstrap estimates.</p>
 
 </div>
 </div>
@@ -424,6 +429,12 @@ dplyr::<span class="kw">glimpse</span>(trainIndex)</code></pre></div>
 </div>
 <div id="ref-bootstrap1986">
 <p>Efron, B, and R Tibshirani. 1986. “Bootstrap Methods for Standard Errors, Confidence Intervals, and Other Measures of Statistical Accuracy.” <em>Statistical Science</em>, 54–75.</p>
+</div>
+<div id="ref-efron1983">
+<p>Efron, B. 1983. “Estimating the Error Rate of a Prediction Rule: Improvement on Cross-Validation.” <em>Journal of the American Statistical Association</em>, 316–31.</p>
+</div>
+<div id="ref-b632plus">
+<p>Efron, B, and R Tibshirani. 1997. “Improvements on Cross-Validation: The 632+ Bootstrap Method.” <em>Journal of the American Statistical Association</em> 92 (438): 548–60.</p>
 </div>
 </div>
             </section>

@@ -3912,16 +3912,12 @@ k-fold cross-validation is to partition the original sample into \(k\)
 equal size subsamples (folds). Use one of the \(k\) folds to validate
 the model and the rest \(k-1\) to train model. Then repeat the process
 \(k\) times with each of the \(k\) folds as the test set. Aggregate the
-results into a performance profile. The following figure represents a
-5-fold cross-validation example.
+results into a performance profile.
 
-\begin{figure}[htbp]
-\centering
-\includegraphics{images/cv5fold.png}
-\caption{5-fold cross-validation}
-\end{figure}
-
-The process of k-fold cross-validation is as follows:
+Denote by \(\hat{f}^{-\kappa}(X)\) the fitted function, computed with
+the \(\kappa^{th}\) fold removed and \(x_i^\kappa\) the predictors for
+samples in left-out fold. The process of k-fold cross-validation is as
+follows:
 
 \begin{quote}
 \begin{enumerate}
@@ -3930,42 +3926,158 @@ The process of k-fold cross-validation is as follows:
 \item
   Partition the original sample into \(k\) equal size folds
 \item
-  for \(i=1…k\)
+  for \(\kappa=1…k\)
 \end{enumerate}
 
-\begin{enumerate}
-\def\labelenumi{\alph{enumi}.}
+\begin{itemize}
 \tightlist
 \item
-  Use data other than fold \(i\) to train the model \(M_{i}\)
+  Use data other than fold \(\kappa\) to train the model
+  \(\hat{f}^{-\kappa}(X)\)
 \item
-  Apply \(M_{i}\) to predict fold \(i\) to get \(R_{i}\)
-\end{enumerate}
+  Apply \(\hat{f}^{-\kappa}(X)\) to predict fold \(\kappa\) to get
+  \(\hat{f}^{-\kappa}(x_i^\kappa)\)
+\end{itemize}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \setcounter{enumi}{2}
 \tightlist
 \item
-  Aggregate the results \(R_{i}\ i=1\dots k\) into a performance profile
+  Aggregate the results
+  \[\hat{Error} = \frac{1}{N}\Sigma_{\kappa=1}^k\Sigma_{x_i^{\kappa}}L(y_i^{\kappa},\hat{f}^{-\kappa}(x_i^\kappa))\]
 \end{enumerate}
 \end{quote}
 
 It is a standard way to find the value of tuning parameter that gives
 you the best performance. It is also a way to study the variability of
-model performance. A special case of k-fold cross-validation is Leave
-One Out Cross Validation (LOOCV) where \(k=1\). When sample size is
-small, it is desired to use as many data to train the model. Most of the
-functions have default setting \(k=10\). The choice is usually 5-10 in
-practice, but there is no standard rule. The more folds to use, the more
-samples are used to fit model, and then the performance estimate is
-closer to the theoretical performance. However, LOOCV has high
-computational cost since the number of interactions is the same as the
-sample size and each model fit uses a subset that is nearly the same
-size of the training set. On the other hand, when k is small (such as 2
-or 3), the computation is more efficient, but the bias and uncertainty
-will increase. When the sample size is big, the impact of \(k\) becomes
-marginal.
+model performance.
+
+The following figure represents a 5-fold cross-validation example.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{images/cv5fold.png}
+\caption{5-fold cross-validation}
+\end{figure}
+
+A special case of k-fold cross-validation is Leave One Out Cross
+Validation (LOOCV) where \(k=1\). When sample size is small, it is
+desired to use as many data to train the model. Most of the functions
+have default setting \(k=10\). The choice is usually 5-10 in practice,
+but there is no standard rule. The more folds to use, the more samples
+are used to fit model, and then the performance estimate is closer to
+the theoretical performance. Meanwhile, the variance of the performance
+is larger since the samples to fit model in different iterations are
+more similar. However, LOOCV has high computational cost since the
+number of interactions is the same as the sample size and each model fit
+uses a subset that is nearly the same size of the training set. On the
+other hand, when k is small (such as 2 or 3), the computation is more
+efficient, but the bias will increase. When the sample size is large,
+the impact of \(k\) becomes marginal.
+
+Chapter 7 of \citep{Hastie2008} presents a more in-depth and more
+detailed discussion about the bias-variance trade-off in k-fold
+cross-validation.
+
+You can implement k-fold cross-validation using \texttt{createFolds()}
+in \texttt{caret}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(caret)}
+\NormalTok{class<-sim.dat$segment}
+\CommentTok{# creat k-folds}
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{1}\NormalTok{)}
+\NormalTok{cv<-}\KeywordTok{createFolds}\NormalTok{(class,}\DataTypeTok{k=}\DecValTok{10}\NormalTok{,}\DataTypeTok{returnTrain=}\NormalTok{T)}
+\KeywordTok{str}\NormalTok{(cv)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## List of 10
+##  $ Fold01: int [1:900] 1 2 3 4 5 6 7 8 9 10 ...
+##  $ Fold02: int [1:900] 1 2 3 4 5 6 7 9 10 11 ...
+##  $ Fold03: int [1:900] 1 2 3 4 5 6 7 8 10 11 ...
+##  $ Fold04: int [1:900] 1 2 3 4 5 6 7 8 9 11 ...
+##  $ Fold05: int [1:900] 1 3 4 6 7 8 9 10 11 12 ...
+##  $ Fold06: int [1:900] 1 2 3 4 5 6 7 8 9 10 ...
+##  $ Fold07: int [1:900] 2 3 4 5 6 7 8 9 10 11 ...
+##  $ Fold08: int [1:900] 1 2 3 4 5 8 9 10 11 12 ...
+##  $ Fold09: int [1:900] 1 2 4 5 6 7 8 9 10 11 ...
+##  $ Fold10: int [1:900] 1 2 3 5 6 7 8 9 10 11 ...
+\end{verbatim}
+
+The above code creates ten folds (\texttt{k=10}) according to the
+customer segments (we set \texttt{class} to be the categorical variable
+\texttt{segment}). The function returns a list of 10 with the index of
+rows in training set.
+
+\subsubsection{Repeated Training/Test
+Splits}\label{repeated-trainingtest-splits}
+
+In fact, this method is nothing but repeating the training/test set
+division on the original data. Fit the model with the training set, and
+evaluate the model with the test set. Unlike k-fold cross-validation,
+the test set generated by this procedure may have duplicate samples. A
+sample usually shows up in more than one test sets. There is no standard
+rule for split ratio and number of repetitions. The most common choice
+in practice is to use 75\% to 80\% of the total sample for training. The
+remaining samples are for validation. The more sample in the training
+set, the less biased the model performance estimate is. Increasing the
+repetitions can reduce the uncertainty in the performance estimates. Of
+course, it is at the cost of computational time when the model is
+complex. The number of repetitions is also related to the sample size of
+the test set. If the size is small, the performance estimate is more
+volatile. In this case, the number of repetitions needs to be higher to
+deal with the uncertainty of the evaluation results.
+
+We can use the same function (\texttt{createDataPartition\ ()}) as
+before. If you look back, you will see \texttt{times\ =\ 1}. The only
+thing to change is to set it to the number of repetitions.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{trainIndex <-}\StringTok{ }\KeywordTok{createDataPartition}\NormalTok{(sim.dat$segment, }\DataTypeTok{p =} \NormalTok{.}\DecValTok{8}\NormalTok{, }\DataTypeTok{list =} \OtherTok{FALSE}\NormalTok{, }\DataTypeTok{times =} \DecValTok{5}\NormalTok{)}
+\NormalTok{dplyr::}\KeywordTok{glimpse}\NormalTok{(trainIndex)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  int [1:800, 1:5] 1 3 4 5 6 7 8 9 10 11 ...
+##  - attr(*, "dimnames")=List of 2
+##   ..$ : NULL
+##   ..$ : chr [1:5] "Resample1" "Resample2" "Resample3" "Resample4" ...
+\end{verbatim}
+
+Once know how to split the data, the repetition comes naturally.
+
+\subsubsection{Bootstrap Methods}\label{bootstrap-methods}
+
+Bootstrap is a powerful statistical tool (a little magic too). It can be
+used to analyze the uncertainty of parameter estimates
+\citep{bootstrap1986} quantitatively. For example, estimate the standard
+deviation of linear regression coefficients. The power of this method is
+that the concept is so simple that it can be easily applied to any model
+as long as the computation allows. However, you can hardly obtain the
+standard deviation for some models by using the traditional statistical
+inference.
+
+Since it is with replacement, a sample can be selected multiple times,
+and the bootstrap sample size is the same as the original data. So for
+every bootstrap set, there are some left-out samples, which is also
+called ``out-of-bag samples.'' The out-of-bag sample is used to evaluate
+the model. Efron points out that under normal circumstances
+\citep{efron1983}, bootstrap estimates the error rate of the model with
+more certainty. On average, 63.2\% of the sample spots appeared at least
+once in a bootstrap sample, so the estimation bias is similar to 2-fold
+cross-validation. As mentioned earlier, the smaller the number of folds,
+the larger the bias. Increasing the sample size will ease the problem.
+In general, bootstrap has larger bias and smaller uncertainty than
+cross-validation. Efron made improvements to the original bootstrap bias
+and came up the following 632-method:
+
+\[(0.632 × original bootstrap estimate) + (0.368 × apparent error rate)\]
 
 \chapter{References}\label{references}
 
