@@ -207,7 +207,7 @@
 
 \title{Introduction to Data Science}
 \author{Hui Lin and Ming Li}
-\date{2018-01-17}
+\date{2018-01-18}
 
 \usepackage{amsthm}
 \newtheorem{theorem}{Theorem}[chapter]
@@ -2873,6 +2873,1035 @@ between \texttt{income} and \texttt{gender}. You can do this by adding
 
 \subsection{Data Cleaning}\label{data-cleaning-1}
 
+\chapter{Data Wrangling}\label{data-wrangling}
+
+This chapter focuses on some of the most frequently used data
+manipulations and shows how to implement them in R and Python. It is
+critical to explore the data with descriptive statistics (mean, standard
+deviation, etc.) and data visualization before analysis. Transform data
+so that the data structure is in line with the requirements of the
+model. You also need to summarize the results after analysis.
+
+\section{Data Wrangling Using R}\label{data-wrangling-using-r}
+
+\subsection{Read and write data}\label{read-and-write-data}
+
+\subsubsection{\texorpdfstring{\texttt{readr}}{readr}}\label{readr}
+
+You must be familiar with \texttt{read.csv()}, \texttt{read.table()} and
+\texttt{write.csv()} in base R. Here we will introduce a more efficient
+package from RStudio in 2015 for reading and writing data:
+\texttt{readr} package. The corresponding functions are
+\texttt{read\_csv()}, \texttt{read\_table()} and \texttt{write\_csv()}.
+The commands look quite similar, but \texttt{readr} is different in the
+following respects:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  It is 10x faster. The trick is that \texttt{readr} uses C++ to process
+  the data quickly.
+\item
+  It doesn't change the column names. The names can start with a number
+  and ``\texttt{.}'' will not be substituted to ``\texttt{\_}''. For
+  example:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(readr)}
+\KeywordTok{read_csv}\NormalTok{(}\StringTok{"2015,2016,2017}
+\StringTok{1,2,3}
+\StringTok{4,5,6"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 2 x 3
+##   `2015` `2016` `2017`
+##    <int>  <int>  <int>
+## 1      1      2      3
+## 2      4      5      6
+\end{verbatim}
+\item
+  \texttt{readr} functions do not convert strings to factors by default,
+  are able to parse dates and times and can automatically determine the
+  data types in each column.
+\item
+  The killing character, in my opinion, is that \texttt{readr} provides
+  \textbf{progress bar}. What makes you feel worse than waiting is not
+  knowing how long you have to wait.
+\end{enumerate}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{images/prograssbar.png}
+\caption{}
+\end{figure}
+
+The major functions of readr is to turn flat files into data frames:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{read\_csv()}: reads comma delimited files
+\item
+  \texttt{read\_csv2()}: reads semicolon separated files (common in
+  countries where \texttt{,} is used as the decimal place)
+\item
+  \texttt{read\_tsv()}: reads tab delimited files
+\item
+  \texttt{read\_delim()}: reads in files with any delimiter
+\item
+  \texttt{read\_fwf()}: reads fixed width files. You can specify fields
+  either by their widths with \texttt{fwf\_widths()} or their position
+  with \texttt{fwf\_positions()}\\
+\item
+  \texttt{read\_table()}: reads a common variation of fixed width files
+  where columns are separated by white space
+\item
+  \texttt{read\_log()}: reads Apache style log files
+\end{itemize}
+
+The good thing is that those functions have similar syntax. Once you
+learn one, the others become easy. Here we will focus on
+\texttt{read\_csv()}.
+
+The most important information for \texttt{read\_csv()} is the path to
+your data:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(readr)}
+\NormalTok{sim.dat <-}\StringTok{ }\KeywordTok{read_csv}\NormalTok{(}\StringTok{"https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv "}\NormalTok{)}
+\KeywordTok{head}\NormalTok{(sim.dat)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 6 x 19
+##     age gender income house store_exp online_exp
+##   <int>  <chr>  <dbl> <chr>     <dbl>      <dbl>
+## 1    57 Female 120963   Yes     529.1      303.5
+## 2    63 Female 122008   Yes     478.0      109.5
+## 3    59   Male 114202   Yes     490.8      279.2
+## 4    60   Male 113616   Yes     347.8      141.7
+## 5    51   Male 124253   Yes     379.6      112.2
+## 6    59   Male 107661   Yes     338.3      195.7
+## # ... with 13 more variables: store_trans <int>,
+## #   online_trans <int>, Q1 <int>, Q2 <int>, Q3 <int>,
+## #   Q4 <int>, Q5 <int>, Q6 <int>, Q7 <int>, Q8 <int>,
+## #   Q9 <int>, Q10 <int>, segment <chr>
+\end{verbatim}
+
+The function reads the file to R as a \texttt{tibble}. You can consider
+\texttt{tibble} as next iteration of the data frame. They are different
+with data frame for the following aspects:
+
+\begin{itemize}
+\tightlist
+\item
+  It never changes an input's type (i.e., no more
+  \texttt{stringsAsFactors\ =\ FALSE}!)
+\item
+  It never adjusts the names of variables
+\item
+  It has a refined print method that shows only the first 10 rows and
+  all the columns that fit on the screen. You can also control the
+  default print behavior by setting options.
+\end{itemize}
+
+Refer to \url{http://r4ds.had.co.nz/tibbles.html} for more information
+about `tibble'.
+
+When you run \texttt{read\_csv()} it prints out a column specification
+that gives the name and type of each column. To better understanding how
+\texttt{readr} works, it is helpful to type in some baby data set and
+check the results:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dat=}\KeywordTok{read_csv}\NormalTok{(}\StringTok{"2015,2016,2017}
+\StringTok{100,200,300}
+\StringTok{canola,soybean,corn"}\NormalTok{)}
+\KeywordTok{print}\NormalTok{(dat)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 2 x 3
+##   `2015`  `2016` `2017`
+##    <chr>   <chr>  <chr>
+## 1    100     200    300
+## 2 canola soybean   corn
+\end{verbatim}
+
+You can also add comments on the top and tell R to skip those lines:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dat=}\KeywordTok{read_csv}\NormalTok{(}\StringTok{"# I will never let you know that}
+\StringTok{          # my favorite food is carrot}
+\StringTok{          Date,Food,Mood}
+\StringTok{          Monday,carrot,happy}
+\StringTok{          Tuesday,carrot,happy}
+\StringTok{          Wednesday,carrot,happy}
+\StringTok{          Thursday,carrot,happy}
+\StringTok{          Friday,carrot,happy}
+\StringTok{          Saturday,carrot,extremely happy}
+\StringTok{          Sunday,carrot,extremely happy"}\NormalTok{, }\DataTypeTok{skip =} \DecValTok{2}\NormalTok{)}
+\KeywordTok{print}\NormalTok{(dat)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 7 x 3
+##        Date   Food            Mood
+##       <chr>  <chr>           <chr>
+## 1    Monday carrot           happy
+## 2   Tuesday carrot           happy
+## 3 Wednesday carrot           happy
+## 4  Thursday carrot           happy
+## 5    Friday carrot           happy
+## 6  Saturday carrot extremely happy
+## 7    Sunday carrot extremely happy
+\end{verbatim}
+
+If you don't have column names, set \texttt{col\_names\ =\ FALSE} then R
+will assign names ``\texttt{X1}'',``\texttt{X2}''\ldots{} to the
+columns:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dat=}\KeywordTok{read_csv}\NormalTok{(}\StringTok{"Saturday,carrot,extremely happy}
+\StringTok{          Sunday,carrot,extremely happy"}\NormalTok{, }\DataTypeTok{col_names=}\OtherTok{FALSE}\NormalTok{)}
+\KeywordTok{print}\NormalTok{(dat)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 2 x 3
+##         X1     X2              X3
+##      <chr>  <chr>           <chr>
+## 1 Saturday carrot extremely happy
+## 2   Sunday carrot extremely happy
+\end{verbatim}
+
+You can also pass \texttt{col\_names} a character vector which will be
+used as the column names. Try to replace \texttt{col\_names=FALSE} with
+\texttt{col\_names=c("Date","Food","Mood")} and see what happen.
+
+As mentioned before, you can use \texttt{read\_csv2()} to read semicolon
+separated files:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dat=}\KeywordTok{read_csv2}\NormalTok{(}\StringTok{"Saturday; carrot; extremely happy }\CharTok{\textbackslash{}n}\StringTok{ Sunday; carrot; extremely happy"}\NormalTok{, }\DataTypeTok{col_names=}\OtherTok{FALSE}\NormalTok{)}
+\KeywordTok{print}\NormalTok{(dat)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 2 x 3
+##         X1     X2              X3
+##      <chr>  <chr>           <chr>
+## 1 Saturday carrot extremely happy
+## 2   Sunday carrot extremely happy
+\end{verbatim}
+
+Here ``\texttt{\textbackslash{}n}'' is a convenient shortcut for adding
+a new line.
+
+You can use \texttt{read\_tsv()} to read tab delimited files：
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dat=}\KeywordTok{read_tsv}\NormalTok{(}\StringTok{"every}\CharTok{\textbackslash{}t}\StringTok{man}\CharTok{\textbackslash{}t}\StringTok{is}\CharTok{\textbackslash{}t}\StringTok{a}\CharTok{\textbackslash{}t}\StringTok{poet}\CharTok{\textbackslash{}t}\StringTok{when}\CharTok{\textbackslash{}t}\StringTok{he}\CharTok{\textbackslash{}t}\StringTok{is}\CharTok{\textbackslash{}t}\StringTok{in}\CharTok{\textbackslash{}t}\StringTok{love}\CharTok{\textbackslash{}n}\StringTok{"}\NormalTok{, }\DataTypeTok{col_names =} \OtherTok{FALSE}\NormalTok{)}
+\KeywordTok{print}\NormalTok{(dat)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 1 x 10
+##      X1    X2    X3    X4    X5    X6    X7    X8
+##   <chr> <chr> <chr> <chr> <chr> <chr> <chr> <chr>
+## 1 every   man    is     a  poet  when    he    is
+## # ... with 2 more variables: X9 <chr>, X10 <chr>
+\end{verbatim}
+
+Or more generally, you can use \texttt{read\_delim()} and assign
+separating character：
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dat=}\KeywordTok{read_delim}\NormalTok{(}\StringTok{"THE|UNBEARABLE|RANDOMNESS|OF|LIFE}\CharTok{\textbackslash{}n}\StringTok{"}\NormalTok{, }\DataTypeTok{delim =} \StringTok{"|"}\NormalTok{, }\DataTypeTok{col_names =} \OtherTok{FALSE}\NormalTok{)}
+\KeywordTok{print}\NormalTok{(dat)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 1 x 5
+##      X1         X2         X3    X4    X5
+##   <chr>      <chr>      <chr> <chr> <chr>
+## 1   THE UNBEARABLE RANDOMNESS    OF  LIFE
+\end{verbatim}
+
+Another situation you will often run into is the missing value. In
+marketing survey, people like to use ``99'' to represent missing. You
+can tell R to set all observation with value ``99'' as missing when you
+read the data:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dat=}\KeywordTok{read_csv}\NormalTok{(}\StringTok{"Q1,Q2,Q3}
+\StringTok{               5, 4,99"}\NormalTok{,}\DataTypeTok{na=}\StringTok{"99"}\NormalTok{)}
+\KeywordTok{print}\NormalTok{(dat)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 1 x 3
+##      Q1    Q2    Q3
+##   <int> <int> <chr>
+## 1     5     4  <NA>
+\end{verbatim}
+
+For writing data back to disk, you can use \texttt{write\_csv()} and
+\texttt{write\_tsv()}. The following two characters of the two functions
+increase the chances of the output file being read back in correctly:
+
+\begin{itemize}
+\tightlist
+\item
+  Encode strings in UTF-8
+\item
+  Save dates and date-times in ISO8601 format so they are easily parsed
+  elsewhere
+\end{itemize}
+
+For example:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{write_csv}\NormalTok{(sim.dat, }\StringTok{"sim_dat.csv"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+For other data types, you can use the following packages:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{Haven}: SPSS, Stata and SAS data
+\item
+  \texttt{Readxl} and \texttt{xlsx}: excel data(.xls and .xlsx)
+\item
+  \texttt{DBI}: given data base, such as RMySQL, RSQLite and
+  RPostgreSQL, read data directly from the database using SQL
+\end{itemize}
+
+Some other useful materials:
+
+\begin{itemize}
+\tightlist
+\item
+  For getting data from the internet, you can refer to the book ``XML
+  and Web Technologies for Data Sciences with R''.\\
+\item
+  \href{https://cran.r-project.org/doc/manuals/r-release/R-data.html\#Acknowledgements}{R
+  data import/export manual}
+\item
+  \texttt{rio} package：\url{https://github.com/leeper/rio}
+\end{itemize}
+
+\subsubsection{\texorpdfstring{\texttt{data.table}--- enhanced
+\texttt{data.frame}}{data.table--- enhanced data.frame}}\label{data.table-enhanced-data.frame}
+
+What is \texttt{data.table}? It is an R package that provides an
+enhanced version of \texttt{data.frame}. The most used object in R is
+\texttt{data\ frame}. Before we move on, let's briefly review some basic
+characters and manipulations of data.frame:
+
+\begin{itemize}
+\tightlist
+\item
+  It is a set of rows and columns.
+\item
+  Each row is of the same length and data type
+\item
+  Every column is of the same length but can be of differing data types
+\item
+  It has characteristics of both a matrix and a list
+\item
+  It uses \texttt{{[}{]}} to subset data
+\end{itemize}
+
+We will use the clothes customer data to illustrate. There are two
+dimensions in \texttt{{[}{]}}. The first one indicates the row and
+second one indicates column. It uses a comma to separate them.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# read data}
+\NormalTok{sim.dat<-readr::}\KeywordTok{read_csv}\NormalTok{(}\StringTok{"https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv"}\NormalTok{)}
+\CommentTok{# subset the first two rows}
+\NormalTok{sim.dat[}\DecValTok{1}\NormalTok{:}\DecValTok{2}\NormalTok{,]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 2 x 19
+##     age gender income house store_exp online_exp
+##   <int>  <chr>  <dbl> <chr>     <dbl>      <dbl>
+## 1    57 Female 120963   Yes     529.1      303.5
+## 2    63 Female 122008   Yes     478.0      109.5
+## # ... with 13 more variables: store_trans <int>,
+## #   online_trans <int>, Q1 <int>, Q2 <int>, Q3 <int>,
+## #   Q4 <int>, Q5 <int>, Q6 <int>, Q7 <int>, Q8 <int>,
+## #   Q9 <int>, Q10 <int>, segment <chr>
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# subset the first two rows and column 3 and 5}
+\NormalTok{sim.dat[}\DecValTok{1}\NormalTok{:}\DecValTok{2}\NormalTok{,}\KeywordTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{,}\DecValTok{5}\NormalTok{)]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 2 x 2
+##   income store_exp
+##    <dbl>     <dbl>
+## 1 120963     529.1
+## 2 122008     478.0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# get all rows with age>70}
+\NormalTok{sim.dat[sim.dat$age>}\DecValTok{70}\NormalTok{,]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 1 x 19
+##     age gender income house store_exp online_exp
+##   <int>  <chr>  <dbl> <chr>     <dbl>      <dbl>
+## 1   300   Male 208017   Yes      5077       6053
+## # ... with 13 more variables: store_trans <int>,
+## #   online_trans <int>, Q1 <int>, Q2 <int>, Q3 <int>,
+## #   Q4 <int>, Q5 <int>, Q6 <int>, Q7 <int>, Q8 <int>,
+## #   Q9 <int>, Q10 <int>, segment <chr>
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# get rows with age> 60 and gender is Male}
+\CommentTok{# select column 3 and 4}
+\NormalTok{sim.dat[sim.dat$age>}\DecValTok{68} \NormalTok{&}\StringTok{ }\NormalTok{sim.dat$gender ==}\StringTok{ "Male"}\NormalTok{, }\DecValTok{3}\NormalTok{:}\DecValTok{4}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 2 x 2
+##   income house
+##    <dbl> <chr>
+## 1 119552    No
+## 2 208017   Yes
+\end{verbatim}
+
+Remember that there are usually different ways to conduct the same
+manipulation. For example, the following code presents three ways to
+calculate an average number of online transactions for male and female:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{tapply}\NormalTok{(sim.dat$online_trans, sim.dat$gender, mean )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Female   Male 
+##  15.38  11.26
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{aggregate}\NormalTok{(online_trans ~}\StringTok{ }\NormalTok{gender, }\DataTypeTok{data =} \NormalTok{sim.dat, mean)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   gender online_trans
+## 1 Female        15.38
+## 2   Male        11.26
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(dplyr)}
+\NormalTok{sim.dat%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(gender)%>%}
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{Avg_online_trans=}\KeywordTok{mean}\NormalTok{(online_trans))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 2 x 2
+##   gender Avg_online_trans
+##    <chr>            <dbl>
+## 1 Female            15.38
+## 2   Male            11.26
+\end{verbatim}
+
+There is no gold standard to choose a specific function to manipulate
+data. The goal is to solve the real problem, not the tool itself. So
+just use whatever tool that is convenient for you.
+
+The way to use \texttt{{[}{]}} is straightforward. But the manipulations
+are limited. If you need more complicated data reshaping or aggregation,
+there are other packages to use such as \texttt{dplyr},
+\texttt{reshape2}, \texttt{tidyr} etc. But the usage of those packages
+are not as straightforward as \texttt{{[}{]}}. You often need to change
+functions. Keeping related operations together, such as subset, group,
+update, join etc, will allow for:
+
+\begin{itemize}
+\tightlist
+\item
+  concise, consistent and readable syntax irrespective of the set of
+  operations you would like to perform to achieve your end goal
+\item
+  performing data manipulation fluidly without the cognitive burden of
+  having to change among different functions
+\item
+  by knowing precisely the data required for each operation, you can
+  automatically optimize operations effectively
+\end{itemize}
+
+\texttt{data.table} is the package for that. If you are not familiar
+with other data manipulating packages and are interested in reducing
+programming time tremendously, then this package is for you.
+
+Other than extending the function of \texttt{{[}{]}},
+\texttt{data.table} has the following advantages:
+
+Offers fast import, subset, grouping, update, and joins for large data
+files It is easy to turn data frame to data table Can behave just like a
+data frame
+
+You need to install and load the package:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# If you haven't install it, use the code to instal}
+\CommentTok{# install.packages("data.table")}
+\CommentTok{# load packagw}
+\KeywordTok{library}\NormalTok{(data.table)}
+\end{Highlighting}
+\end{Shaded}
+
+Use \texttt{data.table()} to covert the existing data frame
+\texttt{sim.dat} to data table:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dt <-}\StringTok{ }\KeywordTok{data.table}\NormalTok{(sim.dat)}
+\KeywordTok{class}\NormalTok{(dt)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "data.table" "data.frame"
+\end{verbatim}
+
+Calculate mean for counts of online transactions:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dt[, }\KeywordTok{mean}\NormalTok{(online_trans)]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 13.55
+\end{verbatim}
+
+You can't do the same thing using data frame:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sim.dat[,}\KeywordTok{mean}\NormalTok{(online_trans)]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Error in mean(online_trans) : object 'online_trans' not found}
+\end{Highlighting}
+\end{Shaded}
+
+If you want to calculate mean by group as before, set ``\texttt{by\ =}''
+argument:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dt[ , }\KeywordTok{mean}\NormalTok{(online_trans), by =}\StringTok{ }\NormalTok{gender]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    gender    V1
+## 1: Female 15.38
+## 2:   Male 11.26
+\end{verbatim}
+
+You can group by more than one variables. For example, group by
+``\texttt{gender}'' and ``\texttt{house}'':
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dt[ , }\KeywordTok{mean}\NormalTok{(online_trans), by =}\StringTok{ }\NormalTok{.(gender, house)]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    gender house     V1
+## 1: Female   Yes 11.312
+## 2:   Male   Yes  8.772
+## 3: Female    No 19.146
+## 4:   Male    No 16.486
+\end{verbatim}
+
+Assign column names for aggregated variables:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dt[ , .(}\DataTypeTok{avg =} \KeywordTok{mean}\NormalTok{(online_trans)), by =}\StringTok{ }\NormalTok{.(gender, house)]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    gender house    avg
+## 1: Female   Yes 11.312
+## 2:   Male   Yes  8.772
+## 3: Female    No 19.146
+## 4:   Male    No 16.486
+\end{verbatim}
+
+\texttt{data.table} can accomplish all operations that
+\texttt{aggregate()} and \texttt{tapply()}can do for data frame.
+
+\begin{itemize}
+\tightlist
+\item
+  General setting of \texttt{data.table}
+\end{itemize}
+
+Different from data frame, there are three arguments for data table:
+
+\includegraphics{images/datable1.png}
+
+It is analogous to SQL. You don't have to know SQL to learn data table.
+But experience with SQL will help you understand data table. In SQL, you
+select column \texttt{j} (use command \texttt{SELECT}) for row
+\texttt{i} (using command \texttt{WHERE}). \texttt{GROUP\ BY} in SQL
+will assign the variable to group the observations.
+
+\includegraphics{images/rSQL.png}
+
+Let's review our previous code:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dt[ , }\KeywordTok{mean}\NormalTok{(online_trans), by =}\StringTok{ }\NormalTok{gender]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    gender    V1
+## 1: Female 15.38
+## 2:   Male 11.26
+\end{verbatim}
+
+The code above is equal to the following SQL：
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT}  \NormalTok{gender, }\FunctionTok{avg}\NormalTok{(online_trans) }\KeywordTok{FROM} \NormalTok{sim.dat }\KeywordTok{GROUP} \KeywordTok{BY} \NormalTok{gender}
+\end{Highlighting}
+\end{Shaded}
+
+R code:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dt[ , .(}\DataTypeTok{avg =} \KeywordTok{mean}\NormalTok{(online_trans)), by =}\StringTok{ }\NormalTok{.(gender, house)]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    gender house    avg
+## 1: Female   Yes 11.312
+## 2:   Male   Yes  8.772
+## 3: Female    No 19.146
+## 4:   Male    No 16.486
+\end{verbatim}
+
+is equal to SQL：
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT} \NormalTok{gender, house, }\FunctionTok{avg}\NormalTok{(online_trans) }\KeywordTok{AS} \FunctionTok{avg} \KeywordTok{FROM} \NormalTok{sim.dat }\KeywordTok{GROUP} \KeywordTok{BY} \NormalTok{gender, house}
+\end{Highlighting}
+\end{Shaded}
+
+R code：
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dt[ age <}\StringTok{ }\DecValTok{40}\NormalTok{, .(}\DataTypeTok{avg =} \KeywordTok{mean}\NormalTok{(online_trans)), by =}\StringTok{ }\NormalTok{.(gender, house)]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    gender house   avg
+## 1:   Male   Yes 14.46
+## 2: Female   Yes 18.14
+## 3:   Male    No 18.24
+## 4: Female    No 20.10
+\end{verbatim}
+
+is equal to SQL：
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT} \NormalTok{gender, house, }\FunctionTok{avg}\NormalTok{(online_trans) }\KeywordTok{AS} \FunctionTok{avg} \KeywordTok{FROM} \NormalTok{sim.dat }\KeywordTok{WHERE} \NormalTok{age < }\DecValTok{40} \KeywordTok{GROUP} \KeywordTok{BY} \NormalTok{gender, house}
+\end{Highlighting}
+\end{Shaded}
+
+You can see the analogy between \texttt{data.table} and \texttt{SQL}.
+Now let's focus on operations in data table.
+
+\begin{itemize}
+\tightlist
+\item
+  select row
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# select rows with age<20 and income > 80000}
+\NormalTok{dt[age <}\StringTok{ }\DecValTok{20} \NormalTok{&}\StringTok{ }\NormalTok{income >}\StringTok{ }\DecValTok{80000}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    age gender income house store_exp online_exp
+## 1:  19 Female  83535    No     227.7       1491
+## 2:  18 Female  89416   Yes     209.5       1926
+## 3:  19 Female  92813    No     186.7       1042
+##    store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9
+## 1:           1           22  2  1  1  2  4  1  4  2  4
+## 2:           3           28  2  1  1  1  4  1  4  2  4
+## 3:           2           18  3  1  1  2  4  1  4  3  4
+##    Q10 segment
+## 1:   1   Style
+## 2:   1   Style
+## 3:   1   Style
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# select the first two rows}
+\NormalTok{dt[}\DecValTok{1}\NormalTok{:}\DecValTok{2}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    age gender income house store_exp online_exp
+## 1:  57 Female 120963   Yes     529.1      303.5
+## 2:  63 Female 122008   Yes     478.0      109.5
+##    store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9
+## 1:           2            2  4  2  1  2  1  4  1  4  2
+## 2:           4            2  4  1  1  2  1  4  1  4  1
+##    Q10 segment
+## 1:   4   Price
+## 2:   4   Price
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  select column
+\end{itemize}
+
+Selecting columns in \texttt{data.table} don't need \texttt{\$}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# select column “age” but return it as a vector}
+\CommentTok{# the argument for row is empty so the result will return all observations}
+\NormalTok{ans <-}\StringTok{ }\NormalTok{dt[, age]}
+\KeywordTok{head}\NormalTok{(ans)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 57 63 59 60 51 59
+\end{verbatim}
+
+To return \texttt{data.table} object, put column names in
+\texttt{list()}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Select age and online_exp columns and return as a data.table instead}
+\NormalTok{ans <-}\StringTok{ }\NormalTok{dt[, }\KeywordTok{list}\NormalTok{(age, online_exp)]}
+\KeywordTok{head}\NormalTok{(ans)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    age online_exp
+## 1:  57      303.5
+## 2:  63      109.5
+## 3:  59      279.2
+## 4:  60      141.7
+## 5:  51      112.2
+## 6:  59      195.7
+\end{verbatim}
+
+Or you can also put column names in \texttt{.()}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ans <-}\StringTok{ }\NormalTok{dt[, .(age, online_exp)]}
+\CommentTok{# head(ans)}
+\end{Highlighting}
+\end{Shaded}
+
+To select all columns from ``\texttt{age}'' to ``\texttt{income}'':
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ans <-}\StringTok{ }\NormalTok{dt[, age:income, with =}\StringTok{ }\OtherTok{FALSE}\NormalTok{]}
+\KeywordTok{head}\NormalTok{(ans,}\DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    age gender income
+## 1:  57 Female 120963
+## 2:  63 Female 122008
+\end{verbatim}
+
+Delete columns using \texttt{-} or \texttt{!}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# delete columns from  age to online_exp}
+\NormalTok{ans <-}\StringTok{ }\NormalTok{dt[, -(age:online_exp), with =}\StringTok{ }\OtherTok{FALSE}\NormalTok{]}
+\NormalTok{ans <-}\StringTok{ }\NormalTok{dt[, !(age:online_exp), with =}\StringTok{ }\OtherTok{FALSE}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
+\item
+  tabulation
+\end{itemize}
+
+In data table. \texttt{.N} means to count。
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# row count}
+\NormalTok{dt[, .N] }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1000
+\end{verbatim}
+
+If you assign the group variable, then it will count by groups:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# counts by gender}
+\NormalTok{dt[, .N, by=}\StringTok{ }\NormalTok{gender]  }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    gender   N
+## 1: Female 554
+## 2:   Male 446
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# for those younger than 30, count by gender}
+ \NormalTok{dt[age <}\StringTok{ }\DecValTok{30}\NormalTok{, .(}\DataTypeTok{count=}\NormalTok{.N), by=}\StringTok{ }\NormalTok{gender] }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    gender count
+## 1: Female   292
+## 2:   Male    86
+\end{verbatim}
+
+Order table:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# get records with the highest 5 online expense:}
+\KeywordTok{head}\NormalTok{(dt[}\KeywordTok{order}\NormalTok{(-online_exp)],}\DecValTok{5}\NormalTok{) }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    age gender income house store_exp online_exp
+## 1:  40 Female 217600    No      7024       9479
+## 2:  41 Female     NA   Yes      3787       8638
+## 3:  36   Male 228550   Yes      3280       8221
+## 4:  31 Female 159508   Yes      5177       8006
+## 5:  43 Female 190407   Yes      4695       7876
+##    store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9
+## 1:          10            6  1  4  5  4  3  4  4  1  4
+## 2:          14           10  1  4  4  4  4  4  4  1  4
+## 3:           8           12  1  4  5  4  4  4  4  1  4
+## 4:          11           13  1  4  4  4  4  4  4  1  4
+## 5:           6           11  1  4  5  4  4  4  4  1  4
+##    Q10     segment
+## 1:   2 Conspicuous
+## 2:   2 Conspicuous
+## 3:   1 Conspicuous
+## 4:   2 Conspicuous
+## 5:   2 Conspicuous
+\end{verbatim}
+
+Since data table keep some characters of data frame, they share some
+operations:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dt[}\KeywordTok{order}\NormalTok{(-online_exp)][}\DecValTok{1}\NormalTok{:}\DecValTok{5}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    age gender income house store_exp online_exp
+## 1:  40 Female 217600    No      7024       9479
+## 2:  41 Female     NA   Yes      3787       8638
+## 3:  36   Male 228550   Yes      3280       8221
+## 4:  31 Female 159508   Yes      5177       8006
+## 5:  43 Female 190407   Yes      4695       7876
+##    store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9
+## 1:          10            6  1  4  5  4  3  4  4  1  4
+## 2:          14           10  1  4  4  4  4  4  4  1  4
+## 3:           8           12  1  4  5  4  4  4  4  1  4
+## 4:          11           13  1  4  4  4  4  4  4  1  4
+## 5:           6           11  1  4  5  4  4  4  4  1  4
+##    Q10     segment
+## 1:   2 Conspicuous
+## 2:   2 Conspicuous
+## 3:   1 Conspicuous
+## 4:   2 Conspicuous
+## 5:   2 Conspicuous
+\end{verbatim}
+
+You can also order the table by more than one variable. The following
+code will order the table by \texttt{gender}, then order within
+\texttt{gender} by \texttt{online\_exp}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dt[}\KeywordTok{order}\NormalTok{(gender, -online_exp)][}\DecValTok{1}\NormalTok{:}\DecValTok{5}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    age gender income house store_exp online_exp
+## 1:  40 Female 217600    No      7024       9479
+## 2:  41 Female     NA   Yes      3787       8638
+## 3:  31 Female 159508   Yes      5177       8006
+## 4:  43 Female 190407   Yes      4695       7876
+## 5:  50 Female 263858   Yes      5814       7449
+##    store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9
+## 1:          10            6  1  4  5  4  3  4  4  1  4
+## 2:          14           10  1  4  4  4  4  4  4  1  4
+## 3:          11           13  1  4  4  4  4  4  4  1  4
+## 4:           6           11  1  4  5  4  4  4  4  1  4
+## 5:          11           11  1  4  5  4  4  4  4  1  4
+##    Q10     segment
+## 1:   2 Conspicuous
+## 2:   2 Conspicuous
+## 3:   2 Conspicuous
+## 4:   2 Conspicuous
+## 5:   1 Conspicuous
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  Use \texttt{fread()} to import dat
+\end{itemize}
+
+Other than \texttt{read.csv} in base R, we have introduced `read\_csv'
+in `readr'. \texttt{read\_csv} is much faster and will provide progress
+bar which makes user feel much better (at least make me feel better).
+\texttt{fread()} in \texttt{data.table} further increase the efficiency
+of reading data. The following are three examples of reading the same
+data file \texttt{topic.csv}. The file includes text data scraped from
+an agriculture forum with 209670 rows and 6 columns:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{system.time}\NormalTok{(topic<-}\KeywordTok{read.csv}\NormalTok{(}\StringTok{"https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/topic.csv"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+  \NormalTok{user  system elapsed }
+  \NormalTok{4.313   0.027   4.340}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{system.time}\NormalTok{(topic<-readr::}\KeywordTok{read_csv}\NormalTok{(}\StringTok{"https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/topic.csv"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+   \NormalTok{user  system elapsed }
+  \NormalTok{0.267   0.008   0.274 }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{system.time}\NormalTok{(topic<-data.table::}\KeywordTok{fread}\NormalTok{(}\StringTok{"https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/topic.csv"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+   \NormalTok{user  system elapsed }
+  \NormalTok{0.217   0.005   0.221 }
+\end{Highlighting}
+\end{Shaded}
+
+It is clear that \texttt{read\_csv()} is much faster than
+\texttt{read.csv()}. \texttt{fread()} is a little faster than
+\texttt{read\_csv()}. As the size increasing, the difference will become
+for significant. Note that \texttt{fread()} will read file as
+\texttt{data.table} by default.
+
 \chapter{Model Tuning Strategy}\label{model-tuning-strategy}
 
 When training a machine learning model, there are many decisions to
@@ -3116,7 +4145,7 @@ sample, the result curve will change significantly:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-32-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-63-1.pdf}
 
 The fitted lines (blue) change over different samples which means it has
 high variance. People also call it overfitting. Fitting the linear model
@@ -3136,7 +4165,7 @@ using the same four subsets, the result barely changes:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-33-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-64-1.pdf}
 
 In general, the variance (\(Var(\hat{f}(\mathbf{X}))\))
 \textbf{increases} and the bias (\(Bias(\hat{f}(\mathbf{X}))\))
@@ -4069,15 +5098,31 @@ every bootstrap set, there are some left-out samples, which is also
 called ``out-of-bag samples.'' The out-of-bag sample is used to evaluate
 the model. Efron points out that under normal circumstances
 \citep{efron1983}, bootstrap estimates the error rate of the model with
-more certainty. On average, 63.2\% of the sample spots appeared at least
-once in a bootstrap sample, so the estimation bias is similar to 2-fold
+more certainty.The probability of an observation \(i\) in bootstrap
+sample B is:
+
+\(\begin{array}{ccc} Pr{i\in B} & = & 1-\left(1-\frac{1}{N}\right)^{N}\\  & \approx & 1-e^{-1}\\  & = & 0.632 \end{array}\)
+
+On average, 63.2\% of the observations appeared at least once in a
+bootstrap sample, so the estimation bias is similar to 2-fold
 cross-validation. As mentioned earlier, the smaller the number of folds,
 the larger the bias. Increasing the sample size will ease the problem.
 In general, bootstrap has larger bias and smaller uncertainty than
-cross-validation. Efron made improvements to the original bootstrap bias
-and came up the following 632-method:
+cross-validation. Efron came up the following ``.632 estimator'' to
+alleviate this bias:
 
-\[(0.632 × original bootstrap estimate) + (0.368 × apparent error rate)\]
+\[(0.632 × original\ bootstrap\ estimate) + (0.368 × apparent\ error\ rate)\]
+
+The apparent error rate is the error rate when the data is used twice,
+both to fit the model and to check its accuracy and it is apparently
+over-optimistic. The modified bootstrap estimate reduces the bias but
+can be unstable with small samples size. This estimate can also be
+unduly optimistic when the model severely over-fits since the apparent
+error rate will be close to zero. Efron and Tibshirani \citep{b632plus}
+discuss another technique, called the ``632+ method,'' for adjusting the
+bootstrap estimates.
+
+\chapter{Measuring Performance}\label{measuring-performance}
 
 \chapter{References}\label{references}
 
