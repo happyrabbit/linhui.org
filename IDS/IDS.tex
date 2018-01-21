@@ -207,7 +207,7 @@
 
 \title{Introduction to Data Science}
 \author{Hui Lin and Ming Li}
-\date{2018-01-18}
+\date{2018-01-21}
 
 \usepackage{amsthm}
 \newtheorem{theorem}{Theorem}[chapter]
@@ -3902,6 +3902,611 @@ It is clear that \texttt{read\_csv()} is much faster than
 for significant. Note that \texttt{fread()} will read file as
 \texttt{data.table} by default.
 
+\subsection{Summarize data}\label{summarize-data}
+
+\subsubsection{\texorpdfstring{\texttt{apply()}, \texttt{lapply()} and
+\texttt{sapply()} in base
+R}{apply(), lapply() and sapply() in base R}}\label{apply-lapply-and-sapply-in-base-r}
+
+There are some powerful functions to summarize data in base R, such as
+\texttt{apply()}, \texttt{lapply()} and \texttt{sapply()}. They do the
+same basic things and are all from ``apply'' family: apply functions
+over parts of data. They differ in two important respects:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  the type of object they apply to
+\item
+  the type of result they will return
+\end{enumerate}
+
+When do we use \texttt{apply()}? When we want to apply a function to
+margins of an array or matrix. That means our data need to be
+structured. The operations can be very flexible. It returns a vector or
+array or list of values obtained by applying a function to margins of an
+array or matrix.
+
+For example you can compute row and column sums for a matrix:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{## simulate a matrix}
+\NormalTok{x <-}\StringTok{ }\KeywordTok{cbind}\NormalTok{(}\DataTypeTok{x1 =}\DecValTok{1}\NormalTok{:}\DecValTok{8}\NormalTok{, }\DataTypeTok{x2 =} \KeywordTok{c}\NormalTok{(}\DecValTok{4}\NormalTok{:}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{:}\DecValTok{5}\NormalTok{))}
+\KeywordTok{dimnames}\NormalTok{(x)[[}\DecValTok{1}\NormalTok{]] <-}\StringTok{ }\NormalTok{letters[}\DecValTok{1}\NormalTok{:}\DecValTok{8}\NormalTok{]}
+\KeywordTok{apply}\NormalTok{(x, }\DecValTok{2}\NormalTok{, mean)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  x1  x2 
+## 4.5 3.0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{col.sums <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(x, }\DecValTok{2}\NormalTok{, sum)}
+\NormalTok{row.sums <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(x, }\DecValTok{1}\NormalTok{, sum)}
+\end{Highlighting}
+\end{Shaded}
+
+You can also apply other functions:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ma <-}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{:}\DecValTok{4}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{6}\NormalTok{:}\DecValTok{8}\NormalTok{), }\DataTypeTok{nrow =} \DecValTok{2}\NormalTok{)}
+\NormalTok{ma}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      [,1] [,2] [,3] [,4]
+## [1,]    1    3    1    7
+## [2,]    2    4    6    8
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{apply}\NormalTok{(ma, }\DecValTok{1}\NormalTok{, table)  }\CommentTok{#--> a list of length 2}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [[1]]
+## 
+## 1 3 7 
+## 2 1 1 
+## 
+## [[2]]
+## 
+## 2 4 6 8 
+## 1 1 1 1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{apply}\NormalTok{(ma, }\DecValTok{1}\NormalTok{, stats::quantile) }\CommentTok{# 5 x n matrix with rownames}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      [,1] [,2]
+## 0%      1  2.0
+## 25%     1  3.5
+## 50%     2  5.0
+## 75%     4  6.5
+## 100%    7  8.0
+\end{verbatim}
+
+Results can have different lengths for each call. This is a trickier
+example. What will you get?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{## Example with different lengths for each call}
+\NormalTok{z <-}\StringTok{ }\KeywordTok{array}\NormalTok{(}\DecValTok{1}\NormalTok{:}\DecValTok{24}\NormalTok{, }\DataTypeTok{dim =} \DecValTok{2}\NormalTok{:}\DecValTok{4}\NormalTok{)}
+\NormalTok{zseq <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(z, }\DecValTok{1}\NormalTok{:}\DecValTok{2}\NormalTok{, function(x) }\KeywordTok{seq_len}\NormalTok{(}\KeywordTok{max}\NormalTok{(x)))}
+\NormalTok{zseq         ## a 2 x 3 matrix}
+\KeywordTok{typeof}\NormalTok{(zseq) ## list}
+\KeywordTok{dim}\NormalTok{(zseq) ## 2 3}
+\NormalTok{zseq[}\DecValTok{1}\NormalTok{,]}
+\KeywordTok{apply}\NormalTok{(z, }\DecValTok{3}\NormalTok{, function(x) }\KeywordTok{seq_len}\NormalTok{(}\KeywordTok{max}\NormalTok{(x)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{lapply()} applies a function over a list, data.frame or vector
+  and returns a list of the same length.
+\item
+  \texttt{sapply()} is a user-friendly version and wrapper of
+  \texttt{lapply()}. By default it returns a vector, matrix or if
+  \texttt{simplify\ =\ "array"}, an array if appropriate.
+  \texttt{apply(x,\ f,\ simplify\ =\ FALSE,\ USE.NAMES\ =\ FALSE)} is
+  the same as \texttt{lapply(x,\ f)}. If \texttt{simplify=TRUE}, then it
+  will return a \texttt{data.frame} instead of \texttt{list}.
+\end{itemize}
+
+Let's use some data with context to help you better understand the
+functions.
+
+\begin{itemize}
+\tightlist
+\item
+  Get the mean and standard deviation of all numerical variables in the
+  dataset.
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Read data}
+\NormalTok{sim.dat<-}\KeywordTok{read.csv}\NormalTok{(}\StringTok{"https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv"}\NormalTok{)}
+\CommentTok{# Get numerical variables}
+\NormalTok{sdat<-sim.dat[,!}\KeywordTok{lapply}\NormalTok{(sim.dat,class)==}\StringTok{"factor"}\NormalTok{]}
+\NormalTok{## Try the following code with apply() function}
+\NormalTok{## apply(sim.dat,2,class)}
+\NormalTok{## What is the problem?}
+\end{Highlighting}
+\end{Shaded}
+
+The data frame \texttt{sdat} only includes numeric columns. Now we can
+go head and use \texttt{apply()} to get mean and standard deviation for
+each column:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{apply}\NormalTok{(sdat, }\DataTypeTok{MARGIN=}\DecValTok{2}\NormalTok{,function(x) }\KeywordTok{mean}\NormalTok{(}\KeywordTok{na.omit}\NormalTok{(x)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##          age       income    store_exp   online_exp 
+##    3.884e+01    1.135e+05    1.357e+03    2.120e+03 
+##  store_trans online_trans           Q1           Q2 
+##    5.350e+00    1.355e+01    3.101e+00    1.823e+00 
+##           Q3           Q4           Q5           Q6 
+##    1.992e+00    2.763e+00    2.945e+00    2.448e+00 
+##           Q7           Q8           Q9          Q10 
+##    3.434e+00    2.396e+00    3.085e+00    2.320e+00
+\end{verbatim}
+
+Here we defined a function using \texttt{function(x)\ mean(na.omit(x))}.
+It is a very simple function. It tells R to ignore the missing value
+when calculating the mean. \texttt{MARGIN=2} tells R to apply the
+function to each column. It is not hard to guess what \texttt{MARGIN=1}
+mean. The result show that the average online expense is much higher
+than store expense. You can also compare the average scores across
+different questions. The command to calculate standard deviation is very
+similar. The only difference is to change \texttt{mean()} to
+\texttt{sd()}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{apply}\NormalTok{(sdat, }\DataTypeTok{MARGIN=}\DecValTok{2}\NormalTok{,function(x) }\KeywordTok{sd}\NormalTok{(}\KeywordTok{na.omit}\NormalTok{(x)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##          age       income    store_exp   online_exp 
+##       16.417    49842.287     2774.400     1731.224 
+##  store_trans online_trans           Q1           Q2 
+##        3.696        7.957        1.450        1.168 
+##           Q3           Q4           Q5           Q6 
+##        1.402        1.155        1.284        1.439 
+##           Q7           Q8           Q9          Q10 
+##        1.456        1.154        1.118        1.136
+\end{verbatim}
+
+Even the average online expense is higher than store expense, the
+standard deviation for store expense is much higher than online expense
+which indicates there is very likely some big/small purchase in store.
+We can check it quickly:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{summary}\NormalTok{(sdat$store_exp)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    -500     205     329    1360     597   50000
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{summary}\NormalTok{(sdat$online_exp)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##      69     420    1940    2120    2440    9480
+\end{verbatim}
+
+There are some odd values in store expense. The minimum value is -500
+which is a wrong imputation which indicates that you should preprocess
+data before analyzing it. Checking those simple statistics will help you
+better understand your data. It then gives you some idea how to
+preprocess and analyze them. How about using \texttt{lapply()} and
+\texttt{sapply()}?
+
+Run the following code and compare the results:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{lapply}\NormalTok{(sdat, function(x) }\KeywordTok{sd}\NormalTok{(}\KeywordTok{na.omit}\NormalTok{(x)))}
+\KeywordTok{sapply}\NormalTok{(sdat, function(x) }\KeywordTok{sd}\NormalTok{(}\KeywordTok{na.omit}\NormalTok{(x)))}
+\KeywordTok{sapply}\NormalTok{(sdat, function(x) }\KeywordTok{sd}\NormalTok{(}\KeywordTok{na.omit}\NormalTok{(x)), }\DataTypeTok{simplify =} \OtherTok{FALSE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{\texorpdfstring{\texttt{dplyr}
+package}{dplyr package}}\label{dplyr-package}
+
+\texttt{dplyr} provides a flexible grammar of data manipulation focusing
+on tools for working with data frames (hence the \texttt{d} in the
+name). It is faster and more friendly:
+
+\begin{itemize}
+\tightlist
+\item
+  It identifies the most important data manipulations and make they easy
+  to use from R
+\item
+  It performs faster for in-memory data by writing key pieces in C++
+  using \texttt{Rcpp}
+\item
+  The interface is the same for data frame, data table or database.
+\end{itemize}
+
+We will illustrate the following functions in order:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Display
+\item
+  Subset
+\item
+  Summarize
+\item
+  Create new variable
+\item
+  Merge
+\end{enumerate}
+
+\textbf{Display}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{tbl\_df()}: Convert the data to \texttt{tibble} which offers
+  better checking and printing capabilities than traditional data
+  frames. It will adjust output width according to fit the current
+  window.
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(dplyr)}
+\KeywordTok{tbl_df}\NormalTok{(sim.dat)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{glimpse()}: This is like a transposed version of
+  \texttt{tbl\_df()}
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{glimpse}\NormalTok{(sim.dat)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Subset}
+
+Get rows with \texttt{income} more than 300000:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(magrittr)}
+\KeywordTok{filter}\NormalTok{(sim.dat, income >}\DecValTok{300000}\NormalTok{) %>%}
+\StringTok{  }\KeywordTok{tbl_df}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 4 x 19
+##     age gender income  house store_exp online_exp
+##   <int> <fctr>  <dbl> <fctr>     <dbl>      <dbl>
+## 1    40   Male 301398    Yes      4840       3618
+## 2    33   Male 319704    Yes      5998       4396
+## 3    41   Male 317476    Yes      3030       4180
+## 4    37 Female 315697    Yes      6549       4284
+## # ... with 13 more variables: store_trans <int>,
+## #   online_trans <int>, Q1 <int>, Q2 <int>, Q3 <int>,
+## #   Q4 <int>, Q5 <int>, Q6 <int>, Q7 <int>, Q8 <int>,
+## #   Q9 <int>, Q10 <int>, segment <fctr>
+\end{verbatim}
+
+Here we meet a new operator \texttt{\%\textgreater{}\%}. It is called
+``Pipe operator'' which pipes a value forward into an expression or
+function call. What you get in the left operation will be the first
+argument or the only argument in the right operation.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{x %>%}\StringTok{ }\KeywordTok{f}\NormalTok{(y) =}\StringTok{ }\KeywordTok{f}\NormalTok{(x, y)}
+\NormalTok{y %>%}\StringTok{ }\KeywordTok{f}\NormalTok{(x, ., z) =}\StringTok{ }\KeywordTok{f}\NormalTok{(x, y, z )}
+\end{Highlighting}
+\end{Shaded}
+
+It is an operator from \texttt{magrittr} which can be really beneficial.
+Look at the following code. Can you tell me what it does?
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ave_exp <-}\StringTok{ }\KeywordTok{filter}\NormalTok{( }
+  \KeywordTok{summarise}\NormalTok{(}
+    \KeywordTok{group_by}\NormalTok{( }
+      \KeywordTok{filter}\NormalTok{(}
+        \NormalTok{sim.dat, }
+        \NormalTok{!}\KeywordTok{is.na}\NormalTok{(income)}
+      \NormalTok{), }
+      \NormalTok{segment}
+    \NormalTok{), }
+    \DataTypeTok{ave_online_exp =} \KeywordTok{mean}\NormalTok{(online_exp), }
+    \DataTypeTok{n =} \KeywordTok{n}\NormalTok{()}
+  \NormalTok{), }
+  \NormalTok{n >}\StringTok{ }\DecValTok{200}
+\NormalTok{) }
+\end{Highlighting}
+\end{Shaded}
+
+Now look at the identical code using ``\texttt{\%\textgreater{}\%}'':
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ave_exp <-}\StringTok{ }\NormalTok{sim.dat %>%}\StringTok{ }
+\StringTok{ }\KeywordTok{filter}\NormalTok{(!}\KeywordTok{is.na}\NormalTok{(income)) %>%}\StringTok{ }
+\StringTok{ }\KeywordTok{group_by}\NormalTok{(segment) %>%}\StringTok{ }
+\StringTok{ }\KeywordTok{summarise}\NormalTok{( }
+   \DataTypeTok{ave_online_exp =} \KeywordTok{mean}\NormalTok{(online_exp), }
+   \DataTypeTok{n =} \KeywordTok{n}\NormalTok{() ) %>%}\StringTok{ }
+\StringTok{  }\KeywordTok{filter}\NormalTok{(n >}\StringTok{ }\DecValTok{200}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Isn't it much more straightforward now? Let's read it:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Delete observations from \texttt{sim.dat} with missing income values
+\item
+  Group the data from step 1 by variable \texttt{segment}
+\item
+  Calculate mean of online expense for each segment and save the result
+  as a new variable named \texttt{ave\_online\_exp}
+\item
+  Calculate the size of each segment and saved it as a new variable
+  named \texttt{n}
+\item
+  Get segments with size larger than 200
+\end{enumerate}
+
+You can use \texttt{distinct()} to delete duplicated rows.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dplyr::}\KeywordTok{distinct}\NormalTok{(sim.dat)}
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{sample\_frac()} will randomly select some rows with a specified
+percentage. \texttt{sample\_n()} can randomly select rows with a
+specified number.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dplyr::}\KeywordTok{sample_frac}\NormalTok{(sim.dat, }\FloatTok{0.5}\NormalTok{, }\DataTypeTok{replace =} \OtherTok{TRUE}\NormalTok{) }
+\NormalTok{dplyr::}\KeywordTok{sample_n}\NormalTok{(sim.dat, }\DecValTok{10}\NormalTok{, }\DataTypeTok{replace =} \OtherTok{TRUE}\NormalTok{) }
+\end{Highlighting}
+\end{Shaded}
+
+\texttt{slice()} will select rows by position:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dplyr::}\KeywordTok{slice}\NormalTok{(sim.dat, }\DecValTok{10}\NormalTok{:}\DecValTok{15}\NormalTok{) }
+\end{Highlighting}
+\end{Shaded}
+
+It is equivalent to \texttt{sim.dat{[}10:15,{]}}.
+
+\texttt{top\_n()} will select the order top n entries:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dplyr::}\KeywordTok{top_n}\NormalTok{(sim.dat,}\DecValTok{2}\NormalTok{,income)}
+\end{Highlighting}
+\end{Shaded}
+
+If you want to select columns instead of rows, you can use
+\texttt{select()}. The following are some sample codes:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# select by column name}
+\NormalTok{dplyr::}\KeywordTok{select}\NormalTok{(sim.dat,income,age,store_exp)}
+
+\CommentTok{# select columns whose name contains a character string}
+\NormalTok{dplyr::}\KeywordTok{select}\NormalTok{(sim.dat, }\KeywordTok{contains}\NormalTok{(}\StringTok{"_"}\NormalTok{))}
+
+\CommentTok{# select columns whose name ends with a character string}
+\CommentTok{# similar there is "starts_with"}
+\NormalTok{dplyr::}\KeywordTok{select}\NormalTok{(sim.dat, }\KeywordTok{ends_with}\NormalTok{(}\StringTok{"e"}\NormalTok{))}
+
+\CommentTok{# select columns Q1,Q2,Q3,Q4 and Q5}
+\KeywordTok{select}\NormalTok{(sim.dat, }\KeywordTok{num_range}\NormalTok{(}\StringTok{"Q"}\NormalTok{, }\DecValTok{1}\NormalTok{:}\DecValTok{5}\NormalTok{)) }
+
+\CommentTok{# select columns whose names are in a group of names}
+\NormalTok{dplyr::}\KeywordTok{select}\NormalTok{(sim.dat, }\KeywordTok{one_of}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{"age"}\NormalTok{, }\StringTok{"income"}\NormalTok{)))}
+
+\CommentTok{# select columns between age and online_exp}
+\NormalTok{dplyr::}\KeywordTok{select}\NormalTok{(sim.dat, age:online_exp)}
+
+\CommentTok{# select all columns except for age}
+\NormalTok{dplyr::}\KeywordTok{select}\NormalTok{(sim.dat, -age)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Summarize}
+
+A standard marketing problem is customer segmentation. It usually starts
+with designing survey and collecting data. Then run a cluster analysis
+on the data to get customer segments. Once we have different segments,
+the next is to understand how each group of customer look like by
+summarizing some key metrics. For example, we can do the following data
+aggregation for different segments of clothes customers.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sim.dat%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(segment)%>%}
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{Age=}\KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(}\KeywordTok{na.omit}\NormalTok{(age)),}\DecValTok{0}\NormalTok{),}
+      \DataTypeTok{FemalePct=}\KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(gender==}\StringTok{"Female"}\NormalTok{),}\DecValTok{2}\NormalTok{),}
+      \DataTypeTok{HouseYes=}\KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(house==}\StringTok{"Yes"}\NormalTok{),}\DecValTok{2}\NormalTok{),}
+      \DataTypeTok{store_exp=}\KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(}\KeywordTok{na.omit}\NormalTok{(store_exp),}\DataTypeTok{trim=}\FloatTok{0.1}\NormalTok{),}\DecValTok{0}\NormalTok{),}
+      \DataTypeTok{online_exp=}\KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(online_exp),}\DecValTok{0}\NormalTok{),}
+      \DataTypeTok{store_trans=}\KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(store_trans),}\DecValTok{1}\NormalTok{),}
+      \DataTypeTok{online_trans=}\KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(online_trans),}\DecValTok{1}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 4 x 8
+##       segment   Age FemalePct HouseYes store_exp
+##        <fctr> <dbl>     <dbl>    <dbl>     <dbl>
+## 1 Conspicuous    42      0.32     0.86      4990
+## 2       Price    60      0.45     0.94       501
+## 3     Quality    35      0.47     0.34       301
+## 4       Style    24      0.81     0.27       200
+## # ... with 3 more variables: online_exp <dbl>,
+## #   store_trans <dbl>, online_trans <dbl>
+\end{verbatim}
+
+Now, let's peel the onion in order.
+
+The first line \texttt{sim.dat} is easy. It is the data you want to work
+on. The second line \texttt{group\_by(segment)} tells R that in the
+following steps you want to summarise by variable \texttt{segment}. Here
+we only summarize data by one categorical variable, but you can group by
+multiple variables, such as \texttt{group\_by(segment,\ house)}. The
+third argument \texttt{summarise} tells R the manipulation(s) to do.
+Then list the exact actions inside \texttt{summarise()} . For example,
+\texttt{Age=round(mean(na.omit(age)),0)} tell R the following things:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Calculate the mean of column \texttt{age} ignoring missing value for
+  each customer segment
+\item
+  Round the result to the specified number of decimal places
+\item
+  Store the result in a new variable named \texttt{Age}
+\end{enumerate}
+
+The rest of the command above is similar. In the end, we calculate the
+following for each segment:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \texttt{Age}: average age for each segment
+\item
+  \texttt{FemalePct}: percentage for each segment
+\item
+  \texttt{HouseYes}: percentage of people who own a house
+\item
+  \texttt{stroe\_exp}: average expense in store
+\item
+  \texttt{online\_exp}: average expense online
+\item
+  \texttt{store\_trans}: average times of transactions in the store
+\item
+  \texttt{online\_trans}: average times of online transactions
+\end{enumerate}
+
+There is a lot of information you can extract from those simple
+averages.
+
+\begin{itemize}
+\item
+  Conspicuous: average age is about 40. It is a group of middle-age
+  wealthy people. 1/3 of them are female, and 2/3 are male. They buy
+  regardless the price. Almost all of them own house (0.86). It makes us
+  wonder what is wrong with the rest 14\%?
+\item
+  Price: They are older people with average age 60. Nearly all of them
+  own a house(0.94). They are less likely to purchase online
+  (store\_trans=6 while online\_trans=3). It is the only group that is
+  less likely to buy online.
+\item
+  Quality: The average age is 35. They are not way different with
+  Conspicuous regarding age. But they spend much less. The percentages
+  of male and female are similar. They prefer online shopping. More than
+  half of them don't own a house (0.66).
+\item
+  Style: They are young people with average age 24. The majority of them
+  are female (0.81). Most of them don't own a house (0.73). They are
+  very likely to be digital natives and prefer online shopping.
+\end{itemize}
+
+You may notice that Style group purchase more frequently online
+(\texttt{online\_trans}) but the expense (\texttt{online\_exp}) is not
+higher. It makes us wonder what is the average expense each time, so you
+have a better idea about the price range of the group.
+
+The analytical process is aggregated instead of independent steps.
+Current step shed new light on what to do next. Sometimes you also need
+to go back to fix something in the previous steps. For example, you may
+need to check those negative expense value.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# apply function anyNA() to each column}
+\CommentTok{# you can also assign a function vector such as: c("anyNA","is.factor")}
+\NormalTok{dplyr::}\KeywordTok{summarise_each}\NormalTok{(sim.dat, }\KeywordTok{funs_}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{"anyNA"}\NormalTok{)))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `summarise_each()` is deprecated.
+## Use `summarise_all()`, `summarise_at()` or `summarise_if()` instead.
+## To map `funs` over all variables, use `summarise_all()`
+\end{verbatim}
+
+\begin{verbatim}
+##     age gender income house store_exp online_exp
+## 1 FALSE  FALSE   TRUE FALSE     FALSE      FALSE
+##   store_trans online_trans    Q1    Q2    Q3    Q4
+## 1       FALSE        FALSE FALSE FALSE FALSE FALSE
+##      Q5    Q6    Q7    Q8    Q9   Q10 segment
+## 1 FALSE FALSE FALSE FALSE FALSE FALSE   FALSE
+\end{verbatim}
+
 \chapter{Model Tuning Strategy}\label{model-tuning-strategy}
 
 When training a machine learning model, there are many decisions to
@@ -4145,7 +4750,7 @@ sample, the result curve will change significantly:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-63-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-73-1.pdf}
 
 The fitted lines (blue) change over different samples which means it has
 high variance. People also call it overfitting. Fitting the linear model
@@ -4165,7 +4770,7 @@ using the same four subsets, the result barely changes:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-64-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-74-1.pdf}
 
 In general, the variance (\(Var(\hat{f}(\mathbf{X}))\))
 \textbf{increases} and the bias (\(Bias(\hat{f}(\mathbf{X}))\))
