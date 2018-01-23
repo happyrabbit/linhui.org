@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2018-01-21">
+<meta name="date" content="2018-01-23">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -895,19 +895,189 @@ dplyr::<span class="kw">select</span>(sim.dat, -age)</code></pre></div>
 <li><p>Style: They are young people with average age 24. The majority of them are female (0.81). Most of them don’t own a house (0.73). They are very likely to be digital natives and prefer online shopping.</p></li>
 </ul>
 <p>You may notice that Style group purchase more frequently online (<code>online_trans</code>) but the expense (<code>online_exp</code>) is not higher. It makes us wonder what is the average expense each time, so you have a better idea about the price range of the group.</p>
-<p>The analytical process is aggregated instead of independent steps. Current step shed new light on what to do next. Sometimes you also need to go back to fix something in the previous steps. For example, you may need to check those negative expense value.</p>
+<p>The analytical process is aggregated instead of independent steps. The current step will shed new light on what to do next. Sometimes you need to go back to fix something in the previous steps. Let’s check average one-time online and instore purchase amounts:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sim.dat%&gt;%
+<span class="kw">group_by</span>(segment)%&gt;%
+<span class="kw">summarise</span>(<span class="dt">avg_online=</span><span class="kw">round</span>(<span class="kw">sum</span>(online_exp)/<span class="kw">sum</span>(online_trans),<span class="dv">2</span>),
+    <span class="dt">avg_store=</span><span class="kw">round</span>(<span class="kw">sum</span>(store_exp)/<span class="kw">sum</span>(store_trans),<span class="dv">2</span>))</code></pre></div>
+<pre><code>## # A tibble: 4 x 3
+##       segment avg_online avg_store
+##        &lt;fctr&gt;      &lt;dbl&gt;     &lt;dbl&gt;
+## 1 Conspicuous     442.27     479.2
+## 2       Price      69.28      81.3
+## 3     Quality     126.05     105.1
+## 4       Style      92.83     121.1</code></pre>
+<p>Price group has the lowest averaged one-time purchase. The Conspicuous group will pay the highest price. When we build customer profile in real life, we will also need to look at the survey summarization. You may be surprised how much information simple data manipulations can provide.</p>
+<p>Another comman task is to check which column has missing values. It requires the program to look at each column in the data. In this case you can use <code>summarise_all</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># apply function anyNA() to each column</span>
 <span class="co"># you can also assign a function vector such as: c(&quot;anyNA&quot;,&quot;is.factor&quot;)</span>
-dplyr::<span class="kw">summarise_each</span>(sim.dat, <span class="kw">funs_</span>(<span class="kw">c</span>(<span class="st">&quot;anyNA&quot;</span>)))</code></pre></div>
-<pre><code>## `summarise_each()` is deprecated.
-## Use `summarise_all()`, `summarise_at()` or `summarise_if()` instead.
-## To map `funs` over all variables, use `summarise_all()`</code></pre>
+dplyr::<span class="kw">summarise_all</span>(sim.dat, <span class="kw">funs_</span>(<span class="kw">c</span>(<span class="st">&quot;anyNA&quot;</span>)))</code></pre></div>
 <pre><code>##     age gender income house store_exp online_exp
 ## 1 FALSE  FALSE   TRUE FALSE     FALSE      FALSE
 ##   store_trans online_trans    Q1    Q2    Q3    Q4
 ## 1       FALSE        FALSE FALSE FALSE FALSE FALSE
 ##      Q5    Q6    Q7    Q8    Q9   Q10 segment
 ## 1 FALSE FALSE FALSE FALSE FALSE FALSE   FALSE</code></pre>
+<p>The above code returns a vector indicating if there is any value missing in each column.</p>
+<p><strong>Create new variable</strong></p>
+<p>There are often situations where you need to create new variables. For example, adding online and store expense to get total expense. In this case, you will apply <strong>window function</strong> to the columns and return a column with the same length. <code>mutate()</code> can do it for you and append one or more new columns:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dplyr::<span class="kw">mutate</span>(sim.dat, <span class="dt">total_exp =</span> store_exp +<span class="st"> </span>online_exp)</code></pre></div>
+<pre><code>##      age gender income house store_exp online_exp
+## 1     57 Female 120963   Yes     529.1     303.51
+## 2     63 Female 122008   Yes     478.0     109.53
+## 3     59   Male 114202   Yes     490.8     279.25
+## 4     60   Male 113616   Yes     347.8     141.67
+## 5     51   Male 124253   Yes     379.6     112.24
+## 6     59   Male 107661   Yes     338.3     195.69
+## 7     57   Male 120483   Yes     482.5     284.54
+## 8     57   Male 110542   Yes     340.7     135.26
+## 9     61 Female 132061   Yes     608.2     142.55
+## 10    60   Male 105049   Yes     470.3     163.47
+## 11    58   Male 107197   Yes     366.6     170.13
+## 12    59   Male     NA   Yes     674.9     310.27
+## 13    64   Male 119020   Yes     613.9     160.85
+## 14    57 Female     NA   Yes     737.0     224.53
+## 15    64   Male 114539   Yes     402.5     241.83
+## 16    61 Female     NA   Yes     615.1     238.10
+## 17    57 Female 133078   Yes     429.4     262.66
+## 18    63   Male 115709   Yes     552.6     187.52
+## 19    57 Female 113211    No     540.3     254.58
+## 20    57 Female 129774    No     384.3     311.03
+## 21    58   Male     NA   Yes     372.4     296.83
+## 22    58   Male 124357   Yes     535.5     205.54
+## 23    59 Female 123117   Yes     481.3     157.29
+## 24    61 Female     NA   Yes     546.2     161.23
+## 25    60 Female     NA   Yes     411.1     123.78
+## 26    56   Male     NA   Yes     492.7     128.02
+## 27    58   Male 127887   Yes     519.3     142.63
+## 28    64   Male 115925   Yes     627.7     240.98
+## 29    63 Female     NA   Yes     511.1     203.49
+## 30    56 Female 112621   Yes     699.3     223.44
+## 31    57   Male     NA   Yes     530.6     217.92
+## 32    59 Female 121773   Yes     532.1     176.88
+## 33    63   Male 126903   Yes     601.6     257.84
+## 34    55   Male 128254   Yes     595.3     248.06
+## 35    60 Female     NA   Yes     403.6     236.96
+## 36    64 Female     NA   Yes     611.7     102.24
+## 37    57 Female 118170   Yes     482.7     183.36
+## 38    57 Female 119148   Yes     412.9     246.87
+## 39    58   Male 125844   Yes     473.8     261.67
+## 40    55   Male 128194   Yes     595.7     156.93
+## 41    59 Female     NA   Yes     548.3     186.50
+## 42    61   Male     NA   Yes     597.2     209.68
+## 43    59 Female 122338   Yes     455.3     205.16
+## 44    58 Female 114519   Yes     493.5     271.67
+## 45    62   Male 123459   Yes     561.7     209.23
+## 46    59   Male 125626   Yes     518.2     261.31
+## 47    56   Male 100583   Yes     633.0     195.95
+## 48    66   Male     NA   Yes     510.3     198.46
+## 49    62 Female 128606   Yes     499.7     244.05
+## 50    54   Male 114337   Yes     518.0     217.25
+##      store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8
+## 1              2            2  4  2  1  2  1  4  1  4
+## 2              4            2  4  1  1  2  1  4  1  4
+## 3              7            2  5  2  1  2  1  4  1  4
+## 4             10            2  5  2  1  3  1  4  1  4
+## 5              4            4  4  1  1  3  1  4  1  4
+## 6              4            5  4  2  1  2  1  4  1  4
+## 7              5            3  4  1  1  2  1  4  1  4
+## 8             11            5  5  2  1  3  1  4  1  4
+## 9              6            1  4  1  1  2  1  4  1  4
+## 10            12            1  4  2  1  3  1  4  1  4
+## 11             5            4  4  1  1  3  1  4  1  4
+## 12             6            2  4  1  1  3  1  4  1  4
+## 13             7            4  5  1  1  3  1  4  1  4
+## 14             7            3  4  2  1  3  1  4  1  4
+## 15             5            5  4  2  1  2  1  4  1  4
+## 16             5            1  5  2  1  2  1  4  1  4
+## 17             5            3  5  2  1  2  1  4  1  4
+## 18             5            2  5  2  1  3  1  4  1  4
+## 19             7            2  4  2  1  3  1  4  1  4
+## 20             4            2  5  2  1  2  1  4  1  5
+## 21            11            2  5  1  1  3  1  4  1  4
+## 22             7            3  4  2  1  2  1  4  1  4
+## 23             6            1  5  2  1  2  1  4  1  4
+## 24             8            3  5  1  1  2  1  4  1  4
+## 25            11            3  4  1  1  3  1  4  1  4
+## 26             7            1  5  1  1  3  1  4  1  4
+## 27             6            2  4  1  1  3  1  4  1  4
+## 28             4            4  5  1  1  2  1  4  1  4
+## 29             4            3  5  1  1  2  1  4  1  4
+## 30             9            2  5  2  1  2  1  4  1  4
+## 31             4            2  4  2  1  3  1  4  1  4
+## 32             2            3  5  2  1  2  1  4  1  4
+## 33             6            4  4  1  1  3  1  4  1  4
+## 34             8            3  4  1  1  2  1  4  1  4
+## 35             9            4  4  2  1  3  1  4  1  4
+## 36             6            4  5  2  1  2  1  4  1  4
+## 37             6            2  4  2  1  3  1  4  1  4
+## 38             6            5  5  1  1  3  1  4  1  4
+## 39             5            4  4  2  1  2  1  4  1  4
+## 40             6            2  4  1  1  2  1  4  1  4
+## 41             2            3  4  1  1  3  1  4  1  4
+## 42             5            1  5  1  1  3  1  4  1  4
+## 43             9            4  5  1  1  2  1  4  1  3
+## 44             4            5  4  1  1  3  1  4  1  4
+## 45             9            1  4  1  1  3  1  4  1  4
+## 46             8            2  5  1  1  3  1  4  1  4
+## 47            11            3  5  1  1  3  1  4  1  4
+## 48             9            4  5  2  1  3  1  4  1  4
+## 49             5            2  4  1  1  2  1  4  1  4
+## 50             6            2  4  1  1  2  1  4  1  4
+##      Q9 Q10     segment total_exp
+## 1     2   4       Price     832.6
+## 2     1   4       Price     587.5
+## 3     1   4       Price     770.1
+## 4     2   4       Price     489.5
+## 5     2   4       Price     491.9
+## 6     1   4       Price     534.0
+## 7     1   4       Price     767.1
+## 8     2   4       Price     476.0
+## 9     1   4       Price     750.8
+## 10    1   4       Price     633.8
+## 11    2   4       Price     536.8
+## 12    1   4       Price     985.1
+## 13    2   4       Price     774.8
+## 14    1   4       Price     961.6
+## 15    1   4       Price     644.3
+## 16    1   4       Price     853.2
+## 17    1   4       Price     692.1
+## 18    2   4       Price     740.1
+## 19    2   4       Price     794.9
+## 20    2   4       Price     695.4
+## 21    1   4       Price     669.2
+## 22    2   4       Price     741.0
+## 23    1   4       Price     638.5
+## 24    2   4       Price     707.4
+## 25    1   4       Price     534.9
+## 26    2   4       Price     620.7
+## 27    2   4       Price     661.9
+## 28    2   4       Price     868.7
+## 29    1   4       Price     714.5
+## 30    2   4       Price     922.8
+## 31    1   4       Price     748.5
+## 32    1   4       Price     709.0
+## 33    2   4       Price     859.5
+## 34    2   4       Price     843.3
+## 35    1   4       Price     640.6
+## 36    1   4       Price     713.9
+## 37    1   4       Price     666.0
+## 38    1   4       Price     659.8
+## 39    2   4       Price     735.4
+## 40    2   4       Price     752.6
+## 41    1   4       Price     734.8
+## 42    2   4       Price     806.9
+## 43    2   4       Price     660.5
+## 44    1   4       Price     765.2
+## 45    1   4       Price     771.0
+## 46    1   4       Price     779.5
+## 47    2   4       Price     829.0
+## 48    1   4       Price     708.7
+## 49    2   4       Price     743.7
+## 50    2   4       Price     735.3
+##  [ reached getOption(&quot;max.print&quot;) -- omitted 950 rows ]</code></pre>
+<p>The above code sums up two columns and appends the result (<code>total_exp</code>) to <code>sim.dat</code>. Another similar function is <code>transmute()</code>. The difference is that <code>transmute()</code> will delete the original columns and only keep the new ones.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dplyr::<span class="kw">transmute</span>(sim.dat, <span class="dt">total_exp =</span> store_exp +<span class="st"> </span>online_exp) </code></pre></div>
 
 </div>
 </div>
