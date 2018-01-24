@@ -32,8 +32,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="resolve-outliers.html">
-<link rel="next" href="sparse-variables.html">
+<link rel="prev" href="data-wrangling-using-r.html">
+<link rel="next" href="model-tuning-strategy.html">
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
@@ -185,71 +185,148 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="collinearity" class="section level2">
-<h2><span class="header-section-number">3.6</span> Collinearity</h2>
-<p>It is probably the technical term known by the most un-technical people. When two predictors are very strongly correlated, including both in a model may lead to confusion or problem with a singular matrix. There is an excellent function in <code>corrplot</code> package with the same name <code>corrplot()</code> that can visualize correlation structure of a set of predictors. The function has the option to reorder the variables in a way that reveals clusters of highly correlated ones.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># select non-survey numerical variables</span>
-sdat&lt;-<span class="kw">subset</span>(sim.dat,<span class="dt">select=</span><span class="kw">c</span>(<span class="st">&quot;age&quot;</span>,<span class="st">&quot;income&quot;</span>,<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>,<span class="st">&quot;store_trans&quot;</span>,<span class="st">&quot;online_trans&quot;</span> ))
-<span class="co"># use bagging imputation here</span>
-imp&lt;-<span class="kw">preProcess</span>(sdat,<span class="dt">method=</span><span class="st">&quot;bagImpute&quot;</span>)
-sdat&lt;-<span class="kw">predict</span>(imp,sdat)
-<span class="co"># get the correlation matrix</span>
-correlation&lt;-<span class="kw">cor</span>(sdat)
-<span class="co"># plot </span>
-<span class="kw">par</span>(<span class="dt">oma=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>))
-<span class="kw">corrplot.mixed</span>(correlation,<span class="dt">order=</span><span class="st">&quot;hclust&quot;</span>,<span class="dt">tl.pos=</span><span class="st">&quot;lt&quot;</span>,<span class="dt">upper=</span><span class="st">&quot;ellipse&quot;</span>)</code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:corp"></span>
-<img src="IDS_files/figure-html/corp-1.svg" alt="Correlation Matrix" width="80%" />
-<p class="caption">
-FIGURE 3.5: Correlation Matrix
-</p>
+<div id="tidy-and-reshape-data" class="section level2">
+<h2><span class="header-section-number">4.2</span> Tidy and Reshape Data</h2>
+<p>“Tidy data” represent the information from a dataset as data frames where each row is an observation, and each column contains the values of a variable (i.e., an attribute of what we are observing). Depending on the situation, the requirements on what to present as rows and columns may change. To make data easy to work with for the problem at hand, in practice, we often need to convert data between the “wide” and the “long” format. The process feels like kneading the dough.</p>
+<p>There are two commonly used packages for this kind of manipulations: <code>tidyr</code> and <code>reshape2</code>. We will show how to tidy and reshape data using the two packages. By comparing the functions to show how they overlap and where they differ.</p>
+<div id="reshape2-package" class="section level3">
+<h3><span class="header-section-number">4.2.1</span> <code>reshape2</code> package</h3>
+<p>It is a reboot of the previous package <code>reshape</code>. Take a baby subset of our exemplary clothes consumers data to illustrate:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(sdat&lt;-sim.dat[<span class="dv">1</span>:<span class="dv">5</span>,<span class="dv">1</span>:<span class="dv">6</span>])</code></pre></div>
+<pre><code>##   age gender income house store_exp online_exp
+## 1  57 Female 120963   Yes     529.1      303.5
+## 2  63 Female 122008   Yes     478.0      109.5
+## 3  59   Male 114202   Yes     490.8      279.2
+## 4  60   Male 113616   Yes     347.8      141.7
+## 5  51   Male 124253   Yes     379.6      112.2</code></pre>
+<p>For the above data <code>sdat</code>, what if we want to have a variable indicating the purchasing channel (i.e. online or in-store) and another column with the corresponding expense amount? Assume we want to keep the rest of the columns the same. It is a task to change data from “wide” to “long”. There are two general ways to shape data:</p>
+<ul>
+<li>Use <code>melt()</code> to convert an object into a molten data frame, i.e., from wide to long</li>
+<li>Use <code>dcast()</code> to cast a molten data frame into the shape you want, i.e., from long to wide</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(reshape2)
+(mdat &lt;-<span class="st"> </span><span class="kw">melt</span>(sdat, <span class="dt">measure.vars=</span><span class="kw">c</span>(<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>),
+              <span class="dt">variable.name =</span> <span class="st">&quot;Channel&quot;</span>,
+              <span class="dt">value.name =</span> <span class="st">&quot;Expense&quot;</span>))</code></pre></div>
+<pre><code>##    age gender income house    Channel Expense
+## 1   57 Female 120963   Yes  store_exp   529.1
+## 2   63 Female 122008   Yes  store_exp   478.0
+## 3   59   Male 114202   Yes  store_exp   490.8
+## 4   60   Male 113616   Yes  store_exp   347.8
+## 5   51   Male 124253   Yes  store_exp   379.6
+## 6   57 Female 120963   Yes online_exp   303.5
+## 7   63 Female 122008   Yes online_exp   109.5
+## 8   59   Male 114202   Yes online_exp   279.2
+## 9   60   Male 113616   Yes online_exp   141.7
+## 10  51   Male 124253   Yes online_exp   112.2</code></pre>
+<p>You melted the data frame <code>sdat</code> by two variables: <code>store_exp</code> and <code>online_exp</code> (<code>measure.vars=c(&quot;store_exp&quot;,&quot;online_exp&quot;)</code>). The new variable name is <code>Channel</code> set by command <code>variable.name = &quot;Channel&quot;</code>. The value name is <code>Expense</code> set by command <code>value.name = &quot;Expense&quot;</code>.</p>
+<p>You can run a regression to study the effect of purchasing channel as follows:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Here we use all observations from sim.dat</span>
+<span class="co"># Don&#39;t show result here</span>
+mdat&lt;-<span class="kw">melt</span>(sim.dat[,<span class="dv">1</span>:<span class="dv">6</span>], <span class="dt">measure.vars=</span><span class="kw">c</span>(<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>),
+            <span class="dt">variable.name =</span> <span class="st">&quot;Channel&quot;</span>,
+              <span class="dt">value.name =</span> <span class="st">&quot;Expense&quot;</span>)
+fit&lt;-<span class="kw">lm</span>(Expense~gender+house+income+Channel+age,<span class="dt">data=</span>mdat)
+<span class="kw">summary</span>(fit)</code></pre></div>
+<p>You can <code>melt()</code> list, matrix, table too. The syntax is similar, and we won’t go through every situation. Sometimes we want to convert the data from “long” to “wide”. For example, <strong>you want to compare the online and in-store expense between male and female based on the house ownership. </strong></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dcast</span>(mdat, house +<span class="st"> </span>gender ~<span class="st"> </span>Channel, sum)</code></pre></div>
+<pre><code>## Using &#39;Expense&#39; as value column. Use &#39;value.var&#39; to override</code></pre>
+<pre><code>##   house gender store_exp online_exp
+## 1   Yes Female      1007      413.0
+## 2   Yes   Male      1218      533.2</code></pre>
+<p>In the above code, what is the left side of <code>~</code> are variables that you want to group by. The right side is the variable you want to spread as columns. It will use the column indicating value from <code>melt()</code> before. Here is “<code>Expense</code>” .</p>
 </div>
-<p>Here use <code>corrplot.mixed()</code> function to visualize the correlation matrix (figure <a href="collinearity.html#fig:corp">3.5</a>). The closer the correlation is to 0, the lighter the color is and the closer the shape is to a circle. The elliptical means the correlation is not equal to 0 (because we set the <code>upper = &quot;ellipse&quot;</code>), the greater the correlation, the narrower the ellipse. Blue represents a positive correlation; red represents a negative correlation. The direction of the ellipse also changes with the correlation. The correlation coefficient is shown in the lower triangle of the matrix. The variables relationship from previous scatter matrix (figure @ref(fig: scm)) are clear here: the negative correlation between age and online shopping, the positive correlation between income and amount of purchasing. Some correlation is very strong ( such as the correlation between <code>online_trans</code> and<code>age</code> is -0.85) which means the two variables contain duplicate information.</p>
-<p>Section 3.5 of “Applied Predictive Modeling” <span class="citation">(Kuhn and Johnston <a href="#ref-APM">2013</a>)</span> presents a heuristic algorithm to remove a minimum number of predictors to ensure all pairwise correlations are below a certain threshold:</p>
-<blockquote>
-<ol style="list-style-type: decimal">
-<li>Calculate the correlation matrix of the predictors.</li>
-<li>Determine the two predictors associated with the largest absolute pairwise correlation (call them predictors A and B).</li>
-<li>Determine the average correlation between A and the other variables. Do the same for predictor B.</li>
-<li>If A has a larger average correlation, remove it; otherwise, remove predictor B.</li>
-<li>Repeat Step 2-4 until no absolute correlations are above the threshold.</li>
-</ol>
-</blockquote>
-<p>The <code>findCorrelation()</code> function in package <code>caret</code> will apply the above algorithm.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(highCorr&lt;-<span class="kw">findCorrelation</span>(<span class="kw">cor</span>(sdat),<span class="dt">cutoff=</span>.<span class="dv">75</span>))</code></pre></div>
-<pre><code>## [1] 1</code></pre>
-<p>It returns the index of columns need to be deleted. It tells us that we need to remove the first column to make sure the correlations are all below 0.75.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># delete highly correlated columns</span>
-sdat&lt;-sdat[-highCorr]
-<span class="co"># check the new correlation matrix</span>
-<span class="kw">cor</span>(sdat)</code></pre></div>
-<pre><code>##               income store_exp online_exp store_trans
-## income        1.0000    0.6004     0.5199      0.7070
-## store_exp     0.6004    1.0000     0.5350      0.5399
-## online_exp    0.5199    0.5350     1.0000      0.4421
-## store_trans   0.7070    0.5399     0.4421      1.0000
-## online_trans -0.3573   -0.1367     0.2256     -0.4368
-##              online_trans
-## income            -0.3573
-## store_exp         -0.1367
-## online_exp         0.2256
-## store_trans       -0.4368
-## online_trans       1.0000</code></pre>
-<p>The absolute value of the elements in the correlation matrix after removal are all below 0.75. How strong does a correlation have to get, before you should start worrying about multicollinearity? There is no easy answer to that question. You can treat the threshold as a tuning parameter and pick one that gives you best prediction accuracy.</p>
+<div id="tidyr-package" class="section level3">
+<h3><span class="header-section-number">4.2.2</span> <code>tidyr</code> package</h3>
+<p>The other package that will do similar manipulations is <code>tidyr</code>. Let’s get a subset to illustrate the usage.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)
+<span class="co"># practice functions we learnt before</span>
+sdat&lt;-sim.dat[<span class="dv">1</span>:<span class="dv">5</span>,]%&gt;%
+<span class="st">  </span>dplyr::<span class="kw">select</span>(age,gender,store_exp,store_trans)
+sdat %&gt;%<span class="st"> </span><span class="kw">tbl_df</span>()</code></pre></div>
+<pre><code>## # A tibble: 5 x 4
+##     age gender store_exp store_trans
+## * &lt;int&gt; &lt;fctr&gt;     &lt;dbl&gt;       &lt;int&gt;
+## 1    57 Female     529.1           2
+## 2    63 Female     478.0           4
+## 3    59   Male     490.8           7
+## 4    60   Male     347.8          10
+## 5    51   Male     379.6           4</code></pre>
+<p><code>gather()</code> function in <code>tidyr</code> is analogous to <code>melt()</code> in <code>reshape2</code>. The following code will do the same thing as we did before using <code>melt()</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyr)
+msdat&lt;-tidyr::<span class="kw">gather</span>(sdat,<span class="st">&quot;variable&quot;</span>,<span class="st">&quot;value&quot;</span>,store_exp,store_trans)
+msdat %&gt;%<span class="st"> </span><span class="kw">tbl_df</span>()</code></pre></div>
+<pre><code>## # A tibble: 10 x 4
+##      age gender    variable value
+##    &lt;int&gt; &lt;fctr&gt;       &lt;chr&gt; &lt;dbl&gt;
+##  1    57 Female   store_exp 529.1
+##  2    63 Female   store_exp 478.0
+##  3    59   Male   store_exp 490.8
+##  4    60   Male   store_exp 347.8
+##  5    51   Male   store_exp 379.6
+##  6    57 Female store_trans   2.0
+##  7    63 Female store_trans   4.0
+##  8    59   Male store_trans   7.0
+##  9    60   Male store_trans  10.0
+## 10    51   Male store_trans   4.0</code></pre>
+<p>Or if we use the pipe operation, we can write the above code as:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sdat%&gt;%<span class="kw">gather</span>(<span class="st">&quot;variable&quot;</span>,<span class="st">&quot;value&quot;</span>,store_exp,store_trans)</code></pre></div>
+<p>It is identical with the following code using <code>melt()</code>:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">melt</span>(sdat, <span class="dt">measure.vars=</span><span class="kw">c</span>(<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;store_trans&quot;</span>),
+            <span class="dt">variable.name =</span> <span class="st">&quot;variable&quot;</span>,
+              <span class="dt">value.name =</span> <span class="st">&quot;value&quot;</span>)</code></pre></div>
+<p>The opposite operation to <code>gather()</code> is <code>spread()</code>. The previous one stacks columns and the latter one spread the columns.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">msdat %&gt;%<span class="st"> </span><span class="kw">spread</span>(variable,value)</code></pre></div>
+<pre><code>##   age gender store_exp store_trans
+## 1  51   Male     379.6           4
+## 2  57 Female     529.1           2
+## 3  59   Male     490.8           7
+## 4  60   Male     347.8          10
+## 5  63 Female     478.0           4</code></pre>
+<p>Another pair of functions that do opposite manipulations are <code>separate()</code> and <code>unite()</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sepdat&lt;-<span class="st"> </span>msdat %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">separate</span>(variable,<span class="kw">c</span>(<span class="st">&quot;Source&quot;</span>,<span class="st">&quot;Type&quot;</span>))
+sepdat %&gt;%<span class="st"> </span><span class="kw">tbl_df</span>()</code></pre></div>
+<pre><code>## # A tibble: 10 x 5
+##      age gender Source  Type value
+##  * &lt;int&gt; &lt;fctr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt;
+##  1    57 Female  store   exp 529.1
+##  2    63 Female  store   exp 478.0
+##  3    59   Male  store   exp 490.8
+##  4    60   Male  store   exp 347.8
+##  5    51   Male  store   exp 379.6
+##  6    57 Female  store trans   2.0
+##  7    63 Female  store trans   4.0
+##  8    59   Male  store trans   7.0
+##  9    60   Male  store trans  10.0
+## 10    51   Male  store trans   4.0</code></pre>
+<p>You can see that the function separates the original column “<code>variable</code>” to two new columns “<code>Source</code>” and “<code>Type</code>”. You can use <code>sep=</code> to set the string or regular expression to separate the column. By default, it is “<code>_</code>”.</p>
+<p>The <code>unite()</code> function will do the opposite: combining two columns. It is the generalization of <code>paste()</code> to a data frame.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sepdat %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">unite</span>(<span class="st">&quot;variable&quot;</span>,Source,Type,<span class="dt">sep=</span><span class="st">&quot;_&quot;</span>)</code></pre></div>
+<pre><code>##    age gender    variable value
+## 1   57 Female   store_exp 529.1
+## 2   63 Female   store_exp 478.0
+## 3   59   Male   store_exp 490.8
+## 4   60   Male   store_exp 347.8
+## 5   51   Male   store_exp 379.6
+## 6   57 Female store_trans   2.0
+## 7   63 Female store_trans   4.0
+## 8   59   Male store_trans   7.0
+## 9   60   Male store_trans  10.0
+## 10  51   Male store_trans   4.0</code></pre>
+<p>The reshaping manipulations may be the trickiest part. You have to practice a lot to get familiar with those functions. Unfortunately, there is no shortcut.</p>
+
 </div>
-<h3> References</h3>
-<div id="refs" class="references">
-<div id="ref-APM">
-<p>Kuhn, Max, and Kjell Johnston. 2013. <em>Applied Predictive Modeling</em>. Springer.</p>
 </div>
-</div>
+<!-- </div> -->
             </section>
 
           </div>
         </div>
       </div>
-<a href="resolve-outliers.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="sparse-variables.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="data-wrangling-using-r.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="model-tuning-strategy.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -278,7 +355,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/happyrabbit/IntroDataScience/04-DataPreprocessing.Rmd",
+"link": "https://github.com/happyrabbit/IntroDataScience/05-DataWrangling.Rmd",
 "text": "Edit"
 },
 "download": ["IDS.pdf", "IDS.epub", "IDS.mobi"],

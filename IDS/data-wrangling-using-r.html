@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2018-01-23">
+<meta name="date" content="2018-01-24">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -33,7 +33,7 @@
   
   
 <link rel="prev" href="data-wrangling.html">
-<link rel="next" href="model-tuning-strategy.html">
+<link rel="next" href="tidy-and-reshape-data.html">
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
@@ -147,6 +147,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="4.1.1" data-path="data-wrangling-using-r.html"><a href="data-wrangling-using-r.html#read-and-write-data"><i class="fa fa-check"></i><b>4.1.1</b> Read and write data</a></li>
 <li class="chapter" data-level="4.1.2" data-path="data-wrangling-using-r.html"><a href="data-wrangling-using-r.html#summarize-data"><i class="fa fa-check"></i><b>4.1.2</b> Summarize data</a></li>
 <li class="chapter" data-level="4.1.3" data-path="data-wrangling-using-r.html"><a href="data-wrangling-using-r.html#dplyr-package"><i class="fa fa-check"></i><b>4.1.3</b> <code>dplyr</code> package</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="tidy-and-reshape-data.html"><a href="tidy-and-reshape-data.html"><i class="fa fa-check"></i><b>4.2</b> Tidy and Reshape Data</a><ul>
+<li class="chapter" data-level="4.2.1" data-path="tidy-and-reshape-data.html"><a href="tidy-and-reshape-data.html#reshape2-package"><i class="fa fa-check"></i><b>4.2.1</b> <code>reshape2</code> package</a></li>
+<li class="chapter" data-level="4.2.2" data-path="tidy-and-reshape-data.html"><a href="tidy-and-reshape-data.html#tidyr-package"><i class="fa fa-check"></i><b>4.2.2</b> <code>tidyr</code> package</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="model-tuning-strategy.html"><a href="model-tuning-strategy.html"><i class="fa fa-check"></i><b>5</b> Model Tuning Strategy</a><ul>
@@ -1078,17 +1082,59 @@ dplyr::<span class="kw">summarise_all</span>(sim.dat, <span class="kw">funs_</sp
 ##  [ reached getOption(&quot;max.print&quot;) -- omitted 950 rows ]</code></pre>
 <p>The above code sums up two columns and appends the result (<code>total_exp</code>) to <code>sim.dat</code>. Another similar function is <code>transmute()</code>. The difference is that <code>transmute()</code> will delete the original columns and only keep the new ones.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dplyr::<span class="kw">transmute</span>(sim.dat, <span class="dt">total_exp =</span> store_exp +<span class="st"> </span>online_exp) </code></pre></div>
-
+<p><strong>Merge</strong></p>
+<p>Similar to SQL, there are different joins in <code>dplyr</code>. We create two baby data sets to show how the functions work.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(x&lt;-<span class="kw">data.frame</span>(<span class="kw">cbind</span>(<span class="dt">ID=</span><span class="kw">c</span>(<span class="st">&quot;A&quot;</span>,<span class="st">&quot;B&quot;</span>,<span class="st">&quot;C&quot;</span>),<span class="dt">x1=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>))))</code></pre></div>
+<pre><code>##   ID x1
+## 1  A  1
+## 2  B  2
+## 3  C  3</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(y&lt;-<span class="kw">data.frame</span>(<span class="kw">cbind</span>(<span class="dt">ID=</span><span class="kw">c</span>(<span class="st">&quot;B&quot;</span>,<span class="st">&quot;C&quot;</span>,<span class="st">&quot;D&quot;</span>),<span class="dt">y1=</span><span class="kw">c</span>(T,T,F))))</code></pre></div>
+<pre><code>##   ID    y1
+## 1  B  TRUE
+## 2  C  TRUE
+## 3  D FALSE</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># join to the left</span>
+<span class="co"># keep all rows in x</span>
+<span class="kw">left_join</span>(x,y,<span class="dt">by=</span><span class="st">&quot;ID&quot;</span>)</code></pre></div>
+<pre><code>##   ID x1   y1
+## 1  A  1 &lt;NA&gt;
+## 2  B  2 TRUE
+## 3  C  3 TRUE</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get rows matched in both data sets</span>
+<span class="kw">inner_join</span>(x,y,<span class="dt">by=</span><span class="st">&quot;ID&quot;</span>)</code></pre></div>
+<pre><code>##   ID x1   y1
+## 1  B  2 TRUE
+## 2  C  3 TRUE</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get rows in either data set</span>
+<span class="kw">full_join</span>(x,y,<span class="dt">by=</span><span class="st">&quot;ID&quot;</span>)</code></pre></div>
+<pre><code>##   ID   x1    y1
+## 1  A    1  &lt;NA&gt;
+## 2  B    2  TRUE
+## 3  C    3  TRUE
+## 4  D &lt;NA&gt; FALSE</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># filter out rows in x that can be matched in y </span>
+<span class="co"># it doesn&#39;t bring in any values from y </span>
+<span class="kw">semi_join</span>(x,y,<span class="dt">by=</span><span class="st">&quot;ID&quot;</span>)</code></pre></div>
+<pre><code>##   ID x1
+## 1  B  2
+## 2  C  3</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># the opposite of  semi_join()</span>
+<span class="co"># it gets rows in x that cannot be matched in y</span>
+<span class="co"># it doesn&#39;t bring in any values from y</span>
+<span class="kw">anti_join</span>(x,y,<span class="dt">by=</span><span class="st">&quot;ID&quot;</span>)</code></pre></div>
+<pre><code>##   ID x1
+## 1  A  1</code></pre>
+<p>There are other functions(<code>intersect()</code>, <code>union()</code> and <code>setdiff()</code>). Also the data frame version of <code>rbind</code> and <code>cbind</code> which are <code>bind_rows()</code> and <code>bind_col()</code>. We are not going to go through them all. You can try them yourself. If you understand the functions we introduced so far. It should be easy for you to figure out the rest.</p>
 </div>
 </div>
-<!-- </div> -->
             </section>
 
           </div>
         </div>
       </div>
 <a href="data-wrangling.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="model-tuning-strategy.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="tidy-and-reshape-data.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>

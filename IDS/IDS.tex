@@ -207,7 +207,7 @@
 
 \title{Introduction to Data Science}
 \author{Hui Lin and Ming Li}
-\date{2018-01-23}
+\date{2018-01-24}
 
 \usepackage{amsthm}
 \newtheorem{theorem}{Theorem}[chapter]
@@ -4714,6 +4714,391 @@ delete the original columns and only keep the new ones.
 \end{Highlighting}
 \end{Shaded}
 
+\textbf{Merge}
+
+Similar to SQL, there are different joins in \texttt{dplyr}. We create
+two baby data sets to show how the functions work.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(x<-}\KeywordTok{data.frame}\NormalTok{(}\KeywordTok{cbind}\NormalTok{(}\DataTypeTok{ID=}\KeywordTok{c}\NormalTok{(}\StringTok{"A"}\NormalTok{,}\StringTok{"B"}\NormalTok{,}\StringTok{"C"}\NormalTok{),}\DataTypeTok{x1=}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{3}\NormalTok{))))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   ID x1
+## 1  A  1
+## 2  B  2
+## 3  C  3
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(y<-}\KeywordTok{data.frame}\NormalTok{(}\KeywordTok{cbind}\NormalTok{(}\DataTypeTok{ID=}\KeywordTok{c}\NormalTok{(}\StringTok{"B"}\NormalTok{,}\StringTok{"C"}\NormalTok{,}\StringTok{"D"}\NormalTok{),}\DataTypeTok{y1=}\KeywordTok{c}\NormalTok{(T,T,F))))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   ID    y1
+## 1  B  TRUE
+## 2  C  TRUE
+## 3  D FALSE
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# join to the left}
+\CommentTok{# keep all rows in x}
+\KeywordTok{left_join}\NormalTok{(x,y,}\DataTypeTok{by=}\StringTok{"ID"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   ID x1   y1
+## 1  A  1 <NA>
+## 2  B  2 TRUE
+## 3  C  3 TRUE
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# get rows matched in both data sets}
+\KeywordTok{inner_join}\NormalTok{(x,y,}\DataTypeTok{by=}\StringTok{"ID"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   ID x1   y1
+## 1  B  2 TRUE
+## 2  C  3 TRUE
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# get rows in either data set}
+\KeywordTok{full_join}\NormalTok{(x,y,}\DataTypeTok{by=}\StringTok{"ID"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   ID   x1    y1
+## 1  A    1  <NA>
+## 2  B    2  TRUE
+## 3  C    3  TRUE
+## 4  D <NA> FALSE
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# filter out rows in x that can be matched in y }
+\CommentTok{# it doesn't bring in any values from y }
+\KeywordTok{semi_join}\NormalTok{(x,y,}\DataTypeTok{by=}\StringTok{"ID"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   ID x1
+## 1  B  2
+## 2  C  3
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# the opposite of  semi_join()}
+\CommentTok{# it gets rows in x that cannot be matched in y}
+\CommentTok{# it doesn't bring in any values from y}
+\KeywordTok{anti_join}\NormalTok{(x,y,}\DataTypeTok{by=}\StringTok{"ID"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   ID x1
+## 1  A  1
+\end{verbatim}
+
+There are other functions(\texttt{intersect()}, \texttt{union()} and
+\texttt{setdiff()}). Also the data frame version of \texttt{rbind} and
+\texttt{cbind} which are \texttt{bind\_rows()} and \texttt{bind\_col()}.
+We are not going to go through them all. You can try them yourself. If
+you understand the functions we introduced so far. It should be easy for
+you to figure out the rest.
+
+\section{Tidy and Reshape Data}\label{tidy-and-reshape-data}
+
+``Tidy data'' represent the information from a dataset as data frames
+where each row is an observation, and each column contains the values of
+a variable (i.e., an attribute of what we are observing). Depending on
+the situation, the requirements on what to present as rows and columns
+may change. To make data easy to work with for the problem at hand, in
+practice, we often need to convert data between the ``wide'' and the
+``long'' format. The process feels like kneading the dough.
+
+There are two commonly used packages for this kind of manipulations:
+\texttt{tidyr} and \texttt{reshape2}. We will show how to tidy and
+reshape data using the two packages. By comparing the functions to show
+how they overlap and where they differ.
+
+\subsection{\texorpdfstring{\texttt{reshape2}
+package}{reshape2 package}}\label{reshape2-package}
+
+It is a reboot of the previous package \texttt{reshape}. Take a baby
+subset of our exemplary clothes consumers data to illustrate:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(sdat<-sim.dat[}\DecValTok{1}\NormalTok{:}\DecValTok{5}\NormalTok{,}\DecValTok{1}\NormalTok{:}\DecValTok{6}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   age gender income house store_exp online_exp
+## 1  57 Female 120963   Yes     529.1      303.5
+## 2  63 Female 122008   Yes     478.0      109.5
+## 3  59   Male 114202   Yes     490.8      279.2
+## 4  60   Male 113616   Yes     347.8      141.7
+## 5  51   Male 124253   Yes     379.6      112.2
+\end{verbatim}
+
+For the above data \texttt{sdat}, what if we want to have a variable
+indicating the purchasing channel (i.e.~online or in-store) and another
+column with the corresponding expense amount? Assume we want to keep the
+rest of the columns the same. It is a task to change data from ``wide''
+to ``long''. There are two general ways to shape data:
+
+\begin{itemize}
+\tightlist
+\item
+  Use \texttt{melt()} to convert an object into a molten data frame,
+  i.e., from wide to long
+\item
+  Use \texttt{dcast()} to cast a molten data frame into the shape you
+  want, i.e., from long to wide
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(reshape2)}
+\NormalTok{(mdat <-}\StringTok{ }\KeywordTok{melt}\NormalTok{(sdat, }\DataTypeTok{measure.vars=}\KeywordTok{c}\NormalTok{(}\StringTok{"store_exp"}\NormalTok{,}\StringTok{"online_exp"}\NormalTok{),}
+              \DataTypeTok{variable.name =} \StringTok{"Channel"}\NormalTok{,}
+              \DataTypeTok{value.name =} \StringTok{"Expense"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    age gender income house    Channel Expense
+## 1   57 Female 120963   Yes  store_exp   529.1
+## 2   63 Female 122008   Yes  store_exp   478.0
+## 3   59   Male 114202   Yes  store_exp   490.8
+## 4   60   Male 113616   Yes  store_exp   347.8
+## 5   51   Male 124253   Yes  store_exp   379.6
+## 6   57 Female 120963   Yes online_exp   303.5
+## 7   63 Female 122008   Yes online_exp   109.5
+## 8   59   Male 114202   Yes online_exp   279.2
+## 9   60   Male 113616   Yes online_exp   141.7
+## 10  51   Male 124253   Yes online_exp   112.2
+\end{verbatim}
+
+You melted the data frame \texttt{sdat} by two variables:
+\texttt{store\_exp} and \texttt{online\_exp}
+(\texttt{measure.vars=c("store\_exp","online\_exp")}). The new variable
+name is \texttt{Channel} set by command
+\texttt{variable.name\ =\ "Channel"}. The value name is \texttt{Expense}
+set by command \texttt{value.name\ =\ "Expense"}.
+
+You can run a regression to study the effect of purchasing channel as
+follows:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Here we use all observations from sim.dat}
+\CommentTok{# Don't show result here}
+\NormalTok{mdat<-}\KeywordTok{melt}\NormalTok{(sim.dat[,}\DecValTok{1}\NormalTok{:}\DecValTok{6}\NormalTok{], }\DataTypeTok{measure.vars=}\KeywordTok{c}\NormalTok{(}\StringTok{"store_exp"}\NormalTok{,}\StringTok{"online_exp"}\NormalTok{),}
+            \DataTypeTok{variable.name =} \StringTok{"Channel"}\NormalTok{,}
+              \DataTypeTok{value.name =} \StringTok{"Expense"}\NormalTok{)}
+\NormalTok{fit<-}\KeywordTok{lm}\NormalTok{(Expense~gender+house+income+Channel+age,}\DataTypeTok{data=}\NormalTok{mdat)}
+\KeywordTok{summary}\NormalTok{(fit)}
+\end{Highlighting}
+\end{Shaded}
+
+You can \texttt{melt()} list, matrix, table too. The syntax is similar,
+and we won't go through every situation. Sometimes we want to convert
+the data from ``long'' to ``wide''. For example, \textbf{you want to
+compare the online and in-store expense between male and female based on
+the house ownership. }
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{dcast}\NormalTok{(mdat, house +}\StringTok{ }\NormalTok{gender ~}\StringTok{ }\NormalTok{Channel, sum)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Using 'Expense' as value column. Use 'value.var' to override
+\end{verbatim}
+
+\begin{verbatim}
+##   house gender store_exp online_exp
+## 1   Yes Female      1007      413.0
+## 2   Yes   Male      1218      533.2
+\end{verbatim}
+
+In the above code, what is the left side of \texttt{\textasciitilde{}}
+are variables that you want to group by. The right side is the variable
+you want to spread as columns. It will use the column indicating value
+from \texttt{melt()} before. Here is ``\texttt{Expense}'' .
+
+\subsection{\texorpdfstring{\texttt{tidyr}
+package}{tidyr package}}\label{tidyr-package}
+
+The other package that will do similar manipulations is \texttt{tidyr}.
+Let's get a subset to illustrate the usage.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(dplyr)}
+\CommentTok{# practice functions we learnt before}
+\NormalTok{sdat<-sim.dat[}\DecValTok{1}\NormalTok{:}\DecValTok{5}\NormalTok{,]%>%}
+\StringTok{  }\NormalTok{dplyr::}\KeywordTok{select}\NormalTok{(age,gender,store_exp,store_trans)}
+\NormalTok{sdat %>%}\StringTok{ }\KeywordTok{tbl_df}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 5 x 4
+##     age gender store_exp store_trans
+## * <int> <fctr>     <dbl>       <int>
+## 1    57 Female     529.1           2
+## 2    63 Female     478.0           4
+## 3    59   Male     490.8           7
+## 4    60   Male     347.8          10
+## 5    51   Male     379.6           4
+\end{verbatim}
+
+\texttt{gather()} function in \texttt{tidyr} is analogous to
+\texttt{melt()} in \texttt{reshape2}. The following code will do the
+same thing as we did before using \texttt{melt()}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(tidyr)}
+\NormalTok{msdat<-tidyr::}\KeywordTok{gather}\NormalTok{(sdat,}\StringTok{"variable"}\NormalTok{,}\StringTok{"value"}\NormalTok{,store_exp,store_trans)}
+\NormalTok{msdat %>%}\StringTok{ }\KeywordTok{tbl_df}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 10 x 4
+##      age gender    variable value
+##    <int> <fctr>       <chr> <dbl>
+##  1    57 Female   store_exp 529.1
+##  2    63 Female   store_exp 478.0
+##  3    59   Male   store_exp 490.8
+##  4    60   Male   store_exp 347.8
+##  5    51   Male   store_exp 379.6
+##  6    57 Female store_trans   2.0
+##  7    63 Female store_trans   4.0
+##  8    59   Male store_trans   7.0
+##  9    60   Male store_trans  10.0
+## 10    51   Male store_trans   4.0
+\end{verbatim}
+
+Or if we use the pipe operation, we can write the above code as:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sdat%>%}\KeywordTok{gather}\NormalTok{(}\StringTok{"variable"}\NormalTok{,}\StringTok{"value"}\NormalTok{,store_exp,store_trans)}
+\end{Highlighting}
+\end{Shaded}
+
+It is identical with the following code using \texttt{melt()}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{melt}\NormalTok{(sdat, }\DataTypeTok{measure.vars=}\KeywordTok{c}\NormalTok{(}\StringTok{"store_exp"}\NormalTok{,}\StringTok{"store_trans"}\NormalTok{),}
+            \DataTypeTok{variable.name =} \StringTok{"variable"}\NormalTok{,}
+              \DataTypeTok{value.name =} \StringTok{"value"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+The opposite operation to \texttt{gather()} is \texttt{spread()}. The
+previous one stacks columns and the latter one spread the columns.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{msdat %>%}\StringTok{ }\KeywordTok{spread}\NormalTok{(variable,value)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   age gender store_exp store_trans
+## 1  51   Male     379.6           4
+## 2  57 Female     529.1           2
+## 3  59   Male     490.8           7
+## 4  60   Male     347.8          10
+## 5  63 Female     478.0           4
+\end{verbatim}
+
+Another pair of functions that do opposite manipulations are
+\texttt{separate()} and \texttt{unite()}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sepdat<-}\StringTok{ }\NormalTok{msdat %>%}\StringTok{ }
+\StringTok{  }\KeywordTok{separate}\NormalTok{(variable,}\KeywordTok{c}\NormalTok{(}\StringTok{"Source"}\NormalTok{,}\StringTok{"Type"}\NormalTok{))}
+\NormalTok{sepdat %>%}\StringTok{ }\KeywordTok{tbl_df}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 10 x 5
+##      age gender Source  Type value
+##  * <int> <fctr>  <chr> <chr> <dbl>
+##  1    57 Female  store   exp 529.1
+##  2    63 Female  store   exp 478.0
+##  3    59   Male  store   exp 490.8
+##  4    60   Male  store   exp 347.8
+##  5    51   Male  store   exp 379.6
+##  6    57 Female  store trans   2.0
+##  7    63 Female  store trans   4.0
+##  8    59   Male  store trans   7.0
+##  9    60   Male  store trans  10.0
+## 10    51   Male  store trans   4.0
+\end{verbatim}
+
+You can see that the function separates the original column
+``\texttt{variable}'' to two new columns ``\texttt{Source}'' and
+``\texttt{Type}''. You can use \texttt{sep=} to set the string or
+regular expression to separate the column. By default, it is
+``\texttt{\_}''.
+
+The \texttt{unite()} function will do the opposite: combining two
+columns. It is the generalization of \texttt{paste()} to a data frame.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sepdat %>%}\StringTok{ }
+\StringTok{  }\KeywordTok{unite}\NormalTok{(}\StringTok{"variable"}\NormalTok{,Source,Type,}\DataTypeTok{sep=}\StringTok{"_"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    age gender    variable value
+## 1   57 Female   store_exp 529.1
+## 2   63 Female   store_exp 478.0
+## 3   59   Male   store_exp 490.8
+## 4   60   Male   store_exp 347.8
+## 5   51   Male   store_exp 379.6
+## 6   57 Female store_trans   2.0
+## 7   63 Female store_trans   4.0
+## 8   59   Male store_trans   7.0
+## 9   60   Male store_trans  10.0
+## 10  51   Male store_trans   4.0
+\end{verbatim}
+
+The reshaping manipulations may be the trickiest part. You have to
+practice a lot to get familiar with those functions. Unfortunately,
+there is no shortcut.
+
 \chapter{Model Tuning Strategy}\label{model-tuning-strategy}
 
 When training a machine learning model, there are many decisions to
@@ -4957,7 +5342,7 @@ sample, the result curve will change significantly:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-75-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-89-1.pdf}
 
 The fitted lines (blue) change over different samples which means it has
 high variance. People also call it overfitting. Fitting the linear model
@@ -4977,7 +5362,7 @@ using the same four subsets, the result barely changes:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-76-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-90-1.pdf}
 
 In general, the variance (\(Var(\hat{f}(\mathbf{X}))\))
 \textbf{increases} and the bias (\(Bias(\hat{f}(\mathbf{X}))\))
