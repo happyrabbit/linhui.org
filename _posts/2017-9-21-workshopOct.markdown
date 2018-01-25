@@ -4,7 +4,6 @@ layout: post
 time: '12:30'
 ---
 
-## Customer Analytics in a Multichannel World 
 
 
 <p align="center">
