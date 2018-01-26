@@ -3,7 +3,7 @@ title: Customer Based Corporate Valuation (Online Workshop)
 layout: post
 ---
 
-## Customer-Based Corporate Valuation: Modeling with Limited, Aggregated, Missing Data
+
 
 <p align="center">
   <img src="http://scientistcafe.com/images/Corporate-Valuation-Services.png"  width="80%" />
@@ -29,6 +29,7 @@ variable models for customer behavior.
 <head>
     <!-- 1. Include style -->
     <link href="http://addtocalendar.com/atc/1.5/atc-style-blue.css" rel="stylesheet" type="text/css">
+    <!--  Customer-Based Corporate Valuation: Modeling with Limited, Aggregated, Missing Data-->
 </head>
 <body>
     <!-- 2. Include script -->

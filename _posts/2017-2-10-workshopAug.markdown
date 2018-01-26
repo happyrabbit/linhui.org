@@ -3,7 +3,6 @@ title: Customer Preference for (Un)biased News (Online Workshop)
 layout: post
 ---
 
-## Demand for (Un)Biased News: The Role of Government Control in Online News Markets
 
 <p align="center">
   <img src="http://scientistcafe.com/images/online_news.png"  width="80%" />
@@ -32,6 +31,7 @@ findings. Andrey’s work is a good example of analyzing social media based on e
 <head>
     <!-- 1. Include style -->
     <link href="http://addtocalendar.com/atc/1.5/atc-style-blue.css" rel="stylesheet" type="text/css">
+    <! --Demand for (Un)Biased News: The Role of Government Control in Online News Markets -->
 </head>
 <body>
     <!-- 2. Include script -->
