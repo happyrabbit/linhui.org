@@ -202,7 +202,7 @@
 
 \title{SQL for Data Science}
 \author{Hui Lin}
-\date{2018-01-10}
+\date{2018-01-26}
 
 \usepackage{amsthm}
 \newtheorem{theorem}{Theorem}[chapter]
@@ -2053,6 +2053,131 @@ Example:
     \href{https://blog.sqlauthority.com/2009/03/11/sql-server-difference-between-union-vs-union-all-optimal-performance-comparison/}{Difference
     Between Union and Union All - Optimal Performance Comparison}
   \end{itemize}
+\end{itemize}
+
+\chapter{Modifying and Analyzing Data with
+SQL}\label{modifying-and-analyzing-data-with-sql}
+
+\section{Text Strings}\label{text-strings}
+
+\begin{itemize}
+\tightlist
+\item
+  Concatenate or combine strings
+\end{itemize}
+
+SQL use the pipe or vertical bar key (\texttt{\textbar{}\textbar{}}) to
+concatenate strings. The following example concatenates the company name
+and the contact name. What it does are:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  use \texttt{SELECT} statement to pull the company name and contact
+  name
+\item
+  concatenate these two together
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT}
+\NormalTok{CompanyName, ContactName, CompanyName || }\StringTok{'  ( '} \NormalTok{|| ContactName || }\StringTok{' ) '}
+\KeywordTok{FROM} \NormalTok{customers}
+\end{Highlighting}
+\end{Shaded}
+
+It's important to know that the different relational database management
+systems use different formats. SQL server, for example, uses the plus
+sign (\texttt{+}) instead of a pipe (\texttt{\textbar{}\textbar{}}).
+
+\begin{itemize}
+\tightlist
+\item
+  Trim strings
+\end{itemize}
+
+With trimming function, you can either trim everything off the front and
+the back, or you can just trim it from the right or left. To do this,
+we're going to use the simple function called \texttt{TRIM}. We also
+have \texttt{RTRIM} and \texttt{LTRIM}, for right trim and left trim
+respectively.
+
+In the following example, there are trailing spaces before and after the
+string. The \texttt{TRIM} takes care of all of the trailing spaces which
+is an easy way to clean up your data and will save you a lot of hassle
+in the long run.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT} \FunctionTok{TRIM} \NormalTok{(}\OtherTok{"  You the best,      "}\NormalTok{)  }\KeywordTok{AS} \NormalTok{TrimmedString;}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
+\item
+  Use the substring function
+\end{itemize}
+
+Substring returns the specified number of characters from a particular
+position of a given string
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule
+First\_name & \texttt{substr(first\_name,\ 2,\ 3)}\tabularnewline
+\midrule
+\endhead
+Alexander & lex\tabularnewline
+Bruce & ruc\tabularnewline
+David & avi\tabularnewline
+Valli & all\tabularnewline
+Diana & ian\tabularnewline
+\bottomrule
+\end{longtable}
+
+In \texttt{substr(first\_name,\ 2,\ 3)}, the first one is string name,
+the second one is string position, and the third is number of characters
+to be returned.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT} \NormalTok{first_name, }\FunctionTok{SUBSTR}\NormalTok{(first_name, }\DecValTok{2}\NormalTok{, }\DecValTok{3}\NormalTok{)}
+\KeywordTok{FROM} \NormalTok{employees}
+\KeywordTok{WHERE} \NormalTok{department_id = }\DecValTok{60}\NormalTok{;}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{itemize}
+\tightlist
+\item
+  Change the case of strings
+\end{itemize}
+
+This is an easy one : )
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT} \FunctionTok{UPPER}\NormalTok{(column_name) }\KeywordTok{FROM} \NormalTok{table_name;}
+\KeywordTok{SELECT} \FunctionTok{LOWER}\NormalTok{(column_name) }\KeywordTok{FROM} \NormalTok{table_name;}
+\NormalTok{SLECT UCASE(column_name) }\KeywordTok{FROM} \NormalTok{table_name;}
+\end{Highlighting}
+\end{Shaded}
+
+\section{Date and Time Strings}\label{date-and-time-strings}
+
+Learning Objectives:
+
+\begin{itemize}
+\tightlist
+\item
+  Describe the complexities of adjusting date and time strings
+\item
+  Discuss the different formats in which dates and times are presented
+\item
+  List and describe the five different functions in SQL that can be used
+  to manipulate data time strings
 \end{itemize}
 
 \bibliography{book.bib}
