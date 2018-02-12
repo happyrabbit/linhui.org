@@ -11,6 +11,7 @@ colorlinks: yes
 lot: yes
 lof: yes
 fontsize: 12pt
+always_allow_html: yes
 monofont: "Source Code Pro"
 monofontoptions: "Scale=0.7"
 site: bookdown::bookdown_site
@@ -45,3 +46,34 @@ Learning is happening increasingly outside of formal educational settings and in
 1. Chunking: cluster similar information, filter out some detail, degrade the complexity
 
 The reading notes are arranged according to book category in my reading list since 2009. For some reason I lost all reading information before 2009. There are tons of paper notes need to be digitized and I will keep working on it in my spare time. My personal comments will start with “Hui:” in blue. Sometimes I summarize the contents with my own words. It is great if you find any of those notes useful for you as well. I thank all my friends who recommended great books to me. I wrote this notes with [R Markdown](https://rmarkdown.rstudio.com)  and the R package [bookdown](https://bookdown.org/yihui/bookdown/).
+
+```{r, message=FALSE, warning=FALSE}
+library(dplyr)
+library(DT)
+dat <- read.csv("1_KnowledgeStructure/RawData/ReadingListHui.csv")
+dat %>%
+  select(Name, ProDetail, Category, Topic) %>%
+  datatable(filter = "top")
+```
+
+- **Name**: Book name
+- **Category**: Book category
+- **ProDetail**: My reading status
+    - `HaveNotRead`: have not started reading
+    - `RoughReading`: just got the structure and key ideas of the book without getting to every glorious detail
+    - `PartialReading`: read carefully for some parts of the book but not the whole
+    - `ThroughReading`: read word by word for the whole book
+    - `IntensiveReading`: read repeatedly and try to understand it very well
+- **Topic**: the subject of the book. I use the information to classify books to do “syntoptical reading” which is to read two or more books on the same subjects. You may find lots of missing values here as I just began my journey on this. Also, it is not easy to identify books with “same subject”. I will only assign subject to non-fictions.
+- **Priority**: priority of writing book summary
+
+The categories are:
+
+```{r}
+dat %>%
+  group_by(Category) %>%
+  summarise( count = n()) %>%
+  arrange(desc(count)) %>%
+  datatable()
+```
+
