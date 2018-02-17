@@ -37,5 +37,80 @@ options(
 #bookdown::render_book("index.Rmd", "bookdown::pdf_book")
 ```
 
+# Introduction{-}
+
+Learning is happening increasingly outside of formal educational settings and in unsupervised environments. Technological advantages provide new tools and opportunities for life-time learners. This reading notes is my first step of managing my learning (aka: Personal Knowledge Management). This step is called Personal Information Management(PIM). The goals are:
+
+1. Organize information
+1. Initially process the information and understand the information structure
+1. Chunking: cluster similar information, filter out some detail, degrade the complexity
+
+The reading notes are arranged according to book category in my reading list since 2009. For some reason I lost all reading information before 2009. There are tons of paper notes need to be digitized and I will keep working on it in my spare time. My personal comments will start with “Hui:” in blue. Sometimes I summarize the contents with my own words. It is great if you find any of those notes useful for you as well. I thank all my friends who recommended great books to me. I wrote this notes with [R Markdown](https://rmarkdown.rstudio.com)  and the R package [bookdown](https://bookdown.org/yihui/bookdown/).
+
+```{r, message=FALSE, warning=FALSE}
+library(dplyr)
+library(DT)
+library(ggplot2)
+dat <- read.csv("1_KnowledgeStructure/RawData/ReadingListHui.csv")
+dat %>%
+  select(Name, ProDetail, Category, Topic) %>%
+  datatable(filter = "top", options = list(pageLength = 50))
+```
+
+- **Name**: Book name
+- **Category**: Book category
+- **ProDetail**: My reading status
+    - `HaveNotRead`: have not started reading
+    - `RoughReading`: just got the structure and key ideas of the book without getting to every glorious detail
+    - `PartialReading`: read carefully for some parts of the book but not the whole
+    - `ThroughReading`: read word by word for the whole book
+    - `IntensiveReading`: read repeatedly and try to understand it very well
+- **Topic**: the subject of the book. I use the information to classify books to do “syntoptical reading” which is to read two or more books on the same subjects. You may find lots of missing values here as I just began my journey on this. Also, it is not easy to identify books with “same subject”. I will only assign subject to non-fictions.
+- **Priority**: priority of writing book summary
+
+The categories are:
+
+```{r}
+dat %>%
+  group_by(Category) %>%
+  summarise( count = n()) %>%
+  arrange(desc(count)) %>%
+  datatable()
+```
+
+## Rules of Generating book ID
+
+It is tentative. I don’t think I will label my books. It was originally motivated by being able to find a book more easily. But it seems that I remember where to get a book when I need it.
+
+1. **Category code** + **Number**
+2. **Number** was origionally assigned as the rank of the book in its category devided by 100 (i.e rank/100)
+3. For new book
+    1. search for the maximum number in that category (`mn`)
+    2. use `mn+0.01` as number for the new book
+
+## Basic Statistical Analysis
+
+Here is a plot for counts of books in each category……
+
+```{r}
+pdat <- dat %>%
+  group_by(Category) %>%
+  summarise(Count = n())
+ggplot(pdat, aes(x = reorder(Category, Count), y = Count, fill = Category)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  theme(legend.position="none", axis.title.y=element_blank()) 
+```
+
+Here is a plot showing the percentage of books I have started (or finished) across different categories.
+
+```{r}
+ggplot(dat,aes(Category, fill = ProDetail)) +
+  geom_bar(position = "fill") +
+  coord_flip() +
+  theme( axis.title.y=element_blank(),
+         axis.title.x=element_blank()) 
+```
+
 
 
