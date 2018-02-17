@@ -1,109 +1,78 @@
 \mainmatter
 
-# Cognitive Science
-## Thinking Fast and Slow
 
-一、大脑的运作机制
+# Introduction
 
-1、大脑的运作是双核系统，有快与慢两种系统模式。
+Learning is happening increasingly outside of formal educational settings and in unsupervised environments. Technological advantages provide new tools and opportunities for life-time learners. This reading notes is my first step of managing my learning (aka: Personal Knowledge Management). This step is called Personal Information Management(PIM). The goals are:
 
-系统1：快的思考方式，即直觉系统，就像自动驾驶系统，指人类无意识的快速思考模式，依赖情感、经验和记忆来做决策判断，不怎么费脑力。
+1. Organize information
+1. Initially process the information and understand the information structure
+1. Chunking: cluster similar information, filter out some detail, degrade the complexity
 
-系统2：慢的思考方式，就像手动驾驶，指有意识进行的一种更慢、更严谨，需要投入更多脑力的思考模式，不容易出错但它很懒惰，经常走捷径，直接采纳系统1的直觉型判断结果。
+The reading notes are arranged according to book category in my reading list since 2009. For some reason I lost all reading information before 2009. There are tons of paper notes need to be digitized and I will keep working on it in my spare time. My personal comments will start with “Hui:” in blue. Sometimes I summarize the contents with my own words. It is great if you find any of those notes useful for you as well. I thank all my friends who recommended great books to me. I wrote this notes with [R Markdown](https://rmarkdown.rstudio.com)  and the R package [bookdown](https://bookdown.org/yihui/bookdown/).
 
-2、误区：主导决策和判断的主角是系统2？
+```{r, message=FALSE, warning=FALSE}
+library(dplyr)
+library(DT)
+library(ggplot2)
+dat <- read.csv("1_KnowledgeStructure/RawData/ReadingListHui.csv")
+dat %>%
+  select(Name, ProDetail, Category, Topic) %>%
+  datatable(filter = "top", options = list(pageLength = 50))
+```
 
-其实真正的主角是系统1，系统2只是配角。
+- **Name**: Book name
+- **Category**: Book category
+- **ProDetail**: My reading status
+    - `HaveNotRead`: have not started reading
+    - `RoughReading`: just got the structure and key ideas of the book without getting to every glorious detail
+    - `PartialReading`: read carefully for some parts of the book but not the whole
+    - `ThroughReading`: read word by word for the whole book
+    - `IntensiveReading`: read repeatedly and try to understand it very well
+- **Topic**: the subject of the book. I use the information to classify books to do “syntoptical reading” which is to read two or more books on the same subjects. You may find lots of missing values here as I just began my journey on this. Also, it is not easy to identify books with “same subject”. I will only assign subject to non-fictions.
+- **Priority**: priority of writing book summary
 
-因为大多数情况下都是系统1在处理，而系统1用直觉进行思考判断的速度非常快，快到往往在人们还没有意识到就将问题处理完了。而如果让系统2来处理，凡事都通过深思熟虑来做决策，实在是太耗费脑力和精力。
+The categories are:
 
-3、系统1和系统2的运作机制
+```{r}
+dat %>%
+  group_by(Category) %>%
+  summarise( count = n()) %>%
+  arrange(desc(count)) %>%
+  datatable()
+```
 
-这两个系统之间的互动，构成了大脑认知和思考的运作机制：
+## Rules of Generating book ID
 
-大多数情况下是系统1用直觉来快速处理，只有在系统1遇到解决不了的问题时，才求助于系统2，系统2才会调动注意力、分析力来思考和解决问题。
+It is tentative. I don’t think I will label my books. It was originally motivated by being able to find a book more easily. But it seems that I remember where to get a book when I need it.
 
-优势：这样既能节约脑力，又能解决绝大多数问题。
+1. **Category code** + **Number**
+2. **Number** was origionally assigned as the rank of the book in its category devided by 100 (i.e rank/100)
+3. For new book
+    1. search for the maximum number in that category (`mn`)
+    2. use `mn+0.01` as number for the new book
 
-弊端：我们容易被系统1也就是直觉所欺骗和糊弄。
+## Basic Statistical Analysis
 
-原因是这种互动的运作机制存在漏洞，即有时候系统1面对不擅长解决而需要系统2介入的问题，却非要用直觉来做判断和处理，而系统2容易怠倦就盲目相信系统1能处理，最终导致决策失误。
+Here is a plot for counts of books in each category……
 
-二、欺骗我们的三大直觉漏洞
+```{r}
+pdat <- dat %>%
+  group_by(Category) %>%
+  summarise(Count = n())
+ggplot(pdat, aes(x = reorder(Category, Count), y = Count, fill = Category)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  theme(legend.position="none", axis.title.y=element_blank()) 
+```
 
-直觉系统会对我们的观点和行为有无所不在的影响，却存在不可避免的错误和偏颇，导致我们容易被直觉糊弄和欺骗，从而过分自信和决策失误。
+Here is a plot showing the percentage of books I have started (or finished) across different categories.
 
-直觉漏洞一：简单联想
-指做决定并不是深思熟虑根据分析和判断来进行，而是直觉系统启动联想效应，以联想到的相关事情来作为判断的重要依据。
+```{r}
+ggplot(dat,aes(Category, fill = ProDetail)) +
+  geom_bar(position = "fill") +
+  coord_flip() +
+  theme( axis.title.y=element_blank(),
+         axis.title.x=element_blank()) 
+```
 
-启动效应
-
-也可以说联想效应，指大脑一旦接受一个新的概念或者信息的时候，立刻启动联想这个机制，带动与此相关的其他记忆和感情。
-
-案例一：心理学实验“投票地点对投票结果的影响”
-
-案例二：心理学实验“图像对自助付款的监督效果对比”
-
-案列三：心理学实验“阅读包含老人意象的词组后影响行动力变慢”
-
-案例四：心理学实验“慢速走路后更容易发现类似老人这样的词组”
-
-很多人利用简单联想来影响我们的行为和决策
-
-广告商深谙简单联想的巨大威力，比如可口可乐。
-
-我们自己因简单联想的影响而决策失误
-
-很可能在生活中因为前一次成功的经验就会简单联想到之后也会成功。
-
-比如：赌钱的人，赢钱了就觉得接下来还会赢。
-
-直觉漏洞二：易得性判断
-指只利用大脑能够想得起来的信息进行判断。直觉系统的这个漏洞，会给决策带来很多问题。比如：100个因素需要分析，大脑只能想到5个因素，直觉就会只用这5个因素来拼凑一个合理的结论。
-
-故事比统计概率更能说服我们。
-
-直觉系统，宁愿相信貌似合理的结论而不是一个可能性更高的结论。这和逻辑、统计概率相矛盾
-
-案例一：心理学经典案列“琳达实验”
-
-易得性原理
-
-指直觉系统通过易得性的数据信息进行貌似合理的分析判断，而不容易得到的信息，都不会主动去思考判断，因为快思考的模式，而容易忽略重要的关键因素。
-
-比如：因为学生的纹身而判断他成绩不好。因为领导演讲很棒，就觉得他是一个合格的好领导。
-
-如果一件事需要对100个因素进行分析，但是大脑只能想到5个因素，直觉就会只用这5个因素来拼凑一个合理的结论，并且只相信这个结论。
-
-直觉漏洞三：因果联系
-指直觉系统习惯于用因果关系解释自己观察到的现象，否认随机性。
-
-对随机性的误解和错觉
-
-未经过统计学训练的人，很难相信随机性，更倾向于用虚假的因果关系去解释他们认为不随机的事件。
-
-案例一：篮球运动中的投篮顺手观点，其实只是随机现象带来的“运气”
-
-在随机事件上寻找因果联系会导致极大的损失
-
-案例二：小样本带来的统计大损失——比尔盖茨基金会赞助17亿美元的无用研究
-
-三、如何避免被直觉的漏洞所欺骗？
-
-解决方案很简单，即在关键时候让系统二介入来处理。
-难点在于：质疑直觉系统很难，会让我们有压力，不愉快，想要逃避。这也是为什么直觉系统这些漏洞发生后，我们根本意识不到的原因。
-
-两个实用方法
-引入外部意见，并结合核查清单的方法，能帮助我们在关键时刻调动系统二介入，从而避免直觉系统犯错误。
-
-方法一：引入外部意见
-
-指旁观者清，应当多听从外部的信息来做思考判断。
-
-案例一：作者花费8年事件编写出版教材的失败经历
-
-方法二：核查清单
-
-相当于给大脑找一个外部专家，借助清单这样的外部工具，将直觉带来的错觉写进核查清单来提醒自己，在关键时刻抵制直觉系统犯错误。
-
-案例一：查理芒格用误判清单来提醒自己在重大投资和决策的时候不要犯错。
