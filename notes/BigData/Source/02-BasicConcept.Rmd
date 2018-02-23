@@ -1,0 +1,60 @@
+# Basic scalable computing concepts
+
+Before we start diving into the details of the Hadoop framework for big data, it is worthwhile to understand some fundamental concepts in computing. The understanding will help you digest the information on Hadoop better and faster. In addition, we want to prepare you to understand the tools beyond Hadoop. Any big data system that you find will be built on these core concepts.
+
+What is a distributed file system?
+ 
+<!--
+You should:
+
+- Describe what a file system is
+- Explain the reasons to have distributed file systems and how it helps big data analysis
+-  Visualize the organization of data in physical compute and storage nodes for big data architectures
+-->
+
+Most of us have file cabinets in our offices or homes that help us store our printed documents. Everyone has their own method of organizing files, including the way we bin similar documents into one file, or the way we sort them in alphabetical or date order.
+
+<center>
+![](images/FileCabinet.png){width=50%}
+</center>
+
+When computers first came out, the information and programs were stored in punch cards.
+ 
+![](images/PunchCard.png)
+
+These punch cards were stored in file cabinets, just like the physical file cabinets today. This is where the name and file system comes from. The need to store information in files comes from a crying out to store information in the long-term. This way the information lives after the computer program or after the termination of the process that produced it. In addition, once the data is in a file, multiple processes can access the same information if needed. For all these reasons, we store information in files on a hard disk.
+ 
+There are many of these files, and they get managed by your operating system, like Windows or Linux. How the operating system manages files is called a file system. How this information is stored on disk drives has high impact on the efficiency and speed of access to data, especially in the big data case. The files have exact addresses for their locations in the drive, referring to the data units of sequence of these blocks. It is called the flat structure, or hierarchy construction of index records, that's called the database.
+ 
+They also have human readable symbolic names, generally followed by an extension. Extensions tell what kind of file it is, in general. Programs and users can access files with their names.
+ 
+Most computer users work on personal laptops or desktop computers with a single hard drive. In this model, the user is limited to the capacity of their hard drive. The capacity of different devices vary.
+ 
+For example, while your phone or tablet might have a storage capacity in the order of gigabytes, your laptop computer might have a terabyte of storage, but what if you have more data?
+ 
+Some of you probably had issues in the past with running out of space on your hard drive.
+A way to solve this is to have an external hard drive and store your files there or, you can buy a bigger disk. Both options are a bit of a hassle, to copy the data to a new disk, aren't they?
+ 
+Now imagine, you having two computers and storing some of your data in one and the rest of your data in another. How you organize and partition your data between these computers is up to you. You might want to store your work data in one computer and your personal data in another. Distributing data on multiple computers might be an option, but it raises new issues. In this situation, you need to know where to find the files you need depending on what you’re doing.
+ 
+You can find it manageable, if it’s just your data. But now imagine having thousands of computers to store data with big volumes and variety. Is there a system that can handle the data access and do this for you?
+ 
+![](images/pcs.png)
+ 
+This is a case that can be handled by a Distributed File System (DFS) where there are thousands of compute nodes operating more or less independently. In this situation, the compute nodes are commodity hardware rather than special-purpose parallel machines. Computer nodes are stored on racks, perhaps 8-64 per rack.
+
+![](images/rack.png)
+
+The compute nodes may fail which is a fact of life. The more component a system has, the more frequently something in the system will not be working at any given time. Some important calculations take minutes or even hours on thousands of compute nodes. If we have to restart everything when the one component fails, then the task will take forever to complete. The solution takes two forms:
+
+1. Replicate data. If we replicate the data between the racks, and computers distributed across geographical regions. When some nodes or a rack goes down, there are other parts of the system, the same data can be found and analyzed. Data replication also helps with scaling the access to this data by many users.
+2. Divide computations to parallel tasks. If one task fails, it won’t affect other tasks.
+
+In a highly parallelized replication, each reader can get their own node to access to and analyze data. This increases overall system performance. However, a problem with having such a distributed replication is that it is hard to make changes to data over time. So the files in DFS system should not only be large, but also rarely updated. They are data for some calculation, and maybe additional data is appended to files from time to time. One example that you shouldn’t use DFS is airline reservation system. Even the data is very large, it is changed so frequently.
+ 
+As a summary, a file system is responsible from the organization of the long term information storage in a computer. When many storage computers are connected through the network, we call it a distributed file system. Distributed file systems provide data scalability, fault tolerance, and high concurrency through partitioning and replication of data on many nodes. The data in the system should be rarely updated.
+ 
+Files are divided to chunks, which are typically 64 MB. Chunks are replicated, perhaps three times, at three different nodes. Moreover, the nodes holding copies of one chunk should be located on different racks, so we don’t lose all copies due to a rack failure. Normally, both the chunk size and the degree of replication can be decided by the user.
+
+To find the chunks of a file, there is another small file called the _master node_ or _name node_ for that file. The master node is itself replicated, and a directory for the file system as a whole knows where to find its copies. The directory itself can be replicated, and all participants using the DFS know where the directory copies are. 
+
