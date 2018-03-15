@@ -7,7 +7,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Introduction to Data Science</title>
   <meta name="description" content="Introduction to Data Science">
-  <meta name="generator" content="bookdown 0.4 and GitBook 2.6.7">
+  <meta name="generator" content="bookdown 0.7 and GitBook 2.6.7">
 
   <meta property="og:title" content="Introduction to Data Science" />
   <meta property="og:type" content="book" />
@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2018-01-24">
+<meta name="date" content="2018-03-15">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -164,7 +164,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="6" data-path="measuring-performance.html"><a href="measuring-performance.html"><i class="fa fa-check"></i><b>6</b> Measuring Performance</a></li>
-<li class="chapter" data-level="7" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>7</b> References</a></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
 
@@ -189,7 +189,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h2><span class="header-section-number">3.8</span> Re-encode Dummy Variables</h2>
 <p>A dummy variable is a binary variable (0/1) to represent subgroups of the sample. Sometimes we need to recode categories to smaller bits of information named “dummy variables.” For example, some questionnaires have five options for each question, A, B, C, D, and E. After you get the data, you will usually convert the corresponding categorical variables for each question into five nominal variables, and then use one of the options as the baseline.</p>
 <p>Let’s encode <code>gender</code> and <code>house</code> from <code>sim.dat</code> to dummy variables. There are two ways to implement this. The first is to use <code>class.ind()</code> from <code>nnet</code> package. However, it only works on one variable at a time.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dumVar&lt;-nnet::<span class="kw">class.ind</span>(sim.dat$gender)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dumVar&lt;-nnet<span class="op">::</span><span class="kw">class.ind</span>(sim.dat<span class="op">$</span>gender)
 <span class="kw">head</span>(dumVar)</code></pre></div>
 <pre><code>##      Female Male
 ## [1,]      1    0
@@ -199,7 +199,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## [5,]      0    1
 ## [6,]      0    1</code></pre>
 <p>Since it is redundant to keep both, we need to remove one of them when modeling. Another more powerful function is <code>dummyVars()</code> from <code>caret</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dumMod&lt;-<span class="kw">dummyVars</span>(~gender+house+income,
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dumMod&lt;-<span class="kw">dummyVars</span>(<span class="op">~</span>gender<span class="op">+</span>house<span class="op">+</span>income,
                   <span class="dt">data=</span>sim.dat,
                   <span class="co"># use &quot;origional variable name + level&quot; as new name</span>
                   <span class="dt">levelsOnly=</span>F)
@@ -212,7 +212,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 ## 5             0           1        0         1 124253
 ## 6             0           1        0         1 107661</code></pre>
 <p><code>dummyVars()</code> can also use formula format. The variable on the right-hand side can be both categorical and numeric. For a numerical variable, the function will keep the variable unchanged. The advantage is that you can apply the function to a data frame without removing numerical variables. Other than that, the function can create interaction term:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dumMod&lt;-<span class="kw">dummyVars</span>(~gender+house+income+income:gender,
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dumMod&lt;-<span class="kw">dummyVars</span>(<span class="op">~</span>gender<span class="op">+</span>house<span class="op">+</span>income<span class="op">+</span>income<span class="op">:</span>gender,
                   <span class="dt">data=</span>sim.dat,
                   <span class="dt">levelsOnly=</span>F)
 <span class="kw">head</span>(<span class="kw">predict</span>(dumMod,sim.dat))</code></pre></div>
@@ -249,17 +249,18 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <script src="libs/gitbook/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook/js/jquery.highlight.js"></script>
 <script>
-require(["gitbook"], function(gitbook) {
+gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
 "sharing": {
 "github": true,
 "facebook": false,
 "twitter": true,
 "google": false,
+"linkedin": false,
 "weibo": false,
 "instapper": false,
 "vk": false,
-"all": ["facebook", "google", "twitter", "weibo", "instapaper"]
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": {
 "theme": "white",
@@ -283,9 +284,11 @@ gitbook.start({
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
-    if (location.protocol !== "file:" && /^https?:/.test(script.src))
-      script.src  = script.src.replace(/^https?:/, '');
+    var src = "";
+    if (src === "" || src === "true") src = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:" && /^https?:/.test(src))
+      src = src.replace(/^https?:/, '');
+    script.src = src;
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
 </script>

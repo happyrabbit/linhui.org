@@ -7,7 +7,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Introduction to Data Science</title>
   <meta name="description" content="Introduction to Data Science">
-  <meta name="generator" content="bookdown 0.4 and GitBook 2.6.7">
+  <meta name="generator" content="bookdown 0.7 and GitBook 2.6.7">
 
   <meta property="og:title" content="Introduction to Data Science" />
   <meta property="og:type" content="book" />
@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2018-01-24">
+<meta name="date" content="2018-03-15">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -164,7 +164,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="6" data-path="measuring-performance.html"><a href="measuring-performance.html"><i class="fa fa-check"></i><b>6</b> Measuring Performance</a></li>
-<li class="chapter" data-level="7" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>7</b> References</a></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
 
@@ -189,15 +189,15 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h2><span class="header-section-number">3.3</span> Centering and Scaling</h2>
 <p>It is the most straightforward data transformation. It centers and scales a variable to mean 0 and standard deviation 1. It ensures that the criterion for finding linear combinations of the predictors is based on how much variation they explain and therefore improves the numerical stability. Models involving finding linear combinations of the predictors to explain response/predictors variation need data centering and scaling, such as PCA <span class="citation">(Jolliffe <a href="#ref-pca1">2002</a>)</span>, PLS <span class="citation">(Geladi P <a href="#ref-PLS1">1986</a>)</span> and EFA <span class="citation">(Mulaik <a href="#ref-EFA1">2009</a>)</span>. You can quickly write code yourself to conduct this transformation.</p>
 <p>Let’s standardize the variable <code>income</code> from <code>sim.dat</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">income&lt;-sim.dat$income
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">income&lt;-sim.dat<span class="op">$</span>income
 <span class="co"># calculate the mean of income</span>
 mux&lt;-<span class="kw">mean</span>(income,<span class="dt">na.rm=</span>T)
 <span class="co"># calculate the standard deviation of income</span>
 sdx&lt;-<span class="kw">sd</span>(income,<span class="dt">na.rm=</span>T)
 <span class="co"># centering</span>
-tr1&lt;-income-mux
+tr1&lt;-income<span class="op">-</span>mux
 <span class="co"># scaling</span>
-tr2&lt;-tr1/sdx</code></pre></div>
+tr2&lt;-tr1<span class="op">/</span>sdx</code></pre></div>
 <p>Or the function <code>preProcess()</code> in package <code>caret</code> can apply this transformation to a set of predictors.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sdat&lt;-<span class="kw">subset</span>(sim.dat,<span class="dt">select=</span><span class="kw">c</span>(<span class="st">&quot;age&quot;</span>,<span class="st">&quot;income&quot;</span>))
 <span class="co"># set the &quot;method&quot; option</span>
@@ -220,12 +220,12 @@ x_{ij}^{*}=\frac{x_{ij}-quantile(x_{.j},0.01)}{quantile(x_{.j}-0.99)-quantile(x_
 \]</span></p>
 <p>The reason to use 99% and 1% quantile instead of maximum and minimum values is to resist the impact of outliers.</p>
 <p>It is easy to write a function to do it:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">qscale&lt;-function(dat){
-  for (i in <span class="dv">1</span>:<span class="kw">ncol</span>(dat)){
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">qscale&lt;-<span class="cf">function</span>(dat){
+  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(dat)){
     up&lt;-<span class="kw">quantile</span>(dat[,i],<span class="fl">0.99</span>)
     low&lt;-<span class="kw">quantile</span>(dat[,i],<span class="fl">0.01</span>)
-    diff&lt;-up-low
-    dat[,i]&lt;-(dat[,i]-low)/diff
+    diff&lt;-up<span class="op">-</span>low
+    dat[,i]&lt;-(dat[,i]<span class="op">-</span>low)<span class="op">/</span>diff
   }
   <span class="kw">return</span>(dat)
 }</code></pre></div>
@@ -241,7 +241,7 @@ x_{ij}^{*}=\frac{x_{ij}-quantile(x_{.j},0.01)}{quantile(x_{.j}-0.99)-quantile(x_
 ##  Max.   : 1.2386   Max.   : 7.477   Max.   : 1.2988</code></pre>
 <p>After transformation, most of the variables are between 0-1.</p>
 </div>
-<h3> References</h3>
+<h3>References</h3>
 <div id="refs" class="references">
 <div id="ref-pca1">
 <p>Jolliffe, I.T. 2002. <em>Principla Component Analysis</em>. 2nd ed. Springer.</p>
@@ -270,17 +270,18 @@ x_{ij}^{*}=\frac{x_{ij}-quantile(x_{.j},0.01)}{quantile(x_{.j}-0.99)-quantile(x_
 <script src="libs/gitbook/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook/js/jquery.highlight.js"></script>
 <script>
-require(["gitbook"], function(gitbook) {
+gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
 "sharing": {
 "github": true,
 "facebook": false,
 "twitter": true,
 "google": false,
+"linkedin": false,
 "weibo": false,
 "instapper": false,
 "vk": false,
-"all": ["facebook", "google", "twitter", "weibo", "instapaper"]
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": {
 "theme": "white",
@@ -304,9 +305,11 @@ gitbook.start({
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
-    if (location.protocol !== "file:" && /^https?:/.test(script.src))
-      script.src  = script.src.replace(/^https?:/, '');
+    var src = "";
+    if (src === "" || src === "true") src = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:" && /^https?:/.test(src))
+      src = src.replace(/^https?:/, '');
+    script.src = src;
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
 </script>

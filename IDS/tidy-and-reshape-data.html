@@ -7,7 +7,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Introduction to Data Science</title>
   <meta name="description" content="Introduction to Data Science">
-  <meta name="generator" content="bookdown 0.4 and GitBook 2.6.7">
+  <meta name="generator" content="bookdown 0.7 and GitBook 2.6.7">
 
   <meta property="og:title" content="Introduction to Data Science" />
   <meta property="og:type" content="book" />
@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2018-01-24">
+<meta name="date" content="2018-03-15">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -164,7 +164,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="6" data-path="measuring-performance.html"><a href="measuring-performance.html"><i class="fa fa-check"></i><b>6</b> Measuring Performance</a></li>
-<li class="chapter" data-level="7" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i><b>7</b> References</a></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
 
@@ -192,7 +192,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="reshape2-package" class="section level3">
 <h3><span class="header-section-number">4.2.1</span> <code>reshape2</code> package</h3>
 <p>It is a reboot of the previous package <code>reshape</code>. Take a baby subset of our exemplary clothes consumers data to illustrate:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(sdat&lt;-sim.dat[<span class="dv">1</span>:<span class="dv">5</span>,<span class="dv">1</span>:<span class="dv">6</span>])</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(sdat&lt;-sim.dat[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">6</span>])</code></pre></div>
 <pre><code>##   age gender income house store_exp online_exp
 ## 1  57 Female 120963   Yes     529.1      303.5
 ## 2  63 Female 122008   Yes     478.0      109.5
@@ -223,13 +223,13 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>You can run a regression to study the effect of purchasing channel as follows:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Here we use all observations from sim.dat</span>
 <span class="co"># Don&#39;t show result here</span>
-mdat&lt;-<span class="kw">melt</span>(sim.dat[,<span class="dv">1</span>:<span class="dv">6</span>], <span class="dt">measure.vars=</span><span class="kw">c</span>(<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>),
+mdat&lt;-<span class="kw">melt</span>(sim.dat[,<span class="dv">1</span><span class="op">:</span><span class="dv">6</span>], <span class="dt">measure.vars=</span><span class="kw">c</span>(<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>),
             <span class="dt">variable.name =</span> <span class="st">&quot;Channel&quot;</span>,
               <span class="dt">value.name =</span> <span class="st">&quot;Expense&quot;</span>)
-fit&lt;-<span class="kw">lm</span>(Expense~gender+house+income+Channel+age,<span class="dt">data=</span>mdat)
+fit&lt;-<span class="kw">lm</span>(Expense<span class="op">~</span>gender<span class="op">+</span>house<span class="op">+</span>income<span class="op">+</span>Channel<span class="op">+</span>age,<span class="dt">data=</span>mdat)
 <span class="kw">summary</span>(fit)</code></pre></div>
 <p>You can <code>melt()</code> list, matrix, table too. The syntax is similar, and we won’t go through every situation. Sometimes we want to convert the data from “long” to “wide”. For example, <strong>you want to compare the online and in-store expense between male and female based on the house ownership. </strong></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dcast</span>(mdat, house +<span class="st"> </span>gender ~<span class="st"> </span>Channel, sum)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dcast</span>(mdat, house <span class="op">+</span><span class="st"> </span>gender <span class="op">~</span><span class="st"> </span>Channel, sum)</code></pre></div>
 <pre><code>## Using &#39;Expense&#39; as value column. Use &#39;value.var&#39; to override</code></pre>
 <pre><code>##   house gender store_exp online_exp
 ## 1   Yes Female      1007      413.0
@@ -241,42 +241,42 @@ fit&lt;-<span class="kw">lm</span>(Expense~gender+house+income+Channel+age,<span
 <p>The other package that will do similar manipulations is <code>tidyr</code>. Let’s get a subset to illustrate the usage.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)
 <span class="co"># practice functions we learnt before</span>
-sdat&lt;-sim.dat[<span class="dv">1</span>:<span class="dv">5</span>,]%&gt;%
-<span class="st">  </span>dplyr::<span class="kw">select</span>(age,gender,store_exp,store_trans)
-sdat %&gt;%<span class="st"> </span><span class="kw">tbl_df</span>()</code></pre></div>
+sdat&lt;-sim.dat[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>,]<span class="op">%&gt;%</span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(age,gender,store_exp,store_trans)
+sdat <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tbl_df</span>()</code></pre></div>
 <pre><code>## # A tibble: 5 x 4
 ##     age gender store_exp store_trans
-## * &lt;int&gt; &lt;fctr&gt;     &lt;dbl&gt;       &lt;int&gt;
-## 1    57 Female     529.1           2
-## 2    63 Female     478.0           4
-## 3    59   Male     490.8           7
-## 4    60   Male     347.8          10
-## 5    51   Male     379.6           4</code></pre>
+## * &lt;int&gt; &lt;fct&gt;      &lt;dbl&gt;       &lt;int&gt;
+## 1    57 Female       529           2
+## 2    63 Female       478           4
+## 3    59 Male         491           7
+## 4    60 Male         348          10
+## 5    51 Male         380           4</code></pre>
 <p><code>gather()</code> function in <code>tidyr</code> is analogous to <code>melt()</code> in <code>reshape2</code>. The following code will do the same thing as we did before using <code>melt()</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyr)
-msdat&lt;-tidyr::<span class="kw">gather</span>(sdat,<span class="st">&quot;variable&quot;</span>,<span class="st">&quot;value&quot;</span>,store_exp,store_trans)
-msdat %&gt;%<span class="st"> </span><span class="kw">tbl_df</span>()</code></pre></div>
+msdat&lt;-tidyr<span class="op">::</span><span class="kw">gather</span>(sdat,<span class="st">&quot;variable&quot;</span>,<span class="st">&quot;value&quot;</span>,store_exp,store_trans)
+msdat <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tbl_df</span>()</code></pre></div>
 <pre><code>## # A tibble: 10 x 4
-##      age gender    variable value
-##    &lt;int&gt; &lt;fctr&gt;       &lt;chr&gt; &lt;dbl&gt;
-##  1    57 Female   store_exp 529.1
-##  2    63 Female   store_exp 478.0
-##  3    59   Male   store_exp 490.8
-##  4    60   Male   store_exp 347.8
-##  5    51   Male   store_exp 379.6
-##  6    57 Female store_trans   2.0
-##  7    63 Female store_trans   4.0
-##  8    59   Male store_trans   7.0
-##  9    60   Male store_trans  10.0
-## 10    51   Male store_trans   4.0</code></pre>
+##      age gender variable     value
+##    &lt;int&gt; &lt;fct&gt;  &lt;chr&gt;        &lt;dbl&gt;
+##  1    57 Female store_exp   529   
+##  2    63 Female store_exp   478   
+##  3    59 Male   store_exp   491   
+##  4    60 Male   store_exp   348   
+##  5    51 Male   store_exp   380   
+##  6    57 Female store_trans   2.00
+##  7    63 Female store_trans   4.00
+##  8    59 Male   store_trans   7.00
+##  9    60 Male   store_trans  10.0 
+## 10    51 Male   store_trans   4.00</code></pre>
 <p>Or if we use the pipe operation, we can write the above code as:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sdat%&gt;%<span class="kw">gather</span>(<span class="st">&quot;variable&quot;</span>,<span class="st">&quot;value&quot;</span>,store_exp,store_trans)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sdat<span class="op">%&gt;%</span><span class="kw">gather</span>(<span class="st">&quot;variable&quot;</span>,<span class="st">&quot;value&quot;</span>,store_exp,store_trans)</code></pre></div>
 <p>It is identical with the following code using <code>melt()</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">melt</span>(sdat, <span class="dt">measure.vars=</span><span class="kw">c</span>(<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;store_trans&quot;</span>),
             <span class="dt">variable.name =</span> <span class="st">&quot;variable&quot;</span>,
               <span class="dt">value.name =</span> <span class="st">&quot;value&quot;</span>)</code></pre></div>
 <p>The opposite operation to <code>gather()</code> is <code>spread()</code>. The previous one stacks columns and the latter one spread the columns.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">msdat %&gt;%<span class="st"> </span><span class="kw">spread</span>(variable,value)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">msdat <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">spread</span>(variable,value)</code></pre></div>
 <pre><code>##   age gender store_exp store_trans
 ## 1  51   Male     379.6           4
 ## 2  57 Female     529.1           2
@@ -284,25 +284,25 @@ msdat %&gt;%<span class="st"> </span><span class="kw">tbl_df</span>()</code></pr
 ## 4  60   Male     347.8          10
 ## 5  63 Female     478.0           4</code></pre>
 <p>Another pair of functions that do opposite manipulations are <code>separate()</code> and <code>unite()</code>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sepdat&lt;-<span class="st"> </span>msdat %&gt;%<span class="st"> </span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sepdat&lt;-<span class="st"> </span>msdat <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">separate</span>(variable,<span class="kw">c</span>(<span class="st">&quot;Source&quot;</span>,<span class="st">&quot;Type&quot;</span>))
-sepdat %&gt;%<span class="st"> </span><span class="kw">tbl_df</span>()</code></pre></div>
+sepdat <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tbl_df</span>()</code></pre></div>
 <pre><code>## # A tibble: 10 x 5
-##      age gender Source  Type value
-##  * &lt;int&gt; &lt;fctr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt;
-##  1    57 Female  store   exp 529.1
-##  2    63 Female  store   exp 478.0
-##  3    59   Male  store   exp 490.8
-##  4    60   Male  store   exp 347.8
-##  5    51   Male  store   exp 379.6
-##  6    57 Female  store trans   2.0
-##  7    63 Female  store trans   4.0
-##  8    59   Male  store trans   7.0
-##  9    60   Male  store trans  10.0
-## 10    51   Male  store trans   4.0</code></pre>
+##      age gender Source Type   value
+##    &lt;int&gt; &lt;fct&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;dbl&gt;
+##  1    57 Female store  exp   529   
+##  2    63 Female store  exp   478   
+##  3    59 Male   store  exp   491   
+##  4    60 Male   store  exp   348   
+##  5    51 Male   store  exp   380   
+##  6    57 Female store  trans   2.00
+##  7    63 Female store  trans   4.00
+##  8    59 Male   store  trans   7.00
+##  9    60 Male   store  trans  10.0 
+## 10    51 Male   store  trans   4.00</code></pre>
 <p>You can see that the function separates the original column “<code>variable</code>” to two new columns “<code>Source</code>” and “<code>Type</code>”. You can use <code>sep=</code> to set the string or regular expression to separate the column. By default, it is “<code>_</code>”.</p>
 <p>The <code>unite()</code> function will do the opposite: combining two columns. It is the generalization of <code>paste()</code> to a data frame.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sepdat %&gt;%<span class="st"> </span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sepdat <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">unite</span>(<span class="st">&quot;variable&quot;</span>,Source,Type,<span class="dt">sep=</span><span class="st">&quot;_&quot;</span>)</code></pre></div>
 <pre><code>##    age gender    variable value
 ## 1   57 Female   store_exp 529.1
@@ -337,17 +337,18 @@ sepdat %&gt;%<span class="st"> </span><span class="kw">tbl_df</span>()</code></p
 <script src="libs/gitbook/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook/js/jquery.highlight.js"></script>
 <script>
-require(["gitbook"], function(gitbook) {
+gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
 "sharing": {
 "github": true,
 "facebook": false,
 "twitter": true,
 "google": false,
+"linkedin": false,
 "weibo": false,
 "instapper": false,
 "vk": false,
-"all": ["facebook", "google", "twitter", "weibo", "instapaper"]
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": {
 "theme": "white",
@@ -371,9 +372,11 @@ gitbook.start({
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
-    if (location.protocol !== "file:" && /^https?:/.test(script.src))
-      script.src  = script.src.replace(/^https?:/, '');
+    var src = "";
+    if (src === "" || src === "true") src = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:" && /^https?:/.test(src))
+      src = src.replace(/^https?:/, '');
+    script.src = src;
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
 </script>
