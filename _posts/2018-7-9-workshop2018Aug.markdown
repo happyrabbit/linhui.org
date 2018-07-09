@@ -47,14 +47,12 @@ Marketing academics and practitioners recognize the importance of monitoring con
 About the speaker: 
 
 <p align="center">
-  <img src="http://scientistcafe.com/images/maxjoo.png" width="20%" />
+  <img src="http://scientistcafe.com/images/liuliu_circle.png" width="20%" />
 </p>
 
 
-**Mingyu (Max) Joo** is a Assistant Professor of Marketing
-at the Ohio State University. His research interests include advertising effectiveness, pricing, and product design using quantitative modeling methods. 
+**Liu Liu**  is an Assistant professor of Marketing at Leeds School of Business in University of Colorado Boulder. She obtained her Ph.D. degree in Marketing from New York University Stern School of Business in May 2018. Her research focuses on the intersection of machine learning and marketing, specifically on visual content and consumer choices.
 
-In 2015, Joo is the recipient of the John D.C. Little Award for the best marketing paper published in Marketing Science or Management Science, and the finalist for the Frank M. Bass Award for the best marketing paper derived from a Ph.D. thesis published in INFORMS journals. He has presented his research at several marketing and pricing conferences, including UTD-FORMS Conference, INFORMS Marketing Science Conference, INFORMS Revenue Management and Pricing Conference, and Annual Pricing Conference.
+Prior to her Ph.D. in Marketing, she worked at Google for three years as a Software Engineer, doing large-scale machine learning for the AdSense system. 
 
-- Web: [Faculty Website](http://www.mingyujoo.com)
 
