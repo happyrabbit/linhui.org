@@ -50,7 +50,6 @@ About the speaker:
   <img src="http://scientistcafe.com/images/liuliu_circle.png" width="20%" />
 </p>
 
-
 **Liu Liu**  is an Assistant professor of Marketing at Leeds School of Business in University of Colorado Boulder. She obtained her Ph.D. degree in Marketing from New York University Stern School of Business in May 2018. Her research focuses on the intersection of machine learning and marketing, specifically on visual content and consumer choices.
 
 Prior to her Ph.D. in Marketing, she worked at Google for three years as a Software Engineer, doing large-scale machine learning for the AdSense system. 
