@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2018-04-12">
+<meta name="date" content="2018-08-22">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -233,18 +233,16 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 sim.dat &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv &quot;</span>)
 <span class="kw">head</span>(sim.dat)</code></pre></div>
 <pre><code>## # A tibble: 6 x 19
-##     age gender income house store_exp online_exp
-##   &lt;int&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt;      &lt;dbl&gt;
-## 1    57 Female 120963 Yes         529        304
-## 2    63 Female 122008 Yes         478        110
-## 3    59 Male   114202 Yes         491        279
-## 4    60 Male   113616 Yes         348        142
-## 5    51 Male   124253 Yes         380        112
-## 6    59 Male   107661 Yes         338        196
-## # ... with 13 more variables: store_trans &lt;int&gt;,
-## #   online_trans &lt;int&gt;, Q1 &lt;int&gt;, Q2 &lt;int&gt;, Q3 &lt;int&gt;,
-## #   Q4 &lt;int&gt;, Q5 &lt;int&gt;, Q6 &lt;int&gt;, Q7 &lt;int&gt;, Q8 &lt;int&gt;,
-## #   Q9 &lt;int&gt;, Q10 &lt;int&gt;, segment &lt;chr&gt;</code></pre>
+##     age gender  income house store_exp online_exp store_trans online_trans    Q1    Q2    Q3    Q4
+##   &lt;int&gt; &lt;chr&gt;    &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt;      &lt;dbl&gt;       &lt;int&gt;        &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+## 1    57 Female 120963. Yes        529.       304.           2            2     4     2     1     2
+## 2    63 Female 122008. Yes        478.       110.           4            2     4     1     1     2
+## 3    59 Male   114202. Yes        491.       279.           7            2     5     2     1     2
+## 4    60 Male   113616. Yes        348.       142.          10            2     5     2     1     3
+## 5    51 Male   124253. Yes        380.       112.           4            4     4     1     1     3
+## 6    59 Male   107661. Yes        338.       196.           4            5     4     2     1     2
+## # ... with 7 more variables: Q5 &lt;int&gt;, Q6 &lt;int&gt;, Q7 &lt;int&gt;, Q8 &lt;int&gt;, Q9 &lt;int&gt;, Q10 &lt;int&gt;,
+## #   segment &lt;chr&gt;</code></pre>
 <p>The function reads the file to R as a <code>tibble</code>. You can consider <code>tibble</code> as next iteration of the data frame. They are different with data frame for the following aspects:</p>
 <ul>
 <li>It never changes an input’s type (i.e., no more <code>stringsAsFactors = FALSE</code>!)</li>
@@ -308,10 +306,9 @@ sim.dat &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span cla
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat=<span class="kw">read_tsv</span>(<span class="st">&quot;every</span><span class="ch">\t</span><span class="st">man</span><span class="ch">\t</span><span class="st">is</span><span class="ch">\t</span><span class="st">a</span><span class="ch">\t</span><span class="st">poet</span><span class="ch">\t</span><span class="st">when</span><span class="ch">\t</span><span class="st">he</span><span class="ch">\t</span><span class="st">is</span><span class="ch">\t</span><span class="st">in</span><span class="ch">\t</span><span class="st">love</span><span class="ch">\n</span><span class="st">&quot;</span>, <span class="dt">col_names =</span> <span class="ot">FALSE</span>)
 <span class="kw">print</span>(dat)</code></pre></div>
 <pre><code>## # A tibble: 1 x 10
-##   X1    X2    X3    X4    X5    X6    X7    X8   
-##   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
-## 1 every man   is    a     poet  when  he    is   
-## # ... with 2 more variables: X9 &lt;chr&gt;, X10 &lt;chr&gt;</code></pre>
+##   X1    X2    X3    X4    X5    X6    X7    X8    X9    X10  
+##   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
+## 1 every man   is    a     poet  when  he    is    in    love</code></pre>
 <p>Or more generally, you can use <code>read_delim()</code> and assign separating character：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat=<span class="kw">read_delim</span>(<span class="st">&quot;THE|UNBEARABLE|RANDOMNESS|OF|LIFE</span><span class="ch">\n</span><span class="st">&quot;</span>, <span class="dt">delim =</span> <span class="st">&quot;|&quot;</span>, <span class="dt">col_names =</span> <span class="ot">FALSE</span>)
 <span class="kw">print</span>(dat)</code></pre></div>
@@ -386,39 +383,35 @@ sim.dat&lt;-readr<span class="op">::</span><span class="kw">read_csv</span>(<spa
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># subset the first two rows</span>
 sim.dat[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>,]</code></pre></div>
 <pre><code>## # A tibble: 2 x 19
-##     age gender income house store_exp online_exp
-##   &lt;int&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt;      &lt;dbl&gt;
-## 1    57 Female 120963 Yes         529        304
-## 2    63 Female 122008 Yes         478        110
-## # ... with 13 more variables: store_trans &lt;int&gt;,
-## #   online_trans &lt;int&gt;, Q1 &lt;int&gt;, Q2 &lt;int&gt;, Q3 &lt;int&gt;,
-## #   Q4 &lt;int&gt;, Q5 &lt;int&gt;, Q6 &lt;int&gt;, Q7 &lt;int&gt;, Q8 &lt;int&gt;,
-## #   Q9 &lt;int&gt;, Q10 &lt;int&gt;, segment &lt;chr&gt;</code></pre>
+##     age gender  income house store_exp online_exp store_trans online_trans    Q1    Q2    Q3    Q4
+##   &lt;int&gt; &lt;chr&gt;    &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt;      &lt;dbl&gt;       &lt;int&gt;        &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+## 1    57 Female 120963. Yes        529.       304.           2            2     4     2     1     2
+## 2    63 Female 122008. Yes        478.       110.           4            2     4     1     1     2
+## # ... with 7 more variables: Q5 &lt;int&gt;, Q6 &lt;int&gt;, Q7 &lt;int&gt;, Q8 &lt;int&gt;, Q9 &lt;int&gt;, Q10 &lt;int&gt;,
+## #   segment &lt;chr&gt;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># subset the first two rows and column 3 and 5</span>
 sim.dat[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>,<span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">5</span>)]</code></pre></div>
 <pre><code>## # A tibble: 2 x 2
-##   income store_exp
-##    &lt;dbl&gt;     &lt;dbl&gt;
-## 1 120963       529
-## 2 122008       478</code></pre>
+##    income store_exp
+##     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 120963.      529.
+## 2 122008.      478.</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get all rows with age&gt;70</span>
 sim.dat[sim.dat<span class="op">$</span>age<span class="op">&gt;</span><span class="dv">70</span>,]</code></pre></div>
 <pre><code>## # A tibble: 1 x 19
-##     age gender income house store_exp online_exp
-##   &lt;int&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt;      &lt;dbl&gt;
-## 1   300 Male   208017 Yes        5077       6053
-## # ... with 13 more variables: store_trans &lt;int&gt;,
-## #   online_trans &lt;int&gt;, Q1 &lt;int&gt;, Q2 &lt;int&gt;, Q3 &lt;int&gt;,
-## #   Q4 &lt;int&gt;, Q5 &lt;int&gt;, Q6 &lt;int&gt;, Q7 &lt;int&gt;, Q8 &lt;int&gt;,
-## #   Q9 &lt;int&gt;, Q10 &lt;int&gt;, segment &lt;chr&gt;</code></pre>
+##     age gender  income house store_exp online_exp store_trans online_trans    Q1    Q2    Q3    Q4
+##   &lt;int&gt; &lt;chr&gt;    &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt;      &lt;dbl&gt;       &lt;int&gt;        &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+## 1   300 Male   208017. Yes       5077.      6053.          12           11     1     4     5     4
+## # ... with 7 more variables: Q5 &lt;int&gt;, Q6 &lt;int&gt;, Q7 &lt;int&gt;, Q8 &lt;int&gt;, Q9 &lt;int&gt;, Q10 &lt;int&gt;,
+## #   segment &lt;chr&gt;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get rows with age&gt; 60 and gender is Male</span>
 <span class="co"># select column 3 and 4</span>
 sim.dat[sim.dat<span class="op">$</span>age<span class="op">&gt;</span><span class="dv">68</span> <span class="op">&amp;</span><span class="st"> </span>sim.dat<span class="op">$</span>gender <span class="op">==</span><span class="st"> &quot;Male&quot;</span>, <span class="dv">3</span><span class="op">:</span><span class="dv">4</span>]</code></pre></div>
 <pre><code>## # A tibble: 2 x 2
-##   income house
-##    &lt;dbl&gt; &lt;chr&gt;
-## 1 119552 No   
-## 2 208017 Yes</code></pre>
+##    income house
+##     &lt;dbl&gt; &lt;chr&gt;
+## 1 119552. No   
+## 2 208017. Yes</code></pre>
 <p>Remember that there are usually different ways to conduct the same manipulation. For example, the following code presents three ways to calculate an average number of online transactions for male and female:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tapply</span>(sim.dat<span class="op">$</span>online_trans, sim.dat<span class="op">$</span>gender, mean )</code></pre></div>
 <pre><code>## Female   Male 
@@ -523,26 +516,19 @@ sim.dat<span class="op">%&gt;%</span><span class="st"> </span>
 </ul>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># select rows with age&lt;20 and income &gt; 80000</span>
 dt[age <span class="op">&lt;</span><span class="st"> </span><span class="dv">20</span> <span class="op">&amp;</span><span class="st"> </span>income <span class="op">&gt;</span><span class="st"> </span><span class="dv">80000</span>]</code></pre></div>
-<pre><code>##    age gender income house store_exp online_exp
-## 1:  19 Female  83535    No     227.7       1491
-## 2:  18 Female  89416   Yes     209.5       1926
-## 3:  19 Female  92813    No     186.7       1042
-##    store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9
-## 1:           1           22  2  1  1  2  4  1  4  2  4
-## 2:           3           28  2  1  1  1  4  1  4  2  4
-## 3:           2           18  3  1  1  2  4  1  4  3  4
+<pre><code>##    age gender income house store_exp online_exp store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9
+## 1:  19 Female  83535    No     227.7       1491           1           22  2  1  1  2  4  1  4  2  4
+## 2:  18 Female  89416   Yes     209.5       1926           3           28  2  1  1  1  4  1  4  2  4
+## 3:  19 Female  92813    No     186.7       1042           2           18  3  1  1  2  4  1  4  3  4
 ##    Q10 segment
 ## 1:   1   Style
 ## 2:   1   Style
 ## 3:   1   Style</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># select the first two rows</span>
 dt[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]</code></pre></div>
-<pre><code>##    age gender income house store_exp online_exp
-## 1:  57 Female 120963   Yes     529.1      303.5
-## 2:  63 Female 122008   Yes     478.0      109.5
-##    store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9
-## 1:           2            2  4  2  1  2  1  4  1  4  2
-## 2:           4            2  4  1  1  2  1  4  1  4  1
+<pre><code>##    age gender income house store_exp online_exp store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9
+## 1:  57 Female 120963   Yes     529.1      303.5           2            2  4  2  1  2  1  4  1  4  2
+## 2:  63 Female 122008   Yes     478.0      109.5           4            2  4  1  1  2  1  4  1  4  1
 ##    Q10 segment
 ## 1:   4   Price
 ## 2:   4   Price</code></pre>
@@ -600,18 +586,12 @@ dt[, .N, by=<span class="st"> </span>gender]  </code></pre></div>
 <p>Order table:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get records with the highest 5 online expense:</span>
 <span class="kw">head</span>(dt[<span class="kw">order</span>(<span class="op">-</span>online_exp)],<span class="dv">5</span>) </code></pre></div>
-<pre><code>##    age gender income house store_exp online_exp
-## 1:  40 Female 217600    No      7024       9479
-## 2:  41 Female     NA   Yes      3787       8638
-## 3:  36   Male 228550   Yes      3280       8221
-## 4:  31 Female 159508   Yes      5177       8006
-## 5:  43 Female 190407   Yes      4695       7876
-##    store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9
-## 1:          10            6  1  4  5  4  3  4  4  1  4
-## 2:          14           10  1  4  4  4  4  4  4  1  4
-## 3:           8           12  1  4  5  4  4  4  4  1  4
-## 4:          11           13  1  4  4  4  4  4  4  1  4
-## 5:           6           11  1  4  5  4  4  4  4  1  4
+<pre><code>##    age gender income house store_exp online_exp store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9
+## 1:  40 Female 217600    No      7024       9479          10            6  1  4  5  4  3  4  4  1  4
+## 2:  41 Female     NA   Yes      3787       8638          14           10  1  4  4  4  4  4  4  1  4
+## 3:  36   Male 228550   Yes      3280       8221           8           12  1  4  5  4  4  4  4  1  4
+## 4:  31 Female 159508   Yes      5177       8006          11           13  1  4  4  4  4  4  4  1  4
+## 5:  43 Female 190407   Yes      4695       7876           6           11  1  4  5  4  4  4  4  1  4
 ##    Q10     segment
 ## 1:   2 Conspicuous
 ## 2:   2 Conspicuous
@@ -620,18 +600,12 @@ dt[, .N, by=<span class="st"> </span>gender]  </code></pre></div>
 ## 5:   2 Conspicuous</code></pre>
 <p>Since data table keep some characters of data frame, they share some operations:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dt[<span class="kw">order</span>(<span class="op">-</span>online_exp)][<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>]</code></pre></div>
-<pre><code>##    age gender income house store_exp online_exp
-## 1:  40 Female 217600    No      7024       9479
-## 2:  41 Female     NA   Yes      3787       8638
-## 3:  36   Male 228550   Yes      3280       8221
-## 4:  31 Female 159508   Yes      5177       8006
-## 5:  43 Female 190407   Yes      4695       7876
-##    store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9
-## 1:          10            6  1  4  5  4  3  4  4  1  4
-## 2:          14           10  1  4  4  4  4  4  4  1  4
-## 3:           8           12  1  4  5  4  4  4  4  1  4
-## 4:          11           13  1  4  4  4  4  4  4  1  4
-## 5:           6           11  1  4  5  4  4  4  4  1  4
+<pre><code>##    age gender income house store_exp online_exp store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9
+## 1:  40 Female 217600    No      7024       9479          10            6  1  4  5  4  3  4  4  1  4
+## 2:  41 Female     NA   Yes      3787       8638          14           10  1  4  4  4  4  4  4  1  4
+## 3:  36   Male 228550   Yes      3280       8221           8           12  1  4  5  4  4  4  4  1  4
+## 4:  31 Female 159508   Yes      5177       8006          11           13  1  4  4  4  4  4  4  1  4
+## 5:  43 Female 190407   Yes      4695       7876           6           11  1  4  5  4  4  4  4  1  4
 ##    Q10     segment
 ## 1:   2 Conspicuous
 ## 2:   2 Conspicuous
@@ -640,18 +614,12 @@ dt[, .N, by=<span class="st"> </span>gender]  </code></pre></div>
 ## 5:   2 Conspicuous</code></pre>
 <p>You can also order the table by more than one variable. The following code will order the table by <code>gender</code>, then order within <code>gender</code> by <code>online_exp</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dt[<span class="kw">order</span>(gender, <span class="op">-</span>online_exp)][<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>]</code></pre></div>
-<pre><code>##    age gender income house store_exp online_exp
-## 1:  40 Female 217600    No      7024       9479
-## 2:  41 Female     NA   Yes      3787       8638
-## 3:  31 Female 159508   Yes      5177       8006
-## 4:  43 Female 190407   Yes      4695       7876
-## 5:  50 Female 263858   Yes      5814       7449
-##    store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9
-## 1:          10            6  1  4  5  4  3  4  4  1  4
-## 2:          14           10  1  4  4  4  4  4  4  1  4
-## 3:          11           13  1  4  4  4  4  4  4  1  4
-## 4:           6           11  1  4  5  4  4  4  4  1  4
-## 5:          11           11  1  4  5  4  4  4  4  1  4
+<pre><code>##    age gender income house store_exp online_exp store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9
+## 1:  40 Female 217600    No      7024       9479          10            6  1  4  5  4  3  4  4  1  4
+## 2:  41 Female     NA   Yes      3787       8638          14           10  1  4  4  4  4  4  4  1  4
+## 3:  31 Female 159508   Yes      5177       8006          11           13  1  4  4  4  4  4  4  1  4
+## 4:  43 Female 190407   Yes      4695       7876           6           11  1  4  5  4  4  4  4  1  4
+## 5:  50 Female 263858   Yes      5814       7449          11           11  1  4  5  4  4  4  4  1  4
 ##    Q10     segment
 ## 1:   2 Conspicuous
 ## 2:   2 Conspicuous
@@ -742,24 +710,20 @@ sdat&lt;-sim.dat[,<span class="op">!</span><span class="kw">lapply</span>(sim.da
 ## What is the problem?</code></pre></div>
 <p>The data frame <code>sdat</code> only includes numeric columns. Now we can go head and use <code>apply()</code> to get mean and standard deviation for each column:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">apply</span>(sdat, <span class="dt">MARGIN=</span><span class="dv">2</span>,<span class="cf">function</span>(x) <span class="kw">mean</span>(<span class="kw">na.omit</span>(x)))</code></pre></div>
-<pre><code>##          age       income    store_exp   online_exp 
-##    3.884e+01    1.135e+05    1.357e+03    2.120e+03 
-##  store_trans online_trans           Q1           Q2 
-##    5.350e+00    1.355e+01    3.101e+00    1.823e+00 
-##           Q3           Q4           Q5           Q6 
-##    1.992e+00    2.763e+00    2.945e+00    2.448e+00 
-##           Q7           Q8           Q9          Q10 
-##    3.434e+00    2.396e+00    3.085e+00    2.320e+00</code></pre>
+<pre><code>##          age       income    store_exp   online_exp  store_trans online_trans           Q1 
+##    3.884e+01    1.135e+05    1.357e+03    2.120e+03    5.350e+00    1.355e+01    3.101e+00 
+##           Q2           Q3           Q4           Q5           Q6           Q7           Q8 
+##    1.823e+00    1.992e+00    2.763e+00    2.945e+00    2.448e+00    3.434e+00    2.396e+00 
+##           Q9          Q10 
+##    3.085e+00    2.320e+00</code></pre>
 <p>Here we defined a function using <code>function(x) mean(na.omit(x))</code>. It is a very simple function. It tells R to ignore the missing value when calculating the mean. <code>MARGIN=2</code> tells R to apply the function to each column. It is not hard to guess what <code>MARGIN=1</code> mean. The result show that the average online expense is much higher than store expense. You can also compare the average scores across different questions. The command to calculate standard deviation is very similar. The only difference is to change <code>mean()</code> to <code>sd()</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">apply</span>(sdat, <span class="dt">MARGIN=</span><span class="dv">2</span>,<span class="cf">function</span>(x) <span class="kw">sd</span>(<span class="kw">na.omit</span>(x)))</code></pre></div>
-<pre><code>##          age       income    store_exp   online_exp 
-##       16.417    49842.287     2774.400     1731.224 
-##  store_trans online_trans           Q1           Q2 
-##        3.696        7.957        1.450        1.168 
-##           Q3           Q4           Q5           Q6 
-##        1.402        1.155        1.284        1.439 
-##           Q7           Q8           Q9          Q10 
-##        1.456        1.154        1.118        1.136</code></pre>
+<pre><code>##          age       income    store_exp   online_exp  store_trans online_trans           Q1 
+##       16.417    49842.287     2774.400     1731.224        3.696        7.957        1.450 
+##           Q2           Q3           Q4           Q5           Q6           Q7           Q8 
+##        1.168        1.402        1.155        1.284        1.439        1.456        1.154 
+##           Q9          Q10 
+##        1.118        1.136</code></pre>
 <p>Even the average online expense is higher than store expense, the standard deviation for store expense is much higher than online expense which indicates there is very likely some big/small purchase in store. We can check it quickly:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(sdat<span class="op">$</span>store_exp)</code></pre></div>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
@@ -806,16 +770,14 @@ sdat&lt;-sim.dat[,<span class="op">!</span><span class="kw">lapply</span>(sim.da
 <span class="kw">filter</span>(sim.dat, income <span class="op">&gt;</span><span class="dv">300000</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">tbl_df</span>()</code></pre></div>
 <pre><code>## # A tibble: 4 x 19
-##     age gender income house store_exp online_exp
-##   &lt;int&gt; &lt;fct&gt;   &lt;dbl&gt; &lt;fct&gt;     &lt;dbl&gt;      &lt;dbl&gt;
-## 1    40 Male   301398 Yes        4840       3618
-## 2    33 Male   319704 Yes        5998       4396
-## 3    41 Male   317476 Yes        3030       4180
-## 4    37 Female 315697 Yes        6549       4284
-## # ... with 13 more variables: store_trans &lt;int&gt;,
-## #   online_trans &lt;int&gt;, Q1 &lt;int&gt;, Q2 &lt;int&gt;, Q3 &lt;int&gt;,
-## #   Q4 &lt;int&gt;, Q5 &lt;int&gt;, Q6 &lt;int&gt;, Q7 &lt;int&gt;, Q8 &lt;int&gt;,
-## #   Q9 &lt;int&gt;, Q10 &lt;int&gt;, segment &lt;fct&gt;</code></pre>
+##     age gender  income house store_exp online_exp store_trans online_trans    Q1    Q2    Q3    Q4
+##   &lt;int&gt; &lt;fct&gt;    &lt;dbl&gt; &lt;fct&gt;     &lt;dbl&gt;      &lt;dbl&gt;       &lt;int&gt;        &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
+## 1    40 Male   301398. Yes       4840.      3618.          10           11     1     4     4     4
+## 2    33 Male   319704. Yes       5998.      4396.           9           11     1     4     4     4
+## 3    41 Male   317476. Yes       3030.      4180.          11           12     1     4     5     4
+## 4    37 Female 315697. Yes       6549.      4284.          13           11     1     4     5     4
+## # ... with 7 more variables: Q5 &lt;int&gt;, Q6 &lt;int&gt;, Q7 &lt;int&gt;, Q8 &lt;int&gt;, Q9 &lt;int&gt;, Q10 &lt;int&gt;,
+## #   segment &lt;fct&gt;</code></pre>
 <p>Here we meet a new operator <code>%&gt;%</code>. It is called “Pipe operator” which pipes a value forward into an expression or function call. What you get in the left operation will be the first argument or the only argument in the right operation.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">f</span>(y) =<span class="st"> </span><span class="kw">f</span>(x, y)
 y <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">f</span>(x, ., z) =<span class="st"> </span><span class="kw">f</span>(x, y, z )</code></pre></div>
@@ -894,14 +856,12 @@ dplyr<span class="op">::</span><span class="kw">select</span>(sim.dat, <span cla
       <span class="dt">store_trans=</span><span class="kw">round</span>(<span class="kw">mean</span>(store_trans),<span class="dv">1</span>),
       <span class="dt">online_trans=</span><span class="kw">round</span>(<span class="kw">mean</span>(online_trans),<span class="dv">1</span>))</code></pre></div>
 <pre><code>## # A tibble: 4 x 8
-##   segment       Age FemalePct HouseYes store_exp
-##   &lt;fct&gt;       &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
-## 1 Conspicuous  42.0     0.320    0.860      4990
-## 2 Price        60.0     0.450    0.940       501
-## 3 Quality      35.0     0.470    0.340       301
-## 4 Style        24.0     0.810    0.270       200
-## # ... with 3 more variables: online_exp &lt;dbl&gt;,
-## #   store_trans &lt;dbl&gt;, online_trans &lt;dbl&gt;</code></pre>
+##   segment       Age FemalePct HouseYes store_exp online_exp store_trans online_trans
+##   &lt;fct&gt;       &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;
+## 1 Conspicuous   42.     0.320    0.860     4990.      4898.       10.9         11.1 
+## 2 Price         60.     0.450    0.940      501.       205.        6.10         3.00
+## 3 Quality       35.     0.470    0.340      301.      2013.        2.90        16.0 
+## 4 Style         24.     0.810    0.270      200.      1962.        3.00        21.1</code></pre>
 <p>Now, let’s peel the onion in order.</p>
 <p>The first line <code>sim.dat</code> is easy. It is the data you want to work on. The second line <code>group_by(segment)</code> tells R that in the following steps you want to summarise by variable <code>segment</code>. Here we only summarize data by one categorical variable, but you can group by multiple variables, such as <code>group_by(segment, house)</code>. The third argument <code>summarise</code> tells R the manipulation(s) to do. Then list the exact actions inside <code>summarise()</code> . For example, <code>Age=round(mean(na.omit(age)),0)</code> tell R the following things:</p>
 <ol style="list-style-type: decimal">
@@ -935,127 +895,74 @@ dplyr<span class="op">::</span><span class="kw">select</span>(sim.dat, <span cla
 <pre><code>## # A tibble: 4 x 3
 ##   segment     avg_online avg_store
 ##   &lt;fct&gt;            &lt;dbl&gt;     &lt;dbl&gt;
-## 1 Conspicuous      442       479  
+## 1 Conspicuous      442.      479. 
 ## 2 Price             69.3      81.3
-## 3 Quality          126       105  
-## 4 Style             92.8     121</code></pre>
+## 3 Quality          126.      105. 
+## 4 Style             92.8     121.</code></pre>
 <p>Price group has the lowest averaged one-time purchase. The Conspicuous group will pay the highest price. When we build customer profile in real life, we will also need to look at the survey summarization. You may be surprised how much information simple data manipulations can provide.</p>
 <p>Another comman task is to check which column has missing values. It requires the program to look at each column in the data. In this case you can use <code>summarise_all</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># apply function anyNA() to each column</span>
 <span class="co"># you can also assign a function vector such as: c(&quot;anyNA&quot;,&quot;is.factor&quot;)</span>
 dplyr<span class="op">::</span><span class="kw">summarise_all</span>(sim.dat, <span class="kw">funs_</span>(<span class="kw">c</span>(<span class="st">&quot;anyNA&quot;</span>)))</code></pre></div>
-<pre><code>##     age gender income house store_exp online_exp
-## 1 FALSE  FALSE   TRUE FALSE     FALSE      FALSE
-##   store_trans online_trans    Q1    Q2    Q3    Q4
-## 1       FALSE        FALSE FALSE FALSE FALSE FALSE
+<pre><code>##     age gender income house store_exp online_exp store_trans online_trans    Q1    Q2    Q3    Q4
+## 1 FALSE  FALSE   TRUE FALSE     FALSE      FALSE       FALSE        FALSE FALSE FALSE FALSE FALSE
 ##      Q5    Q6    Q7    Q8    Q9   Q10 segment
 ## 1 FALSE FALSE FALSE FALSE FALSE FALSE   FALSE</code></pre>
 <p>The above code returns a vector indicating if there is any value missing in each column.</p>
 <p><strong>Create new variable</strong></p>
 <p>There are often situations where you need to create new variables. For example, adding online and store expense to get total expense. In this case, you will apply <strong>window function</strong> to the columns and return a column with the same length. <code>mutate()</code> can do it for you and append one or more new columns:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dplyr<span class="op">::</span><span class="kw">mutate</span>(sim.dat, <span class="dt">total_exp =</span> store_exp <span class="op">+</span><span class="st"> </span>online_exp)</code></pre></div>
-<pre><code>##      age gender income house store_exp online_exp
-## 1     57 Female 120963   Yes     529.1     303.51
-## 2     63 Female 122008   Yes     478.0     109.53
-## 3     59   Male 114202   Yes     490.8     279.25
-## 4     60   Male 113616   Yes     347.8     141.67
-## 5     51   Male 124253   Yes     379.6     112.24
-## 6     59   Male 107661   Yes     338.3     195.69
-## 7     57   Male 120483   Yes     482.5     284.54
-## 8     57   Male 110542   Yes     340.7     135.26
-## 9     61 Female 132061   Yes     608.2     142.55
-## 10    60   Male 105049   Yes     470.3     163.47
-## 11    58   Male 107197   Yes     366.6     170.13
-## 12    59   Male     NA   Yes     674.9     310.27
-## 13    64   Male 119020   Yes     613.9     160.85
-## 14    57 Female     NA   Yes     737.0     224.53
-## 15    64   Male 114539   Yes     402.5     241.83
-## 16    61 Female     NA   Yes     615.1     238.10
-## 17    57 Female 133078   Yes     429.4     262.66
-## 18    63   Male 115709   Yes     552.6     187.52
-## 19    57 Female 113211    No     540.3     254.58
-## 20    57 Female 129774    No     384.3     311.03
-## 21    58   Male     NA   Yes     372.4     296.83
-## 22    58   Male 124357   Yes     535.5     205.54
-## 23    59 Female 123117   Yes     481.3     157.29
-## 24    61 Female     NA   Yes     546.2     161.23
-## 25    60 Female     NA   Yes     411.1     123.78
-## 26    56   Male     NA   Yes     492.7     128.02
-## 27    58   Male 127887   Yes     519.3     142.63
-## 28    64   Male 115925   Yes     627.7     240.98
-## 29    63 Female     NA   Yes     511.1     203.49
-## 30    56 Female 112621   Yes     699.3     223.44
-## 31    57   Male     NA   Yes     530.6     217.92
-## 32    59 Female 121773   Yes     532.1     176.88
-## 33    63   Male 126903   Yes     601.6     257.84
-## 34    55   Male 128254   Yes     595.3     248.06
-## 35    60 Female     NA   Yes     403.6     236.96
-## 36    64 Female     NA   Yes     611.7     102.24
-## 37    57 Female 118170   Yes     482.7     183.36
-## 38    57 Female 119148   Yes     412.9     246.87
-## 39    58   Male 125844   Yes     473.8     261.67
-## 40    55   Male 128194   Yes     595.7     156.93
-## 41    59 Female     NA   Yes     548.3     186.50
-## 42    61   Male     NA   Yes     597.2     209.68
-## 43    59 Female 122338   Yes     455.3     205.16
-## 44    58 Female 114519   Yes     493.5     271.67
-## 45    62   Male 123459   Yes     561.7     209.23
-## 46    59   Male 125626   Yes     518.2     261.31
-## 47    56   Male 100583   Yes     633.0     195.95
-## 48    66   Male     NA   Yes     510.3     198.46
-## 49    62 Female 128606   Yes     499.7     244.05
-## 50    54   Male 114337   Yes     518.0     217.25
-##      store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8
-## 1              2            2  4  2  1  2  1  4  1  4
-## 2              4            2  4  1  1  2  1  4  1  4
-## 3              7            2  5  2  1  2  1  4  1  4
-## 4             10            2  5  2  1  3  1  4  1  4
-## 5              4            4  4  1  1  3  1  4  1  4
-## 6              4            5  4  2  1  2  1  4  1  4
-## 7              5            3  4  1  1  2  1  4  1  4
-## 8             11            5  5  2  1  3  1  4  1  4
-## 9              6            1  4  1  1  2  1  4  1  4
-## 10            12            1  4  2  1  3  1  4  1  4
-## 11             5            4  4  1  1  3  1  4  1  4
-## 12             6            2  4  1  1  3  1  4  1  4
-## 13             7            4  5  1  1  3  1  4  1  4
-## 14             7            3  4  2  1  3  1  4  1  4
-## 15             5            5  4  2  1  2  1  4  1  4
-## 16             5            1  5  2  1  2  1  4  1  4
-## 17             5            3  5  2  1  2  1  4  1  4
-## 18             5            2  5  2  1  3  1  4  1  4
-## 19             7            2  4  2  1  3  1  4  1  4
-## 20             4            2  5  2  1  2  1  4  1  5
-## 21            11            2  5  1  1  3  1  4  1  4
-## 22             7            3  4  2  1  2  1  4  1  4
-## 23             6            1  5  2  1  2  1  4  1  4
-## 24             8            3  5  1  1  2  1  4  1  4
-## 25            11            3  4  1  1  3  1  4  1  4
-## 26             7            1  5  1  1  3  1  4  1  4
-## 27             6            2  4  1  1  3  1  4  1  4
-## 28             4            4  5  1  1  2  1  4  1  4
-## 29             4            3  5  1  1  2  1  4  1  4
-## 30             9            2  5  2  1  2  1  4  1  4
-## 31             4            2  4  2  1  3  1  4  1  4
-## 32             2            3  5  2  1  2  1  4  1  4
-## 33             6            4  4  1  1  3  1  4  1  4
-## 34             8            3  4  1  1  2  1  4  1  4
-## 35             9            4  4  2  1  3  1  4  1  4
-## 36             6            4  5  2  1  2  1  4  1  4
-## 37             6            2  4  2  1  3  1  4  1  4
-## 38             6            5  5  1  1  3  1  4  1  4
-## 39             5            4  4  2  1  2  1  4  1  4
-## 40             6            2  4  1  1  2  1  4  1  4
-## 41             2            3  4  1  1  3  1  4  1  4
-## 42             5            1  5  1  1  3  1  4  1  4
-## 43             9            4  5  1  1  2  1  4  1  3
-## 44             4            5  4  1  1  3  1  4  1  4
-## 45             9            1  4  1  1  3  1  4  1  4
-## 46             8            2  5  1  1  3  1  4  1  4
-## 47            11            3  5  1  1  3  1  4  1  4
-## 48             9            4  5  2  1  3  1  4  1  4
-## 49             5            2  4  1  1  2  1  4  1  4
-## 50             6            2  4  1  1  2  1  4  1  4
+<pre><code>##      age gender income house store_exp online_exp store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8
+## 1     57 Female 120963   Yes     529.1     303.51           2            2  4  2  1  2  1  4  1  4
+## 2     63 Female 122008   Yes     478.0     109.53           4            2  4  1  1  2  1  4  1  4
+## 3     59   Male 114202   Yes     490.8     279.25           7            2  5  2  1  2  1  4  1  4
+## 4     60   Male 113616   Yes     347.8     141.67          10            2  5  2  1  3  1  4  1  4
+## 5     51   Male 124253   Yes     379.6     112.24           4            4  4  1  1  3  1  4  1  4
+## 6     59   Male 107661   Yes     338.3     195.69           4            5  4  2  1  2  1  4  1  4
+## 7     57   Male 120483   Yes     482.5     284.54           5            3  4  1  1  2  1  4  1  4
+## 8     57   Male 110542   Yes     340.7     135.26          11            5  5  2  1  3  1  4  1  4
+## 9     61 Female 132061   Yes     608.2     142.55           6            1  4  1  1  2  1  4  1  4
+## 10    60   Male 105049   Yes     470.3     163.47          12            1  4  2  1  3  1  4  1  4
+## 11    58   Male 107197   Yes     366.6     170.13           5            4  4  1  1  3  1  4  1  4
+## 12    59   Male     NA   Yes     674.9     310.27           6            2  4  1  1  3  1  4  1  4
+## 13    64   Male 119020   Yes     613.9     160.85           7            4  5  1  1  3  1  4  1  4
+## 14    57 Female     NA   Yes     737.0     224.53           7            3  4  2  1  3  1  4  1  4
+## 15    64   Male 114539   Yes     402.5     241.83           5            5  4  2  1  2  1  4  1  4
+## 16    61 Female     NA   Yes     615.1     238.10           5            1  5  2  1  2  1  4  1  4
+## 17    57 Female 133078   Yes     429.4     262.66           5            3  5  2  1  2  1  4  1  4
+## 18    63   Male 115709   Yes     552.6     187.52           5            2  5  2  1  3  1  4  1  4
+## 19    57 Female 113211    No     540.3     254.58           7            2  4  2  1  3  1  4  1  4
+## 20    57 Female 129774    No     384.3     311.03           4            2  5  2  1  2  1  4  1  5
+## 21    58   Male     NA   Yes     372.4     296.83          11            2  5  1  1  3  1  4  1  4
+## 22    58   Male 124357   Yes     535.5     205.54           7            3  4  2  1  2  1  4  1  4
+## 23    59 Female 123117   Yes     481.3     157.29           6            1  5  2  1  2  1  4  1  4
+## 24    61 Female     NA   Yes     546.2     161.23           8            3  5  1  1  2  1  4  1  4
+## 25    60 Female     NA   Yes     411.1     123.78          11            3  4  1  1  3  1  4  1  4
+## 26    56   Male     NA   Yes     492.7     128.02           7            1  5  1  1  3  1  4  1  4
+## 27    58   Male 127887   Yes     519.3     142.63           6            2  4  1  1  3  1  4  1  4
+## 28    64   Male 115925   Yes     627.7     240.98           4            4  5  1  1  2  1  4  1  4
+## 29    63 Female     NA   Yes     511.1     203.49           4            3  5  1  1  2  1  4  1  4
+## 30    56 Female 112621   Yes     699.3     223.44           9            2  5  2  1  2  1  4  1  4
+## 31    57   Male     NA   Yes     530.6     217.92           4            2  4  2  1  3  1  4  1  4
+## 32    59 Female 121773   Yes     532.1     176.88           2            3  5  2  1  2  1  4  1  4
+## 33    63   Male 126903   Yes     601.6     257.84           6            4  4  1  1  3  1  4  1  4
+## 34    55   Male 128254   Yes     595.3     248.06           8            3  4  1  1  2  1  4  1  4
+## 35    60 Female     NA   Yes     403.6     236.96           9            4  4  2  1  3  1  4  1  4
+## 36    64 Female     NA   Yes     611.7     102.24           6            4  5  2  1  2  1  4  1  4
+## 37    57 Female 118170   Yes     482.7     183.36           6            2  4  2  1  3  1  4  1  4
+## 38    57 Female 119148   Yes     412.9     246.87           6            5  5  1  1  3  1  4  1  4
+## 39    58   Male 125844   Yes     473.8     261.67           5            4  4  2  1  2  1  4  1  4
+## 40    55   Male 128194   Yes     595.7     156.93           6            2  4  1  1  2  1  4  1  4
+## 41    59 Female     NA   Yes     548.3     186.50           2            3  4  1  1  3  1  4  1  4
+## 42    61   Male     NA   Yes     597.2     209.68           5            1  5  1  1  3  1  4  1  4
+## 43    59 Female 122338   Yes     455.3     205.16           9            4  5  1  1  2  1  4  1  3
+## 44    58 Female 114519   Yes     493.5     271.67           4            5  4  1  1  3  1  4  1  4
+## 45    62   Male 123459   Yes     561.7     209.23           9            1  4  1  1  3  1  4  1  4
+## 46    59   Male 125626   Yes     518.2     261.31           8            2  5  1  1  3  1  4  1  4
+## 47    56   Male 100583   Yes     633.0     195.95          11            3  5  1  1  3  1  4  1  4
+## 48    66   Male     NA   Yes     510.3     198.46           9            4  5  2  1  3  1  4  1  4
+## 49    62 Female 128606   Yes     499.7     244.05           5            2  4  1  1  2  1  4  1  4
+## 50    54   Male 114337   Yes     518.0     217.25           6            2  4  1  1  2  1  4  1  4
 ##      Q9 Q10     segment total_exp
 ## 1     2   4       Price     832.6
 ## 2     1   4       Price     587.5
