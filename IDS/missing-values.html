@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2018-08-22">
+<meta name="date" content="2018-10-14">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -205,39 +205,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 demo_imp&lt;-<span class="kw">impute</span>(sim.dat,<span class="dt">method=</span><span class="st">&quot;median/mode&quot;</span>)
 <span class="co"># check the first 5 columns, there is no missing values in other columns</span>
 <span class="kw">summary</span>(demo_imp[,<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>])</code></pre></div>
-<pre><code>##       age          gender        income      
-##  Min.   :16.0   Female:554   Min.   : 41776  
-##  1st Qu.:25.0   Male  :446   1st Qu.: 87896  
-##  Median :36.0                Median : 93869  
-##  Mean   :38.6                Mean   :109923  
-##  3rd Qu.:53.0                3rd Qu.:119456  
-##  Max.   :69.0                Max.   :319704  
-##  house       store_exp    
-##  No :432   Min.   :  156  
-##  Yes:568   1st Qu.:  205  
-##            Median :  330  
-##            Mean   : 1358  
-##            3rd Qu.:  597  
-##            Max.   :50000</code></pre>
 <p>After imputation, <code>demo_imp</code> has no missing value. This method is straightforward and widely used. The disadvantage is that it does not take into account the relationship between the variables. When there is a significant proportion of missing, it will distort the data. In this case, it is better to consider the relationship between variables and study the missing mechanism. In the example here, the missing variables are numeric. If the missing variable is a categorical/factor variable, the <code>impute()</code> function will impute with the mode.</p>
 <p>You can also use <code>preProcess()</code> function, but it is only for numeric variables, and can not impute categorical variables. Since missing values here are numeric, we can use the <code>preProcess()</code> function. The result is the same as the <code>impute()</code> function. <code>PreProcess()</code> is a powerful function that can link to a variety of data preprocessing methods. We will use the function later for other data preprocessing.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">imp&lt;-<span class="kw">preProcess</span>(sim.dat,<span class="dt">method=</span><span class="st">&quot;medianImpute&quot;</span>)
 demo_imp2&lt;-<span class="kw">predict</span>(imp,sim.dat)
 <span class="kw">summary</span>(demo_imp2[,<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>])</code></pre></div>
-<pre><code>##       age          gender        income      
-##  Min.   :16.0   Female:554   Min.   : 41776  
-##  1st Qu.:25.0   Male  :446   1st Qu.: 87896  
-##  Median :36.0                Median : 93869  
-##  Mean   :38.6                Mean   :109923  
-##  3rd Qu.:53.0                3rd Qu.:119456  
-##  Max.   :69.0                Max.   :319704  
-##  house       store_exp    
-##  No :432   Min.   :  156  
-##  Yes:568   1st Qu.:  205  
-##            Median :  330  
-##            Mean   : 1358  
-##            3rd Qu.:  597  
-##            Max.   :50000</code></pre>
 </div>
 <div id="k-nearest-neighbors" class="section level3">
 <h3><span class="header-section-number">3.2.2</span> K-nearest neighbors</h3>
@@ -254,24 +226,9 @@ imp&lt;-<span class="kw">preProcess</span>(sim.dat,<span class="dt">method=</spa
 idx&lt;-<span class="kw">which</span>(<span class="kw">lapply</span>(sim.dat,class)<span class="op">==</span><span class="st">&quot;factor&quot;</span>)
 demo_imp&lt;-<span class="kw">predict</span>(imp,sim.dat[,<span class="op">-</span>idx])
 <span class="kw">summary</span>(demo_imp[,<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>])</code></pre></div>
-<pre><code>##       age             income         store_exp     
-##  Min.   :-1.591   Min.   :-1.440   Min.   :-0.433  
-##  1st Qu.:-0.957   1st Qu.:-0.537   1st Qu.:-0.416  
-##  Median :-0.182   Median :-0.376   Median :-0.371  
-##  Mean   : 0.000   Mean   : 0.024   Mean   : 0.000  
-##  3rd Qu.: 1.016   3rd Qu.: 0.215   3rd Qu.:-0.274  
-##  Max.   : 2.144   Max.   : 4.136   Max.   :17.527</code></pre>
 <p><code>lapply(data,class)</code> can return a list of column class. Here the data frame is <code>sim.dat</code>, and the following code will give the list of column class:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># only show the first three elements</span>
 <span class="kw">lapply</span>(sim.dat,class)[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>]</code></pre></div>
-<pre><code>## $age
-## [1] &quot;integer&quot;
-## 
-## $gender
-## [1] &quot;factor&quot;
-## 
-## $income
-## [1] &quot;numeric&quot;</code></pre>
 <p>Comparing the KNN result with the previous median imputation, the two are very different. This is because when you tell the <code>preProcess()</code> function to use KNN (the option <code>method =&quot; knnImpute&quot;</code>), it will automatically standardize the data. Another way is to use Bagging tree (in the next section). Note that KNN can not impute samples with the entire row missing. The reason is straightforward. Since the algorithm uses the average of its neighbors if none of them has a value, what does it apply to calculate the mean? Let’s append a new row with all values missing to the original data frame to get a new object called <code>temp</code>. Then apply KNN to <code>temp</code> and see what happens:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">temp&lt;-<span class="kw">rbind</span>(sim.dat,<span class="kw">rep</span>(<span class="ot">NA</span>,<span class="kw">ncol</span>(sim.dat)))
 imp&lt;-<span class="kw">preProcess</span>(sim.dat,<span class="dt">method=</span><span class="st">&quot;knnImpute&quot;</span>,<span class="dt">k=</span><span class="dv">5</span>)
@@ -282,7 +239,6 @@ idx&lt;-<span class="kw">which</span>(<span class="kw">lapply</span>(temp,class)
 <p>There is an error saying “cannot impute when all predictors are missing in the new data point”. It is easy to fix by finding and removing the problematic row:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">idx&lt;-<span class="kw">apply</span>(temp,<span class="dv">1</span>,<span class="cf">function</span>(x) <span class="kw">sum</span>(<span class="kw">is.na</span>(x)) )
 <span class="kw">as.vector</span>(<span class="kw">which</span>(idx<span class="op">==</span><span class="kw">ncol</span>(temp)))</code></pre></div>
-<pre><code>## [1] 1001</code></pre>
 <p>It shows that row 1001 is problematic. You can go ahead to delete it.</p>
 </div>
 <div id="bagging-tree" class="section level3">

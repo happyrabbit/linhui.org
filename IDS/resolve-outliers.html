@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2018-08-22">
+<meta name="date" content="2018-10-14">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -196,18 +196,13 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="resolve-outliers" class="section level2">
 <h2><span class="header-section-number">3.5</span> Resolve Outliers</h2>
 <p>Even under certain assumptions we can statistically define outliers, it can be hard to define in some situations. Box plot, histogram and some other basic visualizations can be used to initially check whether there are outliers. For example, we can visualize numerical non-survey variables in <code>sim.dat</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># select numerical non-survey data</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># scm, fig.cap=&#39;Use basic visualization to check outliers&#39;, out.width=&#39;80%&#39;, # fig.asp=.75, fig.align=&#39;center&#39;</span>
+<span class="co"># select numerical non-survey data</span>
 sdat&lt;-<span class="kw">subset</span>(sim.dat,<span class="dt">select=</span><span class="kw">c</span>(<span class="st">&quot;age&quot;</span>,<span class="st">&quot;income&quot;</span>,<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>,<span class="st">&quot;store_trans&quot;</span>,<span class="st">&quot;online_trans&quot;</span> ))
 <span class="co"># use scatterplotMatrix() function from car package</span>
 <span class="kw">par</span>(<span class="dt">oma=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">2</span>))
 <span class="kw">scatterplotMatrix</span>(sdat,<span class="dt">diagonal=</span><span class="st">&quot;boxplot&quot;</span>,<span class="dt">smoother=</span><span class="ot">FALSE</span>)</code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:scm"></span>
-<img src="IDS_files/figure-html/scm-1.svg" alt="Use basic visualization to check outliers" width="80%" />
-<p class="caption">
-FIGURE 3.3: Use basic visualization to check outliers
-</p>
-</div>
-<p>As figure <a href="resolve-outliers.html#fig:scm">3.3</a> shows, <code>store_exp</code> has outliers. It is also easy to observe the pair relationship from the plot. <code>age</code> is negatively correlated with <code>online_trans</code> but positively correlated with <code>store_trans</code>. It seems that older people tend to purchase from the local store. The amount of expense is positively correlated with income. Scatterplot matrix like this can reveal lots of information before modeling.</p>
+<p>As figure <a href="#fig:scm"><strong>??</strong></a> shows, <code>store_exp</code> has outliers. It is also easy to observe the pair relationship from the plot. <code>age</code> is negatively correlated with <code>online_trans</code> but positively correlated with <code>store_trans</code>. It seems that older people tend to purchase from the local store. The amount of expense is positively correlated with income. Scatterplot matrix like this can reveal lots of information before modeling.</p>
 <p>In addition to visualization, there are some statistical methods to define outliers, such as the commonly used Z-score. The Z-score for variable <span class="math inline">\(\mathbf{Y}\)</span> is defined as:</p>
 <p><span class="math display">\[Z_{i}=\frac{Y_{i}-\bar{Y}}{s}\]</span></p>
 <p>where <span class="math inline">\(\bar{Y}\)</span> and <span class="math inline">\(s\)</span> are mean and standard deviation for <span class="math inline">\(Y\)</span>. Z-score is a measurement of the distance between each observation and the mean. This method may be misleading, especially when the sample size is small. Iglewicz and Hoaglin proposed to use the modified Z-score to determine the outlier<span class="citation">(Iglewicz and Hoaglin <a href="#ref-mad1">1993</a>)</span>：</p>
@@ -219,7 +214,6 @@ ymad&lt;-<span class="kw">mad</span>(<span class="kw">na.omit</span>(sdat<span c
 zs&lt;-(sdat<span class="op">$</span>income<span class="op">-</span><span class="kw">mean</span>(<span class="kw">na.omit</span>(sdat<span class="op">$</span>income)))<span class="op">/</span>ymad
 <span class="co"># count the number of outliers</span>
 <span class="kw">sum</span>(<span class="kw">na.omit</span>(zs<span class="op">&gt;</span><span class="fl">3.5</span>))</code></pre></div>
-<pre><code>## [1] 59</code></pre>
 <p>According to modified Z-score, variable income has 59 outliers. Refer to <span class="citation">(Iglewicz and Hoaglin <a href="#ref-mad1">1993</a>)</span> for other ways of detecting outliers.</p>
 <p>The impact of outliers depends on the model. Some models are sensitive to outliers, such as linear regression, logistic regression. Some are pretty robust to outliers, such as tree models, support vector machine. Also, the outlier is not wrong data. It is real observation so cannot be deleted at will. If a model is sensitive to outliers, we can use <em>spatial sign transformation</em> <span class="citation">(Serneels S <a href="#ref-ssp">2006</a>)</span> to minimize the problem. It projects the original sample points to the surface of a sphere by:</p>
 <p><span class="math display">\[x_{ij}^{*}=\frac{x_{ij}}{\sqrt{\sum_{j=1}^{p}x_{ij}^{2}}}\]</span></p>
@@ -230,7 +224,9 @@ zs&lt;-(sdat<span class="op">$</span>income<span class="op">-</span><span class=
 <li>If there are some variables to remove (for example, highly correlated variables), do it before the transformation</li>
 </ol>
 <p>Function <code>spatialSign()</code> <code>caret</code> package can conduct the transformation. Take <code>income</code> and <code>age</code> as an example:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># KNN imputation</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># sst, fig.cap=&#39;Spatial sign transformation&#39;, out.width=&#39;80%&#39;, fig.asp=.75, </span>
+<span class="co"># fig.align=&#39;center&#39;}</span>
+<span class="co"># KNN imputation</span>
 sdat&lt;-sim.dat[,<span class="kw">c</span>(<span class="st">&quot;income&quot;</span>,<span class="st">&quot;age&quot;</span>)]
 imp&lt;-<span class="kw">preProcess</span>(sdat,<span class="dt">method=</span><span class="kw">c</span>(<span class="st">&quot;knnImpute&quot;</span>),<span class="dt">k=</span><span class="dv">5</span>)
 sdat&lt;-<span class="kw">predict</span>(imp,sdat)
@@ -239,12 +235,6 @@ transformed &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(
 <span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>),<span class="dt">oma=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>))
 <span class="kw">plot</span>(income <span class="op">~</span><span class="st"> </span>age,<span class="dt">data =</span> sdat,<span class="dt">col=</span><span class="st">&quot;blue&quot;</span>,<span class="dt">main=</span><span class="st">&quot;Before&quot;</span>)
 <span class="kw">plot</span>(income <span class="op">~</span><span class="st"> </span>age,<span class="dt">data =</span> transformed,<span class="dt">col=</span><span class="st">&quot;blue&quot;</span>,<span class="dt">main=</span><span class="st">&quot;After&quot;</span>)</code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:sst"></span>
-<img src="IDS_files/figure-html/sst-1.svg" alt="Spatial sign transformation" width="80%" />
-<p class="caption">
-FIGURE 3.4: Spatial sign transformation
-</p>
-</div>
 <p>Some readers may have found that the above code does not seem to standardize the data before transformation. Recall the introduction of KNN, <code>preProcess()</code> with <code>method=&quot;knnImpute&quot;</code> by default will standardize data.</p>
 </div>
 <h3>References</h3>

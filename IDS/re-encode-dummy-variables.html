@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2018-08-22">
+<meta name="date" content="2018-10-14">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -199,38 +199,17 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>Let’s encode <code>gender</code> and <code>house</code> from <code>sim.dat</code> to dummy variables. There are two ways to implement this. The first is to use <code>class.ind()</code> from <code>nnet</code> package. However, it only works on one variable at a time.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dumVar&lt;-nnet<span class="op">::</span><span class="kw">class.ind</span>(sim.dat<span class="op">$</span>gender)
 <span class="kw">head</span>(dumVar)</code></pre></div>
-<pre><code>##      Female Male
-## [1,]      1    0
-## [2,]      1    0
-## [3,]      0    1
-## [4,]      0    1
-## [5,]      0    1
-## [6,]      0    1</code></pre>
 <p>Since it is redundant to keep both, we need to remove one of them when modeling. Another more powerful function is <code>dummyVars()</code> from <code>caret</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dumMod&lt;-<span class="kw">dummyVars</span>(<span class="op">~</span>gender<span class="op">+</span>house<span class="op">+</span>income,
                   <span class="dt">data=</span>sim.dat,
                   <span class="co"># use &quot;origional variable name + level&quot; as new name</span>
                   <span class="dt">levelsOnly=</span>F)
 <span class="kw">head</span>(<span class="kw">predict</span>(dumMod,sim.dat))</code></pre></div>
-<pre><code>##   gender.Female gender.Male house.No house.Yes income
-## 1             1           0        0         1 120963
-## 2             1           0        0         1 122008
-## 3             0           1        0         1 114202
-## 4             0           1        0         1 113616
-## 5             0           1        0         1 124253
-## 6             0           1        0         1 107661</code></pre>
 <p><code>dummyVars()</code> can also use formula format. The variable on the right-hand side can be both categorical and numeric. For a numerical variable, the function will keep the variable unchanged. The advantage is that you can apply the function to a data frame without removing numerical variables. Other than that, the function can create interaction term:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dumMod&lt;-<span class="kw">dummyVars</span>(<span class="op">~</span>gender<span class="op">+</span>house<span class="op">+</span>income<span class="op">+</span>income<span class="op">:</span>gender,
                   <span class="dt">data=</span>sim.dat,
                   <span class="dt">levelsOnly=</span>F)
 <span class="kw">head</span>(<span class="kw">predict</span>(dumMod,sim.dat))</code></pre></div>
-<pre><code>##   gender.Female gender.Male house.No house.Yes income gender.Female:income gender.Male:income
-## 1             1           0        0         1 120963               120963                  0
-## 2             1           0        0         1 122008               122008                  0
-## 3             0           1        0         1 114202                    0             114202
-## 4             0           1        0         1 113616                    0             113616
-## 5             0           1        0         1 124253                    0             124253
-## 6             0           1        0         1 107661                    0             107661</code></pre>
 <p>If you think the impact income levels on purchasing behavior is different for male and female, then you may add the interaction term between <code>income</code> and <code>gender</code>. You can do this by adding <code>income: gender</code> in the formula.</p>
 </div>
             </section>

@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2018-08-22">
+<meta name="date" content="2018-10-14">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -214,14 +214,6 @@ trans&lt;-<span class="kw">preProcess</span>(sdat,<span class="dt">method=</span
 transformed&lt;-<span class="kw">predict</span>(trans,sdat)</code></pre></div>
 <p>Now the two variables are in the same scale:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(transformed)</code></pre></div>
-<pre><code>##       age             income     
-##  Min.   :-1.591   Min.   :-1.44  
-##  1st Qu.:-0.957   1st Qu.:-0.56  
-##  Median :-0.182   Median :-0.39  
-##  Mean   : 0.000   Mean   : 0.00  
-##  3rd Qu.: 1.016   3rd Qu.: 0.22  
-##  Max.   : 2.144   Max.   : 4.14  
-##  NA&#39;s   :1        NA&#39;s   :184</code></pre>
 <p>Sometimes you only need to scale the variable. For example, if the model adds a penalty to the parameter estimates (such as <span class="math inline">\(L_2\)</span> penalty is ridge regression and <span class="math inline">\(L_1\)</span> penalty in LASSO), the variables need to have a similar scale to ensure a fair variable selection. I am a heavy user of this kind of penalty-based model in my work, and I used the following quantile transformation:</p>
 <p><span class="math display">\[
 x_{ij}^{*}=\frac{x_{ij}-quantile(x_{.j},0.01)}{quantile(x_{.j}-0.99)-quantile(x_{-j},0.01)}
@@ -240,13 +232,6 @@ x_{ij}^{*}=\frac{x_{ij}-quantile(x_{.j},0.01)}{quantile(x_{.j}-0.99)-quantile(x_
 <p>In order to illustrate, let’s apply it to some variables from `demo_imp2:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">demo_imp3&lt;-<span class="kw">qscale</span>(<span class="kw">subset</span>(demo_imp2,<span class="dt">select=</span><span class="kw">c</span>(<span class="st">&quot;income&quot;</span>,<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>)))
 <span class="kw">summary</span>(demo_imp3)</code></pre></div>
-<pre><code>##      income          store_exp        online_exp     
-##  Min.   :-0.0578   Min.   :-0.003   Min.   :-0.0060  
-##  1st Qu.: 0.1574   1st Qu.: 0.004   1st Qu.: 0.0427  
-##  Median : 0.1852   Median : 0.023   Median : 0.2537  
-##  Mean   : 0.2601   Mean   : 0.177   Mean   : 0.2784  
-##  3rd Qu.: 0.3046   3rd Qu.: 0.063   3rd Qu.: 0.3229  
-##  Max.   : 1.2386   Max.   : 7.477   Max.   : 1.2988</code></pre>
 <p>After transformation, most of the variables are between 0-1.</p>
 </div>
 <h3>References</h3>

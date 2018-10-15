@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2018-08-22">
+<meta name="date" content="2018-10-14">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -206,12 +206,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(readr)
 <span class="kw">read_csv</span>(<span class="st">&quot;2015,2016,2017</span>
 <span class="st">1,2,3</span>
-<span class="st">4,5,6&quot;</span>)</code></pre></div>
-<pre><code>## # A tibble: 2 x 3
-##   `2015` `2016` `2017`
-##    &lt;int&gt;  &lt;int&gt;  &lt;int&gt;
-## 1      1      2      3
-## 2      4      5      6</code></pre></li>
+<span class="st">4,5,6&quot;</span>)</code></pre></div></li>
 <li><p><code>readr</code> functions do not convert strings to factors by default, are able to parse dates and times and can automatically determine the data types in each column.</p></li>
 <li><p>The killing character, in my opinion, is that <code>readr</code> provides <strong>progress bar</strong>. What makes you feel worse than waiting is not knowing how long you have to wait.</p></li>
 </ol>
@@ -232,17 +227,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(readr)
 sim.dat &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv &quot;</span>)
 <span class="kw">head</span>(sim.dat)</code></pre></div>
-<pre><code>## # A tibble: 6 x 19
-##     age gender  income house store_exp online_exp store_trans online_trans    Q1    Q2    Q3    Q4
-##   &lt;int&gt; &lt;chr&gt;    &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt;      &lt;dbl&gt;       &lt;int&gt;        &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
-## 1    57 Female 120963. Yes        529.       304.           2            2     4     2     1     2
-## 2    63 Female 122008. Yes        478.       110.           4            2     4     1     1     2
-## 3    59 Male   114202. Yes        491.       279.           7            2     5     2     1     2
-## 4    60 Male   113616. Yes        348.       142.          10            2     5     2     1     3
-## 5    51 Male   124253. Yes        380.       112.           4            4     4     1     1     3
-## 6    59 Male   107661. Yes        338.       196.           4            5     4     2     1     2
-## # ... with 7 more variables: Q5 &lt;int&gt;, Q6 &lt;int&gt;, Q7 &lt;int&gt;, Q8 &lt;int&gt;, Q9 &lt;int&gt;, Q10 &lt;int&gt;,
-## #   segment &lt;chr&gt;</code></pre>
 <p>The function reads the file to R as a <code>tibble</code>. You can consider <code>tibble</code> as next iteration of the data frame. They are different with data frame for the following aspects:</p>
 <ul>
 <li>It never changes an input’s type (i.e., no more <code>stringsAsFactors = FALSE</code>!)</li>
@@ -255,11 +239,6 @@ sim.dat &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span cla
 <span class="st">100,200,300</span>
 <span class="st">canola,soybean,corn&quot;</span>)
 <span class="kw">print</span>(dat)</code></pre></div>
-<pre><code>## # A tibble: 2 x 3
-##   `2015` `2016`  `2017`
-##   &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt; 
-## 1 100    200     300   
-## 2 canola soybean corn</code></pre>
 <p>You can also add comments on the top and tell R to skip those lines:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat=<span class="kw">read_csv</span>(<span class="st">&quot;# I will never let you know that</span>
 <span class="st">          # my favorite food is carrot</span>
@@ -272,58 +251,25 @@ sim.dat &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span cla
 <span class="st">          Saturday,carrot,extremely happy</span>
 <span class="st">          Sunday,carrot,extremely happy&quot;</span>, <span class="dt">skip =</span> <span class="dv">2</span>)
 <span class="kw">print</span>(dat)</code></pre></div>
-<pre><code>## # A tibble: 7 x 3
-##   Date      Food   Mood           
-##   &lt;chr&gt;     &lt;chr&gt;  &lt;chr&gt;          
-## 1 Monday    carrot happy          
-## 2 Tuesday   carrot happy          
-## 3 Wednesday carrot happy          
-## 4 Thursday  carrot happy          
-## 5 Friday    carrot happy          
-## 6 Saturday  carrot extremely happy
-## 7 Sunday    carrot extremely happy</code></pre>
 <p>If you don’t have column names, set <code>col_names = FALSE</code> then R will assign names “<code>X1</code>”,“<code>X2</code>”… to the columns:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat=<span class="kw">read_csv</span>(<span class="st">&quot;Saturday,carrot,extremely happy</span>
 <span class="st">          Sunday,carrot,extremely happy&quot;</span>, <span class="dt">col_names=</span><span class="ot">FALSE</span>)
 <span class="kw">print</span>(dat)</code></pre></div>
-<pre><code>## # A tibble: 2 x 3
-##   X1       X2     X3             
-##   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;          
-## 1 Saturday carrot extremely happy
-## 2 Sunday   carrot extremely happy</code></pre>
 <p>You can also pass <code>col_names</code> a character vector which will be used as the column names. Try to replace <code>col_names=FALSE</code> with <code>col_names=c(&quot;Date&quot;,&quot;Food&quot;,&quot;Mood&quot;)</code> and see what happen.</p>
 <p>As mentioned before, you can use <code>read_csv2()</code> to read semicolon separated files:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat=<span class="kw">read_csv2</span>(<span class="st">&quot;Saturday; carrot; extremely happy </span><span class="ch">\n</span><span class="st"> Sunday; carrot; extremely happy&quot;</span>, <span class="dt">col_names=</span><span class="ot">FALSE</span>)</code></pre></div>
-<pre><code>## Using &#39;,&#39; as decimal and &#39;.&#39; as grouping mark. Use read_delim() for more control.</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(dat)</code></pre></div>
-<pre><code>## # A tibble: 2 x 3
-##   X1       X2     X3             
-##   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;          
-## 1 Saturday carrot extremely happy
-## 2 Sunday   carrot extremely happy</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat=<span class="kw">read_csv2</span>(<span class="st">&quot;Saturday; carrot; extremely happy </span><span class="ch">\n</span><span class="st"> Sunday; carrot; extremely happy&quot;</span>, <span class="dt">col_names=</span><span class="ot">FALSE</span>)
+<span class="kw">print</span>(dat)</code></pre></div>
 <p>Here “<code>\n</code>” is a convenient shortcut for adding a new line.</p>
 <p>You can use <code>read_tsv()</code> to read tab delimited files：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat=<span class="kw">read_tsv</span>(<span class="st">&quot;every</span><span class="ch">\t</span><span class="st">man</span><span class="ch">\t</span><span class="st">is</span><span class="ch">\t</span><span class="st">a</span><span class="ch">\t</span><span class="st">poet</span><span class="ch">\t</span><span class="st">when</span><span class="ch">\t</span><span class="st">he</span><span class="ch">\t</span><span class="st">is</span><span class="ch">\t</span><span class="st">in</span><span class="ch">\t</span><span class="st">love</span><span class="ch">\n</span><span class="st">&quot;</span>, <span class="dt">col_names =</span> <span class="ot">FALSE</span>)
 <span class="kw">print</span>(dat)</code></pre></div>
-<pre><code>## # A tibble: 1 x 10
-##   X1    X2    X3    X4    X5    X6    X7    X8    X9    X10  
-##   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
-## 1 every man   is    a     poet  when  he    is    in    love</code></pre>
 <p>Or more generally, you can use <code>read_delim()</code> and assign separating character：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat=<span class="kw">read_delim</span>(<span class="st">&quot;THE|UNBEARABLE|RANDOMNESS|OF|LIFE</span><span class="ch">\n</span><span class="st">&quot;</span>, <span class="dt">delim =</span> <span class="st">&quot;|&quot;</span>, <span class="dt">col_names =</span> <span class="ot">FALSE</span>)
 <span class="kw">print</span>(dat)</code></pre></div>
-<pre><code>## # A tibble: 1 x 5
-##   X1    X2         X3         X4    X5   
-##   &lt;chr&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt; &lt;chr&gt;
-## 1 THE   UNBEARABLE RANDOMNESS OF    LIFE</code></pre>
 <p>Another situation you will often run into is the missing value. In marketing survey, people like to use “99” to represent missing. You can tell R to set all observation with value “99” as missing when you read the data:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat=<span class="kw">read_csv</span>(<span class="st">&quot;Q1,Q2,Q3</span>
 <span class="st">               5, 4,99&quot;</span>,<span class="dt">na=</span><span class="st">&quot;99&quot;</span>)
 <span class="kw">print</span>(dat)</code></pre></div>
-<pre><code>## # A tibble: 1 x 3
-##      Q1    Q2 Q3   
-##   &lt;int&gt; &lt;int&gt; &lt;chr&gt;
-## 1     5     4 &lt;NA&gt;</code></pre>
 <p>For writing data back to disk, you can use <code>write_csv()</code> and <code>write_tsv()</code>. The following two characters of the two functions increase the chances of the output file being read back in correctly:</p>
 <ul>
 <li>Encode strings in UTF-8</li>
@@ -357,78 +303,25 @@ sim.dat &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span cla
 </ul>
 <p>We will use the clothes customer data to illustrate. There are two dimensions in <code>[]</code>. The first one indicates the row and second one indicates column. It uses a comma to separate them.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># read data</span>
-sim.dat&lt;-readr<span class="op">::</span><span class="kw">read_csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv&quot;</span>)</code></pre></div>
-<pre><code>## Parsed with column specification:
-## cols(
-##   age = col_integer(),
-##   gender = col_character(),
-##   income = col_double(),
-##   house = col_character(),
-##   store_exp = col_double(),
-##   online_exp = col_double(),
-##   store_trans = col_integer(),
-##   online_trans = col_integer(),
-##   Q1 = col_integer(),
-##   Q2 = col_integer(),
-##   Q3 = col_integer(),
-##   Q4 = col_integer(),
-##   Q5 = col_integer(),
-##   Q6 = col_integer(),
-##   Q7 = col_integer(),
-##   Q8 = col_integer(),
-##   Q9 = col_integer(),
-##   Q10 = col_integer(),
-##   segment = col_character()
-## )</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># subset the first two rows</span>
-sim.dat[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>,]</code></pre></div>
-<pre><code>## # A tibble: 2 x 19
-##     age gender  income house store_exp online_exp store_trans online_trans    Q1    Q2    Q3    Q4
-##   &lt;int&gt; &lt;chr&gt;    &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt;      &lt;dbl&gt;       &lt;int&gt;        &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
-## 1    57 Female 120963. Yes        529.       304.           2            2     4     2     1     2
-## 2    63 Female 122008. Yes        478.       110.           4            2     4     1     1     2
-## # ... with 7 more variables: Q5 &lt;int&gt;, Q6 &lt;int&gt;, Q7 &lt;int&gt;, Q8 &lt;int&gt;, Q9 &lt;int&gt;, Q10 &lt;int&gt;,
-## #   segment &lt;chr&gt;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># subset the first two rows and column 3 and 5</span>
-sim.dat[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>,<span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">5</span>)]</code></pre></div>
-<pre><code>## # A tibble: 2 x 2
-##    income store_exp
-##     &lt;dbl&gt;     &lt;dbl&gt;
-## 1 120963.      529.
-## 2 122008.      478.</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get all rows with age&gt;70</span>
-sim.dat[sim.dat<span class="op">$</span>age<span class="op">&gt;</span><span class="dv">70</span>,]</code></pre></div>
-<pre><code>## # A tibble: 1 x 19
-##     age gender  income house store_exp online_exp store_trans online_trans    Q1    Q2    Q3    Q4
-##   &lt;int&gt; &lt;chr&gt;    &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt;      &lt;dbl&gt;       &lt;int&gt;        &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
-## 1   300 Male   208017. Yes       5077.      6053.          12           11     1     4     5     4
-## # ... with 7 more variables: Q5 &lt;int&gt;, Q6 &lt;int&gt;, Q7 &lt;int&gt;, Q8 &lt;int&gt;, Q9 &lt;int&gt;, Q10 &lt;int&gt;,
-## #   segment &lt;chr&gt;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get rows with age&gt; 60 and gender is Male</span>
+sim.dat&lt;-readr<span class="op">::</span><span class="kw">read_csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv&quot;</span>)
+<span class="co"># subset the first two rows</span>
+sim.dat[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>,]
+<span class="co"># subset the first two rows and column 3 and 5</span>
+sim.dat[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>,<span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">5</span>)]
+<span class="co"># get all rows with age&gt;70</span>
+sim.dat[sim.dat<span class="op">$</span>age<span class="op">&gt;</span><span class="dv">70</span>,]
+<span class="co"># get rows with age&gt; 60 and gender is Male</span>
 <span class="co"># select column 3 and 4</span>
 sim.dat[sim.dat<span class="op">$</span>age<span class="op">&gt;</span><span class="dv">68</span> <span class="op">&amp;</span><span class="st"> </span>sim.dat<span class="op">$</span>gender <span class="op">==</span><span class="st"> &quot;Male&quot;</span>, <span class="dv">3</span><span class="op">:</span><span class="dv">4</span>]</code></pre></div>
-<pre><code>## # A tibble: 2 x 2
-##    income house
-##     &lt;dbl&gt; &lt;chr&gt;
-## 1 119552. No   
-## 2 208017. Yes</code></pre>
 <p>Remember that there are usually different ways to conduct the same manipulation. For example, the following code presents three ways to calculate an average number of online transactions for male and female:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tapply</span>(sim.dat<span class="op">$</span>online_trans, sim.dat<span class="op">$</span>gender, mean )</code></pre></div>
-<pre><code>## Female   Male 
-##  15.38  11.26</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">aggregate</span>(online_trans <span class="op">~</span><span class="st"> </span>gender, <span class="dt">data =</span> sim.dat, mean)</code></pre></div>
-<pre><code>##   gender online_trans
-## 1 Female        15.38
-## 2   Male        11.26</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tapply</span>(sim.dat<span class="op">$</span>online_trans, sim.dat<span class="op">$</span>gender, mean )
+
+<span class="kw">aggregate</span>(online_trans <span class="op">~</span><span class="st"> </span>gender, <span class="dt">data =</span> sim.dat, mean)
+
+<span class="kw">library</span>(dplyr)
 sim.dat<span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">group_by</span>(gender)<span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">summarise</span>(<span class="dt">Avg_online_trans=</span><span class="kw">mean</span>(online_trans))</code></pre></div>
-<pre><code>## # A tibble: 2 x 2
-##   gender Avg_online_trans
-##   &lt;chr&gt;             &lt;dbl&gt;
-## 1 Female             15.4
-## 2 Male               11.3</code></pre>
 <p>There is no gold standard to choose a specific function to manipulate data. The goal is to solve the real problem, not the tool itself. So just use whatever tool that is convenient for you.</p>
 <p>The way to use <code>[]</code> is straightforward. But the manipulations are limited. If you need more complicated data reshaping or aggregation, there are other packages to use such as <code>dplyr</code>, <code>reshape2</code>, <code>tidyr</code> etc. But the usage of those packages are not as straightforward as <code>[]</code>. You often need to change functions. Keeping related operations together, such as subset, group, update, join etc, will allow for:</p>
 <ul>
@@ -447,32 +340,17 @@ sim.dat<span class="op">%&gt;%</span><span class="st"> </span>
 <p>Use <code>data.table()</code> to covert the existing data frame <code>sim.dat</code> to data table:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dt &lt;-<span class="st"> </span><span class="kw">data.table</span>(sim.dat)
 <span class="kw">class</span>(dt)</code></pre></div>
-<pre><code>## [1] &quot;data.table&quot; &quot;data.frame&quot;</code></pre>
 <p>Calculate mean for counts of online transactions:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dt[, <span class="kw">mean</span>(online_trans)]</code></pre></div>
-<pre><code>## [1] 13.55</code></pre>
 <p>You can’t do the same thing using data frame:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sim.dat[,<span class="kw">mean</span>(online_trans)]</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode html"><code class="sourceCode html">Error in mean(online_trans) : object &#39;online_trans&#39; not found</code></pre></div>
 <p>If you want to calculate mean by group as before, set “<code>by =</code>” argument:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dt[ , <span class="kw">mean</span>(online_trans), by =<span class="st"> </span>gender]</code></pre></div>
-<pre><code>##    gender    V1
-## 1: Female 15.38
-## 2:   Male 11.26</code></pre>
 <p>You can group by more than one variables. For example, group by “<code>gender</code>” and “<code>house</code>”:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dt[ , <span class="kw">mean</span>(online_trans), by =<span class="st"> </span>.(gender, house)]</code></pre></div>
-<pre><code>##    gender house     V1
-## 1: Female   Yes 11.312
-## 2:   Male   Yes  8.772
-## 3: Female    No 19.146
-## 4:   Male    No 16.486</code></pre>
 <p>Assign column names for aggregated variables:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dt[ , .(<span class="dt">avg =</span> <span class="kw">mean</span>(online_trans)), by =<span class="st"> </span>.(gender, house)]</code></pre></div>
-<pre><code>##    gender house    avg
-## 1: Female   Yes 11.312
-## 2:   Male   Yes  8.772
-## 3: Female    No 19.146
-## 4:   Male    No 16.486</code></pre>
 <p><code>data.table</code> can accomplish all operations that <code>aggregate()</code> and <code>tapply()</code>can do for data frame.</p>
 <ul>
 <li>General setting of <code>data.table</code></li>
@@ -487,27 +365,14 @@ sim.dat<span class="op">%&gt;%</span><span class="st"> </span>
 </center>
 <p>Let’s review our previous code:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dt[ , <span class="kw">mean</span>(online_trans), by =<span class="st"> </span>gender]</code></pre></div>
-<pre><code>##    gender    V1
-## 1: Female 15.38
-## 2:   Male 11.26</code></pre>
 <p>The code above is equal to the following SQL：</p>
 <div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span>  gender, <span class="fu">avg</span>(online_trans) <span class="kw">FROM</span> sim.dat <span class="kw">GROUP</span> <span class="kw">BY</span> gender</code></pre></div>
 <p>R code:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dt[ , .(<span class="dt">avg =</span> <span class="kw">mean</span>(online_trans)), by =<span class="st"> </span>.(gender, house)]</code></pre></div>
-<pre><code>##    gender house    avg
-## 1: Female   Yes 11.312
-## 2:   Male   Yes  8.772
-## 3: Female    No 19.146
-## 4:   Male    No 16.486</code></pre>
 <p>is equal to SQL：</p>
 <div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> gender, house, <span class="fu">avg</span>(online_trans) <span class="kw">AS</span> <span class="fu">avg</span> <span class="kw">FROM</span> sim.dat <span class="kw">GROUP</span> <span class="kw">BY</span> gender, house</code></pre></div>
 <p>R code：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dt[ age <span class="op">&lt;</span><span class="st"> </span><span class="dv">40</span>, .(<span class="dt">avg =</span> <span class="kw">mean</span>(online_trans)), by =<span class="st"> </span>.(gender, house)]</code></pre></div>
-<pre><code>##    gender house   avg
-## 1:   Male   Yes 14.46
-## 2: Female   Yes 18.14
-## 3:   Male    No 18.24
-## 4: Female    No 20.10</code></pre>
 <p>is equal to SQL：</p>
 <div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> gender, house, <span class="fu">avg</span>(online_trans) <span class="kw">AS</span> <span class="fu">avg</span> <span class="kw">FROM</span> sim.dat <span class="kw">WHERE</span> age &lt; <span class="dv">40</span> <span class="kw">GROUP</span> <span class="kw">BY</span> gender, house</code></pre></div>
 <p>You can see the analogy between <code>data.table</code> and <code>SQL</code>. Now let’s focus on operations in data table.</p>
@@ -515,23 +380,9 @@ sim.dat<span class="op">%&gt;%</span><span class="st"> </span>
 <li>select row</li>
 </ul>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># select rows with age&lt;20 and income &gt; 80000</span>
-dt[age <span class="op">&lt;</span><span class="st"> </span><span class="dv">20</span> <span class="op">&amp;</span><span class="st"> </span>income <span class="op">&gt;</span><span class="st"> </span><span class="dv">80000</span>]</code></pre></div>
-<pre><code>##    age gender income house store_exp online_exp store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9
-## 1:  19 Female  83535    No     227.7       1491           1           22  2  1  1  2  4  1  4  2  4
-## 2:  18 Female  89416   Yes     209.5       1926           3           28  2  1  1  1  4  1  4  2  4
-## 3:  19 Female  92813    No     186.7       1042           2           18  3  1  1  2  4  1  4  3  4
-##    Q10 segment
-## 1:   1   Style
-## 2:   1   Style
-## 3:   1   Style</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># select the first two rows</span>
+dt[age <span class="op">&lt;</span><span class="st"> </span><span class="dv">20</span> <span class="op">&amp;</span><span class="st"> </span>income <span class="op">&gt;</span><span class="st"> </span><span class="dv">80000</span>]
+<span class="co"># select the first two rows</span>
 dt[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]</code></pre></div>
-<pre><code>##    age gender income house store_exp online_exp store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9
-## 1:  57 Female 120963   Yes     529.1      303.5           2            2  4  2  1  2  1  4  1  4  2
-## 2:  63 Female 122008   Yes     478.0      109.5           4            2  4  1  1  2  1  4  1  4  1
-##    Q10 segment
-## 1:   4   Price
-## 2:   4   Price</code></pre>
 <ul>
 <li>select column</li>
 </ul>
@@ -540,27 +391,16 @@ dt[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]<
 <span class="co"># the argument for row is empty so the result will return all observations</span>
 ans &lt;-<span class="st"> </span>dt[, age]
 <span class="kw">head</span>(ans)</code></pre></div>
-<pre><code>## [1] 57 63 59 60 51 59</code></pre>
 <p>To return <code>data.table</code> object, put column names in <code>list()</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Select age and online_exp columns and return as a data.table instead</span>
 ans &lt;-<span class="st"> </span>dt[, <span class="kw">list</span>(age, online_exp)]
 <span class="kw">head</span>(ans)</code></pre></div>
-<pre><code>##    age online_exp
-## 1:  57      303.5
-## 2:  63      109.5
-## 3:  59      279.2
-## 4:  60      141.7
-## 5:  51      112.2
-## 6:  59      195.7</code></pre>
 <p>Or you can also put column names in <code>.()</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ans &lt;-<span class="st"> </span>dt[, .(age, online_exp)]
 <span class="co"># head(ans)</span></code></pre></div>
 <p>To select all columns from “<code>age</code>” to “<code>income</code>”:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ans &lt;-<span class="st"> </span>dt[, age<span class="op">:</span>income, with =<span class="st"> </span><span class="ot">FALSE</span>]
 <span class="kw">head</span>(ans,<span class="dv">2</span>)</code></pre></div>
-<pre><code>##    age gender income
-## 1:  57 Female 120963
-## 2:  63 Female 122008</code></pre>
 <p>Delete columns using <code>-</code> or <code>!</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># delete columns from  age to online_exp</span>
 ans &lt;-<span class="st"> </span>dt[, <span class="op">-</span>(age<span class="op">:</span>online_exp), with =<span class="st"> </span><span class="ot">FALSE</span>]
@@ -571,61 +411,18 @@ ans &lt;-<span class="st"> </span>dt[, <span class="op">!</span>(age<span class=
 <p>In data table. <code>.N</code> means to count。</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># row count</span>
 dt[, .N] </code></pre></div>
-<pre><code>## [1] 1000</code></pre>
 <p>If you assign the group variable, then it will count by groups:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># counts by gender</span>
-dt[, .N, by=<span class="st"> </span>gender]  </code></pre></div>
-<pre><code>##    gender   N
-## 1: Female 554
-## 2:   Male 446</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># for those younger than 30, count by gender</span>
+dt[, .N, by=<span class="st"> </span>gender]  
+<span class="co"># for those younger than 30, count by gender</span>
  dt[age <span class="op">&lt;</span><span class="st"> </span><span class="dv">30</span>, .(<span class="dt">count=</span>.N), by=<span class="st"> </span>gender] </code></pre></div>
-<pre><code>##    gender count
-## 1: Female   292
-## 2:   Male    86</code></pre>
 <p>Order table:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get records with the highest 5 online expense:</span>
 <span class="kw">head</span>(dt[<span class="kw">order</span>(<span class="op">-</span>online_exp)],<span class="dv">5</span>) </code></pre></div>
-<pre><code>##    age gender income house store_exp online_exp store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9
-## 1:  40 Female 217600    No      7024       9479          10            6  1  4  5  4  3  4  4  1  4
-## 2:  41 Female     NA   Yes      3787       8638          14           10  1  4  4  4  4  4  4  1  4
-## 3:  36   Male 228550   Yes      3280       8221           8           12  1  4  5  4  4  4  4  1  4
-## 4:  31 Female 159508   Yes      5177       8006          11           13  1  4  4  4  4  4  4  1  4
-## 5:  43 Female 190407   Yes      4695       7876           6           11  1  4  5  4  4  4  4  1  4
-##    Q10     segment
-## 1:   2 Conspicuous
-## 2:   2 Conspicuous
-## 3:   1 Conspicuous
-## 4:   2 Conspicuous
-## 5:   2 Conspicuous</code></pre>
 <p>Since data table keep some characters of data frame, they share some operations:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dt[<span class="kw">order</span>(<span class="op">-</span>online_exp)][<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>]</code></pre></div>
-<pre><code>##    age gender income house store_exp online_exp store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9
-## 1:  40 Female 217600    No      7024       9479          10            6  1  4  5  4  3  4  4  1  4
-## 2:  41 Female     NA   Yes      3787       8638          14           10  1  4  4  4  4  4  4  1  4
-## 3:  36   Male 228550   Yes      3280       8221           8           12  1  4  5  4  4  4  4  1  4
-## 4:  31 Female 159508   Yes      5177       8006          11           13  1  4  4  4  4  4  4  1  4
-## 5:  43 Female 190407   Yes      4695       7876           6           11  1  4  5  4  4  4  4  1  4
-##    Q10     segment
-## 1:   2 Conspicuous
-## 2:   2 Conspicuous
-## 3:   1 Conspicuous
-## 4:   2 Conspicuous
-## 5:   2 Conspicuous</code></pre>
 <p>You can also order the table by more than one variable. The following code will order the table by <code>gender</code>, then order within <code>gender</code> by <code>online_exp</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dt[<span class="kw">order</span>(gender, <span class="op">-</span>online_exp)][<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>]</code></pre></div>
-<pre><code>##    age gender income house store_exp online_exp store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9
-## 1:  40 Female 217600    No      7024       9479          10            6  1  4  5  4  3  4  4  1  4
-## 2:  41 Female     NA   Yes      3787       8638          14           10  1  4  4  4  4  4  4  1  4
-## 3:  31 Female 159508   Yes      5177       8006          11           13  1  4  4  4  4  4  4  1  4
-## 4:  43 Female 190407   Yes      4695       7876           6           11  1  4  5  4  4  4  4  1  4
-## 5:  50 Female 263858   Yes      5814       7449          11           11  1  4  5  4  4  4  4  1  4
-##    Q10     segment
-## 1:   2 Conspicuous
-## 2:   2 Conspicuous
-## 3:   2 Conspicuous
-## 4:   2 Conspicuous
-## 5:   1 Conspicuous</code></pre>
 <ul>
 <li>Use <code>fread()</code> to import dat</li>
 </ul>
@@ -656,34 +453,14 @@ dt[, .N, by=<span class="st"> </span>gender]  </code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## simulate a matrix
 x &lt;-<span class="st"> </span><span class="kw">cbind</span>(<span class="dt">x1 =</span><span class="dv">1</span><span class="op">:</span><span class="dv">8</span>, <span class="dt">x2 =</span> <span class="kw">c</span>(<span class="dv">4</span><span class="op">:</span><span class="dv">1</span>, <span class="dv">2</span><span class="op">:</span><span class="dv">5</span>))
 <span class="kw">dimnames</span>(x)[[<span class="dv">1</span>]] &lt;-<span class="st"> </span>letters[<span class="dv">1</span><span class="op">:</span><span class="dv">8</span>]
-<span class="kw">apply</span>(x, <span class="dv">2</span>, mean)</code></pre></div>
-<pre><code>##  x1  x2 
-## 4.5 3.0</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">col.sums &lt;-<span class="st"> </span><span class="kw">apply</span>(x, <span class="dv">2</span>, sum)
+<span class="kw">apply</span>(x, <span class="dv">2</span>, mean)
+col.sums &lt;-<span class="st"> </span><span class="kw">apply</span>(x, <span class="dv">2</span>, sum)
 row.sums &lt;-<span class="st"> </span><span class="kw">apply</span>(x, <span class="dv">1</span>, sum)</code></pre></div>
 <p>You can also apply other functions:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ma &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>, <span class="dv">1</span>, <span class="dv">6</span><span class="op">:</span><span class="dv">8</span>), <span class="dt">nrow =</span> <span class="dv">2</span>)
-ma</code></pre></div>
-<pre><code>##      [,1] [,2] [,3] [,4]
-## [1,]    1    3    1    7
-## [2,]    2    4    6    8</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">apply</span>(ma, <span class="dv">1</span>, table)  <span class="co">#--&gt; a list of length 2</span></code></pre></div>
-<pre><code>## [[1]]
-## 
-## 1 3 7 
-## 2 1 1 
-## 
-## [[2]]
-## 
-## 2 4 6 8 
-## 1 1 1 1</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">apply</span>(ma, <span class="dv">1</span>, stats<span class="op">::</span>quantile) <span class="co"># 5 x n matrix with rownames</span></code></pre></div>
-<pre><code>##      [,1] [,2]
-## 0%      1  2.0
-## 25%     1  3.5
-## 50%     2  5.0
-## 75%     4  6.5
-## 100%    7  8.0</code></pre>
+ma
+<span class="kw">apply</span>(ma, <span class="dv">1</span>, table)  <span class="co">#--&gt; a list of length 2</span>
+<span class="kw">apply</span>(ma, <span class="dv">1</span>, stats<span class="op">::</span>quantile) <span class="co"># 5 x n matrix with rownames</span></code></pre></div>
 <p>Results can have different lengths for each call. This is a trickier example. What will you get?</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Example with different lengths for each call
 z &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">24</span>, <span class="dt">dim =</span> <span class="dv">2</span><span class="op">:</span><span class="dv">4</span>)
@@ -710,27 +487,11 @@ sdat&lt;-sim.dat[,<span class="op">!</span><span class="kw">lapply</span>(sim.da
 ## What is the problem?</code></pre></div>
 <p>The data frame <code>sdat</code> only includes numeric columns. Now we can go head and use <code>apply()</code> to get mean and standard deviation for each column:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">apply</span>(sdat, <span class="dt">MARGIN=</span><span class="dv">2</span>,<span class="cf">function</span>(x) <span class="kw">mean</span>(<span class="kw">na.omit</span>(x)))</code></pre></div>
-<pre><code>##          age       income    store_exp   online_exp  store_trans online_trans           Q1 
-##    3.884e+01    1.135e+05    1.357e+03    2.120e+03    5.350e+00    1.355e+01    3.101e+00 
-##           Q2           Q3           Q4           Q5           Q6           Q7           Q8 
-##    1.823e+00    1.992e+00    2.763e+00    2.945e+00    2.448e+00    3.434e+00    2.396e+00 
-##           Q9          Q10 
-##    3.085e+00    2.320e+00</code></pre>
 <p>Here we defined a function using <code>function(x) mean(na.omit(x))</code>. It is a very simple function. It tells R to ignore the missing value when calculating the mean. <code>MARGIN=2</code> tells R to apply the function to each column. It is not hard to guess what <code>MARGIN=1</code> mean. The result show that the average online expense is much higher than store expense. You can also compare the average scores across different questions. The command to calculate standard deviation is very similar. The only difference is to change <code>mean()</code> to <code>sd()</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">apply</span>(sdat, <span class="dt">MARGIN=</span><span class="dv">2</span>,<span class="cf">function</span>(x) <span class="kw">sd</span>(<span class="kw">na.omit</span>(x)))</code></pre></div>
-<pre><code>##          age       income    store_exp   online_exp  store_trans online_trans           Q1 
-##       16.417    49842.287     2774.400     1731.224        3.696        7.957        1.450 
-##           Q2           Q3           Q4           Q5           Q6           Q7           Q8 
-##        1.168        1.402        1.155        1.284        1.439        1.456        1.154 
-##           Q9          Q10 
-##        1.118        1.136</code></pre>
 <p>Even the average online expense is higher than store expense, the standard deviation for store expense is much higher than online expense which indicates there is very likely some big/small purchase in store. We can check it quickly:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(sdat<span class="op">$</span>store_exp)</code></pre></div>
-<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-##    -500     205     329    1357     597   50000</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(sdat<span class="op">$</span>online_exp)</code></pre></div>
-<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-##      69     420    1942    2120    2441    9479</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(sdat<span class="op">$</span>store_exp)
+<span class="kw">summary</span>(sdat<span class="op">$</span>online_exp)</code></pre></div>
 <p>There are some odd values in store expense. The minimum value is -500 which is a wrong imputation which indicates that you should preprocess data before analyzing it. Checking those simple statistics will help you better understand your data. It then gives you some idea how to preprocess and analyze them. How about using <code>lapply()</code> and <code>sapply()</code>?</p>
 <p>Run the following code and compare the results:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">lapply</span>(sdat, <span class="cf">function</span>(x) <span class="kw">sd</span>(<span class="kw">na.omit</span>(x)))
@@ -758,6 +519,7 @@ sdat&lt;-sim.dat[,<span class="op">!</span><span class="kw">lapply</span>(sim.da
 <ul>
 <li><code>tbl_df()</code>: Convert the data to <code>tibble</code> which offers better checking and printing capabilities than traditional data frames. It will adjust output width according to fit the current window.</li>
 </ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)
 <span class="kw">tbl_df</span>(sim.dat)</code></pre></div>
 <ul>
@@ -769,15 +531,6 @@ sdat&lt;-sim.dat[,<span class="op">!</span><span class="kw">lapply</span>(sim.da
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(magrittr)
 <span class="kw">filter</span>(sim.dat, income <span class="op">&gt;</span><span class="dv">300000</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">tbl_df</span>()</code></pre></div>
-<pre><code>## # A tibble: 4 x 19
-##     age gender  income house store_exp online_exp store_trans online_trans    Q1    Q2    Q3    Q4
-##   &lt;int&gt; &lt;fct&gt;    &lt;dbl&gt; &lt;fct&gt;     &lt;dbl&gt;      &lt;dbl&gt;       &lt;int&gt;        &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
-## 1    40 Male   301398. Yes       4840.      3618.          10           11     1     4     4     4
-## 2    33 Male   319704. Yes       5998.      4396.           9           11     1     4     4     4
-## 3    41 Male   317476. Yes       3030.      4180.          11           12     1     4     5     4
-## 4    37 Female 315697. Yes       6549.      4284.          13           11     1     4     5     4
-## # ... with 7 more variables: Q5 &lt;int&gt;, Q6 &lt;int&gt;, Q7 &lt;int&gt;, Q8 &lt;int&gt;, Q9 &lt;int&gt;, Q10 &lt;int&gt;,
-## #   segment &lt;fct&gt;</code></pre>
 <p>Here we meet a new operator <code>%&gt;%</code>. It is called “Pipe operator” which pipes a value forward into an expression or function call. What you get in the left operation will be the first argument or the only argument in the right operation.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">f</span>(y) =<span class="st"> </span><span class="kw">f</span>(x, y)
 y <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">f</span>(x, ., z) =<span class="st"> </span><span class="kw">f</span>(x, y, z )</code></pre></div>
@@ -855,13 +608,6 @@ dplyr<span class="op">::</span><span class="kw">select</span>(sim.dat, <span cla
       <span class="dt">online_exp=</span><span class="kw">round</span>(<span class="kw">mean</span>(online_exp),<span class="dv">0</span>),
       <span class="dt">store_trans=</span><span class="kw">round</span>(<span class="kw">mean</span>(store_trans),<span class="dv">1</span>),
       <span class="dt">online_trans=</span><span class="kw">round</span>(<span class="kw">mean</span>(online_trans),<span class="dv">1</span>))</code></pre></div>
-<pre><code>## # A tibble: 4 x 8
-##   segment       Age FemalePct HouseYes store_exp online_exp store_trans online_trans
-##   &lt;fct&gt;       &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;
-## 1 Conspicuous   42.     0.320    0.860     4990.      4898.       10.9         11.1 
-## 2 Price         60.     0.450    0.940      501.       205.        6.10         3.00
-## 3 Quality       35.     0.470    0.340      301.      2013.        2.90        16.0 
-## 4 Style         24.     0.810    0.270      200.      1962.        3.00        21.1</code></pre>
 <p>Now, let’s peel the onion in order.</p>
 <p>The first line <code>sim.dat</code> is easy. It is the data you want to work on. The second line <code>group_by(segment)</code> tells R that in the following steps you want to summarise by variable <code>segment</code>. Here we only summarize data by one categorical variable, but you can group by multiple variables, such as <code>group_by(segment, house)</code>. The third argument <code>summarise</code> tells R the manipulation(s) to do. Then list the exact actions inside <code>summarise()</code> . For example, <code>Age=round(mean(na.omit(age)),0)</code> tell R the following things:</p>
 <ol style="list-style-type: decimal">
@@ -892,174 +638,35 @@ dplyr<span class="op">::</span><span class="kw">select</span>(sim.dat, <span cla
 <span class="kw">group_by</span>(segment)<span class="op">%&gt;%</span>
 <span class="kw">summarise</span>(<span class="dt">avg_online=</span><span class="kw">round</span>(<span class="kw">sum</span>(online_exp)<span class="op">/</span><span class="kw">sum</span>(online_trans),<span class="dv">2</span>),
     <span class="dt">avg_store=</span><span class="kw">round</span>(<span class="kw">sum</span>(store_exp)<span class="op">/</span><span class="kw">sum</span>(store_trans),<span class="dv">2</span>))</code></pre></div>
-<pre><code>## # A tibble: 4 x 3
-##   segment     avg_online avg_store
-##   &lt;fct&gt;            &lt;dbl&gt;     &lt;dbl&gt;
-## 1 Conspicuous      442.      479. 
-## 2 Price             69.3      81.3
-## 3 Quality          126.      105. 
-## 4 Style             92.8     121.</code></pre>
 <p>Price group has the lowest averaged one-time purchase. The Conspicuous group will pay the highest price. When we build customer profile in real life, we will also need to look at the survey summarization. You may be surprised how much information simple data manipulations can provide.</p>
 <p>Another comman task is to check which column has missing values. It requires the program to look at each column in the data. In this case you can use <code>summarise_all</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># apply function anyNA() to each column</span>
 <span class="co"># you can also assign a function vector such as: c(&quot;anyNA&quot;,&quot;is.factor&quot;)</span>
 dplyr<span class="op">::</span><span class="kw">summarise_all</span>(sim.dat, <span class="kw">funs_</span>(<span class="kw">c</span>(<span class="st">&quot;anyNA&quot;</span>)))</code></pre></div>
-<pre><code>##     age gender income house store_exp online_exp store_trans online_trans    Q1    Q2    Q3    Q4
-## 1 FALSE  FALSE   TRUE FALSE     FALSE      FALSE       FALSE        FALSE FALSE FALSE FALSE FALSE
-##      Q5    Q6    Q7    Q8    Q9   Q10 segment
-## 1 FALSE FALSE FALSE FALSE FALSE FALSE   FALSE</code></pre>
 <p>The above code returns a vector indicating if there is any value missing in each column.</p>
 <p><strong>Create new variable</strong></p>
 <p>There are often situations where you need to create new variables. For example, adding online and store expense to get total expense. In this case, you will apply <strong>window function</strong> to the columns and return a column with the same length. <code>mutate()</code> can do it for you and append one or more new columns:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dplyr<span class="op">::</span><span class="kw">mutate</span>(sim.dat, <span class="dt">total_exp =</span> store_exp <span class="op">+</span><span class="st"> </span>online_exp)</code></pre></div>
-<pre><code>##      age gender income house store_exp online_exp store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8
-## 1     57 Female 120963   Yes     529.1     303.51           2            2  4  2  1  2  1  4  1  4
-## 2     63 Female 122008   Yes     478.0     109.53           4            2  4  1  1  2  1  4  1  4
-## 3     59   Male 114202   Yes     490.8     279.25           7            2  5  2  1  2  1  4  1  4
-## 4     60   Male 113616   Yes     347.8     141.67          10            2  5  2  1  3  1  4  1  4
-## 5     51   Male 124253   Yes     379.6     112.24           4            4  4  1  1  3  1  4  1  4
-## 6     59   Male 107661   Yes     338.3     195.69           4            5  4  2  1  2  1  4  1  4
-## 7     57   Male 120483   Yes     482.5     284.54           5            3  4  1  1  2  1  4  1  4
-## 8     57   Male 110542   Yes     340.7     135.26          11            5  5  2  1  3  1  4  1  4
-## 9     61 Female 132061   Yes     608.2     142.55           6            1  4  1  1  2  1  4  1  4
-## 10    60   Male 105049   Yes     470.3     163.47          12            1  4  2  1  3  1  4  1  4
-## 11    58   Male 107197   Yes     366.6     170.13           5            4  4  1  1  3  1  4  1  4
-## 12    59   Male     NA   Yes     674.9     310.27           6            2  4  1  1  3  1  4  1  4
-## 13    64   Male 119020   Yes     613.9     160.85           7            4  5  1  1  3  1  4  1  4
-## 14    57 Female     NA   Yes     737.0     224.53           7            3  4  2  1  3  1  4  1  4
-## 15    64   Male 114539   Yes     402.5     241.83           5            5  4  2  1  2  1  4  1  4
-## 16    61 Female     NA   Yes     615.1     238.10           5            1  5  2  1  2  1  4  1  4
-## 17    57 Female 133078   Yes     429.4     262.66           5            3  5  2  1  2  1  4  1  4
-## 18    63   Male 115709   Yes     552.6     187.52           5            2  5  2  1  3  1  4  1  4
-## 19    57 Female 113211    No     540.3     254.58           7            2  4  2  1  3  1  4  1  4
-## 20    57 Female 129774    No     384.3     311.03           4            2  5  2  1  2  1  4  1  5
-## 21    58   Male     NA   Yes     372.4     296.83          11            2  5  1  1  3  1  4  1  4
-## 22    58   Male 124357   Yes     535.5     205.54           7            3  4  2  1  2  1  4  1  4
-## 23    59 Female 123117   Yes     481.3     157.29           6            1  5  2  1  2  1  4  1  4
-## 24    61 Female     NA   Yes     546.2     161.23           8            3  5  1  1  2  1  4  1  4
-## 25    60 Female     NA   Yes     411.1     123.78          11            3  4  1  1  3  1  4  1  4
-## 26    56   Male     NA   Yes     492.7     128.02           7            1  5  1  1  3  1  4  1  4
-## 27    58   Male 127887   Yes     519.3     142.63           6            2  4  1  1  3  1  4  1  4
-## 28    64   Male 115925   Yes     627.7     240.98           4            4  5  1  1  2  1  4  1  4
-## 29    63 Female     NA   Yes     511.1     203.49           4            3  5  1  1  2  1  4  1  4
-## 30    56 Female 112621   Yes     699.3     223.44           9            2  5  2  1  2  1  4  1  4
-## 31    57   Male     NA   Yes     530.6     217.92           4            2  4  2  1  3  1  4  1  4
-## 32    59 Female 121773   Yes     532.1     176.88           2            3  5  2  1  2  1  4  1  4
-## 33    63   Male 126903   Yes     601.6     257.84           6            4  4  1  1  3  1  4  1  4
-## 34    55   Male 128254   Yes     595.3     248.06           8            3  4  1  1  2  1  4  1  4
-## 35    60 Female     NA   Yes     403.6     236.96           9            4  4  2  1  3  1  4  1  4
-## 36    64 Female     NA   Yes     611.7     102.24           6            4  5  2  1  2  1  4  1  4
-## 37    57 Female 118170   Yes     482.7     183.36           6            2  4  2  1  3  1  4  1  4
-## 38    57 Female 119148   Yes     412.9     246.87           6            5  5  1  1  3  1  4  1  4
-## 39    58   Male 125844   Yes     473.8     261.67           5            4  4  2  1  2  1  4  1  4
-## 40    55   Male 128194   Yes     595.7     156.93           6            2  4  1  1  2  1  4  1  4
-## 41    59 Female     NA   Yes     548.3     186.50           2            3  4  1  1  3  1  4  1  4
-## 42    61   Male     NA   Yes     597.2     209.68           5            1  5  1  1  3  1  4  1  4
-## 43    59 Female 122338   Yes     455.3     205.16           9            4  5  1  1  2  1  4  1  3
-## 44    58 Female 114519   Yes     493.5     271.67           4            5  4  1  1  3  1  4  1  4
-## 45    62   Male 123459   Yes     561.7     209.23           9            1  4  1  1  3  1  4  1  4
-## 46    59   Male 125626   Yes     518.2     261.31           8            2  5  1  1  3  1  4  1  4
-## 47    56   Male 100583   Yes     633.0     195.95          11            3  5  1  1  3  1  4  1  4
-## 48    66   Male     NA   Yes     510.3     198.46           9            4  5  2  1  3  1  4  1  4
-## 49    62 Female 128606   Yes     499.7     244.05           5            2  4  1  1  2  1  4  1  4
-## 50    54   Male 114337   Yes     518.0     217.25           6            2  4  1  1  2  1  4  1  4
-##      Q9 Q10     segment total_exp
-## 1     2   4       Price     832.6
-## 2     1   4       Price     587.5
-## 3     1   4       Price     770.1
-## 4     2   4       Price     489.5
-## 5     2   4       Price     491.9
-## 6     1   4       Price     534.0
-## 7     1   4       Price     767.1
-## 8     2   4       Price     476.0
-## 9     1   4       Price     750.8
-## 10    1   4       Price     633.8
-## 11    2   4       Price     536.8
-## 12    1   4       Price     985.1
-## 13    2   4       Price     774.8
-## 14    1   4       Price     961.6
-## 15    1   4       Price     644.3
-## 16    1   4       Price     853.2
-## 17    1   4       Price     692.1
-## 18    2   4       Price     740.1
-## 19    2   4       Price     794.9
-## 20    2   4       Price     695.4
-## 21    1   4       Price     669.2
-## 22    2   4       Price     741.0
-## 23    1   4       Price     638.5
-## 24    2   4       Price     707.4
-## 25    1   4       Price     534.9
-## 26    2   4       Price     620.7
-## 27    2   4       Price     661.9
-## 28    2   4       Price     868.7
-## 29    1   4       Price     714.5
-## 30    2   4       Price     922.8
-## 31    1   4       Price     748.5
-## 32    1   4       Price     709.0
-## 33    2   4       Price     859.5
-## 34    2   4       Price     843.3
-## 35    1   4       Price     640.6
-## 36    1   4       Price     713.9
-## 37    1   4       Price     666.0
-## 38    1   4       Price     659.8
-## 39    2   4       Price     735.4
-## 40    2   4       Price     752.6
-## 41    1   4       Price     734.8
-## 42    2   4       Price     806.9
-## 43    2   4       Price     660.5
-## 44    1   4       Price     765.2
-## 45    1   4       Price     771.0
-## 46    1   4       Price     779.5
-## 47    2   4       Price     829.0
-## 48    1   4       Price     708.7
-## 49    2   4       Price     743.7
-## 50    2   4       Price     735.3
-##  [ reached getOption(&quot;max.print&quot;) -- omitted 950 rows ]</code></pre>
 <p>The above code sums up two columns and appends the result (<code>total_exp</code>) to <code>sim.dat</code>. Another similar function is <code>transmute()</code>. The difference is that <code>transmute()</code> will delete the original columns and only keep the new ones.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dplyr<span class="op">::</span><span class="kw">transmute</span>(sim.dat, <span class="dt">total_exp =</span> store_exp <span class="op">+</span><span class="st"> </span>online_exp) </code></pre></div>
 <p><strong>Merge</strong></p>
 <p>Similar to SQL, there are different joins in <code>dplyr</code>. We create two baby data sets to show how the functions work.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(x&lt;-<span class="kw">data.frame</span>(<span class="kw">cbind</span>(<span class="dt">ID=</span><span class="kw">c</span>(<span class="st">&quot;A&quot;</span>,<span class="st">&quot;B&quot;</span>,<span class="st">&quot;C&quot;</span>),<span class="dt">x1=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>))))</code></pre></div>
-<pre><code>##   ID x1
-## 1  A  1
-## 2  B  2
-## 3  C  3</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(y&lt;-<span class="kw">data.frame</span>(<span class="kw">cbind</span>(<span class="dt">ID=</span><span class="kw">c</span>(<span class="st">&quot;B&quot;</span>,<span class="st">&quot;C&quot;</span>,<span class="st">&quot;D&quot;</span>),<span class="dt">y1=</span><span class="kw">c</span>(T,T,F))))</code></pre></div>
-<pre><code>##   ID    y1
-## 1  B  TRUE
-## 2  C  TRUE
-## 3  D FALSE</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(x&lt;-<span class="kw">data.frame</span>(<span class="kw">cbind</span>(<span class="dt">ID=</span><span class="kw">c</span>(<span class="st">&quot;A&quot;</span>,<span class="st">&quot;B&quot;</span>,<span class="st">&quot;C&quot;</span>),<span class="dt">x1=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>))))
+(y&lt;-<span class="kw">data.frame</span>(<span class="kw">cbind</span>(<span class="dt">ID=</span><span class="kw">c</span>(<span class="st">&quot;B&quot;</span>,<span class="st">&quot;C&quot;</span>,<span class="st">&quot;D&quot;</span>),<span class="dt">y1=</span><span class="kw">c</span>(T,T,F))))</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># join to the left</span>
 <span class="co"># keep all rows in x</span>
 <span class="kw">left_join</span>(x,y,<span class="dt">by=</span><span class="st">&quot;ID&quot;</span>)</code></pre></div>
-<pre><code>##   ID x1   y1
-## 1  A  1 &lt;NA&gt;
-## 2  B  2 TRUE
-## 3  C  3 TRUE</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get rows matched in both data sets</span>
 <span class="kw">inner_join</span>(x,y,<span class="dt">by=</span><span class="st">&quot;ID&quot;</span>)</code></pre></div>
-<pre><code>##   ID x1   y1
-## 1  B  2 TRUE
-## 2  C  3 TRUE</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get rows in either data set</span>
 <span class="kw">full_join</span>(x,y,<span class="dt">by=</span><span class="st">&quot;ID&quot;</span>)</code></pre></div>
-<pre><code>##   ID   x1    y1
-## 1  A    1  &lt;NA&gt;
-## 2  B    2  TRUE
-## 3  C    3  TRUE
-## 4  D &lt;NA&gt; FALSE</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># filter out rows in x that can be matched in y </span>
 <span class="co"># it doesn&#39;t bring in any values from y </span>
 <span class="kw">semi_join</span>(x,y,<span class="dt">by=</span><span class="st">&quot;ID&quot;</span>)</code></pre></div>
-<pre><code>##   ID x1
-## 1  B  2
-## 2  C  3</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># the opposite of  semi_join()</span>
 <span class="co"># it gets rows in x that cannot be matched in y</span>
 <span class="co"># it doesn&#39;t bring in any values from y</span>
 <span class="kw">anti_join</span>(x,y,<span class="dt">by=</span><span class="st">&quot;ID&quot;</span>)</code></pre></div>
-<pre><code>##   ID x1
-## 1  A  1</code></pre>
 <p>There are other functions(<code>intersect()</code>, <code>union()</code> and <code>setdiff()</code>). Also the data frame version of <code>rbind</code> and <code>cbind</code> which are <code>bind_rows()</code> and <code>bind_col()</code>. We are not going to go through them all. You can try them yourself. If you understand the functions we introduced so far. It should be easy for you to figure out the rest.</p>
 </div>
 </div>

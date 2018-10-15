@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2018-08-22">
+<meta name="date" content="2018-10-14">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -196,7 +196,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="collinearity" class="section level2">
 <h2><span class="header-section-number">3.6</span> Collinearity</h2>
 <p>It is probably the technical term known by the most un-technical people. When two predictors are very strongly correlated, including both in a model may lead to confusion or problem with a singular matrix. There is an excellent function in <code>corrplot</code> package with the same name <code>corrplot()</code> that can visualize correlation structure of a set of predictors. The function has the option to reorder the variables in a way that reveals clusters of highly correlated ones.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># select non-survey numerical variables</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># corp, fig.cap=&#39;Correlation Matrix&#39;, out.width=&#39;80%&#39;, fig.asp=.75, </span>
+<span class="co"># fig.align=&#39;center&#39;}</span>
+<span class="co"># select non-survey numerical variables</span>
 sdat&lt;-<span class="kw">subset</span>(sim.dat,<span class="dt">select=</span><span class="kw">c</span>(<span class="st">&quot;age&quot;</span>,<span class="st">&quot;income&quot;</span>,<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>,<span class="st">&quot;store_trans&quot;</span>,<span class="st">&quot;online_trans&quot;</span> ))
 <span class="co"># use bagging imputation here</span>
 imp&lt;-<span class="kw">preProcess</span>(sdat,<span class="dt">method=</span><span class="st">&quot;bagImpute&quot;</span>)
@@ -206,13 +208,7 @@ correlation&lt;-<span class="kw">cor</span>(sdat)
 <span class="co"># plot </span>
 <span class="kw">par</span>(<span class="dt">oma=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>))
 <span class="kw">corrplot.mixed</span>(correlation,<span class="dt">order=</span><span class="st">&quot;hclust&quot;</span>,<span class="dt">tl.pos=</span><span class="st">&quot;lt&quot;</span>,<span class="dt">upper=</span><span class="st">&quot;ellipse&quot;</span>)</code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:corp"></span>
-<img src="IDS_files/figure-html/corp-1.svg" alt="Correlation Matrix" width="80%" />
-<p class="caption">
-FIGURE 3.5: Correlation Matrix
-</p>
-</div>
-<p>Here use <code>corrplot.mixed()</code> function to visualize the correlation matrix (figure <a href="collinearity.html#fig:corp">3.5</a>). The closer the correlation is to 0, the lighter the color is and the closer the shape is to a circle. The elliptical means the correlation is not equal to 0 (because we set the <code>upper = &quot;ellipse&quot;</code>), the greater the correlation, the narrower the ellipse. Blue represents a positive correlation; red represents a negative correlation. The direction of the ellipse also changes with the correlation. The correlation coefficient is shown in the lower triangle of the matrix. The variables relationship from previous scatter matrix (figure @ref(fig: scm)) are clear here: the negative correlation between age and online shopping, the positive correlation between income and amount of purchasing. Some correlation is very strong ( such as the correlation between <code>online_trans</code> and<code>age</code> is -0.85) which means the two variables contain duplicate information.</p>
+<p>Here use <code>corrplot.mixed()</code> function to visualize the correlation matrix (figure <a href="#fig:corp"><strong>??</strong></a>). The closer the correlation is to 0, the lighter the color is and the closer the shape is to a circle. The elliptical means the correlation is not equal to 0 (because we set the <code>upper = &quot;ellipse&quot;</code>), the greater the correlation, the narrower the ellipse. Blue represents a positive correlation; red represents a negative correlation. The direction of the ellipse also changes with the correlation. The correlation coefficient is shown in the lower triangle of the matrix. The variables relationship from previous scatter matrix (figure @ref(fig: scm)) are clear here: the negative correlation between age and online shopping, the positive correlation between income and amount of purchasing. Some correlation is very strong ( such as the correlation between <code>online_trans</code> and<code>age</code> is -0.85) which means the two variables contain duplicate information.</p>
 <p>Section 3.5 of “Applied Predictive Modeling” <span class="citation">(Kuhn and Johnston <a href="#ref-APM">2013</a>)</span> presents a heuristic algorithm to remove a minimum number of predictors to ensure all pairwise correlations are below a certain threshold:</p>
 <blockquote>
 <ol style="list-style-type: decimal">
@@ -225,18 +221,11 @@ FIGURE 3.5: Correlation Matrix
 </blockquote>
 <p>The <code>findCorrelation()</code> function in package <code>caret</code> will apply the above algorithm.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(highCorr&lt;-<span class="kw">findCorrelation</span>(<span class="kw">cor</span>(sdat),<span class="dt">cutoff=</span>.<span class="dv">75</span>))</code></pre></div>
-<pre><code>## [1] 1</code></pre>
 <p>It returns the index of columns need to be deleted. It tells us that we need to remove the first column to make sure the correlations are all below 0.75.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># delete highly correlated columns</span>
 sdat&lt;-sdat[<span class="op">-</span>highCorr]
 <span class="co"># check the new correlation matrix</span>
 <span class="kw">cor</span>(sdat)</code></pre></div>
-<pre><code>##               income store_exp online_exp store_trans online_trans
-## income        1.0000    0.6004     0.5199      0.7070      -0.3573
-## store_exp     0.6004    1.0000     0.5350      0.5399      -0.1367
-## online_exp    0.5199    0.5350     1.0000      0.4421       0.2256
-## store_trans   0.7070    0.5399     0.4421      1.0000      -0.4368
-## online_trans -0.3573   -0.1367     0.2256     -0.4368       1.0000</code></pre>
 <p>The absolute value of the elements in the correlation matrix after removal are all below 0.75. How strong does a correlation have to get, before you should start worrying about multicollinearity? There is no easy answer to that question. You can treat the threshold as a tuning parameter and pick one that gives you best prediction accuracy.</p>
 </div>
 <h3>References</h3>
