@@ -32,8 +32,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="missing-values.html">
-<link rel="next" href="resolve-skewness.html">
+<link rel="prev" href="introduction.html">
+<link rel="next" href="introduction-to-the-data.html">
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
@@ -186,66 +186,23 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="centering-and-scaling" class="section level2">
-<h2><span class="header-section-number">3.3</span> Centering and Scaling</h2>
-<p>It is the most straightforward data transformation. It centers and scales a variable to mean 0 and standard deviation 1. It ensures that the criterion for finding linear combinations of the predictors is based on how much variation they explain and therefore improves the numerical stability. Models involving finding linear combinations of the predictors to explain response/predictors variation need data centering and scaling, such as PCA <span class="citation">(Jolliffe <a href="#ref-pca1">2002</a>)</span>, PLS <span class="citation">(Geladi P <a href="#ref-PLS1">1986</a>)</span> and EFA <span class="citation">(Mulaik <a href="#ref-EFA1">2009</a>)</span>. You can quickly write code yourself to conduct this transformation.</p>
-<p>Let’s standardize the variable <code>income</code> from <code>sim.dat</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">income&lt;-sim.dat<span class="op">$</span>income
-<span class="co"># calculate the mean of income</span>
-mux&lt;-<span class="kw">mean</span>(income,<span class="dt">na.rm=</span>T)
-<span class="co"># calculate the standard deviation of income</span>
-sdx&lt;-<span class="kw">sd</span>(income,<span class="dt">na.rm=</span>T)
-<span class="co"># centering</span>
-tr1&lt;-income<span class="op">-</span>mux
-<span class="co"># scaling</span>
-tr2&lt;-tr1<span class="op">/</span>sdx</code></pre></div>
-<p>Or the function <code>preProcess()</code> in package <code>caret</code> can apply this transformation to a set of predictors.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sdat&lt;-<span class="kw">subset</span>(sim.dat,<span class="dt">select=</span><span class="kw">c</span>(<span class="st">&quot;age&quot;</span>,<span class="st">&quot;income&quot;</span>))
-<span class="co"># set the &quot;method&quot; option</span>
-trans&lt;-<span class="kw">preProcess</span>(sdat,<span class="dt">method=</span><span class="kw">c</span>(<span class="st">&quot;center&quot;</span>,<span class="st">&quot;scale&quot;</span>))
-<span class="co"># use predict() function to get the final result</span>
-transformed&lt;-<span class="kw">predict</span>(trans,sdat)</code></pre></div>
-<p>Now the two variables are in the same scale:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(transformed)</code></pre></div>
-<p>Sometimes you only need to scale the variable. For example, if the model adds a penalty to the parameter estimates (such as <span class="math inline">\(L_2\)</span> penalty is ridge regression and <span class="math inline">\(L_1\)</span> penalty in LASSO), the variables need to have a similar scale to ensure a fair variable selection. I am a heavy user of this kind of penalty-based model in my work, and I used the following quantile transformation:</p>
-<p><span class="math display">\[
-x_{ij}^{*}=\frac{x_{ij}-quantile(x_{.j},0.01)}{quantile(x_{.j}-0.99)-quantile(x_{-j},0.01)}
-\]</span></p>
-<p>The reason to use 99% and 1% quantile instead of maximum and minimum values is to resist the impact of outliers.</p>
-<p>It is easy to write a function to do it:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">qscale&lt;-<span class="cf">function</span>(dat){
-  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(dat)){
-    up&lt;-<span class="kw">quantile</span>(dat[,i],<span class="fl">0.99</span>)
-    low&lt;-<span class="kw">quantile</span>(dat[,i],<span class="fl">0.01</span>)
-    diff&lt;-up<span class="op">-</span>low
-    dat[,i]&lt;-(dat[,i]<span class="op">-</span>low)<span class="op">/</span>diff
-  }
-  <span class="kw">return</span>(dat)
-}</code></pre></div>
-<p>In order to illustrate, let’s apply it to some variables from `demo_imp2:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">demo_imp3&lt;-<span class="kw">qscale</span>(<span class="kw">subset</span>(demo_imp2,<span class="dt">select=</span><span class="kw">c</span>(<span class="st">&quot;income&quot;</span>,<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>)))
-<span class="kw">summary</span>(demo_imp3)</code></pre></div>
-<p>After transformation, most of the variables are between 0-1.</p>
+<div id="blind-men-and-an-elephant" class="section level2">
+<h2><span class="header-section-number">1.1</span> Blind men and an elephant</h2>
+<p>There is a widely diffused Chinese parable (depending on where you are from, you may think it is a Japanese parable) which is about a group of blind men conceptualizing what the elephant is like by touching it:</p>
+<blockquote>
+<p>“…In the case of the first person, whose hand landed on the trunk, said: ‘This being is like a thick snake’. For another one whose hand reached its ear, it seemed like a kind of fan. As for another person, whose hand was upon its leg, said, the elephant is a pillar like a tree-trunk. The blind man who placed his hand upon its side said, ‘elephant is a wall’. Another who felt its tail described it as a rope. The last felt its tusk, stating the elephant is that which is hard, smooth and like a spear.” <a href="https://en.wikipedia.org/wiki/Blind_men_and_an_elephant">wikipedia</a></p>
+</blockquote>
+<p>Data science is the elephant. With the data science hype picking up stream, many professionals changed their titles to be “Data Scientist” without any of the necessary qualifications. Today’s data scientists have vastly different backgrounds, yet each one conceptualizes what the elephant is based on his/her own professional training and application area. And to make matters worse, most of us are not even fully aware of our own conceptualizations, much less the uniqueness of the experience from which they are derived.</p>
+
 </div>
-<h3>References</h3>
-<div id="refs" class="references">
-<div id="ref-pca1">
-<p>Jolliffe, I.T. 2002. <em>Principla Component Analysis</em>. 2nd ed. Springer.</p>
-</div>
-<div id="ref-PLS1">
-<p>Geladi P, Kowalski B. 1986. “Partial Least Squares Regression: A Tutorial.” <em>Analytica Chimica Acta</em>, no. 185: 1–17.</p>
-</div>
-<div id="ref-EFA1">
-<p>Mulaik, S.A. 2009. <em>Foundations of Factor Analysis</em>. 2ND ed. Boca Raton: Chapman &amp; Hall/CRC.</p>
-</div>
-</div>
+<!-- </div> -->
             </section>
 
           </div>
         </div>
       </div>
-<a href="missing-values.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="resolve-skewness.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="introduction.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="introduction-to-the-data.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -275,7 +232,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/happyrabbit/IntroDataScience/04-DataPreprocessing.Rmd",
+"link": "https://github.com/happyrabbit/IntroDataScience/01-Introduction.Rmd",
 "text": "Edit"
 },
 "download": ["IDS.pdf", "IDS.epub", "IDS.mobi"],
