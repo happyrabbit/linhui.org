@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Introduction to Data Science</title>
+  <meta name="description" content="Introduction to Data Science">
+  <meta name="generator" content="bookdown 0.7 and GitBook 2.6.7">
+
+  <meta property="og:title" content="Introduction to Data Science" />
+  <meta property="og:type" content="book" />
+  <meta property="og:url" content="http://scientistcafe.com/IDS/" />
+  
+  <meta property="og:description" content="Introduction to Data Science" />
+  <meta name="github-repo" content="happyrabbit/IntroDataScience" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Introduction to Data Science" />
+  
+  <meta name="twitter:description" content="Introduction to Data Science" />
+  
+
+<meta name="author" content="Hui Lin and Ming Li">
+
+
+<meta name="date" content="2018-11-12">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="model-tuning-strategy.html">
+<link rel="next" href="data-splitting-and-resampling.html">
+<script src="libs/jquery/jquery.min.js"></script>
+<link href="libs/gitbook/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="http://scientistcafe.com">Homepage</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a><ul>
+<li class="chapter" data-level="" data-path="goal-of-the-book.html"><a href="goal-of-the-book.html"><i class="fa fa-check"></i>Goal of the Book</a></li>
+<li class="chapter" data-level="" data-path="who-this-book-is-for.html"><a href="who-this-book-is-for.html"><i class="fa fa-check"></i>Who This Book Is For</a></li>
+<li class="chapter" data-level="" data-path="what-this-book-covers.html"><a href="what-this-book-covers.html"><i class="fa fa-check"></i>What This Book Covers</a></li>
+<li class="chapter" data-level="" data-path="conventions.html"><a href="conventions.html"><i class="fa fa-check"></i>Conventions</a></li>
+<li class="chapter" data-level="" data-path="acknowledgements.html"><a href="acknowledgements.html"><i class="fa fa-check"></i>Acknowledgements</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="about-the-authors.html"><a href="about-the-authors.html"><i class="fa fa-check"></i>About the Authors</a></li>
+<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a><ul>
+<li class="chapter" data-level="1.1" data-path="blind-men-and-an-elephant.html"><a href="blind-men-and-an-elephant.html"><i class="fa fa-check"></i><b>1.1</b> Blind men and an elephant</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="introduction-to-the-data.html"><a href="introduction-to-the-data.html"><i class="fa fa-check"></i><b>2</b> Introduction to the data</a><ul>
+<li class="chapter" data-level="2.1" data-path="customer-data-for-clothing-company.html"><a href="customer-data-for-clothing-company.html"><i class="fa fa-check"></i><b>2.1</b> Customer Data for Clothing Company</a></li>
+<li class="chapter" data-level="2.2" data-path="customer-satisfaction-survey-data-from-airline-company.html"><a href="customer-satisfaction-survey-data-from-airline-company.html"><i class="fa fa-check"></i><b>2.2</b> Customer Satisfaction Survey Data from Airline Company</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="data-pre-processing.html"><a href="data-pre-processing.html"><i class="fa fa-check"></i><b>3</b> Data Pre-processing</a><ul>
+<li class="chapter" data-level="3.1" data-path="data-cleaning.html"><a href="data-cleaning.html"><i class="fa fa-check"></i><b>3.1</b> Data Cleaning</a></li>
+<li class="chapter" data-level="3.2" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>3.2</b> Missing Values</a><ul>
+<li class="chapter" data-level="3.2.1" data-path="missing-values.html"><a href="missing-values.html#impute-missing-values-with-medianmode"><i class="fa fa-check"></i><b>3.2.1</b> Impute missing values with median/mode</a></li>
+<li class="chapter" data-level="3.2.2" data-path="missing-values.html"><a href="missing-values.html#k-nearest-neighbors"><i class="fa fa-check"></i><b>3.2.2</b> K-nearest neighbors</a></li>
+<li class="chapter" data-level="3.2.3" data-path="missing-values.html"><a href="missing-values.html#bagging-tree"><i class="fa fa-check"></i><b>3.2.3</b> Bagging Tree</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="centering-and-scaling.html"><a href="centering-and-scaling.html"><i class="fa fa-check"></i><b>3.3</b> Centering and Scaling</a></li>
+<li class="chapter" data-level="3.4" data-path="resolve-skewness.html"><a href="resolve-skewness.html"><i class="fa fa-check"></i><b>3.4</b> Resolve Skewness</a></li>
+<li class="chapter" data-level="3.5" data-path="resolve-outliers.html"><a href="resolve-outliers.html"><i class="fa fa-check"></i><b>3.5</b> Resolve Outliers</a></li>
+<li class="chapter" data-level="3.6" data-path="collinearity.html"><a href="collinearity.html"><i class="fa fa-check"></i><b>3.6</b> Collinearity</a></li>
+<li class="chapter" data-level="3.7" data-path="sparse-variables.html"><a href="sparse-variables.html"><i class="fa fa-check"></i><b>3.7</b> Sparse Variables</a></li>
+<li class="chapter" data-level="3.8" data-path="re-encode-dummy-variables.html"><a href="re-encode-dummy-variables.html"><i class="fa fa-check"></i><b>3.8</b> Re-encode Dummy Variables</a></li>
+<li class="chapter" data-level="3.9" data-path="python-computing.html"><a href="python-computing.html"><i class="fa fa-check"></i><b>3.9</b> Python Computing</a><ul>
+<li class="chapter" data-level="3.9.1" data-path="python-computing.html"><a href="python-computing.html#data-cleaning-1"><i class="fa fa-check"></i><b>3.9.1</b> Data Cleaning</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="data-wrangling.html"><a href="data-wrangling.html"><i class="fa fa-check"></i><b>4</b> Data Wrangling</a><ul>
+<li class="chapter" data-level="4.1" data-path="data-wrangling-using-r.html"><a href="data-wrangling-using-r.html"><i class="fa fa-check"></i><b>4.1</b> Data Wrangling Using R</a><ul>
+<li class="chapter" data-level="4.1.1" data-path="data-wrangling-using-r.html"><a href="data-wrangling-using-r.html#read-and-write-data"><i class="fa fa-check"></i><b>4.1.1</b> Read and write data</a></li>
+<li class="chapter" data-level="4.1.2" data-path="data-wrangling-using-r.html"><a href="data-wrangling-using-r.html#summarize-data"><i class="fa fa-check"></i><b>4.1.2</b> Summarize data</a></li>
+<li class="chapter" data-level="4.1.3" data-path="data-wrangling-using-r.html"><a href="data-wrangling-using-r.html#dplyr-package"><i class="fa fa-check"></i><b>4.1.3</b> <code>dplyr</code> package</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="tidy-and-reshape-data.html"><a href="tidy-and-reshape-data.html"><i class="fa fa-check"></i><b>4.2</b> Tidy and Reshape Data</a><ul>
+<li class="chapter" data-level="4.2.1" data-path="tidy-and-reshape-data.html"><a href="tidy-and-reshape-data.html#reshape2-package"><i class="fa fa-check"></i><b>4.2.1</b> <code>reshape2</code> package</a></li>
+<li class="chapter" data-level="4.2.2" data-path="tidy-and-reshape-data.html"><a href="tidy-and-reshape-data.html#tidyr-package"><i class="fa fa-check"></i><b>4.2.2</b> <code>tidyr</code> package</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="model-tuning-strategy.html"><a href="model-tuning-strategy.html"><i class="fa fa-check"></i><b>5</b> Model Tuning Strategy</a><ul>
+<li class="chapter" data-level="5.1" data-path="systematic-error-and-random-error.html"><a href="systematic-error-and-random-error.html"><i class="fa fa-check"></i><b>5.1</b> Systematic Error and Random Error</a><ul>
+<li class="chapter" data-level="5.1.1" data-path="systematic-error-and-random-error.html"><a href="systematic-error-and-random-error.html#measurement-error-in-the-response"><i class="fa fa-check"></i><b>5.1.1</b> Measurement Error in the Response</a></li>
+<li class="chapter" data-level="5.1.2" data-path="systematic-error-and-random-error.html"><a href="systematic-error-and-random-error.html#measurement-error-in-the-independent-variables"><i class="fa fa-check"></i><b>5.1.2</b> Measurement Error in the Independent Variables</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="data-splitting-and-resampling.html"><a href="data-splitting-and-resampling.html"><i class="fa fa-check"></i><b>5.2</b> Data Splitting and Resampling</a><ul>
+<li class="chapter" data-level="5.2.1" data-path="data-splitting-and-resampling.html"><a href="data-splitting-and-resampling.html#data-splitting"><i class="fa fa-check"></i><b>5.2.1</b> Data Splitting</a></li>
+<li class="chapter" data-level="5.2.2" data-path="data-splitting-and-resampling.html"><a href="data-splitting-and-resampling.html#resampling"><i class="fa fa-check"></i><b>5.2.2</b> Resampling</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="measuring-performance.html"><a href="measuring-performance.html"><i class="fa fa-check"></i><b>6</b> Measuring Performance</a></li>
+<li class="chapter" data-level="7" data-path="tree-based-methods.html"><a href="tree-based-methods.html"><i class="fa fa-check"></i><b>7</b> Tree-Based Methods</a><ul>
+<li class="chapter" data-level="7.1" data-path="splitting-criteria.html"><a href="splitting-criteria.html"><i class="fa fa-check"></i><b>7.1</b> Splitting Criteria</a></li>
+<li class="chapter" data-level="7.2" data-path="tree-pruning.html"><a href="tree-pruning.html"><i class="fa fa-check"></i><b>7.2</b> Tree Pruning</a></li>
+<li class="chapter" data-level="7.3" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html"><i class="fa fa-check"></i><b>7.3</b> Regression and Decision Tree Basic</a></li>
+<li class="chapter" data-level="7.4" data-path="bagging-tree-1.html"><a href="bagging-tree-1.html"><i class="fa fa-check"></i><b>7.4</b> Bagging Tree</a></li>
+<li class="chapter" data-level="7.5" data-path="random-forest.html"><a href="random-forest.html"><i class="fa fa-check"></i><b>7.5</b> Random Forest</a></li>
+<li class="chapter" data-level="7.6" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html"><i class="fa fa-check"></i><b>7.6</b> Gradient Boosted Machine</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Introduction to Data Science</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="systematic-error-and-random-error" class="section level2">
+<h2><span class="header-section-number">5.1</span> Systematic Error and Random Error</h2>
+<p>Assume <span class="math inline">\(\mathbf{X}\)</span> is <span class="math inline">\(n \times p\)</span> observation matrix and <span class="math inline">\(\mathbf{y}\)</span> is response variable, we have:</p>
+<p><span class="math display">\[\mathbf{y}=f(\mathbf{X})+\mathbf{\epsilon}\]</span></p>
+<p>where <span class="math inline">\(\mathbf{\epsilon}\)</span> is the random error with a mean of zero. The function <span class="math inline">\(f(\cdot)\)</span> is our modeling target, which represents the information in the response variable that predictors can explain. The main goal of estimating <span class="math inline">\(f(\cdot)\)</span> is inference or prediction, or sometimes both. In general, there is a trade-off between flexibility and interpretability of the model. So data scientists need to comprehend the delicate balance between these two.</p>
+<p>Depending on the modeling purposes, the requirement for interpretability varies. If the prediction is the only goal, then as long as the prediction is accurate enough, the interpretability is not under consideration. In this case, people can use “black box” model, such as random forest, boosting tree, neural network and so on. These models are very flexible but nearly impossible to explain. Their accuracy is usually higher on the training set, but not necessary when it predicts. It is not surprising since those models have a huge number of parameters and high flexibility that they can “memorize” the entire training data. A paper by Chiyuan Zhang et al. in 2017 pointed out that “Deep neural networks (even just two-layer net) easily fit random labels” <span class="citation">(Zhang et al. <a href="#ref-rethinkDL">2017</a>)</span>. The traditional forms of regularization, such as weight decay, dropout, and data augmentation, fail to control generalization error. It poses a conceptual challenge to statistical theory and also calls our attention when we use such black-box models.</p>
+<p>There are two kinds of application problems: complete information problem and incomplete information problem. The complete information problem has all the information you need to know the correct response. Take the famous cat recognition, for example, all the information you need to identify a cat is in the picture. In this situation, the algorithm that penetrates the data the most wins. There are some other similar problems such as the self-driving car, chess game, facial recognition and speech recognition. But in most of the data science applications, the information is incomplete. If you want to know whether a customer is going to purchase again or not, it is unlikely to have 360-degree of the customer’s information. You may have their historical purchasing record, discounts and service received. But you don’t know if the customer sees your advertisement, or has a friend recommends competitor’s product, or encounters some unhappy purchasing experience somewhere. There could be a myriad of factors that will influence the customer’s purchase decision while what you have as data is only a small part. To make things worse, in many cases, you don’t even know what you don’t know. Deep learning doesn’t have any advantage in solving those problems. Instead, some parametric models often work better in this situation. You will comprehend this more after learning the different types of model error. Assume we have <span class="math inline">\(\hat{f}\)</span> which is an estimator of <span class="math inline">\(f\)</span>. Then we can further get <span class="math inline">\(\mathbf{\hat{y}}=\hat{f}(\mathbf{X})\)</span>. The predicted error is divided into two parts, systematic error, and random error:</p>
+<p><span class="math display">\[E(\mathbf{y}-\hat{\mathbf{y}})^{2}=E[f(\mathbf{X})+\mathbf{\epsilon}-\hat{f}(\mathbf{X})]^{2}=\underset{\text{(1)}}{\underbrace{E[f(\mathbf{X})-\hat{f}(\mathbf{X})]^{2}}}+\underset{\text{(2)}}{\underbrace{Var(\mathbf{\epsilon})}}
+\label{eq:error}\]</span></p>
+<p>It is also called Mean Square Error (MSE) where (1) is the systematic error. It exists because <span class="math inline">\(\hat{f}\)</span> usually does not entirely describe the “systematic relation” between X and y which refers to the stable relationship that exists across different samples or time. Model improvement can help reduce this kind of error; (2) is the random error which represents the part of y that cannot be explained by X. A more complex model does not reduce the error. There are three reasons for random error:</p>
+<ol style="list-style-type: decimal">
+<li>the current sample is not representative, so the pattern in one sample set does not generalize to a broader scale.</li>
+<li>The information is incomplete. In other words, you don’t have all variables needed to explain the response.</li>
+<li>Measurement error in the variables.</li>
+</ol>
+<p>Deep learning has significant success solving problems with complete information and usually low measurement error. As mentioned before, in a task like image recognition, all you need are the pixels in the pictures. So in deep learning applications, increasing the sample size can improve the model performance significantly. But it may not perform well in problems with incomplete information. The biggest problem with the black-box model is that it fits random error, i.e., over-fitting. The notable feature of random error is that it varies over different samples. So one way to determine whether overfitting happens is to reserve a part of the data as the test set and then check the performance of the trained model on the test data. Note that overfitting is a general problem from which any model could suffer. However, since black-box models usually have a large number of parameters, it is much more suspectable to over-fitting.</p>
+<div class="figure">
+<img src="images/ModelError.png" alt="Types of Model Error" />
+<p class="caption">Types of Model Error</p>
+</div>
+<p>The systematic error can be further decomposed as:</p>
+<p><span class="math display">\[
+\begin{array}{ccc}
+E[f(\mathbf{X})-\hat{f}(\mathbf{X})]^{2} &amp; = &amp; E\left(f(\mathbf{X})-E[\hat{f}(\mathbf{X})]+E[\hat{f}(\mathbf{X})]-\hat{f}(\mathbf{X})\right)^{2}\\
+ &amp; = &amp; E\left(E[\hat{f}(\mathbf{X})]-f(\mathbf{X})\right)^{2}+E\left(\hat{f}(\mathbf{X})-E[\hat{f}(\mathbf{X})]\right)^{2}\\
+ &amp; = &amp; [Bias(\hat{f}(\mathbf{X}))]^{2}+Var(\hat{f}(\mathbf{X}))
+\end{array}
+\]</span></p>
+<p>The systematic error consists of two parts, <span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span> and <span class="math inline">\(Var (\hat{f}(\mathbf{X}))\)</span>. To minimize the systematic error, we need to minimize both. The bias represents the error caused by the model’s approximation of the reality, i.e., systematic relation, which may be very complex. For example, linear regression assumes a linear relationship between the predictors and the response, but rarely is there a perfect linear relationship in real life. So linear regression is more likely to have a high bias.</p>
+<p>To explore bias and variance, let’s begin with a simple simulation. We will simulate a data with a non-linear relationship and fit different models on it. An intuitive way to show these is to compare the plots of various models.</p>
+<p>The code below simulates one predictor (<code>x</code>) and one response variable (<code>fx</code>). The relationship between <code>x</code> and <code>fx</code> is non-linear.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">source</span>(<span class="kw">ids_url</span>(<span class="st">&#39;R/multiplot.r&#39;</span>))
+<span class="co"># randomly simulate some non-linear samples</span>
+x =<span class="st"> </span><span class="kw">seq</span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="fl">0.01</span>) <span class="op">*</span><span class="st"> </span>pi
+e =<span class="st"> </span><span class="kw">rnorm</span>(<span class="kw">length</span>(x), <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="fl">0.2</span>)
+fx &lt;-<span class="st"> </span><span class="kw">sin</span>(x) <span class="op">+</span><span class="st"> </span>e <span class="op">+</span><span class="st"> </span><span class="kw">sqrt</span>(x)
+dat =<span class="st"> </span><span class="kw">data.frame</span>(x, fx)</code></pre></div>
+<p>Then fit a simple linear regression on these data:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># plot fitting result</span>
+<span class="kw">library</span>(ggplot2)
+<span class="kw">ggplot</span>(dat, <span class="kw">aes</span>(x, fx)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)</code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:linearbias"></span>
+<img src="IDS_files/figure-html/linearbias-1.svg" alt="High bias model" width="80%" />
+<p class="caption">
+FIGURE 5.1: High bias model
+</p>
+</div>
+<p>Despite a large sample size, trained linear regression cannot describe the relationship very well. In other words, in this case, the model has a high bias (Fig. <a href="systematic-error-and-random-error.html#fig:linearbias">5.1</a>). People also call it underfitting.</p>
+<p>Since the estimated parameters will be somewhat different for different samples, there is the variance of estimates. Intuitively, it gives you some sense that if we fit the same model with different samples (presumably, they are from the same population), how much will the estimates change. Ideally, the change is trivial. For high variance models, small changes in the training data result in very different estimates. In general, a model with high flexibility also has high variance., such as the CART tree, and the initial boosting method. To overcome that problem, the Random Forest and Gradient Boosting Model aim to reduce the variance by summarizing the results obtained from different samples.</p>
+<p>Let’s fit the above data using a smoothing method which is highly flexible and can fit the current data tightly:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(dat, <span class="kw">aes</span>(x, fx)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)</code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:linearvar"></span>
+<img src="IDS_files/figure-html/linearvar-1.svg" alt="High variance model" width="80%" />
+<p class="caption">
+FIGURE 5.2: High variance model
+</p>
+</div>
+<p>The resulting plot (Fig. <a href="systematic-error-and-random-error.html#fig:linearvar">5.2</a>) indicates the smoothing method fit the data much better so it has a much smaller bias. However, this method has a high variance. If we simulate different subsets of the sample, the result curve will change significantly:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># set random seed</span>
+<span class="kw">set.seed</span>(<span class="dv">2016</span>)
+<span class="co"># sample part of the data to fit model sample 1</span>
+idx1 =<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(x), <span class="dv">100</span>)
+dat1 =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x1 =</span> x[idx1], <span class="dt">fx1 =</span> fx[idx1])
+p1 =<span class="st"> </span><span class="kw">ggplot</span>(dat1, <span class="kw">aes</span>(x1, fx1)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)
+<span class="co"># sample 2</span>
+idx2 =<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(x), <span class="dv">100</span>)
+dat2 =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x2 =</span> x[idx2], <span class="dt">fx2 =</span> fx[idx2])
+p2 =<span class="st"> </span><span class="kw">ggplot</span>(dat2, <span class="kw">aes</span>(x2, fx2)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)
+<span class="co"># sample 3</span>
+idx3 =<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(x), <span class="dv">100</span>)
+dat3 =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x3 =</span> x[idx3], <span class="dt">fx3 =</span> fx[idx3])
+p3 =<span class="st"> </span><span class="kw">ggplot</span>(dat3, <span class="kw">aes</span>(x3, fx3)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)
+<span class="co"># sample 4</span>
+idx4 =<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(x), <span class="dv">100</span>)
+dat4 =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x4 =</span> x[idx4], <span class="dt">fx4 =</span> fx[idx4])
+p4 =<span class="st"> </span><span class="kw">ggplot</span>(dat4, <span class="kw">aes</span>(x4, fx4)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)
+<span class="kw">multiplot</span>(p1, p2, p3, p4, <span class="dt">cols =</span> <span class="dv">2</span>)</code></pre></div>
+<p><img src="IDS_files/figure-html/unnamed-chunk-8-1.svg" width="672" /></p>
+<p>The fitted lines (blue) change over different samples which means it has high variance. People also call it overfitting. Fitting the linear model using the same four subsets, the result barely changes:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p1 =<span class="st"> </span><span class="kw">ggplot</span>(dat1, <span class="kw">aes</span>(x1, fx1)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, 
+    <span class="dt">se =</span> <span class="ot">FALSE</span>)
+p2 =<span class="st"> </span><span class="kw">ggplot</span>(dat2, <span class="kw">aes</span>(x2, fx2)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, 
+    <span class="dt">se =</span> <span class="ot">FALSE</span>)
+p3 =<span class="st"> </span><span class="kw">ggplot</span>(dat3, <span class="kw">aes</span>(x3, fx3)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, 
+    <span class="dt">se =</span> <span class="ot">FALSE</span>)
+p4 =<span class="st"> </span><span class="kw">ggplot</span>(dat4, <span class="kw">aes</span>(x4, fx4)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, 
+    <span class="dt">se =</span> <span class="ot">FALSE</span>)
+<span class="kw">multiplot</span>(p1, p2, p3, p4, <span class="dt">cols =</span> <span class="dv">2</span>)</code></pre></div>
+<p><img src="IDS_files/figure-html/unnamed-chunk-9-1.svg" width="672" /></p>
+<p>In general, the variance (<span class="math inline">\(Var(\hat{f}(\mathbf{X}))\)</span>) <strong>increases</strong> and the bias (<span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span>) <strong>decreases</strong> as the model flexibility increases. Variance and bias together determine the systematic error. As we increase the flexibility of the model, at first the rate at which <span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span> decreases is faster than <span class="math inline">\(Var (\hat{f} (\mathbf{X}))\)</span>, so the MSE decreases. However, to some degree, higher flexibility has little effect on <span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span> but <span class="math inline">\(Var(\hat{f} (\mathbf{X}))\)</span> increases significantly, so the MSE increases.</p>
+<div id="measurement-error-in-the-response" class="section level3">
+<h3><span class="header-section-number">5.1.1</span> Measurement Error in the Response</h3>
+<p>The measurement error in the response contributes to the random error (<span class="math inline">\(\mathbf{\epsilon}\)</span>). This part of the error is irreducible if you change the data collection mechanism, and so it makes the root mean square error (RMSE) and <span class="math inline">\(R^2\)</span> have the corresponding upper and lower limits. RMSE and <span class="math inline">\(R^2\)</span> are commonly used performance measures for the regression model which we will talk in more detail later. Therefore, the random error term not only represents the part of fluctuations the model cannot explain but also contains measurement error in the response variables. Section 20.2 of Applied Predictive Modeling <span class="citation">(Kuhn and Johnston <a href="#ref-APM">2013</a>)</span> has an example that shows the effect of the measurement error in the response variable on the model performance (RMSE and <span class="math inline">\(R^2\)</span>).</p>
+<p>The authors increased the error in the response proportional to a base level error which was gotten using the original data without introducing extra noise. Then fit a set of models repeatedly using the “contaminated” data sets to study the change of <span class="math inline">\(RMSE\)</span> and <span class="math inline">\(R^2\)</span> as the level of noise. Here we use clothing consumer data for a similar illustration. Suppose many people do not want to disclose their income and so we need to use other variables to establish a model to predict income. We set up the following model:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># load data</span>
+sim.dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv &quot;</span>)
+ymad &lt;-<span class="st"> </span><span class="kw">mad</span>(<span class="kw">na.omit</span>(sim.dat<span class="op">$</span>income))
+<span class="co"># calculate z-score</span>
+zs &lt;-<span class="st"> </span>(sim.dat<span class="op">$</span>income <span class="op">-</span><span class="st"> </span><span class="kw">mean</span>(<span class="kw">na.omit</span>(sim.dat<span class="op">$</span>income)))<span class="op">/</span>ymad
+<span class="co"># which(na.omit(zs&gt;3.5)): identify outliers which(is.na(zs)):</span>
+<span class="co"># identify missing values</span>
+idex &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">which</span>(<span class="kw">na.omit</span>(zs <span class="op">&gt;</span><span class="st"> </span><span class="fl">3.5</span>)), <span class="kw">which</span>(<span class="kw">is.na</span>(zs)))
+<span class="co"># delete rows with outliers and missing values</span>
+sim.dat &lt;-<span class="st"> </span>sim.dat[<span class="op">-</span>idex, ]
+fit &lt;-<span class="st"> </span><span class="kw">lm</span>(income <span class="op">~</span><span class="st"> </span>store_exp <span class="op">+</span><span class="st"> </span>online_exp <span class="op">+</span><span class="st"> </span>store_trans <span class="op">+</span><span class="st"> </span>online_trans, 
+    <span class="dt">data =</span> sim.dat)</code></pre></div>
+<p>The output shows that without additional noise, the root mean square error (RMSE) of the model is 29567, <span class="math inline">\(R^2\)</span> is 0.6.</p>
+<p>Let’s add various degrees of noise (0 to 3 times the RMSE) to the variable <code>income</code>:</p>
+<p><span class="math display">\[ RMSE \times (0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0) \]</span></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">noise &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rep</span>(<span class="ot">NA</span>, <span class="dv">7</span> <span class="op">*</span><span class="st"> </span><span class="kw">nrow</span>(sim.dat)), <span class="dt">nrow =</span> <span class="kw">nrow</span>(sim.dat), 
+    <span class="dt">ncol =</span> <span class="dv">7</span>)
+<span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(sim.dat)) {
+    noise[i, ] &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">7</span>, <span class="kw">rep</span>(<span class="dv">0</span>, <span class="dv">7</span>), <span class="kw">summary</span>(fit)<span class="op">$</span>sigma <span class="op">*</span><span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, 
+        <span class="dv">3</span>, <span class="dt">by =</span> <span class="fl">0.5</span>))
+}</code></pre></div>
+<p>We then examine the effect of noise intensity on <span class="math inline">\(R^2\)</span> for models with different complexity. The models with complexity from low to high are: ordinary linear regression, partial least square regression(PLS), multivariate adaptive regression spline (MARS), support vector machine (SVM, the kernel function is radial basis function), and random forest.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># fit ordinary linear regression</span>
+rsq_linear &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">0</span>, <span class="kw">ncol</span>(noise))
+<span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">7</span>) {
+    withnoise &lt;-<span class="st"> </span>sim.dat<span class="op">$</span>income <span class="op">+</span><span class="st"> </span>noise[, i]
+    fit0 &lt;-<span class="st"> </span><span class="kw">lm</span>(withnoise <span class="op">~</span><span class="st"> </span>store_exp <span class="op">+</span><span class="st"> </span>online_exp <span class="op">+</span><span class="st"> </span>store_trans <span class="op">+</span><span class="st"> </span>
+<span class="st">        </span>online_trans, <span class="dt">data =</span> sim.dat)
+    rsq_linear[i] &lt;-<span class="st"> </span><span class="kw">summary</span>(fit0)<span class="op">$</span>adj.r.squared
+}</code></pre></div>
+<p>PLS is a method of linearizing nonlinear relationships through hidden layers. It is similar to the principal component regression (PCR), except that PCR does not take into account the information of the dependent variable when selecting the components, and its purpose is to find the linear combinations (i.e., unsupervised) that capture the most variance of the independent variables. When the independent variables and response variables are related, PCR can well identify the systematic relationship between them. However, when there exist independent variables not associated with response variable, it will undermine PCR’s performance. And PLS maximizes the linear combination of dependencies with the response variable. In the current case, the more complicated PLS does not perform better than simple linear regression.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># pls: conduct PLS and PCR</span>
+<span class="kw">library</span>(pls)
+rsq_pls &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">0</span>, <span class="kw">ncol</span>(noise))
+<span class="co"># fit PLS</span>
+<span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">7</span>) {
+    withnoise &lt;-<span class="st"> </span>sim.dat<span class="op">$</span>income <span class="op">+</span><span class="st"> </span>noise[, i]
+    fit0 &lt;-<span class="st"> </span><span class="kw">plsr</span>(withnoise <span class="op">~</span><span class="st"> </span>store_exp <span class="op">+</span><span class="st"> </span>online_exp <span class="op">+</span><span class="st"> </span>store_trans <span class="op">+</span><span class="st"> </span>
+<span class="st">        </span>online_trans, <span class="dt">data =</span> sim.dat)
+    rsq_pls[i] &lt;-<span class="st"> </span><span class="kw">max</span>(<span class="kw">drop</span>(<span class="kw">R2</span>(fit0, <span class="dt">estimate =</span> <span class="st">&quot;train&quot;</span>, <span class="dt">intercept =</span> <span class="ot">FALSE</span>)<span class="op">$</span>val))
+}</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># earth: fit mars</span>
+<span class="kw">library</span>(earth)
+rsq_mars &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">0</span>, <span class="kw">ncol</span>(noise))
+<span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">7</span>) {
+    withnoise &lt;-<span class="st"> </span>sim.dat<span class="op">$</span>income <span class="op">+</span><span class="st"> </span>noise[, i]
+    fit0 &lt;-<span class="st"> </span><span class="kw">earth</span>(withnoise <span class="op">~</span><span class="st"> </span>store_exp <span class="op">+</span><span class="st"> </span>online_exp <span class="op">+</span><span class="st"> </span>store_trans <span class="op">+</span><span class="st"> </span>
+<span class="st">        </span>online_trans, <span class="dt">data =</span> sim.dat)
+    rsq_mars[i] &lt;-<span class="st"> </span>fit0<span class="op">$</span>rsq
+}</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># caret: awesome package for tuning predictive model</span>
+<span class="kw">library</span>(caret)
+rsq_svm &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">0</span>, <span class="kw">ncol</span>(noise))
+<span class="co"># Need some time to run</span>
+<span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">7</span>) {
+    idex &lt;-<span class="st"> </span><span class="kw">which</span>(<span class="kw">is.na</span>(sim.dat<span class="op">$</span>income))
+    withnoise &lt;-<span class="st"> </span>sim.dat<span class="op">$</span>income <span class="op">+</span><span class="st"> </span>noise[, i]
+    trainX &lt;-<span class="st"> </span>sim.dat[, <span class="kw">c</span>(<span class="st">&quot;store_exp&quot;</span>, <span class="st">&quot;online_exp&quot;</span>, <span class="st">&quot;store_trans&quot;</span>, 
+        <span class="st">&quot;online_trans&quot;</span>)]
+    trainY &lt;-<span class="st"> </span>withnoise
+    fit0 &lt;-<span class="st"> </span><span class="kw">train</span>(trainX, trainY, <span class="dt">method =</span> <span class="st">&quot;svmRadial&quot;</span>, <span class="dt">tuneLength =</span> <span class="dv">15</span>, 
+        <span class="dt">trControl =</span> <span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>))
+    rsq_svm[i] &lt;-<span class="st"> </span><span class="kw">max</span>(fit0<span class="op">$</span>results<span class="op">$</span>Rsquared)
+}</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># randomForest: random forest model</span>
+<span class="kw">library</span>(randomForest)
+rsq_rf &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">0</span>, <span class="kw">ncol</span>(noise))
+<span class="co"># ntree=500 number of trees na.action = na.omit ignore</span>
+<span class="co"># missing value</span>
+<span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">7</span>) {
+    withnoise &lt;-<span class="st"> </span>sim.dat<span class="op">$</span>income <span class="op">+</span><span class="st"> </span>noise[, i]
+    fit0 &lt;-<span class="st"> </span><span class="kw">randomForest</span>(withnoise <span class="op">~</span><span class="st"> </span>store_exp <span class="op">+</span><span class="st"> </span>online_exp <span class="op">+</span><span class="st"> </span>
+<span class="st">        </span>store_trans <span class="op">+</span><span class="st"> </span>online_trans, <span class="dt">data =</span> sim.dat, <span class="dt">ntree =</span> <span class="dv">500</span>, 
+        <span class="dt">na.action =</span> na.omit)
+    rsq_rf[i] &lt;-<span class="st"> </span><span class="kw">tail</span>(fit0<span class="op">$</span>rsq, <span class="dv">1</span>)
+}
+<span class="kw">library</span>(reshape2)
+rsq &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(<span class="dt">Noise =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">0.5</span>, <span class="dv">1</span>, <span class="fl">1.5</span>, <span class="dv">2</span>, <span class="fl">2.5</span>, <span class="dv">3</span>), 
+    rsq_linear, rsq_pls, rsq_mars, rsq_svm, rsq_rf))
+rsq &lt;-<span class="st"> </span><span class="kw">melt</span>(rsq, <span class="dt">id.vars =</span> <span class="st">&quot;Noise&quot;</span>, <span class="dt">measure.vars =</span> <span class="kw">c</span>(<span class="st">&quot;rsq_linear&quot;</span>, 
+    <span class="st">&quot;rsq_pls&quot;</span>, <span class="st">&quot;rsq_mars&quot;</span>, <span class="st">&quot;rsq_svm&quot;</span>, <span class="st">&quot;rsq_rf&quot;</span>))</code></pre></div>
+
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ggplot2)
+<span class="kw">ggplot</span>(<span class="dt">data =</span> rsq, <span class="kw">aes</span>(<span class="dt">x =</span> Noise, <span class="dt">y =</span> value, <span class="dt">group =</span> variable, 
+    <span class="dt">colour =</span> variable)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_line</span>() <span class="op">+</span><span class="st"> </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span><span class="kw">ylab</span>(<span class="st">&quot;R2&quot;</span>)</code></pre></div>
+<div class="figure" style="text-align: center"><span id="fig:error"></span>
+<img src="IDS_files/figure-html/error-1.svg" alt="Test set \(R^2\) profiles for income models when measurement system noise increases. rsq_linear: linear regression, rsq_pls: Partial Least Square, rsq_mars: Multiple Adaptive Regression Spline Regression, rsq_svm: Support Vector Machine，rsq_rf: Random Forest" width="80%" />
+<p class="caption">
+FIGURE 5.3: Test set <span class="math inline">\(R^2\)</span> profiles for income models when measurement system noise increases. <code>rsq_linear</code>: linear regression, <code>rsq_pls</code>: Partial Least Square, <code>rsq_mars</code>: Multiple Adaptive Regression Spline Regression, <code>rsq_svm</code>: Support Vector Machine，<code>rsq_rf</code>: Random Forest
+</p>
+</div>
+<p>Fig. <a href="systematic-error-and-random-error.html#fig:error">5.3</a> shows that:</p>
+<p>All model performance decreases sharply with increasing noise intensity. To better anticipate model performance, it helps to understand the way variable is measured. It is something need to make clear at the beginning of an analytical project. A data scientist should be aware of the quality of the data in the database. For data from the clients, it is an important to understand the quality of the data by communication.</p>
+<p>More complex model is not necessarily better. The best model in this situation is MARS, not random forests or SVM. Simple linear regression and PLS perform the worst when noise is low. MARS is more complicated than the linear regression and PLS, but it is simpler and easier to explain than random forest and SVM.</p>
+<p>When noise increases to a certain extent, the potential structure becomes vaguer, and complex random forest model starts to fail. When the systematic measurement error is significant, a more straightforward but not naive model may be a better choice. It is always a good practice to try different models, and select the simplest model in the case of similar performance. Model evaluation and selection represent the career “maturity” of a data scientist.</p>
+</div>
+<div id="measurement-error-in-the-independent-variables" class="section level3">
+<h3><span class="header-section-number">5.1.2</span> Measurement Error in the Independent Variables</h3>
+<p>The traditional statistical model usually assumes that the measurement of the independent variable has no error which is not possible in practice. Considering the error in the independent variables is necessary. The impact of the error depends on the following factors: (1) the magnitude of the randomness; (2) the importance of the corresponding variable in the model, and (3) the type of model used. Use variable <code>online_exp</code> as an example. The approach is similar to the previous section. Add varying degrees of noise and see its impact on the model performance. We add the following different levels of noise (0 to 3 times the standard deviation) to<code>online_exp</code>:</p>
+<p><span class="math display">\[\sigma_{0} \times (0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0)\]</span></p>
+<p>where <span class="math inline">\(\sigma_{0}\)</span> is the standard error of <code>online_exp</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">noise&lt;-<span class="kw">matrix</span>(<span class="kw">rep</span>(<span class="ot">NA</span>,<span class="dv">7</span><span class="op">*</span><span class="kw">nrow</span>(sim.dat)),<span class="dt">nrow=</span><span class="kw">nrow</span>(sim.dat),<span class="dt">ncol=</span><span class="dv">7</span>)
+<span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(sim.dat)){
+noise[i,]&lt;-<span class="kw">rnorm</span>(<span class="dv">7</span>,<span class="kw">rep</span>(<span class="dv">0</span>,<span class="dv">7</span>),<span class="kw">sd</span>(sim.dat<span class="op">$</span>online_exp)<span class="op">*</span><span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">3</span>,<span class="dt">by=</span><span class="fl">0.5</span>))
+}</code></pre></div>
+<p>Likewise, we examine the effect of noise intensity on different models (<span class="math inline">\(R^2\)</span>). The models with complexity from low to high are: ordinary linear regression, partial least square regression(PLS), multivariate adaptive regression spline (MARS), support vector machine (SVM, the Kernel function is radial basis function), and random forest. The code is similar as before so not shown here.</p>
+
+<div class="figure" style="text-align: center"><span id="fig:errorvariable"></span>
+<img src="IDS_files/figure-html/errorvariable-1.svg" alt="Test set \(R^2\) profiles for income models when noise in online_exp increases. rsq_linear : linear regression, rsq_pls : Partial Least Square, rsq_mars: Multiple Adaptive Regression Spline Regression, rsq_svm: Support Vector Machine，rsq_rf: Random Forest" width="80%" />
+<p class="caption">
+FIGURE 5.4: Test set <span class="math inline">\(R^2\)</span> profiles for income models when noise in <code>online_exp</code> increases. <code>rsq_linear</code> : linear regression, <code>rsq_pls</code> : Partial Least Square, <code>rsq_mars</code>: Multiple Adaptive Regression Spline Regression, <code>rsq_svm</code>: Support Vector Machine，<code>rsq_rf</code>: Random Forest
+</p>
+</div>
+<p>Comparing Fig. <a href="systematic-error-and-random-error.html#fig:errorvariable">5.4</a> and Fig. <a href="systematic-error-and-random-error.html#fig:error">5.3</a>, the influence of the two types of error is very different. The error in response cannot be overcome for any model, but it is not the case for the independent variables. Imagine an extreme case, if <code>online_exp</code> is completely random, that is, no information in it, the impact on the performance of random forest and support vector machine is marginal. Linear regression and PLS still perform similarly. With the increase of noise, the performance starts to decline faster. To a certain extent, it becomes steady. In general, if an independent variable contains error, other variables associated with it can compensate to some extent.</p>
+</div>
+</div>
+<h3>References</h3>
+<div id="refs" class="references">
+<div id="ref-rethinkDL">
+<p>Zhang, Chiyuan, Samy Bengio, Moritz Hardt, Benjamin Recht, and Oriol Vinyals. 2017. “Understanding Deep Learning Requires Rethinking Generalization.” <em>arXiv :1611.03530</em>.</p>
+</div>
+<div id="ref-APM">
+<p>Kuhn, Max, and Kjell Johnston. 2013. <em>Applied Predictive Modeling</em>. Springer.</p>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="model-tuning-strategy.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="data-splitting-and-resampling.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook/js/app.min.js"></script>
+<script src="libs/gitbook/js/lunr.js"></script>
+<script src="libs/gitbook/js/plugin-search.js"></script>
+<script src="libs/gitbook/js/plugin-sharing.js"></script>
+<script src="libs/gitbook/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": true,
+"facebook": false,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/happyrabbit/IntroDataScience/07-ModelTuning.Rmd",
+"text": "Edit"
+},
+"download": ["IDS.pdf", "IDS.epub", "IDS.mobi"],
+"toc": {
+"collapse": "none"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "";
+    if (src === "" || src === "true") src = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:" && /^https?:/.test(src))
+      src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
