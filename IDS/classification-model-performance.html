@@ -32,8 +32,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="centering-and-scaling.html">
-<link rel="next" href="resolve-outliers.html">
+<link rel="prev" href="regression-model-performance.html">
+<link rel="next" href="tree-based-methods.html">
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
@@ -195,64 +195,18 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="resolve-skewness" class="section level2">
-<h2><span class="header-section-number">3.4</span> Resolve Skewness</h2>
-<p><a href="https://en.wikipedia.org/wiki/Skewness">Skewness</a> is defined to be the third standardized central moment. The formula for the sample skewness statistics is: <span class="math display">\[ skewness=\frac{\sum(x_{i}-\bar{x})^{3}}{(n-1)v^{3/2}}\]</span> <span class="math display">\[v=\frac{\sum(x_{i}-\bar{x})^{2}}{(n-1)}\]</span> Skewness=0 means that the destribution is symmetric, i.e. the probability of falling on either side of the distribution’s mean is equal.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># skew, fig.cap=&#39;Shewed Distribution&#39;, out.width=&#39;80%&#39;, fig.asp=.75, # fig.align=&#39;center&#39;</span>
-<span class="co"># need skewness() function from e1071 package</span>
-<span class="kw">set.seed</span>(<span class="dv">1000</span>)
-<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>),<span class="dt">oma=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>))
-<span class="co"># random sample 1000 chi-square distribution with df=2</span>
-<span class="co"># right skew</span>
-x1&lt;-<span class="kw">rchisq</span>(<span class="dv">1000</span>,<span class="dv">2</span>, <span class="dt">ncp =</span> <span class="dv">0</span>)
-<span class="co"># get left skew variable x2 from x1</span>
-x2&lt;-<span class="kw">max</span>(x1)<span class="op">-</span>x1
-<span class="kw">plot</span>(<span class="kw">density</span>(x2),<span class="dt">main=</span><span class="kw">paste</span>(<span class="st">&quot;left skew, skewnwss =&quot;</span>,<span class="kw">round</span>(<span class="kw">skewness</span>(x2),<span class="dv">2</span>)), <span class="dt">xlab=</span><span class="st">&quot;X2&quot;</span>)
-<span class="kw">plot</span>(<span class="kw">density</span>(x1),<span class="dt">main=</span><span class="kw">paste</span>(<span class="st">&quot;right skew, skewness =&quot;</span>,<span class="kw">round</span>(<span class="kw">skewness</span>(x1),<span class="dv">2</span>)), <span class="dt">xlab=</span><span class="st">&quot;X1&quot;</span>)</code></pre></div>
-<!--You can easily tell if a distribution is skewed by simple visualization(Figure\@ref(fig:skew)). -->
-<p>There are different ways may help to remove skewness such as log, square root or inverse. However, it is often difficult to determine from plots which transformation is most appropriate for correcting skewness. The Box-Cox procedure automatically identified a transformation from the family of power transformations that are indexed by a parameter <span class="math inline">\(\lambda\)</span><span class="citation">(Box G <a href="#ref-BOXCOX1">1964</a>)</span>.</p>
-<p><span class="math display">\[
-x^{*}=\begin{cases}
-\begin{array}{c}
-\frac{x^{\lambda}-1}{\lambda}\\
-log(x)
-\end{array} &amp; \begin{array}{c}
-if\ \lambda\neq0\\
-if\ \lambda=0
-\end{array}\end{cases}
-\]</span></p>
-<p>It is easy to see that this family includes log transformation (<span class="math inline">\(\lambda=0\)</span>), square transformation (<span class="math inline">\(\lambda=2\)</span>), square root (<span class="math inline">\(\lambda=0.5\)</span>), inverse (<span class="math inline">\(\lambda=-1\)</span>) and others in-between. We can still use function <code>preProcess()</code> in package <code>caret</code> to apply this transformation by chaning the <code>method</code> argument.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">describe</span>(sim.dat)</code></pre></div>
-<p>It is easy to see the skewed variables. If <code>mean</code> and <code>trimmed</code> differ a lot, there is very likely outliers. By default, <code>trimmed</code> reports mean by dropping the top and bottom 10%. It can be adjusted by setting argument <code>trim=</code>. It is clear that <code>store_exp</code> has outliers.</p>
-<p>As an example, we will apply Box-Cox transformation on <code>store_trans</code> and <code>online_trans</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># select the two columns and save them as dat_bc</span>
-dat_bc&lt;-<span class="kw">subset</span>(sim.dat,<span class="dt">select=</span><span class="kw">c</span>(<span class="st">&quot;store_trans&quot;</span>,<span class="st">&quot;online_trans&quot;</span>))
-(trans&lt;-<span class="kw">preProcess</span>(dat_bc,<span class="dt">method=</span><span class="kw">c</span>(<span class="st">&quot;BoxCox&quot;</span>)))</code></pre></div>
-<p>The last line of the output shows the estimates of <span class="math inline">\(\lambda\)</span> for each variable. As before, use <code>predict()</code> to get the transformed result:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># bc, fig.cap=&#39;Box-Cox Transformation&#39;, out.width=&#39;80%&#39;, fig.asp=.75, # fig.align=&#39;center&#39;</span>
-transformed&lt;-<span class="kw">predict</span>(trans,dat_bc)
-<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>),<span class="dt">oma=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>))
-<span class="kw">hist</span>(dat_bc<span class="op">$</span>store_trans,<span class="dt">main=</span><span class="st">&quot;Before Transformation&quot;</span>,<span class="dt">xlab=</span><span class="st">&quot;store_trans&quot;</span>)
-<span class="kw">hist</span>(transformed<span class="op">$</span>store_trans,<span class="dt">main=</span><span class="st">&quot;After Transformation&quot;</span>,<span class="dt">xlab=</span><span class="st">&quot;store_trans&quot;</span>)</code></pre></div>
-<p>Before the transformation, the <code>stroe_trans</code> is skewed right. <!--The situation is significantly improved after (figure\@ref(fig:bc)). --> <code>BoxCoxTrans ()</code> can also conduct Box-Cox transform. But note that <code>BoxCoxTrans ()</code> can only be applied to a single variable, and it is not possible to transform difference columns in a data frame at the same time.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(trans&lt;-<span class="kw">BoxCoxTrans</span>(dat_bc<span class="op">$</span>store_trans))</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">transformed&lt;-<span class="kw">predict</span>(trans,dat_bc<span class="op">$</span>store_trans)
-<span class="kw">skewness</span>(transformed)</code></pre></div>
-<p>The estimate of <span class="math inline">\(\lambda\)</span> is the same as before (0.1). The skewness of the original observation is 1.1, and -0.2 after transformation. Although it is not strictly 0, it is greatly improved.</p>
+<div id="classification-model-performance" class="section level2">
+<h2><span class="header-section-number">6.2</span> Classification Model Performance</h2>
+
 </div>
-<h3>References</h3>
-<div id="refs" class="references">
-<div id="ref-BOXCOX1">
-<p>Box G, Cox D. 1964. “An Analysis of Transformations.” <em>Journal of the Royal Statistical Society</em>, 211–52.</p>
-</div>
-</div>
+<!-- </div> -->
             </section>
 
           </div>
         </div>
       </div>
-<a href="centering-and-scaling.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="resolve-outliers.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="regression-model-performance.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="tree-based-methods.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -282,7 +236,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/happyrabbit/IntroDataScience/04-DataPreprocessing.Rmd",
+"link": "https://github.com/happyrabbit/IntroDataScience/08-MeasurePerformance.Rmd",
 "text": "Edit"
 },
 "download": ["IDS.pdf", "IDS.epub", "IDS.mobi"],
