@@ -32,8 +32,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="multivariate-adaptive-regression-splines.html">
-<link rel="next" href="pcr-and-pls.html">
+<link rel="prev" href="a1-big-data-cloud-platform.html">
+<link rel="next" href="other-useful-topics.html">
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
@@ -258,16 +258,106 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="generalized-linear-model" class="section level2">
-<h2><span class="header-section-number">9.3</span> Generalized Linear Model</h2>
+<div id="databases-and-sql" class="section level2 unnumbered">
+<h2>Databases and SQL</h2>
+<p>Databases have been around for many years and efficiently store, organize, retrieve, and update data systematically. In the past, statisticians usually dealt with small datasets stored in Excel files and often did not interact with databases. Students from traditional statistics departments usually lack the needed database knowledge which is essential and required in an enterprise environment where data are stored in some form of database. Databases often contain a collection of tables and the relationship among these tables (i.e. schema). The table is the fundamental structure for databases which contains rows and columns similar to data frames in R or Python pandas. Database management systems (DBMS) ensure data integration and security in real time operations. There are many different DBMS such as Oracle, SQL Server, MySQL, Teradata, Hive, Redshift and Hana. The majority of database operations are very similar among different DBMS, and Structured Query Language (SQL) is the standard language to use these systems.</p>
+<p>SQL became a standard of the American National Standards Institute (ANSI) in 1986, and of the International Organization for Standardization (ISO) in 1987. The most recent version is published in December 2016. For typical users, the fundamental knowledge is the nearly the same. In addition to the standard features, each DBMS providers include their own functions and features. So, for the same query, it may be different implementations (i.e. SQL script) for different systems. In this section, we use the Databricks’ SQL implementation (i.e. all the SQL scripts can run in Databricks SQL notebook).</p>
+<p>More recently data is stored in distributed system such as Hive or in-memory such as Hana. Most relational databases are row-based (i.e. data for each row are stored closely), whereas analytics workflows often favor column-based systems (i.e. data for each column are stored closely). Fortunately, as a database user, we only need to learn how to write SQL scripts to retrieve and manipulate data. Even though there are different implantations of SQL across different DBMS, SQL is nearly universal across relational database including Hive and Spark, which means once we know SQL, our knowledge can be transferred among different database systems. SQL is easy to learn even if you do not have previous experience. In this session, we will go over the key concepts in database and SQL. A more detailed description of database basic can be found through a list of YouTube videos using a specific textbook: <a href="https://www.youtube.com/playlist?list=PLtqstN-ayEb0H5AAo6_V5qEzWs0D-igpw" class="uri">https://www.youtube.com/playlist?list=PLtqstN-ayEb0H5AAo6_V5qEzWs0D-igpw</a></p>
+<div id="database-table-and-view" class="section level3 unnumbered">
+<h3>Database, Table and View</h3>
+<p>A database is a collection of tables that are related to each other. A database has its own database name and each table has its name as well. We can think database is a “folder” where tables within a database are “files” within the folder. A table has rows and columns exactly as an R or pandas data frame. Each row (also called record) represents a unique instance of the subject and each column (also called field or attribute) represents a characteristic of the subject on the table. For each table, there is a special column called primary key which uniquely identifies each of its record.</p>
+<p>Tables within a specific database contains related information and the schema of a database illustrates all fields in every table as well as how these tables and fields relate to each other. Tables can be joined and aggregated to return specific information. View a virtual table composed of fields from one or more base tables. View does not store data, and only store table structure. Also referred as a saved query. View is typically used to protect the data stored in the table and users can only query information from a view and cannot change or update its contents.</p>
+</div>
+<div id="sample-tables" class="section level3 unnumbered">
+<h3>Sample Tables</h3>
+<p>We will use two simple tables to illustrate basic SQL operations. These two tables are from an R dataset which contains the 50 states’ population and income. The first table is called “divisions” which has two columns: state and division and the first few rows are shown in the following table:</p>
+<center>
+<img src="http://scientistcafe.com/CE_JSM2017/images/tbdivision.png" alt="Table divisions used in the examples" />
+</center>
+<p>The second table is called metrics which contains three columns: state, population and income and first few rows of the table is shown below:</p>
+<center>
+<img src="http://scientistcafe.com/CE_JSM2017/images/tbpopin.png" />
+</center>
+<p>To illustrate missing information, three more rows are added at the end of the original division table with state Alberta, Ontario, and Quebec with their corresponding division NULL.</p>
+<p>Please watch the following YouTube video on how to upload a .csv file to a Databricks table: <a href="https://youtu.be/H5LxjaJgpSk" class="uri">https://youtu.be/H5LxjaJgpSk</a></p>
+</div>
+<div id="basic-sql-statement" class="section level3 unnumbered">
+<h3>Basic SQL Statement</h3>
+<p>After logging into Databricks and creating two tables, you can now open a notebook and now choose the type of the notebook to be SQL. There are a few very easy SQL statement to help us understand the database and table structure:</p>
+<ul>
+<li><code>show database</code>: show current databases in the system</li>
+<li><code>create database db_name</code>: create a new database with name db_name</li>
+<li><code>drop database db_name</code>: delete database db_name (be careful when using it!!)</li>
+<li><code>use db_name</code>: set up the current database to be used</li>
+<li><code>show tables</code>: show all the tables within the currently used database</li>
+<li><code>describe tbl_name</code>: show the structure of table with name tbl_name (i.e. list of column name and data type)</li>
+<li><code>drop tbl_name</code>: delete a table with name tbl_name (be careful when using it!!)</li>
+<li><code>select * from metrics limit 10</code>: show the first 10 rows of a table</li>
+</ul>
+<p>If you are familiar with a procedural programming language such as C and FORTRN or scripting languages such as R and Python, you may find SQL code a little bit strange. We should view SQL code by each specific chunk where it finishes a specific task. SQL codes descript a specific task and DBMS will run and finish the task.</p>
+</div>
+<div id="simple-select-statement" class="section level3 unnumbered">
+<h3>Simple SELECT Statement</h3>
+<p>SELECT is the most used statements in SQL, especially for database users and business analyst. It is used to extract specific information (i.e. column or columns) FROM one or multiple tables. It can be used to combine multiple columns. WHERE can be used in SELECT statement to selected rows with specific conditions. ORDER BY can be used in SELECT statement to order the results in descending or ascending order. We can use * after SELECT to represent all columns in the table. Below is the basic structure of a SELECT statement:</p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> Col_Name1, Col_Name2
+<span class="kw">FROM</span> Table_Name
+<span class="kw">WHERE</span> Specific_Condition
+<span class="kw">ORDER</span> <span class="kw">BY</span> Col_Name1, Col_Name2;</code></pre></div>
+<p>WHERE specific_condition is the typical logical conditions and only columns with TRUE for this condition will be chosen. For example, if we want to choose states and its total income where the population larger than 10000 and income less than 5000 with the result order by state name, we can use the following query</p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">select</span> state, income*population <span class="kw">as</span> total_income  
+<span class="kw">from</span> metrics
+<span class="kw">where</span> population &gt; <span class="dv">10000</span> <span class="kw">and</span> income &lt; <span class="dv">5000</span>
+<span class="kw">order</span> <span class="kw">by</span> state</code></pre></div>
+<p>The SELECT statement is used to slicing and dicing the dataset as well as create new columns of interest using basic computation functions.</p>
+</div>
+<div id="aggregation-functions-and-group-by" class="section level3 unnumbered">
+<h3>Aggregation Functions and GROUP BY</h3>
+<p>We can also use aggregation functions in SELECT statement to summarize the data. For example, count(col_name) function will return the total number of not NULL rows for a specific column. Other aggregation function on numerical values include min(col_name), max(col_name), avg(col_name). Let’s use metrics table again to illustrate aggregation functions. For aggregation function, it takes all the rows that match WHERE condition (if any) and return one number. The following statement will calculate the maximum, minimum, and average population for all states starts with letter A to E.</p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">select</span> <span class="fu">sum</span>(population) <span class="kw">as</span> sum_pop, <span class="fu">max</span>(population) <span class="kw">as</span> 
+    max_pop, <span class="fu">min</span>(population) <span class="kw">as</span> min_pop, <span class="fu">avg</span>(population)
+    <span class="kw">as</span> avg_pop, <span class="fu">count</span>(population) <span class="kw">as</span> count_pop
+<span class="kw">from</span> metrics
+<span class="kw">where</span> substring(state, <span class="dv">1</span>, <span class="dv">1</span>) <span class="kw">in</span> (<span class="st">&#39;A&#39;</span>, <span class="st">&#39;B&#39;</span>, <span class="st">&#39;C&#39;</span>, <span class="st">&#39;D&#39;</span>, <span class="st">&#39;E&#39;</span>)</code></pre></div>
+<p>The results from the above query only return one row as expected. Sometimes we want to find the aggregated value based on groups that can be defined by one or more columns. Instead of writing multiple SQL to calculate the aggregated value for each group, we can easily use the GROUP BY to calculate the aggregated value for each group in more SELECT statement. For example, if we want of find how many states in each division, we can use the following:</p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">select</span> division, <span class="fu">count</span>(state)<span class="kw">as</span> number_of_states
+<span class="kw">from</span> divisions
+<span class="kw">group</span> <span class="kw">by</span> division</code></pre></div>
+<p>Another special aggregation function is to return distinct values for one column or a combination of multiple columns. Simple use SELECT DISTINCT col_name1, col_name2 in the first line of the SELECT statement.</p>
+</div>
+<div id="join-multiple-tables" class="section level3 unnumbered">
+<h3>Join Multiple Tables</h3>
+<p>The database system is usually designed such that each table contains a piece of specific information and oftentimes we need to JOIN multiple tables to achieve a specific task. There are few types typically JOINs: inner join (keep only rows that match the join condition from both tables), left outer join (rows from inner join + unmatched rows from the first table), right outer join (rows from inner join + unmatched rows from the second table) and full outer join (rows from inner join + unmatched rows from both tables). The typical JOIN statement is illustrated below:</p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">SELECT</span> a.col_name1 <span class="kw">as</span> var1, b.col_name2 <span class="kw">as</span> var2
+<span class="kw">FROM</span> tbl_one <span class="kw">as</span> a
+INNER/LEFT <span class="kw">JOIN</span> tabl_two ad b
+<span class="kw">ON</span> a.col_to_match = b.col_to_match</code></pre></div>
+<p>For example, lets join the division table and metrics table to find what is the average population and income for each division, and the results order by division names:</p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">select</span> a.division, <span class="fu">avg</span>(b.population) <span class="kw">as</span> avg_pop,
+     <span class="fu">avg</span>(b.income) <span class="kw">as</span> avg_inc
+<span class="kw">from</span> divisions <span class="kw">as</span> a
+<span class="kw">inner</span> <span class="kw">join</span> metrics <span class="kw">as</span> b
+<span class="kw">on</span> a.state = b.state
+<span class="kw">group</span> <span class="kw">by</span> division
+<span class="kw">order</span> <span class="kw">by</span> division</code></pre></div>
+</div>
+<div id="add-more-content-into-a-table" class="section level3 unnumbered">
+<h3>Add More Content into a Table</h3>
+<p>We can use INSERT statement to add additional rows into a particular table, for example, we can add one more row to the metrics table by using the following query:</p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">insert</span> <span class="kw">into</span> metrics
+<span class="kw">values</span> (<span class="st">&#39;Alberta&#39;</span>, <span class="dv">4146</span>, <span class="dv">7370</span>)</code></pre></div>
+</div>
+<div id="advanced-topics-in-database" class="section level3 unnumbered">
+<h3>Advanced Topics in Database</h3>
+<p>Database management is a specific research area and there are many advanced topics such as how to efficiently query data using index; how to take care of data integrity when multiple users are using the same table; algorithm behind data storage (i.e. column-wise or row-wise data storage); how to design the database schema. Users can learn these advanced topics gradually. We hope the basic knowledge covered in this section will kick off the initial momentum to learn SQL. As you can see, it is fairly easy to write SQL statement to retrieve, join, slice, dice and aggregate data. All the SQL scripts can be found in this notebook: <a href="https://databricks-prod-cloudfront.cloud.databricks.com/public/4027ec902e239c93eaaa8714f173bcfc/2961012104553482/4213233595765185/1806228006848429/latest.html" class="uri">https://databricks-prod-cloudfront.cloud.databricks.com/public/4027ec902e239c93eaaa8714f173bcfc/2961012104553482/4213233595765185/1806228006848429/latest.html</a></p>
+</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="multivariate-adaptive-regression-splines.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="pcr-and-pls.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="a1-big-data-cloud-platform.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="other-useful-topics.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -297,7 +387,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/happyrabbit/IntroDataScience/09-Regression.Rmd",
+"link": "https://github.com/happyrabbit/IntroDataScience/19-Appendix.Rmd",
 "text": "Edit"
 },
 "download": ["IDS.pdf", "IDS.epub", "IDS.mobi"],
