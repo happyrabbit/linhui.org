@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2019-04-29">
+<meta name="date" content="2019-04-30">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -302,10 +302,33 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p><strong>Sum of Square Error (SSE)</strong></p>
 <p>The previous two metrics are for classification tree. The SSE is the most widely used splitting metric for regression. Suppose you want to divide the data set <span class="math inline">\(S\)</span> into two groups of <span class="math inline">\(S_{1}\)</span> and <span class="math inline">\(S_{2}\)</span>, where the selection of <span class="math inline">\(S_{1}\)</span> and <span class="math inline">\(S_{2}\)</span> needs to minimize the sum of squared errors:</p>
 <span class="math display" id="eq:treesse">\[\begin{equation}
-$$SSE=\Sigma_{i\in S_{1}}(y_{i}-\bar{y}_{1})^{2}+\Sigma_{i\in S_{2}}(y_{i}-\bar{y}_{2})^{2}$$
+SSE=\Sigma_{i\in S_{1}}(y_{i}-\bar{y}_{1})^{2}+\Sigma_{i\in S_{2}}(y_{i}-\bar{y}_{2})^{2}
 \tag{11.1}
 \end{equation}\]</span>
-<p>In equation <a href="splitting-criteria.html#eq:treesse">(11.1)</a>, <span class="math inline">\(\bar{y}_{1}\)</span> and <span class="math inline">\(\bar{y}_{1}\)</span> are the average of the sample in <span class="math inline">\(S_{1}\)</span> and <span class="math inline">\(S_{2}\)</span>.</p>
+<p>In equation <a href="splitting-criteria.html#eq:treesse">(11.1)</a>, <span class="math inline">\(\bar{y}_{1}\)</span> and <span class="math inline">\(\bar{y}_{1}\)</span> are the average of the sample in <span class="math inline">\(S_{1}\)</span> and <span class="math inline">\(S_{2}\)</span>. The way regression tree grows is to automatically decide on the splitting variables and split points that can maximize <strong>SSE reduction</strong>. Since this process is essentially a recursive segmentation, this approach is also called recursive partitioning.</p>
+<p>Take a look at this simple regression tree for the height of 10 students:</p>
+<center>
+<img src="images/varEN.png" />
+</center>
+<p>You can calculate the SSE using the following code:</p>
+<ol style="list-style-type: decimal">
+<li>SSE for “Female” is 136</li>
+<li>SSE for “Male” is 32</li>
+<li>SSE for splitting node “Gender” is the sum of the above two numbers which is 168</li>
+</ol>
+<p>SSE for the 10 students in root node is 522.9. After the split, SSE decreases from 522.9 to 168.</p>
+<p>If there is another possible way of splitting, divide it by major, as follows:</p>
+<center>
+<img src="images/varEN2.png" />
+</center>
+<p>In this situation:</p>
+<ol style="list-style-type: decimal">
+<li>SSE for “Math” is 184</li>
+<li>SSE for “English” is 302.8</li>
+<li>SSE for splitting node “Major” is the sum of the above two numbers which is 486.8</li>
+</ol>
+<p>Splitting data using variable “gender” reduced SSE from 522.9 to 168; using variable “major” reduced SSE from 522.9 to 486.8. Based on SSE reduction, you should use gender to split the data.</p>
+<p>The three splitting criteria mentioned above are the basis for building a tree model.</p>
 </div>
 <h3>References</h3>
 <div id="refs" class="references">
