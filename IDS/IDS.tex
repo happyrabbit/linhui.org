@@ -168,7 +168,7 @@
 
 \title{Introduction to Data Science}
 \author{Hui Lin and Ming Li}
-\date{2019-06-16}
+\date{2019-08-20}
 
 \usepackage{amsthm}
 \newtheorem{theorem}{Theorem}[chapter]
@@ -2185,9 +2185,10 @@ data sets with \(\gamma = 2\). Let's check the data:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{disease_dat<-}\KeywordTok{read.csv}\NormalTok{(}\StringTok{"https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/sim1_da1.csv"}\NormalTok{)}
+\NormalTok{disease_dat<-}\KeywordTok{read.csv}\NormalTok{(}\StringTok{"http://bit.ly/2KXb1Qi"}\NormalTok{)}
 \CommentTok{# only show the last 7 columns here}
-\KeywordTok{head}\NormalTok{(}\KeywordTok{subset}\NormalTok{(disease_dat,}\DataTypeTok{select=}\KeywordTok{c}\NormalTok{( }\StringTok{"Q118.A"}\NormalTok{,}\StringTok{"Q118.B"}\NormalTok{,}\StringTok{"Q119.A"}\NormalTok{,}\StringTok{"Q119.B"}\NormalTok{,}\StringTok{"Q120.A"}\NormalTok{,}\StringTok{"Q120.B"}\NormalTok{,}\StringTok{"y"}\NormalTok{))) }
+\KeywordTok{head}\NormalTok{(}\KeywordTok{subset}\NormalTok{(disease_dat,}\DataTypeTok{select=}\KeywordTok{c}\NormalTok{(}\StringTok{"Q118.A"}\NormalTok{,}\StringTok{"Q118.B"}\NormalTok{,}\StringTok{"Q119.A"}\NormalTok{,}
+                                 \StringTok{"Q119.B"}\NormalTok{,}\StringTok{"Q120.A"}\NormalTok{,}\StringTok{"Q120.B"}\NormalTok{,}\StringTok{"y"}\NormalTok{))) }
 \end{Highlighting}
 \end{Shaded}
 
@@ -2210,6 +2211,8 @@ consider \texttt{C} as the baseline.
 Refer to Appendix for the simulation code.
 
 \section{MNIST Dataset}\label{mnist-dataset}
+
+\section{IMDB Dataset}\label{imdb-dataset}
 
 \chapter{Data Pre-processing}\label{data-pre-processing}
 
@@ -2307,7 +2310,15 @@ Load the R packages first:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{source}\NormalTok{(}\StringTok{"https://raw.githubusercontent.com/happyrabbit/CE_JSM2017/master/Rcode/00-course-setup.R"}\NormalTok{)}
+\CommentTok{# install packages from CRAN}
+\NormalTok{p_needed <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{'imputeMissings'}\NormalTok{,}\StringTok{'caret'}\NormalTok{,}\StringTok{'e1071'}\NormalTok{,}\StringTok{'psych'}\NormalTok{,}\StringTok{'car'}\NormalTok{,}\StringTok{'corrplot'}\NormalTok{)}
+\NormalTok{packages <-}\StringTok{ }\KeywordTok{rownames}\NormalTok{(}\KeywordTok{installed.packages}\NormalTok{())}
+\NormalTok{p_to_install <-}\StringTok{ }\NormalTok{p_needed[}\OperatorTok{!}\NormalTok{(p_needed }\OperatorTok{%in%}\StringTok{ }\NormalTok{packages)]}
+\ControlFlowTok{if}\NormalTok{ (}\KeywordTok{length}\NormalTok{(p_to_install) }\OperatorTok{>}\StringTok{ }\DecValTok{0}\NormalTok{) \{}
+    \KeywordTok{install.packages}\NormalTok{(p_to_install)}
+\NormalTok{\}}
+
+\KeywordTok{lapply}\NormalTok{(p_needed, require, }\DataTypeTok{character.only =} \OtherTok{TRUE}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -2319,16 +2330,50 @@ Let's read and check the data:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{sim.dat <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv "}\NormalTok{)}
+\NormalTok{sim.dat <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"http://bit.ly/2P5gTw4"}\NormalTok{)}
 \KeywordTok{summary}\NormalTok{(sim.dat)}
 \end{Highlighting}
 \end{Shaded}
 
+\begin{verbatim}
+      age           gender        income       house       store_exp    
+ Min.   : 16.0   Female:554   Min.   : 41776   No :432   Min.   : -500  
+ 1st Qu.: 25.0   Male  :446   1st Qu.: 85832   Yes:568   1st Qu.:  205  
+ Median : 36.0                Median : 93869             Median :  329  
+ Mean   : 38.8                Mean   :113543             Mean   : 1357  
+ 3rd Qu.: 53.0                3rd Qu.:124572             3rd Qu.:  597  
+ Max.   :300.0                Max.   :319704             Max.   :50000  
+                              NA's   :184                               
+   online_exp    store_trans     online_trans        Q1            Q2      
+ Min.   :  69   Min.   : 1.00   Min.   : 1.0   Min.   :1.0   Min.   :1.00  
+ 1st Qu.: 420   1st Qu.: 3.00   1st Qu.: 6.0   1st Qu.:2.0   1st Qu.:1.00  
+ Median :1942   Median : 4.00   Median :14.0   Median :3.0   Median :1.00  
+ Mean   :2120   Mean   : 5.35   Mean   :13.6   Mean   :3.1   Mean   :1.82  
+ 3rd Qu.:2441   3rd Qu.: 7.00   3rd Qu.:20.0   3rd Qu.:4.0   3rd Qu.:2.00  
+ Max.   :9479   Max.   :20.00   Max.   :36.0   Max.   :5.0   Max.   :5.00  
+                                                                           
+       Q3             Q4             Q5             Q6             Q7      
+ Min.   :1.00   Min.   :1.00   Min.   :1.00   Min.   :1.00   Min.   :1.00  
+ 1st Qu.:1.00   1st Qu.:2.00   1st Qu.:1.75   1st Qu.:1.00   1st Qu.:2.50  
+ Median :1.00   Median :3.00   Median :4.00   Median :2.00   Median :4.00  
+ Mean   :1.99   Mean   :2.76   Mean   :2.94   Mean   :2.45   Mean   :3.43  
+ 3rd Qu.:3.00   3rd Qu.:4.00   3rd Qu.:4.00   3rd Qu.:4.00   3rd Qu.:4.00  
+ Max.   :5.00   Max.   :5.00   Max.   :5.00   Max.   :5.00   Max.   :5.00  
+                                                                           
+       Q8            Q9            Q10              segment   
+ Min.   :1.0   Min.   :1.00   Min.   :1.00   Conspicuous:200  
+ 1st Qu.:1.0   1st Qu.:2.00   1st Qu.:1.00   Price      :250  
+ Median :2.0   Median :4.00   Median :2.00   Quality    :200  
+ Mean   :2.4   Mean   :3.08   Mean   :2.32   Style      :350  
+ 3rd Qu.:3.0   3rd Qu.:4.00   3rd Qu.:3.00                    
+ Max.   :5.0   Max.   :5.00   Max.   :5.00                    
+\end{verbatim}
+
 Are there any problems? Questionnaire response Q1-Q10 seem reasonable,
 the minimum is 1 and maximum is 5. Recall that the questionnaire score
-is 1-5. The number of store transactions (store\_trans) and online
-transactions (store\_trans) make sense too. Things need to pay attention
-are:
+is 1-5. The number of store transactions (\texttt{store\_trans}) and
+online transactions (\texttt{online\_trans}) make sense too. Things to
+pay attention are:
 
 \begin{itemize}
 \tightlist
@@ -2346,7 +2391,7 @@ are:
 \end{itemize}
 
 How to deal with that? Depending on the real situation, if the sample
-size is large enough, it will not hurt to delete those problematic
+size is large enough, it does not hurt to delete those problematic
 samples. Here we have 1000 observations. Since marketing survey is
 usually expensive, it is better to set these values as missing and
 impute them instead of deleting the rows.
@@ -2354,25 +2399,25 @@ impute them instead of deleting the rows.
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# set problematic values as missings}
-\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{age[}\KeywordTok{which}\NormalTok{(sim.dat}\OperatorTok{$}\NormalTok{age}\OperatorTok{>}\DecValTok{100}\NormalTok{)]<-}\OtherTok{NA}
-\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{store_exp[}\KeywordTok{which}\NormalTok{(sim.dat}\OperatorTok{$}\NormalTok{store_exp}\OperatorTok{<}\DecValTok{0}\NormalTok{)]<-}\OtherTok{NA}
+\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{age[}\KeywordTok{which}\NormalTok{(sim.dat}\OperatorTok{$}\NormalTok{age }\OperatorTok{>}\StringTok{ }\DecValTok{100}\NormalTok{)] <-}\StringTok{ }\OtherTok{NA}
+\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{store_exp[}\KeywordTok{which}\NormalTok{(sim.dat}\OperatorTok{$}\NormalTok{store_exp }\OperatorTok{<}\StringTok{ }\DecValTok{0}\NormalTok{)] <-}\StringTok{ }\OtherTok{NA}
 \CommentTok{# see the results}
-\KeywordTok{summary}\NormalTok{(}\KeywordTok{subset}\NormalTok{(sim.dat,}\DataTypeTok{select=}\KeywordTok{c}\NormalTok{(}\StringTok{"age"}\NormalTok{,}\StringTok{"income"}\NormalTok{)))}
+\KeywordTok{summary}\NormalTok{(}\KeywordTok{subset}\NormalTok{(sim.dat, }\DataTypeTok{select =} \KeywordTok{c}\NormalTok{(}\StringTok{"age"}\NormalTok{, }\StringTok{"store_exp"}\NormalTok{)))}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-      age            income      
- Min.   :16.00   Min.   : 41776  
- 1st Qu.:25.00   1st Qu.: 84930  
- Median :33.00   Median : 93023  
- Mean   :36.64   Mean   :109968  
- 3rd Qu.:45.00   3rd Qu.:121535  
- Max.   :69.00   Max.   :317476  
- NA's   :1  
+      age          store_exp      
+ Min.   :16.00   Min.   :  155.8  
+ 1st Qu.:25.00   1st Qu.:  205.1  
+ Median :36.00   Median :  329.8  
+ Mean   :38.58   Mean   : 1358.7  
+ 3rd Qu.:53.00   3rd Qu.:  597.4  
+ Max.   :69.00   Max.   :50000.0  
+ NA's   :1       NA's   :1        
 \end{verbatim}
 
-Now we will deal with the missing values in the data.
+Now let's deal with the missing values in the data.
 
 \section{Missing Values}\label{missing-values}
 
@@ -2424,20 +2469,20 @@ use \texttt{impute()} function in \texttt{imputeMissings} package.
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# save the result as another object}
-\NormalTok{demo_imp<-}\KeywordTok{impute}\NormalTok{(sim.dat,}\DataTypeTok{method=}\StringTok{"median/mode"}\NormalTok{)}
+\NormalTok{demo_imp <-}\StringTok{ }\KeywordTok{impute}\NormalTok{(sim.dat, }\DataTypeTok{method =} \StringTok{"median/mode"}\NormalTok{)}
 \CommentTok{# check the first 5 columns, there is no missing values in other columns}
-\KeywordTok{summary}\NormalTok{(demo_imp[,}\DecValTok{1}\OperatorTok{:}\DecValTok{5}\NormalTok{])}
+\KeywordTok{summary}\NormalTok{(demo_imp[, }\DecValTok{1}\OperatorTok{:}\DecValTok{5}\NormalTok{])}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
       age           gender        income       house       store_exp      
- Min.   :16.00   Female:446   Min.   : 41776   No :372   Min.   :  155.8  
- 1st Qu.:25.00   Male  :326   1st Qu.: 84930   Yes:400   1st Qu.:  202.7  
- Median :33.00                Median : 93023             Median :  293.0  
- Mean   :36.63                Mean   :109968             Mean   : 1265.4  
- 3rd Qu.:45.00                3rd Qu.:121535             3rd Qu.:  540.2  
- Max.   :69.00                Max.   :317476             Max.   :50000.0 
+ Min.   :16.00   Female:554   Min.   : 41776   No :432   Min.   :  155.8  
+ 1st Qu.:25.00   Male  :446   1st Qu.: 87896   Yes:568   1st Qu.:  205.1  
+ Median :36.00                Median : 93869             Median :  329.8  
+ Mean   :38.58                Mean   :109923             Mean   : 1357.7  
+ 3rd Qu.:53.00                3rd Qu.:119456             3rd Qu.:  597.3  
+ Max.   :69.00                Max.   :319704             Max.   :50000.0
 \end{verbatim}
 
 After imputation, \texttt{demo\_imp} has no missing value. This method
@@ -2449,21 +2494,31 @@ study the missing mechanism. In the example here, the missing variables
 are numeric. If the missing variable is a categorical/factor variable,
 the \texttt{impute()} function will impute with the mode.
 
-You can also use \texttt{preProcess()} function, but it is only for
-numeric variables, and can not impute categorical variables. Since
-missing values here are numeric, we can use the \texttt{preProcess()}
-function. The result is the same as the \texttt{impute()} function.
-\texttt{PreProcess()} is a powerful function that can link to a variety
-of data preprocessing methods. We will use the function later for other
-data preprocessing.
+You can also use \texttt{preProcess()} in package \texttt{caret}, but it
+is only for numeric variables, and can not impute categorical variables.
+Since missing values here are numeric, we can use the
+\texttt{preProcess()} function. The result is the same as the
+\texttt{impute()} function. \texttt{PreProcess()} is a powerful function
+that can link to a variety of data preprocessing methods. We will use
+the function later for other data preprocessing.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{imp<-}\KeywordTok{preProcess}\NormalTok{(sim.dat,}\DataTypeTok{method=}\StringTok{"medianImpute"}\NormalTok{)}
-\NormalTok{demo_imp2<-}\KeywordTok{predict}\NormalTok{(imp,sim.dat)}
-\KeywordTok{summary}\NormalTok{(demo_imp2[,}\DecValTok{1}\OperatorTok{:}\DecValTok{5}\NormalTok{])}
+\NormalTok{imp <-}\StringTok{ }\KeywordTok{preProcess}\NormalTok{(sim.dat, }\DataTypeTok{method =} \StringTok{"medianImpute"}\NormalTok{)}
+\NormalTok{demo_imp2 <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(imp, sim.dat)}
+\KeywordTok{summary}\NormalTok{(demo_imp2[, }\DecValTok{1}\OperatorTok{:}\DecValTok{5}\NormalTok{])}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+      age           gender        income       house       store_exp      
+ Min.   :16.00   Female:554   Min.   : 41776   No :432   Min.   :  155.8  
+ 1st Qu.:25.00   Male  :446   1st Qu.: 87896   Yes:568   1st Qu.:  205.1  
+ Median :36.00                Median : 93869             Median :  329.8  
+ Mean   :38.58                Mean   :109923             Mean   : 1357.7  
+ 3rd Qu.:53.00                3rd Qu.:119456             3rd Qu.:  597.3  
+ Max.   :69.00                Max.   :319704             Max.   :50000.0  
+\end{verbatim}
 
 \subsection{K-nearest neighbors}\label{k-nearest-neighbors}
 
@@ -2475,43 +2530,26 @@ Use \texttt{preProcess()} to conduct KNN:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{imp<-}\KeywordTok{preProcess}\NormalTok{(sim.dat,}\DataTypeTok{method=}\StringTok{"knnImpute"}\NormalTok{,}\DataTypeTok{k=}\DecValTok{5}\NormalTok{)}
+\NormalTok{imp <-}\StringTok{ }\KeywordTok{preProcess}\NormalTok{(sim.dat, }\DataTypeTok{method =} \StringTok{"knnImpute"}\NormalTok{, }\DataTypeTok{k =} \DecValTok{5}\NormalTok{)}
 \CommentTok{# need to use predict() to get KNN result}
-\NormalTok{demo_imp<-}\KeywordTok{predict}\NormalTok{(imp,sim.dat)}
+\NormalTok{demo_imp <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(imp, sim.dat)}
+\CommentTok{# only show the first three elements}
+\KeywordTok{lapply}\NormalTok{(sim.dat, class)[}\DecValTok{1}\OperatorTok{:}\DecValTok{3}\NormalTok{]}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-Error in `[.data.frame`(old, , non_missing_cols, drop = FALSE) : 
-  undefined columns selected
+      age                gender        income        
+ Min.   :-1.5910972   Female:554   Min.   :-1.43989  
+ 1st Qu.:-0.9568733   Male  :446   1st Qu.:-0.53732  
+ Median :-0.1817107                Median :-0.37606  
+ Mean   : 0.0000156                Mean   : 0.02389  
+ 3rd Qu.: 1.0162678                3rd Qu.: 0.21540  
+ Max.   : 2.1437770                Max.   : 4.13627 
 \end{verbatim}
 
-Now we get an error saying ``undefined columns selected.'' It is because
-\texttt{sim.dat} has non-numeric variables. The \texttt{preProcess()} in
-the first line will automatically ignore non-numeric columns, so there
-is no error. However, there is a problem when using \texttt{predict()}
-to get the result. Removing those variable will solve the problem.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{# find factor columns}
-\NormalTok{imp<-}\KeywordTok{preProcess}\NormalTok{(sim.dat,}\DataTypeTok{method=}\StringTok{"knnImpute"}\NormalTok{,}\DataTypeTok{k=}\DecValTok{5}\NormalTok{)}
-\NormalTok{idx<-}\KeywordTok{which}\NormalTok{(}\KeywordTok{lapply}\NormalTok{(sim.dat,class)}\OperatorTok{==}\StringTok{"factor"}\NormalTok{)}
-\NormalTok{demo_imp<-}\KeywordTok{predict}\NormalTok{(imp,sim.dat[,}\OperatorTok{-}\NormalTok{idx])}
-\KeywordTok{summary}\NormalTok{(demo_imp[,}\DecValTok{1}\OperatorTok{:}\DecValTok{3}\NormalTok{])}
-\end{Highlighting}
-\end{Shaded}
-
-\texttt{lapply(data,class)} can return a list of column class. Here the
-data frame is \texttt{sim.dat}, and the following code will give the
-list of column class:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{# only show the first three elements}
-\KeywordTok{lapply}\NormalTok{(sim.dat,class)[}\DecValTok{1}\OperatorTok{:}\DecValTok{3}\NormalTok{]}
-\end{Highlighting}
-\end{Shaded}
+The \texttt{preProcess()} in the first line will automatically ignore
+non-numeric columns.
 
 Comparing the KNN result with the previous median imputation, the two
 are very different. This is because when you tell the
@@ -2521,21 +2559,17 @@ data. Another way is to use Bagging tree (in the next section). Note
 that KNN can not impute samples with the entire row missing. The reason
 is straightforward. Since the algorithm uses the average of its
 neighbors if none of them has a value, what does it apply to calculate
-the mean? Let's append a new row with all values missing to the original
-data frame to get a new object called \texttt{temp}. Then apply KNN to
+the mean?
+
+Let's append a new row with all values missing to the original data
+frame to get a new object called \texttt{temp}. Then apply KNN to
 \texttt{temp} and see what happens:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{temp<-}\KeywordTok{rbind}\NormalTok{(sim.dat,}\KeywordTok{rep}\NormalTok{(}\OtherTok{NA}\NormalTok{,}\KeywordTok{ncol}\NormalTok{(sim.dat)))}
-\NormalTok{imp<-}\KeywordTok{preProcess}\NormalTok{(sim.dat,}\DataTypeTok{method=}\StringTok{"knnImpute"}\NormalTok{,}\DataTypeTok{k=}\DecValTok{5}\NormalTok{)}
-\NormalTok{idx<-}\KeywordTok{which}\NormalTok{(}\KeywordTok{lapply}\NormalTok{(temp,class)}\OperatorTok{==}\StringTok{"factor"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{demo_imp<-}\KeywordTok{predict}\NormalTok{(imp,temp[,}\OperatorTok{-}\NormalTok{idx])}
+\NormalTok{temp <-}\StringTok{ }\KeywordTok{rbind}\NormalTok{(sim.dat, }\KeywordTok{rep}\NormalTok{(}\OtherTok{NA}\NormalTok{, }\KeywordTok{ncol}\NormalTok{(sim.dat)))}
+\NormalTok{imp <-}\StringTok{ }\KeywordTok{preProcess}\NormalTok{(sim.dat, }\DataTypeTok{method =} \StringTok{"knnImpute"}\NormalTok{, }\DataTypeTok{k =} \DecValTok{5}\NormalTok{)}
+\NormalTok{demo_imp <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(imp, temp)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -2544,14 +2578,14 @@ Error in FUN(newX[, i], ...) :
   cannot impute when all predictors are missing in the new data point
 \end{verbatim}
 
-There is an error saying ``cannot impute when all predictors are missing
-in the new data point''. It is easy to fix by finding and removing the
-problematic row:
+There is an error saying
+``\texttt{cannot\ impute\ when\ all\ predictors\ are\ missing\ in\ the\ new\ data\ point}''.
+It is easy to fix by finding and removing the problematic row(s):
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{idx<-}\KeywordTok{apply}\NormalTok{(temp,}\DecValTok{1}\NormalTok{,}\ControlFlowTok{function}\NormalTok{(x) }\KeywordTok{sum}\NormalTok{(}\KeywordTok{is.na}\NormalTok{(x)) )}
-\KeywordTok{as.vector}\NormalTok{(}\KeywordTok{which}\NormalTok{(idx}\OperatorTok{==}\KeywordTok{ncol}\NormalTok{(temp)))}
+\NormalTok{idx <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(temp, }\DecValTok{1}\NormalTok{, }\ControlFlowTok{function}\NormalTok{(x) }\KeywordTok{sum}\NormalTok{(}\KeywordTok{is.na}\NormalTok{(x)))}
+\KeywordTok{as.vector}\NormalTok{(}\KeywordTok{which}\NormalTok{(idx }\OperatorTok{==}\StringTok{ }\KeywordTok{ncol}\NormalTok{(temp)))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -2574,9 +2608,9 @@ classification. Here we use \texttt{preProcess()} to impute
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{imp<-}\KeywordTok{preProcess}\NormalTok{(sim.dat,}\DataTypeTok{method=}\StringTok{"bagImpute"}\NormalTok{)}
-\NormalTok{demo_imp<-}\KeywordTok{predict}\NormalTok{(imp,sim.dat)}
-\KeywordTok{summary}\NormalTok{(demo_imp[,}\DecValTok{1}\OperatorTok{:}\DecValTok{5}\NormalTok{])}
+\NormalTok{imp <-}\StringTok{ }\KeywordTok{preProcess}\NormalTok{(sim.dat, }\DataTypeTok{method =} \StringTok{"bagImpute"}\NormalTok{)}
+\NormalTok{demo_imp <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(imp, sim.dat)}
+\KeywordTok{summary}\NormalTok{(demo_imp[, }\DecValTok{1}\OperatorTok{:}\DecValTok{5}\NormalTok{])}
 \end{Highlighting}
 \end{Shaded}
 
@@ -2606,80 +2640,33 @@ Let's standardize the variable \texttt{income} from \texttt{sim.dat}:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{income<-sim.dat}\OperatorTok{$}\NormalTok{income}
+\NormalTok{income <-}\StringTok{ }\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{income}
 \CommentTok{# calculate the mean of income}
-\NormalTok{mux<-}\KeywordTok{mean}\NormalTok{(income,}\DataTypeTok{na.rm=}\NormalTok{T)}
+\NormalTok{mux <-}\StringTok{ }\KeywordTok{mean}\NormalTok{(income, }\DataTypeTok{na.rm =}\NormalTok{ T)}
 \CommentTok{# calculate the standard deviation of income}
-\NormalTok{sdx<-}\KeywordTok{sd}\NormalTok{(income,}\DataTypeTok{na.rm=}\NormalTok{T)}
+\NormalTok{sdx <-}\StringTok{ }\KeywordTok{sd}\NormalTok{(income, }\DataTypeTok{na.rm =}\NormalTok{ T)}
 \CommentTok{# centering}
-\NormalTok{tr1<-income}\OperatorTok{-}\NormalTok{mux}
+\NormalTok{tr1 <-}\StringTok{ }\NormalTok{income }\OperatorTok{-}\StringTok{ }\NormalTok{mux}
 \CommentTok{# scaling}
-\NormalTok{tr2<-tr1}\OperatorTok{/}\NormalTok{sdx}
+\NormalTok{tr2 <-}\StringTok{ }\NormalTok{tr1}\OperatorTok{/}\NormalTok{sdx}
 \end{Highlighting}
 \end{Shaded}
 
-Or the function \texttt{preProcess()} in package \texttt{caret} can
-apply this transformation to a set of predictors.
+Or the function \texttt{preProcess()} can apply this transformation to a
+set of predictors.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{sdat<-}\KeywordTok{subset}\NormalTok{(sim.dat,}\DataTypeTok{select=}\KeywordTok{c}\NormalTok{(}\StringTok{"age"}\NormalTok{,}\StringTok{"income"}\NormalTok{))}
-\CommentTok{# set the "method" option}
-\NormalTok{trans<-}\KeywordTok{preProcess}\NormalTok{(sdat,}\DataTypeTok{method=}\KeywordTok{c}\NormalTok{(}\StringTok{"center"}\NormalTok{,}\StringTok{"scale"}\NormalTok{))}
+\NormalTok{sdat <-}\StringTok{ }\KeywordTok{subset}\NormalTok{(sim.dat, }\DataTypeTok{select =} \KeywordTok{c}\NormalTok{(}\StringTok{"age"}\NormalTok{, }\StringTok{"income"}\NormalTok{))}
+\CommentTok{# set the 'method' option}
+\NormalTok{trans <-}\StringTok{ }\KeywordTok{preProcess}\NormalTok{(sdat, }\DataTypeTok{method =} \KeywordTok{c}\NormalTok{(}\StringTok{"center"}\NormalTok{, }\StringTok{"scale"}\NormalTok{))}
 \CommentTok{# use predict() function to get the final result}
-\NormalTok{transformed<-}\KeywordTok{predict}\NormalTok{(trans,sdat)}
+\NormalTok{transformed <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(trans, sdat)}
 \end{Highlighting}
 \end{Shaded}
 
-Now the two variables are in the same scale:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\KeywordTok{summary}\NormalTok{(transformed)}
-\end{Highlighting}
-\end{Shaded}
-
-Sometimes you only need to scale the variable. For example, if the model
-adds a penalty to the parameter estimates (such as \(L_2\) penalty is
-ridge regression and \(L_1\) penalty in LASSO), the variables need to
-have a similar scale to ensure a fair variable selection. I am a heavy
-user of this kind of penalty-based model in my work, and I used the
-following quantile transformation:
-
-\[
-x_{ij}^{*}=\frac{x_{ij}-quantile(x_{.j},0.01)}{quantile(x_{.j}-0.99)-quantile(x_{-j},0.01)}
-\]
-
-The reason to use 99\% and 1\% quantile instead of maximum and minimum
-values is to resist the impact of outliers.
-
-It is easy to write a function to do it:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{qscale<-}\ControlFlowTok{function}\NormalTok{(dat)\{}
-  \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{ncol}\NormalTok{(dat))\{}
-\NormalTok{    up<-}\KeywordTok{quantile}\NormalTok{(dat[,i],}\FloatTok{0.99}\NormalTok{)}
-\NormalTok{    low<-}\KeywordTok{quantile}\NormalTok{(dat[,i],}\FloatTok{0.01}\NormalTok{)}
-\NormalTok{    diff<-up}\OperatorTok{-}\NormalTok{low}
-\NormalTok{    dat[,i]<-(dat[,i]}\OperatorTok{-}\NormalTok{low)}\OperatorTok{/}\NormalTok{diff}
-\NormalTok{  \}}
-  \KeywordTok{return}\NormalTok{(dat)}
-\NormalTok{\}}
-\end{Highlighting}
-\end{Shaded}
-
-In order to illustrate, let's apply it to some variables from
-`demo\_imp2:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{demo_imp3<-}\KeywordTok{qscale}\NormalTok{(}\KeywordTok{subset}\NormalTok{(demo_imp2,}\DataTypeTok{select=}\KeywordTok{c}\NormalTok{(}\StringTok{"income"}\NormalTok{,}\StringTok{"store_exp"}\NormalTok{,}\StringTok{"online_exp"}\NormalTok{)))}
-\KeywordTok{summary}\NormalTok{(demo_imp3)}
-\end{Highlighting}
-\end{Shaded}
-
-After transformation, most of the variables are between 0-1.
+Now the two variables are in the same scale. You can check the result
+using \texttt{summary(transformed)}. Note that there are missing values.
 
 \section{Resolve Skewness}\label{resolve-skewness}
 
@@ -2693,19 +2680,21 @@ side of the distribution's mean is equal.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{# skew, fig.cap='Shewed Distribution', out.width='80%', fig.asp=.75, # fig.align='center'}
 \CommentTok{# need skewness() function from e1071 package}
 \KeywordTok{set.seed}\NormalTok{(}\DecValTok{1000}\NormalTok{)}
-\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow=}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{),}\DataTypeTok{oma=}\KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{))}
-\CommentTok{# random sample 1000 chi-square distribution with df=2}
-\CommentTok{# right skew}
-\NormalTok{x1<-}\KeywordTok{rchisq}\NormalTok{(}\DecValTok{1000}\NormalTok{,}\DecValTok{2}\NormalTok{, }\DataTypeTok{ncp =} \DecValTok{0}\NormalTok{)}
+\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{), }\DataTypeTok{oma =} \KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\CommentTok{# random sample 1000 chi-square distribution with df=2 right skew}
+\NormalTok{x1 <-}\StringTok{ }\KeywordTok{rchisq}\NormalTok{(}\DecValTok{1000}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DataTypeTok{ncp =} \DecValTok{0}\NormalTok{)}
 \CommentTok{# get left skew variable x2 from x1}
-\NormalTok{x2<-}\KeywordTok{max}\NormalTok{(x1)}\OperatorTok{-}\NormalTok{x1}
-\KeywordTok{plot}\NormalTok{(}\KeywordTok{density}\NormalTok{(x2),}\DataTypeTok{main=}\KeywordTok{paste}\NormalTok{(}\StringTok{"left skew, skewnwss ="}\NormalTok{,}\KeywordTok{round}\NormalTok{(}\KeywordTok{skewness}\NormalTok{(x2),}\DecValTok{2}\NormalTok{)), }\DataTypeTok{xlab=}\StringTok{"X2"}\NormalTok{)}
-\KeywordTok{plot}\NormalTok{(}\KeywordTok{density}\NormalTok{(x1),}\DataTypeTok{main=}\KeywordTok{paste}\NormalTok{(}\StringTok{"right skew, skewness ="}\NormalTok{,}\KeywordTok{round}\NormalTok{(}\KeywordTok{skewness}\NormalTok{(x1),}\DecValTok{2}\NormalTok{)), }\DataTypeTok{xlab=}\StringTok{"X1"}\NormalTok{)}
+\NormalTok{x2 <-}\StringTok{ }\KeywordTok{max}\NormalTok{(x1) }\OperatorTok{-}\StringTok{ }\NormalTok{x1}
+\KeywordTok{plot}\NormalTok{(}\KeywordTok{density}\NormalTok{(x2), }\DataTypeTok{main =} \KeywordTok{paste}\NormalTok{(}\StringTok{"left skew, skewnwss ="}\NormalTok{, }\KeywordTok{round}\NormalTok{(}\KeywordTok{skewness}\NormalTok{(x2), }
+    \DecValTok{2}\NormalTok{)), }\DataTypeTok{xlab =} \StringTok{"X2"}\NormalTok{)}
+\KeywordTok{plot}\NormalTok{(}\KeywordTok{density}\NormalTok{(x1), }\DataTypeTok{main =} \KeywordTok{paste}\NormalTok{(}\StringTok{"right skew, skewness ="}\NormalTok{, }\KeywordTok{round}\NormalTok{(}\KeywordTok{skewness}\NormalTok{(x1), }
+    \DecValTok{2}\NormalTok{)), }\DataTypeTok{xlab =} \StringTok{"X1"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
+
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-9-1.pdf}
 
 There are different ways may help to remove skewness such as log, square
 root or inverse. However, it is often difficult to determine from plots
@@ -2737,6 +2726,19 @@ to apply this transformation by chaning the \texttt{method} argument.
 \end{Highlighting}
 \end{Shaded}
 
+\begin{verbatim}
+             vars    n      mean       sd median   trimmed      mad ...
+age             1 1000     38.84    16.42     36     37.69    16.31
+gender*         2 1000      1.45     0.50      1      1.43     0.00
+income          3  816 113543.07 49842.29  93869 104841.94 28989.47
+house*          4 1000      1.57     0.50      2      1.58     0.00
+store_exp       5 1000   1356.85  2774.40    329    839.92   196.45
+online_exp      6 1000   2120.18  1731.22   1942   1874.51  1015.21
+store_trans     7 1000      5.35     3.70      4      4.89     2.97
+online_trans    8 1000     13.55     7.96     14     13.42    10.38
+...
+\end{verbatim}
+
 It is easy to see the skewed variables. If \texttt{mean} and
 \texttt{trimmed} differ a lot, there is very likely outliers. By
 default, \texttt{trimmed} reports mean by dropping the top and bottom
@@ -2749,10 +2751,21 @@ As an example, we will apply Box-Cox transformation on
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# select the two columns and save them as dat_bc}
-\NormalTok{dat_bc<-}\KeywordTok{subset}\NormalTok{(sim.dat,}\DataTypeTok{select=}\KeywordTok{c}\NormalTok{(}\StringTok{"store_trans"}\NormalTok{,}\StringTok{"online_trans"}\NormalTok{))}
-\NormalTok{(trans<-}\KeywordTok{preProcess}\NormalTok{(dat_bc,}\DataTypeTok{method=}\KeywordTok{c}\NormalTok{(}\StringTok{"BoxCox"}\NormalTok{)))}
+\NormalTok{dat_bc <-}\StringTok{ }\KeywordTok{subset}\NormalTok{(sim.dat, }\DataTypeTok{select =} \KeywordTok{c}\NormalTok{(}\StringTok{"store_trans"}\NormalTok{, }\StringTok{"online_trans"}\NormalTok{))}
+\NormalTok{(trans <-}\StringTok{ }\KeywordTok{preProcess}\NormalTok{(dat_bc, }\DataTypeTok{method =} \KeywordTok{c}\NormalTok{(}\StringTok{"BoxCox"}\NormalTok{)))}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+## Created from 1000 samples and 2 variables
+## 
+## Pre-processing:
+##   - Box-Cox transformation (2)
+##   - ignored (0)
+## 
+## Lambda estimates for Box-Cox transformation:
+## 0.1, 0.7
+\end{verbatim}
 
 The last line of the output shows the estimates of \(\lambda\) for each
 variable. As before, use \texttt{predict()} to get the transformed
@@ -2760,13 +2773,14 @@ result:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{# bc, fig.cap='Box-Cox Transformation', out.width='80%', fig.asp=.75, # fig.align='center'}
-\NormalTok{transformed<-}\KeywordTok{predict}\NormalTok{(trans,dat_bc)}
-\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow=}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{),}\DataTypeTok{oma=}\KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{))}
-\KeywordTok{hist}\NormalTok{(dat_bc}\OperatorTok{$}\NormalTok{store_trans,}\DataTypeTok{main=}\StringTok{"Before Transformation"}\NormalTok{,}\DataTypeTok{xlab=}\StringTok{"store_trans"}\NormalTok{)}
-\KeywordTok{hist}\NormalTok{(transformed}\OperatorTok{$}\NormalTok{store_trans,}\DataTypeTok{main=}\StringTok{"After Transformation"}\NormalTok{,}\DataTypeTok{xlab=}\StringTok{"store_trans"}\NormalTok{)}
+\NormalTok{transformed <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(trans, dat_bc)}
+\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{), }\DataTypeTok{oma =} \KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\KeywordTok{hist}\NormalTok{(dat_bc}\OperatorTok{$}\NormalTok{store_trans, }\DataTypeTok{main =} \StringTok{"Before Transformation"}\NormalTok{, }\DataTypeTok{xlab =} \StringTok{"store_trans"}\NormalTok{)}
+\KeywordTok{hist}\NormalTok{(transformed}\OperatorTok{$}\NormalTok{store_trans, }\DataTypeTok{main =} \StringTok{"After Transformation"}\NormalTok{, }\DataTypeTok{xlab =} \StringTok{"store_trans"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
+
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-11-1.pdf}
 
 Before the transformation, the \texttt{stroe\_trans} is skewed right.
 \texttt{BoxCoxTrans\ ()} can also conduct Box-Cox transform. But note
@@ -2776,16 +2790,36 @@ at the same time.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{(trans<-}\KeywordTok{BoxCoxTrans}\NormalTok{(dat_bc}\OperatorTok{$}\NormalTok{store_trans))}
+\NormalTok{(trans <-}\StringTok{ }\KeywordTok{BoxCoxTrans}\NormalTok{(dat_bc}\OperatorTok{$}\NormalTok{store_trans))}
 \end{Highlighting}
 \end{Shaded}
 
+\begin{verbatim}
+## Box-Cox Transformation
+## 
+## 1000 data points used to estimate Lambda
+## 
+## Input data summary:
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    1.00    3.00    4.00    5.35    7.00   20.00 
+## 
+## Largest/Smallest: 20 
+## Sample Skewness: 1.11 
+## 
+## Estimated Lambda: 0.1 
+## With fudge factor, Lambda = 0 will be used for transformations
+\end{verbatim}
+
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{transformed<-}\KeywordTok{predict}\NormalTok{(trans,dat_bc}\OperatorTok{$}\NormalTok{store_trans)}
+\NormalTok{transformed <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(trans, dat_bc}\OperatorTok{$}\NormalTok{store_trans)}
 \KeywordTok{skewness}\NormalTok{(transformed)}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+## [1] -0.2155
+\end{verbatim}
 
 The estimate of \(\lambda\) is the same as before (0.1). The skewness of
 the original observation is 1.1, and -0.2 after transformation. Although
@@ -2801,7 +2835,6 @@ variables in \texttt{sim.dat}:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{# scm, fig.cap='Use basic visualization to check outliers', out.width='80%', # fig.asp=.75, fig.align='center'}
 \CommentTok{# select numerical non-survey data}
 \NormalTok{sdat<-}\KeywordTok{subset}\NormalTok{(sim.dat,}\DataTypeTok{select=}\KeywordTok{c}\NormalTok{(}\StringTok{"age"}\NormalTok{,}\StringTok{"income"}\NormalTok{,}\StringTok{"store_exp"}\NormalTok{,}\StringTok{"online_exp"}\NormalTok{,}\StringTok{"store_trans"}\NormalTok{,}\StringTok{"online_trans"}\NormalTok{ ))}
 \CommentTok{# use scatterplotMatrix() function from car package}
@@ -2809,6 +2842,8 @@ variables in \texttt{sim.dat}:
 \KeywordTok{scatterplotMatrix}\NormalTok{(sdat,}\DataTypeTok{diagonal=}\StringTok{"boxplot"}\NormalTok{,}\DataTypeTok{smoother=}\OtherTok{FALSE}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
+
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-14-1.pdf}
 
 It is also easy to observe the pair relationship from the plot.
 \texttt{age} is negatively correlated with \texttt{online\_trans} but
@@ -2839,13 +2874,17 @@ possible outliers. Let's apply it to \texttt{income}:
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# calculate median of the absolute dispersion for income}
-\NormalTok{ymad<-}\KeywordTok{mad}\NormalTok{(}\KeywordTok{na.omit}\NormalTok{(sdat}\OperatorTok{$}\NormalTok{income))}
+\NormalTok{ymad <-}\StringTok{ }\KeywordTok{mad}\NormalTok{(}\KeywordTok{na.omit}\NormalTok{(sdat}\OperatorTok{$}\NormalTok{income))}
 \CommentTok{# calculate z-score}
-\NormalTok{zs<-(sdat}\OperatorTok{$}\NormalTok{income}\OperatorTok{-}\KeywordTok{mean}\NormalTok{(}\KeywordTok{na.omit}\NormalTok{(sdat}\OperatorTok{$}\NormalTok{income)))}\OperatorTok{/}\NormalTok{ymad}
+\NormalTok{zs <-}\StringTok{ }\NormalTok{(sdat}\OperatorTok{$}\NormalTok{income }\OperatorTok{-}\StringTok{ }\KeywordTok{mean}\NormalTok{(}\KeywordTok{na.omit}\NormalTok{(sdat}\OperatorTok{$}\NormalTok{income)))}\OperatorTok{/}\NormalTok{ymad}
 \CommentTok{# count the number of outliers}
-\KeywordTok{sum}\NormalTok{(}\KeywordTok{na.omit}\NormalTok{(zs}\OperatorTok{>}\FloatTok{3.5}\NormalTok{))}
+\KeywordTok{sum}\NormalTok{(}\KeywordTok{na.omit}\NormalTok{(zs }\OperatorTok{>}\StringTok{ }\FloatTok{3.5}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+## [1] 59
+\end{verbatim}
 
 According to modified Z-score, variable income has 59 outliers. Refer to
 \citep{mad1} for other ways of detecting outliers.
@@ -2885,19 +2924,19 @@ transformation. Take \texttt{income} and \texttt{age} as an example:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{# sst, fig.cap='Spatial sign transformation', out.width='80%', fig.asp=.75, }
-\CommentTok{# fig.align='center'\}}
 \CommentTok{# KNN imputation}
-\NormalTok{sdat<-sim.dat[,}\KeywordTok{c}\NormalTok{(}\StringTok{"income"}\NormalTok{,}\StringTok{"age"}\NormalTok{)]}
-\NormalTok{imp<-}\KeywordTok{preProcess}\NormalTok{(sdat,}\DataTypeTok{method=}\KeywordTok{c}\NormalTok{(}\StringTok{"knnImpute"}\NormalTok{),}\DataTypeTok{k=}\DecValTok{5}\NormalTok{)}
-\NormalTok{sdat<-}\KeywordTok{predict}\NormalTok{(imp,sdat)}
+\NormalTok{sdat <-}\StringTok{ }\NormalTok{sim.dat[, }\KeywordTok{c}\NormalTok{(}\StringTok{"income"}\NormalTok{, }\StringTok{"age"}\NormalTok{)]}
+\NormalTok{imp <-}\StringTok{ }\KeywordTok{preProcess}\NormalTok{(sdat, }\DataTypeTok{method =} \KeywordTok{c}\NormalTok{(}\StringTok{"knnImpute"}\NormalTok{), }\DataTypeTok{k =} \DecValTok{5}\NormalTok{)}
+\NormalTok{sdat <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(imp, sdat)}
 \NormalTok{transformed <-}\StringTok{ }\KeywordTok{spatialSign}\NormalTok{(sdat)}
 \NormalTok{transformed <-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(transformed)}
-\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow=}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{),}\DataTypeTok{oma=}\KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{))}
-\KeywordTok{plot}\NormalTok{(income }\OperatorTok{~}\StringTok{ }\NormalTok{age,}\DataTypeTok{data =}\NormalTok{ sdat,}\DataTypeTok{col=}\StringTok{"blue"}\NormalTok{,}\DataTypeTok{main=}\StringTok{"Before"}\NormalTok{)}
-\KeywordTok{plot}\NormalTok{(income }\OperatorTok{~}\StringTok{ }\NormalTok{age,}\DataTypeTok{data =}\NormalTok{ transformed,}\DataTypeTok{col=}\StringTok{"blue"}\NormalTok{,}\DataTypeTok{main=}\StringTok{"After"}\NormalTok{)}
+\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{), }\DataTypeTok{oma =} \KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\KeywordTok{plot}\NormalTok{(income }\OperatorTok{~}\StringTok{ }\NormalTok{age, }\DataTypeTok{data =}\NormalTok{ sdat, }\DataTypeTok{col =} \StringTok{"blue"}\NormalTok{, }\DataTypeTok{main =} \StringTok{"Before"}\NormalTok{)}
+\KeywordTok{plot}\NormalTok{(income }\OperatorTok{~}\StringTok{ }\NormalTok{age, }\DataTypeTok{data =}\NormalTok{ transformed, }\DataTypeTok{col =} \StringTok{"blue"}\NormalTok{, }\DataTypeTok{main =} \StringTok{"After"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
+
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-16-1.pdf}
 
 Some readers may have found that the above code does not seem to
 standardize the data before transformation. Recall the introduction of
@@ -2916,20 +2955,21 @@ way that reveals clusters of highly correlated ones.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{# corp, fig.cap='Correlation Matrix', out.width='80%', fig.asp=.75, }
-\CommentTok{# fig.align='center'\}}
 \CommentTok{# select non-survey numerical variables}
-\NormalTok{sdat<-}\KeywordTok{subset}\NormalTok{(sim.dat,}\DataTypeTok{select=}\KeywordTok{c}\NormalTok{(}\StringTok{"age"}\NormalTok{,}\StringTok{"income"}\NormalTok{,}\StringTok{"store_exp"}\NormalTok{,}\StringTok{"online_exp"}\NormalTok{,}\StringTok{"store_trans"}\NormalTok{,}\StringTok{"online_trans"}\NormalTok{ ))}
+\NormalTok{sdat <-}\StringTok{ }\KeywordTok{subset}\NormalTok{(sim.dat, }\DataTypeTok{select =} \KeywordTok{c}\NormalTok{(}\StringTok{"age"}\NormalTok{, }\StringTok{"income"}\NormalTok{, }\StringTok{"store_exp"}\NormalTok{, }\StringTok{"online_exp"}\NormalTok{, }
+    \StringTok{"store_trans"}\NormalTok{, }\StringTok{"online_trans"}\NormalTok{))}
 \CommentTok{# use bagging imputation here}
-\NormalTok{imp<-}\KeywordTok{preProcess}\NormalTok{(sdat,}\DataTypeTok{method=}\StringTok{"bagImpute"}\NormalTok{)}
-\NormalTok{sdat<-}\KeywordTok{predict}\NormalTok{(imp,sdat)}
+\NormalTok{imp <-}\StringTok{ }\KeywordTok{preProcess}\NormalTok{(sdat, }\DataTypeTok{method =} \StringTok{"bagImpute"}\NormalTok{)}
+\NormalTok{sdat <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(imp, sdat)}
 \CommentTok{# get the correlation matrix}
-\NormalTok{correlation<-}\KeywordTok{cor}\NormalTok{(sdat)}
-\CommentTok{# plot }
-\KeywordTok{par}\NormalTok{(}\DataTypeTok{oma=}\KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{))}
-\KeywordTok{corrplot.mixed}\NormalTok{(correlation,}\DataTypeTok{order=}\StringTok{"hclust"}\NormalTok{,}\DataTypeTok{tl.pos=}\StringTok{"lt"}\NormalTok{,}\DataTypeTok{upper=}\StringTok{"ellipse"}\NormalTok{)}
+\NormalTok{correlation <-}\StringTok{ }\KeywordTok{cor}\NormalTok{(sdat)}
+\CommentTok{# plot}
+\KeywordTok{par}\NormalTok{(}\DataTypeTok{oma =} \KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\KeywordTok{corrplot.mixed}\NormalTok{(correlation, }\DataTypeTok{order =} \StringTok{"hclust"}\NormalTok{, }\DataTypeTok{tl.pos =} \StringTok{"lt"}\NormalTok{, }\DataTypeTok{upper =} \StringTok{"ellipse"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
+
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-17-1.pdf}
 
 The closer the correlation is to 0, the lighter the color is and the
 closer the shape is to a circle. The elliptical means the correlation is
@@ -2938,11 +2978,12 @@ greater the correlation, the narrower the ellipse. Blue represents a
 positive correlation; red represents a negative correlation. The
 direction of the ellipse also changes with the correlation. The
 correlation coefficient is shown in the lower triangle of the matrix.
+
 The variables relationship from previous scatter matrix are clear here:
 the negative correlation between age and online shopping, the positive
 correlation between income and amount of purchasing. Some correlation is
 very strong ( such as the correlation between \texttt{online\_trans}
-and\texttt{age} is -0.85) which means the two variables contain
+and\texttt{age} is -0.7414) which means the two variables contain
 duplicate information.
 
 Section 3.5 of ``Applied Predictive Modeling'' \citep{APM} presents a
@@ -2975,25 +3016,29 @@ apply the above algorithm.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{(highCorr<-}\KeywordTok{findCorrelation}\NormalTok{(}\KeywordTok{cor}\NormalTok{(sdat),}\DataTypeTok{cutoff=}\NormalTok{.}\DecValTok{75}\NormalTok{))}
+\NormalTok{(highCorr <-}\StringTok{ }\KeywordTok{findCorrelation}\NormalTok{(}\KeywordTok{cor}\NormalTok{(sdat), }\DataTypeTok{cutoff =} \FloatTok{0.7}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
+\begin{verbatim}
+## [1] 2 6
+\end{verbatim}
+
 It returns the index of columns need to be deleted. It tells us that we
 need to remove the first column to make sure the correlations are all
-below 0.75.
+below 0.7.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# delete highly correlated columns}
-\NormalTok{sdat<-sdat[}\OperatorTok{-}\NormalTok{highCorr]}
+\NormalTok{sdat <-}\StringTok{ }\NormalTok{sdat[}\OperatorTok{-}\NormalTok{highCorr]}
 \CommentTok{# check the new correlation matrix}
-\KeywordTok{cor}\NormalTok{(sdat)}
+\NormalTok{(}\KeywordTok{cor}\NormalTok{(sdat))}
 \end{Highlighting}
 \end{Shaded}
 
 The absolute value of the elements in the correlation matrix after
-removal are all below 0.75. How strong does a correlation have to get,
+removal are all below 0.7. How strong does a correlation have to get,
 before you should start worrying about multicollinearity? There is no
 easy answer to that question. You can treat the threshold as a tuning
 parameter and pick one that gives you best prediction accuracy.
@@ -3027,12 +3072,11 @@ variables to the origional data \texttt{sim.dat}:
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# make a copy}
-\NormalTok{zero_demo<-sim.dat}
-\CommentTok{# add two sparse variable}
-\CommentTok{# zero1 only has one unique value}
-\CommentTok{# zero2 is a vector with the first element 1 and the rest are 0s}
-\NormalTok{zero_demo}\OperatorTok{$}\NormalTok{zero1<-}\KeywordTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{,}\KeywordTok{nrow}\NormalTok{(zero_demo))}
-\NormalTok{zero_demo}\OperatorTok{$}\NormalTok{zero2<-}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{,}\KeywordTok{nrow}\NormalTok{(zero_demo)}\OperatorTok{-}\DecValTok{1}\NormalTok{))}
+\NormalTok{zero_demo <-}\StringTok{ }\NormalTok{sim.dat}
+\CommentTok{# add two sparse variable zero1 only has one unique value zero2 is a}
+\CommentTok{# vector with the first element 1 and the rest are 0s}
+\NormalTok{zero_demo}\OperatorTok{$}\NormalTok{zero1 <-}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{1}\NormalTok{, }\KeywordTok{nrow}\NormalTok{(zero_demo))}
+\NormalTok{zero_demo}\OperatorTok{$}\NormalTok{zero2 <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\KeywordTok{rep}\NormalTok{(}\DecValTok{0}\NormalTok{, }\KeywordTok{nrow}\NormalTok{(zero_demo) }\OperatorTok{-}\StringTok{ }\DecValTok{1}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -3044,6 +3088,10 @@ to remove:
 \KeywordTok{nearZeroVar}\NormalTok{(zero_demo,}\DataTypeTok{freqCut =} \DecValTok{95}\OperatorTok{/}\DecValTok{5}\NormalTok{, }\DataTypeTok{uniqueCut =} \DecValTok{10}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+## [1] 20 21
+\end{verbatim}
 
 As expected, it returns the two columns we generated. You can go ahead
 to remove them. Note the two arguments in the function
@@ -3077,10 +3125,20 @@ works on one variable at a time.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{dumVar<-nnet}\OperatorTok{::}\KeywordTok{class.ind}\NormalTok{(sim.dat}\OperatorTok{$}\NormalTok{gender)}
+\NormalTok{dumVar <-}\StringTok{ }\NormalTok{nnet}\OperatorTok{::}\KeywordTok{class.ind}\NormalTok{(sim.dat}\OperatorTok{$}\NormalTok{gender)}
 \KeywordTok{head}\NormalTok{(dumVar)}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+##      Female Male
+## [1,]      1    0
+## [2,]      1    0
+## [3,]      0    1
+## [4,]      0    1
+## [5,]      0    1
+## [6,]      0    1
+\end{verbatim}
 
 Since it is redundant to keep both, we need to remove one of them when
 modeling. Another more powerful function is \texttt{dummyVars()} from
@@ -3088,13 +3146,23 @@ modeling. Another more powerful function is \texttt{dummyVars()} from
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{dumMod<-}\KeywordTok{dummyVars}\NormalTok{(}\OperatorTok{~}\NormalTok{gender}\OperatorTok{+}\NormalTok{house}\OperatorTok{+}\NormalTok{income,}
-                  \DataTypeTok{data=}\NormalTok{sim.dat,}
-                  \CommentTok{# use "origional variable name + level" as new name}
-                  \DataTypeTok{levelsOnly=}\NormalTok{F)}
-\KeywordTok{head}\NormalTok{(}\KeywordTok{predict}\NormalTok{(dumMod,sim.dat))}
+\CommentTok{# use "origional variable name + level" as new name}
+\NormalTok{dumMod <-}\StringTok{ }\KeywordTok{dummyVars}\NormalTok{(}\OperatorTok{~}\NormalTok{gender }\OperatorTok{+}\StringTok{ }\NormalTok{house }\OperatorTok{+}\StringTok{ }\NormalTok{income, }
+                    \DataTypeTok{data =}\NormalTok{ sim.dat, }
+                    \DataTypeTok{levelsOnly =}\NormalTok{ F)}
+\KeywordTok{head}\NormalTok{(}\KeywordTok{predict}\NormalTok{(dumMod, sim.dat))}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+##   gender.Female gender.Male house.No house.Yes income
+## 1             1           0        0         1 120963
+## 2             1           0        0         1 122008
+## 3             0           1        0         1 114202
+## 4             0           1        0         1 113616
+## 5             0           1        0         1 124253
+## 6             0           1        0         1 107661
+\end{verbatim}
 
 \texttt{dummyVars()} can also use formula format. The variable on the
 right-hand side can be both categorical and numeric. For a numerical
@@ -3105,41 +3173,34 @@ interaction term:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{dumMod<-}\KeywordTok{dummyVars}\NormalTok{(}\OperatorTok{~}\NormalTok{gender}\OperatorTok{+}\NormalTok{house}\OperatorTok{+}\NormalTok{income}\OperatorTok{+}\NormalTok{income}\OperatorTok{:}\NormalTok{gender,}
-                  \DataTypeTok{data=}\NormalTok{sim.dat,}
-                  \DataTypeTok{levelsOnly=}\NormalTok{F)}
-\KeywordTok{head}\NormalTok{(}\KeywordTok{predict}\NormalTok{(dumMod,sim.dat))}
+\NormalTok{dumMod <-}\StringTok{ }\KeywordTok{dummyVars}\NormalTok{(}\OperatorTok{~}\NormalTok{gender }\OperatorTok{+}\StringTok{ }\NormalTok{house }\OperatorTok{+}\StringTok{ }\NormalTok{income }\OperatorTok{+}\StringTok{ }\NormalTok{income}\OperatorTok{:}\NormalTok{gender, }
+                    \DataTypeTok{data =}\NormalTok{ sim.dat, }
+                    \DataTypeTok{levelsOnly =}\NormalTok{ F)}
+\KeywordTok{head}\NormalTok{(}\KeywordTok{predict}\NormalTok{(dumMod, sim.dat))}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+##   gender.Female gender.Male house.No house.Yes income
+## 1             1           0        0         1 120963
+## 2             1           0        0         1 122008
+## 3             0           1        0         1 114202
+## 4             0           1        0         1 113616
+## 5             0           1        0         1 124253
+## 6             0           1        0         1 107661
+##   gender.Female:income gender.Male:income
+## 1               120963                  0
+## 2               122008                  0
+## 3                    0             114202
+## 4                    0             113616
+## 5                    0             124253
+## 6                    0             107661
+\end{verbatim}
 
 If you think the impact income levels on purchasing behavior is
 different for male and female, then you may add the interaction term
 between \texttt{income} and \texttt{gender}. You can do this by adding
 \texttt{income:\ gender} in the formula.
-
-\section{Python Computing}\label{python-computing}
-
-\textbf{Environmental Setup}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\ImportTok{from}\NormalTok{ IPython.core.interactiveshell }\ImportTok{import}\NormalTok{ InteractiveShell}
-\NormalTok{InteractiveShell.ast_node_interactivity }\OperatorTok{=} \StringTok{"all"}
-
-\ImportTok{import}\NormalTok{ numpy }\ImportTok{as}\NormalTok{ np}
-\ImportTok{import}\NormalTok{ scipy }\ImportTok{as}\NormalTok{ sp}
-\ImportTok{import}\NormalTok{ pandas }\ImportTok{as}\NormalTok{ pd}
-\ImportTok{import}\NormalTok{ math}
-
-\ImportTok{from}\NormalTok{ sklearn.preprocessing }\ImportTok{import}\NormalTok{ Imputer}
-\ImportTok{from}\NormalTok{ sklearn.preprocessing }\ImportTok{import}\NormalTok{ StandardScaler}
-
-\ImportTok{from}\NormalTok{ pandas.plotting }\ImportTok{import}\NormalTok{ scatter_matrix}
-\ImportTok{import}\NormalTok{ matplotlib.pyplot }\ImportTok{as}\NormalTok{ plt}
-\end{Highlighting}
-\end{Shaded}
-
-\subsection{Data Cleaning}\label{data-cleaning-1}
 
 \chapter{Data Wrangling}\label{data-wrangling}
 
@@ -3149,6 +3210,22 @@ critical to explore the data with descriptive statistics (mean, standard
 deviation, etc.) and data visualization before analysis. Transform data
 so that the data structure is in line with the requirements of the
 model. You also need to summarize the results after analysis.
+
+Load the R packages first:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# install packages from CRAN}
+\NormalTok{p_needed <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{'readr'}\NormalTok{,}\StringTok{'dplyr'}\NormalTok{,}\StringTok{'data.table'}\NormalTok{,}\StringTok{'reshape2'}\NormalTok{,}\StringTok{'tidyr'}\NormalTok{)}
+\NormalTok{packages <-}\StringTok{ }\KeywordTok{rownames}\NormalTok{(}\KeywordTok{installed.packages}\NormalTok{())}
+\NormalTok{p_to_install <-}\StringTok{ }\NormalTok{p_needed[}\OperatorTok{!}\NormalTok{(p_needed }\OperatorTok{%in%}\StringTok{ }\NormalTok{packages)]}
+\ControlFlowTok{if}\NormalTok{ (}\KeywordTok{length}\NormalTok{(p_to_install) }\OperatorTok{>}\StringTok{ }\DecValTok{0}\NormalTok{) \{}
+    \KeywordTok{install.packages}\NormalTok{(p_to_install)}
+\NormalTok{\}}
+
+\KeywordTok{lapply}\NormalTok{(p_needed, require, }\DataTypeTok{character.only =} \OtherTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
 
 \section{Read and write data}\label{read-and-write-data}
 
@@ -3171,15 +3248,26 @@ following respects:
   It doesn't change the column names. The names can start with a number
   and ``\texttt{.}'' will not be substituted to ``\texttt{\_}''. For
   example:
+\end{enumerate}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{library}\NormalTok{(readr)}
 \KeywordTok{read_csv}\NormalTok{(}\StringTok{"2015,2016,2017}
 \StringTok{1,2,3}
 \StringTok{4,5,6"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 2 x 3
+##   `2015` `2016` `2017`
+##    <int>  <int>  <int>
+## 1      1      2      3
+## 2      4      5      6
+\end{verbatim}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
 \item
   \texttt{readr} functions do not convert strings to factors by default,
   are able to parse dates and times and can automatically determine the
@@ -3190,7 +3278,11 @@ following respects:
   knowing how long you have to wait.
 \end{enumerate}
 
-\includegraphics{images/prograssbar.png}~
+\begin{figure}
+\centering
+\includegraphics{images/prograssbar.png}
+\caption{}
+\end{figure}
 
 The major functions of readr is to turn flat files into data frames:
 
@@ -3225,11 +3317,24 @@ your data:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{library}\NormalTok{(readr)}
-\NormalTok{sim.dat <-}\StringTok{ }\KeywordTok{read_csv}\NormalTok{(}\StringTok{"https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv "}\NormalTok{)}
+\NormalTok{sim.dat <-}\StringTok{ }\KeywordTok{read_csv}\NormalTok{(}\StringTok{"http://bit.ly/2P5gTw4"}\NormalTok{)}
 \KeywordTok{head}\NormalTok{(sim.dat)}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+# A tibble: 6 x 19
+    age gender income house store_exp online_exp store_trans online_trans    Q1
+  <int> <chr>   <dbl> <chr>     <dbl>      <dbl>       <int>        <int> <int>
+1    57 Female 1.21e5 Yes        529.       304.           2            2     4
+2    63 Female 1.22e5 Yes        478.       110.           4            2     4
+3    59 Male   1.14e5 Yes        491.       279.           7            2     5
+4    60 Male   1.14e5 Yes        348.       142.          10            2     5
+5    51 Male   1.24e5 Yes        380.       112.           4            4     4
+6    59 Male   1.08e5 Yes        338.       196.           4            5     4
+# ... with 10 more variables: Q2 <int>, Q3 <int>, Q4 <int>, Q5 <int>, Q6 <int>,
+#   Q7 <int>, Q8 <int>, Q9 <int>, Q10 <int>, segment <chr>
+\end{verbatim}
 
 The function reads the file to R as a \texttt{tibble}. You can consider
 \texttt{tibble} as next iteration of the data frame. They are different
@@ -3258,18 +3363,26 @@ check the results:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{dat=}\KeywordTok{read_csv}\NormalTok{(}\StringTok{"2015,2016,2017}
+\NormalTok{dat <-}\StringTok{ }\KeywordTok{read_csv}\NormalTok{(}\StringTok{"2015,2016,2017}
 \StringTok{100,200,300}
 \StringTok{canola,soybean,corn"}\NormalTok{)}
 \KeywordTok{print}\NormalTok{(dat)}
 \end{Highlighting}
 \end{Shaded}
 
+\begin{verbatim}
+## # A tibble: 2 x 3
+##   `2015` `2016`  `2017`
+##   <chr>  <chr>   <chr> 
+## 1 100    200     300   
+## 2 canola soybean corn
+\end{verbatim}
+
 You can also add comments on the top and tell R to skip those lines:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{dat=}\KeywordTok{read_csv}\NormalTok{(}\StringTok{"# I will never let you know that}
+\NormalTok{dat <-}\StringTok{ }\KeywordTok{read_csv}\NormalTok{(}\StringTok{"# I will never let you know that}
 \StringTok{          # my favorite food is carrot}
 \StringTok{          Date,Food,Mood}
 \StringTok{          Monday,carrot,happy}
@@ -3278,10 +3391,24 @@ You can also add comments on the top and tell R to skip those lines:
 \StringTok{          Thursday,carrot,happy}
 \StringTok{          Friday,carrot,happy}
 \StringTok{          Saturday,carrot,extremely happy}
-\StringTok{          Sunday,carrot,extremely happy"}\NormalTok{, }\DataTypeTok{skip =} \DecValTok{2}\NormalTok{)}
+\StringTok{          Sunday,carrot,extremely happy"}\NormalTok{, }
+          \DataTypeTok{skip =} \DecValTok{2}\NormalTok{)}
 \KeywordTok{print}\NormalTok{(dat)}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 7 x 3
+##   Date      Food   Mood           
+##   <chr>     <chr>  <chr>          
+## 1 Monday    carrot happy          
+## 2 Tuesday   carrot happy          
+## 3 Wednesday carrot happy          
+## 4 Thursday  carrot happy          
+## 5 Friday    carrot happy          
+## 6 Saturday  carrot extremely happy
+## 7 Sunday    carrot extremely happy
+\end{verbatim}
 
 If you don't have column names, set \texttt{col\_names\ =\ FALSE} then R
 will assign names ``\texttt{X1}'',``\texttt{X2}''\ldots{} to the
@@ -3289,11 +3416,19 @@ columns:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{dat=}\KeywordTok{read_csv}\NormalTok{(}\StringTok{"Saturday,carrot,extremely happy}
-\StringTok{          Sunday,carrot,extremely happy"}\NormalTok{, }\DataTypeTok{col_names=}\OtherTok{FALSE}\NormalTok{)}
+\NormalTok{dat <-}\StringTok{ }\KeywordTok{read_csv}\NormalTok{(}\StringTok{"Saturday,carrot,extremely happy}
+\StringTok{          Sunday,carrot,extremely happy"}\NormalTok{, }\DataTypeTok{col_names =} \OtherTok{FALSE}\NormalTok{)}
 \KeywordTok{print}\NormalTok{(dat)}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 2 x 3
+##   X1       X2     X3             
+##   <chr>    <chr>  <chr>          
+## 1 Saturday carrot extremely happy
+## 2 Sunday   carrot extremely happy
+\end{verbatim}
 
 You can also pass \texttt{col\_names} a character vector which will be
 used as the column names. Try to replace \texttt{col\_names=FALSE} with
@@ -3304,10 +3439,27 @@ separated files:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{dat=}\KeywordTok{read_csv2}\NormalTok{(}\StringTok{"Saturday; carrot; extremely happy }\CharTok{\textbackslash{}n}\StringTok{ Sunday; carrot; extremely happy"}\NormalTok{, }\DataTypeTok{col_names=}\OtherTok{FALSE}\NormalTok{)}
+\NormalTok{dat <-}\StringTok{ }\KeywordTok{read_csv2}\NormalTok{(}\StringTok{"Saturday; carrot; extremely happy }\CharTok{\textbackslash{}n}\StringTok{ Sunday; carrot; extremely happy"}\NormalTok{, }\DataTypeTok{col_names =} \OtherTok{FALSE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Using ',' as decimal and '.' as grouping mark. Use read_delim() for more control.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \KeywordTok{print}\NormalTok{(dat)}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 2 x 3
+##   X1       X2     X3             
+##   <chr>    <chr>  <chr>          
+## 1 Saturday carrot extremely happy
+## 2 Sunday   carrot extremely happy
+\end{verbatim}
 
 Here ``\texttt{\textbackslash{}n}'' is a convenient shortcut for adding
 a new line.
@@ -3316,20 +3468,37 @@ You can use \texttt{read\_tsv()} to read tab delimited files：
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{dat=}\KeywordTok{read_tsv}\NormalTok{(}\StringTok{"every}\CharTok{\textbackslash{}t}\StringTok{man}\CharTok{\textbackslash{}t}\StringTok{is}\CharTok{\textbackslash{}t}\StringTok{a}\CharTok{\textbackslash{}t}\StringTok{poet}\CharTok{\textbackslash{}t}\StringTok{when}\CharTok{\textbackslash{}t}\StringTok{he}\CharTok{\textbackslash{}t}\StringTok{is}\CharTok{\textbackslash{}t}\StringTok{in}\CharTok{\textbackslash{}t}\StringTok{love}\CharTok{\textbackslash{}n}\StringTok{"}\NormalTok{, }\DataTypeTok{col_names =} \OtherTok{FALSE}\NormalTok{)}
+\NormalTok{dat <-}\StringTok{ }\KeywordTok{read_tsv}\NormalTok{(}\StringTok{"every}\CharTok{\textbackslash{}t}\StringTok{man}\CharTok{\textbackslash{}t}\StringTok{is}\CharTok{\textbackslash{}t}\StringTok{a}\CharTok{\textbackslash{}t}\StringTok{poet}\CharTok{\textbackslash{}t}\StringTok{when}\CharTok{\textbackslash{}t}\StringTok{he}\CharTok{\textbackslash{}t}\StringTok{is}\CharTok{\textbackslash{}t}\StringTok{in}\CharTok{\textbackslash{}t}\StringTok{love}\CharTok{\textbackslash{}n}\StringTok{"}\NormalTok{, }
+    \DataTypeTok{col_names =} \OtherTok{FALSE}\NormalTok{)}
 \KeywordTok{print}\NormalTok{(dat)}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 1 x 10
+##   X1    X2    X3    X4    X5    X6    X7    X8   
+##   <chr> <chr> <chr> <chr> <chr> <chr> <chr> <chr>
+## 1 every man   is    a     poet  when  he    is   
+## # ... with 2 more variables: X9 <chr>, X10 <chr>
+\end{verbatim}
 
 Or more generally, you can use \texttt{read\_delim()} and assign
 separating character：
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{dat=}\KeywordTok{read_delim}\NormalTok{(}\StringTok{"THE|UNBEARABLE|RANDOMNESS|OF|LIFE}\CharTok{\textbackslash{}n}\StringTok{"}\NormalTok{, }\DataTypeTok{delim =} \StringTok{"|"}\NormalTok{, }\DataTypeTok{col_names =} \OtherTok{FALSE}\NormalTok{)}
+\NormalTok{dat <-}\StringTok{ }\KeywordTok{read_delim}\NormalTok{(}\StringTok{"THE|UNBEARABLE|RANDOMNESS|OF|LIFE}\CharTok{\textbackslash{}n}\StringTok{"}\NormalTok{, }
+    \DataTypeTok{delim =} \StringTok{"|"}\NormalTok{, }\DataTypeTok{col_names =} \OtherTok{FALSE}\NormalTok{)}
 \KeywordTok{print}\NormalTok{(dat)}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 1 x 5
+##   X1    X2         X3         X4    X5   
+##   <chr> <chr>      <chr>      <chr> <chr>
+## 1 THE   UNBEARABLE RANDOMNESS OF    LIFE
+\end{verbatim}
 
 Another situation you will often run into is the missing value. In
 marketing survey, people like to use ``99'' to represent missing. You
@@ -3338,11 +3507,19 @@ read the data:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{dat=}\KeywordTok{read_csv}\NormalTok{(}\StringTok{"Q1,Q2,Q3}
-\StringTok{               5, 4,99"}\NormalTok{,}\DataTypeTok{na=}\StringTok{"99"}\NormalTok{)}
+\NormalTok{dat <-}\StringTok{ }\KeywordTok{read_csv}\NormalTok{(}\StringTok{"Q1,Q2,Q3}
+\StringTok{               5, 4,99"}\NormalTok{, }
+               \DataTypeTok{na =} \StringTok{"99"}\NormalTok{)}
 \KeywordTok{print}\NormalTok{(dat)}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 1 x 3
+##      Q1    Q2 Q3   
+##   <int> <int> <chr>
+## 1     5     4 <NA>
+\end{verbatim}
 
 For writing data back to disk, you can use \texttt{write\_csv()} and
 \texttt{write\_tsv()}. The following two characters of the two functions
@@ -3421,16 +3598,45 @@ second one indicates column. It uses a comma to separate them.
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# read data}
-\NormalTok{sim.dat<-readr}\OperatorTok{::}\KeywordTok{read_csv}\NormalTok{(}\StringTok{"https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv"}\NormalTok{)}
+\NormalTok{sim.dat <-}\StringTok{ }\NormalTok{readr}\OperatorTok{::}\KeywordTok{read_csv}\NormalTok{(}\StringTok{"http://bit.ly/2P5gTw4"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Parsed with column specification:
+## cols(
+##   age = col_integer(),
+##   gender = col_character(),
+##   income = col_double(),
+##   house = col_character(),
+##   store_exp = col_double(),
+##   online_exp = col_double(),
+##   store_trans = col_integer(),
+##   online_trans = col_integer(),
+##   Q1 = col_integer(),
+##   Q2 = col_integer(),
+##   Q3 = col_integer(),
+##   Q4 = col_integer(),
+##   Q5 = col_integer(),
+##   Q6 = col_integer(),
+##   Q7 = col_integer(),
+##   Q8 = col_integer(),
+##   Q9 = col_integer(),
+##   Q10 = col_integer(),
+##   segment = col_character()
+## )
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \CommentTok{# subset the first two rows}
-\NormalTok{sim.dat[}\DecValTok{1}\OperatorTok{:}\DecValTok{2}\NormalTok{,]}
+\NormalTok{sim.dat[}\DecValTok{1}\OperatorTok{:}\DecValTok{2}\NormalTok{, ]}
 \CommentTok{# subset the first two rows and column 3 and 5}
-\NormalTok{sim.dat[}\DecValTok{1}\OperatorTok{:}\DecValTok{2}\NormalTok{,}\KeywordTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{,}\DecValTok{5}\NormalTok{)]}
+\NormalTok{sim.dat[}\DecValTok{1}\OperatorTok{:}\DecValTok{2}\NormalTok{, }\KeywordTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{, }\DecValTok{5}\NormalTok{)]}
 \CommentTok{# get all rows with age>70}
-\NormalTok{sim.dat[sim.dat}\OperatorTok{$}\NormalTok{age}\OperatorTok{>}\DecValTok{70}\NormalTok{,]}
-\CommentTok{# get rows with age> 60 and gender is Male}
-\CommentTok{# select column 3 and 4}
-\NormalTok{sim.dat[sim.dat}\OperatorTok{$}\NormalTok{age}\OperatorTok{>}\DecValTok{68} \OperatorTok{&}\StringTok{ }\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{gender }\OperatorTok{==}\StringTok{ "Male"}\NormalTok{, }\DecValTok{3}\OperatorTok{:}\DecValTok{4}\NormalTok{]}
+\NormalTok{sim.dat[sim.dat}\OperatorTok{$}\NormalTok{age }\OperatorTok{>}\StringTok{ }\DecValTok{70}\NormalTok{, ]}
+\CommentTok{# get rows with age> 60 and gender is Male select column 3 and 4}
+\NormalTok{sim.dat[sim.dat}\OperatorTok{$}\NormalTok{age }\OperatorTok{>}\StringTok{ }\DecValTok{68} \OperatorTok{&}\StringTok{ }\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{gender }\OperatorTok{==}\StringTok{ "Male"}\NormalTok{, }\DecValTok{3}\OperatorTok{:}\DecValTok{4}\NormalTok{]}
 \end{Highlighting}
 \end{Shaded}
 
@@ -3440,14 +3646,13 @@ calculate an average number of online transactions for male and female:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{tapply}\NormalTok{(sim.dat}\OperatorTok{$}\NormalTok{online_trans, sim.dat}\OperatorTok{$}\NormalTok{gender, mean )}
+\KeywordTok{tapply}\NormalTok{(sim.dat}\OperatorTok{$}\NormalTok{online_trans, sim.dat}\OperatorTok{$}\NormalTok{gender, mean)}
 
 \KeywordTok{aggregate}\NormalTok{(online_trans }\OperatorTok{~}\StringTok{ }\NormalTok{gender, }\DataTypeTok{data =}\NormalTok{ sim.dat, mean)}
 
-\KeywordTok{library}\NormalTok{(dplyr)}
-\NormalTok{sim.dat}\OperatorTok{%>%}\StringTok{ }
-\StringTok{  }\KeywordTok{group_by}\NormalTok{(gender)}\OperatorTok{%>%}
-\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{Avg_online_trans=}\KeywordTok{mean}\NormalTok{(online_trans))}
+\NormalTok{sim.dat }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(gender) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{Avg_online_trans =} \KeywordTok{mean}\NormalTok{(online_trans))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -3483,22 +3688,20 @@ programming time tremendously, then this package is for you.
 Other than extending the function of \texttt{{[}{]}},
 \texttt{data.table} has the following advantages:
 
-Offers fast import, subset, grouping, update, and joins for large data
-files It is easy to turn data frame to data table Can behave just like a
-data frame
+\begin{itemize}
+\tightlist
+\item
+  Offers fast import, subset, grouping, update, and joins for large data
+  files
+\item
+  It is easy to turn data frame to data table
+\item
+  Can behave just like a data frame
+\end{itemize}
 
 You need to install and load the package:
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{# If you haven't install it, use the code to instal}
-\CommentTok{# install.packages("data.table")}
-\CommentTok{# load packagw}
-\KeywordTok{library}\NormalTok{(data.table)}
-\end{Highlighting}
-\end{Shaded}
-
-Use \texttt{data.table()} to covert the existing data frame
+Use \texttt{data.table()} to convert the existing data frame
 \texttt{sim.dat} to data table:
 
 \begin{Shaded}
@@ -3508,6 +3711,10 @@ Use \texttt{data.table()} to covert the existing data frame
 \end{Highlighting}
 \end{Shaded}
 
+\begin{verbatim}
+## [1] "data.table" "data.frame"
+\end{verbatim}
+
 Calculate mean for counts of online transactions:
 
 \begin{Shaded}
@@ -3515,6 +3722,10 @@ Calculate mean for counts of online transactions:
 \NormalTok{dt[, }\KeywordTok{mean}\NormalTok{(online_trans)]}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+## [1] 13.55
+\end{verbatim}
 
 You can't do the same thing using data frame:
 
@@ -3539,6 +3750,12 @@ argument:
 \end{Highlighting}
 \end{Shaded}
 
+\begin{verbatim}
+##    gender    V1
+## 1: Female 15.38
+## 2:   Male 11.26
+\end{verbatim}
+
 You can group by more than one variables. For example, group by
 ``\texttt{gender}'' and ``\texttt{house}'':
 
@@ -3548,6 +3765,14 @@ You can group by more than one variables. For example, group by
 \end{Highlighting}
 \end{Shaded}
 
+\begin{verbatim}
+##    gender house     V1
+## 1: Female   Yes 11.312
+## 2:   Male   Yes  8.772
+## 3: Female    No 19.146
+## 4:   Male    No 16.486
+\end{verbatim}
+
 Assign column names for aggregated variables:
 
 \begin{Shaded}
@@ -3555,6 +3780,14 @@ Assign column names for aggregated variables:
 \NormalTok{dt[ , .(}\DataTypeTok{avg =} \KeywordTok{mean}\NormalTok{(online_trans)), by =}\StringTok{ }\NormalTok{.(gender, house)]}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+##    gender house    avg
+## 1: Female   Yes 11.312
+## 2:   Male   Yes  8.772
+## 3: Female    No 19.146
+## 4:   Male    No 16.486
+\end{verbatim}
 
 \texttt{data.table} can accomplish all operations that
 \texttt{aggregate()} and \texttt{tapply()}can do for data frame.
@@ -3638,10 +3871,42 @@ Now let's focus on operations in data table.
 \begin{Highlighting}[]
 \CommentTok{# select rows with age<20 and income > 80000}
 \NormalTok{dt[age }\OperatorTok{<}\StringTok{ }\DecValTok{20} \OperatorTok{&}\StringTok{ }\NormalTok{income }\OperatorTok{>}\StringTok{ }\DecValTok{80000}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    age gender income house store_exp online_exp
+## 1:  19 Female  83535    No     227.7       1491
+## 2:  18 Female  89416   Yes     209.5       1926
+## 3:  19 Female  92813    No     186.7       1042
+##    store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9
+## 1:           1           22  2  1  1  2  4  1  4  2  4
+## 2:           3           28  2  1  1  1  4  1  4  2  4
+## 3:           2           18  3  1  1  2  4  1  4  3  4
+##    Q10 segment
+## 1:   1   Style
+## 2:   1   Style
+## 3:   1   Style
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \CommentTok{# select the first two rows}
 \NormalTok{dt[}\DecValTok{1}\OperatorTok{:}\DecValTok{2}\NormalTok{]}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+##    age gender income house store_exp online_exp
+## 1:  57 Female 120963   Yes     529.1      303.5
+## 2:  63 Female 122008   Yes     478.0      109.5
+##    store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9
+## 1:           2            2  4  2  1  2  1  4  1  4  2
+## 2:           4            2  4  1  1  2  1  4  1  4  1
+##    Q10 segment
+## 1:   4   Price
+## 2:   4   Price
+\end{verbatim}
 
 \begin{itemize}
 \tightlist
@@ -3659,6 +3924,10 @@ Selecting columns in \texttt{data.table} don't need \texttt{\$}:
 \KeywordTok{head}\NormalTok{(ans)}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+## [1] 57 63 59 60 51 59
+\end{verbatim}
 
 To return \texttt{data.table} object, put column names in
 \texttt{list()}:
@@ -3689,6 +3958,12 @@ To select all columns from ``\texttt{age}'' to ``\texttt{income}'':
 \end{Highlighting}
 \end{Shaded}
 
+\begin{verbatim}
+##    age gender income
+## 1:  57 Female 120963
+## 2:  63 Female 122008
+\end{verbatim}
+
 Delete columns using \texttt{-} or \texttt{!}:
 
 \begin{Shaded}
@@ -3714,16 +3989,37 @@ In data table. \texttt{.N} means to count。
 \end{Highlighting}
 \end{Shaded}
 
+\begin{verbatim}
+## [1] 1000
+\end{verbatim}
+
 If you assign the group variable, then it will count by groups:
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# counts by gender}
 \NormalTok{dt[, .N, by=}\StringTok{ }\NormalTok{gender]  }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    gender   N
+## 1: Female 554
+## 2:   Male 446
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \CommentTok{# for those younger than 30, count by gender}
 \NormalTok{ dt[age }\OperatorTok{<}\StringTok{ }\DecValTok{30}\NormalTok{, .(}\DataTypeTok{count=}\NormalTok{.N), by=}\StringTok{ }\NormalTok{gender] }
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+##    gender count
+## 1: Female   292
+## 2:   Male    86
+\end{verbatim}
 
 Order table:
 
@@ -3733,6 +4029,16 @@ Order table:
 \KeywordTok{head}\NormalTok{(dt[}\KeywordTok{order}\NormalTok{(}\OperatorTok{-}\NormalTok{online_exp)],}\DecValTok{5}\NormalTok{) }
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+   age gender   income house store_exp online_exp store_trans ...
+1:  40 Female 217599.7    No  7023.684   9479.442          10
+2:  41 Female       NA   Yes  3786.740   8638.239          14
+3:  36   Male 228550.1   Yes  3279.621   8220.555           8
+4:  31 Female 159508.1   Yes  5177.081   8005.932          11
+5:  43 Female 190407.4   Yes  4694.922   7875.562           6
+...
+\end{verbatim}
 
 Since data table keep some characters of data frame, they share some
 operations:
@@ -3769,40 +4075,40 @@ an agriculture forum with 209670 rows and 6 columns:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{system.time}\NormalTok{(topic<-}\KeywordTok{read.csv}\NormalTok{(}\StringTok{"https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/topic.csv"}\NormalTok{))}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{  user  system elapsed }
-\NormalTok{  4.313   0.027   4.340}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\KeywordTok{system.time}\NormalTok{(topic<-readr}\OperatorTok{::}\KeywordTok{read_csv}\NormalTok{(}\StringTok{"https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/topic.csv"}\NormalTok{))}
+\KeywordTok{system.time}\NormalTok{(topic<-}\KeywordTok{read.csv}\NormalTok{(}\StringTok{"http://bit.ly/2zam5ny"}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{   user  system elapsed }
-\NormalTok{  0.267   0.008   0.274 }
+\NormalTok{  3.561   0.051   4.888 }
 \end{Highlighting}
 \end{Shaded}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{system.time}\NormalTok{(topic<-data.table}\OperatorTok{::}\KeywordTok{fread}\NormalTok{(}\StringTok{"https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/topic.csv"}\NormalTok{))}
+\KeywordTok{system.time}\NormalTok{(topic<-readr}\OperatorTok{::}\KeywordTok{read_csv}\NormalTok{(}\StringTok{"http://bit.ly/2zam5ny"}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{   user  system elapsed }
-\NormalTok{  0.217   0.005   0.221 }
+\NormalTok{  0.409   0.032   2.233 }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{system.time}\NormalTok{(topic<-data.table}\OperatorTok{::}\KeywordTok{fread}\NormalTok{(}\StringTok{"http://bit.ly/2zam5ny"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{   user  system elapsed }
+\NormalTok{  0.276   0.096   1.117 }
 \end{Highlighting}
 \end{Shaded}
 
@@ -3846,6 +4152,16 @@ For example you can compute row and column sums for a matrix:
 \NormalTok{x <-}\StringTok{ }\KeywordTok{cbind}\NormalTok{(}\DataTypeTok{x1 =}\DecValTok{1}\OperatorTok{:}\DecValTok{8}\NormalTok{, }\DataTypeTok{x2 =} \KeywordTok{c}\NormalTok{(}\DecValTok{4}\OperatorTok{:}\DecValTok{1}\NormalTok{, }\DecValTok{2}\OperatorTok{:}\DecValTok{5}\NormalTok{))}
 \KeywordTok{dimnames}\NormalTok{(x)[[}\DecValTok{1}\NormalTok{]] <-}\StringTok{ }\NormalTok{letters[}\DecValTok{1}\OperatorTok{:}\DecValTok{8}\NormalTok{]}
 \KeywordTok{apply}\NormalTok{(x, }\DecValTok{2}\NormalTok{, mean)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  x1  x2 
+## 4.5 3.0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \NormalTok{col.sums <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(x, }\DecValTok{2}\NormalTok{, sum)}
 \NormalTok{row.sums <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(x, }\DecValTok{1}\NormalTok{, sum)}
 \end{Highlighting}
@@ -3857,10 +4173,47 @@ You can also apply other functions:
 \begin{Highlighting}[]
 \NormalTok{ma <-}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{4}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{6}\OperatorTok{:}\DecValTok{8}\NormalTok{), }\DataTypeTok{nrow =} \DecValTok{2}\NormalTok{)}
 \NormalTok{ma}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      [,1] [,2] [,3] [,4]
+## [1,]    1    3    1    7
+## [2,]    2    4    6    8
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \KeywordTok{apply}\NormalTok{(ma, }\DecValTok{1}\NormalTok{, table)  }\CommentTok{#--> a list of length 2}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [[1]]
+## 
+## 1 3 7 
+## 2 1 1 
+## 
+## [[2]]
+## 
+## 2 4 6 8 
+## 1 1 1 1
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \KeywordTok{apply}\NormalTok{(ma, }\DecValTok{1}\NormalTok{, stats}\OperatorTok{::}\NormalTok{quantile) }\CommentTok{# 5 x n matrix with rownames}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+##      [,1] [,2]
+## 0%      1  2.0
+## 25%     1  3.5
+## 50%     2  5.0
+## 75%     4  6.5
+## 100%    7  8.0
+\end{verbatim}
 
 Results can have different lengths for each call. This is a trickier
 example. What will you get?
@@ -3905,11 +4258,10 @@ functions.
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# Read data}
-\NormalTok{sim.dat<-}\KeywordTok{read.csv}\NormalTok{(}\StringTok{"https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv"}\NormalTok{)}
+\NormalTok{sim.dat <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"http://bit.ly/2P5gTw4"}\NormalTok{)}
 \CommentTok{# Get numerical variables}
-\NormalTok{sdat<-sim.dat[,}\OperatorTok{!}\KeywordTok{lapply}\NormalTok{(sim.dat,class)}\OperatorTok{==}\StringTok{"factor"}\NormalTok{]}
-\NormalTok{## Try the following code with apply() function}
-\NormalTok{## apply(sim.dat,2,class)}
+\NormalTok{sdat <-}\StringTok{ }\NormalTok{sim.dat[, }\OperatorTok{!}\KeywordTok{lapply}\NormalTok{(sim.dat, class) }\OperatorTok{==}\StringTok{ "factor"}\NormalTok{]}
+\NormalTok{## Try the following code with apply() function apply(sim.dat,2,class)}
 \NormalTok{## What is the problem?}
 \end{Highlighting}
 \end{Shaded}
@@ -3923,6 +4275,17 @@ each column:
 \KeywordTok{apply}\NormalTok{(sdat, }\DataTypeTok{MARGIN=}\DecValTok{2}\NormalTok{,}\ControlFlowTok{function}\NormalTok{(x) }\KeywordTok{mean}\NormalTok{(}\KeywordTok{na.omit}\NormalTok{(x)))}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+##          age       income    store_exp   online_exp 
+##    3.884e+01    1.135e+05    1.357e+03    2.120e+03 
+##  store_trans online_trans           Q1           Q2 
+##    5.350e+00    1.355e+01    3.101e+00    1.823e+00 
+##           Q3           Q4           Q5           Q6 
+##    1.992e+00    2.763e+00    2.945e+00    2.448e+00 
+##           Q7           Q8           Q9          Q10 
+##    3.434e+00    2.396e+00    3.085e+00    2.320e+00
+\end{verbatim}
 
 Here we defined a function using \texttt{function(x)\ mean(na.omit(x))}.
 It is a very simple function. It tells R to ignore the missing value
@@ -3940,6 +4303,17 @@ similar. The only difference is to change \texttt{mean()} to
 \end{Highlighting}
 \end{Shaded}
 
+\begin{verbatim}
+##          age       income    store_exp   online_exp 
+##       16.417    49842.287     2774.400     1731.224 
+##  store_trans online_trans           Q1           Q2 
+##        3.696        7.957        1.450        1.168 
+##           Q3           Q4           Q5           Q6 
+##        1.402        1.155        1.284        1.439 
+##           Q7           Q8           Q9          Q10 
+##        1.456        1.154        1.118        1.136
+\end{verbatim}
+
 Even the average online expense is higher than store expense, the
 standard deviation for store expense is much higher than online expense
 which indicates there is very likely some big/small purchase in store.
@@ -3948,16 +4322,30 @@ We can check it quickly:
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{summary}\NormalTok{(sdat}\OperatorTok{$}\NormalTok{store_exp)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    -500     205     329    1357     597   50000
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \KeywordTok{summary}\NormalTok{(sdat}\OperatorTok{$}\NormalTok{online_exp)}
 \end{Highlighting}
 \end{Shaded}
 
+\begin{verbatim}
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##      69     420    1942    2120    2441    9479
+\end{verbatim}
+
 There are some odd values in store expense. The minimum value is -500
-which is a wrong imputation which indicates that you should preprocess
-data before analyzing it. Checking those simple statistics will help you
-better understand your data. It then gives you some idea how to
-preprocess and analyze them. How about using \texttt{lapply()} and
-\texttt{sapply()}?
+which indicates that you should preprocess data before analyzing it.
+Checking those simple statistics will help you better understand your
+data. It then gives you some idea how to preprocess and analyze them.
+How about using \texttt{lapply()} and \texttt{sapply()}?
 
 Run the following code and compare the results:
 
@@ -4018,13 +4406,6 @@ We will illustrate the following functions in order:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{library}\NormalTok{(dplyr)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\KeywordTok{library}\NormalTok{(dplyr)}
 \KeywordTok{tbl_df}\NormalTok{(sim.dat)}
 \end{Highlighting}
 \end{Shaded}
@@ -4048,7 +4429,6 @@ Get rows with \texttt{income} more than 300000:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{library}\NormalTok{(magrittr)}
 \KeywordTok{filter}\NormalTok{(sim.dat, income }\OperatorTok{>}\DecValTok{300000}\NormalTok{) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{tbl_df}\NormalTok{()}
 \end{Highlighting}
@@ -4198,19 +4578,26 @@ aggregation for different segments of clothes customers.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{sim.dat}\OperatorTok{%>%}
-\StringTok{  }\KeywordTok{group_by}\NormalTok{(segment)}\OperatorTok{%>%}
-\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{Age=}\KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(}\KeywordTok{na.omit}\NormalTok{(age)),}\DecValTok{0}\NormalTok{),}
-      \DataTypeTok{FemalePct=}\KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(gender}\OperatorTok{==}\StringTok{"Female"}\NormalTok{),}\DecValTok{2}\NormalTok{),}
-      \DataTypeTok{HouseYes=}\KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(house}\OperatorTok{==}\StringTok{"Yes"}\NormalTok{),}\DecValTok{2}\NormalTok{),}
-      \DataTypeTok{store_exp=}\KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(}\KeywordTok{na.omit}\NormalTok{(store_exp),}\DataTypeTok{trim=}\FloatTok{0.1}\NormalTok{),}\DecValTok{0}\NormalTok{),}
-      \DataTypeTok{online_exp=}\KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(online_exp),}\DecValTok{0}\NormalTok{),}
-      \DataTypeTok{store_trans=}\KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(store_trans),}\DecValTok{1}\NormalTok{),}
-      \DataTypeTok{online_trans=}\KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(online_trans),}\DecValTok{1}\NormalTok{))}
+\NormalTok{sim.dat }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(segment) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{Age =} \KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(}\KeywordTok{na.omit}\NormalTok{(age)), }\DecValTok{0}\NormalTok{), }
+            \DataTypeTok{FemalePct =} \KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(gender }\OperatorTok{==}\StringTok{ "Female"}\NormalTok{), }\DecValTok{2}\NormalTok{), }
+            \DataTypeTok{HouseYes =} \KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(house }\OperatorTok{==}\StringTok{ "Yes"}\NormalTok{), }\DecValTok{2}\NormalTok{), }
+            \DataTypeTok{store_exp =} \KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(}\KeywordTok{na.omit}\NormalTok{(store_exp), }\DataTypeTok{trim =} \FloatTok{0.1}\NormalTok{), }\DecValTok{0}\NormalTok{),}
+            \DataTypeTok{online_exp =} \KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(online_exp), }\DecValTok{0}\NormalTok{), }
+            \DataTypeTok{store_trans =} \KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(store_trans), }\DecValTok{1}\NormalTok{), }
+            \DataTypeTok{online_trans =} \KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(online_trans), }\DecValTok{1}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
-Now, let's peel the onion in order.
+\begin{verbatim}
+##   Age FemalePct HouseYes store_exp online_exp
+## 1  39      0.55     0.57       840       2120
+##   store_trans online_trans
+## 1         5.3         13.5
+\end{verbatim}
+
+Now, let's peel the onion.
 
 The first line \texttt{sim.dat} is easy. It is the data you want to work
 on. The second line \texttt{group\_by(segment)} tells R that in the
@@ -4292,12 +4679,17 @@ one-time online and instore purchase amounts:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{sim.dat}\OperatorTok{%>%}
-\KeywordTok{group_by}\NormalTok{(segment)}\OperatorTok{%>%}
-\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{avg_online=}\KeywordTok{round}\NormalTok{(}\KeywordTok{sum}\NormalTok{(online_exp)}\OperatorTok{/}\KeywordTok{sum}\NormalTok{(online_trans),}\DecValTok{2}\NormalTok{),}
-    \DataTypeTok{avg_store=}\KeywordTok{round}\NormalTok{(}\KeywordTok{sum}\NormalTok{(store_exp)}\OperatorTok{/}\KeywordTok{sum}\NormalTok{(store_trans),}\DecValTok{2}\NormalTok{))}
+\NormalTok{sim.dat }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(segment) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{avg_online =} \KeywordTok{round}\NormalTok{(}\KeywordTok{sum}\NormalTok{(online_exp)}\OperatorTok{/}\KeywordTok{sum}\NormalTok{(online_trans), }\DecValTok{2}\NormalTok{),}
+            \DataTypeTok{avg_store =} \KeywordTok{round}\NormalTok{(}\KeywordTok{sum}\NormalTok{(store_exp)}\OperatorTok{/}\KeywordTok{sum}\NormalTok{(store_trans), }\DecValTok{2}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+##   avg_online avg_store
+## 1      156.5     253.6
+\end{verbatim}
 
 Price group has the lowest averaged one-time purchase. The Conspicuous
 group will pay the highest price. When we build customer profile in real
@@ -4315,6 +4707,15 @@ you can use \texttt{summarise\_all}:
 \NormalTok{dplyr}\OperatorTok{::}\KeywordTok{summarise_all}\NormalTok{(sim.dat, }\KeywordTok{funs_}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{"anyNA"}\NormalTok{)))}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+##     age gender income house store_exp online_exp
+## 1 FALSE  FALSE   TRUE FALSE     FALSE      FALSE
+##   store_trans online_trans    Q1    Q2    Q3    Q4
+## 1       FALSE        FALSE FALSE FALSE FALSE FALSE
+##      Q5    Q6    Q7    Q8    Q9   Q10 segment
+## 1 FALSE FALSE FALSE FALSE FALSE FALSE   FALSE
+\end{verbatim}
 
 The above code returns a vector indicating if there is any value missing
 in each column.
@@ -4340,7 +4741,7 @@ delete the original columns and only keep the new ones.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{transmute}\NormalTok{(sim.dat, }\DataTypeTok{total_exp =}\NormalTok{ store_exp }\OperatorTok{+}\StringTok{ }\NormalTok{online_exp) }
+\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{transmute}\NormalTok{(sim.dat, }\DataTypeTok{total_exp =}\NormalTok{ store_exp }\OperatorTok{+}\StringTok{ }\NormalTok{online_exp)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -4351,38 +4752,93 @@ two baby data sets to show how the functions work.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{(x<-}\KeywordTok{data.frame}\NormalTok{(}\KeywordTok{cbind}\NormalTok{(}\DataTypeTok{ID=}\KeywordTok{c}\NormalTok{(}\StringTok{"A"}\NormalTok{,}\StringTok{"B"}\NormalTok{,}\StringTok{"C"}\NormalTok{),}\DataTypeTok{x1=}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{3}\NormalTok{))))}
-\NormalTok{(y<-}\KeywordTok{data.frame}\NormalTok{(}\KeywordTok{cbind}\NormalTok{(}\DataTypeTok{ID=}\KeywordTok{c}\NormalTok{(}\StringTok{"B"}\NormalTok{,}\StringTok{"C"}\NormalTok{,}\StringTok{"D"}\NormalTok{),}\DataTypeTok{y1=}\KeywordTok{c}\NormalTok{(T,T,F))))}
+\NormalTok{(x <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\KeywordTok{cbind}\NormalTok{(}\DataTypeTok{ID =} \KeywordTok{c}\NormalTok{(}\StringTok{"A"}\NormalTok{, }\StringTok{"B"}\NormalTok{, }\StringTok{"C"}\NormalTok{), }\DataTypeTok{x1 =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{3}\NormalTok{))))}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+##   ID x1
+## 1  A  1
+## 2  B  2
+## 3  C  3
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{(y <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\KeywordTok{cbind}\NormalTok{(}\DataTypeTok{ID =} \KeywordTok{c}\NormalTok{(}\StringTok{"B"}\NormalTok{, }\StringTok{"C"}\NormalTok{, }\StringTok{"D"}\NormalTok{), }\DataTypeTok{y1 =} \KeywordTok{c}\NormalTok{(T, T, F))))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   ID    y1
+## 1  B  TRUE
+## 2  C  TRUE
+## 3  D FALSE
+\end{verbatim}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# join to the left}
 \CommentTok{# keep all rows in x}
-\KeywordTok{left_join}\NormalTok{(x,y,}\DataTypeTok{by=}\StringTok{"ID"}\NormalTok{)}
+\KeywordTok{left_join}\NormalTok{(x, y, }\DataTypeTok{by =} \StringTok{"ID"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+## Warning: Column `ID` joining factors with different
+## levels, coercing to character vector
+\end{verbatim}
+
+\begin{verbatim}
+##   ID x1   y1
+## 1  A  1 <NA>
+## 2  B  2 TRUE
+## 3  C  3 TRUE
+\end{verbatim}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# get rows matched in both data sets}
-\KeywordTok{inner_join}\NormalTok{(x,y,}\DataTypeTok{by=}\StringTok{"ID"}\NormalTok{)}
+\KeywordTok{inner_join}\NormalTok{(x, y, }\DataTypeTok{by =} \StringTok{"ID"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+## Warning: Column `ID` joining factors with different
+## levels, coercing to character vector
+\end{verbatim}
+
+\begin{verbatim}
+##   ID x1   y1
+## 1  B  2 TRUE
+## 2  C  3 TRUE
+\end{verbatim}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# get rows in either data set}
-\KeywordTok{full_join}\NormalTok{(x,y,}\DataTypeTok{by=}\StringTok{"ID"}\NormalTok{)}
+\KeywordTok{full_join}\NormalTok{(x, y, }\DataTypeTok{by =} \StringTok{"ID"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+## Warning: Column `ID` joining factors with different
+## levels, coercing to character vector
+\end{verbatim}
+
+\begin{verbatim}
+##   ID   x1    y1
+## 1  A    1  <NA>
+## 2  B    2  TRUE
+## 3  C    3  TRUE
+## 4  D <NA> FALSE
+\end{verbatim}
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# filter out rows in x that can be matched in y }
 \CommentTok{# it doesn't bring in any values from y }
-\KeywordTok{semi_join}\NormalTok{(x,y,}\DataTypeTok{by=}\StringTok{"ID"}\NormalTok{)}
+\KeywordTok{semi_join}\NormalTok{(x, y, }\DataTypeTok{by =} \StringTok{"ID"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -4391,7 +4847,7 @@ two baby data sets to show how the functions work.
 \CommentTok{# the opposite of  semi_join()}
 \CommentTok{# it gets rows in x that cannot be matched in y}
 \CommentTok{# it doesn't bring in any values from y}
-\KeywordTok{anti_join}\NormalTok{(x,y,}\DataTypeTok{by=}\StringTok{"ID"}\NormalTok{)}
+\KeywordTok{anti_join}\NormalTok{(x, y, }\DataTypeTok{by =} \StringTok{"ID"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -4425,7 +4881,7 @@ subset of our exemplary clothes consumers data to illustrate:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{(sdat<-sim.dat[}\DecValTok{1}\OperatorTok{:}\DecValTok{5}\NormalTok{,}\DecValTok{1}\OperatorTok{:}\DecValTok{6}\NormalTok{])}
+\NormalTok{sdat<-sim.dat[}\DecValTok{1}\OperatorTok{:}\DecValTok{5}\NormalTok{,}\DecValTok{1}\OperatorTok{:}\DecValTok{6}\NormalTok{]}
 \end{Highlighting}
 \end{Shaded}
 
@@ -4447,12 +4903,25 @@ to ``long''. There are two general ways to shape data:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{library}\NormalTok{(reshape2)}
-\NormalTok{(mdat <-}\StringTok{ }\KeywordTok{melt}\NormalTok{(sdat, }\DataTypeTok{measure.vars=}\KeywordTok{c}\NormalTok{(}\StringTok{"store_exp"}\NormalTok{,}\StringTok{"online_exp"}\NormalTok{),}
-              \DataTypeTok{variable.name =} \StringTok{"Channel"}\NormalTok{,}
+\NormalTok{(mdat <-}\StringTok{ }\KeywordTok{melt}\NormalTok{(sdat, }\DataTypeTok{measure.vars =} \KeywordTok{c}\NormalTok{(}\StringTok{"store_exp"}\NormalTok{, }\StringTok{"online_exp"}\NormalTok{),}
+              \DataTypeTok{variable.name =} \StringTok{"Channel"}\NormalTok{, }
               \DataTypeTok{value.name =} \StringTok{"Expense"}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+##    age gender income house    Channel Expense
+## 1   57 Female 120963   Yes  store_exp   529.1
+## 2   63 Female 122008   Yes  store_exp   478.0
+## 3   59   Male 114202   Yes  store_exp   490.8
+## 4   60   Male 113616   Yes  store_exp   347.8
+## 5   51   Male 124253   Yes  store_exp   379.6
+## 6   57 Female 120963   Yes online_exp   303.5
+## 7   63 Female 122008   Yes online_exp   109.5
+## 8   59   Male 114202   Yes online_exp   279.2
+## 9   60   Male 113616   Yes online_exp   141.7
+## 10  51   Male 124253   Yes online_exp   112.2
+\end{verbatim}
 
 You melted the data frame \texttt{sdat} by two variables:
 \texttt{store\_exp} and \texttt{online\_exp}
@@ -4468,10 +4937,9 @@ follows:
 \begin{Highlighting}[]
 \CommentTok{# Here we use all observations from sim.dat}
 \CommentTok{# Don't show result here}
-\NormalTok{mdat<-}\KeywordTok{melt}\NormalTok{(sim.dat[,}\DecValTok{1}\OperatorTok{:}\DecValTok{6}\NormalTok{], }\DataTypeTok{measure.vars=}\KeywordTok{c}\NormalTok{(}\StringTok{"store_exp"}\NormalTok{,}\StringTok{"online_exp"}\NormalTok{),}
-            \DataTypeTok{variable.name =} \StringTok{"Channel"}\NormalTok{,}
-              \DataTypeTok{value.name =} \StringTok{"Expense"}\NormalTok{)}
-\NormalTok{fit<-}\KeywordTok{lm}\NormalTok{(Expense}\OperatorTok{~}\NormalTok{gender}\OperatorTok{+}\NormalTok{house}\OperatorTok{+}\NormalTok{income}\OperatorTok{+}\NormalTok{Channel}\OperatorTok{+}\NormalTok{age,}\DataTypeTok{data=}\NormalTok{mdat)}
+\NormalTok{mdat <-}\StringTok{ }\KeywordTok{melt}\NormalTok{(sim.dat[, }\DecValTok{1}\OperatorTok{:}\DecValTok{6}\NormalTok{], }\DataTypeTok{measure.vars =} \KeywordTok{c}\NormalTok{(}\StringTok{"store_exp"}\NormalTok{, }\StringTok{"online_exp"}\NormalTok{), }
+    \DataTypeTok{variable.name =} \StringTok{"Channel"}\NormalTok{, }\DataTypeTok{value.name =} \StringTok{"Expense"}\NormalTok{)}
+\NormalTok{fit <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(Expense }\OperatorTok{~}\StringTok{ }\NormalTok{gender }\OperatorTok{+}\StringTok{ }\NormalTok{house }\OperatorTok{+}\StringTok{ }\NormalTok{income }\OperatorTok{+}\StringTok{ }\NormalTok{Channel }\OperatorTok{+}\StringTok{ }\NormalTok{age, }\DataTypeTok{data =}\NormalTok{ mdat)}
 \KeywordTok{summary}\NormalTok{(fit)}
 \end{Highlighting}
 \end{Shaded}
@@ -4488,6 +4956,16 @@ the house ownership. }
 \end{Highlighting}
 \end{Shaded}
 
+\begin{verbatim}
+## Using Expense as value column: use value.var to override.
+\end{verbatim}
+
+\begin{verbatim}
+##   house gender store_exp online_exp
+## 1   Yes Female      1007      413.0
+## 2   Yes   Male      1218      533.2
+\end{verbatim}
+
 In the above code, what is the left side of \texttt{\textasciitilde{}}
 are variables that you want to group by. The right side is the variable
 you want to spread as columns. It will use the column indicating value
@@ -4501,7 +4979,6 @@ Let's get a subset to illustrate the usage.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{library}\NormalTok{(dplyr)}
 \CommentTok{# practice functions we learnt before}
 \NormalTok{sdat<-sim.dat[}\DecValTok{1}\OperatorTok{:}\DecValTok{5}\NormalTok{,]}\OperatorTok{%>%}
 \StringTok{  }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{select}\NormalTok{(age,gender,store_exp,store_trans)}
@@ -4822,7 +5299,7 @@ sample, the result curve will change significantly:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-9-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-61-1.pdf}
 
 The fitted lines (blue) change over different samples which means it has
 high variance. People also call it overfitting. Fitting the linear model
@@ -4842,7 +5319,7 @@ using the same four subsets, the result barely changes:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-10-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-62-1.pdf}
 
 In general, the variance (\(Var(\hat{f}(\mathbf{X}))\))
 \textbf{increases} and the bias (\(Bias(\hat{f}(\mathbf{X}))\))
@@ -4881,7 +5358,7 @@ income. We set up the following model:
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# load data}
-\NormalTok{sim.dat <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv"}\NormalTok{)}
+\NormalTok{sim.dat <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"http://bit.ly/2P5gTw4"}\NormalTok{)}
 \NormalTok{ymad <-}\StringTok{ }\KeywordTok{mad}\NormalTok{(}\KeywordTok{na.omit}\NormalTok{(sim.dat}\OperatorTok{$}\NormalTok{income))}
 \CommentTok{# calculate z-score}
 \NormalTok{zs <-}\StringTok{ }\NormalTok{(sim.dat}\OperatorTok{$}\NormalTok{income }\OperatorTok{-}\StringTok{ }\KeywordTok{mean}\NormalTok{(}\KeywordTok{na.omit}\NormalTok{(sim.dat}\OperatorTok{$}\NormalTok{income)))}\OperatorTok{/}\NormalTok{ymad}

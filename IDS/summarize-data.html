@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2019-06-17">
+<meta name="date" content="2019-08-20">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -145,6 +145,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="3.2" data-path="customer-satisfaction-survey-data-from-airline-company.html"><a href="customer-satisfaction-survey-data-from-airline-company.html"><i class="fa fa-check"></i><b>3.2</b> Customer Satisfaction Survey Data from Airline Company</a></li>
 <li class="chapter" data-level="3.3" data-path="swine-disease-breakout-data.html"><a href="swine-disease-breakout-data.html"><i class="fa fa-check"></i><b>3.3</b> Swine Disease Breakout Data</a></li>
 <li class="chapter" data-level="3.4" data-path="mnist-dataset.html"><a href="mnist-dataset.html"><i class="fa fa-check"></i><b>3.4</b> MNIST Dataset</a></li>
+<li class="chapter" data-level="3.5" data-path="imdb-dataset.html"><a href="imdb-dataset.html"><i class="fa fa-check"></i><b>3.5</b> IMDB Dataset</a></li>
 </ul></li>
 <li class="chapter" data-level="4" data-path="data-pre-processing.html"><a href="data-pre-processing.html"><i class="fa fa-check"></i><b>4</b> Data Pre-processing</a><ul>
 <li class="chapter" data-level="4.1" data-path="data-cleaning.html"><a href="data-cleaning.html"><i class="fa fa-check"></i><b>4.1</b> Data Cleaning</a></li>
@@ -159,9 +160,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="4.6" data-path="collinearity.html"><a href="collinearity.html"><i class="fa fa-check"></i><b>4.6</b> Collinearity</a></li>
 <li class="chapter" data-level="4.7" data-path="sparse-variables.html"><a href="sparse-variables.html"><i class="fa fa-check"></i><b>4.7</b> Sparse Variables</a></li>
 <li class="chapter" data-level="4.8" data-path="re-encode-dummy-variables.html"><a href="re-encode-dummy-variables.html"><i class="fa fa-check"></i><b>4.8</b> Re-encode Dummy Variables</a></li>
-<li class="chapter" data-level="4.9" data-path="python-computing.html"><a href="python-computing.html"><i class="fa fa-check"></i><b>4.9</b> Python Computing</a><ul>
-<li class="chapter" data-level="4.9.1" data-path="python-computing.html"><a href="python-computing.html#data-cleaning-1"><i class="fa fa-check"></i><b>4.9.1</b> Data Cleaning</a></li>
-</ul></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="data-wrangling.html"><a href="data-wrangling.html"><i class="fa fa-check"></i><b>5</b> Data Wrangling</a><ul>
 <li class="chapter" data-level="5.1" data-path="read-and-write-data.html"><a href="read-and-write-data.html"><i class="fa fa-check"></i><b>5.1</b> Read and write data</a><ul>
@@ -280,14 +278,34 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## simulate a matrix
 x &lt;-<span class="st"> </span><span class="kw">cbind</span>(<span class="dt">x1 =</span><span class="dv">1</span><span class="op">:</span><span class="dv">8</span>, <span class="dt">x2 =</span> <span class="kw">c</span>(<span class="dv">4</span><span class="op">:</span><span class="dv">1</span>, <span class="dv">2</span><span class="op">:</span><span class="dv">5</span>))
 <span class="kw">dimnames</span>(x)[[<span class="dv">1</span>]] &lt;-<span class="st"> </span>letters[<span class="dv">1</span><span class="op">:</span><span class="dv">8</span>]
-<span class="kw">apply</span>(x, <span class="dv">2</span>, mean)
-col.sums &lt;-<span class="st"> </span><span class="kw">apply</span>(x, <span class="dv">2</span>, sum)
+<span class="kw">apply</span>(x, <span class="dv">2</span>, mean)</code></pre></div>
+<pre><code>##  x1  x2 
+## 4.5 3.0</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">col.sums &lt;-<span class="st"> </span><span class="kw">apply</span>(x, <span class="dv">2</span>, sum)
 row.sums &lt;-<span class="st"> </span><span class="kw">apply</span>(x, <span class="dv">1</span>, sum)</code></pre></div>
 <p>You can also apply other functions:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ma &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>, <span class="dv">1</span>, <span class="dv">6</span><span class="op">:</span><span class="dv">8</span>), <span class="dt">nrow =</span> <span class="dv">2</span>)
-ma
-<span class="kw">apply</span>(ma, <span class="dv">1</span>, table)  <span class="co">#--&gt; a list of length 2</span>
-<span class="kw">apply</span>(ma, <span class="dv">1</span>, stats<span class="op">::</span>quantile) <span class="co"># 5 x n matrix with rownames</span></code></pre></div>
+ma</code></pre></div>
+<pre><code>##      [,1] [,2] [,3] [,4]
+## [1,]    1    3    1    7
+## [2,]    2    4    6    8</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">apply</span>(ma, <span class="dv">1</span>, table)  <span class="co">#--&gt; a list of length 2</span></code></pre></div>
+<pre><code>## [[1]]
+## 
+## 1 3 7 
+## 2 1 1 
+## 
+## [[2]]
+## 
+## 2 4 6 8 
+## 1 1 1 1</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">apply</span>(ma, <span class="dv">1</span>, stats<span class="op">::</span>quantile) <span class="co"># 5 x n matrix with rownames</span></code></pre></div>
+<pre><code>##      [,1] [,2]
+## 0%      1  2.0
+## 25%     1  3.5
+## 50%     2  5.0
+## 75%     4  6.5
+## 100%    7  8.0</code></pre>
 <p>Results can have different lengths for each call. This is a trickier example. What will you get?</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Example with different lengths for each call
 z &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">24</span>, <span class="dt">dim =</span> <span class="dv">2</span><span class="op">:</span><span class="dv">4</span>)
@@ -306,20 +324,39 @@ zseq[<span class="dv">1</span>,]
 <li>Get the mean and standard deviation of all numerical variables in the dataset.</li>
 </ul>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Read data</span>
-sim.dat&lt;-<span class="kw">read.csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/happyrabbit/DataScientistR/master/Data/SegData.csv&quot;</span>)
+sim.dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)
 <span class="co"># Get numerical variables</span>
-sdat&lt;-sim.dat[,<span class="op">!</span><span class="kw">lapply</span>(sim.dat,class)<span class="op">==</span><span class="st">&quot;factor&quot;</span>]
-## Try the following code with apply() function
-## apply(sim.dat,2,class)
+sdat &lt;-<span class="st"> </span>sim.dat[, <span class="op">!</span><span class="kw">lapply</span>(sim.dat, class) <span class="op">==</span><span class="st"> &quot;factor&quot;</span>]
+## Try the following code with apply() function apply(sim.dat,2,class)
 ## What is the problem?</code></pre></div>
 <p>The data frame <code>sdat</code> only includes numeric columns. Now we can go head and use <code>apply()</code> to get mean and standard deviation for each column:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">apply</span>(sdat, <span class="dt">MARGIN=</span><span class="dv">2</span>,<span class="cf">function</span>(x) <span class="kw">mean</span>(<span class="kw">na.omit</span>(x)))</code></pre></div>
+<pre><code>##          age       income    store_exp   online_exp 
+##    3.884e+01    1.135e+05    1.357e+03    2.120e+03 
+##  store_trans online_trans           Q1           Q2 
+##    5.350e+00    1.355e+01    3.101e+00    1.823e+00 
+##           Q3           Q4           Q5           Q6 
+##    1.992e+00    2.763e+00    2.945e+00    2.448e+00 
+##           Q7           Q8           Q9          Q10 
+##    3.434e+00    2.396e+00    3.085e+00    2.320e+00</code></pre>
 <p>Here we defined a function using <code>function(x) mean(na.omit(x))</code>. It is a very simple function. It tells R to ignore the missing value when calculating the mean. <code>MARGIN=2</code> tells R to apply the function to each column. It is not hard to guess what <code>MARGIN=1</code> mean. The result show that the average online expense is much higher than store expense. You can also compare the average scores across different questions. The command to calculate standard deviation is very similar. The only difference is to change <code>mean()</code> to <code>sd()</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">apply</span>(sdat, <span class="dt">MARGIN=</span><span class="dv">2</span>,<span class="cf">function</span>(x) <span class="kw">sd</span>(<span class="kw">na.omit</span>(x)))</code></pre></div>
+<pre><code>##          age       income    store_exp   online_exp 
+##       16.417    49842.287     2774.400     1731.224 
+##  store_trans online_trans           Q1           Q2 
+##        3.696        7.957        1.450        1.168 
+##           Q3           Q4           Q5           Q6 
+##        1.402        1.155        1.284        1.439 
+##           Q7           Q8           Q9          Q10 
+##        1.456        1.154        1.118        1.136</code></pre>
 <p>Even the average online expense is higher than store expense, the standard deviation for store expense is much higher than online expense which indicates there is very likely some big/small purchase in store. We can check it quickly:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(sdat<span class="op">$</span>store_exp)
-<span class="kw">summary</span>(sdat<span class="op">$</span>online_exp)</code></pre></div>
-<p>There are some odd values in store expense. The minimum value is -500 which is a wrong imputation which indicates that you should preprocess data before analyzing it. Checking those simple statistics will help you better understand your data. It then gives you some idea how to preprocess and analyze them. How about using <code>lapply()</code> and <code>sapply()</code>?</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(sdat<span class="op">$</span>store_exp)</code></pre></div>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    -500     205     329    1357     597   50000</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(sdat<span class="op">$</span>online_exp)</code></pre></div>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##      69     420    1942    2120    2441    9479</code></pre>
+<p>There are some odd values in store expense. The minimum value is -500 which indicates that you should preprocess data before analyzing it. Checking those simple statistics will help you better understand your data. It then gives you some idea how to preprocess and analyze them. How about using <code>lapply()</code> and <code>sapply()</code>?</p>
 <p>Run the following code and compare the results:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">lapply</span>(sdat, <span class="cf">function</span>(x) <span class="kw">sd</span>(<span class="kw">na.omit</span>(x)))
 <span class="kw">sapply</span>(sdat, <span class="cf">function</span>(x) <span class="kw">sd</span>(<span class="kw">na.omit</span>(x)))
@@ -345,17 +382,14 @@ sdat&lt;-sim.dat[,<span class="op">!</span><span class="kw">lapply</span>(sim.da
 <ul>
 <li><code>tbl_df()</code>: Convert the data to <code>tibble</code> which offers better checking and printing capabilities than traditional data frames. It will adjust output width according to fit the current window.</li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)
-<span class="kw">tbl_df</span>(sim.dat)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tbl_df</span>(sim.dat)</code></pre></div>
 <ul>
 <li><code>glimpse()</code>: This is like a transposed version of <code>tbl_df()</code></li>
 </ul>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">glimpse</span>(sim.dat)</code></pre></div>
 <p><strong>Subset</strong></p>
 <p>Get rows with <code>income</code> more than 300000:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(magrittr)
-<span class="kw">filter</span>(sim.dat, income <span class="op">&gt;</span><span class="dv">300000</span>) <span class="op">%&gt;%</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">filter</span>(sim.dat, income <span class="op">&gt;</span><span class="dv">300000</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">tbl_df</span>()</code></pre></div>
 <p>Here we meet a new operator <code>%&gt;%</code>. It is called “Pipe operator” which pipes a value forward into an expression or function call. What you get in the left operation will be the first argument or the only argument in the right operation.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">f</span>(y) =<span class="st"> </span><span class="kw">f</span>(x, y)
@@ -425,16 +459,25 @@ dplyr<span class="op">::</span><span class="kw">select</span>(sim.dat, age<span 
 dplyr<span class="op">::</span><span class="kw">select</span>(sim.dat, <span class="op">-</span>age)</code></pre></div>
 <p><strong>Summarize</strong></p>
 <p>A standard marketing problem is customer segmentation. It usually starts with designing survey and collecting data. Then run a cluster analysis on the data to get customer segments. Once we have different segments, the next is to understand how each group of customer look like by summarizing some key metrics. For example, we can do the following data aggregation for different segments of clothes customers.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sim.dat<span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">group_by</span>(segment)<span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">summarise</span>(<span class="dt">Age=</span><span class="kw">round</span>(<span class="kw">mean</span>(<span class="kw">na.omit</span>(age)),<span class="dv">0</span>),
-      <span class="dt">FemalePct=</span><span class="kw">round</span>(<span class="kw">mean</span>(gender<span class="op">==</span><span class="st">&quot;Female&quot;</span>),<span class="dv">2</span>),
-      <span class="dt">HouseYes=</span><span class="kw">round</span>(<span class="kw">mean</span>(house<span class="op">==</span><span class="st">&quot;Yes&quot;</span>),<span class="dv">2</span>),
-      <span class="dt">store_exp=</span><span class="kw">round</span>(<span class="kw">mean</span>(<span class="kw">na.omit</span>(store_exp),<span class="dt">trim=</span><span class="fl">0.1</span>),<span class="dv">0</span>),
-      <span class="dt">online_exp=</span><span class="kw">round</span>(<span class="kw">mean</span>(online_exp),<span class="dv">0</span>),
-      <span class="dt">store_trans=</span><span class="kw">round</span>(<span class="kw">mean</span>(store_trans),<span class="dv">1</span>),
-      <span class="dt">online_trans=</span><span class="kw">round</span>(<span class="kw">mean</span>(online_trans),<span class="dv">1</span>))</code></pre></div>
-<p>Now, let’s peel the onion in order.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sim.dat <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">group_by</span>(segment) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">summarise</span>(<span class="dt">Age =</span> <span class="kw">round</span>(<span class="kw">mean</span>(<span class="kw">na.omit</span>(age)), <span class="dv">0</span>), 
+            <span class="dt">FemalePct =</span> <span class="kw">round</span>(<span class="kw">mean</span>(gender <span class="op">==</span><span class="st"> &quot;Female&quot;</span>), <span class="dv">2</span>), 
+            <span class="dt">HouseYes =</span> <span class="kw">round</span>(<span class="kw">mean</span>(house <span class="op">==</span><span class="st"> &quot;Yes&quot;</span>), <span class="dv">2</span>), 
+            <span class="dt">store_exp =</span> <span class="kw">round</span>(<span class="kw">mean</span>(<span class="kw">na.omit</span>(store_exp), <span class="dt">trim =</span> <span class="fl">0.1</span>), <span class="dv">0</span>),
+            <span class="dt">online_exp =</span> <span class="kw">round</span>(<span class="kw">mean</span>(online_exp), <span class="dv">0</span>), 
+            <span class="dt">store_trans =</span> <span class="kw">round</span>(<span class="kw">mean</span>(store_trans), <span class="dv">1</span>), 
+            <span class="dt">online_trans =</span> <span class="kw">round</span>(<span class="kw">mean</span>(online_trans), <span class="dv">1</span>))</code></pre></div>
+<pre><code>## # A tibble: 4 x 8
+##   segment       Age FemalePct HouseYes store_exp
+##   &lt;fct&gt;       &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+## 1 Conspicuous   42.     0.320    0.860     4990.
+## 2 Price         60.     0.450    0.940      501.
+## 3 Quality       35.     0.470    0.340      301.
+## 4 Style         24.     0.810    0.270      200.
+## # ... with 3 more variables: online_exp &lt;dbl&gt;,
+## #   store_trans &lt;dbl&gt;, online_trans &lt;dbl&gt;</code></pre>
+<p>Now, let’s peel the onion.</p>
 <p>The first line <code>sim.dat</code> is easy. It is the data you want to work on. The second line <code>group_by(segment)</code> tells R that in the following steps you want to summarise by variable <code>segment</code>. Here we only summarize data by one categorical variable, but you can group by multiple variables, such as <code>group_by(segment, house)</code>. The third argument <code>summarise</code> tells R the manipulation(s) to do. Then list the exact actions inside <code>summarise()</code> . For example, <code>Age=round(mean(na.omit(age)),0)</code> tell R the following things:</p>
 <ol style="list-style-type: decimal">
 <li>Calculate the mean of column <code>age</code> ignoring missing value for each customer segment</li>
@@ -460,39 +503,78 @@ dplyr<span class="op">::</span><span class="kw">select</span>(sim.dat, <span cla
 </ul>
 <p>You may notice that Style group purchase more frequently online (<code>online_trans</code>) but the expense (<code>online_exp</code>) is not higher. It makes us wonder what is the average expense each time, so you have a better idea about the price range of the group.</p>
 <p>The analytical process is aggregated instead of independent steps. The current step will shed new light on what to do next. Sometimes you need to go back to fix something in the previous steps. Let’s check average one-time online and instore purchase amounts:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sim.dat<span class="op">%&gt;%</span>
-<span class="kw">group_by</span>(segment)<span class="op">%&gt;%</span>
-<span class="kw">summarise</span>(<span class="dt">avg_online=</span><span class="kw">round</span>(<span class="kw">sum</span>(online_exp)<span class="op">/</span><span class="kw">sum</span>(online_trans),<span class="dv">2</span>),
-    <span class="dt">avg_store=</span><span class="kw">round</span>(<span class="kw">sum</span>(store_exp)<span class="op">/</span><span class="kw">sum</span>(store_trans),<span class="dv">2</span>))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sim.dat <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">group_by</span>(segment) <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">summarise</span>(<span class="dt">avg_online =</span> <span class="kw">round</span>(<span class="kw">sum</span>(online_exp)<span class="op">/</span><span class="kw">sum</span>(online_trans), <span class="dv">2</span>),
+            <span class="dt">avg_store =</span> <span class="kw">round</span>(<span class="kw">sum</span>(store_exp)<span class="op">/</span><span class="kw">sum</span>(store_trans), <span class="dv">2</span>))</code></pre></div>
+<pre><code>## # A tibble: 4 x 3
+##   segment     avg_online avg_store
+##   &lt;fct&gt;            &lt;dbl&gt;     &lt;dbl&gt;
+## 1 Conspicuous      442.      479. 
+## 2 Price             69.3      81.3
+## 3 Quality          126.      105. 
+## 4 Style             92.8     121.</code></pre>
 <p>Price group has the lowest averaged one-time purchase. The Conspicuous group will pay the highest price. When we build customer profile in real life, we will also need to look at the survey summarization. You may be surprised how much information simple data manipulations can provide.</p>
 <p>Another comman task is to check which column has missing values. It requires the program to look at each column in the data. In this case you can use <code>summarise_all</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># apply function anyNA() to each column</span>
 <span class="co"># you can also assign a function vector such as: c(&quot;anyNA&quot;,&quot;is.factor&quot;)</span>
 dplyr<span class="op">::</span><span class="kw">summarise_all</span>(sim.dat, <span class="kw">funs_</span>(<span class="kw">c</span>(<span class="st">&quot;anyNA&quot;</span>)))</code></pre></div>
+<pre><code>##     age gender income house store_exp online_exp
+## 1 FALSE  FALSE   TRUE FALSE     FALSE      FALSE
+##   store_trans online_trans    Q1    Q2    Q3    Q4
+## 1       FALSE        FALSE FALSE FALSE FALSE FALSE
+##      Q5    Q6    Q7    Q8    Q9   Q10 segment
+## 1 FALSE FALSE FALSE FALSE FALSE FALSE   FALSE</code></pre>
 <p>The above code returns a vector indicating if there is any value missing in each column.</p>
 <p><strong>Create new variable</strong></p>
 <p>There are often situations where you need to create new variables. For example, adding online and store expense to get total expense. In this case, you will apply <strong>window function</strong> to the columns and return a column with the same length. <code>mutate()</code> can do it for you and append one or more new columns:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dplyr<span class="op">::</span><span class="kw">mutate</span>(sim.dat, <span class="dt">total_exp =</span> store_exp <span class="op">+</span><span class="st"> </span>online_exp)</code></pre></div>
 <p>The above code sums up two columns and appends the result (<code>total_exp</code>) to <code>sim.dat</code>. Another similar function is <code>transmute()</code>. The difference is that <code>transmute()</code> will delete the original columns and only keep the new ones.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dplyr<span class="op">::</span><span class="kw">transmute</span>(sim.dat, <span class="dt">total_exp =</span> store_exp <span class="op">+</span><span class="st"> </span>online_exp) </code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dplyr<span class="op">::</span><span class="kw">transmute</span>(sim.dat, <span class="dt">total_exp =</span> store_exp <span class="op">+</span><span class="st"> </span>online_exp)</code></pre></div>
 <p><strong>Merge</strong></p>
 <p>Similar to SQL, there are different joins in <code>dplyr</code>. We create two baby data sets to show how the functions work.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(x&lt;-<span class="kw">data.frame</span>(<span class="kw">cbind</span>(<span class="dt">ID=</span><span class="kw">c</span>(<span class="st">&quot;A&quot;</span>,<span class="st">&quot;B&quot;</span>,<span class="st">&quot;C&quot;</span>),<span class="dt">x1=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>))))
-(y&lt;-<span class="kw">data.frame</span>(<span class="kw">cbind</span>(<span class="dt">ID=</span><span class="kw">c</span>(<span class="st">&quot;B&quot;</span>,<span class="st">&quot;C&quot;</span>,<span class="st">&quot;D&quot;</span>),<span class="dt">y1=</span><span class="kw">c</span>(T,T,F))))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(x &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(<span class="dt">ID =</span> <span class="kw">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>), <span class="dt">x1 =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))))</code></pre></div>
+<pre><code>##   ID x1
+## 1  A  1
+## 2  B  2
+## 3  C  3</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(y &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(<span class="dt">ID =</span> <span class="kw">c</span>(<span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;D&quot;</span>), <span class="dt">y1 =</span> <span class="kw">c</span>(T, T, F))))</code></pre></div>
+<pre><code>##   ID    y1
+## 1  B  TRUE
+## 2  C  TRUE
+## 3  D FALSE</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># join to the left</span>
 <span class="co"># keep all rows in x</span>
-<span class="kw">left_join</span>(x,y,<span class="dt">by=</span><span class="st">&quot;ID&quot;</span>)</code></pre></div>
+<span class="kw">left_join</span>(x, y, <span class="dt">by =</span> <span class="st">&quot;ID&quot;</span>)</code></pre></div>
+<pre><code>## Warning: Column `ID` joining factors with different
+## levels, coercing to character vector</code></pre>
+<pre><code>##   ID x1   y1
+## 1  A  1 &lt;NA&gt;
+## 2  B  2 TRUE
+## 3  C  3 TRUE</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get rows matched in both data sets</span>
-<span class="kw">inner_join</span>(x,y,<span class="dt">by=</span><span class="st">&quot;ID&quot;</span>)</code></pre></div>
+<span class="kw">inner_join</span>(x, y, <span class="dt">by =</span> <span class="st">&quot;ID&quot;</span>)</code></pre></div>
+<pre><code>## Warning: Column `ID` joining factors with different
+## levels, coercing to character vector</code></pre>
+<pre><code>##   ID x1   y1
+## 1  B  2 TRUE
+## 2  C  3 TRUE</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get rows in either data set</span>
-<span class="kw">full_join</span>(x,y,<span class="dt">by=</span><span class="st">&quot;ID&quot;</span>)</code></pre></div>
+<span class="kw">full_join</span>(x, y, <span class="dt">by =</span> <span class="st">&quot;ID&quot;</span>)</code></pre></div>
+<pre><code>## Warning: Column `ID` joining factors with different
+## levels, coercing to character vector</code></pre>
+<pre><code>##   ID   x1    y1
+## 1  A    1  &lt;NA&gt;
+## 2  B    2  TRUE
+## 3  C    3  TRUE
+## 4  D &lt;NA&gt; FALSE</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># filter out rows in x that can be matched in y </span>
 <span class="co"># it doesn&#39;t bring in any values from y </span>
-<span class="kw">semi_join</span>(x,y,<span class="dt">by=</span><span class="st">&quot;ID&quot;</span>)</code></pre></div>
+<span class="kw">semi_join</span>(x, y, <span class="dt">by =</span> <span class="st">&quot;ID&quot;</span>)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># the opposite of  semi_join()</span>
 <span class="co"># it gets rows in x that cannot be matched in y</span>
 <span class="co"># it doesn&#39;t bring in any values from y</span>
-<span class="kw">anti_join</span>(x,y,<span class="dt">by=</span><span class="st">&quot;ID&quot;</span>)</code></pre></div>
+<span class="kw">anti_join</span>(x, y, <span class="dt">by =</span> <span class="st">&quot;ID&quot;</span>)</code></pre></div>
 <p>There are other functions(<code>intersect()</code>, <code>union()</code> and <code>setdiff()</code>). Also the data frame version of <code>rbind</code> and <code>cbind</code> which are <code>bind_rows()</code> and <code>bind_col()</code>. We are not going to go through them all. You can try them yourself. If you understand the functions we introduced so far. It should be easy for you to figure out the rest.</p>
 </div>
 </div>

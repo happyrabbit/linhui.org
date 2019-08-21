@@ -25,14 +25,14 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2019-06-17">
+<meta name="date" content="2019-08-20">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="mnist-dataset.html">
+<link rel="prev" href="imdb-dataset.html">
 <link rel="next" href="data-cleaning.html">
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
@@ -145,6 +145,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="3.2" data-path="customer-satisfaction-survey-data-from-airline-company.html"><a href="customer-satisfaction-survey-data-from-airline-company.html"><i class="fa fa-check"></i><b>3.2</b> Customer Satisfaction Survey Data from Airline Company</a></li>
 <li class="chapter" data-level="3.3" data-path="swine-disease-breakout-data.html"><a href="swine-disease-breakout-data.html"><i class="fa fa-check"></i><b>3.3</b> Swine Disease Breakout Data</a></li>
 <li class="chapter" data-level="3.4" data-path="mnist-dataset.html"><a href="mnist-dataset.html"><i class="fa fa-check"></i><b>3.4</b> MNIST Dataset</a></li>
+<li class="chapter" data-level="3.5" data-path="imdb-dataset.html"><a href="imdb-dataset.html"><i class="fa fa-check"></i><b>3.5</b> IMDB Dataset</a></li>
 </ul></li>
 <li class="chapter" data-level="4" data-path="data-pre-processing.html"><a href="data-pre-processing.html"><i class="fa fa-check"></i><b>4</b> Data Pre-processing</a><ul>
 <li class="chapter" data-level="4.1" data-path="data-cleaning.html"><a href="data-cleaning.html"><i class="fa fa-check"></i><b>4.1</b> Data Cleaning</a></li>
@@ -159,9 +160,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="4.6" data-path="collinearity.html"><a href="collinearity.html"><i class="fa fa-check"></i><b>4.6</b> Collinearity</a></li>
 <li class="chapter" data-level="4.7" data-path="sparse-variables.html"><a href="sparse-variables.html"><i class="fa fa-check"></i><b>4.7</b> Sparse Variables</a></li>
 <li class="chapter" data-level="4.8" data-path="re-encode-dummy-variables.html"><a href="re-encode-dummy-variables.html"><i class="fa fa-check"></i><b>4.8</b> Re-encode Dummy Variables</a></li>
-<li class="chapter" data-level="4.9" data-path="python-computing.html"><a href="python-computing.html"><i class="fa fa-check"></i><b>4.9</b> Python Computing</a><ul>
-<li class="chapter" data-level="4.9.1" data-path="python-computing.html"><a href="python-computing.html#data-cleaning-1"><i class="fa fa-check"></i><b>4.9.1</b> Data Cleaning</a></li>
-</ul></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="data-wrangling.html"><a href="data-wrangling.html"><i class="fa fa-check"></i><b>5</b> Data Wrangling</a><ul>
 <li class="chapter" data-level="5.1" data-path="read-and-write-data.html"><a href="read-and-write-data.html"><i class="fa fa-check"></i><b>5.1</b> Read and write data</a><ul>
@@ -294,198 +292,27 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>The final table results for clients need to be in a nicer format than what used in the analysis. Usually, data analysts will take the results from data scientists and adjust the format, such as labels, cell color, highlight. It is important for a data scientist to make sure the results look consistent which makes the next step easier for data analysts.</p>
 <p>It is highly recommended to store each step of the data and the R code, making the whole process as repeatable as possible. The R markdown reproducible report will be extremely helpful for that. If the data changes, it is easy to rerun the process. In the remainder of this chapter, we will show the most common data preprocessing methods.</p>
 <p>Load the R packages first:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">source</span>(<span class="st">&quot;https://raw.githubusercontent.com/happyrabbit/CE_JSM2017/master/Rcode/00-course-setup.R&quot;</span>)</code></pre></div>
-<pre><code>## Loading required package: plyr</code></pre>
-<pre><code>## Loading required package: dplyr</code></pre>
-<pre><code>## Warning: package &#39;dplyr&#39; was built under R version
-## 3.5.2</code></pre>
-<pre><code>## 
-## Attaching package: &#39;dplyr&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:plyr&#39;:
-## 
-##     arrange, count, desc, failwith, id, mutate,
-##     rename, summarise, summarize</code></pre>
-<pre><code>## The following objects are masked from &#39;package:stats&#39;:
-## 
-##     filter, lag</code></pre>
-<pre><code>## The following objects are masked from &#39;package:base&#39;:
-## 
-##     intersect, setdiff, setequal, union</code></pre>
-<pre><code>## Loading required package: caret</code></pre>
-<pre><code>## Warning: package &#39;caret&#39; was built under R version
-## 3.5.2</code></pre>
-<pre><code>## Loading required package: lattice</code></pre>
-<pre><code>## Loading required package: ggplot2</code></pre>
-<pre><code>## Warning: package &#39;ggplot2&#39; was built under R version
-## 3.5.2</code></pre>
-<pre><code>## Loading required package: e1071</code></pre>
-<pre><code>## Warning: package &#39;e1071&#39; was built under R version
-## 3.5.2</code></pre>
-<pre><code>## Loading required package: gridExtra</code></pre>
-<pre><code>## 
-## Attaching package: &#39;gridExtra&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
-## 
-##     combine</code></pre>
-<pre><code>## Loading required package: imputeMissings</code></pre>
-<pre><code>## 
-## Attaching package: &#39;imputeMissings&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:e1071&#39;:
-## 
-##     impute</code></pre>
-<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
-## 
-##     compute</code></pre>
-<pre><code>## Loading required package: RANN</code></pre>
-<pre><code>## Loading required package: corrplot</code></pre>
-<pre><code>## corrplot 0.84 loaded</code></pre>
-<pre><code>## Loading required package: nnet</code></pre>
-<pre><code>## Loading required package: car</code></pre>
-<pre><code>## Loading required package: carData</code></pre>
-<pre><code>## 
-## Attaching package: &#39;car&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
-## 
-##     recode</code></pre>
-<pre><code>## Loading required package: gpairs</code></pre>
-<pre><code>## Loading required package: reshape2</code></pre>
-<pre><code>## Loading required package: psych</code></pre>
-<pre><code>## 
-## Attaching package: &#39;psych&#39;</code></pre>
-<pre><code>## The following object is masked _by_ &#39;.GlobalEnv&#39;:
-## 
-##     income</code></pre>
-<pre><code>## The following object is masked from &#39;package:car&#39;:
-## 
-##     logit</code></pre>
-<pre><code>## The following objects are masked from &#39;package:ggplot2&#39;:
-## 
-##     %+%, alpha</code></pre>
-<pre><code>## Loading required package: tidyr</code></pre>
-<pre><code>## Warning: package &#39;tidyr&#39; was built under R version
-## 3.5.2</code></pre>
-<pre><code>## 
-## Attaching package: &#39;tidyr&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:reshape2&#39;:
-## 
-##     smiths</code></pre>
-<pre><code>## Loading required package: sparklyr</code></pre>
-<pre><code>## Loading required package: readr</code></pre>
-<pre><code>## Loading required package: mvtnorm</code></pre>
-<pre><code>## Loading required package: MASS</code></pre>
-<pre><code>## 
-## Attaching package: &#39;MASS&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
-## 
-##     select</code></pre>
-<pre><code>## Loading required package: data.table</code></pre>
-<pre><code>## Warning: package &#39;data.table&#39; was built under R version
-## 3.5.2</code></pre>
-<pre><code>## data.table 1.12.2 using 4 threads (see ?getDTthreads).  Latest news: r-datatable.com</code></pre>
-<pre><code>## 
-## Attaching package: &#39;data.table&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:reshape2&#39;:
-## 
-##     dcast, melt</code></pre>
-<pre><code>## The following objects are masked from &#39;package:dplyr&#39;:
-## 
-##     between, first, last</code></pre>
-<pre><code>## Loading required package: magrittr</code></pre>
-<pre><code>## 
-## Attaching package: &#39;magrittr&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:tidyr&#39;:
-## 
-##     extract</code></pre>
-<pre><code>## Loading required package: shiny</code></pre>
-<pre><code>## Loading required package: metricsgraphics</code></pre>
-<pre><code>## Loading required package: DT</code></pre>
-<pre><code>## 
-## Attaching package: &#39;DT&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:shiny&#39;:
-## 
-##     dataTableOutput, renderDataTable</code></pre>
-<pre><code>## Loading required package: leaflet</code></pre>
-<pre><code>## Loading required package: dygraphs</code></pre>
-<pre><code>## Loading required package: xts</code></pre>
-<pre><code>## Loading required package: zoo</code></pre>
-<pre><code>## 
-## Attaching package: &#39;zoo&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:base&#39;:
-## 
-##     as.Date, as.Date.numeric</code></pre>
-<pre><code>## 
-## Attaching package: &#39;xts&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:leaflet&#39;:
-## 
-##     addLegend</code></pre>
-<pre><code>## The following objects are masked from &#39;package:data.table&#39;:
-## 
-##     first, last</code></pre>
-<pre><code>## The following objects are masked from &#39;package:dplyr&#39;:
-## 
-##     first, last</code></pre>
-<pre><code>## Loading required package: lubridate</code></pre>
-<pre><code>## 
-## Attaching package: &#39;lubridate&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:data.table&#39;:
-## 
-##     hour, isoweek, mday, minute, month, quarter,
-##     second, wday, week, yday, year</code></pre>
-<pre><code>## The following object is masked from &#39;package:plyr&#39;:
-## 
-##     here</code></pre>
-<pre><code>## The following object is masked from &#39;package:base&#39;:
-## 
-##     date</code></pre>
-<pre><code>## Loading required package: highcharter</code></pre>
-<pre><code>## Highcharts (www.highcharts.com) is a Highsoft software product which is</code></pre>
-<pre><code>## not free for commercial and Governmental use</code></pre>
-<pre><code>## Loading required package: rbokeh</code></pre>
-<pre><code>## Loading required package: networkD3</code></pre>
-<pre><code>## 
-## Attaching package: &#39;networkD3&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:highcharter&#39;:
-## 
-##     JS</code></pre>
-<pre><code>## The following object is masked from &#39;package:leaflet&#39;:
-## 
-##     JS</code></pre>
-<pre><code>## The following object is masked from &#39;package:DT&#39;:
-## 
-##     JS</code></pre>
-<pre><code>## The following object is masked from &#39;package:metricsgraphics&#39;:
-## 
-##     JS</code></pre>
-<pre><code>## Loading required package: threejs</code></pre>
-<pre><code>## Loading required package: igraph</code></pre>
-<pre><code>## 
-## Attaching package: &#39;igraph&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:lubridate&#39;:
-## 
-##     %--%, union</code></pre>
-<pre><code>## The following object is masked from &#39;package:tidyr&#39;:
-## 
-##     crossing</code></pre>
-<pre><code>## The following objects are masked from &#39;package:dplyr&#39;:
-## 
-##     as_data_frame, groups, union</code></pre>
-<pre><code>## The following objects are masked from &#39;package:stats&#39;:
-## 
-##     decompose, spectrum</code></pre>
-<pre><code>## The following object is masked from &#39;package:base&#39;:
-## 
-##     union</code></pre>
-<pre><code>## Loading required package: knitr</code></pre>
-<pre><code>## Loading required package: formatR</code></pre>
-<pre><code>## Warning: package &#39;formatR&#39; was built under R version
-## 3.5.2</code></pre> 
+<!--
+```r
+source("https://raw.githubusercontent.com/happyrabbit/CE_JSM2017/master/Rcode/00-course-setup.R")
+```
+-->
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># install packages from CRAN</span>
+p_needed &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;imputeMissings&#39;</span>,<span class="st">&#39;caret&#39;</span>,<span class="st">&#39;e1071&#39;</span>,<span class="st">&#39;psych&#39;</span>,<span class="st">&#39;car&#39;</span>,<span class="st">&#39;corrplot&#39;</span>)
+packages &lt;-<span class="st"> </span><span class="kw">rownames</span>(<span class="kw">installed.packages</span>())
+p_to_install &lt;-<span class="st"> </span>p_needed[<span class="op">!</span>(p_needed <span class="op">%in%</span><span class="st"> </span>packages)]
+<span class="cf">if</span> (<span class="kw">length</span>(p_to_install) <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>) {
+    <span class="kw">install.packages</span>(p_to_install)
+}
+
+<span class="kw">lapply</span>(p_needed, require, <span class="dt">character.only =</span> <span class="ot">TRUE</span>)</code></pre></div> 
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="mnist-dataset.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="imdb-dataset.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
 <a href="data-cleaning.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>

@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2019-06-17">
+<meta name="date" content="2019-08-20">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -145,6 +145,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="3.2" data-path="customer-satisfaction-survey-data-from-airline-company.html"><a href="customer-satisfaction-survey-data-from-airline-company.html"><i class="fa fa-check"></i><b>3.2</b> Customer Satisfaction Survey Data from Airline Company</a></li>
 <li class="chapter" data-level="3.3" data-path="swine-disease-breakout-data.html"><a href="swine-disease-breakout-data.html"><i class="fa fa-check"></i><b>3.3</b> Swine Disease Breakout Data</a></li>
 <li class="chapter" data-level="3.4" data-path="mnist-dataset.html"><a href="mnist-dataset.html"><i class="fa fa-check"></i><b>3.4</b> MNIST Dataset</a></li>
+<li class="chapter" data-level="3.5" data-path="imdb-dataset.html"><a href="imdb-dataset.html"><i class="fa fa-check"></i><b>3.5</b> IMDB Dataset</a></li>
 </ul></li>
 <li class="chapter" data-level="4" data-path="data-pre-processing.html"><a href="data-pre-processing.html"><i class="fa fa-check"></i><b>4</b> Data Pre-processing</a><ul>
 <li class="chapter" data-level="4.1" data-path="data-cleaning.html"><a href="data-cleaning.html"><i class="fa fa-check"></i><b>4.1</b> Data Cleaning</a></li>
@@ -159,9 +160,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="4.6" data-path="collinearity.html"><a href="collinearity.html"><i class="fa fa-check"></i><b>4.6</b> Collinearity</a></li>
 <li class="chapter" data-level="4.7" data-path="sparse-variables.html"><a href="sparse-variables.html"><i class="fa fa-check"></i><b>4.7</b> Sparse Variables</a></li>
 <li class="chapter" data-level="4.8" data-path="re-encode-dummy-variables.html"><a href="re-encode-dummy-variables.html"><i class="fa fa-check"></i><b>4.8</b> Re-encode Dummy Variables</a></li>
-<li class="chapter" data-level="4.9" data-path="python-computing.html"><a href="python-computing.html"><i class="fa fa-check"></i><b>4.9</b> Python Computing</a><ul>
-<li class="chapter" data-level="4.9.1" data-path="python-computing.html"><a href="python-computing.html#data-cleaning-1"><i class="fa fa-check"></i><b>4.9.1</b> Data Cleaning</a></li>
-</ul></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="data-wrangling.html"><a href="data-wrangling.html"><i class="fa fa-check"></i><b>5</b> Data Wrangling</a><ul>
 <li class="chapter" data-level="5.1" data-path="read-and-write-data.html"><a href="read-and-write-data.html"><i class="fa fa-check"></i><b>5.1</b> Read and write data</a><ul>
@@ -269,20 +267,21 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="collinearity" class="section level2">
 <h2><span class="header-section-number">4.6</span> Collinearity</h2>
 <p>It is probably the technical term known by the most un-technical people. When two predictors are very strongly correlated, including both in a model may lead to confusion or problem with a singular matrix. There is an excellent function in <code>corrplot</code> package with the same name <code>corrplot()</code> that can visualize correlation structure of a set of predictors. The function has the option to reorder the variables in a way that reveals clusters of highly correlated ones.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># corp, fig.cap=&#39;Correlation Matrix&#39;, out.width=&#39;80%&#39;, fig.asp=.75, </span>
-<span class="co"># fig.align=&#39;center&#39;}</span>
-<span class="co"># select non-survey numerical variables</span>
-sdat&lt;-<span class="kw">subset</span>(sim.dat,<span class="dt">select=</span><span class="kw">c</span>(<span class="st">&quot;age&quot;</span>,<span class="st">&quot;income&quot;</span>,<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>,<span class="st">&quot;store_trans&quot;</span>,<span class="st">&quot;online_trans&quot;</span> ))
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># select non-survey numerical variables</span>
+sdat &lt;-<span class="st"> </span><span class="kw">subset</span>(sim.dat, <span class="dt">select =</span> <span class="kw">c</span>(<span class="st">&quot;age&quot;</span>, <span class="st">&quot;income&quot;</span>, <span class="st">&quot;store_exp&quot;</span>, <span class="st">&quot;online_exp&quot;</span>, 
+    <span class="st">&quot;store_trans&quot;</span>, <span class="st">&quot;online_trans&quot;</span>))
 <span class="co"># use bagging imputation here</span>
-imp&lt;-<span class="kw">preProcess</span>(sdat,<span class="dt">method=</span><span class="st">&quot;bagImpute&quot;</span>)
-sdat&lt;-<span class="kw">predict</span>(imp,sdat)
+imp &lt;-<span class="st"> </span><span class="kw">preProcess</span>(sdat, <span class="dt">method =</span> <span class="st">&quot;bagImpute&quot;</span>)
+sdat &lt;-<span class="st"> </span><span class="kw">predict</span>(imp, sdat)
 <span class="co"># get the correlation matrix</span>
-correlation&lt;-<span class="kw">cor</span>(sdat)
-<span class="co"># plot </span>
-<span class="kw">par</span>(<span class="dt">oma=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>))
-<span class="kw">corrplot.mixed</span>(correlation,<span class="dt">order=</span><span class="st">&quot;hclust&quot;</span>,<span class="dt">tl.pos=</span><span class="st">&quot;lt&quot;</span>,<span class="dt">upper=</span><span class="st">&quot;ellipse&quot;</span>)</code></pre></div>
+correlation &lt;-<span class="st"> </span><span class="kw">cor</span>(sdat)
+<span class="co"># plot</span>
+<span class="kw">par</span>(<span class="dt">oma =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>))
+<span class="kw">corrplot.mixed</span>(correlation, <span class="dt">order =</span> <span class="st">&quot;hclust&quot;</span>, <span class="dt">tl.pos =</span> <span class="st">&quot;lt&quot;</span>, <span class="dt">upper =</span> <span class="st">&quot;ellipse&quot;</span>)</code></pre></div>
+<p><img src="IDS_files/figure-html/unnamed-chunk-18-1.svg" width="672" /></p>
 <!--Here use `corrplot.mixed()` function to visualize the correlation matrix (figure \@ref(fig:corp)).-->
-<p>The closer the correlation is to 0, the lighter the color is and the closer the shape is to a circle. The elliptical means the correlation is not equal to 0 (because we set the <code>upper = &quot;ellipse&quot;</code>), the greater the correlation, the narrower the ellipse. Blue represents a positive correlation; red represents a negative correlation. The direction of the ellipse also changes with the correlation. The correlation coefficient is shown in the lower triangle of the matrix. The variables relationship from previous scatter matrix are clear here: the negative correlation between age and online shopping, the positive correlation between income and amount of purchasing. Some correlation is very strong ( such as the correlation between <code>online_trans</code> and<code>age</code> is -0.85) which means the two variables contain duplicate information.</p>
+<p>The closer the correlation is to 0, the lighter the color is and the closer the shape is to a circle. The elliptical means the correlation is not equal to 0 (because we set the <code>upper = &quot;ellipse&quot;</code>), the greater the correlation, the narrower the ellipse. Blue represents a positive correlation; red represents a negative correlation. The direction of the ellipse also changes with the correlation. The correlation coefficient is shown in the lower triangle of the matrix.</p>
+<p>The variables relationship from previous scatter matrix are clear here: the negative correlation between age and online shopping, the positive correlation between income and amount of purchasing. Some correlation is very strong ( such as the correlation between <code>online_trans</code> and<code>age</code> is -0.7414) which means the two variables contain duplicate information.</p>
 <p>Section 3.5 of “Applied Predictive Modeling” <span class="citation">(Kuhn and Johnston <a href="#ref-APM">2013</a>)</span> presents a heuristic algorithm to remove a minimum number of predictors to ensure all pairwise correlations are below a certain threshold:</p>
 <blockquote>
 <ol style="list-style-type: decimal">
@@ -294,13 +293,14 @@ correlation&lt;-<span class="kw">cor</span>(sdat)
 </ol>
 </blockquote>
 <p>The <code>findCorrelation()</code> function in package <code>caret</code> will apply the above algorithm.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(highCorr&lt;-<span class="kw">findCorrelation</span>(<span class="kw">cor</span>(sdat),<span class="dt">cutoff=</span>.<span class="dv">75</span>))</code></pre></div>
-<p>It returns the index of columns need to be deleted. It tells us that we need to remove the first column to make sure the correlations are all below 0.75.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(highCorr &lt;-<span class="st"> </span><span class="kw">findCorrelation</span>(<span class="kw">cor</span>(sdat), <span class="dt">cutoff =</span> <span class="fl">0.7</span>))</code></pre></div>
+<pre><code>## [1] 2 6</code></pre>
+<p>It returns the index of columns need to be deleted. It tells us that we need to remove the first column to make sure the correlations are all below 0.7.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># delete highly correlated columns</span>
-sdat&lt;-sdat[<span class="op">-</span>highCorr]
+sdat &lt;-<span class="st"> </span>sdat[<span class="op">-</span>highCorr]
 <span class="co"># check the new correlation matrix</span>
-<span class="kw">cor</span>(sdat)</code></pre></div>
-<p>The absolute value of the elements in the correlation matrix after removal are all below 0.75. How strong does a correlation have to get, before you should start worrying about multicollinearity? There is no easy answer to that question. You can treat the threshold as a tuning parameter and pick one that gives you best prediction accuracy.</p>
+(<span class="kw">cor</span>(sdat))</code></pre></div>
+<p>The absolute value of the elements in the correlation matrix after removal are all below 0.7. How strong does a correlation have to get, before you should start worrying about multicollinearity? There is no easy answer to that question. You can treat the threshold as a tuning parameter and pick one that gives you best prediction accuracy.</p>
 </div>
 <h3>References</h3>
 <div id="refs" class="references">

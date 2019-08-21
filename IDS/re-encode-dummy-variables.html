@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2019-06-17">
+<meta name="date" content="2019-08-20">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -33,7 +33,7 @@
   
   
 <link rel="prev" href="sparse-variables.html">
-<link rel="next" href="python-computing.html">
+<link rel="next" href="data-wrangling.html">
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
@@ -145,6 +145,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="3.2" data-path="customer-satisfaction-survey-data-from-airline-company.html"><a href="customer-satisfaction-survey-data-from-airline-company.html"><i class="fa fa-check"></i><b>3.2</b> Customer Satisfaction Survey Data from Airline Company</a></li>
 <li class="chapter" data-level="3.3" data-path="swine-disease-breakout-data.html"><a href="swine-disease-breakout-data.html"><i class="fa fa-check"></i><b>3.3</b> Swine Disease Breakout Data</a></li>
 <li class="chapter" data-level="3.4" data-path="mnist-dataset.html"><a href="mnist-dataset.html"><i class="fa fa-check"></i><b>3.4</b> MNIST Dataset</a></li>
+<li class="chapter" data-level="3.5" data-path="imdb-dataset.html"><a href="imdb-dataset.html"><i class="fa fa-check"></i><b>3.5</b> IMDB Dataset</a></li>
 </ul></li>
 <li class="chapter" data-level="4" data-path="data-pre-processing.html"><a href="data-pre-processing.html"><i class="fa fa-check"></i><b>4</b> Data Pre-processing</a><ul>
 <li class="chapter" data-level="4.1" data-path="data-cleaning.html"><a href="data-cleaning.html"><i class="fa fa-check"></i><b>4.1</b> Data Cleaning</a></li>
@@ -159,9 +160,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="4.6" data-path="collinearity.html"><a href="collinearity.html"><i class="fa fa-check"></i><b>4.6</b> Collinearity</a></li>
 <li class="chapter" data-level="4.7" data-path="sparse-variables.html"><a href="sparse-variables.html"><i class="fa fa-check"></i><b>4.7</b> Sparse Variables</a></li>
 <li class="chapter" data-level="4.8" data-path="re-encode-dummy-variables.html"><a href="re-encode-dummy-variables.html"><i class="fa fa-check"></i><b>4.8</b> Re-encode Dummy Variables</a></li>
-<li class="chapter" data-level="4.9" data-path="python-computing.html"><a href="python-computing.html"><i class="fa fa-check"></i><b>4.9</b> Python Computing</a><ul>
-<li class="chapter" data-level="4.9.1" data-path="python-computing.html"><a href="python-computing.html#data-cleaning-1"><i class="fa fa-check"></i><b>4.9.1</b> Data Cleaning</a></li>
-</ul></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="data-wrangling.html"><a href="data-wrangling.html"><i class="fa fa-check"></i><b>5</b> Data Wrangling</a><ul>
 <li class="chapter" data-level="5.1" data-path="read-and-write-data.html"><a href="read-and-write-data.html"><i class="fa fa-check"></i><b>5.1</b> Read and write data</a><ul>
@@ -270,28 +268,58 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h2><span class="header-section-number">4.8</span> Re-encode Dummy Variables</h2>
 <p>A dummy variable is a binary variable (0/1) to represent subgroups of the sample. Sometimes we need to recode categories to smaller bits of information named “dummy variables.” For example, some questionnaires have five options for each question, A, B, C, D, and E. After you get the data, you will usually convert the corresponding categorical variables for each question into five nominal variables, and then use one of the options as the baseline.</p>
 <p>Let’s encode <code>gender</code> and <code>house</code> from <code>sim.dat</code> to dummy variables. There are two ways to implement this. The first is to use <code>class.ind()</code> from <code>nnet</code> package. However, it only works on one variable at a time.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dumVar&lt;-nnet<span class="op">::</span><span class="kw">class.ind</span>(sim.dat<span class="op">$</span>gender)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dumVar &lt;-<span class="st"> </span>nnet<span class="op">::</span><span class="kw">class.ind</span>(sim.dat<span class="op">$</span>gender)
 <span class="kw">head</span>(dumVar)</code></pre></div>
+<pre><code>##      Female Male
+## [1,]      1    0
+## [2,]      1    0
+## [3,]      0    1
+## [4,]      0    1
+## [5,]      0    1
+## [6,]      0    1</code></pre>
 <p>Since it is redundant to keep both, we need to remove one of them when modeling. Another more powerful function is <code>dummyVars()</code> from <code>caret</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dumMod&lt;-<span class="kw">dummyVars</span>(<span class="op">~</span>gender<span class="op">+</span>house<span class="op">+</span>income,
-                  <span class="dt">data=</span>sim.dat,
-                  <span class="co"># use &quot;origional variable name + level&quot; as new name</span>
-                  <span class="dt">levelsOnly=</span>F)
-<span class="kw">head</span>(<span class="kw">predict</span>(dumMod,sim.dat))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># use &quot;origional variable name + level&quot; as new name</span>
+dumMod &lt;-<span class="st"> </span><span class="kw">dummyVars</span>(<span class="op">~</span>gender <span class="op">+</span><span class="st"> </span>house <span class="op">+</span><span class="st"> </span>income, 
+                    <span class="dt">data =</span> sim.dat, 
+                    <span class="dt">levelsOnly =</span> F)
+<span class="kw">head</span>(<span class="kw">predict</span>(dumMod, sim.dat))</code></pre></div>
+<pre><code>##   gender.Female gender.Male house.No house.Yes income
+## 1             1           0        0         1 120963
+## 2             1           0        0         1 122008
+## 3             0           1        0         1 114202
+## 4             0           1        0         1 113616
+## 5             0           1        0         1 124253
+## 6             0           1        0         1 107661</code></pre>
 <p><code>dummyVars()</code> can also use formula format. The variable on the right-hand side can be both categorical and numeric. For a numerical variable, the function will keep the variable unchanged. The advantage is that you can apply the function to a data frame without removing numerical variables. Other than that, the function can create interaction term:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dumMod&lt;-<span class="kw">dummyVars</span>(<span class="op">~</span>gender<span class="op">+</span>house<span class="op">+</span>income<span class="op">+</span>income<span class="op">:</span>gender,
-                  <span class="dt">data=</span>sim.dat,
-                  <span class="dt">levelsOnly=</span>F)
-<span class="kw">head</span>(<span class="kw">predict</span>(dumMod,sim.dat))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dumMod &lt;-<span class="st"> </span><span class="kw">dummyVars</span>(<span class="op">~</span>gender <span class="op">+</span><span class="st"> </span>house <span class="op">+</span><span class="st"> </span>income <span class="op">+</span><span class="st"> </span>income<span class="op">:</span>gender, 
+                    <span class="dt">data =</span> sim.dat, 
+                    <span class="dt">levelsOnly =</span> F)
+<span class="kw">head</span>(<span class="kw">predict</span>(dumMod, sim.dat))</code></pre></div>
+<pre><code>##   gender.Female gender.Male house.No house.Yes income
+## 1             1           0        0         1 120963
+## 2             1           0        0         1 122008
+## 3             0           1        0         1 114202
+## 4             0           1        0         1 113616
+## 5             0           1        0         1 124253
+## 6             0           1        0         1 107661
+##   gender.Female:income gender.Male:income
+## 1               120963                  0
+## 2               122008                  0
+## 3                    0             114202
+## 4                    0             113616
+## 5                    0             124253
+## 6                    0             107661</code></pre>
 <p>If you think the impact income levels on purchasing behavior is different for male and female, then you may add the interaction term between <code>income</code> and <code>gender</code>. You can do this by adding <code>income: gender</code> in the formula.</p>
+
 </div>
+<!-- </div> -->
             </section>
 
           </div>
         </div>
       </div>
 <a href="sparse-variables.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="python-computing.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="data-wrangling.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>

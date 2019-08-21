@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2019-06-17">
+<meta name="date" content="2019-08-20">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -145,6 +145,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="3.2" data-path="customer-satisfaction-survey-data-from-airline-company.html"><a href="customer-satisfaction-survey-data-from-airline-company.html"><i class="fa fa-check"></i><b>3.2</b> Customer Satisfaction Survey Data from Airline Company</a></li>
 <li class="chapter" data-level="3.3" data-path="swine-disease-breakout-data.html"><a href="swine-disease-breakout-data.html"><i class="fa fa-check"></i><b>3.3</b> Swine Disease Breakout Data</a></li>
 <li class="chapter" data-level="3.4" data-path="mnist-dataset.html"><a href="mnist-dataset.html"><i class="fa fa-check"></i><b>3.4</b> MNIST Dataset</a></li>
+<li class="chapter" data-level="3.5" data-path="imdb-dataset.html"><a href="imdb-dataset.html"><i class="fa fa-check"></i><b>3.5</b> IMDB Dataset</a></li>
 </ul></li>
 <li class="chapter" data-level="4" data-path="data-pre-processing.html"><a href="data-pre-processing.html"><i class="fa fa-check"></i><b>4</b> Data Pre-processing</a><ul>
 <li class="chapter" data-level="4.1" data-path="data-cleaning.html"><a href="data-cleaning.html"><i class="fa fa-check"></i><b>4.1</b> Data Cleaning</a></li>
@@ -159,9 +160,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="4.6" data-path="collinearity.html"><a href="collinearity.html"><i class="fa fa-check"></i><b>4.6</b> Collinearity</a></li>
 <li class="chapter" data-level="4.7" data-path="sparse-variables.html"><a href="sparse-variables.html"><i class="fa fa-check"></i><b>4.7</b> Sparse Variables</a></li>
 <li class="chapter" data-level="4.8" data-path="re-encode-dummy-variables.html"><a href="re-encode-dummy-variables.html"><i class="fa fa-check"></i><b>4.8</b> Re-encode Dummy Variables</a></li>
-<li class="chapter" data-level="4.9" data-path="python-computing.html"><a href="python-computing.html"><i class="fa fa-check"></i><b>4.9</b> Python Computing</a><ul>
-<li class="chapter" data-level="4.9.1" data-path="python-computing.html"><a href="python-computing.html#data-cleaning-1"><i class="fa fa-check"></i><b>4.9.1</b> Data Cleaning</a></li>
-</ul></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="data-wrangling.html"><a href="data-wrangling.html"><i class="fa fa-check"></i><b>5</b> Data Wrangling</a><ul>
 <li class="chapter" data-level="5.1" data-path="read-and-write-data.html"><a href="read-and-write-data.html"><i class="fa fa-check"></i><b>5.1</b> Read and write data</a><ul>
@@ -273,34 +271,46 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="reshape2-package" class="section level3">
 <h3><span class="header-section-number">5.3.1</span> <code>reshape2</code> package</h3>
 <p>It is a reboot of the previous package <code>reshape</code>. Take a baby subset of our exemplary clothes consumers data to illustrate:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(sdat&lt;-sim.dat[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">6</span>])</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sdat&lt;-sim.dat[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</code></pre></div>
 <p>For the above data <code>sdat</code>, what if we want to have a variable indicating the purchasing channel (i.e. online or in-store) and another column with the corresponding expense amount? Assume we want to keep the rest of the columns the same. It is a task to change data from “wide” to “long”. There are two general ways to shape data:</p>
 <ul>
 <li>Use <code>melt()</code> to convert an object into a molten data frame, i.e., from wide to long</li>
 <li>Use <code>dcast()</code> to cast a molten data frame into the shape you want, i.e., from long to wide</li>
 </ul>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(reshape2)
-(mdat &lt;-<span class="st"> </span><span class="kw">melt</span>(sdat, <span class="dt">measure.vars=</span><span class="kw">c</span>(<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>),
-              <span class="dt">variable.name =</span> <span class="st">&quot;Channel&quot;</span>,
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(mdat &lt;-<span class="st"> </span><span class="kw">melt</span>(sdat, <span class="dt">measure.vars =</span> <span class="kw">c</span>(<span class="st">&quot;store_exp&quot;</span>, <span class="st">&quot;online_exp&quot;</span>),
+              <span class="dt">variable.name =</span> <span class="st">&quot;Channel&quot;</span>, 
               <span class="dt">value.name =</span> <span class="st">&quot;Expense&quot;</span>))</code></pre></div>
+<pre><code>##    age gender income house    Channel Expense
+## 1   57 Female 120963   Yes  store_exp   529.1
+## 2   63 Female 122008   Yes  store_exp   478.0
+## 3   59   Male 114202   Yes  store_exp   490.8
+## 4   60   Male 113616   Yes  store_exp   347.8
+## 5   51   Male 124253   Yes  store_exp   379.6
+## 6   57 Female 120963   Yes online_exp   303.5
+## 7   63 Female 122008   Yes online_exp   109.5
+## 8   59   Male 114202   Yes online_exp   279.2
+## 9   60   Male 113616   Yes online_exp   141.7
+## 10  51   Male 124253   Yes online_exp   112.2</code></pre>
 <p>You melted the data frame <code>sdat</code> by two variables: <code>store_exp</code> and <code>online_exp</code> (<code>measure.vars=c(&quot;store_exp&quot;,&quot;online_exp&quot;)</code>). The new variable name is <code>Channel</code> set by command <code>variable.name = &quot;Channel&quot;</code>. The value name is <code>Expense</code> set by command <code>value.name = &quot;Expense&quot;</code>.</p>
 <p>You can run a regression to study the effect of purchasing channel as follows:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Here we use all observations from sim.dat</span>
 <span class="co"># Don&#39;t show result here</span>
-mdat&lt;-<span class="kw">melt</span>(sim.dat[,<span class="dv">1</span><span class="op">:</span><span class="dv">6</span>], <span class="dt">measure.vars=</span><span class="kw">c</span>(<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>),
-            <span class="dt">variable.name =</span> <span class="st">&quot;Channel&quot;</span>,
-              <span class="dt">value.name =</span> <span class="st">&quot;Expense&quot;</span>)
-fit&lt;-<span class="kw">lm</span>(Expense<span class="op">~</span>gender<span class="op">+</span>house<span class="op">+</span>income<span class="op">+</span>Channel<span class="op">+</span>age,<span class="dt">data=</span>mdat)
+mdat &lt;-<span class="st"> </span><span class="kw">melt</span>(sim.dat[, <span class="dv">1</span><span class="op">:</span><span class="dv">6</span>], <span class="dt">measure.vars =</span> <span class="kw">c</span>(<span class="st">&quot;store_exp&quot;</span>, <span class="st">&quot;online_exp&quot;</span>), 
+    <span class="dt">variable.name =</span> <span class="st">&quot;Channel&quot;</span>, <span class="dt">value.name =</span> <span class="st">&quot;Expense&quot;</span>)
+fit &lt;-<span class="st"> </span><span class="kw">lm</span>(Expense <span class="op">~</span><span class="st"> </span>gender <span class="op">+</span><span class="st"> </span>house <span class="op">+</span><span class="st"> </span>income <span class="op">+</span><span class="st"> </span>Channel <span class="op">+</span><span class="st"> </span>age, <span class="dt">data =</span> mdat)
 <span class="kw">summary</span>(fit)</code></pre></div>
 <p>You can <code>melt()</code> list, matrix, table too. The syntax is similar, and we won’t go through every situation. Sometimes we want to convert the data from “long” to “wide”. For example, <strong>you want to compare the online and in-store expense between male and female based on the house ownership. </strong></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">dcast</span>(mdat, house <span class="op">+</span><span class="st"> </span>gender <span class="op">~</span><span class="st"> </span>Channel, sum)</code></pre></div>
+<pre><code>## Using Expense as value column: use value.var to override.</code></pre>
+<pre><code>##   house gender store_exp online_exp
+## 1   Yes Female      1007      413.0
+## 2   Yes   Male      1218      533.2</code></pre>
 <p>In the above code, what is the left side of <code>~</code> are variables that you want to group by. The right side is the variable you want to spread as columns. It will use the column indicating value from <code>melt()</code> before. Here is “<code>Expense</code>” .</p>
 </div>
 <div id="tidyr-package" class="section level3">
 <h3><span class="header-section-number">5.3.2</span> <code>tidyr</code> package</h3>
 <p>The other package that will do similar manipulations is <code>tidyr</code>. Let’s get a subset to illustrate the usage.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)
-<span class="co"># practice functions we learnt before</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># practice functions we learnt before</span>
 sdat&lt;-sim.dat[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>,]<span class="op">%&gt;%</span>
 <span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(age,gender,store_exp,store_trans)
 sdat <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tbl_df</span>()</code></pre></div>

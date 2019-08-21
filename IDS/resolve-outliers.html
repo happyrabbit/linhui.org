@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2019-06-17">
+<meta name="date" content="2019-08-20">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -145,6 +145,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="3.2" data-path="customer-satisfaction-survey-data-from-airline-company.html"><a href="customer-satisfaction-survey-data-from-airline-company.html"><i class="fa fa-check"></i><b>3.2</b> Customer Satisfaction Survey Data from Airline Company</a></li>
 <li class="chapter" data-level="3.3" data-path="swine-disease-breakout-data.html"><a href="swine-disease-breakout-data.html"><i class="fa fa-check"></i><b>3.3</b> Swine Disease Breakout Data</a></li>
 <li class="chapter" data-level="3.4" data-path="mnist-dataset.html"><a href="mnist-dataset.html"><i class="fa fa-check"></i><b>3.4</b> MNIST Dataset</a></li>
+<li class="chapter" data-level="3.5" data-path="imdb-dataset.html"><a href="imdb-dataset.html"><i class="fa fa-check"></i><b>3.5</b> IMDB Dataset</a></li>
 </ul></li>
 <li class="chapter" data-level="4" data-path="data-pre-processing.html"><a href="data-pre-processing.html"><i class="fa fa-check"></i><b>4</b> Data Pre-processing</a><ul>
 <li class="chapter" data-level="4.1" data-path="data-cleaning.html"><a href="data-cleaning.html"><i class="fa fa-check"></i><b>4.1</b> Data Cleaning</a></li>
@@ -159,9 +160,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="4.6" data-path="collinearity.html"><a href="collinearity.html"><i class="fa fa-check"></i><b>4.6</b> Collinearity</a></li>
 <li class="chapter" data-level="4.7" data-path="sparse-variables.html"><a href="sparse-variables.html"><i class="fa fa-check"></i><b>4.7</b> Sparse Variables</a></li>
 <li class="chapter" data-level="4.8" data-path="re-encode-dummy-variables.html"><a href="re-encode-dummy-variables.html"><i class="fa fa-check"></i><b>4.8</b> Re-encode Dummy Variables</a></li>
-<li class="chapter" data-level="4.9" data-path="python-computing.html"><a href="python-computing.html"><i class="fa fa-check"></i><b>4.9</b> Python Computing</a><ul>
-<li class="chapter" data-level="4.9.1" data-path="python-computing.html"><a href="python-computing.html#data-cleaning-1"><i class="fa fa-check"></i><b>4.9.1</b> Data Cleaning</a></li>
-</ul></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="data-wrangling.html"><a href="data-wrangling.html"><i class="fa fa-check"></i><b>5</b> Data Wrangling</a><ul>
 <li class="chapter" data-level="5.1" data-path="read-and-write-data.html"><a href="read-and-write-data.html"><i class="fa fa-check"></i><b>5.1</b> Read and write data</a><ul>
@@ -269,12 +267,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="resolve-outliers" class="section level2">
 <h2><span class="header-section-number">4.5</span> Resolve Outliers</h2>
 <p>Even under certain assumptions we can statistically define outliers, it can be hard to define in some situations. Box plot, histogram and some other basic visualizations can be used to initially check whether there are outliers. For example, we can visualize numerical non-survey variables in <code>sim.dat</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># scm, fig.cap=&#39;Use basic visualization to check outliers&#39;, out.width=&#39;80%&#39;, # fig.asp=.75, fig.align=&#39;center&#39;</span>
-<span class="co"># select numerical non-survey data</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># select numerical non-survey data</span>
 sdat&lt;-<span class="kw">subset</span>(sim.dat,<span class="dt">select=</span><span class="kw">c</span>(<span class="st">&quot;age&quot;</span>,<span class="st">&quot;income&quot;</span>,<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>,<span class="st">&quot;store_trans&quot;</span>,<span class="st">&quot;online_trans&quot;</span> ))
 <span class="co"># use scatterplotMatrix() function from car package</span>
 <span class="kw">par</span>(<span class="dt">oma=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">2</span>))
 <span class="kw">scatterplotMatrix</span>(sdat,<span class="dt">diagonal=</span><span class="st">&quot;boxplot&quot;</span>,<span class="dt">smoother=</span><span class="ot">FALSE</span>)</code></pre></div>
+<p><img src="IDS_files/figure-html/unnamed-chunk-15-1.svg" width="672" /></p>
 <!--As figure \@ref(fig:scm) shows, `store_exp` has outliers. -->
 <p>It is also easy to observe the pair relationship from the plot. <code>age</code> is negatively correlated with <code>online_trans</code> but positively correlated with <code>store_trans</code>. It seems that older people tend to purchase from the local store. The amount of expense is positively correlated with income. Scatterplot matrix like this can reveal lots of information before modeling.</p>
 <p>In addition to visualization, there are some statistical methods to define outliers, such as the commonly used Z-score. The Z-score for variable <span class="math inline">\(\mathbf{Y}\)</span> is defined as:</p>
@@ -283,11 +281,12 @@ sdat&lt;-<span class="kw">subset</span>(sim.dat,<span class="dt">select=</span><
 <p><span class="math display">\[M_{i}=\frac{0.6745(Y_{i}-\bar{Y})}{MAD}\]</span></p>
 <p>Where MAD is the median of a series of <span class="math inline">\(|Y_ {i} - \bar{Y}|\)</span>, called the median of the absolute dispersion. Iglewicz and Hoaglin suggest that the points with the Z-score greater than 3.5 corrected above are possible outliers. Let’s apply it to <code>income</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate median of the absolute dispersion for income</span>
-ymad&lt;-<span class="kw">mad</span>(<span class="kw">na.omit</span>(sdat<span class="op">$</span>income))
+ymad &lt;-<span class="st"> </span><span class="kw">mad</span>(<span class="kw">na.omit</span>(sdat<span class="op">$</span>income))
 <span class="co"># calculate z-score</span>
-zs&lt;-(sdat<span class="op">$</span>income<span class="op">-</span><span class="kw">mean</span>(<span class="kw">na.omit</span>(sdat<span class="op">$</span>income)))<span class="op">/</span>ymad
+zs &lt;-<span class="st"> </span>(sdat<span class="op">$</span>income <span class="op">-</span><span class="st"> </span><span class="kw">mean</span>(<span class="kw">na.omit</span>(sdat<span class="op">$</span>income)))<span class="op">/</span>ymad
 <span class="co"># count the number of outliers</span>
-<span class="kw">sum</span>(<span class="kw">na.omit</span>(zs<span class="op">&gt;</span><span class="fl">3.5</span>))</code></pre></div>
+<span class="kw">sum</span>(<span class="kw">na.omit</span>(zs <span class="op">&gt;</span><span class="st"> </span><span class="fl">3.5</span>))</code></pre></div>
+<pre><code>## [1] 59</code></pre>
 <p>According to modified Z-score, variable income has 59 outliers. Refer to <span class="citation">(Iglewicz and Hoaglin <a href="#ref-mad1">1993</a>)</span> for other ways of detecting outliers.</p>
 <p>The impact of outliers depends on the model. Some models are sensitive to outliers, such as linear regression, logistic regression. Some are pretty robust to outliers, such as tree models, support vector machine. Also, the outlier is not wrong data. It is real observation so cannot be deleted at will. If a model is sensitive to outliers, we can use <em>spatial sign transformation</em> <span class="citation">(Serneels S <a href="#ref-ssp">2006</a>)</span> to minimize the problem. It projects the original sample points to the surface of a sphere by:</p>
 <p><span class="math display">\[x_{ij}^{*}=\frac{x_{ij}}{\sqrt{\sum_{j=1}^{p}x_{ij}^{2}}}\]</span></p>
@@ -298,17 +297,16 @@ zs&lt;-(sdat<span class="op">$</span>income<span class="op">-</span><span class=
 <li>If there are some variables to remove (for example, highly correlated variables), do it before the transformation</li>
 </ol>
 <p>Function <code>spatialSign()</code> <code>caret</code> package can conduct the transformation. Take <code>income</code> and <code>age</code> as an example:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># sst, fig.cap=&#39;Spatial sign transformation&#39;, out.width=&#39;80%&#39;, fig.asp=.75, </span>
-<span class="co"># fig.align=&#39;center&#39;}</span>
-<span class="co"># KNN imputation</span>
-sdat&lt;-sim.dat[,<span class="kw">c</span>(<span class="st">&quot;income&quot;</span>,<span class="st">&quot;age&quot;</span>)]
-imp&lt;-<span class="kw">preProcess</span>(sdat,<span class="dt">method=</span><span class="kw">c</span>(<span class="st">&quot;knnImpute&quot;</span>),<span class="dt">k=</span><span class="dv">5</span>)
-sdat&lt;-<span class="kw">predict</span>(imp,sdat)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># KNN imputation</span>
+sdat &lt;-<span class="st"> </span>sim.dat[, <span class="kw">c</span>(<span class="st">&quot;income&quot;</span>, <span class="st">&quot;age&quot;</span>)]
+imp &lt;-<span class="st"> </span><span class="kw">preProcess</span>(sdat, <span class="dt">method =</span> <span class="kw">c</span>(<span class="st">&quot;knnImpute&quot;</span>), <span class="dt">k =</span> <span class="dv">5</span>)
+sdat &lt;-<span class="st"> </span><span class="kw">predict</span>(imp, sdat)
 transformed &lt;-<span class="st"> </span><span class="kw">spatialSign</span>(sdat)
 transformed &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(transformed)
-<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>),<span class="dt">oma=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>))
-<span class="kw">plot</span>(income <span class="op">~</span><span class="st"> </span>age,<span class="dt">data =</span> sdat,<span class="dt">col=</span><span class="st">&quot;blue&quot;</span>,<span class="dt">main=</span><span class="st">&quot;Before&quot;</span>)
-<span class="kw">plot</span>(income <span class="op">~</span><span class="st"> </span>age,<span class="dt">data =</span> transformed,<span class="dt">col=</span><span class="st">&quot;blue&quot;</span>,<span class="dt">main=</span><span class="st">&quot;After&quot;</span>)</code></pre></div>
+<span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">oma =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>))
+<span class="kw">plot</span>(income <span class="op">~</span><span class="st"> </span>age, <span class="dt">data =</span> sdat, <span class="dt">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="dt">main =</span> <span class="st">&quot;Before&quot;</span>)
+<span class="kw">plot</span>(income <span class="op">~</span><span class="st"> </span>age, <span class="dt">data =</span> transformed, <span class="dt">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="dt">main =</span> <span class="st">&quot;After&quot;</span>)</code></pre></div>
+<p><img src="IDS_files/figure-html/unnamed-chunk-17-1.svg" width="672" /></p>
 <p>Some readers may have found that the above code does not seem to standardize the data before transformation. Recall the introduction of KNN, <code>preProcess()</code> with <code>method=&quot;knnImpute&quot;</code> by default will standardize data.</p>
 </div>
 <h3>References</h3>
