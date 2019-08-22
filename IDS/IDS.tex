@@ -168,7 +168,7 @@
 
 \title{Introduction to Data Science}
 \author{Hui Lin and Ming Li}
-\date{2019-08-20}
+\date{2019-08-21}
 
 \usepackage{amsthm}
 \newtheorem{theorem}{Theorem}[chapter]
@@ -2212,7 +2212,90 @@ Refer to Appendix for the simulation code.
 
 \section{MNIST Dataset}\label{mnist-dataset}
 
+The MNIST dataset is a popular dataset for image classification machine
+learning model tutorials. It is conveniently included in the Keras
+library and ready to be loaded with build-in functions for analysis. The
+WIKI page of MNIST provides a detailed description of the dataset:
+\url{https://en.wikipedia.org/wiki/MNIST_database}. It contains 70,000
+images of handwritten digits from American Census Bureau employees and
+American high school students. There are 60,000 training images and
+10,000 testing images. Each image has a resolution of 28x28, and the
+numerical pixel values are in greyscale. Each image is represented by a
+28x28 matrix with each element of the matrix an integer between 0 and
+255. The label of each image is the intended digit of the handwritten
+image between 0 and 9. We cover the detailed steps to explore the MNIST
+dataset in the R and Python notebooks. A sample of the dataset is
+illustrated in the figure below:
+
+\begin{figure}
+\centering
+\includegraphics[width=0.70000\textwidth]{images/MnistExamples.png}
+\caption{Sample of MNIST dataset
+(\url{https://en.wikipedia.org/wiki/File:MnistExamples.png})}
+\end{figure}
+
 \section{IMDB Dataset}\label{imdb-dataset}
+
+The IMDB dataset (\url{http://ai.stanford.edu/~amaas/data/sentiment/})
+is a popular dataset for text and language-related machine learning
+tutorials. It is also conveniently included in the Keras library, and
+there are a few build-in functions in Keras for data loading and
+pre-processing. It contains 50,000 movie reviews (25,000 in training and
+25,000 in testing) from IMDB, as well as each movie review's binary
+sentiment: positive or negative. The raw data contains the text of each
+movie review, and it has to be pre-processed before being fitted with
+any machine learning models. By using Keras's built-in functions, we can
+easily get the processed dataset (i.e., a numerical data frame) for
+machine learning algorithms. Keras' build-in functions perform the
+following tasks to convert the raw review text into a data frame:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Convert text data into numerical data. Machine learning models cannot
+  work with raw text data directly, and we have to convert text into
+  numbers. There are many different ways for the conversion and Keras'
+  build-in function uses each word's rank of frequency in the entire
+  training dataset to replace the raw text in both the training and
+  testing dataset. For example, the 10th most frequent word is replaced
+  by integer 10. There are a few additional setups for this process,
+  including:~
+
+  \begin{enumerate}
+  \def\labelenumii{\alph{enumii}.}
+  \tightlist
+  \item
+    Skip top frequent words. We usually skip a few top frequent words as
+    they are mainly stopwords like ``the'' ``and'' or ``a,'' which
+    usually do not provide much information. There is a parameter in the
+    build-in function to specify how many top words to skip.\\
+  \item
+    Set the maximum number of unique words. The entire vocabulary of the
+    unique words in the training dataset may be large, and many of them
+    have very low frequencies such as just appearing once in the entire
+    training dataset.~To keep the size of the vocabulary, we can also
+    set up the maximum number of the unique words using Keras' built-in
+    function such that any words with least frequencies will be replaced
+    with a special index such as ``2''.~
+  \end{enumerate}
+\item
+  Padding or truncation to keep all the reviews to be the same length.
+  For most machine learning models, the algorithms expect to see the
+  same number of features (i.e., same number of input columns in the
+  data frame). There is a parameter in the Keras build-in function to
+  set the maximum number of words in each review (i.e., max\_length).
+  For reviews that have less than max\_legth words, we pad them with
+  ``0''. For reviews that have more than max\_length words, we truncate
+  them.~
+\end{enumerate}
+
+After the above pre-processing, each review is represented by one row in
+the data frame. There is one column for the binary positive/negative
+sentiment, and max\_length columns input features converted from the raw
+review text. In the corresponding R and Python notebooks, we will go
+over the details of the data pre-processing using Keras' built-in
+functions.
 
 \chapter{Data Pre-processing}\label{data-pre-processing}
 
@@ -4980,11 +5063,22 @@ Let's get a subset to illustrate the usage.
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# practice functions we learnt before}
-\NormalTok{sdat<-sim.dat[}\DecValTok{1}\OperatorTok{:}\DecValTok{5}\NormalTok{,]}\OperatorTok{%>%}
-\StringTok{  }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{select}\NormalTok{(age,gender,store_exp,store_trans)}
+\NormalTok{sdat <-}\StringTok{ }\NormalTok{sim.dat[}\DecValTok{1}\OperatorTok{:}\DecValTok{5}\NormalTok{, ] }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{select}\NormalTok{(age, gender, store_exp, store_trans)}
 \NormalTok{sdat }\OperatorTok{%>%}\StringTok{ }\KeywordTok{tbl_df}\NormalTok{()}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 5 x 4
+##     age gender store_exp store_trans
+## * <int> <fct>      <dbl>       <int>
+## 1    57 Female      529.           2
+## 2    63 Female      478.           4
+## 3    59 Male        491.           7
+## 4    60 Male        348.          10
+## 5    51 Male        380.           4
+\end{verbatim}
 
 \texttt{gather()} function in \texttt{tidyr} is analogous to
 \texttt{melt()} in \texttt{reshape2}. The following code will do the
@@ -4992,17 +5086,32 @@ same thing as we did before using \texttt{melt()}:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{library}\NormalTok{(tidyr)}
-\NormalTok{msdat<-tidyr}\OperatorTok{::}\KeywordTok{gather}\NormalTok{(sdat,}\StringTok{"variable"}\NormalTok{,}\StringTok{"value"}\NormalTok{,store_exp,store_trans)}
+\NormalTok{msdat <-}\StringTok{ }\NormalTok{tidyr}\OperatorTok{::}\KeywordTok{gather}\NormalTok{(sdat, }\StringTok{"variable"}\NormalTok{,}\StringTok{"value"}\NormalTok{, store_exp, store_trans)}
 \NormalTok{msdat }\OperatorTok{%>%}\StringTok{ }\KeywordTok{tbl_df}\NormalTok{()}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 10 x 4
+##      age gender variable     value
+##    <int> <fct>  <chr>        <dbl>
+##  1    57 Female store_exp   529.  
+##  2    63 Female store_exp   478.  
+##  3    59 Male   store_exp   491.  
+##  4    60 Male   store_exp   348.  
+##  5    51 Male   store_exp   380.  
+##  6    57 Female store_trans   2.00
+##  7    63 Female store_trans   4.00
+##  8    59 Male   store_trans   7.00
+##  9    60 Male   store_trans  10.0 
+## 10    51 Male   store_trans   4.00
+\end{verbatim}
 
 Or if we use the pipe operation, we can write the above code as:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{sdat}\OperatorTok{%>%}\KeywordTok{gather}\NormalTok{(}\StringTok{"variable"}\NormalTok{,}\StringTok{"value"}\NormalTok{,store_exp,store_trans)}
+\NormalTok{sdat }\OperatorTok{%>%}\StringTok{ }\KeywordTok{gather}\NormalTok{(}\StringTok{"variable"}\NormalTok{, }\StringTok{"value"}\NormalTok{, store_exp, store_trans)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -5010,9 +5119,9 @@ It is identical with the following code using \texttt{melt()}:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{melt}\NormalTok{(sdat, }\DataTypeTok{measure.vars=}\KeywordTok{c}\NormalTok{(}\StringTok{"store_exp"}\NormalTok{,}\StringTok{"store_trans"}\NormalTok{),}
-            \DataTypeTok{variable.name =} \StringTok{"variable"}\NormalTok{,}
-              \DataTypeTok{value.name =} \StringTok{"value"}\NormalTok{)}
+\KeywordTok{melt}\NormalTok{(sdat, }\DataTypeTok{measure.vars =} \KeywordTok{c}\NormalTok{(}\StringTok{"store_exp"}\NormalTok{, }\StringTok{"store_trans"}\NormalTok{), }
+     \DataTypeTok{variable.name =} \StringTok{"variable"}\NormalTok{, }
+     \DataTypeTok{value.name =} \StringTok{"value"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -5021,9 +5130,18 @@ previous one stacks columns and the latter one spread the columns.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{msdat }\OperatorTok{%>%}\StringTok{ }\KeywordTok{spread}\NormalTok{(variable,value)}
+\NormalTok{msdat }\OperatorTok{%>%}\StringTok{ }\KeywordTok{spread}\NormalTok{(variable, value)}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+##   age gender store_exp store_trans
+## 1  51   Male     379.6           4
+## 2  57 Female     529.1           2
+## 3  59   Male     490.8           7
+## 4  60   Male     347.8          10
+## 5  63 Female     478.0           4
+\end{verbatim}
 
 Another pair of functions that do opposite manipulations are
 \texttt{separate()} and \texttt{unite()}.
@@ -5035,6 +5153,22 @@ Another pair of functions that do opposite manipulations are
 \NormalTok{sepdat }\OperatorTok{%>%}\StringTok{ }\KeywordTok{tbl_df}\NormalTok{()}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 10 x 5
+##      age gender Source Type   value
+##    <int> <fct>  <chr>  <chr>  <dbl>
+##  1    57 Female store  exp   529.  
+##  2    63 Female store  exp   478.  
+##  3    59 Male   store  exp   491.  
+##  4    60 Male   store  exp   348.  
+##  5    51 Male   store  exp   380.  
+##  6    57 Female store  trans   2.00
+##  7    63 Female store  trans   4.00
+##  8    59 Male   store  trans   7.00
+##  9    60 Male   store  trans  10.0 
+## 10    51 Male   store  trans   4.00
+\end{verbatim}
 
 You can see that the function separates the original column
 ``\texttt{variable}'' to two new columns ``\texttt{Source}'' and
@@ -5048,9 +5182,23 @@ columns. It is the generalization of \texttt{paste()} to a data frame.
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{sepdat }\OperatorTok{%>%}\StringTok{ }
-\StringTok{  }\KeywordTok{unite}\NormalTok{(}\StringTok{"variable"}\NormalTok{,Source,Type,}\DataTypeTok{sep=}\StringTok{"_"}\NormalTok{)}
+\StringTok{  }\KeywordTok{unite}\NormalTok{(}\StringTok{"variable"}\NormalTok{, Source, Type, }\DataTypeTok{sep =} \StringTok{"_"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+##    age gender    variable value
+## 1   57 Female   store_exp 529.1
+## 2   63 Female   store_exp 478.0
+## 3   59   Male   store_exp 490.8
+## 4   60   Male   store_exp 347.8
+## 5   51   Male   store_exp 379.6
+## 6   57 Female store_trans   2.0
+## 7   63 Female store_trans   4.0
+## 8   59   Male store_trans   7.0
+## 9   60   Male store_trans  10.0
+## 10  51   Male store_trans   4.0
+\end{verbatim}
 
 The reshaping manipulations may be the trickiest part. You have to
 practice a lot to get familiar with those functions. Unfortunately,
@@ -5299,7 +5447,7 @@ sample, the result curve will change significantly:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-61-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-66-1.pdf}
 
 The fitted lines (blue) change over different samples which means it has
 high variance. People also call it overfitting. Fitting the linear model
@@ -5319,7 +5467,7 @@ using the same four subsets, the result barely changes:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-62-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-67-1.pdf}
 
 In general, the variance (\(Var(\hat{f}(\mathbf{X}))\))
 \textbf{increases} and the bias (\(Bias(\hat{f}(\mathbf{X}))\))

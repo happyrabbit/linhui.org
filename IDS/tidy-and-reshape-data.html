@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2019-08-20">
+<meta name="date" content="2019-08-21">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -311,29 +311,79 @@ fit &lt;-<span class="st"> </span><span class="kw">lm</span>(Expense <span class
 <h3><span class="header-section-number">5.3.2</span> <code>tidyr</code> package</h3>
 <p>The other package that will do similar manipulations is <code>tidyr</code>. Let’s get a subset to illustrate the usage.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># practice functions we learnt before</span>
-sdat&lt;-sim.dat[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>,]<span class="op">%&gt;%</span>
-<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(age,gender,store_exp,store_trans)
+sdat &lt;-<span class="st"> </span>sim.dat[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, ] <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(age, gender, store_exp, store_trans)
 sdat <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tbl_df</span>()</code></pre></div>
+<pre><code>## # A tibble: 5 x 4
+##     age gender store_exp store_trans
+## * &lt;int&gt; &lt;fct&gt;      &lt;dbl&gt;       &lt;int&gt;
+## 1    57 Female      529.           2
+## 2    63 Female      478.           4
+## 3    59 Male        491.           7
+## 4    60 Male        348.          10
+## 5    51 Male        380.           4</code></pre>
 <p><code>gather()</code> function in <code>tidyr</code> is analogous to <code>melt()</code> in <code>reshape2</code>. The following code will do the same thing as we did before using <code>melt()</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyr)
-msdat&lt;-tidyr<span class="op">::</span><span class="kw">gather</span>(sdat,<span class="st">&quot;variable&quot;</span>,<span class="st">&quot;value&quot;</span>,store_exp,store_trans)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">msdat &lt;-<span class="st"> </span>tidyr<span class="op">::</span><span class="kw">gather</span>(sdat, <span class="st">&quot;variable&quot;</span>,<span class="st">&quot;value&quot;</span>, store_exp, store_trans)
 msdat <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tbl_df</span>()</code></pre></div>
+<pre><code>## # A tibble: 10 x 4
+##      age gender variable     value
+##    &lt;int&gt; &lt;fct&gt;  &lt;chr&gt;        &lt;dbl&gt;
+##  1    57 Female store_exp   529.  
+##  2    63 Female store_exp   478.  
+##  3    59 Male   store_exp   491.  
+##  4    60 Male   store_exp   348.  
+##  5    51 Male   store_exp   380.  
+##  6    57 Female store_trans   2.00
+##  7    63 Female store_trans   4.00
+##  8    59 Male   store_trans   7.00
+##  9    60 Male   store_trans  10.0 
+## 10    51 Male   store_trans   4.00</code></pre>
 <p>Or if we use the pipe operation, we can write the above code as:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sdat<span class="op">%&gt;%</span><span class="kw">gather</span>(<span class="st">&quot;variable&quot;</span>,<span class="st">&quot;value&quot;</span>,store_exp,store_trans)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sdat <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">gather</span>(<span class="st">&quot;variable&quot;</span>, <span class="st">&quot;value&quot;</span>, store_exp, store_trans)</code></pre></div>
 <p>It is identical with the following code using <code>melt()</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">melt</span>(sdat, <span class="dt">measure.vars=</span><span class="kw">c</span>(<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;store_trans&quot;</span>),
-            <span class="dt">variable.name =</span> <span class="st">&quot;variable&quot;</span>,
-              <span class="dt">value.name =</span> <span class="st">&quot;value&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">melt</span>(sdat, <span class="dt">measure.vars =</span> <span class="kw">c</span>(<span class="st">&quot;store_exp&quot;</span>, <span class="st">&quot;store_trans&quot;</span>), 
+     <span class="dt">variable.name =</span> <span class="st">&quot;variable&quot;</span>, 
+     <span class="dt">value.name =</span> <span class="st">&quot;value&quot;</span>)</code></pre></div>
 <p>The opposite operation to <code>gather()</code> is <code>spread()</code>. The previous one stacks columns and the latter one spread the columns.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">msdat <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">spread</span>(variable,value)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">msdat <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">spread</span>(variable, value)</code></pre></div>
+<pre><code>##   age gender store_exp store_trans
+## 1  51   Male     379.6           4
+## 2  57 Female     529.1           2
+## 3  59   Male     490.8           7
+## 4  60   Male     347.8          10
+## 5  63 Female     478.0           4</code></pre>
 <p>Another pair of functions that do opposite manipulations are <code>separate()</code> and <code>unite()</code>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sepdat&lt;-<span class="st"> </span>msdat <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">separate</span>(variable,<span class="kw">c</span>(<span class="st">&quot;Source&quot;</span>,<span class="st">&quot;Type&quot;</span>))
 sepdat <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tbl_df</span>()</code></pre></div>
+<pre><code>## # A tibble: 10 x 5
+##      age gender Source Type   value
+##    &lt;int&gt; &lt;fct&gt;  &lt;chr&gt;  &lt;chr&gt;  &lt;dbl&gt;
+##  1    57 Female store  exp   529.  
+##  2    63 Female store  exp   478.  
+##  3    59 Male   store  exp   491.  
+##  4    60 Male   store  exp   348.  
+##  5    51 Male   store  exp   380.  
+##  6    57 Female store  trans   2.00
+##  7    63 Female store  trans   4.00
+##  8    59 Male   store  trans   7.00
+##  9    60 Male   store  trans  10.0 
+## 10    51 Male   store  trans   4.00</code></pre>
 <p>You can see that the function separates the original column “<code>variable</code>” to two new columns “<code>Source</code>” and “<code>Type</code>”. You can use <code>sep=</code> to set the string or regular expression to separate the column. By default, it is “<code>_</code>”.</p>
 <p>The <code>unite()</code> function will do the opposite: combining two columns. It is the generalization of <code>paste()</code> to a data frame.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sepdat <span class="op">%&gt;%</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">unite</span>(<span class="st">&quot;variable&quot;</span>,Source,Type,<span class="dt">sep=</span><span class="st">&quot;_&quot;</span>)</code></pre></div>
+<span class="st">  </span><span class="kw">unite</span>(<span class="st">&quot;variable&quot;</span>, Source, Type, <span class="dt">sep =</span> <span class="st">&quot;_&quot;</span>)</code></pre></div>
+<pre><code>##    age gender    variable value
+## 1   57 Female   store_exp 529.1
+## 2   63 Female   store_exp 478.0
+## 3   59   Male   store_exp 490.8
+## 4   60   Male   store_exp 347.8
+## 5   51   Male   store_exp 379.6
+## 6   57 Female store_trans   2.0
+## 7   63 Female store_trans   4.0
+## 8   59   Male store_trans   7.0
+## 9   60   Male store_trans  10.0
+## 10  51   Male store_trans   4.0</code></pre>
 <p>The reshaping manipulations may be the trickiest part. You have to practice a lot to get familiar with those functions. Unfortunately, there is no shortcut.</p>
 
 </div>

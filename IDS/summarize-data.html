@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2019-08-20">
+<meta name="date" content="2019-08-21">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -468,15 +468,10 @@ dplyr<span class="op">::</span><span class="kw">select</span>(sim.dat, <span cla
             <span class="dt">online_exp =</span> <span class="kw">round</span>(<span class="kw">mean</span>(online_exp), <span class="dv">0</span>), 
             <span class="dt">store_trans =</span> <span class="kw">round</span>(<span class="kw">mean</span>(store_trans), <span class="dv">1</span>), 
             <span class="dt">online_trans =</span> <span class="kw">round</span>(<span class="kw">mean</span>(online_trans), <span class="dv">1</span>))</code></pre></div>
-<pre><code>## # A tibble: 4 x 8
-##   segment       Age FemalePct HouseYes store_exp
-##   &lt;fct&gt;       &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
-## 1 Conspicuous   42.     0.320    0.860     4990.
-## 2 Price         60.     0.450    0.940      501.
-## 3 Quality       35.     0.470    0.340      301.
-## 4 Style         24.     0.810    0.270      200.
-## # ... with 3 more variables: online_exp &lt;dbl&gt;,
-## #   store_trans &lt;dbl&gt;, online_trans &lt;dbl&gt;</code></pre>
+<pre><code>##   Age FemalePct HouseYes store_exp online_exp
+## 1  39      0.55     0.57       840       2120
+##   store_trans online_trans
+## 1         5.3         13.5</code></pre>
 <p>Now, let’s peel the onion.</p>
 <p>The first line <code>sim.dat</code> is easy. It is the data you want to work on. The second line <code>group_by(segment)</code> tells R that in the following steps you want to summarise by variable <code>segment</code>. Here we only summarize data by one categorical variable, but you can group by multiple variables, such as <code>group_by(segment, house)</code>. The third argument <code>summarise</code> tells R the manipulation(s) to do. Then list the exact actions inside <code>summarise()</code> . For example, <code>Age=round(mean(na.omit(age)),0)</code> tell R the following things:</p>
 <ol style="list-style-type: decimal">
@@ -507,13 +502,8 @@ dplyr<span class="op">::</span><span class="kw">select</span>(sim.dat, <span cla
 <span class="st">  </span><span class="kw">group_by</span>(segment) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">summarise</span>(<span class="dt">avg_online =</span> <span class="kw">round</span>(<span class="kw">sum</span>(online_exp)<span class="op">/</span><span class="kw">sum</span>(online_trans), <span class="dv">2</span>),
             <span class="dt">avg_store =</span> <span class="kw">round</span>(<span class="kw">sum</span>(store_exp)<span class="op">/</span><span class="kw">sum</span>(store_trans), <span class="dv">2</span>))</code></pre></div>
-<pre><code>## # A tibble: 4 x 3
-##   segment     avg_online avg_store
-##   &lt;fct&gt;            &lt;dbl&gt;     &lt;dbl&gt;
-## 1 Conspicuous      442.      479. 
-## 2 Price             69.3      81.3
-## 3 Quality          126.      105. 
-## 4 Style             92.8     121.</code></pre>
+<pre><code>##   avg_online avg_store
+## 1      156.5     253.6</code></pre>
 <p>Price group has the lowest averaged one-time purchase. The Conspicuous group will pay the highest price. When we build customer profile in real life, we will also need to look at the survey summarization. You may be surprised how much information simple data manipulations can provide.</p>
 <p>Another comman task is to check which column has missing values. It requires the program to look at each column in the data. In this case you can use <code>summarise_all</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># apply function anyNA() to each column</span>
