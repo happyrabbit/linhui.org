@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2019-09-23">
+<meta name="date" content="2019-09-26">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -284,6 +284,39 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li><p>testing the final model.</p></li>
 </ol>
 <p>You train a complete tree using the subset (1) and apply the tree on the subset (2) to calculate the accuracy. Then prune the tree based on a node and apply that on the subset (2) to calculate another accuracy. If the accuracy after pruning is higher or equal to that from the complete tree, then we set the node as a terminal node. Otherwise, keep the subtree under the node. The advantage of this method is that it is easy to compute. However, when the size of the subset (2) is much smaller than that of the subset (1), there is a risk of over-pruning. Some researchers found that this method results in more accurate trees than pruning process based on tree size <span class="citation">(F. Espoito and Semeraro <a href="#ref-Espoito1997">1997</a>)</span>.</p>
+<ul>
+<li>Error-complexity pruning</li>
+</ul>
+<p>This method is to search for a trade-off between error and complexity. Assume we have a splitting node <span class="math inline">\(t\)</span>, and the corresponding subtree <span class="math inline">\(T\)</span>. The error cost of the node is defined as:</p>
+<p><span class="math display">\[R(t)=r(t)\times p(t)\]</span></p>
+<p>where <span class="math inline">\(r(t)\)</span> is the error rate associate with the node:</p>
+<p><span class="math display">\[r(t)=\frac{misclassified\ sample\ size\ of\ the\ node}{sample\ size\ of\ the\ node}\]</span></p>
+<p><span class="math inline">\(p(t)\)</span> is the ratio of the sample of the node to the total sample：</p>
+<p><span class="math display">\[p(t)=\frac{ sample\ size\ of\ the\ node}{total\ sample\ size}\]</span></p>
+<p>If we keep note <span class="math inline">\(t\)</span>, the error cost of the subtree <span class="math inline">\(T\)</span> is:</p>
+<p><span class="math display">\[R(T)=\Sigma_{i = no.\ of\ leaves} R(i)\]</span></p>
+<p>The error-complexity measure of the node is:</p>
+<p><span class="math display">\[a(t)=\frac{R(t)-R(T)_{t}}{no.\ of\ leaves - 1}\]</span></p>
+<p>Based on the metrics above, the pruning process is <span class="citation">(Patel and Upadhyay <a href="#ref-Nikita2012">2012</a>)</span>：</p>
+<ol style="list-style-type: decimal">
+<li>Calculate <span class="math inline">\(a\)</span> for every node <span class="math inline">\(t\)</span></li>
+<li>Prune the node with the lowest value</li>
+<li>Repeat 1 and 2. It produces a pruned tree each time and they form a forest.</li>
+<li>Select the tree with the best overall accuracy</li>
+</ol>
+<ul>
+<li>Minium error pruning</li>
+</ul>
+<p>Niblett and Brotko came it up in 1991<span class="citation">(B. Cestnik and Bratko <a href="#ref-Cestnik1991">1991</a>)</span>. The process is bottom-up which seeks a single tree that minimizes the expected error rate on new samples. If we prune a splitting point <span class="math inline">\(t\)</span>, all the samples under <span class="math inline">\(t\)</span> will be classified as from one category, say category <span class="math inline">\(c\)</span>. If we prune the subtree, the expected error rate is:</p>
+<p><span class="math display">\[E(t)=\frac{n_{t}-n_{t,c}+k-1}{n_{t}+k}\]</span></p>
+<p>where:</p>
+<p><span class="math display">\[k=number\ of\ categories\]</span> <span class="math display">\[n_{t}=sample\ size\ under\ node\ t\]</span> <span class="math display">\[n_{t,c}= number\ of\ sample\ under\ t\ that\ belong\ to\ category\ c\]</span></p>
+<p>Based on the above definition, the pruning process is<span class="citation">(F. Espoito and Semeraro <a href="#ref-Espoito1997">1997</a>)</span>:</p>
+<ul>
+<li>Calculate the expected error rate for each non-leave node if that subtree is pruned</li>
+<li>Calculate the expected error rate for that node if that subtree is not pruned</li>
+<li>If pruning the node leads to higher expected rate, then keep the subtree; otherwise, prune it.</li>
+</ul>
 </div>
 <h3>References</h3>
 <div id="refs" class="references">
@@ -298,6 +331,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </div>
 <div id="ref-Espoito1997">
 <p>F. Espoito, D. Malerba, and G. Semeraro. 1997. “A Comparative Analysis of Methods for Pruning Decision Trees.” <em>IEEE Transactions on Pattern Analysis and Machine Intelligence</em> 19 (5): 476–91.</p>
+</div>
+<div id="ref-Nikita2012">
+<p>Patel, Nikita, and Saurabh Upadhyay. 2012. “Study of Various Decision Tree Pruning Methods with Their Empirical Comparison in Weka.” <em>International Journal of Computer Applications</em> 60 (12).</p>
+</div>
+<div id="ref-Cestnik1991">
+<p>B. Cestnik, and I. Bratko. 1991. “Estimating Probabilities in Tree Pruning.” <em>EWSL</em>, 138–50.</p>
 </div>
 </div>
             </section>
