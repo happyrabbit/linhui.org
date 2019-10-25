@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2019-10-12">
+<meta name="date" content="2019-10-25">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -261,6 +261,74 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
             <section class="normal" id="section-">
 <div id="bagging-tree-1" class="section level2">
 <h2><span class="header-section-number">11.4</span> Bagging Tree</h2>
+<p>As mentioned before, a single tree is unstable. If you randomly separate the sample to be two parts and fit tree model on each, you can get two very different trees. A stable model should give a similar result on different random samples. Some traditional statistical models have high stability, such as linear regression. <em>Ensemble methods</em> appeared in the 1990s which can effectively stabilize the model. <em>Bootstrapping</em> is a type of process where you repeated draw samples of the same size from a single original sample with replacement <span class="citation">(B and R <a href="#ref-Efron1986">1986</a>)</span>. <em>Bootstrap aggregation</em> (Bagged) is an ensemble technique proposed by Leo Breiman (Breiman 1996a). It uses bootstrapping in conjunction with any model to construct an ensemble. The process is very straightforward:</p>
+<ol style="list-style-type: decimal">
+<li>Build a model on different bootstrap samples to form an ensemble, say <span class="math inline">\(B\)</span> samples</li>
+<li>For a new sample, each model will give a prediction: <span class="math inline">\(\hat{f}^1(x),\hat{f}^2(x)\dots,\hat{f}^B(x)\)</span></li>
+<li>The bagged model’s prediction is the average of all the predictions:</li>
+</ol>
+<p><span class="math display">\[\hat{f}_{avg}(x)=\frac{1}{B}\Sigma^B_{b=1}\hat{f}^b(x)\]</span></p>
+<p>Assume that there are <span class="math inline">\(n\)</span> independent random variables <span class="math inline">\(Z_1,\dots,Z_n\)</span> with variance <span class="math inline">\(\sigma^2\)</span>. Then the variance of the mean <span class="math inline">\(\bar{Z}\)</span> is <span class="math inline">\(\frac{\sigma^2}{n}\)</span>. It is easy to see why bagged models have less variance. Since bootstrapping is to sample with replacement, it means some samples are selected multiple times and some not at all. Those left out samples are called out-of-bag. You can use the out-of-bag sample to access the model performance. For regression, the prediction is a simple average. For classification, the prediction is the category with the most “votes”. Here, the number of trees, <span class="math inline">\(B\)</span> is a parameter you need to decide, i.e. tuning parameter.</p>
+<p>The advantages of bagging tree are:</p>
+<ul>
+<li><p>Bagging stabilizes the model predictions by averaging the results. If we have 10 bootstrap samples and fit a single tree on each of those, we may get 10 trees with very different structures and leading to different predictions for a new sample. But if we use the average of the 10 predictions as the final prediction, then the result should be much more stable. It means if we have another 10 samples and do it all-over again, we will get very similar averaged prediction.</p></li>
+<li><p>Bagging provides more accurate predictions. If the goal is to predict rather than interpret, then the ensemble approach definitely has an advantage, especially for unstable models. However, for stable models (such as regression, MARS), bagging may bring marginal improvement for the model performance.</p></li>
+<li><p>Bagging can use out-of-bag samples to evaluate model performance. For each model in the ensemble, we can calculate the value of the model performance metric (you can decide what metric to use). You can use the average of all the out-of-bag performance values to gauge the predictive performance of the entire ensemble. This correlates well with either cross-validation estimates or test set estimates. On average, each tree uses about 2/3 of the samples, and the rest 1/3 is used as out-of-bag. When the number of bootstrap samples is large enough, the out-of-bag performance estimate approximates that from leave one out cross-validation.</p></li>
+</ul>
+<p>You need to choose the number of bootstrap samples. The author of “Applied Predictive Modeling” <span class="citation">(Kuhn and Johnston <a href="#ref-APM">2013</a>)</span> points out that often people see an exponential decrease in predictive improvement as the number of iterations increases. Most of the predictive power is from a small portion of the trees. Based on their experience, model performance can have small improvements up to 50 bagging iterations. If it is still not satisfying, they suggest trying other more powerfully predictive ensemble methods such as random forests and boosting which will be described in the following sections.</p>
+<p>The disadvantages of bagging tree are:</p>
+<ul>
+<li><p>As the number of bootstrap samples increases, the computation and memory requirements increase as well. You can mitigate this disadvantage by parallel computing. Since each bootstrap sample and modeling is independent of any other sample and model, you can easily parallelize the bagging process by building those models separately and bring back the results in the ed to generate the prediction.</p></li>
+<li><p>The bagged model is difficult to explain which is common for all ensemble approaches. However, you can still get variable importance by combining measures of importance across the ensemble. For example, we can calculate the RSS decrease for each variable across all trees and use the average as the measurement of the importance.</p></li>
+<li><p>Since the bagging tree uses all of the original predictors as everey split of every tree, those trees are related with each other. The tree correlation prevents bagging from optimally reducing the variance of the predicted values. See <span class="citation">(Hastie T <a href="#ref-Hastie2008">2008</a>)</span> for a mathematical illustration of the tree correlation phenomenon.</p></li>
+</ul>
+<p>Let’s look at how to use R to build bagging tree. Get the predictors and response variable first:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)
+<span class="co"># use the 10 survey questions as predictors</span>
+trainx &lt;-<span class="st"> </span>dat[, <span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>, <span class="kw">names</span>(dat))]
+<span class="co"># add segment as a predictor </span>
+<span class="co"># don&#39;t need to encode it to dummy variables</span>
+trainx<span class="op">$</span>segment &lt;-<span class="st"> </span>dat<span class="op">$</span>segment
+<span class="co"># use gender as the response variable</span>
+trainy &lt;-<span class="st"> </span><span class="kw">as.factor</span>(dat<span class="op">$</span>gender)</code></pre></div>
+<p>Then fit the model using train function in caret package. Here we just set the number of trees to be 1000. You can tune that parameter.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">100</span>)
+bagTune &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(trainx, trainy, 
+                           <span class="dt">method =</span> <span class="st">&quot;treebag&quot;</span>,
+                           <span class="dt">nbagg =</span> <span class="dv">2000</span>,
+                           <span class="dt">metric =</span> <span class="st">&quot;ROC&quot;</span>,
+                           <span class="dt">trControl =</span> <span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>,
+                           <span class="dt">summaryFunction =</span> twoClassSummary,
+                           <span class="dt">classProbs =</span> <span class="ot">TRUE</span>,
+                           <span class="dt">savePredictions =</span> <span class="ot">TRUE</span>))</code></pre></div>
+<p>The model results are:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bagTune</code></pre></div>
+<pre><code>## Bagged CART 
+## 
+## 1000 samples
+##   11 predictor
+##    2 classes: &#39;Female&#39;, &#39;Male&#39; 
+## 
+## No pre-processing
+## Resampling: Cross-Validated (10 fold) 
+## Summary of sample sizes: 901, 899, 900, 900, 901, 900, ... 
+## Resampling results:
+## 
+##   ROC     Sens    Spec  
+##   0.7093  0.6533  0.6774</code></pre>
+<p>Since we only have a handful of variables in this example, the maximum AUC doesn’t improve by using bagging tree. But it makes a difference when we have more predictors.</p>
+</div>
+<h3>References</h3>
+<div id="refs" class="references">
+<div id="ref-Efron1986">
+<p>B, Efron, and Tibshirani R. 1986. “Bootstrap Methods for Standard Errors, Con- Fidence Intervals, and Other Measures of Statistical Accuracy.” <em>Statistical Science</em>, 54–75.</p>
+</div>
+<div id="ref-APM">
+<p>Kuhn, Max, and Kjell Johnston. 2013. <em>Applied Predictive Modeling</em>. Springer.</p>
+</div>
+<div id="ref-Hastie2008">
+<p>Hastie T, Friedman J, Tibshirani R. 2008. <em>The Elements of Statistical Learning: Data Mining, Inference and Prediction</em>. 2nd ed. Springer.</p>
+</div>
 </div>
             </section>
 

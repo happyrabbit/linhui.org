@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2019-10-12">
+<meta name="date" content="2019-10-25">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -261,6 +261,101 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
             <section class="normal" id="section-">
 <div id="random-forest" class="section level2">
 <h2><span class="header-section-number">11.5</span> Random Forest</h2>
+<p>Since the tree correlation prevents bagging from optimally reducing the variance of the predicted values, a natural way to improve the model performance is to reduce the correlation among trees. That is what random forest aims to do: improve the performance of bagging by de-correlating trees.</p>
+<p>From a statistical perspective, you can de-correlate trees by introducing randomness when you build each tree. One approach <span class="citation">(T <a href="#ref-Ho1998">1998</a>; Y and D <a href="#ref-amit1997">1997</a>)</span> is to randomly choose <span class="math inline">\(m\)</span> variables to use each time you build a tree. Dietterich<span class="citation">(T <a href="#ref-Dietterich2000">2000</a>)</span> came up with the idea of random split selection which is to randomly choose <span class="math inline">\(m\)</span> variables to use at each splitting node. Based on the different generalizations to the original bagging algorithm, Breiman <span class="citation">(Breiman <a href="#ref-Breiman2001">2001</a><a href="#ref-Breiman2001">a</a>)</span> came up with a unified algorithm called <em>random forest.</em></p>
+<p>When building a tree, the algorithm randomly chooses <span class="math inline">\(m\)</span> variables to use at each splitting node. Then choose the best one out of the <span class="math inline">\(m\)</span> to use at that node. In general, people use <span class="math inline">\(m=\sqrt{p}\)</span>. For example, if we use 10 questions from the questionnaire as predictors, then at each node, the algorithm will randomly choose 4 candidate variables. Since those trees in the forest don’t always use the same variables, tree correlation is less than that in bagging. It tends to work better when there are more predictors. Since we only have 10 predictors here, the improvement from the random forest is marginal. The number of randomly selected predictors is a tuning parameter in the random forest. Since random forest is computationally intensive, we suggest starting with 5 value around <span class="math inline">\(m=\sqrt{p}\)</span>. Another tuning parameter is the number of trees in the forest. You can start with 1000 trees and then increase the number until performance levels off.</p>
+<p>The basic random forest is as follows:</p>
+<ol style="list-style-type: decimal">
+<li>Select the number of trees, B</li>
+<li><strong>for</strong> <em>i=1 to B</em> <strong>do</strong>
+<ul>
+<li>generate a bootstrap sample of the original data</li>
+<li>train a tree on this sample
+<ul>
+<li><strong>for</strong> <em>each split</em> <strong>do</strong>
+<ul>
+<li>randomly select m（&lt;p）predictors</li>
+<li>choose the best one out of the <span class="math inline">\(m\)</span> and partition the data</li>
+</ul></li>
+<li><strong>end</strong></li>
+</ul></li>
+<li>use typical tree model stopping criteria to determine when a tree is complete without pruning</li>
+</ul></li>
+<li><strong>end</strong></li>
+</ol>
+<p>When <span class="math inline">\(m=p\)</span>, random forest is equal to the bagging tree. When the predictors are highly correlated, then smaller <span class="math inline">\(m\)</span> tends to work better. Let’s use the <code>caret</code> package to train a random forest:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># tune across a list of numbers of predictors</span>
+mtryValues &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>)
+<span class="kw">set.seed</span>(<span class="dv">100</span>)
+rfTune &lt;-<span class="st"> </span><span class="kw">train</span>(<span class="dt">x =</span> trainx, 
+               <span class="dt">y =</span> trainy,
+               <span class="co"># set the model to be random forest</span>
+               <span class="dt">method =</span> <span class="st">&quot;rf&quot;</span>,
+               <span class="dt">ntree =</span> <span class="dv">1000</span>,
+               <span class="dt">tuneGrid =</span> <span class="kw">data.frame</span>(<span class="dt">.mtry =</span> mtryValues),
+               <span class="dt">importance =</span> <span class="ot">TRUE</span>,
+               <span class="dt">metric =</span> <span class="st">&quot;ROC&quot;</span>,
+               <span class="dt">trControl =</span> <span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>,
+                           <span class="dt">summaryFunction =</span> twoClassSummary,
+                           <span class="dt">classProbs =</span> <span class="ot">TRUE</span>,
+                           <span class="dt">savePredictions =</span> <span class="ot">TRUE</span>))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rfTune</code></pre></div>
+<pre><code>## Random Forest 
+## 
+## 1000 samples
+##   11 predictor
+##    2 classes: &#39;Female&#39;, &#39;Male&#39; 
+## 
+## No pre-processing
+## Resampling: Cross-Validated (10 fold) 
+## Summary of sample sizes: 899, 900, 900, 899, 899, 901, ... 
+## Resampling results across tuning parameters:
+## 
+##   mtry  ROC     Sens    Spec  
+##   1     0.7169  0.5341  0.8205
+##   2     0.7137  0.6334  0.7175
+##   3     0.7150  0.6478  0.6995
+##   4     0.7114  0.6550  0.6950
+##   5     0.7092  0.6514  0.6882
+## 
+## ROC was used to select the optimal model using the largest value.
+## The final value used for the model was mtry = 1.</code></pre>
+<p>In this example, since the number of predictors is small, the result of the model indicates that the optimal number of candidate variables at each node is 1. The optimal AUC is not too much higher than that from bagging tree:</p>
+<p>If you have selected the values of tuning parameters, you can also use the randomForest package to fit a random forest.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(randomForest)
+rfit =<span class="st"> </span><span class="kw">randomForest</span>(trainy <span class="op">~</span><span class="st"> </span>., trainx, <span class="dt">mtry =</span> <span class="dv">1</span>, <span class="dt">ntree =</span> <span class="dv">1000</span>)</code></pre></div>
+<p>Since bagging tree is a special case of random forest, you can fit the bagging tree by setting <span class="math inline">\(mtry=p\)</span>. Function <code>importance()</code> can return the importance of each predictor:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">importance</span>(rfit)</code></pre></div>
+<pre><code>##         MeanDecreaseGini
+## Q1                 9.056
+## Q2                 7.582
+## Q3                 7.611
+## Q4                12.308
+## Q5                 5.628
+## Q6                 9.740
+## Q7                 6.638
+## Q8                 7.829
+## Q9                 5.955
+## Q10                4.781
+## segment           11.185</code></pre>
+<p>You can use varImpPlot() function to visualize the predictor importance:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">varImpPlot</span>(rfit)</code></pre></div>
+<p><img src="IDS_files/figure-html/unnamed-chunk-106-1.svg" width="672" /> It is easy to see from the plot that <code>segment</code> and <code>Q4</code> are the top two variables to classify gender.</p>
+</div>
+<h3>References</h3>
+<div id="refs" class="references">
+<div id="ref-Ho1998">
+<p>T, Ho. 1998. “The Random Subspace Method for Constructing Decision Forests.” <em>IEEE Transactions on Pattern Analysis and Machine Intelligence</em> 13: 340–54.</p>
+</div>
+<div id="ref-amit1997">
+<p>Y, Amit, and Geman D. 1997. “Shape Quantization and Recognition with Randomized Trees.” <em>Neural Computation</em> 9: 1545–88.</p>
+</div>
+<div id="ref-Dietterich2000">
+<p>T, Dietterich. 2000. “An Experimental Comparison of Three Methods for Constructing Ensembles of Decision Trees: Bagging, Boosting, and Randomization.” <em>Machine Learning</em> 40: 139–58.</p>
+</div>
+<div id="ref-Breiman2001">
+<p>Breiman, Leo. 2001a. “Random Forests.” <em>Machine Learning</em> 45: 5–32.</p>
+</div>
 </div>
             </section>
 

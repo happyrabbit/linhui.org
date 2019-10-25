@@ -168,7 +168,7 @@
 
 \title{Introduction to Data Science}
 \author{Hui Lin and Ming Li}
-\date{2019-08-21}
+\date{2019-10-12}
 
 \usepackage{amsthm}
 \newtheorem{theorem}{Theorem}[chapter]
@@ -1893,7 +1893,7 @@ business value. Here is the summary of the mistakes:
   Missing necessary online checkup
 \end{itemize}
 
-\chapter{Introduction to the data}\label{introduction-to-the-data}
+\chapter{Introduction to The Data}\label{introduction-to-the-data}
 
 Before tackling analytics problem, we start by introducing data to be
 analyzed in later chapters.
@@ -2296,6 +2296,80 @@ sentiment, and max\_length columns input features converted from the raw
 review text. In the corresponding R and Python notebooks, we will go
 over the details of the data pre-processing using Keras' built-in
 functions.
+
+\chapter{Big Data Cloud Platform}\label{big-data-cloud-platform}
+
+\section{How Data Becomes Science?}\label{how-data-becomes-science}
+
+Data has been statistician and analyst's friend for hundreds of years.
+Tabulated data are the most common format that we use daily. People used
+to store data on papers, tapes, diskettes, or hard drives. Only
+recently, with the development of computer hardware and software, the
+volume, variety, and speed of the data exceed the capacity of a
+traditional statistician or analyst. So using data becomes a science
+that focuses on the question: how can we store, access, process, analyze
+the massive amount of data and provide actionable insights? In the past
+few years, by utilizing commodity hardware and open-source software,
+people created a big data ecosystem for data storage, data retrieval,
+and parallel computation. Hadoop and Spark have become a popular
+platform that enables data scientist, statistician, and analyst to
+access the data and to build models. Programming skills in the big data
+platform have been an obstacle for a traditional statistician or analyst
+to become a successful data scientist. However, cloud computing reduces
+the difficulty significantly. The user interface of the data platform is
+much more friendly today, and people push mush of the technical details
+to the background. Today's cloud systems also enable quick
+implementation to the production environment. Now data science
+emphasizes more on the data itself, models and algorithms on top of the
+data, rather than the platform, infrastructure and low-level programming
+such as Java.
+
+\section{Power of Cluster of
+Computers}\label{power-of-cluster-of-computers}
+
+We are familiar with our laptop/desktop computers which have three main
+components to do data computation: (1) Hard disk, (2) Memory, and (3)
+CPU.
+
+The data and codes stored in the hard disk have specific features such
+as slow to read and write, and large capacity of around a few TB in
+today's market. Memory is fast to read and write but with small capacity
+in the order of a few dozens of GB in today's market. CPU is where all
+the computation happens.
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.8\linewidth]{images/cluster} 
+
+}
+
+\caption{Single computer (left) and a cluster of computers (right)}\label{fig:sparkcluster}
+\end{figure}
+
+For statistical software such as R, the amount of data it can process is
+limited by the computer's memory. The memory of computers before 2000 is
+less than 1 GB. The memory capacity grows way slower than the amount of
+the data. Now it is common that we need to analyze data far beyond the
+capacity of a single computer's memory, especially in an enterprise
+environment. Meanwhile, as the data size increases, to solve the same
+problem (such as regressions), the computation time is growing faster
+than linear. Using a cluster of computers become a common way to solve a
+big data problem. In Figure \ref{fig:sparkcluster} (right), a cluster of
+computers can be viewed as one powerful machine with memory, hard disk
+and CPU equivalent to the sum of individual computers. It is common to
+have hundreds or even thousands of nodes for a cluster.
+
+In the past, users need to write code (such as MPI) to distribute data
+and do parallel computing. Fortunately, with the recent new development,
+the cloud environment for big data analysis is more user-friendly. As
+data is often beyond the size of the hard disk, the dataset itself is
+stored across different nodes (i.e., the Hadoop system). When doing
+analysis, the data is distributed across different nodes, and algorithms
+are parallel to leverage corresponding nodes' CPUs to compute (i.e., the
+Spark system).
+
+\section{Evolution of Cluster
+Computing}\label{evolution-of-cluster-computing}
 
 \chapter{Data Pre-processing}\label{data-pre-processing}
 
@@ -6437,18 +6511,6 @@ Performance}\label{regression-model-performance}
 \section{Classification Model
 Performance}\label{classification-model-performance}
 
-\chapter{Feature Engineering}\label{feature-engineering}
-
-\section{Feature Construction}\label{feature-construction}
-
-\section{Feature Extraction}\label{feature-extraction}
-
-\section{Feature Selection}\label{feature-selection}
-
-\subsection{Filter Method}\label{filter-method}
-
-\subsection{Wrapper Method}\label{wrapper-method}
-
 \chapter{Regression Models}\label{regression-models}
 
 \section{Ordinary Least Squares}\label{ordinary-least-squares}
@@ -6473,10 +6535,13 @@ Model}\label{lasso-generalized-linear-model}
 
 \chapter{Tree-Based Methods}\label{tree-based-methods}
 
-The tree-based models can be used for regression and classification.
-They are conceptually simple yet powerful. This type of model is often
-referred to as Classification And Regression Trees (CART). They are
-popular tools for many reasons:
+The tree-based models can be used for regression and classification. The
+goal is to stratify or segment the predictor space into a number of
+sub-regions. For a given observation, use the mean or the mode of the
+training observations in the sub-region as the prediction. Tree-based
+methods are conceptually simple yet powerful. This type of model is
+often referred to as Classification And Regression Trees (CART). They
+are popular tools for many reasons:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -6775,8 +6840,477 @@ You can limit the tree size by setting some parameters.
   However, people often treat it as a tuning parameter.
 \end{itemize}
 
+\textbf{Remove branches}
+
+Another way is to first let the tree grow as much as possible and then
+go back to remove insignificant branches. The process reduces the depth
+of the tree. The idea is to overfit the training set and then correct
+using the testing set. There are different implementations.
+
+\begin{itemize}
+\tightlist
+\item
+  cost/complexity penalty
+\end{itemize}
+
+The idea is that the pruning minimizes the penalized error
+\(SSE_{\lambda}\) with a certain value of tuning parameter \(\lambda\).
+
+\[SSE_{\lambda} = SSE+\lambda \times (complexity)\]
+
+Here complexity is a function of the number of leaves. For every given
+\(\lambda\), we want to find the smallest tree that minimizes this
+penalized error. Breiman presents the algorithm to solve the
+optimization\citep{Breiman1984}.
+
+To find the optimal pruning tree, you need to iterate through a series
+of values of \(\lambda\) and calculate the corresponding SSE. For the
+same \(\lambda\), SSE changes over different samples. Breiman et al.
+suggested using cross-validation \citep{Breiman1984} to study the
+variation of SSE under each \(\lambda\) value. They also proposed a
+standard deviation criterion to give the simplest tree: within one
+standard deviation, find the simplest tree that minimizes the absolute
+error. Another method is to choose the tree size that minimizes the
+numerical error \citep{Hastie2008}.
+
+\begin{itemize}
+\tightlist
+\item
+  Error-based pruning
+\end{itemize}
+
+This method was first proposed by Quinlan \citep{Quinlan1999}. The idea
+behind is intuitive. All split nodes of the tree are included in the
+initial candidate pool. Pruning a split node means removing the entire
+subtree under the node and setting the node as a terminal node. The data
+is divided into 3 subsets for:
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\item
+  training a complete tree;
+\item
+  pruning;
+\item
+  testing the final model.
+\end{enumerate}
+
+You train a complete tree using the subset (1) and apply the tree on the
+subset (2) to calculate the accuracy. Then prune the tree based on a
+node and apply that on the subset (2) to calculate another accuracy. If
+the accuracy after pruning is higher or equal to that from the complete
+tree, then we set the node as a terminal node. Otherwise, keep the
+subtree under the node. The advantage of this method is that it is easy
+to compute. However, when the size of the subset (2) is much smaller
+than that of the subset (1), there is a risk of over-pruning. Some
+researchers found that this method results in more accurate trees than
+pruning process based on tree size \citep{Espoito1997}.
+
+\begin{itemize}
+\tightlist
+\item
+  Error-complexity pruning
+\end{itemize}
+
+This method is to search for a trade-off between error and complexity.
+Assume we have a splitting node \(t\), and the corresponding subtree
+\(T\). The error cost of the node is defined as:
+
+\[R(t)=r(t)\times p(t)\]
+
+where \(r(t)\) is the error rate associate with the node:
+
+\[r(t)=\frac{misclassified\ sample\ size\ of\ the\ node}{sample\ size\ of\ the\ node}\]
+
+\(p(t)\) is the ratio of the sample of the node to the total sample：
+
+\[p(t)=\frac{ sample\ size\ of\ the\ node}{total\ sample\ size}\]
+
+If we keep note \(t\), the error cost of the subtree \(T\) is:
+
+\[R(T)=\Sigma_{i = no.\ of\ leaves} R(i)\]
+
+The error-complexity measure of the node is:
+
+\[a(t)=\frac{R(t)-R(T)_{t}}{no.\ of\ leaves - 1}\]
+
+Based on the metrics above, the pruning process is \citep{Nikita2012}：
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Calculate \(a\) for every node \(t\)
+\item
+  Prune the node with the lowest value
+\item
+  Repeat 1 and 2. It produces a pruned tree each time and they form a
+  forest.
+\item
+  Select the tree with the best overall accuracy
+\end{enumerate}
+
+\begin{itemize}
+\tightlist
+\item
+  Minium error pruning
+\end{itemize}
+
+Niblett and Brotko came it up in 1991\citep{Cestnik1991}. The process is
+bottom-up which seeks a single tree that minimizes the expected error
+rate on new samples. If we prune a splitting point \(t\), all the
+samples under \(t\) will be classified as from one category, say
+category \(c\). If we prune the subtree, the expected error rate is:
+
+\[E(t)=\frac{n_{t}-n_{t,c}+k-1}{n_{t}+k}\]
+
+where:
+
+\[k=number\ of\ categories\] \[n_{t}=sample\ size\ under\ node\ t\]
+\[n_{t,c}= number\ of\ sample\ under\ t\ that\ belong\ to\ category\ c\]
+
+Based on the above definition, the pruning process
+is\citep{Espoito1997}:
+
+\begin{itemize}
+\tightlist
+\item
+  Calculate the expected error rate for each non-leave node if that
+  subtree is pruned
+\item
+  Calculate the expected error rate for each non-leave node if that
+  subtree is not pruned
+\item
+  If pruning the node leads to higher expected rate, then keep the
+  subtree; otherwise, prune it.
+\end{itemize}
+
 \section{Regression and Decision Tree
 Basic}\label{regression-and-decision-tree-basic}
+
+\subsection{Regression Tree}\label{regression-tree}
+
+Let's look at the process of building a regression tree\citep{ISLR15}.
+There are two steps:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Divide predictors space --- that is a set of possible values of
+  \(X_1,X_2,\dots,X_p\)--- into \(J\) distinct and non-overlapping
+  regions: \(R_1,R_2,\dots,R_J\)
+\item
+  For every observation that falls into the region \(R_j\), the
+  prediction in the mean of the response values for the training
+  observations in \(R_j\)
+\end{enumerate}
+
+Let's go back to the previous baby example. If we use the variable
+``Gender'' to divide the observations, we obtain two regions \(R_1\)
+(female) and \(R_2\) (male).
+
+\includegraphics{images/varEN.png}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{y1=}\KeywordTok{c}\NormalTok{(}\DecValTok{156}\NormalTok{,}\DecValTok{167}\NormalTok{,}\DecValTok{165}\NormalTok{,}\DecValTok{163}\NormalTok{,}\DecValTok{160}\NormalTok{,}\DecValTok{170}\NormalTok{,}\DecValTok{160}\NormalTok{)}
+\NormalTok{y2=}\KeywordTok{c}\NormalTok{(}\DecValTok{172}\NormalTok{,}\DecValTok{180}\NormalTok{,}\DecValTok{176}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+The sample average for region \(R_1\) is 163, for region \(R_2\) is 176.
+For a new observation, if it is female, the model predicts the height to
+be 163, if it is male, the predicted height is 176. Calculating the mean
+is easy. Let's look at the first step in more detail which is to divide
+the space into \(R_1, R_2, \dots, R_J\).
+
+In theory, the region can be any shape. However, to simplify the
+problem, we divide the predictor space into high-dimensional rectangles.
+The goal is to divide the space in a way that minimize RSS. Practically,
+it is nearly impossible to consider all possible partitions of the
+feature space. So we use an approach named recursive binary splitting, a
+top-down , greedy algorithm. The process starts from the top of the tree
+(root node) and then successively splits the predictor space. Each split
+produces two branches (hence binary). At each step of the process, it
+chooses the best split at that particular step, rather than looking
+ahead and picking a split that leads to a better tree in general (hence
+greedy).
+
+\[R_{1}(j, s)=\{X|X_j<s\}\ and\ R_{2}(j, s)=\{X|X_j\geq s\}\]
+
+Calculate the RSS decrease after the split. For different \((j,s)\),
+search for the combination that minimizes the RSS, that is to minimize
+the following:
+
+\[\Sigma_{i:x_i\in R_1(j,s)}(y_i-\hat{y}_{R_{1}})^2+\Sigma_{i:x_i\in R_2(j,s)}(y_i-\hat{y}_{R_{2}})^2\]
+
+where \(\hat{y}_{R_1}\) is the mean of all samples in \(R_1\),
+\(\hat{y}_{R_2}\) is the mean of samples in \(R_2\). It can be quick to
+optimize the equation above. Especially when \(p\) is not too large.
+
+Next, we continue to search for the split that optimize the RSS. Note
+that the optimization is limited in the sub-region. The process keeps
+going until a stopping criterion is reaches. For example, continue until
+no region contains more than 5 samples or the RSS decreases less than
+1\%. The process is like a tree growing.
+
+\includegraphics{images/BinaryTree.png}
+
+There are multiple R packages for building regression tree, such as
+\texttt{ctree}, \texttt{rpart} and \texttt{tree}. \texttt{rpart} is
+widely used for building single tree. The split is based on CART
+algorithm, using \texttt{rpart()} function from the package. There are
+some parameters that controls the model fitting, such as the minimum
+number of observations that must exist in a node in order for a split to
+be attempted, the minimum number of observations in any leaf node etc.
+You can can set those parameter using \texttt{rpart.control}.
+
+A more convenient way is to use \texttt{train()} function in
+\texttt{caret} package. The package can call \texttt{rpart()} function
+and train the model through cross-validation. In this case, the most
+common parameters are \texttt{cp} (complexity parameter) and
+\texttt{maxdepth} (the maximum depth of any node of the final tree). To
+tune the complexity parameter, set \texttt{method\ =\ "rpart"}. To tune
+the maximum tree depth, set \texttt{method\ =\ "rpart2"} :
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(rpart)}
+\NormalTok{dat <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"http://bit.ly/2P5gTw4"}\NormalTok{)}
+\CommentTok{# data cleaning: delete wrong observations}
+\NormalTok{dat <-}\StringTok{ }\KeywordTok{subset}\NormalTok{(dat, store_exp }\OperatorTok{>}\StringTok{ }\DecValTok{0} \OperatorTok{&}\StringTok{ }\NormalTok{online_exp }\OperatorTok{>}\StringTok{ }\DecValTok{0}\NormalTok{)}
+\CommentTok{# use the 10 survey questions as predictors}
+\NormalTok{trainx <-}\StringTok{ }\NormalTok{dat[, }\KeywordTok{grep}\NormalTok{(}\StringTok{"Q"}\NormalTok{, }\KeywordTok{names}\NormalTok{(dat))]}
+\CommentTok{# use the sum of store and online expenditure as response variable}
+\CommentTok{# total expenditure = store expenditure + online expenditure}
+\NormalTok{trainy <-}\StringTok{ }\NormalTok{dat}\OperatorTok{$}\NormalTok{store_exp }\OperatorTok{+}\StringTok{ }\NormalTok{dat}\OperatorTok{$}\NormalTok{online_exp}
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{100}\NormalTok{)}
+\NormalTok{rpartTune <-}\StringTok{ }\KeywordTok{train}\NormalTok{(trainx, trainy, }\DataTypeTok{method =} \StringTok{"rpart2"}\NormalTok{, }\DataTypeTok{tuneLength =} \DecValTok{10}\NormalTok{, }
+    \DataTypeTok{trControl =} \KeywordTok{trainControl}\NormalTok{(}\DataTypeTok{method =} \StringTok{"cv"}\NormalTok{))}
+\KeywordTok{plot}\NormalTok{(rpartTune)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-85-1.pdf}
+
+RMSE doesn't change much when the maximum is larger than 2. So we set
+the maximum depth to be 2 and refit the model:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{rpartTree <-}\StringTok{ }\KeywordTok{rpart}\NormalTok{(trainy }\OperatorTok{~}\StringTok{ }\NormalTok{., }\DataTypeTok{data =}\NormalTok{ trainx, }\DataTypeTok{maxdepth =} \DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+You can check the result using \texttt{print()}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{print}\NormalTok{(rpartTree)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## n= 999 
+## 
+## node), split, n, deviance, yval
+##       * denotes terminal node
+## 
+## 1) root 999 1.581e+10  3479.0  
+##   2) Q3< 3.5 799 2.374e+09  1819.0  
+##     4) Q5< 1.5 250 3.534e+06   705.2 *
+##     5) Q5>=1.5 549 1.919e+09  2326.0 *
+##   3) Q3>=3.5 200 2.436e+09 10110.0 *
+\end{verbatim}
+
+You can see that the final model picks \texttt{Q3} and \texttt{Q5} to
+predict total expenditure. To visualize the tree, you can convert
+\texttt{rpart} object to \texttt{party} object using \texttt{partykit}
+then use \texttt{plot()} function:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(partykit)}
+\NormalTok{rpartTree2 <-}\StringTok{ }\KeywordTok{as.party}\NormalTok{(rpartTree)}
+\KeywordTok{plot}\NormalTok{(rpartTree2)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-88-1.pdf}
+
+\subsection{Decision Tree}\label{decision-tree}
+
+Similar to a regression tree, the goal of a classification tree is to
+stratifying the predictor space into a number of sub-regions that are
+more homogeneous. The difference is that a classification tree is used
+to predict a categorical response rather than a continuous one. For a
+classification tree, the prediction is the most commonly occurring class
+of training observations in the region to which an observation belongs.
+The splitting criteria for a classification tree are different. The most
+common criteria are entropy and Gini impurity. CART uses Gini impurity
+and C4.5 uses entropy.
+
+When the predictor is continuous, the splitting process is
+straightforward. When the predictor is categorical, the process can take
+different approaches:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Keep the variable as categorical and group some categories on either
+  side of the split. In this way, the model can make more dynamic splits
+  but must treat the categorical predictor as an ordered set of bits.
+\item
+  Encode the categorical variable to be a set of binary dummy variables.
+  In this way, the information in the categorical variable is decomposed
+  to independent bits of information. The model considers these dummy
+  variables separately and evaluates for each of these on one split
+  point (because there are only two possible values: 0/1).
+\end{enumerate}
+
+When fitting tree models, people need to choose the way to treat
+categorical predictors. If you know some of the categories have higher
+predictability, then the first approach may be better. In the rest of
+this section, we will build tree models using the above two approaches
+and compare them.
+
+Let's build a classification model to identify the gender of the
+customer:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(caret)}
+\KeywordTok{library}\NormalTok{(pROC)}
+\NormalTok{dat <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"http://bit.ly/2P5gTw4"}\NormalTok{)}
+\CommentTok{# use the 10 survey questions as predictors}
+\NormalTok{trainx1 <-}\StringTok{ }\NormalTok{dat[, }\KeywordTok{grep}\NormalTok{(}\StringTok{"Q"}\NormalTok{, }\KeywordTok{names}\NormalTok{(dat))]}
+\CommentTok{# add a categorical predictor}
+\CommentTok{# use two ways to treat categorical predictor}
+\CommentTok{# trainx1: use approach 1, without encoding}
+\NormalTok{trainx1}\OperatorTok{$}\NormalTok{segment <-}\StringTok{ }\NormalTok{dat}\OperatorTok{$}\NormalTok{segment}
+
+\CommentTok{# trainx2: use approach 2, encode it to a set of dummy variables}
+\NormalTok{dumMod<-}\KeywordTok{dummyVars}\NormalTok{(}\OperatorTok{~}\NormalTok{.,}
+                  \DataTypeTok{data=}\NormalTok{trainx1,}
+                  \CommentTok{# Combine the previous variable name and the level name}
+                  \CommentTok{# as the new dummy variable name}
+                  \DataTypeTok{levelsOnly=}\NormalTok{F)}
+\NormalTok{trainx2 <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(dumMod,trainx1)}
+\CommentTok{# the response variable is gender}
+\NormalTok{trainy <-}\StringTok{ }\NormalTok{dat}\OperatorTok{$}\NormalTok{gender}
+\end{Highlighting}
+\end{Shaded}
+
+Here we use \texttt{train()} function in \texttt{caret} package to call
+\texttt{rpart} to build the model. We can compare the model results from
+the two approaches:
+
+\begin{verbatim}
+CART 
+
+1000 samples
+  11 predictor
+   2 classes: 'Female', 'Male' 
+
+No pre-processing
+Resampling: Cross-Validated (10 fold) 
+Summary of sample sizes: 901, 899, 900, 900, 901, 900, ... 
+Resampling results across tuning parameters:
+
+  cp       ROC     Sens    Spec  
+  0.00000  0.6937  0.6517  0.6884
+  0.00835  0.7026  0.6119  0.7355
+  0.01670  0.6852  0.5324  0.8205
+  0.02505  0.6803  0.5107  0.8498
+  0.03340  0.6803  0.5107  0.8498
+  
+  ......
+
+  0.23380  0.6341  0.5936  0.6745
+  0.24215  0.5556  0.7873  0.3240
+
+ROC was used to select the optimal model using the largest value.
+The final value used for the model was cp = 0.00835.
+\end{verbatim}
+
+The above keeps the variable as categorical without encoding. Here
+\texttt{cp} is the complexity parameter. It is used to decide when to
+stop growing the tree. \texttt{cp\ =\ 0.01} means the algorithm only
+keeps the split that improves the corresponding metric by more than
+0.01. Next, let's encode the categorical variable to be a set of dummy
+variables and fit the model again:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{rpartTune2 <-}\StringTok{ }\NormalTok{caret}\OperatorTok{::}\KeywordTok{train}\NormalTok{(trainx2, trainy, }\DataTypeTok{method =} \StringTok{"rpart"}\NormalTok{,}
+                       \DataTypeTok{tuneLength =} \DecValTok{30}\NormalTok{,}
+                       \DataTypeTok{metric =} \StringTok{"ROC"}\NormalTok{, }
+                       \DataTypeTok{trControl =} \KeywordTok{trainControl}\NormalTok{(}\DataTypeTok{method =} \StringTok{"cv"}\NormalTok{,}
+                                                \DataTypeTok{summaryFunction =}\NormalTok{ twoClassSummary,}
+                                                \DataTypeTok{classProbs =} \OtherTok{TRUE}\NormalTok{,}
+                                                \DataTypeTok{savePredictions =} \OtherTok{TRUE}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+Compare the results of the two approaches.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{rpartRoc <-}\StringTok{ }\KeywordTok{roc}\NormalTok{(}\DataTypeTok{response =}\NormalTok{ rpartTune1}\OperatorTok{$}\NormalTok{pred}\OperatorTok{$}\NormalTok{obs,}
+                \DataTypeTok{predictor =}\NormalTok{ rpartTune1}\OperatorTok{$}\NormalTok{pred}\OperatorTok{$}\NormalTok{Female,}
+                \DataTypeTok{levels =} \KeywordTok{rev}\NormalTok{(}\KeywordTok{levels}\NormalTok{(rpartTune1}\OperatorTok{$}\NormalTok{pred}\OperatorTok{$}\NormalTok{obs)))}
+
+\NormalTok{rpartFactorRoc <-}\StringTok{ }\KeywordTok{roc}\NormalTok{(}\DataTypeTok{response =}\NormalTok{ rpartTune2}\OperatorTok{$}\NormalTok{pred}\OperatorTok{$}\NormalTok{obs,}
+                      \DataTypeTok{predictor =}\NormalTok{ rpartTune2}\OperatorTok{$}\NormalTok{pred}\OperatorTok{$}\NormalTok{Female,}
+                      \DataTypeTok{levels =} \KeywordTok{rev}\NormalTok{(}\KeywordTok{levels}\NormalTok{(rpartTune1}\OperatorTok{$}\NormalTok{pred}\OperatorTok{$}\NormalTok{obs)))}
+
+\KeywordTok{plot}\NormalTok{(rpartRoc, }\DataTypeTok{type =} \StringTok{"s"}\NormalTok{, }\DataTypeTok{print.thres =} \KeywordTok{c}\NormalTok{(.}\DecValTok{5}\NormalTok{),}
+     \DataTypeTok{print.thres.pch =} \DecValTok{3}\NormalTok{,}
+     \DataTypeTok{print.thres.pattern =} \StringTok{""}\NormalTok{,}
+     \DataTypeTok{print.thres.cex =} \FloatTok{1.2}\NormalTok{,}
+     \DataTypeTok{col =} \StringTok{"red"}\NormalTok{, }\DataTypeTok{legacy.axes =} \OtherTok{TRUE}\NormalTok{,}
+     \DataTypeTok{print.thres.col =} \StringTok{"red"}\NormalTok{)}
+
+\KeywordTok{plot}\NormalTok{(rpartFactorRoc,}
+     \DataTypeTok{type =} \StringTok{"s"}\NormalTok{,}
+     \DataTypeTok{add =} \OtherTok{TRUE}\NormalTok{,}
+     \DataTypeTok{print.thres =} \KeywordTok{c}\NormalTok{(.}\DecValTok{5}\NormalTok{),}
+     \DataTypeTok{print.thres.pch =} \DecValTok{16}\NormalTok{, }\DataTypeTok{legacy.axes =} \OtherTok{TRUE}\NormalTok{,}
+     \DataTypeTok{print.thres.pattern =} \StringTok{""}\NormalTok{,}
+     \DataTypeTok{print.thres.cex =} \FloatTok{1.2}\NormalTok{)}
+\KeywordTok{legend}\NormalTok{(.}\DecValTok{75}\NormalTok{, .}\DecValTok{2}\NormalTok{,}
+       \KeywordTok{c}\NormalTok{(}\StringTok{"Grouped Categories"}\NormalTok{, }\StringTok{"Independent Categories"}\NormalTok{),}
+       \DataTypeTok{lwd =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{),}
+       \DataTypeTok{col =} \KeywordTok{c}\NormalTok{(}\StringTok{"black"}\NormalTok{, }\StringTok{"red"}\NormalTok{),}
+       \DataTypeTok{pch =} \KeywordTok{c}\NormalTok{(}\DecValTok{16}\NormalTok{, }\DecValTok{3}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-92-1.pdf}
+
+You can see that in this case, the two approaches lead to similar model
+performance.
+
+Single tree is straightforward and easy to interpret but it has
+problems:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Low accuracy
+\item
+  Unstable: little change in the training data leads to very different
+  trees.
+\end{enumerate}
+
+One way to overcome those is to use an ensemble of trees. In the rest of
+this chapter, we will introduce three ensemble methods: bagging tree,
+random forest, and gradient boosted machine. Those ensemble approaches
+have significant higher accuracy and stability. However, it comes with
+the cost of interpretability.
 
 \section{Bagging Tree}\label{bagging-tree-1}
 
@@ -7003,126 +7537,14 @@ Network}\label{convolutional-neural-network}
 
 \section{Recurrent Neural Network}\label{recurrent-neural-network}
 
+\subsection{}\label{section}
+
+\chapter{Big Data Cloud Platform}\label{big-data-cloud-platform-1}
+
+\section{History}\label{history}
+
 \appendix \addcontentsline{toc}{chapter}{\appendixname}
 
-
-\chapter{Big Data Cloud Platform}\label{big-data-cloud-platform}
-
-\section{How Data becomes Science?}\label{how-data-becomes-science}
-
-Data has been statistician's friend for hundreds of years. Tabulated
-data are the most familiar format that we use daily. People used to
-store data on papers, tapes, diskettes, or hard drives. Only recently,
-with the development of the computer, hardware, software, and
-algorithms, the volume, variety, and speed of the data suddenly beyond
-the capacity of a traditional statistician. And data becomes a special
-science with the very first focus on a fundamental question: with a huge
-amount of data, how can we store the data and quick access and process
-the data. In the past a few years, by utilizing commodity hardware and
-open source software, a big data ecosystem was created for data storage,
-data retrieval, and parallel computation. Hadoop and Spark have become a
-popular platform that enables data scientist, statistician, and business
-analyst to access the data and to build models. Programming skills in
-the big data platform have been the largest gap for a statistician to
-become a successful data scientist. However, with the recent wave of
-cloud computing, this gap is significantly reduced. Many of the
-technical details have been pushed to the background, and the user
-interface becomes much easier to learn. Cloud systems also enable quick
-implementation to the production environment. Now data science is
-emphasis more on the data itself as well as models and algorithms on top
-of the data instead of platform and infrastructure.
-
-\section{Power of Cluster of
-Computers}\label{power-of-cluster-of-computers}
-
-We are all familiar with our laptop/desktop computers which contain
-mainly three components to finish computation with data: (1) Hard disk,
-(2) Memory, and (3) CPU as shown in Figure 41 left. The data and codes
-are stored in the hard disk which has certain features such as
-relatively slow for reading and writes and relatively large capacity of
-around a few TB in today's market. Memory is relatively fast for reading
-and writing but relatively small in capacity in the order of a few
-dozens of GB in today's market. CPU is where all the computation is
-done.
-
-\includegraphics{images/cluster.png}
-
-For statistical software such as R, the amount of data that it can
-process is limited by the computer's memory. For a typical computer
-before the year 2000, the memory is less than 1 GB. The memory capacity
-grows far slower than the availability of the data to analyze. Now it is
-quite often that we need to analyze data far beyond the capacity of a
-single computer's memory, especially in an enterprise environment.
-Meanwhile, the computation time is growing faster than linear to solve
-the same problem (such as regressions) as the data size increases. Using
-a cluster of computers become a common way to solve big data problem. In
-Figure 41 (right), a cluster of computers can be viewed as one powerful
-machine with total memory, hard disk and CPU equivale to the sum of
-individual computers. It is common to have thousands of nodes for a
-cluster.
-
-In the past, to use a cluster of computers, users must write code (such
-as MPI) to take care of how data is distributed and how the computation
-is done in a parallel fashion. Luckily with the recent new development,
-the cloud environment for big data analysis is more user-friendly. As
-data is typically beyond the size of one hard disk, the dataset itself
-is stored across different nodes' hard disk (i.e.~the Hadoop system
-mentioned below). When we perform analysis, we can assume the needed
-data is already distributed across many node's memories in the cluster
-and algorithm are parallel in nature to leverage corresponding nodes'
-CPUs to compute (i.e.~the Spark system mentioned below).
-
-\subsection{Evolution of Clustering
-Computing}\label{evolution-of-clustering-computing}
-
-Using computer clusters to solve general purpose data and analytics
-problems needs a lot of efforts if we have to specifically control every
-element and steps such as data storage, memory allocation, and parallel
-computation. Fortunately, high tech IT companies and open source
-communities have developed the entire ecosystem based on Hadoop and
-Spark. Users need only to know high-level scripting language such as
-Python and R to leverage computer clusters' storage, memory and
-computation power.
-
-\subsection{Hadoop}\label{hadoop}
-
-The very first problem internet companies face is that a lot of data has
-been collected and how to better store these data for future analysis.
-Google developed its own file system to provide efficient, reliable
-access to data using large clusters of commodity hardware. The open
-source version is known as Hadoop Distributed File System (HDFS). Both
-systems use Map-Reduce to allocate computation across computation nodes
-on top of the file system. Hadoop in written in Java and writing
-map-reduce job using Java is a direct way to interact with Hadoop which
-is not familiar to many in the data and analytics community. To help
-better use Hadoop system, an SQL-like data warehouse system called Hive,
-and a scripting language for analytics interface called Pig were
-introduced for people with analytics background to interact with Hadoop
-system. Within Hive, we can create user defined function through R or
-Python to leverage the distributed and parallel computing
-infrastructure. Map-reduce on top of HDFS is the main concept of the
-Hadoop ecosystem. Each map-reduce operation requires retrieving data
-from hard disk, computation time, and then storing the result onto disk
-again. So, jobs on top of Hadoop require a lot of disk operation which
-may slow down the computation process.
-
-\subsection{Spark}\label{spark}
-
-Spark works on top of distributed file system including HDFS with better
-data and analytics efficiency by leveraging in-memory operations and is
-more tailored for data processing and analytics. The spark system
-includes an SQL-like framework called Spark SQL and a parallel machine
-learning library called MLib. Fortunately for many in the analytics
-community, Spark also supports R and Python. We can interact with data
-stored in distributed file system using parallel computing across nodes
-easily with R and Python through the Spark API and do not need to worry
-about lower level details of distributed computing. We will introduce
-how to use R notebook to drive Spark computations.
-
-\section{Introduction of Cloud
-Environment}\label{introduction-of-cloud-environment}
-
-\chapter{Databases and SQL}\label{databases-and-sql}
 
 \chapter{R code for data simulation}\label{r-code-for-data-simulation}
 
@@ -7130,20 +7552,10 @@ Environment}\label{introduction-of-cloud-environment}
 Company}\label{customer-data-for-clothing-company-1}
 
 The simulation is not very straightforward and we will break it into
-three parts:
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\tightlist
-\item
-  Define data structure: variable names, variable distribution, customer
-  segment names, segment size
-\item
-  Variable distribution parameters: mean and variance
-\item
-  Iterate across segments and variables. Simulate data according to
-  specific parameters assigned
-\end{enumerate}
+three parts: 1. Define data structure: variable names, variable
+distribution, customer segment names, segment size 1. Variable
+distribution parameters: mean and variance 1. Iterate across segments
+and variables. Simulate data according to specific parameters assigned
 
 By organizing code this way, it makes easy for us to change specific
 parts of the simulation. For example, if we want to change the
