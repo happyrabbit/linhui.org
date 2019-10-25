@@ -168,7 +168,7 @@
 
 \title{Introduction to Data Science}
 \author{Hui Lin and Ming Li}
-\date{2019-10-12}
+\date{2019-10-25}
 
 \usepackage{amsthm}
 \newtheorem{theorem}{Theorem}[chapter]
@@ -7307,14 +7307,355 @@ problems:
 \end{enumerate}
 
 One way to overcome those is to use an ensemble of trees. In the rest of
-this chapter, we will introduce three ensemble methods: bagging tree,
-random forest, and gradient boosted machine. Those ensemble approaches
-have significant higher accuracy and stability. However, it comes with
-the cost of interpretability.
+this chapter, we will introduce three ensemble methods (combine many
+models' predictions): bagging tree, random forest, and gradient boosted
+machine. Those ensemble approaches have significant higher accuracy and
+stability. However, it comes with the cost of interpretability.
 
 \section{Bagging Tree}\label{bagging-tree-1}
 
+As mentioned before, a single tree is unstable. If you randomly separate
+the sample to be two parts and fit tree model on each, you can get two
+very different trees. A stable model should give a similar result on
+different random samples. Some traditional statistical models have high
+stability, such as linear regression. \emph{Ensemble methods} appeared
+in the 1990s which can effectively stabilize the model.
+\emph{Bootstrapping} is a type of process where you repeated draw
+samples of the same size from a single original sample with replacement
+\citep{Efron1986}. \emph{Bootstrap aggregation} (Bagged) is an ensemble
+technique proposed by Leo Breiman (Breiman 1996a). It uses bootstrapping
+in conjunction with any model to construct an ensemble. The process is
+very straightforward:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Build a model on different bootstrap samples to form an ensemble, say
+  \(B\) samples
+\item
+  For a new sample, each model will give a prediction:
+  \(\hat{f}^1(x),\hat{f}^2(x)\dots,\hat{f}^B(x)\)
+\item
+  The bagged model's prediction is the average of all the predictions:
+\end{enumerate}
+
+\[\hat{f}_{avg}(x)=\frac{1}{B}\Sigma^B_{b=1}\hat{f}^b(x)\]
+
+Assume that there are \(n\) independent random variables
+\(Z_1,\dots,Z_n\) with variance \(\sigma^2\). Then the variance of the
+mean \(\bar{Z}\) is \(\frac{\sigma^2}{n}\). It is easy to see why bagged
+models have less variance. Since bootstrapping is to sample with
+replacement, it means some samples are selected multiple times and some
+not at all. Those left out samples are called out-of-bag. You can use
+the out-of-bag sample to access the model performance. For regression,
+the prediction is a simple average. For classification, the prediction
+is the category with the most ``votes''. Here, the number of trees,
+\(B\) is a parameter you need to decide, i.e.~tuning parameter.
+
+The advantages of bagging tree are:
+
+\begin{itemize}
+\item
+  Bagging stabilizes the model predictions by averaging the results. If
+  we have 10 bootstrap samples and fit a single tree on each of those,
+  we may get 10 trees with very different structures and leading to
+  different predictions for a new sample. But if we use the average of
+  the 10 predictions as the final prediction, then the result should be
+  much more stable. It means if we have another 10 samples and do it
+  all-over again, we will get very similar averaged prediction.
+\item
+  Bagging provides more accurate predictions. If the goal is to predict
+  rather than interpret, then the ensemble approach definitely has an
+  advantage, especially for unstable models. However, for stable models
+  (such as regression, MARS), bagging may bring marginal improvement for
+  the model performance.
+\item
+  Bagging can use out-of-bag samples to evaluate model performance. For
+  each model in the ensemble, we can calculate the value of the model
+  performance metric (you can decide what metric to use). You can use
+  the average of all the out-of-bag performance values to gauge the
+  predictive performance of the entire ensemble. This correlates well
+  with either cross-validation estimates or test set estimates. On
+  average, each tree uses about 2/3 of the samples, and the rest 1/3 is
+  used as out-of-bag. When the number of bootstrap samples is large
+  enough, the out-of-bag performance estimate approximates that from
+  leave one out cross-validation.
+\end{itemize}
+
+You need to choose the number of bootstrap samples. The author of
+``Applied Predictive Modeling'' \citep{APM} points out that often people
+see an exponential decrease in predictive improvement as the number of
+iterations increases. Most of the predictive power is from a small
+portion of the trees. Based on their experience, model performance can
+have small improvements up to 50 bagging iterations. If it is still not
+satisfying, they suggest trying other more powerfully predictive
+ensemble methods such as random forests and boosting which will be
+described in the following sections.
+
+The disadvantages of bagging tree are:
+
+\begin{itemize}
+\item
+  As the number of bootstrap samples increases, the computation and
+  memory requirements increase as well. You can mitigate this
+  disadvantage by parallel computing. Since each bootstrap sample and
+  modeling is independent of any other sample and model, you can easily
+  parallelize the bagging process by building those models separately
+  and bring back the results in the ed to generate the prediction.
+\item
+  The bagged model is difficult to explain which is common for all
+  ensemble approaches. However, you can still get variable importance by
+  combining measures of importance across the ensemble. For example, we
+  can calculate the RSS decrease for each variable across all trees and
+  use the average as the measurement of the importance.
+\item
+  Since the bagging tree uses all of the original predictors as everey
+  split of every tree, those trees are related with each other. The tree
+  correlation prevents bagging from optimally reducing the variance of
+  the predicted values. See \citep{Hastie2008} for a mathematical
+  illustration of the tree correlation phenomenon.
+\end{itemize}
+
+Let's look at how to use R to build bagging tree. Get the predictors and
+response variable first:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dat <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"http://bit.ly/2P5gTw4"}\NormalTok{)}
+\CommentTok{# use the 10 survey questions as predictors}
+\NormalTok{trainx <-}\StringTok{ }\NormalTok{dat[, }\KeywordTok{grep}\NormalTok{(}\StringTok{"Q"}\NormalTok{, }\KeywordTok{names}\NormalTok{(dat))]}
+\CommentTok{# add segment as a predictor }
+\CommentTok{# don't need to encode it to dummy variables}
+\NormalTok{trainx}\OperatorTok{$}\NormalTok{segment <-}\StringTok{ }\NormalTok{dat}\OperatorTok{$}\NormalTok{segment}
+\CommentTok{# use gender as the response variable}
+\NormalTok{trainy <-}\StringTok{ }\KeywordTok{as.factor}\NormalTok{(dat}\OperatorTok{$}\NormalTok{gender)}
+\end{Highlighting}
+\end{Shaded}
+
+Then fit the model using train function in caret package. Here we just
+set the number of trees to be 1000. You can tune that parameter.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{100}\NormalTok{)}
+\NormalTok{bagTune <-}\StringTok{ }\NormalTok{caret}\OperatorTok{::}\KeywordTok{train}\NormalTok{(trainx, trainy, }
+                           \DataTypeTok{method =} \StringTok{"treebag"}\NormalTok{,}
+                           \DataTypeTok{nbagg =} \DecValTok{2000}\NormalTok{,}
+                           \DataTypeTok{metric =} \StringTok{"ROC"}\NormalTok{,}
+                           \DataTypeTok{trControl =} \KeywordTok{trainControl}\NormalTok{(}\DataTypeTok{method =} \StringTok{"cv"}\NormalTok{,}
+                           \DataTypeTok{summaryFunction =}\NormalTok{ twoClassSummary,}
+                           \DataTypeTok{classProbs =} \OtherTok{TRUE}\NormalTok{,}
+                           \DataTypeTok{savePredictions =} \OtherTok{TRUE}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+The model results are:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{bagTune}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Bagged CART 
+## 
+## 1000 samples
+##   11 predictor
+##    2 classes: 'Female', 'Male' 
+## 
+## No pre-processing
+## Resampling: Cross-Validated (10 fold) 
+## Summary of sample sizes: 901, 899, 900, 900, 901, 900, ... 
+## Resampling results:
+## 
+##   ROC     Sens    Spec  
+##   0.7093  0.6533  0.6774
+\end{verbatim}
+
+Since we only have a handful of variables in this example, the maximum
+AUC doesn't improve by using bagging tree. But it makes a difference
+when we have more predictors.
+
 \section{Random Forest}\label{random-forest}
+
+Since the tree correlation prevents bagging from optimally reducing the
+variance of the predicted values, a natural way to improve the model
+performance is to reduce the correlation among trees. That is what
+random forest aims to do: improve the performance of bagging by
+de-correlating trees.
+
+From a statistical perspective, you can de-correlate trees by
+introducing randomness when you build each tree. One approach
+\citep{Ho1998, amit1997} is to randomly choose \(m\) variables to use
+each time you build a tree. Dietterich\citep{Dietterich2000} came up
+with the idea of random split selection which is to randomly choose
+\(m\) variables to use at each splitting node. Based on the different
+generalizations to the original bagging algorithm, Breiman
+\citep{Breiman2001} came up with a unified algorithm called \emph{random
+forest.}
+
+When building a tree, the algorithm randomly chooses \(m\) variables to
+use at each splitting node. Then choose the best one out of the \(m\) to
+use at that node. In general, people use \(m=\sqrt{p}\). For example, if
+we use 10 questions from the questionnaire as predictors, then at each
+node, the algorithm will randomly choose 4 candidate variables. Since
+those trees in the forest don't always use the same variables, tree
+correlation is less than that in bagging. It tends to work better when
+there are more predictors. Since we only have 10 predictors here, the
+improvement from the random forest is marginal. The number of randomly
+selected predictors is a tuning parameter in the random forest. Since
+random forest is computationally intensive, we suggest starting with 5
+value around \(m=\sqrt{p}\). Another tuning parameter is the number of
+trees in the forest. You can start with 1000 trees and then increase the
+number until performance levels off.
+
+The basic random forest is as follows:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Select the number of trees, B
+\item
+  \textbf{for} \emph{i=1 to B} \textbf{do}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    generate a bootstrap sample of the original data
+  \item
+    train a tree on this sample
+
+    \begin{itemize}
+    \tightlist
+    \item
+      \textbf{for} \emph{each split} \textbf{do}
+
+      \begin{itemize}
+      \tightlist
+      \item
+        randomly select m（\textless{}p）predictors
+      \item
+        choose the best one out of the \(m\) and partition the data
+      \end{itemize}
+    \item
+      \textbf{end}
+    \end{itemize}
+  \item
+    use typical tree model stopping criteria to determine when a tree is
+    complete without pruning
+  \end{itemize}
+\item
+  \textbf{end}
+\end{enumerate}
+
+When \(m=p\), random forest is equal to the bagging tree. When the
+predictors are highly correlated, then smaller \(m\) tends to work
+better. Let's use the \texttt{caret} package to train a random forest:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# tune across a list of numbers of predictors}
+\NormalTok{mtryValues <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{5}\NormalTok{)}
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{100}\NormalTok{)}
+\NormalTok{rfTune <-}\StringTok{ }\KeywordTok{train}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ trainx, }
+               \DataTypeTok{y =}\NormalTok{ trainy,}
+               \CommentTok{# set the model to be random forest}
+               \DataTypeTok{method =} \StringTok{"rf"}\NormalTok{,}
+               \DataTypeTok{ntree =} \DecValTok{1000}\NormalTok{,}
+               \DataTypeTok{tuneGrid =} \KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{.mtry =}\NormalTok{ mtryValues),}
+               \DataTypeTok{importance =} \OtherTok{TRUE}\NormalTok{,}
+               \DataTypeTok{metric =} \StringTok{"ROC"}\NormalTok{,}
+               \DataTypeTok{trControl =} \KeywordTok{trainControl}\NormalTok{(}\DataTypeTok{method =} \StringTok{"cv"}\NormalTok{,}
+                           \DataTypeTok{summaryFunction =}\NormalTok{ twoClassSummary,}
+                           \DataTypeTok{classProbs =} \OtherTok{TRUE}\NormalTok{,}
+                           \DataTypeTok{savePredictions =} \OtherTok{TRUE}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{rfTune}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Random Forest 
+## 
+## 1000 samples
+##   11 predictor
+##    2 classes: 'Female', 'Male' 
+## 
+## No pre-processing
+## Resampling: Cross-Validated (10 fold) 
+## Summary of sample sizes: 899, 900, 900, 899, 899, 901, ... 
+## Resampling results across tuning parameters:
+## 
+##   mtry  ROC     Sens    Spec  
+##   1     0.7169  0.5341  0.8205
+##   2     0.7137  0.6334  0.7175
+##   3     0.7150  0.6478  0.6995
+##   4     0.7114  0.6550  0.6950
+##   5     0.7092  0.6514  0.6882
+## 
+## ROC was used to select the optimal model using
+##  the largest value.
+## The final value used for the model was mtry = 1.
+\end{verbatim}
+
+In this example, since the number of predictors is small, the result of
+the model indicates that the optimal number of candidate variables at
+each node is 1. The optimal AUC is not too much higher than that from
+bagging tree:
+
+If you have selected the values of tuning parameters, you can also use
+the randomForest package to fit a random forest.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(randomForest)}
+\NormalTok{rfit =}\StringTok{ }\KeywordTok{randomForest}\NormalTok{(trainy }\OperatorTok{~}\StringTok{ }\NormalTok{., trainx, }\DataTypeTok{mtry =} \DecValTok{1}\NormalTok{, }\DataTypeTok{ntree =} \DecValTok{1000}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Since bagging tree is a special case of random forest, you can fit the
+bagging tree by setting \(mtry=p\). Function \texttt{importance()} can
+return the importance of each predictor:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{importance}\NormalTok{(rfit)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##         MeanDecreaseGini
+## Q1                 9.056
+## Q2                 7.582
+## Q3                 7.611
+## Q4                12.308
+## Q5                 5.628
+## Q6                 9.740
+## Q7                 6.638
+## Q8                 7.829
+## Q9                 5.955
+## Q10                4.781
+## segment           11.185
+\end{verbatim}
+
+You can use varImpPlot() function to visualize the predictor importance:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{varImpPlot}\NormalTok{(rfit)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-100-1.pdf} It is
+easy to see from the plot that \texttt{segment} and \texttt{Q4} are the
+top two variables to classify gender.
 
 \section{Gradient Boosted Machine}\label{gradient-boosted-machine}
 
