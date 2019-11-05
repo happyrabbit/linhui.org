@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2019-10-25">
+<meta name="date" content="2019-11-04">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -215,7 +215,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 <li class="chapter" data-level="11.4" data-path="bagging-tree-1.html"><a href="bagging-tree-1.html"><i class="fa fa-check"></i><b>11.4</b> Bagging Tree</a></li>
 <li class="chapter" data-level="11.5" data-path="random-forest.html"><a href="random-forest.html"><i class="fa fa-check"></i><b>11.5</b> Random Forest</a></li>
-<li class="chapter" data-level="11.6" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html"><i class="fa fa-check"></i><b>11.6</b> Gradient Boosted Machine</a></li>
+<li class="chapter" data-level="11.6" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html"><i class="fa fa-check"></i><b>11.6</b> Gradient Boosted Machine</a><ul>
+<li class="chapter" data-level="11.6.1" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#adaptive-boosting"><i class="fa fa-check"></i><b>11.6.1</b> Adaptive Boosting</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="12" data-path="neural-network.html"><a href="neural-network.html"><i class="fa fa-check"></i><b>12</b> Neural Network</a><ul>
 <li class="chapter" data-level="12.1" data-path="projection-pursuit-regression.html"><a href="projection-pursuit-regression.html"><i class="fa fa-check"></i><b>12.1</b> Projection Pursuit Regression</a></li>
@@ -228,9 +230,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="12.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html"><i class="fa fa-check"></i><b>12.4</b> Recurrent Neural Network</a><ul>
 <li class="chapter" data-level="12.4.1" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#section"><i class="fa fa-check"></i><b>12.4.1</b> </a></li>
 </ul></li>
-</ul></li>
-<li class="chapter" data-level="13" data-path="big-data-cloud-platform-1.html"><a href="big-data-cloud-platform-1.html"><i class="fa fa-check"></i><b>13</b> Big Data Cloud Platform</a><ul>
-<li class="chapter" data-level="13.1" data-path="history.html"><a href="history.html"><i class="fa fa-check"></i><b>13.1</b> History</a></li>
 </ul></li>
 <li class="appendix"><span><b>Appendix</b></span></li>
 <li class="chapter" data-level="A" data-path="r-code-for-data-simulation.html"><a href="r-code-for-data-simulation.html"><i class="fa fa-check"></i><b>A</b> R code for data simulation</a><ul>
@@ -326,20 +325,24 @@ sdat &lt;-<span class="st"> </span>sim.dat[, <span class="op">!</span><span clas
 ## What is the problem?</code></pre></div>
 <p>The data frame <code>sdat</code> only includes numeric columns. Now we can go head and use <code>apply()</code> to get mean and standard deviation for each column:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">apply</span>(sdat, <span class="dt">MARGIN=</span><span class="dv">2</span>,<span class="cf">function</span>(x) <span class="kw">mean</span>(<span class="kw">na.omit</span>(x)))</code></pre></div>
-<pre><code>##          age       income    store_exp   online_exp  store_trans online_trans           Q1 
-##    3.884e+01    1.135e+05    1.357e+03    2.120e+03    5.350e+00    1.355e+01    3.101e+00 
-##           Q2           Q3           Q4           Q5           Q6           Q7           Q8 
-##    1.823e+00    1.992e+00    2.763e+00    2.945e+00    2.448e+00    3.434e+00    2.396e+00 
-##           Q9          Q10 
-##    3.085e+00    2.320e+00</code></pre>
+<pre><code>##          age       income    store_exp   online_exp 
+##    3.884e+01    1.135e+05    1.357e+03    2.120e+03 
+##  store_trans online_trans           Q1           Q2 
+##    5.350e+00    1.355e+01    3.101e+00    1.823e+00 
+##           Q3           Q4           Q5           Q6 
+##    1.992e+00    2.763e+00    2.945e+00    2.448e+00 
+##           Q7           Q8           Q9          Q10 
+##    3.434e+00    2.396e+00    3.085e+00    2.320e+00</code></pre>
 <p>Here we defined a function using <code>function(x) mean(na.omit(x))</code>. It is a very simple function. It tells R to ignore the missing value when calculating the mean. <code>MARGIN=2</code> tells R to apply the function to each column. It is not hard to guess what <code>MARGIN=1</code> mean. The result show that the average online expense is much higher than store expense. You can also compare the average scores across different questions. The command to calculate standard deviation is very similar. The only difference is to change <code>mean()</code> to <code>sd()</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">apply</span>(sdat, <span class="dt">MARGIN=</span><span class="dv">2</span>,<span class="cf">function</span>(x) <span class="kw">sd</span>(<span class="kw">na.omit</span>(x)))</code></pre></div>
-<pre><code>##          age       income    store_exp   online_exp  store_trans online_trans           Q1 
-##       16.417    49842.287     2774.400     1731.224        3.696        7.957        1.450 
-##           Q2           Q3           Q4           Q5           Q6           Q7           Q8 
-##        1.168        1.402        1.155        1.284        1.439        1.456        1.154 
-##           Q9          Q10 
-##        1.118        1.136</code></pre>
+<pre><code>##          age       income    store_exp   online_exp 
+##       16.417    49842.287     2774.400     1731.224 
+##  store_trans online_trans           Q1           Q2 
+##        3.696        7.957        1.450        1.168 
+##           Q3           Q4           Q5           Q6 
+##        1.402        1.155        1.284        1.439 
+##           Q7           Q8           Q9          Q10 
+##        1.456        1.154        1.118        1.136</code></pre>
 <p>Even the average online expense is higher than store expense, the standard deviation for store expense is much higher than online expense which indicates there is very likely some big/small purchase in store. We can check it quickly:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(sdat<span class="op">$</span>store_exp)</code></pre></div>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
@@ -459,8 +462,15 @@ dplyr<span class="op">::</span><span class="kw">select</span>(sim.dat, <span cla
             <span class="dt">online_exp =</span> <span class="kw">round</span>(<span class="kw">mean</span>(online_exp), <span class="dv">0</span>), 
             <span class="dt">store_trans =</span> <span class="kw">round</span>(<span class="kw">mean</span>(store_trans), <span class="dv">1</span>), 
             <span class="dt">online_trans =</span> <span class="kw">round</span>(<span class="kw">mean</span>(online_trans), <span class="dv">1</span>))</code></pre></div>
-<pre><code>##   Age FemalePct HouseYes store_exp online_exp store_trans online_trans
-## 1  39      0.55     0.57       840       2120         5.3         13.5</code></pre>
+<pre><code>## # A tibble: 4 x 8
+##   segment       Age FemalePct HouseYes store_exp
+##   &lt;fct&gt;       &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+## 1 Conspicuous   42.     0.320    0.860     4990.
+## 2 Price         60.     0.450    0.940      501.
+## 3 Quality       35.     0.470    0.340      301.
+## 4 Style         24.     0.810    0.270      200.
+## # ... with 3 more variables: online_exp &lt;dbl&gt;,
+## #   store_trans &lt;dbl&gt;, online_trans &lt;dbl&gt;</code></pre>
 <p>Now, let’s peel the onion.</p>
 <p>The first line <code>sim.dat</code> is easy. It is the data you want to work on. The second line <code>group_by(segment)</code> tells R that in the following steps you want to summarise by variable <code>segment</code>. Here we only summarize data by one categorical variable, but you can group by multiple variables, such as <code>group_by(segment, house)</code>. The third argument <code>summarise</code> tells R the manipulation(s) to do. Then list the exact actions inside <code>summarise()</code> . For example, <code>Age=round(mean(na.omit(age)),0)</code> tell R the following things:</p>
 <ol style="list-style-type: decimal">
@@ -491,15 +501,22 @@ dplyr<span class="op">::</span><span class="kw">select</span>(sim.dat, <span cla
 <span class="st">  </span><span class="kw">group_by</span>(segment) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">summarise</span>(<span class="dt">avg_online =</span> <span class="kw">round</span>(<span class="kw">sum</span>(online_exp)<span class="op">/</span><span class="kw">sum</span>(online_trans), <span class="dv">2</span>),
             <span class="dt">avg_store =</span> <span class="kw">round</span>(<span class="kw">sum</span>(store_exp)<span class="op">/</span><span class="kw">sum</span>(store_trans), <span class="dv">2</span>))</code></pre></div>
-<pre><code>##   avg_online avg_store
-## 1      156.5     253.6</code></pre>
+<pre><code>## # A tibble: 4 x 3
+##   segment     avg_online avg_store
+##   &lt;fct&gt;            &lt;dbl&gt;     &lt;dbl&gt;
+## 1 Conspicuous      442.      479. 
+## 2 Price             69.3      81.3
+## 3 Quality          126.      105. 
+## 4 Style             92.8     121.</code></pre>
 <p>Price group has the lowest averaged one-time purchase. The Conspicuous group will pay the highest price. When we build customer profile in real life, we will also need to look at the survey summarization. You may be surprised how much information simple data manipulations can provide.</p>
 <p>Another comman task is to check which column has missing values. It requires the program to look at each column in the data. In this case you can use <code>summarise_all</code>:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># apply function anyNA() to each column</span>
 <span class="co"># you can also assign a function vector such as: c(&quot;anyNA&quot;,&quot;is.factor&quot;)</span>
 dplyr<span class="op">::</span><span class="kw">summarise_all</span>(sim.dat, <span class="kw">funs_</span>(<span class="kw">c</span>(<span class="st">&quot;anyNA&quot;</span>)))</code></pre></div>
-<pre><code>##     age gender income house store_exp online_exp store_trans online_trans    Q1    Q2    Q3    Q4
-## 1 FALSE  FALSE   TRUE FALSE     FALSE      FALSE       FALSE        FALSE FALSE FALSE FALSE FALSE
+<pre><code>##     age gender income house store_exp online_exp
+## 1 FALSE  FALSE   TRUE FALSE     FALSE      FALSE
+##   store_trans online_trans    Q1    Q2    Q3    Q4
+## 1       FALSE        FALSE FALSE FALSE FALSE FALSE
 ##      Q5    Q6    Q7    Q8    Q9   Q10 segment
 ## 1 FALSE FALSE FALSE FALSE FALSE FALSE   FALSE</code></pre>
 <p>The above code returns a vector indicating if there is any value missing in each column.</p>
@@ -523,20 +540,23 @@ dplyr<span class="op">::</span><span class="kw">summarise_all</span>(sim.dat, <s
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># join to the left</span>
 <span class="co"># keep all rows in x</span>
 <span class="kw">left_join</span>(x, y, <span class="dt">by =</span> <span class="st">&quot;ID&quot;</span>)</code></pre></div>
-<pre><code>## Warning: Column `ID` joining factors with different levels, coercing to character vector</code></pre>
+<pre><code>## Warning: Column `ID` joining factors with different
+## levels, coercing to character vector</code></pre>
 <pre><code>##   ID x1   y1
 ## 1  A  1 &lt;NA&gt;
 ## 2  B  2 TRUE
 ## 3  C  3 TRUE</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get rows matched in both data sets</span>
 <span class="kw">inner_join</span>(x, y, <span class="dt">by =</span> <span class="st">&quot;ID&quot;</span>)</code></pre></div>
-<pre><code>## Warning: Column `ID` joining factors with different levels, coercing to character vector</code></pre>
+<pre><code>## Warning: Column `ID` joining factors with different
+## levels, coercing to character vector</code></pre>
 <pre><code>##   ID x1   y1
 ## 1  B  2 TRUE
 ## 2  C  3 TRUE</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get rows in either data set</span>
 <span class="kw">full_join</span>(x, y, <span class="dt">by =</span> <span class="st">&quot;ID&quot;</span>)</code></pre></div>
-<pre><code>## Warning: Column `ID` joining factors with different levels, coercing to character vector</code></pre>
+<pre><code>## Warning: Column `ID` joining factors with different
+## levels, coercing to character vector</code></pre>
 <pre><code>##   ID   x1    y1
 ## 1  A    1  &lt;NA&gt;
 ## 2  B    2  TRUE

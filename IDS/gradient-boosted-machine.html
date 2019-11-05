@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2019-10-25">
+<meta name="date" content="2019-11-04">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -215,7 +215,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 <li class="chapter" data-level="11.4" data-path="bagging-tree-1.html"><a href="bagging-tree-1.html"><i class="fa fa-check"></i><b>11.4</b> Bagging Tree</a></li>
 <li class="chapter" data-level="11.5" data-path="random-forest.html"><a href="random-forest.html"><i class="fa fa-check"></i><b>11.5</b> Random Forest</a></li>
-<li class="chapter" data-level="11.6" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html"><i class="fa fa-check"></i><b>11.6</b> Gradient Boosted Machine</a></li>
+<li class="chapter" data-level="11.6" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html"><i class="fa fa-check"></i><b>11.6</b> Gradient Boosted Machine</a><ul>
+<li class="chapter" data-level="11.6.1" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#adaptive-boosting"><i class="fa fa-check"></i><b>11.6.1</b> Adaptive Boosting</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="12" data-path="neural-network.html"><a href="neural-network.html"><i class="fa fa-check"></i><b>12</b> Neural Network</a><ul>
 <li class="chapter" data-level="12.1" data-path="projection-pursuit-regression.html"><a href="projection-pursuit-regression.html"><i class="fa fa-check"></i><b>12.1</b> Projection Pursuit Regression</a></li>
@@ -228,9 +230,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="12.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html"><i class="fa fa-check"></i><b>12.4</b> Recurrent Neural Network</a><ul>
 <li class="chapter" data-level="12.4.1" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#section"><i class="fa fa-check"></i><b>12.4.1</b> </a></li>
 </ul></li>
-</ul></li>
-<li class="chapter" data-level="13" data-path="big-data-cloud-platform-1.html"><a href="big-data-cloud-platform-1.html"><i class="fa fa-check"></i><b>13</b> Big Data Cloud Platform</a><ul>
-<li class="chapter" data-level="13.1" data-path="history.html"><a href="history.html"><i class="fa fa-check"></i><b>13.1</b> History</a></li>
 </ul></li>
 <li class="appendix"><span><b>Appendix</b></span></li>
 <li class="chapter" data-level="A" data-path="r-code-for-data-simulation.html"><a href="r-code-for-data-simulation.html"><i class="fa fa-check"></i><b>A</b> R code for data simulation</a><ul>
@@ -261,9 +260,65 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
             <section class="normal" id="section-">
 <div id="gradient-boosted-machine" class="section level2">
 <h2><span class="header-section-number">11.6</span> Gradient Boosted Machine</h2>
+<p>Boosting models were developed in the 1980s <span class="citation">(L <a href="#ref-Valiant1984">1984</a>; M and L <a href="#ref-KV1989">1989</a>)</span> and were originally for classification problems. Due to the excellent model performance, they were widely used for a variety of applications, such as gene expression <span class="citation">(Dudoit S and T <a href="#ref-dudoit2002">2002</a>; Ben-Dor A and Z <a href="#ref-ben-dor2000">2000</a>)</span>, chemical substructure classification <span class="citation">(Varmuza K and K <a href="#ref-Varmuza2003">2003</a>)</span>, music classification <span class="citation">(Bergstra J and B <a href="#ref-Bergstra2006">2006</a>)</span>, etc. The first effective implementation of boosting is Adaptive Boosting (AdaBoost) algorithm came up by Yoav Freund and Robert Schapire in 1996 <span class="citation">(YFR <a href="#ref-Schapire1999">1999</a>)</span>. After that, some researchers <span class="citation">(Friedman J and R <a href="#ref-Friedman2000">2000</a>)</span> started to connect the boosting algorithm with some statistical concepts, such as loss function, additive model, logistic regression. Friedman pointed out that boosting can be considered as a forward stagewise additive model that minimizes exponential loss. The new view of boosting in a statistical framework enabled the method to be extended to regression problems.</p>
+<p>The idea is to combine a group of weak learners (a classifier that is marginally better than random guess) to produce a strong learner. Like bagging, boosting is a general approach that can be applied to different learners. Here we focus on the decision tree. Recall that both bagging and random forest create multiple copies of the original training data using the bootstrap, fitting a separate decision tree to each copy and combining all the results to create a single prediction. Boosting also creates different trees but the trees are grown sequentially and each tree is a weak learner. Any modeling technique with tuning parameters can produce a range of learners, from weak to strong. You can easily make a weak learner by restricting the depth of the tree. There are different types of boosting. Here we introduce two main types: adaptive boosting and stochastic gradient boosting.</p>
+<div id="adaptive-boosting" class="section level3">
+<h3><span class="header-section-number">11.6.1</span> Adaptive Boosting</h3>
+<p>Yoav Freund and Robert Schapire <span class="citation">(Freund and Schapire <a href="#ref-Freund1997">1997</a>)</span> came up the AdaBoost.M1 algorithm. Consider a binary classification problem where the response variable has two categories <span class="math inline">\(Y \in \{-1, 1\}\)</span>. Given predictor matrix, <span class="math inline">\(X\)</span>, construct a classifier <span class="math inline">\(G(X)\)</span> that predicts <span class="math inline">\(1\)</span> or <span class="math inline">\(-1\)</span>. The corresponding error rate in the training set is:</p>
+<p><span class="math display">\[\bar{err}=\frac{1}{N}\Sigma_{i=1}^NI(y_i\neq G(x_i))\]</span></p>
+<p>The algorithm produces a series of classifiers <span class="math inline">\(G_m(x),\ m=1,2,...,M\)</span> from different iterations. In each iteration, it finds the best classifier based on the current weights. The misclassified samples in the <span class="math inline">\(m^{th}\)</span> iteration will have higher weights in the <span class="math inline">\(m+1^{th}\)</span> iteration and the correctly classified samples will have lower weights. As it moves on, the algorithm will put more effort into the “difficult” samples until it can correctly classify them. So it requires the algorithm to change focus at each iteration. At each iteration, the algorithm will calculate a stage weight based on the error rate. The final prediction is a weighted average of all those weak classifiers using stage weights from all the iterations:</p>
+<p><span class="math display">\[G(x)=sign ( \Sigma_{m=1}^M \alpha_{m}G_m(x))\]</span> where <span class="math inline">\(\alpha_1,\alpha_2,...,\alpha_M\)</span> are the weights from different iterations.</p>
+<p><strong>AdaBoost.M1</strong></p>
+<ol style="list-style-type: decimal">
+<li>Response variables have two values: +1 and -1</li>
+<li>Initialize the observation to have the same weights: <span class="math inline">\(w_i=\frac{1}{N},i=1,...,N\)</span></li>
+<li><p>for m = 1 to M:</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>Fit a classifier <span class="math inline">\(G_m(x)\)</span> to the training data using weights <span class="math inline">\(w_i\)</span></p></li>
+<li><p>Compute the error rate for the <span class="math inline">\(m^th\)</span> classifier: <span class="math inline">\(err_m=\frac{\Sigma_{i=1}^Nw_i I(y_i\neq G_m(x_i))}{\Sigma_{i=1}^Nw_i}\)</span></p></li>
+<li><p>Compute the stage weight for <span class="math inline">\(m^{th}\)</span> iteration: <span class="math inline">\(\alpha_m=log\frac{1-err_m}{err_m}\)</span></p></li>
+<li><p>Update <span class="math inline">\(w_i = w_i\cdot exp[\alpha_m\cdot I(y_i \neq G_m(x_i))],\ i=1,2,\dots,N\)</span></p></li>
+</ol></li>
+<li><p>Calculate the prediction：<span class="math inline">\(G(x)=sign[\Sigma_{m=1}^M\alpha_mG_m(x)]\)</span>，where <span class="math inline">\(sign(\cdot)\)</span> means if <span class="math inline">\(\cdot\)</span> is positive, then the sample is classified as +1, -1 otherwise.</p></li>
+</ol>
+<p>Since the classifier <span class="math inline">\(G_m(x)\)</span> returns discrete value, the AdaBoost.M1 algorithm is known as “Discrete AdaBoost” <span class="citation">(Friedman J and R <a href="#ref-Friedman2000">2000</a>)</span>. You can revise the above algorithm if it returns continuous value, for example, a probability<span class="citation">(Friedman J and R <a href="#ref-Friedman2000">2000</a>)</span>. As mentioned before, boosting is a general approach that can be applied to different learners. Since you can easily create weak learners by limiting the depth of the tree, the boosting tree is a common method. Since the classification tree is a low bias/high variance technique, ensemble decreases model variance and lead to low bias/low variance model. See Breinman<span class="citation">(Breiman <a href="#ref-Breiman1998">1998</a>)</span> for more explanation about why the boosting tree performs well in general. However, boosting can not significantly improve the low variance model. So applying boosting to Latent Dirichlet Allocation (LDA) or K-Nearest Neighbor (KNN) doesn’t lead to as good improvement as applying boosting to statistical learning methods like naive Bayes <span class="citation">(E and R, n.d.)</span>.</p>
 
 </div>
+</div>
 <!-- </div> -->
+<h3>References</h3>
+<div id="refs" class="references">
+<div id="ref-Valiant1984">
+<p>L, Valiant. 1984. “A Theory of the Learnable.” <em>Communications of the ACM</em> 27: 1134–42.</p>
+</div>
+<div id="ref-KV1989">
+<p>M, Kearns, and Valiant L. 1989. “Cryptographic Limitations on Learning Boolean Formulae and Finite Automata.”</p>
+</div>
+<div id="ref-dudoit2002">
+<p>Dudoit S, Fridlyand J, and Speed T. 2002. “Comparison of Discrimination Meth- Ods for the Classification of Tumors Using Gene Expression Data.” <em>Journal of the American Statistical Association</em> 97 (457): 77–87.</p>
+</div>
+<div id="ref-ben-dor2000">
+<p>Ben-Dor A, Friedman N, Bruhn L, and Yakhini Z. 2000. “Tissue Classification with Gene Expression Profiles.” <em>Journal of Computational Biology</em> 7 (3): 559–83.</p>
+</div>
+<div id="ref-Varmuza2003">
+<p>Varmuza K, He P, and Fang K. 2003. “Boosting Applied to Classification of Mass Spectral Data.” <em>Journal of Data Science</em> 1 (391–404).</p>
+</div>
+<div id="ref-Bergstra2006">
+<p>Bergstra J, Erhan D, Casagrande N, and K ́egl B. 2006. “Aggregate Features and Adaboost for Music Classification.” <em>Machine Learning</em> 65: 473–84.</p>
+</div>
+<div id="ref-Schapire1999">
+<p>YFR, Schapire. 1999. “Adaptive Game Playing Using Multiplicative Weights.” <em>Games and Economic Behavior</em> 29: 79–103.</p>
+</div>
+<div id="ref-Friedman2000">
+<p>Friedman J, Hastie T, and Tibshirani R. 2000. “Additive Logistic Regression: A Statistical View of Boosting.” <em>Annals of Statistics</em> 38: 337–74.</p>
+</div>
+<div id="ref-Freund1997">
+<p>Freund, Y., and R. Schapire. 1997. “A Decision-Theoretic Generalization of Online Learning and an Application to Boosting.” <em>Journal of Computer and System Sciences</em> 55: 119–39.</p>
+</div>
+<div id="ref-Breiman1998">
+<p>Breiman, Leo. 1998. “Arcing Classifiers.” <em>The Annals of Statistics</em> 26: 123–40.</p>
+</div>
+</div>
             </section>
 
           </div>

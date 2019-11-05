@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2019-10-25">
+<meta name="date" content="2019-11-04">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -215,7 +215,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 <li class="chapter" data-level="11.4" data-path="bagging-tree-1.html"><a href="bagging-tree-1.html"><i class="fa fa-check"></i><b>11.4</b> Bagging Tree</a></li>
 <li class="chapter" data-level="11.5" data-path="random-forest.html"><a href="random-forest.html"><i class="fa fa-check"></i><b>11.5</b> Random Forest</a></li>
-<li class="chapter" data-level="11.6" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html"><i class="fa fa-check"></i><b>11.6</b> Gradient Boosted Machine</a></li>
+<li class="chapter" data-level="11.6" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html"><i class="fa fa-check"></i><b>11.6</b> Gradient Boosted Machine</a><ul>
+<li class="chapter" data-level="11.6.1" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#adaptive-boosting"><i class="fa fa-check"></i><b>11.6.1</b> Adaptive Boosting</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="12" data-path="neural-network.html"><a href="neural-network.html"><i class="fa fa-check"></i><b>12</b> Neural Network</a><ul>
 <li class="chapter" data-level="12.1" data-path="projection-pursuit-regression.html"><a href="projection-pursuit-regression.html"><i class="fa fa-check"></i><b>12.1</b> Projection Pursuit Regression</a></li>
@@ -228,9 +230,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="12.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html"><i class="fa fa-check"></i><b>12.4</b> Recurrent Neural Network</a><ul>
 <li class="chapter" data-level="12.4.1" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#section"><i class="fa fa-check"></i><b>12.4.1</b> </a></li>
 </ul></li>
-</ul></li>
-<li class="chapter" data-level="13" data-path="big-data-cloud-platform-1.html"><a href="big-data-cloud-platform-1.html"><i class="fa fa-check"></i><b>13</b> Big Data Cloud Platform</a><ul>
-<li class="chapter" data-level="13.1" data-path="history.html"><a href="history.html"><i class="fa fa-check"></i><b>13.1</b> History</a></li>
 </ul></li>
 <li class="appendix"><span><b>Appendix</b></span></li>
 <li class="chapter" data-level="A" data-path="r-code-for-data-simulation.html"><a href="r-code-for-data-simulation.html"><i class="fa fa-check"></i><b>A</b> R code for data simulation</a><ul>
@@ -318,12 +317,28 @@ rfTune &lt;-<span class="st"> </span><span class="kw">train</span>(<span class="
 ##   4     0.7114  0.6550  0.6950
 ##   5     0.7092  0.6514  0.6882
 ## 
-## ROC was used to select the optimal model using the largest value.
+## ROC was used to select the optimal model using
+##  the largest value.
 ## The final value used for the model was mtry = 1.</code></pre>
 <p>In this example, since the number of predictors is small, the result of the model indicates that the optimal number of candidate variables at each node is 1. The optimal AUC is not too much higher than that from bagging tree:</p>
 <p>If you have selected the values of tuning parameters, you can also use the randomForest package to fit a random forest.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(randomForest)
-rfit =<span class="st"> </span><span class="kw">randomForest</span>(trainy <span class="op">~</span><span class="st"> </span>., trainx, <span class="dt">mtry =</span> <span class="dv">1</span>, <span class="dt">ntree =</span> <span class="dv">1000</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(randomForest)</code></pre></div>
+<pre><code>## Warning: package &#39;randomForest&#39; was built under R
+## version 3.4.4</code></pre>
+<pre><code>## randomForest 4.6-14</code></pre>
+<pre><code>## Type rfNews() to see new features/changes/bug fixes.</code></pre>
+<pre><code>## 
+## Attaching package: &#39;randomForest&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     combine</code></pre>
+<pre><code>## The following object is masked from &#39;package:psych&#39;:
+## 
+##     outlier</code></pre>
+<pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
+## 
+##     margin</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rfit =<span class="st"> </span><span class="kw">randomForest</span>(trainy <span class="op">~</span><span class="st"> </span>., trainx, <span class="dt">mtry =</span> <span class="dv">1</span>, <span class="dt">ntree =</span> <span class="dv">1000</span>)</code></pre></div>
 <p>Since bagging tree is a special case of random forest, you can fit the bagging tree by setting <span class="math inline">\(mtry=p\)</span>. Function <code>importance()</code> can return the importance of each predictor:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">importance</span>(rfit)</code></pre></div>
 <pre><code>##         MeanDecreaseGini
@@ -340,7 +355,7 @@ rfit =<span class="st"> </span><span class="kw">randomForest</span>(trainy <span
 ## segment           11.185</code></pre>
 <p>You can use varImpPlot() function to visualize the predictor importance:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">varImpPlot</span>(rfit)</code></pre></div>
-<p><img src="IDS_files/figure-html/unnamed-chunk-106-1.svg" width="672" /> It is easy to see from the plot that <code>segment</code> and <code>Q4</code> are the top two variables to classify gender.</p>
+<p><img src="IDS_files/figure-html/unnamed-chunk-100-1.svg" width="672" /> It is easy to see from the plot that <code>segment</code> and <code>Q4</code> are the top two variables to classify gender.</p>
 </div>
 <h3>References</h3>
 <div id="refs" class="references">

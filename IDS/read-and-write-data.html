@@ -25,7 +25,7 @@
 <meta name="author" content="Hui Lin and Ming Li">
 
 
-<meta name="date" content="2019-10-25">
+<meta name="date" content="2019-11-04">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -215,7 +215,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 <li class="chapter" data-level="11.4" data-path="bagging-tree-1.html"><a href="bagging-tree-1.html"><i class="fa fa-check"></i><b>11.4</b> Bagging Tree</a></li>
 <li class="chapter" data-level="11.5" data-path="random-forest.html"><a href="random-forest.html"><i class="fa fa-check"></i><b>11.5</b> Random Forest</a></li>
-<li class="chapter" data-level="11.6" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html"><i class="fa fa-check"></i><b>11.6</b> Gradient Boosted Machine</a></li>
+<li class="chapter" data-level="11.6" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html"><i class="fa fa-check"></i><b>11.6</b> Gradient Boosted Machine</a><ul>
+<li class="chapter" data-level="11.6.1" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#adaptive-boosting"><i class="fa fa-check"></i><b>11.6.1</b> Adaptive Boosting</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="12" data-path="neural-network.html"><a href="neural-network.html"><i class="fa fa-check"></i><b>12</b> Neural Network</a><ul>
 <li class="chapter" data-level="12.1" data-path="projection-pursuit-regression.html"><a href="projection-pursuit-regression.html"><i class="fa fa-check"></i><b>12.1</b> Projection Pursuit Regression</a></li>
@@ -228,9 +230,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="12.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html"><i class="fa fa-check"></i><b>12.4</b> Recurrent Neural Network</a><ul>
 <li class="chapter" data-level="12.4.1" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#section"><i class="fa fa-check"></i><b>12.4.1</b> </a></li>
 </ul></li>
-</ul></li>
-<li class="chapter" data-level="13" data-path="big-data-cloud-platform-1.html"><a href="big-data-cloud-platform-1.html"><i class="fa fa-check"></i><b>13</b> Big Data Cloud Platform</a><ul>
-<li class="chapter" data-level="13.1" data-path="history.html"><a href="history.html"><i class="fa fa-check"></i><b>13.1</b> History</a></li>
 </ul></li>
 <li class="appendix"><span><b>Appendix</b></span></li>
 <li class="chapter" data-level="A" data-path="r-code-for-data-simulation.html"><a href="r-code-for-data-simulation.html"><i class="fa fa-check"></i><b>A</b> R code for data simulation</a><ul>
@@ -375,9 +374,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
     <span class="dt">col_names =</span> <span class="ot">FALSE</span>)
 <span class="kw">print</span>(dat)</code></pre></div>
 <pre><code>## # A tibble: 1 x 10
-##   X1    X2    X3    X4    X5    X6    X7    X8    X9    X10  
-##   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
-## 1 every man   is    a     poet  when  he    is    in    love</code></pre>
+##   X1    X2    X3    X4    X5    X6    X7    X8   
+##   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
+## 1 every man   is    a     poet  when  he    is   
+## # ... with 2 more variables: X9 &lt;chr&gt;, X10 &lt;chr&gt;</code></pre>
 <p>Or more generally, you can use <code>read_delim()</code> and assign separating character：</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat &lt;-<span class="st"> </span><span class="kw">read_delim</span>(<span class="st">&quot;THE|UNBEARABLE|RANDOMNESS|OF|LIFE</span><span class="ch">\n</span><span class="st">&quot;</span>, 
     <span class="dt">delim =</span> <span class="st">&quot;|&quot;</span>, <span class="dt">col_names =</span> <span class="ot">FALSE</span>)
@@ -541,19 +541,26 @@ sim.dat <span class="op">%&gt;%</span><span class="st"> </span>
 </ul>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># select rows with age&lt;20 and income &gt; 80000</span>
 dt[age <span class="op">&lt;</span><span class="st"> </span><span class="dv">20</span> <span class="op">&amp;</span><span class="st"> </span>income <span class="op">&gt;</span><span class="st"> </span><span class="dv">80000</span>]</code></pre></div>
-<pre><code>##    age gender income house store_exp online_exp store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9
-## 1:  19 Female  83535    No     227.7       1491           1           22  2  1  1  2  4  1  4  2  4
-## 2:  18 Female  89416   Yes     209.5       1926           3           28  2  1  1  1  4  1  4  2  4
-## 3:  19 Female  92813    No     186.7       1042           2           18  3  1  1  2  4  1  4  3  4
+<pre><code>##    age gender income house store_exp online_exp
+## 1:  19 Female  83535    No     227.7       1491
+## 2:  18 Female  89416   Yes     209.5       1926
+## 3:  19 Female  92813    No     186.7       1042
+##    store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9
+## 1:           1           22  2  1  1  2  4  1  4  2  4
+## 2:           3           28  2  1  1  1  4  1  4  2  4
+## 3:           2           18  3  1  1  2  4  1  4  3  4
 ##    Q10 segment
 ## 1:   1   Style
 ## 2:   1   Style
 ## 3:   1   Style</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># select the first two rows</span>
 dt[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]</code></pre></div>
-<pre><code>##    age gender income house store_exp online_exp store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9
-## 1:  57 Female 120963   Yes     529.1      303.5           2            2  4  2  1  2  1  4  1  4  2
-## 2:  63 Female 122008   Yes     478.0      109.5           4            2  4  1  1  2  1  4  1  4  1
+<pre><code>##    age gender income house store_exp online_exp
+## 1:  57 Female 120963   Yes     529.1      303.5
+## 2:  63 Female 122008   Yes     478.0      109.5
+##    store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9
+## 1:           2            2  4  2  1  2  1  4  1  4  2
+## 2:           4            2  4  1  1  2  1  4  1  4  1
 ##    Q10 segment
 ## 1:   4   Price
 ## 2:   4   Price</code></pre>
