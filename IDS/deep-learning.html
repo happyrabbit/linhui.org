@@ -32,8 +32,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   
   
-<link rel="prev" href="data-cleaning.html">
-<link rel="next" href="centering-and-scaling.html">
+<link rel="prev" href="gradient-boosted-machine.html">
+<link rel="next" href="projection-pursuit-regression.html">
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
@@ -264,95 +264,16 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="missing-values" class="section level2">
-<h2><span class="header-section-number">5.2</span> Missing Values</h2>
-<p>You can write a whole book about missing value. This section will only show some of the most commonly used methods without getting too deep into the topic. Chapter 7 of the book by De Waal, Pannekoek and Scholtus <span class="citation">(Waal, Pannekoek, and Scholtus <a href="#ref-Ton2011">2011</a>)</span> makes a concise overview of some of the existing imputation methods. The choice of specific method depends on the actual situation. There is no best way.</p>
-<p>One question to ask before imputation: Is there any auxiliary information? Being aware of any auxiliary information is critical. For example, if the system set customer who did not purchase as missing, then the real purchasing amount should be 0. Is missing a random occurrence? If so, it may be reasonable to impute with mean or median. If not, is there a potential mechanism for the missing data? For example, older people are more reluctant to disclose their ages in the questionnaire, so that the absence of age is not completely random. In this case, the missing values need to be estimated using the relationship between age and other independent variables. For example, use variables such as whether they have children, income, and other survey questions to build a model to predict age.</p>
-<p>Also, the purpose of modeling is important for selecting imputation methods. If the goal is to interpret the parameter estimate or statistical inference, then it is important to study the missing mechanism carefully and to estimate the missing values using non-missing information as much as possible. If the goal is to predict, people usually will not study the absence mechanism rigorously (but sometimes the mechanism is obvious). If the absence mechanism is not clear, treat it as missing at random and use mean, median, or k-nearest neighbor to impute. Since statistical inference is sensitive to missing values, researchers from survey statistics have conducted in-depth studies of various imputation schemes which focus on valid statistical inference. The problem of missing values in the prediction model is different from that in the traditional survey. Therefore, there are not many papers on missing value imputation in the prediction model. Those who want to study further can refer to Saar-Tsechansky and Provost’s comparison of different imputation methods <span class="citation">(M and F 2007b)</span> and De Waal, Pannekoek and Scholtus’ book <span class="citation">(Waal, Pannekoek, and Scholtus <a href="#ref-Ton2011">2011</a>)</span>.</p>
-<div id="impute-missing-values-with-medianmode" class="section level3">
-<h3><span class="header-section-number">5.2.1</span> Impute missing values with median/mode</h3>
-<p>In the case of missing at random, a common method is to impute with the mean (continuous variable) or median (categorical variables). You can use <code>impute()</code> function in <code>imputeMissings</code> package.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># save the result as another object</span>
-demo_imp &lt;-<span class="st"> </span><span class="kw">impute</span>(sim.dat, <span class="dt">method =</span> <span class="st">&quot;median/mode&quot;</span>)
-<span class="co"># check the first 5 columns, there is no missing values in other columns</span>
-<span class="kw">summary</span>(demo_imp[, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>])</code></pre></div>
-<pre class="pre"><code>      age           gender        income       house       store_exp      
- Min.   :16.00   Female:554   Min.   : 41776   No :432   Min.   :  155.8  
- 1st Qu.:25.00   Male  :446   1st Qu.: 87896   Yes:568   1st Qu.:  205.1  
- Median :36.00                Median : 93869             Median :  329.8  
- Mean   :38.58                Mean   :109923             Mean   : 1357.7  
- 3rd Qu.:53.00                3rd Qu.:119456             3rd Qu.:  597.3  
- Max.   :69.00                Max.   :319704             Max.   :50000.0</code></pre>
-<p>After imputation, <code>demo_imp</code> has no missing value. This method is straightforward and widely used. The disadvantage is that it does not take into account the relationship between the variables. When there is a significant proportion of missing, it will distort the data. In this case, it is better to consider the relationship between variables and study the missing mechanism. In the example here, the missing variables are numeric. If the missing variable is a categorical/factor variable, the <code>impute()</code> function will impute with the mode.</p>
-<p>You can also use <code>preProcess()</code> in package <code>caret</code>, but it is only for numeric variables, and can not impute categorical variables. Since missing values here are numeric, we can use the <code>preProcess()</code> function. The result is the same as the <code>impute()</code> function. <code>PreProcess()</code> is a powerful function that can link to a variety of data preprocessing methods. We will use the function later for other data preprocessing.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">imp &lt;-<span class="st"> </span><span class="kw">preProcess</span>(sim.dat, <span class="dt">method =</span> <span class="st">&quot;medianImpute&quot;</span>)
-demo_imp2 &lt;-<span class="st"> </span><span class="kw">predict</span>(imp, sim.dat)
-<span class="kw">summary</span>(demo_imp2[, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>])</code></pre></div>
-<pre class="pre"><code>      age           gender        income       house       store_exp      
- Min.   :16.00   Female:554   Min.   : 41776   No :432   Min.   :  155.8  
- 1st Qu.:25.00   Male  :446   1st Qu.: 87896   Yes:568   1st Qu.:  205.1  
- Median :36.00                Median : 93869             Median :  329.8  
- Mean   :38.58                Mean   :109923             Mean   : 1357.7  
- 3rd Qu.:53.00                3rd Qu.:119456             3rd Qu.:  597.3  
- Max.   :69.00                Max.   :319704             Max.   :50000.0  </code></pre>
-</div>
-<div id="k-nearest-neighbors" class="section level3">
-<h3><span class="header-section-number">5.2.2</span> K-nearest neighbors</h3>
-<p>K-nearest neighbor (KNN) will find the k closest samples (Euclidian distance) in the training set and impute the mean of those “neighbors.”</p>
-<p>Use <code>preProcess()</code> to conduct KNN:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">imp &lt;-<span class="st"> </span><span class="kw">preProcess</span>(sim.dat, <span class="dt">method =</span> <span class="st">&quot;knnImpute&quot;</span>, <span class="dt">k =</span> <span class="dv">5</span>)
-<span class="co"># need to use predict() to get KNN result</span>
-demo_imp &lt;-<span class="st"> </span><span class="kw">predict</span>(imp, sim.dat)
-<span class="co"># only show the first three elements</span>
-<span class="kw">lapply</span>(sim.dat, class)[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>]</code></pre></div>
-<pre class="pre"><code>      age                gender        income        
- Min.   :-1.5910972   Female:554   Min.   :-1.43989  
- 1st Qu.:-0.9568733   Male  :446   1st Qu.:-0.53732  
- Median :-0.1817107                Median :-0.37606  
- Mean   : 0.0000156                Mean   : 0.02389  
- 3rd Qu.: 1.0162678                3rd Qu.: 0.21540  
- Max.   : 2.1437770                Max.   : 4.13627 </code></pre>
-<p>The <code>preProcess()</code> in the first line will automatically ignore non-numeric columns.</p>
-<p>Comparing the KNN result with the previous median imputation, the two are very different. This is because when you tell the <code>preProcess()</code> function to use KNN (the option <code>method =&quot; knnImpute&quot;</code>), it will automatically standardize the data. Another way is to use Bagging tree (in the next section). Note that KNN can not impute samples with the entire row missing. The reason is straightforward. Since the algorithm uses the average of its neighbors if none of them has a value, what does it apply to calculate the mean?</p>
-<p>Let’s append a new row with all values missing to the original data frame to get a new object called <code>temp</code>. Then apply KNN to <code>temp</code> and see what happens:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">temp &lt;-<span class="st"> </span><span class="kw">rbind</span>(sim.dat, <span class="kw">rep</span>(<span class="ot">NA</span>, <span class="kw">ncol</span>(sim.dat)))
-imp &lt;-<span class="st"> </span><span class="kw">preProcess</span>(sim.dat, <span class="dt">method =</span> <span class="st">&quot;knnImpute&quot;</span>, <span class="dt">k =</span> <span class="dv">5</span>)
-demo_imp &lt;-<span class="st"> </span><span class="kw">predict</span>(imp, temp)</code></pre></div>
-<pre class="pre"><code>Error in FUN(newX[, i], ...) : 
-  cannot impute when all predictors are missing in the new data point</code></pre>
-<p>There is an error saying “<code>cannot impute when all predictors are missing in the new data point</code>”. It is easy to fix by finding and removing the problematic row(s):</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">idx &lt;-<span class="st"> </span><span class="kw">apply</span>(temp, <span class="dv">1</span>, <span class="cf">function</span>(x) <span class="kw">sum</span>(<span class="kw">is.na</span>(x)))
-<span class="kw">as.vector</span>(<span class="kw">which</span>(idx <span class="op">==</span><span class="st"> </span><span class="kw">ncol</span>(temp)))</code></pre></div>
-<p>It shows that row 1001 is problematic. You can go ahead to delete it.</p>
-</div>
-<div id="bagging-tree" class="section level3">
-<h3><span class="header-section-number">5.2.3</span> Bagging Tree</h3>
-<p>Bagging (Bootstrap aggregating) was originally proposed by Leo Breiman. It is one of the earliest ensemble methods <span class="citation">(L 1966a)</span>. When used in missing value imputation, it will use the remaining variables as predictors to train a bagging tree and then use the tree to predict the missing values. Although theoretically, the method is powerful, the computation is much more intense than KNN. In practice, there is a trade-off between computation time and the effect. If a median or mean meet the modeling needs, even bagging tree may improve the accuracy a little, but the upgrade is so marginal that it does not deserve the extra time. The bagging tree itself is a model for regression and classification. Here we use <code>preProcess()</code> to impute <code>sim.dat</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">imp &lt;-<span class="st"> </span><span class="kw">preProcess</span>(sim.dat, <span class="dt">method =</span> <span class="st">&quot;bagImpute&quot;</span>)
-demo_imp &lt;-<span class="st"> </span><span class="kw">predict</span>(imp, sim.dat)
-<span class="kw">summary</span>(demo_imp[, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>])</code></pre></div>
-<pre class="pre"><code>      age           gender        income       house       store_exp      
- Min.   :16.00   Female:554   Min.   : 41776   No :432   Min.   :  155.8  
- 1st Qu.:25.00   Male  :446   1st Qu.: 86762   Yes:568   1st Qu.:  205.1  
- Median :36.00                Median : 94739             Median :  329.0  
- Mean   :38.58                Mean   :114665             Mean   : 1357.7  
- 3rd Qu.:53.00                3rd Qu.:123726             3rd Qu.:  597.3  
- Max.   :69.00                Max.   :319704             Max.   :50000.0  </code></pre>
-</div>
-</div>
-<h3>References</h3>
-<div id="refs" class="references">
-<div id="ref-Ton2011">
-<p>Waal, Ton de, Jeroen Pannekoek, and Sander Scholtus. 2011. <em>Handbook of Statistical Data Editing and Imputation</em>. John Wiley; Sons.</p>
-</div>
+<div id="deep-learning" class="section level1">
+<h1><span class="header-section-number">Chapter 12</span> Deep Learning</h1> 
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="data-cleaning.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="centering-and-scaling.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="gradient-boosted-machine.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="projection-pursuit-regression.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -382,7 +303,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/happyrabbit/IntroDataScience/04-DataPreprocessing.Rmd",
+"link": "https://github.com/happyrabbit/IntroDataScience/12-DeepLearning.Rmd",
 "text": "Edit"
 },
 "download": ["IDS.pdf", "IDS.epub", "IDS.mobi"],
