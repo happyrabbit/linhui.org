@@ -1,45 +1,48 @@
 <!DOCTYPE html>
-<html >
-
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
 <head>
 
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Introduction to Data Science</title>
-  <meta name="description" content="Introduction to Data Science">
-  <meta name="generator" content="bookdown 0.7 and GitBook 2.6.7">
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>12.2 Standard Neural Network | Introduction to Data Science</title>
+  <meta name="description" content="12.2 Standard Neural Network | Introduction to Data Science" />
+  <meta name="generator" content="bookdown 0.15 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Introduction to Data Science" />
+  <meta property="og:title" content="12.2 Standard Neural Network | Introduction to Data Science" />
   <meta property="og:type" content="book" />
   <meta property="og:url" content="http://scientistcafe.com/IDS/" />
   
-  <meta property="og:description" content="Introduction to Data Science" />
+  <meta property="og:description" content="12.2 Standard Neural Network | Introduction to Data Science" />
   <meta name="github-repo" content="happyrabbit/IntroDataScience" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Introduction to Data Science" />
+  <meta name="twitter:title" content="12.2 Standard Neural Network | Introduction to Data Science" />
   
-  <meta name="twitter:description" content="Introduction to Data Science" />
+  <meta name="twitter:description" content="12.2 Standard Neural Network | Introduction to Data Science" />
   
 
-<meta name="author" content="Hui Lin and Ming Li">
+<meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2019-11-12">
+<meta name="date" content="2019-11-13" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="projection-pursuit-regression.html">
-<link rel="next" href="convolutional-neural-network.html">
+<link rel="prev" href="projection-pursuit-regression.html"/>
+<link rel="next" href="convolutional-neural-network.html"/>
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-highlight.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-clipboard.css" rel="stylesheet" />
+
+
 
 
 
@@ -50,41 +53,66 @@
 
 
 <style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 <link rel="stylesheet" href="css/style.css" type="text/css" />
@@ -274,7 +302,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="logistic_reg_as_neural_network" class="section level3">
 <h3><span class="header-section-number">12.2.1</span> Logistic Regression as Neural Network</h3>
 <p>Let’s look at logistic regression from the lens of neural network. For a binary classification problem, for example spam classifier, given <span class="math inline">\(m\)</span> samples <span class="math inline">\(\{(x^{(1)}, y^{(1)}),(x^{(2)}, y^{(2)}),...,(x^{(m)}, y^{(m)})\}\)</span>, we need to use the input feature <span class="math inline">\(x^{(i)}\)</span> (they may be the frequency of various words such as “money”, special characters like dollar signs, and the use of capital letters in the message etc.) to predict the output <span class="math inline">\(y^{(i)}\)</span> (if it is a spam email). Assume that for each sample <span class="math inline">\(i\)</span>, there are <span class="math inline">\(n_{x}\)</span> input features. Then we have:</p>
-<span class="math display" id="eq:input">\[\begin{equation}
+<p><span class="math display" id="eq:input">\[\begin{equation}
 X=\left[\begin{array}{cccc}
 x_{1}^{(1)} &amp; x_{1}^{(2)} &amp; \dotsb &amp; x_{1}^{(m)}\\
 x_{2}^{(1)} &amp; x_{2}^{(2)} &amp; \dotsb &amp; x_{2}^{(m)}\\
@@ -282,7 +310,7 @@ x_{2}^{(1)} &amp; x_{2}^{(2)} &amp; \dotsb &amp; x_{2}^{(m)}\\
 x_{n_{x}}^{(1)} &amp; x_{n_{x}}^{(2)} &amp; \dots &amp; x_{n_{x}}^{(m)}
 \end{array}\right]\in\mathbb{R}^{n_{x}\times m}
 \tag{11.7}
-\end{equation}\]</span>
+\end{equation}\]</span></p>
 <p><span class="math display">\[y=[y^{(1)},y^{(2)},\dots,y^{(m)}] \in \mathbb{R}^{1 \times m}\]</span></p>
 <p>To predict if sample <span class="math inline">\(i\)</span> is a spam email, we first get the inactivated <strong>neuro</strong> <span class="math inline">\(z^{(i)}\)</span> by a linear transformation of the input <span class="math inline">\(x^{(i)}\)</span>, which is <span class="math inline">\(z^{(i)}=w^Tx^{(i)} + b\)</span>. Then we apply a function to “activate” the neuro <span class="math inline">\(z^{(i)}\)</span> and we call it “activation function”. In logistic regression, the activation function is sigmoid function and the “activated” <span class="math inline">\(z^{(i)}\)</span> is the prediction:</p>
 <p><span class="math display">\[\hat{y}^{(i)} = \sigma(w^Tx^{(i)} + b)\]</span></p>
@@ -291,15 +319,17 @@ x_{n_{x}}^{(1)} &amp; x_{n_{x}}^{(2)} &amp; \dots &amp; x_{n_{x}}^{(m)}
 <img src="images/dnn0.png" style="width:30.0%" />
 </center>
 <p>There are two types of layers. The last layer connects directly to the output. All the rest are <em>intermediate layers</em>. Depending on your definition, we call it “0-layer neural network” where the layer count only considers <em>intermediate layers</em>. To train the model, you need a cost function which is defined as equation <a href="standard-neural-network.html#eq:costlogistic">(11.8)</a>.</p>
-<span class="math display" id="eq:costlogistic">\[\begin{equation}
+<p><span class="math display" id="eq:costlogistic">\[\begin{equation}
 J(w,b)=\frac{1}{m} \Sigma_{i=1}^m L(\hat{y}^{(i)}, y^{(i)}) = \frac{1}{m} \Sigma_{i=1}^{m} \{\ -y^{(i)}log(\hat{y}^{(i)})-(1-y^{(i)})log(1-\hat{y}^{(i)}) \}
 \tag{11.8}
-\end{equation}\]</span>
+\end{equation}\]</span></p>
 <p>The general approach to minimize <span class="math inline">\(J(w,b)\)</span> is by gradient descent, also known as <em>back-propagation</em>. In logistic regression, it is easy to calculate the gradient w.r.t the parameters <span class="math inline">\((w, b)\)</span> using the chain rule for differentiation. The optimization process is a forward and backward sweep over the network. Let’s look at the gradient descent for logistic regression across m sample. The non-vectorized process is as follows.</p>
 <center>
 <img src="images/GradientDescent.png" style="width:100.0%" />
 </center>
-<p>First initialize <span class="math inline">\(w_1\)</span>, <span class="math inline">\(w_2\)</span>, … , <span class="math inline">\(w_{n_x}\)</span>, and <span class="math inline">\(b\)</span>. Then plug in the initialized value to the forward and backward propagation. The forward propagation takes the current weights and calculates the prediction <span class="math inline">\(\hat{h}^{(i)}\)</span> and cost <span class="math inline">\(J^{(i)}\)</span>. The backward propagation calculates the gradient descent for the parameters. After iterating through all <span class="math inline">\(m\)</span> samples, you can calculate gradient descent for the parameters. Then update the parameter by: <span class="math display">\[w := w - \gamma \frac{\partial J}{\partial w}\]</span> <span class="math display">\[b := b - \gamma \frac{\partial J}{\partial b}\]</span></p>
+<p>First initialize <span class="math inline">\(w_1\)</span>, <span class="math inline">\(w_2\)</span>, … , <span class="math inline">\(w_{n_x}\)</span>, and <span class="math inline">\(b\)</span>. Then plug in the initialized value to the forward and backward propagation. The forward propagation takes the current weights and calculates the prediction <span class="math inline">\(\hat{h}^{(i)}\)</span> and cost <span class="math inline">\(J^{(i)}\)</span>. The backward propagation calculates the gradient descent for the parameters. After iterating through all <span class="math inline">\(m\)</span> samples, you can calculate gradient descent for the parameters. Then update the parameter by:
+<span class="math display">\[w := w - \gamma \frac{\partial J}{\partial w}\]</span>
+<span class="math display">\[b := b - \gamma \frac{\partial J}{\partial b}\]</span></p>
 <p>Repeat the progapation process using the updated parameter until the cost <span class="math inline">\(J\)</span> stabilizes.</p>
 </div>
 <div id="deep-neural-network" class="section level3">
@@ -325,24 +355,25 @@ J(w,b)=\frac{1}{m} \Sigma_{i=1}^m L(\hat{y}^{(i)}, y^{(i)}) = \frac{1}{m} \Sigma
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
 <script src="libs/gitbook/js/lunr.js"></script>
+<script src="libs/gitbook/js/clipboard.min.js"></script>
 <script src="libs/gitbook/js/plugin-search.js"></script>
 <script src="libs/gitbook/js/plugin-sharing.js"></script>
 <script src="libs/gitbook/js/plugin-fontsettings.js"></script>
 <script src="libs/gitbook/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook/js/jquery.highlight.js"></script>
+<script src="libs/gitbook/js/plugin-clipboard.js"></script>
 <script>
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
 "sharing": {
-"github": true,
 "facebook": false,
 "twitter": true,
-"google": false,
 "linkedin": false,
 "weibo": false,
-"instapper": false,
+"instapaper": false,
 "vk": false,
-"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"],
+"github": true
 },
 "fontsettings": {
 "theme": "white",
@@ -352,6 +383,10 @@ gitbook.start({
 "edit": {
 "link": "https://github.com/happyrabbit/IntroDataScience/12-DeepLearning.Rmd",
 "text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
 },
 "download": ["IDS.pdf", "IDS.epub", "IDS.mobi"],
 "toc": {
@@ -367,10 +402,11 @@ gitbook.start({
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    var src = "";
-    if (src === "" || src === "true") src = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
-    if (location.protocol !== "file:" && /^https?:/.test(src))
-      src = src.replace(/^https?:/, '');
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
     script.src = src;
     document.getElementsByTagName("head")[0].appendChild(script);
   })();

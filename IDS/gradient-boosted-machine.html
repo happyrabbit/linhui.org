@@ -1,45 +1,48 @@
 <!DOCTYPE html>
-<html >
-
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
 <head>
 
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Introduction to Data Science</title>
-  <meta name="description" content="Introduction to Data Science">
-  <meta name="generator" content="bookdown 0.7 and GitBook 2.6.7">
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>11.6 Gradient Boosted Machine | Introduction to Data Science</title>
+  <meta name="description" content="11.6 Gradient Boosted Machine | Introduction to Data Science" />
+  <meta name="generator" content="bookdown 0.15 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Introduction to Data Science" />
+  <meta property="og:title" content="11.6 Gradient Boosted Machine | Introduction to Data Science" />
   <meta property="og:type" content="book" />
   <meta property="og:url" content="http://scientistcafe.com/IDS/" />
   
-  <meta property="og:description" content="Introduction to Data Science" />
+  <meta property="og:description" content="11.6 Gradient Boosted Machine | Introduction to Data Science" />
   <meta name="github-repo" content="happyrabbit/IntroDataScience" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Introduction to Data Science" />
+  <meta name="twitter:title" content="11.6 Gradient Boosted Machine | Introduction to Data Science" />
   
-  <meta name="twitter:description" content="Introduction to Data Science" />
+  <meta name="twitter:description" content="11.6 Gradient Boosted Machine | Introduction to Data Science" />
   
 
-<meta name="author" content="Hui Lin and Ming Li">
+<meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2019-11-12">
+<meta name="date" content="2019-11-13" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="random-forest.html">
-<link rel="next" href="deep-learning.html">
+<link rel="prev" href="random-forest.html"/>
+<link rel="next" href="deep-learning.html"/>
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-highlight.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-clipboard.css" rel="stylesheet" />
+
+
 
 
 
@@ -50,41 +53,66 @@
 
 
 <style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 <link rel="stylesheet" href="css/style.css" type="text/css" />
@@ -278,7 +306,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>Yoav Freund and Robert Schapire <span class="citation">(Freund and Schapire <a href="#ref-Freund1997">1997</a>)</span> came up the AdaBoost.M1 algorithm. Consider a binary classification problem where the response variable has two categories <span class="math inline">\(Y \in \{-1, 1\}\)</span>. Given predictor matrix, <span class="math inline">\(X\)</span>, construct a classifier <span class="math inline">\(G(X)\)</span> that predicts <span class="math inline">\(1\)</span> or <span class="math inline">\(-1\)</span>. The corresponding error rate in the training set is:</p>
 <p><span class="math display">\[\bar{err}=\frac{1}{N}\Sigma_{i=1}^NI(y_i\neq G(x_i))\]</span></p>
 <p>The algorithm produces a series of classifiers <span class="math inline">\(G_m(x),\ m=1,2,...,M\)</span> from different iterations. In each iteration, it finds the best classifier based on the current weights. The misclassified samples in the <span class="math inline">\(m^{th}\)</span> iteration will have higher weights in the <span class="math inline">\(m+1^{th}\)</span> iteration and the correctly classified samples will have lower weights. As it moves on, the algorithm will put more effort into the “difficult” samples until it can correctly classify them. So it requires the algorithm to change focus at each iteration. At each iteration, the algorithm will calculate a stage weight based on the error rate. The final prediction is a weighted average of all those weak classifiers using stage weights from all the iterations:</p>
-<p><span class="math display">\[G(x)=sign ( \Sigma_{m=1}^M \alpha_{m}G_m(x))\]</span> where <span class="math inline">\(\alpha_1,\alpha_2,...,\alpha_M\)</span> are the weights from different iterations.</p>
+<p><span class="math display">\[G(x)=sign ( \Sigma_{m=1}^M \alpha_{m}G_m(x))\]</span>
+where <span class="math inline">\(\alpha_1,\alpha_2,...,\alpha_M\)</span> are the weights from different iterations.</p>
 <p><strong>AdaBoost.M1</strong></p>
 <ol style="list-style-type: decimal">
 <li>Response variables have two values: +1 and -1</li>
@@ -315,95 +344,95 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>The way to calculate variable importance in boosting is similar to a bagging model. You get variable importance by combining measures of importance across the ensemble. For example, we can calculate the Gini index improvement for each variable across all trees and use the average as the measurement of the importance.</p>
 <p>Boosting is a very popular method for classification. It is one of the methods that can be directly applied to the data without requiring a great deal of time-consuming data preprocessing. Applying boosting on tree models significantly improves predictive accuracy. Some advantages of trees that are sacrificed by boosting are speed and interpretability.</p>
 <p>Let’s look at the R implementation.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">gbmGrid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">interaction.depth =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">9</span>),
-                       <span class="dt">n.trees =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>,
-                       <span class="dt">shrinkage =</span> <span class="kw">c</span>(.<span class="dv">01</span>, .<span class="dv">1</span>),
-                       <span class="dt">n.minobsinnode =</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>))
-
-<span class="kw">set.seed</span>(<span class="dv">100</span>)
-gbmTune &lt;-<span class="st"> </span><span class="kw">train</span>(<span class="dt">x =</span> trainx, 
-                <span class="dt">y =</span> trainy,
-                <span class="dt">method =</span> <span class="st">&quot;gbm&quot;</span>,
-                <span class="dt">tuneGrid =</span> gbmGrid,
-                <span class="dt">metric =</span> <span class="st">&quot;ROC&quot;</span>,
-                <span class="dt">verbose =</span> <span class="ot">FALSE</span>,
-                <span class="dt">trControl =</span> <span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>,
-                           <span class="dt">summaryFunction =</span> twoClassSummary,
-                           <span class="dt">classProbs =</span> <span class="ot">TRUE</span>,
-                           <span class="dt">savePredictions =</span> <span class="ot">TRUE</span>))</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># only show part of the output</span>
-gbmTune</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode html"><code class="sourceCode html">Stochastic Gradient Boosting 
-
-1000 samples
-  11 predictor
-   2 classes: &#39;Female&#39;, &#39;Male&#39; 
-
-No pre-processing
-Resampling: Cross-Validated (10 fold) 
-Summary of sample sizes: 899, 900, 900, 899, 899, 901, ... 
-Resampling results across tuning parameters:
-
-  shrinkage  interaction.depth  n.minobsinnode  n.trees  ROC     Sens    Spec    
-  0.01       1                   1              1        0.6821  1.0000  0.000000
-  0.01       1                   1              2        0.6882  1.0000  0.000000
-  0.01       1                   1              3        0.6936  1.0000  0.000000
-  .
-  .
-  .
-  0.01       5                   8              2        0.7127  1.0000  0.000000
-  0.01       5                   8              3        0.7148  1.0000  0.000000
-  0.01       5                   8              4        0.7096  1.0000  0.000000
-  0.01       5                   8              5        0.7100  1.0000  0.000000
-  0.01       5                   9              1        0.7006  1.0000  0.000000
-  0.01       5                   9              2        0.7055  1.0000  0.000000
- [ reached getOption(&quot;max.print&quot;) -- omitted 358 rows ]
-
-ROC was used to select the optimal model using the largest value.
-The final values used for the model were n.trees = 4, interaction.depth = 3, shrinkage
- = 0.01 and n.minobsinnode = 6.</code></pre></div>
+<div class="sourceCode" id="cb390"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb390-1" data-line-number="1">gbmGrid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">interaction.depth =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">9</span>),</a>
+<a class="sourceLine" id="cb390-2" data-line-number="2">                       <span class="dt">n.trees =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>,</a>
+<a class="sourceLine" id="cb390-3" data-line-number="3">                       <span class="dt">shrinkage =</span> <span class="kw">c</span>(.<span class="dv">01</span>, <span class="fl">.1</span>),</a>
+<a class="sourceLine" id="cb390-4" data-line-number="4">                       <span class="dt">n.minobsinnode =</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>))</a>
+<a class="sourceLine" id="cb390-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb390-6" data-line-number="6"><span class="kw">set.seed</span>(<span class="dv">100</span>)</a>
+<a class="sourceLine" id="cb390-7" data-line-number="7">gbmTune &lt;-<span class="st"> </span><span class="kw">train</span>(<span class="dt">x =</span> trainx, </a>
+<a class="sourceLine" id="cb390-8" data-line-number="8">                <span class="dt">y =</span> trainy,</a>
+<a class="sourceLine" id="cb390-9" data-line-number="9">                <span class="dt">method =</span> <span class="st">&quot;gbm&quot;</span>,</a>
+<a class="sourceLine" id="cb390-10" data-line-number="10">                <span class="dt">tuneGrid =</span> gbmGrid,</a>
+<a class="sourceLine" id="cb390-11" data-line-number="11">                <span class="dt">metric =</span> <span class="st">&quot;ROC&quot;</span>,</a>
+<a class="sourceLine" id="cb390-12" data-line-number="12">                <span class="dt">verbose =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb390-13" data-line-number="13">                <span class="dt">trControl =</span> <span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>,</a>
+<a class="sourceLine" id="cb390-14" data-line-number="14">                           <span class="dt">summaryFunction =</span> twoClassSummary,</a>
+<a class="sourceLine" id="cb390-15" data-line-number="15">                           <span class="dt">classProbs =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb390-16" data-line-number="16">                           <span class="dt">savePredictions =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb391"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb391-1" data-line-number="1"><span class="co"># only show part of the output</span></a>
+<a class="sourceLine" id="cb391-2" data-line-number="2">gbmTune</a></code></pre></div>
+<div class="sourceCode" id="cb392"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb392-1" data-line-number="1">Stochastic Gradient Boosting </a>
+<a class="sourceLine" id="cb392-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb392-3" data-line-number="3">1000 samples</a>
+<a class="sourceLine" id="cb392-4" data-line-number="4">  11 predictor</a>
+<a class="sourceLine" id="cb392-5" data-line-number="5">   2 classes: &#39;Female&#39;, &#39;Male&#39; </a>
+<a class="sourceLine" id="cb392-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb392-7" data-line-number="7">No pre-processing</a>
+<a class="sourceLine" id="cb392-8" data-line-number="8">Resampling: Cross-Validated (10 fold) </a>
+<a class="sourceLine" id="cb392-9" data-line-number="9">Summary of sample sizes: 899, 900, 900, 899, 899, 901, ... </a>
+<a class="sourceLine" id="cb392-10" data-line-number="10">Resampling results across tuning parameters:</a>
+<a class="sourceLine" id="cb392-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb392-12" data-line-number="12">  shrinkage  interaction.depth  n.minobsinnode  n.trees  ROC     Sens    Spec    </a>
+<a class="sourceLine" id="cb392-13" data-line-number="13">  0.01       1                   1              1        0.6821  1.0000  0.000000</a>
+<a class="sourceLine" id="cb392-14" data-line-number="14">  0.01       1                   1              2        0.6882  1.0000  0.000000</a>
+<a class="sourceLine" id="cb392-15" data-line-number="15">  0.01       1                   1              3        0.6936  1.0000  0.000000</a>
+<a class="sourceLine" id="cb392-16" data-line-number="16">  .</a>
+<a class="sourceLine" id="cb392-17" data-line-number="17">  .</a>
+<a class="sourceLine" id="cb392-18" data-line-number="18">  .</a>
+<a class="sourceLine" id="cb392-19" data-line-number="19">  0.01       5                   8              2        0.7127  1.0000  0.000000</a>
+<a class="sourceLine" id="cb392-20" data-line-number="20">  0.01       5                   8              3        0.7148  1.0000  0.000000</a>
+<a class="sourceLine" id="cb392-21" data-line-number="21">  0.01       5                   8              4        0.7096  1.0000  0.000000</a>
+<a class="sourceLine" id="cb392-22" data-line-number="22">  0.01       5                   8              5        0.7100  1.0000  0.000000</a>
+<a class="sourceLine" id="cb392-23" data-line-number="23">  0.01       5                   9              1        0.7006  1.0000  0.000000</a>
+<a class="sourceLine" id="cb392-24" data-line-number="24">  0.01       5                   9              2        0.7055  1.0000  0.000000</a>
+<a class="sourceLine" id="cb392-25" data-line-number="25"> [ reached getOption(&quot;max.print&quot;) -- omitted 358 rows ]</a>
+<a class="sourceLine" id="cb392-26" data-line-number="26"></a>
+<a class="sourceLine" id="cb392-27" data-line-number="27">ROC was used to select the optimal model using the largest value.</a>
+<a class="sourceLine" id="cb392-28" data-line-number="28">The final values used for the model were n.trees = 4, interaction.depth = 3, shrinkage</a>
+<a class="sourceLine" id="cb392-29" data-line-number="29"> = 0.01 and n.minobsinnode = 6.</a></code></pre></div>
 <p>The results show that the tuning parameter settings that lead to the best ROC are <code>n.trees = 4</code> (number of trees), <code>interaction.depth = 3</code> (depth of tree), <code>shrinkage = 0.01</code> (learning rate) and <code>n.minobsinnode = 6</code> (minimum number of observations in each node).</p>
 <p>Now, let’s compare the results from the three tree models.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">treebagRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span class="dt">response =</span> bagTune<span class="op">$</span>pred<span class="op">$</span>obs,
-                        <span class="dt">predictor =</span> bagTune<span class="op">$</span>pred<span class="op">$</span>Female,
-                        <span class="dt">levels =</span> <span class="kw">rev</span>(<span class="kw">levels</span>(bagTune<span class="op">$</span>pred<span class="op">$</span>obs)))
-
-rfRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span class="dt">response =</span> rfTune<span class="op">$</span>pred<span class="op">$</span>obs,
-             <span class="dt">predictor =</span> rfTune<span class="op">$</span>pred<span class="op">$</span>Female,
-             <span class="dt">levels =</span> <span class="kw">rev</span>(<span class="kw">levels</span>(rfTune<span class="op">$</span>pred<span class="op">$</span>obs)))
-
-gbmRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span class="dt">response =</span> gbmTune<span class="op">$</span>pred<span class="op">$</span>obs,
-              <span class="dt">predictor =</span> gbmTune<span class="op">$</span>pred<span class="op">$</span>Female,
-              <span class="dt">levels =</span> <span class="kw">rev</span>(<span class="kw">levels</span>(gbmTune<span class="op">$</span>pred<span class="op">$</span>obs)))
-
-<span class="kw">plot</span>(rpartRoc, <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>, <span class="dt">print.thres =</span> <span class="kw">c</span>(.<span class="dv">5</span>),
-     <span class="dt">print.thres.pch =</span> <span class="dv">16</span>,
-     <span class="dt">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>,
-     <span class="dt">print.thres.cex =</span> <span class="fl">1.2</span>,
-     <span class="dt">col =</span> <span class="st">&quot;black&quot;</span>, <span class="dt">legacy.axes =</span> <span class="ot">TRUE</span>,
-     <span class="dt">print.thres.col =</span> <span class="st">&quot;black&quot;</span>)
-
-<span class="kw">plot</span>(treebagRoc, <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">print.thres =</span> <span class="kw">c</span>(.<span class="dv">5</span>), 
-     <span class="dt">print.thres.pch =</span> <span class="dv">3</span>, <span class="dt">legacy.axes =</span> <span class="ot">TRUE</span>, <span class="dt">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>, 
-     <span class="dt">print.thres.cex =</span> <span class="fl">1.2</span>,
-     <span class="dt">col =</span> <span class="st">&quot;red&quot;</span>, <span class="dt">print.thres.col =</span> <span class="st">&quot;red&quot;</span>)
-
-<span class="kw">plot</span>(rfRoc, <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">print.thres =</span> <span class="kw">c</span>(.<span class="dv">5</span>), 
-     <span class="dt">print.thres.pch =</span> <span class="dv">1</span>, <span class="dt">legacy.axes =</span> <span class="ot">TRUE</span>, <span class="dt">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>, 
-     <span class="dt">print.thres.cex =</span> <span class="fl">1.2</span>,
-     <span class="dt">col =</span> <span class="st">&quot;green&quot;</span>, <span class="dt">print.thres.col =</span> <span class="st">&quot;green&quot;</span>)
-
-<span class="kw">plot</span>(gbmRoc, <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">print.thres =</span> <span class="kw">c</span>(.<span class="dv">5</span>), 
-     <span class="dt">print.thres.pch =</span> <span class="dv">10</span>, <span class="dt">legacy.axes =</span> <span class="ot">TRUE</span>, <span class="dt">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>, 
-     <span class="dt">print.thres.cex =</span> <span class="fl">1.2</span>,
-     <span class="dt">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="dt">print.thres.col =</span> <span class="st">&quot;blue&quot;</span>)
-
-<span class="kw">legend</span>(<span class="fl">0.2</span>, <span class="fl">0.5</span>, <span class="dt">cex =</span> <span class="fl">0.8</span>,
-       <span class="kw">c</span>(<span class="st">&quot;Single Tree&quot;</span>, <span class="st">&quot;Bagged Tree&quot;</span>, <span class="st">&quot;Random Forest&quot;</span>, <span class="st">&quot;Boosted Tree&quot;</span>),
-       <span class="dt">lwd =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>),
-       <span class="dt">col =</span> <span class="kw">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;red&quot;</span>, <span class="st">&quot;green&quot;</span>, <span class="st">&quot;blue&quot;</span>),
-       <span class="dt">pch =</span> <span class="kw">c</span>(<span class="dv">16</span>, <span class="dv">3</span>, <span class="dv">1</span>, <span class="dv">10</span>))</code></pre></div>
-<p><img src="IDS_files/figure-html/unnamed-chunk-103-1.svg" width="672" /></p>
+<div class="sourceCode" id="cb393"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb393-1" data-line-number="1">treebagRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span class="dt">response =</span> bagTune<span class="op">$</span>pred<span class="op">$</span>obs,</a>
+<a class="sourceLine" id="cb393-2" data-line-number="2">                        <span class="dt">predictor =</span> bagTune<span class="op">$</span>pred<span class="op">$</span>Female,</a>
+<a class="sourceLine" id="cb393-3" data-line-number="3">                        <span class="dt">levels =</span> <span class="kw">rev</span>(<span class="kw">levels</span>(bagTune<span class="op">$</span>pred<span class="op">$</span>obs)))</a></code></pre></div>
+<pre><code>## Setting direction: controls &lt; cases</code></pre>
+<div class="sourceCode" id="cb395"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb395-1" data-line-number="1">rfRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span class="dt">response =</span> rfTune<span class="op">$</span>pred<span class="op">$</span>obs,</a>
+<a class="sourceLine" id="cb395-2" data-line-number="2">             <span class="dt">predictor =</span> rfTune<span class="op">$</span>pred<span class="op">$</span>Female,</a>
+<a class="sourceLine" id="cb395-3" data-line-number="3">             <span class="dt">levels =</span> <span class="kw">rev</span>(<span class="kw">levels</span>(rfTune<span class="op">$</span>pred<span class="op">$</span>obs)))</a></code></pre></div>
+<pre><code>## Setting direction: controls &lt; cases</code></pre>
+<div class="sourceCode" id="cb397"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb397-1" data-line-number="1">gbmRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span class="dt">response =</span> gbmTune<span class="op">$</span>pred<span class="op">$</span>obs,</a>
+<a class="sourceLine" id="cb397-2" data-line-number="2">              <span class="dt">predictor =</span> gbmTune<span class="op">$</span>pred<span class="op">$</span>Female,</a>
+<a class="sourceLine" id="cb397-3" data-line-number="3">              <span class="dt">levels =</span> <span class="kw">rev</span>(<span class="kw">levels</span>(gbmTune<span class="op">$</span>pred<span class="op">$</span>obs)))</a></code></pre></div>
+<pre><code>## Setting direction: controls &lt; cases</code></pre>
+<div class="sourceCode" id="cb399"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb399-1" data-line-number="1"><span class="kw">plot</span>(rpartRoc, <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>, <span class="dt">print.thres =</span> <span class="kw">c</span>(.<span class="dv">5</span>),</a>
+<a class="sourceLine" id="cb399-2" data-line-number="2">     <span class="dt">print.thres.pch =</span> <span class="dv">16</span>,</a>
+<a class="sourceLine" id="cb399-3" data-line-number="3">     <span class="dt">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>,</a>
+<a class="sourceLine" id="cb399-4" data-line-number="4">     <span class="dt">print.thres.cex =</span> <span class="fl">1.2</span>,</a>
+<a class="sourceLine" id="cb399-5" data-line-number="5">     <span class="dt">col =</span> <span class="st">&quot;black&quot;</span>, <span class="dt">legacy.axes =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb399-6" data-line-number="6">     <span class="dt">print.thres.col =</span> <span class="st">&quot;black&quot;</span>)</a>
+<a class="sourceLine" id="cb399-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb399-8" data-line-number="8"><span class="kw">plot</span>(treebagRoc, <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">print.thres =</span> <span class="kw">c</span>(.<span class="dv">5</span>), </a>
+<a class="sourceLine" id="cb399-9" data-line-number="9">     <span class="dt">print.thres.pch =</span> <span class="dv">3</span>, <span class="dt">legacy.axes =</span> <span class="ot">TRUE</span>, <span class="dt">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>, </a>
+<a class="sourceLine" id="cb399-10" data-line-number="10">     <span class="dt">print.thres.cex =</span> <span class="fl">1.2</span>,</a>
+<a class="sourceLine" id="cb399-11" data-line-number="11">     <span class="dt">col =</span> <span class="st">&quot;red&quot;</span>, <span class="dt">print.thres.col =</span> <span class="st">&quot;red&quot;</span>)</a>
+<a class="sourceLine" id="cb399-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb399-13" data-line-number="13"><span class="kw">plot</span>(rfRoc, <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">print.thres =</span> <span class="kw">c</span>(.<span class="dv">5</span>), </a>
+<a class="sourceLine" id="cb399-14" data-line-number="14">     <span class="dt">print.thres.pch =</span> <span class="dv">1</span>, <span class="dt">legacy.axes =</span> <span class="ot">TRUE</span>, <span class="dt">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>, </a>
+<a class="sourceLine" id="cb399-15" data-line-number="15">     <span class="dt">print.thres.cex =</span> <span class="fl">1.2</span>,</a>
+<a class="sourceLine" id="cb399-16" data-line-number="16">     <span class="dt">col =</span> <span class="st">&quot;green&quot;</span>, <span class="dt">print.thres.col =</span> <span class="st">&quot;green&quot;</span>)</a>
+<a class="sourceLine" id="cb399-17" data-line-number="17"></a>
+<a class="sourceLine" id="cb399-18" data-line-number="18"><span class="kw">plot</span>(gbmRoc, <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">print.thres =</span> <span class="kw">c</span>(.<span class="dv">5</span>), </a>
+<a class="sourceLine" id="cb399-19" data-line-number="19">     <span class="dt">print.thres.pch =</span> <span class="dv">10</span>, <span class="dt">legacy.axes =</span> <span class="ot">TRUE</span>, <span class="dt">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>, </a>
+<a class="sourceLine" id="cb399-20" data-line-number="20">     <span class="dt">print.thres.cex =</span> <span class="fl">1.2</span>,</a>
+<a class="sourceLine" id="cb399-21" data-line-number="21">     <span class="dt">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="dt">print.thres.col =</span> <span class="st">&quot;blue&quot;</span>)</a>
+<a class="sourceLine" id="cb399-22" data-line-number="22"></a>
+<a class="sourceLine" id="cb399-23" data-line-number="23"><span class="kw">legend</span>(<span class="fl">0.2</span>, <span class="fl">0.5</span>, <span class="dt">cex =</span> <span class="fl">0.8</span>,</a>
+<a class="sourceLine" id="cb399-24" data-line-number="24">       <span class="kw">c</span>(<span class="st">&quot;Single Tree&quot;</span>, <span class="st">&quot;Bagged Tree&quot;</span>, <span class="st">&quot;Random Forest&quot;</span>, <span class="st">&quot;Boosted Tree&quot;</span>),</a>
+<a class="sourceLine" id="cb399-25" data-line-number="25">       <span class="dt">lwd =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>),</a>
+<a class="sourceLine" id="cb399-26" data-line-number="26">       <span class="dt">col =</span> <span class="kw">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;red&quot;</span>, <span class="st">&quot;green&quot;</span>, <span class="st">&quot;blue&quot;</span>),</a>
+<a class="sourceLine" id="cb399-27" data-line-number="27">       <span class="dt">pch =</span> <span class="kw">c</span>(<span class="dv">16</span>, <span class="dv">3</span>, <span class="dv">1</span>, <span class="dv">10</span>))</a></code></pre></div>
+<p><img src="IDS_files/figure-html/unnamed-chunk-111-1.svg" width="672" /></p>
 <p>Since the data here doesn’t have many variables, we don’t see a significant difference among the models. But you can still see those ensemble methods are better than a single tree. In most of the real applications, ensemble methods perform much better. Random forest and boosting trees can be a baseline model. Before exploring different models, you can quickly run a random forest to see the performance and then try to improve that performance. If the performance you got from the random forest is not too much better than guessing, you should consider collecting more data or reviewing the problem to frame it a different way instead of trying other models. Because it usually means the current data is not enough to solve the problem.</p>
 </div>
 <div id="boosting-as-additive-model" class="section level3">
@@ -411,15 +440,15 @@ gbmRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span class="dt
 <p>This section illustrates how boosting is a forward stagewise additive model that minimizes exponential loss <span class="citation">(Friedman J and R <a href="#ref-Friedman2000">2000</a>)</span>. Many seemingly different models can be represented as a <strong>basis expansion model</strong>. Recall the classifier obtained by the AdaBoost.M1 algorithm:</p>
 <p><span class="math display">\[G(x)=sign ( \Sigma_{m=1}^M \alpha_{m}G_m(x))\]</span></p>
 <p>The above expression fits in the framework of basis expansion which is as following:</p>
-<span class="math display" id="eq:basisexp">\[\begin{equation}
+<p><span class="math display" id="eq:basisexp">\[\begin{equation}
 f(x)=\Sigma_{m=1}^M \beta_m b(x,\gamma_m)
 \tag{11.2}
-\end{equation}\]</span>
+\end{equation}\]</span></p>
 <p>where <span class="math inline">\(\beta_m,\ m=1,\dots,M\)</span> is expansion coefficient and <span class="math inline">\(b(x,\gamma)\in \mathbb{R}\)</span> is basis function. Many of the learning methods fit into this additive framework. Hastie et al discuss basis expansion in detail in Chapter 5 of the book <span class="citation">(Hastie T <a href="#ref-Hastie2008">2008</a>)</span> and cover the additive expansion for different learning techniques <span class="citation">(Hastie T <a href="#ref-Hastie2008">2008</a>)</span>, such as single-hidden-layer neural networks (Chapter 11) and MARS (Section 9.4). These models are fit by minimizing a designated loss function averaged over the training data:</p>
-<span class="math display" id="eq:additiveloss">\[\begin{equation}
+<p><span class="math display" id="eq:additiveloss">\[\begin{equation}
 \underset{\{\beta_m,\gamma_m\}_i^M}{min}\Sigma_{i=1}^N L\left(y_i,\Sigma_{m=1}^M\beta_{m}b(x_i;\gamma_m)\right)
 \tag{11.3}
-\end{equation}\]</span>
+\end{equation}\]</span></p>
 <p>Different models have different basis function <span class="math inline">\(b(x_i;\gamma_m)\)</span>. You can also customize loss function <span class="math inline">\(L(\cdot)\)</span>, such as squared-error loss, or likelihood-based loss. Optimizing the loss function across the whole training set is usually computation costly no matter the choice of basis and loss. The good news is that the problem can be simplified as fitting a single basis function.</p>
 <p><span class="math display">\[\underset{\beta,\gamma}{min}=\Sigma_{i=1}^N L(y_i,\beta b(x_i;\gamma))\]</span></p>
 <p>The forward stagewise algorithm approximates the optimal solution of equation <a href="gradient-boosted-machine.html#eq:additiveloss">(11.3)</a>. It adds new basis functions to the expansion without adjusting the previous ones. The forward stagewise additive algorithm is as following (section 10.2, <span class="citation">(Hastie T <a href="#ref-Hastie2008">2008</a>)</span>):</p>
@@ -427,7 +456,8 @@ f(x)=\Sigma_{m=1}^M \beta_m b(x,\gamma_m)
 <li>Initialize <span class="math inline">\(f_0(x)=0\)</span></li>
 <li><strong>for</strong> <span class="math inline">\(m=1,\dots,M\)</span> <strong>do</strong>：
 <ul>
-<li>compute <span class="math display">\[(\beta_m,\gamma_m)=\underset{\beta,\gamma}{argmin}\Sigma_{i=1}^NL(y_i,f_{m-1}(x_i)+\beta b(x_i;\gamma))\]</span></li>
+<li>compute
+<span class="math display">\[(\beta_m,\gamma_m)=\underset{\beta,\gamma}{argmin}\Sigma_{i=1}^NL(y_i,f_{m-1}(x_i)+\beta b(x_i;\gamma))\]</span></li>
 <li>set <span class="math inline">\(f_m(x)=f_{m-1}(x)+\beta_m b(x;\gamma_m)\)</span></li>
 </ul></li>
 </ol>
@@ -440,16 +470,16 @@ f(x)=\Sigma_{m=1}^M \beta_m b(x,\gamma_m)
 <p>Now let is go back to the AdaBoost.M1 algorithm. It is actually a special case of the above forward stagewise model when the loss function is:</p>
 <p><span class="math display">\[L(y,f(x))=exp(-yf(x))\]</span></p>
 <p>In AdaBoost.M1, the basis function is the classifier from each iteration <span class="math inline">\(G_m(x)\in \{-1,1\}\)</span>. If we use the exponential loss, the optimization problem is</p>
-<span class="math display" id="eq:explossadaboost1">\[\begin{equation}
+<p><span class="math display" id="eq:explossadaboost1">\[\begin{equation}
 \begin{array}{ccc}
 (\beta_m,G_m) &amp; = &amp; \underset{\beta,G}{argmin}\Sigma_{i=1}^N exp[-y_i(f_{m-1}(x_i)+\beta G(x_i))]\\
 &amp; = &amp; \underset{\beta, G}{argmin}\Sigma_{i=1}^N exp[-y_i \beta G(x_i)]\cdot exp[-y_if_{m-1}(x_i)]\\
 &amp; = &amp; \underset{\beta, G}{argmin}\Sigma_{i=1}^N w_i^m exp[-y_i\beta G(x_i)]
 \end{array}
 \tag{11.4}
-\end{equation}\]</span>
+\end{equation}\]</span></p>
 <p>where <span class="math inline">\(w_i^m= exp[-y_if_{m-1}(x_i)]\)</span>. It does not depend on <span class="math inline">\(\beta\)</span> and <span class="math inline">\(G(x)\)</span>. So we can consider it as the weight for each sample. Since the weight is related to <span class="math inline">\(f_{m-1}(x_i)\)</span>, it changes each iteration. We can further decompose equation <a href="gradient-boosted-machine.html#eq:explossadaboost1">(11.4)</a>:</p>
-<span class="math display" id="eq:explossadaboost2">\[\begin{equation}
+<p><span class="math display" id="eq:explossadaboost2">\[\begin{equation}
 \begin{array}{ccc}
 (\beta_{m},G_{m}) &amp; = &amp; \underset{\beta,G}{argmin}\Sigma_{i=1}^{N}w_{i}^{m}exp[-y_{i}\beta G(x_{i})]\\
 &amp; = &amp; \underset{\beta,G}{argmin}\Sigma_{i=1}^{N}\left\{ w_{i}^{m}e^{-\beta}I(y_{i}=G(x))+w_{i}^{m}e^{\beta}I(y_{i}\neq G(x))\right\} \\
@@ -457,7 +487,7 @@ f(x)=\Sigma_{m=1}^M \beta_m b(x,\gamma_m)
 &amp; = &amp; \underset{\beta,G}{argmin}\left\{ (e^{\beta}-e^{-\beta})\cdot\Sigma_{i=1}^{N}w_{i}^{m}I(y_{i}\neq G(x_{i}))+e^{-\beta}\cdot\Sigma_{i=1}^{N}w_{i}^{m}\right\}
 \end{array}
 \tag{11.5}
-\end{equation}\]</span>
+\end{equation}\]</span></p>
 <p>when <span class="math inline">\(\beta &gt;0\)</span>, the solution for equation <a href="gradient-boosted-machine.html#eq:explossadaboost2">(11.5)</a> is:</p>
 <p><span class="math display">\[G_{m} = \underset{G}{argmin}\Sigma_{i=1}^{N}w_{i}^{m}I(y_{i}\neq G(x))\]</span></p>
 <p>It is the classifier that minimizes the weighted error. Plug the above <span class="math inline">\(G_m\)</span> into equation <a href="gradient-boosted-machine.html#eq:explossadaboost2">(11.5)</a>. Take the derivative with respect to <span class="math inline">\(\beta\)</span> and set it to be 0 to solve the optimal <span class="math inline">\(\beta_m\)</span>:</p>
@@ -467,14 +497,14 @@ f(x)=\Sigma_{m=1}^M \beta_m b(x,\gamma_m)
 <p>According to the forward stagewise algorithm, the result is updated as:</p>
 <p><span class="math display">\[f_m(x)=f_{m-1}(x)+\beta_m G_m(x)\]</span></p>
 <p>We can go ahead and get the weight for the next iteration:</p>
-<span class="math display" id="eq:explossadaboost3">\[\begin{equation}
+<p><span class="math display" id="eq:explossadaboost3">\[\begin{equation}
 \begin{array}{ccc}
 w_i^{m+1} &amp; = &amp; exp[-y_if_m (x_i)]\\
 &amp; = &amp; exp[-y_if_{m-1}(x)-y_i \beta_m G_m(x)]\\
 &amp; = &amp; w_{i}^{m}\cdot exp[-\beta_m y_i G_m(x_i)]
 \end{array}
 \tag{11.6}
-\end{equation}\]</span>
+\end{equation}\]</span></p>
 <p>Since <span class="math inline">\(-y_i G_m(x_i)=2\cdot I(y_i \neq G_m(x_i))-1\)</span>, equation <a href="gradient-boosted-machine.html#eq:explossadaboost2">(11.5)</a> can be written as:</p>
 <p><span class="math display">\[w_i^{m+1}=w_i^m \cdot exp[\alpha_mI(y_i\neq G_m(x_i))] \cdot exp[-\beta_m]\]</span></p>
 <p>where <span class="math inline">\(\alpha_m=2\beta_m=log\frac{1-err_m}{err_m}\)</span> is the same with the <span class="math inline">\(\alpha_m\)</span> in AdaBoost.M1 algorithm we showed before. So AdaBoost.M1 is a special case of a forward stagewise additive model using exponential loss. For comparing and selecting different loss functions, you can refer to section 10.5 and 10.6 in <span class="citation">(Hastie T <a href="#ref-Hastie2008">2008</a>)</span>.</p>
@@ -484,41 +514,41 @@ w_i^{m+1} &amp; = &amp; exp[-y_if_m (x_i)]\\
 <!-- </div> -->
 <h3>References</h3>
 <div id="refs" class="references">
+<div id="ref-bendor2000">
+<p>al, BenDor A et. 2000. “Tissue Classification with Gene Expression Profiles.” <em>Journal of Computational Biology</em> 7 (3): 559–83.</p>
+</div>
+<div id="ref-Bergstra2006">
+<p>al, Bergstra J et. 2006. “Aggregate Features and Adaboost for Music Classification.” <em>Machine Learning</em> 65: 473–84.</p>
+</div>
+<div id="ref-Breiman1998">
+<p>Breiman, Leo. 1998. “Arcing Classifiers.” <em>The Annals of Statistics</em> 26: 123–40.</p>
+</div>
+<div id="ref-dudoit2002">
+<p>Dudoit S, Fridlyand J, and Speed T. 2002. “Comparison of Discrimination Meth- Ods for the Classification of Tumors Using Gene Expression Data.” <em>Journal of the American Statistical Association</em> 97 (457): 77–87.</p>
+</div>
+<div id="ref-Bauer1999">
+<p>E, Bauer, and Kohavi R. 1999. “An Empirical Comparison of Voting Classifica- Tion Algorithms: Bagging, Boosting, and Variants.” <em>Machine Learning</em> 36: 105–42.</p>
+</div>
+<div id="ref-Freund1997">
+<p>Freund, Y., and R. Schapire. 1997. “A Decision-Theoretic Generalization of Online Learning and an Application to Boosting.” <em>Journal of Computer and System Sciences</em> 55: 119–39.</p>
+</div>
+<div id="ref-Friedman2000">
+<p>Friedman J, Hastie T, and Tibshirani R. 2000. “Additive Logistic Regression: A Statistical View of Boosting.” <em>Annals of Statistics</em> 38: 337–74.</p>
+</div>
+<div id="ref-Hastie2008">
+<p>Hastie T, Friedman J, Tibshirani R. 2008. <em>The Elements of Statistical Learning: Data Mining, Inference and Prediction</em>. 2nd ed. Springer.</p>
+</div>
 <div id="ref-Valiant1984">
 <p>L, Valiant. 1984. “A Theory of the Learnable.” <em>Communications of the ACM</em> 27: 1134–42.</p>
 </div>
 <div id="ref-KV1989">
 <p>M, Kearns, and Valiant L. 1989. “Cryptographic Limitations on Learning Boolean Formulae and Finite Automata.”</p>
 </div>
-<div id="ref-dudoit2002">
-<p>Dudoit S, Fridlyand J, and Speed T. 2002. “Comparison of Discrimination Meth- Ods for the Classification of Tumors Using Gene Expression Data.” <em>Journal of the American Statistical Association</em> 97 (457): 77–87.</p>
-</div>
-<div id="ref-bendor2000">
-<p>al, BenDor A et. 2000. “Tissue Classification with Gene Expression Profiles.” <em>Journal of Computational Biology</em> 7 (3): 559–83.</p>
-</div>
 <div id="ref-Varmuza2003">
 <p>Varmuza K, He P, and Fang K. 2003. “Boosting Applied to Classification of Mass Spectral Data.” <em>Journal of Data Science</em> 1 (391–404).</p>
 </div>
-<div id="ref-Bergstra2006">
-<p>al, Bergstra J et. 2006. “Aggregate Features and Adaboost for Music Classification.” <em>Machine Learning</em> 65: 473–84.</p>
-</div>
 <div id="ref-Schapire1999">
 <p>YFR, Schapire. 1999. “Adaptive Game Playing Using Multiplicative Weights.” <em>Games and Economic Behavior</em> 29: 79–103.</p>
-</div>
-<div id="ref-Friedman2000">
-<p>Friedman J, Hastie T, and Tibshirani R. 2000. “Additive Logistic Regression: A Statistical View of Boosting.” <em>Annals of Statistics</em> 38: 337–74.</p>
-</div>
-<div id="ref-Freund1997">
-<p>Freund, Y., and R. Schapire. 1997. “A Decision-Theoretic Generalization of Online Learning and an Application to Boosting.” <em>Journal of Computer and System Sciences</em> 55: 119–39.</p>
-</div>
-<div id="ref-Breiman1998">
-<p>Breiman, Leo. 1998. “Arcing Classifiers.” <em>The Annals of Statistics</em> 26: 123–40.</p>
-</div>
-<div id="ref-Bauer1999">
-<p>E, Bauer, and Kohavi R. 1999. “An Empirical Comparison of Voting Classifica- Tion Algorithms: Bagging, Boosting, and Variants.” <em>Machine Learning</em> 36: 105–42.</p>
-</div>
-<div id="ref-Hastie2008">
-<p>Hastie T, Friedman J, Tibshirani R. 2008. <em>The Elements of Statistical Learning: Data Mining, Inference and Prediction</em>. 2nd ed. Springer.</p>
 </div>
 </div>
             </section>
@@ -532,24 +562,25 @@ w_i^{m+1} &amp; = &amp; exp[-y_if_m (x_i)]\\
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
 <script src="libs/gitbook/js/lunr.js"></script>
+<script src="libs/gitbook/js/clipboard.min.js"></script>
 <script src="libs/gitbook/js/plugin-search.js"></script>
 <script src="libs/gitbook/js/plugin-sharing.js"></script>
 <script src="libs/gitbook/js/plugin-fontsettings.js"></script>
 <script src="libs/gitbook/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook/js/jquery.highlight.js"></script>
+<script src="libs/gitbook/js/plugin-clipboard.js"></script>
 <script>
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
 "sharing": {
-"github": true,
 "facebook": false,
 "twitter": true,
-"google": false,
 "linkedin": false,
 "weibo": false,
-"instapper": false,
+"instapaper": false,
 "vk": false,
-"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"],
+"github": true
 },
 "fontsettings": {
 "theme": "white",
@@ -559,6 +590,10 @@ gitbook.start({
 "edit": {
 "link": "https://github.com/happyrabbit/IntroDataScience/11-tree.Rmd",
 "text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
 },
 "download": ["IDS.pdf", "IDS.epub", "IDS.mobi"],
 "toc": {
@@ -574,10 +609,11 @@ gitbook.start({
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    var src = "";
-    if (src === "" || src === "true") src = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
-    if (location.protocol !== "file:" && /^https?:/.test(src))
-      src = src.replace(/^https?:/, '');
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
     script.src = src;
     document.getElementsByTagName("head")[0].appendChild(script);
   })();

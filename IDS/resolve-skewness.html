@@ -1,45 +1,48 @@
 <!DOCTYPE html>
-<html >
-
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
 <head>
 
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Introduction to Data Science</title>
-  <meta name="description" content="Introduction to Data Science">
-  <meta name="generator" content="bookdown 0.7 and GitBook 2.6.7">
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>5.4 Resolve Skewness | Introduction to Data Science</title>
+  <meta name="description" content="5.4 Resolve Skewness | Introduction to Data Science" />
+  <meta name="generator" content="bookdown 0.15 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Introduction to Data Science" />
+  <meta property="og:title" content="5.4 Resolve Skewness | Introduction to Data Science" />
   <meta property="og:type" content="book" />
   <meta property="og:url" content="http://scientistcafe.com/IDS/" />
   
-  <meta property="og:description" content="Introduction to Data Science" />
+  <meta property="og:description" content="5.4 Resolve Skewness | Introduction to Data Science" />
   <meta name="github-repo" content="happyrabbit/IntroDataScience" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Introduction to Data Science" />
+  <meta name="twitter:title" content="5.4 Resolve Skewness | Introduction to Data Science" />
   
-  <meta name="twitter:description" content="Introduction to Data Science" />
+  <meta name="twitter:description" content="5.4 Resolve Skewness | Introduction to Data Science" />
   
 
-<meta name="author" content="Hui Lin and Ming Li">
+<meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2019-11-12">
+<meta name="date" content="2019-11-13" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="centering-and-scaling.html">
-<link rel="next" href="resolve-outliers.html">
+<link rel="prev" href="centering-and-scaling.html"/>
+<link rel="next" href="resolve-outliers.html"/>
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-highlight.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-search.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-clipboard.css" rel="stylesheet" />
+
+
 
 
 
@@ -50,41 +53,66 @@
 
 
 <style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 <link rel="stylesheet" href="css/style.css" type="text/css" />
@@ -271,18 +299,21 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
             <section class="normal" id="section-">
 <div id="resolve-skewness" class="section level2">
 <h2><span class="header-section-number">5.4</span> Resolve Skewness</h2>
-<p><a href="https://en.wikipedia.org/wiki/Skewness">Skewness</a> is defined to be the third standardized central moment. The formula for the sample skewness statistics is: <span class="math display">\[ skewness=\frac{\sum(x_{i}-\bar{x})^{3}}{(n-1)v^{3/2}}\]</span> <span class="math display">\[v=\frac{\sum(x_{i}-\bar{x})^{2}}{(n-1)}\]</span> Skewness=0 means that the destribution is symmetric, i.e. the probability of falling on either side of the distribution’s mean is equal.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># need skewness() function from e1071 package</span>
-<span class="kw">set.seed</span>(<span class="dv">1000</span>)
-<span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">oma =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>))
-<span class="co"># random sample 1000 chi-square distribution with df=2 right skew</span>
-x1 &lt;-<span class="st"> </span><span class="kw">rchisq</span>(<span class="dv">1000</span>, <span class="dv">2</span>, <span class="dt">ncp =</span> <span class="dv">0</span>)
-<span class="co"># get left skew variable x2 from x1</span>
-x2 &lt;-<span class="st"> </span><span class="kw">max</span>(x1) <span class="op">-</span><span class="st"> </span>x1
-<span class="kw">plot</span>(<span class="kw">density</span>(x2), <span class="dt">main =</span> <span class="kw">paste</span>(<span class="st">&quot;left skew, skewnwss =&quot;</span>, <span class="kw">round</span>(<span class="kw">skewness</span>(x2), 
-    <span class="dv">2</span>)), <span class="dt">xlab =</span> <span class="st">&quot;X2&quot;</span>)
-<span class="kw">plot</span>(<span class="kw">density</span>(x1), <span class="dt">main =</span> <span class="kw">paste</span>(<span class="st">&quot;right skew, skewness =&quot;</span>, <span class="kw">round</span>(<span class="kw">skewness</span>(x1), 
-    <span class="dv">2</span>)), <span class="dt">xlab =</span> <span class="st">&quot;X1&quot;</span>)</code></pre></div>
+<p><a href="https://en.wikipedia.org/wiki/Skewness">Skewness</a> is defined to be the third standardized central moment. The formula for the sample skewness statistics is:
+<span class="math display">\[ skewness=\frac{\sum(x_{i}-\bar{x})^{3}}{(n-1)v^{3/2}}\]</span>
+<span class="math display">\[v=\frac{\sum(x_{i}-\bar{x})^{2}}{(n-1)}\]</span>
+Skewness=0 means that the destribution is symmetric, i.e. the probability of falling on either side of the distribution’s mean is equal.</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1"><span class="co"># need skewness() function from e1071 package</span></a>
+<a class="sourceLine" id="cb25-2" data-line-number="2"><span class="kw">set.seed</span>(<span class="dv">1000</span>)</a>
+<a class="sourceLine" id="cb25-3" data-line-number="3"><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">oma =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb25-4" data-line-number="4"><span class="co"># random sample 1000 chi-square distribution with df=2 right skew</span></a>
+<a class="sourceLine" id="cb25-5" data-line-number="5">x1 &lt;-<span class="st"> </span><span class="kw">rchisq</span>(<span class="dv">1000</span>, <span class="dv">2</span>, <span class="dt">ncp =</span> <span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb25-6" data-line-number="6"><span class="co"># get left skew variable x2 from x1</span></a>
+<a class="sourceLine" id="cb25-7" data-line-number="7">x2 &lt;-<span class="st"> </span><span class="kw">max</span>(x1) <span class="op">-</span><span class="st"> </span>x1</a>
+<a class="sourceLine" id="cb25-8" data-line-number="8"><span class="kw">plot</span>(<span class="kw">density</span>(x2), <span class="dt">main =</span> <span class="kw">paste</span>(<span class="st">&quot;left skew, skewnwss =&quot;</span>, <span class="kw">round</span>(<span class="kw">skewness</span>(x2), </a>
+<a class="sourceLine" id="cb25-9" data-line-number="9">    <span class="dv">2</span>)), <span class="dt">xlab =</span> <span class="st">&quot;X2&quot;</span>)</a>
+<a class="sourceLine" id="cb25-10" data-line-number="10"><span class="kw">plot</span>(<span class="kw">density</span>(x1), <span class="dt">main =</span> <span class="kw">paste</span>(<span class="st">&quot;right skew, skewness =&quot;</span>, <span class="kw">round</span>(<span class="kw">skewness</span>(x1), </a>
+<a class="sourceLine" id="cb25-11" data-line-number="11">    <span class="dv">2</span>)), <span class="dt">xlab =</span> <span class="st">&quot;X1&quot;</span>)</a></code></pre></div>
 <p><img src="IDS_files/figure-html/unnamed-chunk-9-1.svg" width="672" /></p>
 <!--You can easily tell if a distribution is skewed by simple visualization(Figure\@ref(fig:skew)). -->
 <p>There are different ways may help to remove skewness such as log, square root or inverse. However, it is often difficult to determine from plots which transformation is most appropriate for correcting skewness. The Box-Cox procedure automatically identified a transformation from the family of power transformations that are indexed by a parameter <span class="math inline">\(\lambda\)</span><span class="citation">(Box G <a href="#ref-BOXCOX1">1964</a>)</span>.</p>
@@ -297,7 +328,7 @@ if\ \lambda=0
 \end{array}\end{cases}
 \]</span></p>
 <p>It is easy to see that this family includes log transformation (<span class="math inline">\(\lambda=0\)</span>), square transformation (<span class="math inline">\(\lambda=2\)</span>), square root (<span class="math inline">\(\lambda=0.5\)</span>), inverse (<span class="math inline">\(\lambda=-1\)</span>) and others in-between. We can still use function <code>preProcess()</code> in package <code>caret</code> to apply this transformation by chaning the <code>method</code> argument.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">describe</span>(sim.dat)</code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1"><span class="kw">describe</span>(sim.dat)</a></code></pre></div>
 <pre class="pre"><code>             vars    n      mean       sd median   trimmed      mad ...
 age             1 1000     38.84    16.42     36     37.69    16.31
 gender*         2 1000      1.45     0.50      1      1.43     0.00
@@ -310,9 +341,9 @@ online_trans    8 1000     13.55     7.96     14     13.42    10.38
 ...</code></pre>
 <p>It is easy to see the skewed variables. If <code>mean</code> and <code>trimmed</code> differ a lot, there is very likely outliers. By default, <code>trimmed</code> reports mean by dropping the top and bottom 10%. It can be adjusted by setting argument <code>trim=</code>. It is clear that <code>store_exp</code> has outliers.</p>
 <p>As an example, we will apply Box-Cox transformation on <code>store_trans</code> and <code>online_trans</code>:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># select the two columns and save them as dat_bc</span>
-dat_bc &lt;-<span class="st"> </span><span class="kw">subset</span>(sim.dat, <span class="dt">select =</span> <span class="kw">c</span>(<span class="st">&quot;store_trans&quot;</span>, <span class="st">&quot;online_trans&quot;</span>))
-(trans &lt;-<span class="st"> </span><span class="kw">preProcess</span>(dat_bc, <span class="dt">method =</span> <span class="kw">c</span>(<span class="st">&quot;BoxCox&quot;</span>)))</code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" data-line-number="1"><span class="co"># select the two columns and save them as dat_bc</span></a>
+<a class="sourceLine" id="cb28-2" data-line-number="2">dat_bc &lt;-<span class="st"> </span><span class="kw">subset</span>(sim.dat, <span class="dt">select =</span> <span class="kw">c</span>(<span class="st">&quot;store_trans&quot;</span>, <span class="st">&quot;online_trans&quot;</span>))</a>
+<a class="sourceLine" id="cb28-3" data-line-number="3">(trans &lt;-<span class="st"> </span><span class="kw">preProcess</span>(dat_bc, <span class="dt">method =</span> <span class="kw">c</span>(<span class="st">&quot;BoxCox&quot;</span>)))</a></code></pre></div>
 <pre><code>## Created from 1000 samples and 2 variables
 ## 
 ## Pre-processing:
@@ -322,13 +353,15 @@ dat_bc &lt;-<span class="st"> </span><span class="kw">subset</span>(sim.dat, <sp
 ## Lambda estimates for Box-Cox transformation:
 ## 0.1, 0.7</code></pre>
 <p>The last line of the output shows the estimates of <span class="math inline">\(\lambda\)</span> for each variable. As before, use <code>predict()</code> to get the transformed result:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">transformed &lt;-<span class="st"> </span><span class="kw">predict</span>(trans, dat_bc)
-<span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">oma =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>))
-<span class="kw">hist</span>(dat_bc<span class="op">$</span>store_trans, <span class="dt">main =</span> <span class="st">&quot;Before Transformation&quot;</span>, <span class="dt">xlab =</span> <span class="st">&quot;store_trans&quot;</span>)
-<span class="kw">hist</span>(transformed<span class="op">$</span>store_trans, <span class="dt">main =</span> <span class="st">&quot;After Transformation&quot;</span>, <span class="dt">xlab =</span> <span class="st">&quot;store_trans&quot;</span>)</code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" data-line-number="1">transformed &lt;-<span class="st"> </span><span class="kw">predict</span>(trans, dat_bc)</a>
+<a class="sourceLine" id="cb30-2" data-line-number="2"><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">oma =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb30-3" data-line-number="3"><span class="kw">hist</span>(dat_bc<span class="op">$</span>store_trans, <span class="dt">main =</span> <span class="st">&quot;Before Transformation&quot;</span>, <span class="dt">xlab =</span> <span class="st">&quot;store_trans&quot;</span>)</a>
+<a class="sourceLine" id="cb30-4" data-line-number="4"><span class="kw">hist</span>(transformed<span class="op">$</span>store_trans, <span class="dt">main =</span> <span class="st">&quot;After Transformation&quot;</span>, <span class="dt">xlab =</span> <span class="st">&quot;store_trans&quot;</span>)</a></code></pre></div>
 <p><img src="IDS_files/figure-html/unnamed-chunk-11-1.svg" width="672" /></p>
-<p>Before the transformation, the <code>stroe_trans</code> is skewed right. <!--The situation is significantly improved after (figure\@ref(fig:bc)). --> <code>BoxCoxTrans ()</code> can also conduct Box-Cox transform. But note that <code>BoxCoxTrans ()</code> can only be applied to a single variable, and it is not possible to transform difference columns in a data frame at the same time.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(trans &lt;-<span class="st"> </span><span class="kw">BoxCoxTrans</span>(dat_bc<span class="op">$</span>store_trans))</code></pre></div>
+<p>Before the transformation, the <code>stroe_trans</code> is skewed right.
+<!--The situation is significantly improved after (figure\@ref(fig:bc)). -->
+<code>BoxCoxTrans ()</code> can also conduct Box-Cox transform. But note that <code>BoxCoxTrans ()</code> can only be applied to a single variable, and it is not possible to transform difference columns in a data frame at the same time.</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" data-line-number="1">(trans &lt;-<span class="st"> </span><span class="kw">BoxCoxTrans</span>(dat_bc<span class="op">$</span>store_trans))</a></code></pre></div>
 <pre><code>## Box-Cox Transformation
 ## 
 ## 1000 data points used to estimate Lambda
@@ -342,8 +375,8 @@ dat_bc &lt;-<span class="st"> </span><span class="kw">subset</span>(sim.dat, <sp
 ## 
 ## Estimated Lambda: 0.1 
 ## With fudge factor, Lambda = 0 will be used for transformations</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">transformed &lt;-<span class="st"> </span><span class="kw">predict</span>(trans, dat_bc<span class="op">$</span>store_trans)
-<span class="kw">skewness</span>(transformed)</code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" data-line-number="1">transformed &lt;-<span class="st"> </span><span class="kw">predict</span>(trans, dat_bc<span class="op">$</span>store_trans)</a>
+<a class="sourceLine" id="cb33-2" data-line-number="2"><span class="kw">skewness</span>(transformed)</a></code></pre></div>
 <pre><code>## [1] -0.2155</code></pre>
 <p>The estimate of <span class="math inline">\(\lambda\)</span> is the same as before (0.1). The skewness of the original observation is 1.1, and -0.2 after transformation. Although it is not strictly 0, it is greatly improved.</p>
 </div>
@@ -364,24 +397,25 @@ dat_bc &lt;-<span class="st"> </span><span class="kw">subset</span>(sim.dat, <sp
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
 <script src="libs/gitbook/js/lunr.js"></script>
+<script src="libs/gitbook/js/clipboard.min.js"></script>
 <script src="libs/gitbook/js/plugin-search.js"></script>
 <script src="libs/gitbook/js/plugin-sharing.js"></script>
 <script src="libs/gitbook/js/plugin-fontsettings.js"></script>
 <script src="libs/gitbook/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook/js/jquery.highlight.js"></script>
+<script src="libs/gitbook/js/plugin-clipboard.js"></script>
 <script>
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
 "sharing": {
-"github": true,
 "facebook": false,
 "twitter": true,
-"google": false,
 "linkedin": false,
 "weibo": false,
-"instapper": false,
+"instapaper": false,
 "vk": false,
-"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"],
+"github": true
 },
 "fontsettings": {
 "theme": "white",
@@ -391,6 +425,10 @@ gitbook.start({
 "edit": {
 "link": "https://github.com/happyrabbit/IntroDataScience/04-DataPreprocessing.Rmd",
 "text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
 },
 "download": ["IDS.pdf", "IDS.epub", "IDS.mobi"],
 "toc": {
@@ -406,10 +444,11 @@ gitbook.start({
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    var src = "";
-    if (src === "" || src === "true") src = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
-    if (location.protocol !== "file:" && /^https?:/.test(src))
-      src = src.replace(/^https?:/, '');
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
     script.src = src;
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
