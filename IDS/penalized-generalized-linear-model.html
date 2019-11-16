@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2019-11-15" />
+<meta name="date" content="2019-11-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -242,7 +242,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="10.2" data-path="lasso.html"><a href="lasso.html"><i class="fa fa-check"></i><b>10.2</b> LASSO</a></li>
 <li class="chapter" data-level="10.3" data-path="variable-selection-property-of-the-lasso.html"><a href="variable-selection-property-of-the-lasso.html"><i class="fa fa-check"></i><b>10.3</b> Variable selection property of the lasso</a></li>
 <li class="chapter" data-level="10.4" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.4</b> Elastic Net</a></li>
-<li class="chapter" data-level="10.5" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.5</b> Penalized Generalized Linear Model</a></li>
+<li class="chapter" data-level="10.5" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.5</b> Penalized Generalized Linear Model</a><ul>
+<li class="chapter" data-level="10.5.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.5.1</b> Introduction to glmnet package</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="tree-based-methods.html"><a href="tree-based-methods.html"><i class="fa fa-check"></i><b>11</b> Tree-Based Methods</a><ul>
 <li class="chapter" data-level="11.1" data-path="splitting-criteria.html"><a href="splitting-criteria.html"><i class="fa fa-check"></i><b>11.1</b> Splitting Criteria</a></li>
@@ -305,7 +307,22 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>where</p>
 <p><span class="math display">\[l(y_{i},\beta_{0}+\mathbf{\beta^{T}x_{i}})=-log[\mathcal{L}(y_{i},\beta_{0}+\mathbf{\beta^{T}x_{i}})]\]</span></p>
 <p>It is the negative logarithm of the likelihood, <span class="math inline">\(\mathcal{L}(y_{i},\beta_{0}+\mathbf{\beta^{T}x_{i}})\)</span>. Maximize likelihood is to minimize <span class="math inline">\(l(y_{i},\beta_{0}+\mathbf{\beta^{T}x_{i}})\)</span>.</p>
+<p>Parameter <span class="math inline">\(\alpha\)</span> decides the penalty, i.e, between <span class="math inline">\(L_2\)</span> (<span class="math inline">\(\alpha=0\)</span>) and <span class="math inline">\(L_1\)</span> (<span class="math inline">\(\alpha=1\)</span>). <span class="math inline">\(\lambda\)</span> controls the weight of the whole penalty item. The higher <span class="math inline">\(\lambda\)</span> is, the more weight the penalty carries comparing to likelihood. As discussed above, the ridge penalty shrinks the coefficients towards 0 but can’t be exactly 0. The lasso penalty can set 0 estimates so it has the property of feature selection. The elastic net combines both. Here we have two tuning parameters, <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\lambda\)</span>.</p>
+<div id="introduction-to-glmnet-package" class="section level3">
+<h3><span class="header-section-number">10.5.1</span> Introduction to glmnet package</h3>
+<p><code>glmnet</code> is a package that fits a penalized generalized linear model using <em>cyclical coordinate descent</em>. It successively optimizes the objective function over each parameter with others fixed, and cycles repeatedly until convergence. Since the linear model is a special case of the generalized linear model, <code>glmnet</code> can also fit a penalized linear model. Other than that, it can also fit penalized logistic regression, multinomial, Poisson, and Cox regression models.</p>
+<p>The default family option in the function <code>glmnet()</code> is <code>gaussian</code>. It is the linear regression we discussed so far in this chapter. But the parameterization is a little different in the generalized linear model framework (we have <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\lambda\)</span>). Let’s start from our previous example, using the same training data but <code>glmnet()</code> to fit model:</p>
+<div class="sourceCode" id="cb257"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb257-1" data-line-number="1"><span class="kw">library</span>(glmnet)</a>
+<a class="sourceLine" id="cb257-2" data-line-number="2">dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)</a>
+<a class="sourceLine" id="cb257-3" data-line-number="3"><span class="co"># data cleaning: delete wrong observations since expense can&#39;t be negative</span></a>
+<a class="sourceLine" id="cb257-4" data-line-number="4">dat &lt;-<span class="st"> </span><span class="kw">subset</span>(dat, store_exp <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span> <span class="op">&amp;</span><span class="st"> </span>online_exp <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb257-5" data-line-number="5"><span class="co"># get predictors</span></a>
+<a class="sourceLine" id="cb257-6" data-line-number="6">trainx &lt;-<span class="st"> </span>dat[, <span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>, <span class="kw">names</span>(dat))]</a>
+<a class="sourceLine" id="cb257-7" data-line-number="7"><span class="co"># get response</span></a>
+<a class="sourceLine" id="cb257-8" data-line-number="8">trainy &lt;-<span class="st"> </span>dat<span class="op">$</span>store_exp <span class="op">+</span><span class="st"> </span>dat<span class="op">$</span>online_exp</a>
+<a class="sourceLine" id="cb257-9" data-line-number="9">glmfit =<span class="st"> </span><span class="kw">glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy)</a></code></pre></div>
 
+</div>
 </div>
 <!-- </div> -->
             </section>
@@ -330,9 +347,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
 "sharing": {
-"facebook": false,
+"facebook": true,
 "twitter": true,
-"linkedin": false,
+"linkedin": true,
 "weibo": false,
 "instapaper": false,
 "vk": false,
@@ -340,7 +357,7 @@ gitbook.start({
 "github": true
 },
 "fontsettings": {
-"theme": "white",
+"theme": "sepia",
 "family": "sans",
 "size": 2
 },
