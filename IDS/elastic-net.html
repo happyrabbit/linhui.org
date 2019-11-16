@@ -4,35 +4,35 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>10.3 Elastic Net | Introduction to Data Science</title>
-  <meta name="description" content="10.3 Elastic Net | Introduction to Data Science" />
+  <title>10.4 Elastic Net | Introduction to Data Science</title>
+  <meta name="description" content="10.4 Elastic Net | Introduction to Data Science" />
   <meta name="generator" content="bookdown 0.15 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="10.3 Elastic Net | Introduction to Data Science" />
+  <meta property="og:title" content="10.4 Elastic Net | Introduction to Data Science" />
   <meta property="og:type" content="book" />
   <meta property="og:url" content="http://scientistcafe.com/IDS/" />
   
-  <meta property="og:description" content="10.3 Elastic Net | Introduction to Data Science" />
+  <meta property="og:description" content="10.4 Elastic Net | Introduction to Data Science" />
   <meta name="github-repo" content="happyrabbit/IntroDataScience" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="10.3 Elastic Net | Introduction to Data Science" />
+  <meta name="twitter:title" content="10.4 Elastic Net | Introduction to Data Science" />
   
-  <meta name="twitter:description" content="10.3 Elastic Net | Introduction to Data Science" />
+  <meta name="twitter:description" content="10.4 Elastic Net | Introduction to Data Science" />
   
 
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2019-11-13" />
+<meta name="date" content="2019-11-15" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="lasso.html"/>
-<link rel="next" href="lasso-generalized-linear-model.html"/>
+<link rel="prev" href="variable-selection-property-of-the-lasso.html"/>
+<link rel="next" href="penalized-generalized-linear-model.html"/>
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
@@ -240,8 +240,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="10" data-path="regularization-methods.html"><a href="regularization-methods.html"><i class="fa fa-check"></i><b>10</b> Regularization Methods</a><ul>
 <li class="chapter" data-level="10.1" data-path="ridge-regression.html"><a href="ridge-regression.html"><i class="fa fa-check"></i><b>10.1</b> Ridge Regression</a></li>
 <li class="chapter" data-level="10.2" data-path="lasso.html"><a href="lasso.html"><i class="fa fa-check"></i><b>10.2</b> LASSO</a></li>
-<li class="chapter" data-level="10.3" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.3</b> Elastic Net</a></li>
-<li class="chapter" data-level="10.4" data-path="lasso-generalized-linear-model.html"><a href="lasso-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.4</b> LASSO Generalized Linear Model</a></li>
+<li class="chapter" data-level="10.3" data-path="variable-selection-property-of-the-lasso.html"><a href="variable-selection-property-of-the-lasso.html"><i class="fa fa-check"></i><b>10.3</b> Variable selection property of the lasso</a></li>
+<li class="chapter" data-level="10.4" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.4</b> Elastic Net</a></li>
+<li class="chapter" data-level="10.5" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.5</b> Penalized Generalized Linear Model</a></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="tree-based-methods.html"><a href="tree-based-methods.html"><i class="fa fa-check"></i><b>11</b> Tree-Based Methods</a><ul>
 <li class="chapter" data-level="11.1" data-path="splitting-criteria.html"><a href="splitting-criteria.html"><i class="fa fa-check"></i><b>11.1</b> Splitting Criteria</a></li>
@@ -298,15 +299,67 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
             <section class="normal" id="section-">
 <div id="elastic-net" class="section level2">
-<h2><span class="header-section-number">10.3</span> Elastic Net</h2>
+<h2><span class="header-section-number">10.4</span> Elastic Net</h2>
+<p>Elastic Net is a generalization of lasso and ridge regression<span class="citation">(Zou and Hastie <a href="#ref-zou2005">2005</a>)</span>. It combines the two penalties. The estimates of coefficients optimize the following function:</p>
+<p><span class="math display" id="eq:elasticnet">\[\begin{equation}
+\Sigma_{i=1}^{n}(y_{i}-\hat{y}_{i})^{2}+\lambda_{1}\Sigma_{j=1}^{p}\beta_{j}^{2}+\lambda_{2}\Sigma_{j=1}^{p}|\beta_{j}|
+\tag{10.7}
+\end{equation}\]</span></p>
+<p>Ridge penalty shrinks the coefficients of correlated predictors towards each other while the lasso tends to pick one and discard the others. So lasso estimates have a higher variance. However, ridge regression doesn’t have a variable selection property. The advantage of the elastic net is that it keeps the feature selection quality from the lasso penalty as well as the effectiveness of the ridge penalty. <span class="citation">(Zou and Hastie <a href="#ref-zou2005">2005</a>)</span> suggest that it deals with highly correlated variables more effectively.</p>
+<p>We can still use train() function to tune the parameters in the elastic net. As before, set the cross-validation and parameter range. Standardize the predictors:</p>
+<div class="sourceCode" id="cb255"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb255-1" data-line-number="1">enetGrid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">.lambda =</span> <span class="kw">seq</span>(<span class="dv">0</span>,<span class="fl">0.2</span>,<span class="dt">length=</span><span class="dv">20</span>), </a>
+<a class="sourceLine" id="cb255-2" data-line-number="2">                        <span class="dt">.fraction =</span> <span class="kw">seq</span>(.<span class="dv">8</span>, <span class="dv">1</span>, <span class="dt">length =</span> <span class="dv">20</span>))</a>
+<a class="sourceLine" id="cb255-3" data-line-number="3"><span class="kw">set.seed</span>(<span class="dv">100</span>)</a>
+<a class="sourceLine" id="cb255-4" data-line-number="4">enetTune &lt;-<span class="st"> </span><span class="kw">train</span>(trainx, trainy,</a>
+<a class="sourceLine" id="cb255-5" data-line-number="5">                  <span class="dt">method =</span> <span class="st">&quot;enet&quot;</span>,</a>
+<a class="sourceLine" id="cb255-6" data-line-number="6">                  <span class="dt">tuneGrid =</span> enetGrid,</a>
+<a class="sourceLine" id="cb255-7" data-line-number="7">                  <span class="dt">trControl =</span> ctrl,</a>
+<a class="sourceLine" id="cb255-8" data-line-number="8">                  <span class="dt">preProc =</span> <span class="kw">c</span>(<span class="st">&quot;center&quot;</span>, <span class="st">&quot;scale&quot;</span>))</a>
+<a class="sourceLine" id="cb255-9" data-line-number="9">enetTune</a></code></pre></div>
+<pre class="pre"><code>Elasticnet 
+
+999 samples
+ 10 predictor
+
+Pre-processing: centered (10), scaled (10) 
+Resampling: Cross-Validated (10 fold) 
+Summary of sample sizes: 899, 899, 899, 899, 899, 900, ... 
+Resampling results across tuning parameters:
+
+  lambda   fraction  RMSE  Rsquared  MAE  
+  0.00000  0.8000    1763  0.7921    787.5
+  0.00000  0.8105    1760  0.7924    784.1
+  .
+  .
+  .
+  0.09474  0.9158    1760  0.7945    782.5
+  0.09474  0.9263    1761  0.7947    782.5
+  0.09474  0.9368    1761  0.7949    782.7
+  0.09474  0.9474    1763  0.7950    783.3
+  0.09474  0.9579    1764  0.7951    784.3
+  0.09474  0.9684    1766  0.7953    785.7
+  0.09474  0.9789    1768  0.7954    787.1
+  0.09474  0.9895    1770  0.7954    788.8
+  0.09474  1.0000    1772  0.7955    790.4
+ [ reached getOption(&quot;max.print&quot;) -- omitted 200 rows ]
+
+RMSE was used to select the optimal model using the smallest value.
+The final values used for the model were fraction = 0.9579 and lambda = 0.</code></pre>
+<p>The results show that the best values of the tuning parameters are fraction is 0.9579 and lambda is 0 It also indicates that the final model is lasso only (the ridge penalty parameter lambda is 0). The RMSE and <span class="math inline">\(R^{2}\)</span> are 1742.2843 and 0.7954 correspondingly.</p>
+</div>
+<h3>References</h3>
+<div id="refs" class="references">
+<div id="ref-zou2005">
+<p>Zou, Hui, and Trevor Hastie. 2005. “Regularization and Variable Selection via the Elastic Net.” <em>Journal of the Royal Statistical Society, Series B,</em> 67 (2): 301–20.</p>
+</div>
 </div>
             </section>
 
           </div>
         </div>
       </div>
-<a href="lasso.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="lasso-generalized-linear-model.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="variable-selection-property-of-the-lasso.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="penalized-generalized-linear-model.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>

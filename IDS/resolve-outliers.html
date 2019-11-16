@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2019-11-13" />
+<meta name="date" content="2019-11-15" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -240,8 +240,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="10" data-path="regularization-methods.html"><a href="regularization-methods.html"><i class="fa fa-check"></i><b>10</b> Regularization Methods</a><ul>
 <li class="chapter" data-level="10.1" data-path="ridge-regression.html"><a href="ridge-regression.html"><i class="fa fa-check"></i><b>10.1</b> Ridge Regression</a></li>
 <li class="chapter" data-level="10.2" data-path="lasso.html"><a href="lasso.html"><i class="fa fa-check"></i><b>10.2</b> LASSO</a></li>
-<li class="chapter" data-level="10.3" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.3</b> Elastic Net</a></li>
-<li class="chapter" data-level="10.4" data-path="lasso-generalized-linear-model.html"><a href="lasso-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.4</b> LASSO Generalized Linear Model</a></li>
+<li class="chapter" data-level="10.3" data-path="variable-selection-property-of-the-lasso.html"><a href="variable-selection-property-of-the-lasso.html"><i class="fa fa-check"></i><b>10.3</b> Variable selection property of the lasso</a></li>
+<li class="chapter" data-level="10.4" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.4</b> Elastic Net</a></li>
+<li class="chapter" data-level="10.5" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.5</b> Penalized Generalized Linear Model</a></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="tree-based-methods.html"><a href="tree-based-methods.html"><i class="fa fa-check"></i><b>11</b> Tree-Based Methods</a><ul>
 <li class="chapter" data-level="11.1" data-path="splitting-criteria.html"><a href="splitting-criteria.html"><i class="fa fa-check"></i><b>11.1</b> Splitting Criteria</a></li>
@@ -301,255 +302,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2><span class="header-section-number">5.5</span> Resolve Outliers</h2>
 <p>Even under certain assumptions we can statistically define outliers, it can be hard to define in some situations. Box plot, histogram and some other basic visualizations can be used to initially check whether there are outliers. For example, we can visualize numerical non-survey variables in <code>sim.dat</code>:</p>
 <div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" data-line-number="1"><span class="co"># select numerical non-survey data</span></a>
-<a class="sourceLine" id="cb35-2" data-line-number="2">sdat&lt;-<span class="kw">subset</span>(sim.dat,<span class="dt">select=</span><span class="kw">c</span>(<span class="st">&quot;age&quot;</span>,<span class="st">&quot;income&quot;</span>,<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>,<span class="st">&quot;store_trans&quot;</span>,<span class="st">&quot;online_trans&quot;</span> ))</a>
-<a class="sourceLine" id="cb35-3" data-line-number="3"><span class="co"># use scatterplotMatrix() function from car package</span></a>
-<a class="sourceLine" id="cb35-4" data-line-number="4"><span class="kw">par</span>(<span class="dt">oma=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">2</span>))</a>
-<a class="sourceLine" id="cb35-5" data-line-number="5"><span class="kw">scatterplotMatrix</span>(sdat,<span class="dt">diagonal=</span><span class="st">&quot;boxplot&quot;</span>,<span class="dt">smoother=</span><span class="ot">FALSE</span>)</a></code></pre></div>
-<pre><code>## Warning in applyDefaults(diagonal, defaults =
-## list(method = &quot;adaptiveDensity&quot;), : unnamed diag
-## arguments, will be ignored</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in axis(side = side, at = at, labels =
-## labels, ...): &quot;smoother&quot; is not a graphical parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in axis(side = side, at = at, labels =
-## labels, ...): &quot;smoother&quot; is not a graphical parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in axis(side = side, at = at, labels =
-## labels, ...): &quot;smoother&quot; is not a graphical parameter
-
-## Warning in axis(side = side, at = at, labels =
-## labels, ...): &quot;smoother&quot; is not a graphical parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in axis(side = side, at = at, labels =
-## labels, ...): &quot;smoother&quot; is not a graphical parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in axis(side = side, at = at, labels =
-## labels, ...): &quot;smoother&quot; is not a graphical parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in axis(side = side, at = at, labels =
-## labels, ...): &quot;smoother&quot; is not a graphical parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in axis(side = side, at = at, labels =
-## labels, ...): &quot;smoother&quot; is not a graphical parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in axis(side = side, at = at, labels =
-## labels, ...): &quot;smoother&quot; is not a graphical parameter
-
-## Warning in axis(side = side, at = at, labels =
-## labels, ...): &quot;smoother&quot; is not a graphical parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in axis(side = side, at = at, labels =
-## labels, ...): &quot;smoother&quot; is not a graphical parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
-<pre><code>## Warning in axis(side = side, at = at, labels =
-## labels, ...): &quot;smoother&quot; is not a graphical parameter</code></pre>
-<pre><code>## Warning in plot.window(...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in plot.xy(xy, type, ...): &quot;smoother&quot; is not a
-## graphical parameter</code></pre>
-<pre><code>## Warning in title(...): &quot;smoother&quot; is not a graphical
-## parameter</code></pre>
+<a class="sourceLine" id="cb35-2" data-line-number="2">sdat &lt;-<span class="st"> </span><span class="kw">subset</span>(sim.dat, <span class="dt">select =</span> <span class="kw">c</span>(<span class="st">&quot;age&quot;</span>, <span class="st">&quot;income&quot;</span>, <span class="st">&quot;store_exp&quot;</span>, </a>
+<a class="sourceLine" id="cb35-3" data-line-number="3">    <span class="st">&quot;online_exp&quot;</span>, <span class="st">&quot;store_trans&quot;</span>, <span class="st">&quot;online_trans&quot;</span>))</a>
+<a class="sourceLine" id="cb35-4" data-line-number="4"><span class="co"># use scatterplotMatrix() function from car package</span></a>
+<a class="sourceLine" id="cb35-5" data-line-number="5"><span class="kw">par</span>(<span class="dt">oma =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb35-6" data-line-number="6"><span class="kw">scatterplotMatrix</span>(sdat, <span class="dt">diagonal =</span> <span class="st">&quot;boxplot&quot;</span>, <span class="dt">smoother =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
 <p><img src="IDS_files/figure-html/unnamed-chunk-14-1.svg" width="672" /></p>
 <!--As figure \@ref(fig:scm) shows, `store_exp` has outliers. -->
 <p>It is also easy to observe the pair relationship from the plot. <code>age</code> is negatively correlated with <code>online_trans</code> but positively correlated with <code>store_trans</code>. It seems that older people tend to purchase from the local store. The amount of expense is positively correlated with income. Scatterplot matrix like this can reveal lots of information before modeling.</p>
@@ -558,12 +315,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>where <span class="math inline">\(\bar{Y}\)</span> and <span class="math inline">\(s\)</span> are mean and standard deviation for <span class="math inline">\(Y\)</span>. Z-score is a measurement of the distance between each observation and the mean. This method may be misleading, especially when the sample size is small. Iglewicz and Hoaglin proposed to use the modified Z-score to determine the outlier<span class="citation">(Iglewicz and Hoaglin <a href="#ref-mad1">1993</a>)</span>：</p>
 <p><span class="math display">\[M_{i}=\frac{0.6745(Y_{i}-\bar{Y})}{MAD}\]</span></p>
 <p>Where MAD is the median of a series of <span class="math inline">\(|Y_ {i} - \bar{Y}|\)</span>, called the median of the absolute dispersion. Iglewicz and Hoaglin suggest that the points with the Z-score greater than 3.5 corrected above are possible outliers. Let’s apply it to <code>income</code>:</p>
-<div class="sourceCode" id="cb155"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb155-1" data-line-number="1"><span class="co"># calculate median of the absolute dispersion for income</span></a>
-<a class="sourceLine" id="cb155-2" data-line-number="2">ymad &lt;-<span class="st"> </span><span class="kw">mad</span>(<span class="kw">na.omit</span>(sdat<span class="op">$</span>income))</a>
-<a class="sourceLine" id="cb155-3" data-line-number="3"><span class="co"># calculate z-score</span></a>
-<a class="sourceLine" id="cb155-4" data-line-number="4">zs &lt;-<span class="st"> </span>(sdat<span class="op">$</span>income <span class="op">-</span><span class="st"> </span><span class="kw">mean</span>(<span class="kw">na.omit</span>(sdat<span class="op">$</span>income)))<span class="op">/</span>ymad</a>
-<a class="sourceLine" id="cb155-5" data-line-number="5"><span class="co"># count the number of outliers</span></a>
-<a class="sourceLine" id="cb155-6" data-line-number="6"><span class="kw">sum</span>(<span class="kw">na.omit</span>(zs <span class="op">&gt;</span><span class="st"> </span><span class="fl">3.5</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" data-line-number="1"><span class="co"># calculate median of the absolute dispersion for income</span></a>
+<a class="sourceLine" id="cb36-2" data-line-number="2">ymad &lt;-<span class="st"> </span><span class="kw">mad</span>(<span class="kw">na.omit</span>(sdat<span class="op">$</span>income))</a>
+<a class="sourceLine" id="cb36-3" data-line-number="3"><span class="co"># calculate z-score</span></a>
+<a class="sourceLine" id="cb36-4" data-line-number="4">zs &lt;-<span class="st"> </span>(sdat<span class="op">$</span>income <span class="op">-</span><span class="st"> </span><span class="kw">mean</span>(<span class="kw">na.omit</span>(sdat<span class="op">$</span>income)))<span class="op">/</span>ymad</a>
+<a class="sourceLine" id="cb36-5" data-line-number="5"><span class="co"># count the number of outliers</span></a>
+<a class="sourceLine" id="cb36-6" data-line-number="6"><span class="kw">sum</span>(<span class="kw">na.omit</span>(zs <span class="op">&gt;</span><span class="st"> </span><span class="fl">3.5</span>))</a></code></pre></div>
 <pre><code>## [1] 59</code></pre>
 <p>According to modified Z-score, variable income has 59 outliers. Refer to <span class="citation">(Iglewicz and Hoaglin <a href="#ref-mad1">1993</a>)</span> for other ways of detecting outliers.</p>
 <p>The impact of outliers depends on the model. Some models are sensitive to outliers, such as linear regression, logistic regression. Some are pretty robust to outliers, such as tree models, support vector machine. Also, the outlier is not wrong data. It is real observation so cannot be deleted at will. If a model is sensitive to outliers, we can use <em>spatial sign transformation</em> <span class="citation">(Serneels S <a href="#ref-ssp">2006</a>)</span> to minimize the problem. It projects the original sample points to the surface of a sphere by:</p>
@@ -575,15 +332,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>If there are some variables to remove (for example, highly correlated variables), do it before the transformation</li>
 </ol>
 <p>Function <code>spatialSign()</code> <code>caret</code> package can conduct the transformation. Take <code>income</code> and <code>age</code> as an example:</p>
-<div class="sourceCode" id="cb157"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb157-1" data-line-number="1"><span class="co"># KNN imputation</span></a>
-<a class="sourceLine" id="cb157-2" data-line-number="2">sdat &lt;-<span class="st"> </span>sim.dat[, <span class="kw">c</span>(<span class="st">&quot;income&quot;</span>, <span class="st">&quot;age&quot;</span>)]</a>
-<a class="sourceLine" id="cb157-3" data-line-number="3">imp &lt;-<span class="st"> </span><span class="kw">preProcess</span>(sdat, <span class="dt">method =</span> <span class="kw">c</span>(<span class="st">&quot;knnImpute&quot;</span>), <span class="dt">k =</span> <span class="dv">5</span>)</a>
-<a class="sourceLine" id="cb157-4" data-line-number="4">sdat &lt;-<span class="st"> </span><span class="kw">predict</span>(imp, sdat)</a>
-<a class="sourceLine" id="cb157-5" data-line-number="5">transformed &lt;-<span class="st"> </span><span class="kw">spatialSign</span>(sdat)</a>
-<a class="sourceLine" id="cb157-6" data-line-number="6">transformed &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(transformed)</a>
-<a class="sourceLine" id="cb157-7" data-line-number="7"><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">oma =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>))</a>
-<a class="sourceLine" id="cb157-8" data-line-number="8"><span class="kw">plot</span>(income <span class="op">~</span><span class="st"> </span>age, <span class="dt">data =</span> sdat, <span class="dt">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="dt">main =</span> <span class="st">&quot;Before&quot;</span>)</a>
-<a class="sourceLine" id="cb157-9" data-line-number="9"><span class="kw">plot</span>(income <span class="op">~</span><span class="st"> </span>age, <span class="dt">data =</span> transformed, <span class="dt">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="dt">main =</span> <span class="st">&quot;After&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb38-1" data-line-number="1"><span class="co"># KNN imputation</span></a>
+<a class="sourceLine" id="cb38-2" data-line-number="2">sdat &lt;-<span class="st"> </span>sim.dat[, <span class="kw">c</span>(<span class="st">&quot;income&quot;</span>, <span class="st">&quot;age&quot;</span>)]</a>
+<a class="sourceLine" id="cb38-3" data-line-number="3">imp &lt;-<span class="st"> </span><span class="kw">preProcess</span>(sdat, <span class="dt">method =</span> <span class="kw">c</span>(<span class="st">&quot;knnImpute&quot;</span>), <span class="dt">k =</span> <span class="dv">5</span>)</a>
+<a class="sourceLine" id="cb38-4" data-line-number="4">sdat &lt;-<span class="st"> </span><span class="kw">predict</span>(imp, sdat)</a>
+<a class="sourceLine" id="cb38-5" data-line-number="5">transformed &lt;-<span class="st"> </span><span class="kw">spatialSign</span>(sdat)</a>
+<a class="sourceLine" id="cb38-6" data-line-number="6">transformed &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(transformed)</a>
+<a class="sourceLine" id="cb38-7" data-line-number="7"><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">oma =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb38-8" data-line-number="8"><span class="kw">plot</span>(income <span class="op">~</span><span class="st"> </span>age, <span class="dt">data =</span> sdat, <span class="dt">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="dt">main =</span> <span class="st">&quot;Before&quot;</span>)</a>
+<a class="sourceLine" id="cb38-9" data-line-number="9"><span class="kw">plot</span>(income <span class="op">~</span><span class="st"> </span>age, <span class="dt">data =</span> transformed, <span class="dt">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="dt">main =</span> <span class="st">&quot;After&quot;</span>)</a></code></pre></div>
 <p><img src="IDS_files/figure-html/unnamed-chunk-16-1.svg" width="672" /></p>
 <p>Some readers may have found that the above code does not seem to standardize the data before transformation. Recall the introduction of KNN, <code>preProcess()</code> with <code>method=&quot;knnImpute&quot;</code> by default will standardize data.</p>
 </div>

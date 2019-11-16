@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2019-11-13" />
+<meta name="date" content="2019-11-15" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -240,8 +240,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="10" data-path="regularization-methods.html"><a href="regularization-methods.html"><i class="fa fa-check"></i><b>10</b> Regularization Methods</a><ul>
 <li class="chapter" data-level="10.1" data-path="ridge-regression.html"><a href="ridge-regression.html"><i class="fa fa-check"></i><b>10.1</b> Ridge Regression</a></li>
 <li class="chapter" data-level="10.2" data-path="lasso.html"><a href="lasso.html"><i class="fa fa-check"></i><b>10.2</b> LASSO</a></li>
-<li class="chapter" data-level="10.3" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.3</b> Elastic Net</a></li>
-<li class="chapter" data-level="10.4" data-path="lasso-generalized-linear-model.html"><a href="lasso-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.4</b> LASSO Generalized Linear Model</a></li>
+<li class="chapter" data-level="10.3" data-path="variable-selection-property-of-the-lasso.html"><a href="variable-selection-property-of-the-lasso.html"><i class="fa fa-check"></i><b>10.3</b> Variable selection property of the lasso</a></li>
+<li class="chapter" data-level="10.4" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.4</b> Elastic Net</a></li>
+<li class="chapter" data-level="10.5" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.5</b> Penalized Generalized Linear Model</a></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="tree-based-methods.html"><a href="tree-based-methods.html"><i class="fa fa-check"></i><b>11</b> Tree-Based Methods</a><ul>
 <li class="chapter" data-level="11.1" data-path="splitting-criteria.html"><a href="splitting-criteria.html"><i class="fa fa-check"></i><b>11.1</b> Splitting Criteria</a></li>
@@ -321,26 +322,26 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><p>Since the bagging tree uses all of the original predictors as everey split of every tree, those trees are related with each other. The tree correlation prevents bagging from optimally reducing the variance of the predicted values. See <span class="citation">(Hastie T <a href="#ref-Hastie2008">2008</a>)</span> for a mathematical illustration of the tree correlation phenomenon.</p></li>
 </ul>
 <p>Let’s look at how to use R to build bagging tree. Get the predictors and response variable first:</p>
-<div class="sourceCode" id="cb379"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb379-1" data-line-number="1">dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)</a>
-<a class="sourceLine" id="cb379-2" data-line-number="2"><span class="co"># use the 10 survey questions as predictors</span></a>
-<a class="sourceLine" id="cb379-3" data-line-number="3">trainx &lt;-<span class="st"> </span>dat[, <span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>, <span class="kw">names</span>(dat))]</a>
-<a class="sourceLine" id="cb379-4" data-line-number="4"><span class="co"># add segment as a predictor </span></a>
-<a class="sourceLine" id="cb379-5" data-line-number="5"><span class="co"># don&#39;t need to encode it to dummy variables</span></a>
-<a class="sourceLine" id="cb379-6" data-line-number="6">trainx<span class="op">$</span>segment &lt;-<span class="st"> </span>dat<span class="op">$</span>segment</a>
-<a class="sourceLine" id="cb379-7" data-line-number="7"><span class="co"># use gender as the response variable</span></a>
-<a class="sourceLine" id="cb379-8" data-line-number="8">trainy &lt;-<span class="st"> </span><span class="kw">as.factor</span>(dat<span class="op">$</span>gender)</a></code></pre></div>
+<div class="sourceCode" id="cb271"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb271-1" data-line-number="1">dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)</a>
+<a class="sourceLine" id="cb271-2" data-line-number="2"><span class="co"># use the 10 survey questions as predictors</span></a>
+<a class="sourceLine" id="cb271-3" data-line-number="3">trainx &lt;-<span class="st"> </span>dat[, <span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>, <span class="kw">names</span>(dat))]</a>
+<a class="sourceLine" id="cb271-4" data-line-number="4"><span class="co"># add segment as a predictor </span></a>
+<a class="sourceLine" id="cb271-5" data-line-number="5"><span class="co"># don&#39;t need to encode it to dummy variables</span></a>
+<a class="sourceLine" id="cb271-6" data-line-number="6">trainx<span class="op">$</span>segment &lt;-<span class="st"> </span>dat<span class="op">$</span>segment</a>
+<a class="sourceLine" id="cb271-7" data-line-number="7"><span class="co"># use gender as the response variable</span></a>
+<a class="sourceLine" id="cb271-8" data-line-number="8">trainy &lt;-<span class="st"> </span><span class="kw">as.factor</span>(dat<span class="op">$</span>gender)</a></code></pre></div>
 <p>Then fit the model using train function in caret package. Here we just set the number of trees to be 1000. You can tune that parameter.</p>
-<div class="sourceCode" id="cb380"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb380-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb380-2" data-line-number="2">bagTune &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(trainx, trainy, </a>
-<a class="sourceLine" id="cb380-3" data-line-number="3">                           <span class="dt">method =</span> <span class="st">&quot;treebag&quot;</span>,</a>
-<a class="sourceLine" id="cb380-4" data-line-number="4">                           <span class="dt">nbagg =</span> <span class="dv">2000</span>,</a>
-<a class="sourceLine" id="cb380-5" data-line-number="5">                           <span class="dt">metric =</span> <span class="st">&quot;ROC&quot;</span>,</a>
-<a class="sourceLine" id="cb380-6" data-line-number="6">                           <span class="dt">trControl =</span> <span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>,</a>
-<a class="sourceLine" id="cb380-7" data-line-number="7">                           <span class="dt">summaryFunction =</span> twoClassSummary,</a>
-<a class="sourceLine" id="cb380-8" data-line-number="8">                           <span class="dt">classProbs =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb380-9" data-line-number="9">                           <span class="dt">savePredictions =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb272"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb272-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">100</span>)</a>
+<a class="sourceLine" id="cb272-2" data-line-number="2">bagTune &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(trainx, trainy, </a>
+<a class="sourceLine" id="cb272-3" data-line-number="3">                           <span class="dt">method =</span> <span class="st">&quot;treebag&quot;</span>,</a>
+<a class="sourceLine" id="cb272-4" data-line-number="4">                           <span class="dt">nbagg =</span> <span class="dv">2000</span>,</a>
+<a class="sourceLine" id="cb272-5" data-line-number="5">                           <span class="dt">metric =</span> <span class="st">&quot;ROC&quot;</span>,</a>
+<a class="sourceLine" id="cb272-6" data-line-number="6">                           <span class="dt">trControl =</span> <span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>,</a>
+<a class="sourceLine" id="cb272-7" data-line-number="7">                           <span class="dt">summaryFunction =</span> twoClassSummary,</a>
+<a class="sourceLine" id="cb272-8" data-line-number="8">                           <span class="dt">classProbs =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb272-9" data-line-number="9">                           <span class="dt">savePredictions =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
 <p>The model results are:</p>
-<div class="sourceCode" id="cb381"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb381-1" data-line-number="1">bagTune</a></code></pre></div>
+<div class="sourceCode" id="cb273"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb273-1" data-line-number="1">bagTune</a></code></pre></div>
 <pre><code>## Bagged CART 
 ## 
 ## 1000 samples

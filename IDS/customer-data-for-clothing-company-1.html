@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2019-11-13" />
+<meta name="date" content="2019-11-15" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -240,8 +240,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="10" data-path="regularization-methods.html"><a href="regularization-methods.html"><i class="fa fa-check"></i><b>10</b> Regularization Methods</a><ul>
 <li class="chapter" data-level="10.1" data-path="ridge-regression.html"><a href="ridge-regression.html"><i class="fa fa-check"></i><b>10.1</b> Ridge Regression</a></li>
 <li class="chapter" data-level="10.2" data-path="lasso.html"><a href="lasso.html"><i class="fa fa-check"></i><b>10.2</b> LASSO</a></li>
-<li class="chapter" data-level="10.3" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.3</b> Elastic Net</a></li>
-<li class="chapter" data-level="10.4" data-path="lasso-generalized-linear-model.html"><a href="lasso-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.4</b> LASSO Generalized Linear Model</a></li>
+<li class="chapter" data-level="10.3" data-path="variable-selection-property-of-the-lasso.html"><a href="variable-selection-property-of-the-lasso.html"><i class="fa fa-check"></i><b>10.3</b> Variable selection property of the lasso</a></li>
+<li class="chapter" data-level="10.4" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.4</b> Elastic Net</a></li>
+<li class="chapter" data-level="10.5" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.5</b> Penalized Generalized Linear Model</a></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="tree-based-methods.html"><a href="tree-based-methods.html"><i class="fa fa-check"></i><b>11</b> Tree-Based Methods</a><ul>
 <li class="chapter" data-level="11.1" data-path="splitting-criteria.html"><a href="splitting-criteria.html"><i class="fa fa-check"></i><b>11.1</b> Splitting Criteria</a></li>
@@ -305,137 +306,137 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 1. Iterate across segments and variables. Simulate data according to specific parameters assigned</p>
 <p>By organizing code this way, it makes easy for us to change specific parts of the simulation. For example, if we want to change the distribution of one variable, we can just change the corresponding part of the code.</p>
 <p>Here is code to define data structure:</p>
-<div class="sourceCode" id="cb401"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb401-1" data-line-number="1"><span class="co"># set a random number seed to make the process repeatable</span></a>
-<a class="sourceLine" id="cb401-2" data-line-number="2"><span class="kw">set.seed</span>(<span class="dv">12345</span>)</a>
-<a class="sourceLine" id="cb401-3" data-line-number="3"><span class="co"># define the number of observations</span></a>
-<a class="sourceLine" id="cb401-4" data-line-number="4">ncust&lt;-<span class="dv">1000</span></a>
-<a class="sourceLine" id="cb401-5" data-line-number="5"><span class="co"># create a data frmae for simulated data</span></a>
-<a class="sourceLine" id="cb401-6" data-line-number="6">seg_dat&lt;-<span class="kw">data.frame</span>(<span class="dt">id=</span><span class="kw">as.factor</span>(<span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span>ncust)))</a>
-<a class="sourceLine" id="cb401-7" data-line-number="7"><span class="co"># assign the variable names</span></a>
-<a class="sourceLine" id="cb401-8" data-line-number="8">vars&lt;-<span class="kw">c</span>(<span class="st">&quot;age&quot;</span>,<span class="st">&quot;gender&quot;</span>,<span class="st">&quot;income&quot;</span>,<span class="st">&quot;house&quot;</span>,<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>,<span class="st">&quot;store_trans&quot;</span>,<span class="st">&quot;online_trans&quot;</span>)</a>
-<a class="sourceLine" id="cb401-9" data-line-number="9"><span class="co"># assign distribution for each variable</span></a>
-<a class="sourceLine" id="cb401-10" data-line-number="10">vartype&lt;-<span class="kw">c</span>(<span class="st">&quot;norm&quot;</span>,<span class="st">&quot;binom&quot;</span>,<span class="st">&quot;norm&quot;</span>,<span class="st">&quot;binom&quot;</span>,<span class="st">&quot;norm&quot;</span>,<span class="st">&quot;norm&quot;</span>,<span class="st">&quot;pois&quot;</span>,<span class="st">&quot;pois&quot;</span>)</a>
-<a class="sourceLine" id="cb401-11" data-line-number="11"><span class="co"># names of 4 segments</span></a>
-<a class="sourceLine" id="cb401-12" data-line-number="12">group_name&lt;-<span class="kw">c</span>(<span class="st">&quot;Price&quot;</span>,<span class="st">&quot;Conspicuous&quot;</span>,<span class="st">&quot;Quality&quot;</span>,<span class="st">&quot;Style&quot;</span>)</a>
-<a class="sourceLine" id="cb401-13" data-line-number="13"><span class="co"># size of each segments</span></a>
-<a class="sourceLine" id="cb401-14" data-line-number="14">group_size&lt;-<span class="kw">c</span>(<span class="dv">250</span>,<span class="dv">200</span>,<span class="dv">200</span>,<span class="dv">350</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb293"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb293-1" data-line-number="1"><span class="co"># set a random number seed to make the process repeatable</span></a>
+<a class="sourceLine" id="cb293-2" data-line-number="2"><span class="kw">set.seed</span>(<span class="dv">12345</span>)</a>
+<a class="sourceLine" id="cb293-3" data-line-number="3"><span class="co"># define the number of observations</span></a>
+<a class="sourceLine" id="cb293-4" data-line-number="4">ncust&lt;-<span class="dv">1000</span></a>
+<a class="sourceLine" id="cb293-5" data-line-number="5"><span class="co"># create a data frmae for simulated data</span></a>
+<a class="sourceLine" id="cb293-6" data-line-number="6">seg_dat&lt;-<span class="kw">data.frame</span>(<span class="dt">id=</span><span class="kw">as.factor</span>(<span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span>ncust)))</a>
+<a class="sourceLine" id="cb293-7" data-line-number="7"><span class="co"># assign the variable names</span></a>
+<a class="sourceLine" id="cb293-8" data-line-number="8">vars&lt;-<span class="kw">c</span>(<span class="st">&quot;age&quot;</span>,<span class="st">&quot;gender&quot;</span>,<span class="st">&quot;income&quot;</span>,<span class="st">&quot;house&quot;</span>,<span class="st">&quot;store_exp&quot;</span>,<span class="st">&quot;online_exp&quot;</span>,<span class="st">&quot;store_trans&quot;</span>,<span class="st">&quot;online_trans&quot;</span>)</a>
+<a class="sourceLine" id="cb293-9" data-line-number="9"><span class="co"># assign distribution for each variable</span></a>
+<a class="sourceLine" id="cb293-10" data-line-number="10">vartype&lt;-<span class="kw">c</span>(<span class="st">&quot;norm&quot;</span>,<span class="st">&quot;binom&quot;</span>,<span class="st">&quot;norm&quot;</span>,<span class="st">&quot;binom&quot;</span>,<span class="st">&quot;norm&quot;</span>,<span class="st">&quot;norm&quot;</span>,<span class="st">&quot;pois&quot;</span>,<span class="st">&quot;pois&quot;</span>)</a>
+<a class="sourceLine" id="cb293-11" data-line-number="11"><span class="co"># names of 4 segments</span></a>
+<a class="sourceLine" id="cb293-12" data-line-number="12">group_name&lt;-<span class="kw">c</span>(<span class="st">&quot;Price&quot;</span>,<span class="st">&quot;Conspicuous&quot;</span>,<span class="st">&quot;Quality&quot;</span>,<span class="st">&quot;Style&quot;</span>)</a>
+<a class="sourceLine" id="cb293-13" data-line-number="13"><span class="co"># size of each segments</span></a>
+<a class="sourceLine" id="cb293-14" data-line-number="14">group_size&lt;-<span class="kw">c</span>(<span class="dv">250</span>,<span class="dv">200</span>,<span class="dv">200</span>,<span class="dv">350</span>)</a></code></pre></div>
 <p>The next step is to define variable distribution parameters. There are 4 segments of customers and 8 parameters. Different segments correspond to different parameters. Let’s store the parameters in a 4×8 matrix:</p>
-<div class="sourceCode" id="cb402"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb402-1" data-line-number="1"><span class="co"># matrix for mean</span></a>
-<a class="sourceLine" id="cb402-2" data-line-number="2">mus &lt;-<span class="st"> </span><span class="kw">matrix</span>( <span class="kw">c</span>(</a>
-<a class="sourceLine" id="cb402-3" data-line-number="3">  <span class="co"># Price</span></a>
-<a class="sourceLine" id="cb402-4" data-line-number="4">  <span class="dv">60</span>, <span class="fl">0.5</span>, <span class="dv">120000</span>,<span class="fl">0.9</span>, <span class="dv">500</span>,<span class="dv">200</span>,<span class="dv">5</span>,<span class="dv">2</span>,</a>
-<a class="sourceLine" id="cb402-5" data-line-number="5">  <span class="co"># Conspicuous</span></a>
-<a class="sourceLine" id="cb402-6" data-line-number="6">  <span class="dv">40</span>, <span class="fl">0.7</span>, <span class="dv">200000</span>,<span class="fl">0.9</span>, <span class="dv">5000</span>,<span class="dv">5000</span>,<span class="dv">10</span>,<span class="dv">10</span>,</a>
-<a class="sourceLine" id="cb402-7" data-line-number="7">  <span class="co"># Quality</span></a>
-<a class="sourceLine" id="cb402-8" data-line-number="8">  <span class="dv">36</span>, <span class="fl">0.5</span>, <span class="dv">70000</span>, <span class="fl">0.4</span>, <span class="dv">300</span>, <span class="dv">2000</span>,<span class="dv">2</span>,<span class="dv">15</span>,</a>
-<a class="sourceLine" id="cb402-9" data-line-number="9">  <span class="co"># Style</span></a>
-<a class="sourceLine" id="cb402-10" data-line-number="10">  <span class="dv">25</span>, <span class="fl">0.2</span>, <span class="dv">90000</span>, <span class="fl">0.2</span>, <span class="dv">200</span>, <span class="dv">2000</span>,<span class="dv">2</span>,<span class="dv">20</span>), <span class="dt">ncol=</span><span class="kw">length</span>(vars), <span class="dt">byrow=</span><span class="ot">TRUE</span>)</a></code></pre></div>
-<div class="sourceCode" id="cb403"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb403-1" data-line-number="1"><span class="co"># matrix for variance</span></a>
-<a class="sourceLine" id="cb403-2" data-line-number="2">sds&lt;-<span class="st"> </span><span class="kw">matrix</span>( <span class="kw">c</span>(</a>
-<a class="sourceLine" id="cb403-3" data-line-number="3">  <span class="co"># Price</span></a>
-<a class="sourceLine" id="cb403-4" data-line-number="4">  <span class="dv">3</span>,<span class="ot">NA</span>,<span class="dv">8000</span>,<span class="ot">NA</span>,<span class="dv">100</span>,<span class="dv">50</span>,<span class="ot">NA</span>,<span class="ot">NA</span>,</a>
-<a class="sourceLine" id="cb403-5" data-line-number="5">  <span class="co"># Conspicuous</span></a>
-<a class="sourceLine" id="cb403-6" data-line-number="6">  <span class="dv">5</span>,<span class="ot">NA</span>,<span class="dv">50000</span>,<span class="ot">NA</span>,<span class="dv">1000</span>,<span class="dv">1500</span>,<span class="ot">NA</span>,<span class="ot">NA</span>,</a>
-<a class="sourceLine" id="cb403-7" data-line-number="7">  <span class="co"># Quality</span></a>
-<a class="sourceLine" id="cb403-8" data-line-number="8">  <span class="dv">7</span>,<span class="ot">NA</span>,<span class="dv">10000</span>,<span class="ot">NA</span>,<span class="dv">50</span>,<span class="dv">200</span>,<span class="ot">NA</span>,<span class="ot">NA</span>,</a>
-<a class="sourceLine" id="cb403-9" data-line-number="9">  <span class="co"># Style</span></a>
-<a class="sourceLine" id="cb403-10" data-line-number="10">  <span class="dv">2</span>,<span class="ot">NA</span>,<span class="dv">5000</span>,<span class="ot">NA</span>,<span class="dv">10</span>,<span class="dv">500</span>,<span class="ot">NA</span>,<span class="ot">NA</span>), <span class="dt">ncol=</span><span class="kw">length</span>(vars), <span class="dt">byrow=</span><span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb294"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb294-1" data-line-number="1"><span class="co"># matrix for mean</span></a>
+<a class="sourceLine" id="cb294-2" data-line-number="2">mus &lt;-<span class="st"> </span><span class="kw">matrix</span>( <span class="kw">c</span>(</a>
+<a class="sourceLine" id="cb294-3" data-line-number="3">  <span class="co"># Price</span></a>
+<a class="sourceLine" id="cb294-4" data-line-number="4">  <span class="dv">60</span>, <span class="fl">0.5</span>, <span class="dv">120000</span>,<span class="fl">0.9</span>, <span class="dv">500</span>,<span class="dv">200</span>,<span class="dv">5</span>,<span class="dv">2</span>,</a>
+<a class="sourceLine" id="cb294-5" data-line-number="5">  <span class="co"># Conspicuous</span></a>
+<a class="sourceLine" id="cb294-6" data-line-number="6">  <span class="dv">40</span>, <span class="fl">0.7</span>, <span class="dv">200000</span>,<span class="fl">0.9</span>, <span class="dv">5000</span>,<span class="dv">5000</span>,<span class="dv">10</span>,<span class="dv">10</span>,</a>
+<a class="sourceLine" id="cb294-7" data-line-number="7">  <span class="co"># Quality</span></a>
+<a class="sourceLine" id="cb294-8" data-line-number="8">  <span class="dv">36</span>, <span class="fl">0.5</span>, <span class="dv">70000</span>, <span class="fl">0.4</span>, <span class="dv">300</span>, <span class="dv">2000</span>,<span class="dv">2</span>,<span class="dv">15</span>,</a>
+<a class="sourceLine" id="cb294-9" data-line-number="9">  <span class="co"># Style</span></a>
+<a class="sourceLine" id="cb294-10" data-line-number="10">  <span class="dv">25</span>, <span class="fl">0.2</span>, <span class="dv">90000</span>, <span class="fl">0.2</span>, <span class="dv">200</span>, <span class="dv">2000</span>,<span class="dv">2</span>,<span class="dv">20</span>), <span class="dt">ncol=</span><span class="kw">length</span>(vars), <span class="dt">byrow=</span><span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb295"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb295-1" data-line-number="1"><span class="co"># matrix for variance</span></a>
+<a class="sourceLine" id="cb295-2" data-line-number="2">sds&lt;-<span class="st"> </span><span class="kw">matrix</span>( <span class="kw">c</span>(</a>
+<a class="sourceLine" id="cb295-3" data-line-number="3">  <span class="co"># Price</span></a>
+<a class="sourceLine" id="cb295-4" data-line-number="4">  <span class="dv">3</span>,<span class="ot">NA</span>,<span class="dv">8000</span>,<span class="ot">NA</span>,<span class="dv">100</span>,<span class="dv">50</span>,<span class="ot">NA</span>,<span class="ot">NA</span>,</a>
+<a class="sourceLine" id="cb295-5" data-line-number="5">  <span class="co"># Conspicuous</span></a>
+<a class="sourceLine" id="cb295-6" data-line-number="6">  <span class="dv">5</span>,<span class="ot">NA</span>,<span class="dv">50000</span>,<span class="ot">NA</span>,<span class="dv">1000</span>,<span class="dv">1500</span>,<span class="ot">NA</span>,<span class="ot">NA</span>,</a>
+<a class="sourceLine" id="cb295-7" data-line-number="7">  <span class="co"># Quality</span></a>
+<a class="sourceLine" id="cb295-8" data-line-number="8">  <span class="dv">7</span>,<span class="ot">NA</span>,<span class="dv">10000</span>,<span class="ot">NA</span>,<span class="dv">50</span>,<span class="dv">200</span>,<span class="ot">NA</span>,<span class="ot">NA</span>,</a>
+<a class="sourceLine" id="cb295-9" data-line-number="9">  <span class="co"># Style</span></a>
+<a class="sourceLine" id="cb295-10" data-line-number="10">  <span class="dv">2</span>,<span class="ot">NA</span>,<span class="dv">5000</span>,<span class="ot">NA</span>,<span class="dv">10</span>,<span class="dv">500</span>,<span class="ot">NA</span>,<span class="ot">NA</span>), <span class="dt">ncol=</span><span class="kw">length</span>(vars), <span class="dt">byrow=</span><span class="ot">TRUE</span>)</a></code></pre></div>
 <p>Now we are ready to simulate data using the parameters defined above:</p>
-<div class="sourceCode" id="cb404"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb404-1" data-line-number="1"><span class="co"># simulate non-survey data</span></a>
-<a class="sourceLine" id="cb404-2" data-line-number="2">sim.dat&lt;-<span class="ot">NULL</span></a>
-<a class="sourceLine" id="cb404-3" data-line-number="3"><span class="kw">set.seed</span>(<span class="dv">2016</span>)</a>
-<a class="sourceLine" id="cb404-4" data-line-number="4"><span class="co"># loop on customer segment (i)</span></a>
-<a class="sourceLine" id="cb404-5" data-line-number="5"> <span class="cf">for</span> (i <span class="cf">in</span> <span class="kw">seq_along</span>(group_name)){</a>
-<a class="sourceLine" id="cb404-6" data-line-number="6"> </a>
-<a class="sourceLine" id="cb404-7" data-line-number="7">   <span class="co"># add this line in order to moniter the process</span></a>
-<a class="sourceLine" id="cb404-8" data-line-number="8">   <span class="kw">cat</span> (i, group_name[i],<span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</a>
-<a class="sourceLine" id="cb404-9" data-line-number="9"> </a>
-<a class="sourceLine" id="cb404-10" data-line-number="10">  <span class="co"># create an empty matrix to store relevent data</span></a>
-<a class="sourceLine" id="cb404-11" data-line-number="11">  seg&lt;-<span class="kw">data.frame</span>(<span class="kw">matrix</span>(<span class="ot">NA</span>,<span class="dt">nrow=</span>group_size[i], <span class="dt">ncol=</span><span class="kw">length</span>(vars)))  </a>
-<a class="sourceLine" id="cb404-12" data-line-number="12"> </a>
-<a class="sourceLine" id="cb404-13" data-line-number="13">  <span class="co"># Simulate data within segment i</span></a>
-<a class="sourceLine" id="cb404-14" data-line-number="14">  <span class="cf">for</span> (j <span class="cf">in</span> <span class="kw">seq_along</span>(vars)){</a>
-<a class="sourceLine" id="cb404-15" data-line-number="15"> </a>
-<a class="sourceLine" id="cb404-16" data-line-number="16">    <span class="co"># loop on every variable (j)</span></a>
-<a class="sourceLine" id="cb404-17" data-line-number="17">    <span class="cf">if</span> (vartype[j]<span class="op">==</span><span class="st">&quot;norm&quot;</span>){</a>
-<a class="sourceLine" id="cb404-18" data-line-number="18">      <span class="co"># simulate normal distribution</span></a>
-<a class="sourceLine" id="cb404-19" data-line-number="19">      seg[,j]&lt;-<span class="kw">rnorm</span>(group_size[i], <span class="dt">mean=</span>mus[i,j], <span class="dt">sd=</span>sds[i,j])</a>
-<a class="sourceLine" id="cb404-20" data-line-number="20">    } <span class="cf">else</span> <span class="cf">if</span> (vartype[j]<span class="op">==</span><span class="st">&quot;pois&quot;</span>) {</a>
-<a class="sourceLine" id="cb404-21" data-line-number="21">      <span class="co"># simulate poisson distribution</span></a>
-<a class="sourceLine" id="cb404-22" data-line-number="22">      seg[,j]&lt;-<span class="kw">rpois</span>(group_size[i], <span class="dt">lambda=</span>mus[i,j])</a>
-<a class="sourceLine" id="cb404-23" data-line-number="23">    } <span class="cf">else</span> <span class="cf">if</span> (vartype[j]<span class="op">==</span><span class="st">&quot;binom&quot;</span>){</a>
-<a class="sourceLine" id="cb404-24" data-line-number="24">      <span class="co"># simulate binomial distribution</span></a>
-<a class="sourceLine" id="cb404-25" data-line-number="25">      seg[,j]&lt;-<span class="kw">rbinom</span>(group_size[i],<span class="dt">size=</span><span class="dv">1</span>,<span class="dt">prob=</span>mus[i,j])</a>
-<a class="sourceLine" id="cb404-26" data-line-number="26">    } <span class="cf">else</span>{</a>
-<a class="sourceLine" id="cb404-27" data-line-number="27">      <span class="co"># if the distribution name is not one of the above, stop and return a message</span></a>
-<a class="sourceLine" id="cb404-28" data-line-number="28">      <span class="kw">stop</span> (<span class="st">&quot;Don&#39;t have type:&quot;</span>,vartype[j])</a>
-<a class="sourceLine" id="cb404-29" data-line-number="29">    }        </a>
-<a class="sourceLine" id="cb404-30" data-line-number="30">  }</a>
-<a class="sourceLine" id="cb404-31" data-line-number="31">  sim.dat&lt;-<span class="kw">rbind</span>(sim.dat,seg)</a>
-<a class="sourceLine" id="cb404-32" data-line-number="32"> }</a></code></pre></div>
+<div class="sourceCode" id="cb296"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb296-1" data-line-number="1"><span class="co"># simulate non-survey data</span></a>
+<a class="sourceLine" id="cb296-2" data-line-number="2">sim.dat&lt;-<span class="ot">NULL</span></a>
+<a class="sourceLine" id="cb296-3" data-line-number="3"><span class="kw">set.seed</span>(<span class="dv">2016</span>)</a>
+<a class="sourceLine" id="cb296-4" data-line-number="4"><span class="co"># loop on customer segment (i)</span></a>
+<a class="sourceLine" id="cb296-5" data-line-number="5"> <span class="cf">for</span> (i <span class="cf">in</span> <span class="kw">seq_along</span>(group_name)){</a>
+<a class="sourceLine" id="cb296-6" data-line-number="6"> </a>
+<a class="sourceLine" id="cb296-7" data-line-number="7">   <span class="co"># add this line in order to moniter the process</span></a>
+<a class="sourceLine" id="cb296-8" data-line-number="8">   <span class="kw">cat</span> (i, group_name[i],<span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</a>
+<a class="sourceLine" id="cb296-9" data-line-number="9"> </a>
+<a class="sourceLine" id="cb296-10" data-line-number="10">  <span class="co"># create an empty matrix to store relevent data</span></a>
+<a class="sourceLine" id="cb296-11" data-line-number="11">  seg&lt;-<span class="kw">data.frame</span>(<span class="kw">matrix</span>(<span class="ot">NA</span>,<span class="dt">nrow=</span>group_size[i], <span class="dt">ncol=</span><span class="kw">length</span>(vars)))  </a>
+<a class="sourceLine" id="cb296-12" data-line-number="12"> </a>
+<a class="sourceLine" id="cb296-13" data-line-number="13">  <span class="co"># Simulate data within segment i</span></a>
+<a class="sourceLine" id="cb296-14" data-line-number="14">  <span class="cf">for</span> (j <span class="cf">in</span> <span class="kw">seq_along</span>(vars)){</a>
+<a class="sourceLine" id="cb296-15" data-line-number="15"> </a>
+<a class="sourceLine" id="cb296-16" data-line-number="16">    <span class="co"># loop on every variable (j)</span></a>
+<a class="sourceLine" id="cb296-17" data-line-number="17">    <span class="cf">if</span> (vartype[j]<span class="op">==</span><span class="st">&quot;norm&quot;</span>){</a>
+<a class="sourceLine" id="cb296-18" data-line-number="18">      <span class="co"># simulate normal distribution</span></a>
+<a class="sourceLine" id="cb296-19" data-line-number="19">      seg[,j]&lt;-<span class="kw">rnorm</span>(group_size[i], <span class="dt">mean=</span>mus[i,j], <span class="dt">sd=</span>sds[i,j])</a>
+<a class="sourceLine" id="cb296-20" data-line-number="20">    } <span class="cf">else</span> <span class="cf">if</span> (vartype[j]<span class="op">==</span><span class="st">&quot;pois&quot;</span>) {</a>
+<a class="sourceLine" id="cb296-21" data-line-number="21">      <span class="co"># simulate poisson distribution</span></a>
+<a class="sourceLine" id="cb296-22" data-line-number="22">      seg[,j]&lt;-<span class="kw">rpois</span>(group_size[i], <span class="dt">lambda=</span>mus[i,j])</a>
+<a class="sourceLine" id="cb296-23" data-line-number="23">    } <span class="cf">else</span> <span class="cf">if</span> (vartype[j]<span class="op">==</span><span class="st">&quot;binom&quot;</span>){</a>
+<a class="sourceLine" id="cb296-24" data-line-number="24">      <span class="co"># simulate binomial distribution</span></a>
+<a class="sourceLine" id="cb296-25" data-line-number="25">      seg[,j]&lt;-<span class="kw">rbinom</span>(group_size[i],<span class="dt">size=</span><span class="dv">1</span>,<span class="dt">prob=</span>mus[i,j])</a>
+<a class="sourceLine" id="cb296-26" data-line-number="26">    } <span class="cf">else</span>{</a>
+<a class="sourceLine" id="cb296-27" data-line-number="27">      <span class="co"># if the distribution name is not one of the above, stop and return a message</span></a>
+<a class="sourceLine" id="cb296-28" data-line-number="28">      <span class="kw">stop</span> (<span class="st">&quot;Don&#39;t have type:&quot;</span>,vartype[j])</a>
+<a class="sourceLine" id="cb296-29" data-line-number="29">    }        </a>
+<a class="sourceLine" id="cb296-30" data-line-number="30">  }</a>
+<a class="sourceLine" id="cb296-31" data-line-number="31">  sim.dat&lt;-<span class="kw">rbind</span>(sim.dat,seg)</a>
+<a class="sourceLine" id="cb296-32" data-line-number="32"> }</a></code></pre></div>
 <p>Now let’s edit the data we just simulated a little by adding tags to 0/1 binomial variables:</p>
-<div class="sourceCode" id="cb405"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb405-1" data-line-number="1"><span class="co"># assign variable names</span></a>
-<a class="sourceLine" id="cb405-2" data-line-number="2"><span class="kw">names</span>(sim.dat)&lt;-vars</a>
-<a class="sourceLine" id="cb405-3" data-line-number="3"><span class="co"># assign factor levels to segment variable</span></a>
-<a class="sourceLine" id="cb405-4" data-line-number="4">sim.dat<span class="op">$</span>segment&lt;-<span class="kw">factor</span>(<span class="kw">rep</span>(group_name,<span class="dt">times=</span>group_size))</a>
-<a class="sourceLine" id="cb405-5" data-line-number="5"><span class="co"># recode gender and house variable</span></a>
-<a class="sourceLine" id="cb405-6" data-line-number="6">sim.dat<span class="op">$</span>gender&lt;-<span class="kw">factor</span>(sim.dat<span class="op">$</span>gender, <span class="dt">labels=</span><span class="kw">c</span>(<span class="st">&quot;Female&quot;</span>,<span class="st">&quot;Male&quot;</span>))</a>
-<a class="sourceLine" id="cb405-7" data-line-number="7">sim.dat<span class="op">$</span>house&lt;-<span class="kw">factor</span>(sim.dat<span class="op">$</span>house, <span class="dt">labels=</span><span class="kw">c</span>(<span class="st">&quot;No&quot;</span>,<span class="st">&quot;Yes&quot;</span>))</a>
-<a class="sourceLine" id="cb405-8" data-line-number="8"><span class="co"># store_trans and online_trans are at least 1</span></a>
-<a class="sourceLine" id="cb405-9" data-line-number="9">sim.dat<span class="op">$</span>store_trans&lt;-sim.dat<span class="op">$</span>store_trans<span class="op">+</span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb405-10" data-line-number="10">sim.dat<span class="op">$</span>online_trans&lt;-sim.dat<span class="op">$</span>online_trans<span class="op">+</span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb405-11" data-line-number="11"><span class="co"># age is integer</span></a>
-<a class="sourceLine" id="cb405-12" data-line-number="12">sim.dat<span class="op">$</span>age&lt;-<span class="kw">floor</span>(sim.dat<span class="op">$</span>age)</a></code></pre></div>
+<div class="sourceCode" id="cb297"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb297-1" data-line-number="1"><span class="co"># assign variable names</span></a>
+<a class="sourceLine" id="cb297-2" data-line-number="2"><span class="kw">names</span>(sim.dat)&lt;-vars</a>
+<a class="sourceLine" id="cb297-3" data-line-number="3"><span class="co"># assign factor levels to segment variable</span></a>
+<a class="sourceLine" id="cb297-4" data-line-number="4">sim.dat<span class="op">$</span>segment&lt;-<span class="kw">factor</span>(<span class="kw">rep</span>(group_name,<span class="dt">times=</span>group_size))</a>
+<a class="sourceLine" id="cb297-5" data-line-number="5"><span class="co"># recode gender and house variable</span></a>
+<a class="sourceLine" id="cb297-6" data-line-number="6">sim.dat<span class="op">$</span>gender&lt;-<span class="kw">factor</span>(sim.dat<span class="op">$</span>gender, <span class="dt">labels=</span><span class="kw">c</span>(<span class="st">&quot;Female&quot;</span>,<span class="st">&quot;Male&quot;</span>))</a>
+<a class="sourceLine" id="cb297-7" data-line-number="7">sim.dat<span class="op">$</span>house&lt;-<span class="kw">factor</span>(sim.dat<span class="op">$</span>house, <span class="dt">labels=</span><span class="kw">c</span>(<span class="st">&quot;No&quot;</span>,<span class="st">&quot;Yes&quot;</span>))</a>
+<a class="sourceLine" id="cb297-8" data-line-number="8"><span class="co"># store_trans and online_trans are at least 1</span></a>
+<a class="sourceLine" id="cb297-9" data-line-number="9">sim.dat<span class="op">$</span>store_trans&lt;-sim.dat<span class="op">$</span>store_trans<span class="op">+</span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb297-10" data-line-number="10">sim.dat<span class="op">$</span>online_trans&lt;-sim.dat<span class="op">$</span>online_trans<span class="op">+</span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb297-11" data-line-number="11"><span class="co"># age is integer</span></a>
+<a class="sourceLine" id="cb297-12" data-line-number="12">sim.dat<span class="op">$</span>age&lt;-<span class="kw">floor</span>(sim.dat<span class="op">$</span>age)</a></code></pre></div>
 <p>In the real world, the data always includes some noise such as missing, wrong imputation. So we will add some noise to the data:</p>
-<div class="sourceCode" id="cb406"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb406-1" data-line-number="1"><span class="co"># add missing values</span></a>
-<a class="sourceLine" id="cb406-2" data-line-number="2">idxm &lt;-<span class="st"> </span><span class="kw">as.logical</span>(<span class="kw">rbinom</span>(ncust, <span class="dt">size=</span><span class="dv">1</span>, <span class="dt">prob=</span>sim.dat<span class="op">$</span>age<span class="op">/</span><span class="dv">200</span>))</a>
-<a class="sourceLine" id="cb406-3" data-line-number="3">sim.dat<span class="op">$</span>income[idxm]&lt;-<span class="ot">NA</span></a>
-<a class="sourceLine" id="cb406-4" data-line-number="4"><span class="co"># add wrong imputations and outliers</span></a>
-<a class="sourceLine" id="cb406-5" data-line-number="5"><span class="kw">set.seed</span>(<span class="dv">123</span>)</a>
-<a class="sourceLine" id="cb406-6" data-line-number="6">idx&lt;-<span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span>ncust,<span class="dv">5</span>)</a>
-<a class="sourceLine" id="cb406-7" data-line-number="7">sim.dat<span class="op">$</span>age[idx[<span class="dv">1</span>]]&lt;-<span class="dv">300</span></a>
-<a class="sourceLine" id="cb406-8" data-line-number="8">sim.dat<span class="op">$</span>store_exp[idx[<span class="dv">2</span>]]&lt;-<span class="st"> </span><span class="dv">-500</span></a>
-<a class="sourceLine" id="cb406-9" data-line-number="9">sim.dat<span class="op">$</span>store_exp[idx[<span class="dv">3</span><span class="op">:</span><span class="dv">5</span>]]&lt;-<span class="kw">c</span>(<span class="dv">50000</span>,<span class="dv">30000</span>,<span class="dv">30000</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb298"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb298-1" data-line-number="1"><span class="co"># add missing values</span></a>
+<a class="sourceLine" id="cb298-2" data-line-number="2">idxm &lt;-<span class="st"> </span><span class="kw">as.logical</span>(<span class="kw">rbinom</span>(ncust, <span class="dt">size=</span><span class="dv">1</span>, <span class="dt">prob=</span>sim.dat<span class="op">$</span>age<span class="op">/</span><span class="dv">200</span>))</a>
+<a class="sourceLine" id="cb298-3" data-line-number="3">sim.dat<span class="op">$</span>income[idxm]&lt;-<span class="ot">NA</span></a>
+<a class="sourceLine" id="cb298-4" data-line-number="4"><span class="co"># add wrong imputations and outliers</span></a>
+<a class="sourceLine" id="cb298-5" data-line-number="5"><span class="kw">set.seed</span>(<span class="dv">123</span>)</a>
+<a class="sourceLine" id="cb298-6" data-line-number="6">idx&lt;-<span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span>ncust,<span class="dv">5</span>)</a>
+<a class="sourceLine" id="cb298-7" data-line-number="7">sim.dat<span class="op">$</span>age[idx[<span class="dv">1</span>]]&lt;-<span class="dv">300</span></a>
+<a class="sourceLine" id="cb298-8" data-line-number="8">sim.dat<span class="op">$</span>store_exp[idx[<span class="dv">2</span>]]&lt;-<span class="st"> </span><span class="dv">-500</span></a>
+<a class="sourceLine" id="cb298-9" data-line-number="9">sim.dat<span class="op">$</span>store_exp[idx[<span class="dv">3</span><span class="op">:</span><span class="dv">5</span>]]&lt;-<span class="kw">c</span>(<span class="dv">50000</span>,<span class="dv">30000</span>,<span class="dv">30000</span>)</a></code></pre></div>
 <p>So far we have created part of the data. You can check it using <code>summary(sim.dat)</code>. Next, we will move on to simulate survey data.</p>
-<div class="sourceCode" id="cb407"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb407-1" data-line-number="1"><span class="co"># number of survey questions</span></a>
-<a class="sourceLine" id="cb407-2" data-line-number="2">nq&lt;-<span class="dv">10</span></a>
-<a class="sourceLine" id="cb407-3" data-line-number="3"><span class="co"># mean matrix for different segments </span></a>
-<a class="sourceLine" id="cb407-4" data-line-number="4">mus2 &lt;-<span class="st"> </span><span class="kw">matrix</span>( <span class="kw">c</span>(</a>
-<a class="sourceLine" id="cb407-5" data-line-number="5">  <span class="co"># Price</span></a>
-<a class="sourceLine" id="cb407-6" data-line-number="6"> <span class="dv">5</span>,<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">2</span>,<span class="dv">4</span>,</a>
-<a class="sourceLine" id="cb407-7" data-line-number="7">  <span class="co"># Conspicuous</span></a>
-<a class="sourceLine" id="cb407-8" data-line-number="8"> <span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">4</span>,<span class="dv">4</span>,<span class="dv">4</span>,<span class="dv">4</span>,<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">2</span>,</a>
-<a class="sourceLine" id="cb407-9" data-line-number="9">  <span class="co"># Quality</span></a>
-<a class="sourceLine" id="cb407-10" data-line-number="10"> <span class="dv">5</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">3</span>,<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">3</span>,</a>
-<a class="sourceLine" id="cb407-11" data-line-number="11">  <span class="co"># Style</span></a>
-<a class="sourceLine" id="cb407-12" data-line-number="12"> <span class="dv">3</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">1</span>,<span class="dv">5</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">2</span>), <span class="dt">ncol=</span>nq, <span class="dt">byrow=</span><span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb407-13" data-line-number="13"></a>
-<a class="sourceLine" id="cb407-14" data-line-number="14"><span class="co"># assume the variance is 0.2 for all</span></a>
-<a class="sourceLine" id="cb407-15" data-line-number="15">sd2&lt;-<span class="fl">0.2</span></a>
-<a class="sourceLine" id="cb407-16" data-line-number="16">sim.dat2&lt;-<span class="ot">NULL</span></a>
-<a class="sourceLine" id="cb407-17" data-line-number="17"><span class="kw">set.seed</span>(<span class="dv">1000</span>)</a>
-<a class="sourceLine" id="cb407-18" data-line-number="18"><span class="co"># loop for customer segment (i)</span></a>
-<a class="sourceLine" id="cb407-19" data-line-number="19"><span class="cf">for</span> (i <span class="cf">in</span> <span class="kw">seq_along</span>(group_name)){</a>
-<a class="sourceLine" id="cb407-20" data-line-number="20">  <span class="co"># the following line is used for checking the progress</span></a>
-<a class="sourceLine" id="cb407-21" data-line-number="21">  <span class="co"># cat (i, group_name[i],&quot;\n&quot;)</span></a>
-<a class="sourceLine" id="cb407-22" data-line-number="22">  <span class="co"># create an empty data frame to store data</span></a>
-<a class="sourceLine" id="cb407-23" data-line-number="23">  seg&lt;-<span class="kw">data.frame</span>(<span class="kw">matrix</span>(<span class="ot">NA</span>,<span class="dt">nrow=</span>group_size[i], <span class="dt">ncol=</span>nq))  </a>
-<a class="sourceLine" id="cb407-24" data-line-number="24">  <span class="co"># simulate data within segment</span></a>
-<a class="sourceLine" id="cb407-25" data-line-number="25">  <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>nq){</a>
-<a class="sourceLine" id="cb407-26" data-line-number="26">    <span class="co"># simulate normal distribution</span></a>
-<a class="sourceLine" id="cb407-27" data-line-number="27">    res&lt;-<span class="kw">rnorm</span>(group_size[i], <span class="dt">mean=</span>mus2[i,j], <span class="dt">sd=</span>sd2)</a>
-<a class="sourceLine" id="cb407-28" data-line-number="28">    <span class="co"># set upper and lower limit</span></a>
-<a class="sourceLine" id="cb407-29" data-line-number="29">    res[res<span class="op">&gt;</span><span class="dv">5</span>]&lt;-<span class="dv">5</span></a>
-<a class="sourceLine" id="cb407-30" data-line-number="30">    res[res<span class="op">&lt;</span><span class="dv">1</span>]&lt;-<span class="dv">1</span></a>
-<a class="sourceLine" id="cb407-31" data-line-number="31">    <span class="co"># convert continuous values to discrete integers</span></a>
-<a class="sourceLine" id="cb407-32" data-line-number="32">    seg[,j]&lt;-<span class="kw">floor</span>(res)</a>
-<a class="sourceLine" id="cb407-33" data-line-number="33">  }</a>
-<a class="sourceLine" id="cb407-34" data-line-number="34">  sim.dat2&lt;-<span class="kw">rbind</span>(sim.dat2,seg)</a>
-<a class="sourceLine" id="cb407-35" data-line-number="35">}</a>
-<a class="sourceLine" id="cb407-36" data-line-number="36"></a>
-<a class="sourceLine" id="cb407-37" data-line-number="37"><span class="kw">names</span>(sim.dat2)&lt;-<span class="kw">paste</span>(<span class="st">&quot;Q&quot;</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>,<span class="dt">sep=</span><span class="st">&quot;&quot;</span>)</a>
-<a class="sourceLine" id="cb407-38" data-line-number="38">sim.dat&lt;-<span class="kw">cbind</span>(sim.dat,sim.dat2)</a>
-<a class="sourceLine" id="cb407-39" data-line-number="39">sim.dat<span class="op">$</span>segment&lt;-<span class="kw">factor</span>(<span class="kw">rep</span>(group_name,<span class="dt">times=</span>group_size))</a></code></pre></div>
+<div class="sourceCode" id="cb299"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb299-1" data-line-number="1"><span class="co"># number of survey questions</span></a>
+<a class="sourceLine" id="cb299-2" data-line-number="2">nq&lt;-<span class="dv">10</span></a>
+<a class="sourceLine" id="cb299-3" data-line-number="3"><span class="co"># mean matrix for different segments </span></a>
+<a class="sourceLine" id="cb299-4" data-line-number="4">mus2 &lt;-<span class="st"> </span><span class="kw">matrix</span>( <span class="kw">c</span>(</a>
+<a class="sourceLine" id="cb299-5" data-line-number="5">  <span class="co"># Price</span></a>
+<a class="sourceLine" id="cb299-6" data-line-number="6"> <span class="dv">5</span>,<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">2</span>,<span class="dv">4</span>,</a>
+<a class="sourceLine" id="cb299-7" data-line-number="7">  <span class="co"># Conspicuous</span></a>
+<a class="sourceLine" id="cb299-8" data-line-number="8"> <span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">4</span>,<span class="dv">4</span>,<span class="dv">4</span>,<span class="dv">4</span>,<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">2</span>,</a>
+<a class="sourceLine" id="cb299-9" data-line-number="9">  <span class="co"># Quality</span></a>
+<a class="sourceLine" id="cb299-10" data-line-number="10"> <span class="dv">5</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">3</span>,<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">3</span>,</a>
+<a class="sourceLine" id="cb299-11" data-line-number="11">  <span class="co"># Style</span></a>
+<a class="sourceLine" id="cb299-12" data-line-number="12"> <span class="dv">3</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">1</span>,<span class="dv">5</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">2</span>), <span class="dt">ncol=</span>nq, <span class="dt">byrow=</span><span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb299-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb299-14" data-line-number="14"><span class="co"># assume the variance is 0.2 for all</span></a>
+<a class="sourceLine" id="cb299-15" data-line-number="15">sd2&lt;-<span class="fl">0.2</span></a>
+<a class="sourceLine" id="cb299-16" data-line-number="16">sim.dat2&lt;-<span class="ot">NULL</span></a>
+<a class="sourceLine" id="cb299-17" data-line-number="17"><span class="kw">set.seed</span>(<span class="dv">1000</span>)</a>
+<a class="sourceLine" id="cb299-18" data-line-number="18"><span class="co"># loop for customer segment (i)</span></a>
+<a class="sourceLine" id="cb299-19" data-line-number="19"><span class="cf">for</span> (i <span class="cf">in</span> <span class="kw">seq_along</span>(group_name)){</a>
+<a class="sourceLine" id="cb299-20" data-line-number="20">  <span class="co"># the following line is used for checking the progress</span></a>
+<a class="sourceLine" id="cb299-21" data-line-number="21">  <span class="co"># cat (i, group_name[i],&quot;\n&quot;)</span></a>
+<a class="sourceLine" id="cb299-22" data-line-number="22">  <span class="co"># create an empty data frame to store data</span></a>
+<a class="sourceLine" id="cb299-23" data-line-number="23">  seg&lt;-<span class="kw">data.frame</span>(<span class="kw">matrix</span>(<span class="ot">NA</span>,<span class="dt">nrow=</span>group_size[i], <span class="dt">ncol=</span>nq))  </a>
+<a class="sourceLine" id="cb299-24" data-line-number="24">  <span class="co"># simulate data within segment</span></a>
+<a class="sourceLine" id="cb299-25" data-line-number="25">  <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>nq){</a>
+<a class="sourceLine" id="cb299-26" data-line-number="26">    <span class="co"># simulate normal distribution</span></a>
+<a class="sourceLine" id="cb299-27" data-line-number="27">    res&lt;-<span class="kw">rnorm</span>(group_size[i], <span class="dt">mean=</span>mus2[i,j], <span class="dt">sd=</span>sd2)</a>
+<a class="sourceLine" id="cb299-28" data-line-number="28">    <span class="co"># set upper and lower limit</span></a>
+<a class="sourceLine" id="cb299-29" data-line-number="29">    res[res<span class="op">&gt;</span><span class="dv">5</span>]&lt;-<span class="dv">5</span></a>
+<a class="sourceLine" id="cb299-30" data-line-number="30">    res[res<span class="op">&lt;</span><span class="dv">1</span>]&lt;-<span class="dv">1</span></a>
+<a class="sourceLine" id="cb299-31" data-line-number="31">    <span class="co"># convert continuous values to discrete integers</span></a>
+<a class="sourceLine" id="cb299-32" data-line-number="32">    seg[,j]&lt;-<span class="kw">floor</span>(res)</a>
+<a class="sourceLine" id="cb299-33" data-line-number="33">  }</a>
+<a class="sourceLine" id="cb299-34" data-line-number="34">  sim.dat2&lt;-<span class="kw">rbind</span>(sim.dat2,seg)</a>
+<a class="sourceLine" id="cb299-35" data-line-number="35">}</a>
+<a class="sourceLine" id="cb299-36" data-line-number="36"></a>
+<a class="sourceLine" id="cb299-37" data-line-number="37"><span class="kw">names</span>(sim.dat2)&lt;-<span class="kw">paste</span>(<span class="st">&quot;Q&quot;</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>,<span class="dt">sep=</span><span class="st">&quot;&quot;</span>)</a>
+<a class="sourceLine" id="cb299-38" data-line-number="38">sim.dat&lt;-<span class="kw">cbind</span>(sim.dat,sim.dat2)</a>
+<a class="sourceLine" id="cb299-39" data-line-number="39">sim.dat<span class="op">$</span>segment&lt;-<span class="kw">factor</span>(<span class="kw">rep</span>(group_name,<span class="dt">times=</span>group_size))</a></code></pre></div>
 </div>
             </section>
 
