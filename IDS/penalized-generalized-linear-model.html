@@ -243,7 +243,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="10.3" data-path="variable-selection-property-of-the-lasso.html"><a href="variable-selection-property-of-the-lasso.html"><i class="fa fa-check"></i><b>10.3</b> Variable selection property of the lasso</a></li>
 <li class="chapter" data-level="10.4" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.4</b> Elastic Net</a></li>
 <li class="chapter" data-level="10.5" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.5</b> Penalized Generalized Linear Model</a><ul>
-<li class="chapter" data-level="10.5.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.5.1</b> Introduction to glmnet package</a></li>
+<li class="chapter" data-level="10.5.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.5.1</b> Introduction to <code>glmnet</code> package</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="tree-based-methods.html"><a href="tree-based-methods.html"><i class="fa fa-check"></i><b>11</b> Tree-Based Methods</a><ul>
@@ -309,18 +309,51 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>It is the negative logarithm of the likelihood, <span class="math inline">\(\mathcal{L}(y_{i},\beta_{0}+\mathbf{\beta^{T}x_{i}})\)</span>. Maximize likelihood is to minimize <span class="math inline">\(l(y_{i},\beta_{0}+\mathbf{\beta^{T}x_{i}})\)</span>.</p>
 <p>Parameter <span class="math inline">\(\alpha\)</span> decides the penalty, i.e, between <span class="math inline">\(L_2\)</span> (<span class="math inline">\(\alpha=0\)</span>) and <span class="math inline">\(L_1\)</span> (<span class="math inline">\(\alpha=1\)</span>). <span class="math inline">\(\lambda\)</span> controls the weight of the whole penalty item. The higher <span class="math inline">\(\lambda\)</span> is, the more weight the penalty carries comparing to likelihood. As discussed above, the ridge penalty shrinks the coefficients towards 0 but can’t be exactly 0. The lasso penalty can set 0 estimates so it has the property of feature selection. The elastic net combines both. Here we have two tuning parameters, <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\lambda\)</span>.</p>
 <div id="introduction-to-glmnet-package" class="section level3">
-<h3><span class="header-section-number">10.5.1</span> Introduction to glmnet package</h3>
+<h3><span class="header-section-number">10.5.1</span> Introduction to <code>glmnet</code> package</h3>
 <p><code>glmnet</code> is a package that fits a penalized generalized linear model using <em>cyclical coordinate descent</em>. It successively optimizes the objective function over each parameter with others fixed, and cycles repeatedly until convergence. Since the linear model is a special case of the generalized linear model, <code>glmnet</code> can also fit a penalized linear model. Other than that, it can also fit penalized logistic regression, multinomial, Poisson, and Cox regression models.</p>
 <p>The default family option in the function <code>glmnet()</code> is <code>gaussian</code>. It is the linear regression we discussed so far in this chapter. But the parameterization is a little different in the generalized linear model framework (we have <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\lambda\)</span>). Let’s start from our previous example, using the same training data but <code>glmnet()</code> to fit model:</p>
-<div class="sourceCode" id="cb257"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb257-1" data-line-number="1"><span class="kw">library</span>(glmnet)</a>
-<a class="sourceLine" id="cb257-2" data-line-number="2">dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)</a>
-<a class="sourceLine" id="cb257-3" data-line-number="3"><span class="co"># data cleaning: delete wrong observations since expense can&#39;t be negative</span></a>
-<a class="sourceLine" id="cb257-4" data-line-number="4">dat &lt;-<span class="st"> </span><span class="kw">subset</span>(dat, store_exp <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span> <span class="op">&amp;</span><span class="st"> </span>online_exp <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</a>
-<a class="sourceLine" id="cb257-5" data-line-number="5"><span class="co"># get predictors</span></a>
-<a class="sourceLine" id="cb257-6" data-line-number="6">trainx &lt;-<span class="st"> </span>dat[, <span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>, <span class="kw">names</span>(dat))]</a>
-<a class="sourceLine" id="cb257-7" data-line-number="7"><span class="co"># get response</span></a>
-<a class="sourceLine" id="cb257-8" data-line-number="8">trainy &lt;-<span class="st"> </span>dat<span class="op">$</span>store_exp <span class="op">+</span><span class="st"> </span>dat<span class="op">$</span>online_exp</a>
-<a class="sourceLine" id="cb257-9" data-line-number="9">glmfit =<span class="st"> </span><span class="kw">glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy)</a></code></pre></div>
+<div class="sourceCode" id="cb271"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb271-1" data-line-number="1"><span class="kw">library</span>(glmnet)</a>
+<a class="sourceLine" id="cb271-2" data-line-number="2">dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)</a>
+<a class="sourceLine" id="cb271-3" data-line-number="3"><span class="co"># data cleaning: delete wrong observations since expense can&#39;t be negative</span></a>
+<a class="sourceLine" id="cb271-4" data-line-number="4">dat &lt;-<span class="st"> </span><span class="kw">subset</span>(dat, store_exp <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span> <span class="op">&amp;</span><span class="st"> </span>online_exp <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb271-5" data-line-number="5"><span class="co"># get predictors</span></a>
+<a class="sourceLine" id="cb271-6" data-line-number="6">trainx &lt;-<span class="st"> </span>dat[, <span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>, <span class="kw">names</span>(dat))]</a>
+<a class="sourceLine" id="cb271-7" data-line-number="7"><span class="co"># get response</span></a>
+<a class="sourceLine" id="cb271-8" data-line-number="8">trainy &lt;-<span class="st"> </span>dat<span class="op">$</span>store_exp <span class="op">+</span><span class="st"> </span>dat<span class="op">$</span>online_exp</a>
+<a class="sourceLine" id="cb271-9" data-line-number="9">glmfit =<span class="st"> </span><span class="kw">glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy)</a></code></pre></div>
+<p>The object glmfit returned by glmnet() has the information of the fitted model for the later operations. An easy way to extract the components is through various functions on glmfit, such as plot(), print(), coef() and predict() . For example, the following code visualizes the path of coefficients as penalty increases:</p>
+<div class="sourceCode" id="cb272"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb272-1" data-line-number="1"><span class="kw">plot</span>(glmfit, <span class="dt">label =</span> T)</a></code></pre></div>
+<p><img src="IDS_files/figure-html/unnamed-chunk-100-1.svg" width="672" /></p>
+<p>Each curve in the plot represents one predictor. The default setting is <span class="math inline">\(\alpha=1\)</span> which means there is only lasso penalty. From left to right, <span class="math inline">\(L_I\)</span> norm is increasing which means <span class="math inline">\(\lambda\)</span> is decreasing. The bottom x-axis is <span class="math inline">\(L_1\)</span> norm (i.e. <span class="math inline">\(\parallel\mathbf{\beta}\parallel_{1}\)</span>). The upper x-axis is the effective degrees of freedom (df) for the lasso. You can check the detail for every step by:</p>
+<div class="sourceCode" id="cb273"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb273-1" data-line-number="1"><span class="kw">print</span>(glmfit)</a></code></pre></div>
+<pre class="pre"><code>Call:  glmnet(x = as.matrix(trainx), y = trainy) 
+
+   Df  %Dev Lambda
+1   0 0.000   3040
+2   2 0.104   2770
+3   2 0.192   2530
+4   2 0.265   2300
+5   3 0.326   2100
+6   3 0.389   1910
+7   3 0.442   1740
+8   3 0.485   1590
+9   3 0.521   1450
+...</code></pre>
+<p>The first column <code>Df</code> is the degree of freedom (i.e. the number of non-zero coefficients), <code>%Dev</code> is the percentage of deviance explained and <code>Lambda</code> is the value of tuning parameter <span class="math inline">\(\lambda\)</span>. By default, the function will try 100 different values of <span class="math inline">\(\lambda\)</span>. However, if as <span class="math inline">\(\lambda\)</span> changes, the <code>%Dev</code> doesn’t change sufficiently, the algorithm will stop before it goes through all the values of <span class="math inline">\(\lambda\)</span>. We didn’t show the full output above. But it only uses 68 different values of <span class="math inline">\(\lambda\)</span>. You can also set the value of <span class="math inline">\(\lambda\)</span> using <code>s=</code> :</p>
+<div class="sourceCode" id="cb275"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb275-1" data-line-number="1"><span class="kw">coef</span>(glmfit, <span class="dt">s =</span> <span class="dv">1200</span>)</a></code></pre></div>
+<pre><code>## 11 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
+##                  1
+## (Intercept) 2255.2
+## Q1          -390.9
+## Q2           653.6
+## Q3           624.4
+## Q4             .  
+## Q5             .  
+## Q6             .  
+## Q7             .  
+## Q8             .  
+## Q9             .  
+## Q10            .</code></pre>
 
 </div>
 </div>

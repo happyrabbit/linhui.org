@@ -243,7 +243,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="10.3" data-path="variable-selection-property-of-the-lasso.html"><a href="variable-selection-property-of-the-lasso.html"><i class="fa fa-check"></i><b>10.3</b> Variable selection property of the lasso</a></li>
 <li class="chapter" data-level="10.4" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.4</b> Elastic Net</a></li>
 <li class="chapter" data-level="10.5" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.5</b> Penalized Generalized Linear Model</a><ul>
-<li class="chapter" data-level="10.5.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.5.1</b> Introduction to glmnet package</a></li>
+<li class="chapter" data-level="10.5.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.5.1</b> Introduction to <code>glmnet</code> package</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="tree-based-methods.html"><a href="tree-based-methods.html"><i class="fa fa-check"></i><b>11</b> Tree-Based Methods</a><ul>
@@ -303,8 +303,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="data-cleaning" class="section level2">
 <h2><span class="header-section-number">5.1</span> Data Cleaning</h2>
 <p>After you load the data, the first thing is to check how many variables are there, the type of variables, the distributions, and data errors. Let’s read and check the data:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">sim.dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)</a>
-<a class="sourceLine" id="cb8-2" data-line-number="2"><span class="kw">summary</span>(sim.dat)</a></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1">sim.dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)</a>
+<a class="sourceLine" id="cb22-2" data-line-number="2"><span class="kw">summary</span>(sim.dat)</a></code></pre></div>
 <pre class="pre"><code>      age           gender        income       house       store_exp    
  Min.   : 16.0   Female:554   Min.   : 41776   No :432   Min.   : -500  
  1st Qu.: 25.0   Male  :446   1st Qu.: 85832   Yes:568   1st Qu.:  205  
@@ -344,11 +344,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>Someone is 300 years old.</li>
 </ul>
 <p>How to deal with that? Depending on the real situation, if the sample size is large enough, it does not hurt to delete those problematic samples. Here we have 1000 observations. Since marketing survey is usually expensive, it is better to set these values as missing and impute them instead of deleting the rows.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="co"># set problematic values as missings</span></a>
-<a class="sourceLine" id="cb10-2" data-line-number="2">sim.dat<span class="op">$</span>age[<span class="kw">which</span>(sim.dat<span class="op">$</span>age <span class="op">&gt;</span><span class="st"> </span><span class="dv">100</span>)] &lt;-<span class="st"> </span><span class="ot">NA</span></a>
-<a class="sourceLine" id="cb10-3" data-line-number="3">sim.dat<span class="op">$</span>store_exp[<span class="kw">which</span>(sim.dat<span class="op">$</span>store_exp <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>)] &lt;-<span class="st"> </span><span class="ot">NA</span></a>
-<a class="sourceLine" id="cb10-4" data-line-number="4"><span class="co"># see the results</span></a>
-<a class="sourceLine" id="cb10-5" data-line-number="5"><span class="kw">summary</span>(<span class="kw">subset</span>(sim.dat, <span class="dt">select =</span> <span class="kw">c</span>(<span class="st">&quot;age&quot;</span>, <span class="st">&quot;store_exp&quot;</span>)))</a></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1"><span class="co"># set problematic values as missings</span></a>
+<a class="sourceLine" id="cb24-2" data-line-number="2">sim.dat<span class="op">$</span>age[<span class="kw">which</span>(sim.dat<span class="op">$</span>age <span class="op">&gt;</span><span class="st"> </span><span class="dv">100</span>)] &lt;-<span class="st"> </span><span class="ot">NA</span></a>
+<a class="sourceLine" id="cb24-3" data-line-number="3">sim.dat<span class="op">$</span>store_exp[<span class="kw">which</span>(sim.dat<span class="op">$</span>store_exp <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>)] &lt;-<span class="st"> </span><span class="ot">NA</span></a>
+<a class="sourceLine" id="cb24-4" data-line-number="4"><span class="co"># see the results</span></a>
+<a class="sourceLine" id="cb24-5" data-line-number="5"><span class="kw">summary</span>(<span class="kw">subset</span>(sim.dat, <span class="dt">select =</span> <span class="kw">c</span>(<span class="st">&quot;age&quot;</span>, <span class="st">&quot;store_exp&quot;</span>)))</a></code></pre></div>
 <pre class="pre"><code>      age          store_exp      
  Min.   :16.00   Min.   :  155.8  
  1st Qu.:25.00   1st Qu.:  205.1  

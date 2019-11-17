@@ -169,7 +169,7 @@
 
 \title{Introduction to Data Science}
 \author{Hui Lin and Ming Li}
-\date{2019-11-15}
+\date{2019-11-16}
 
 \begin{document}
 \maketitle
@@ -5091,7 +5091,7 @@ When \(p＝2\), lasso estimates (\(\hat{\beta}_{lasso}\) in figure \ref{fig:lass
 
 \begin{figure}
 
-{\centering \includegraphics[width=0.8\linewidth]{images/LassoRidge} 
+{\centering \includegraphics[width=1\linewidth]{images/LassoRidge} 
 
 }
 
@@ -5174,6 +5174,87 @@ where
 \[l(y_{i},\beta_{0}+\mathbf{\beta^{T}x_{i}})=-log[\mathcal{L}(y_{i},\beta_{0}+\mathbf{\beta^{T}x_{i}})]\]
 
 It is the negative logarithm of the likelihood, \(\mathcal{L}(y_{i},\beta_{0}+\mathbf{\beta^{T}x_{i}})\). Maximize likelihood is to minimize \(l(y_{i},\beta_{0}+\mathbf{\beta^{T}x_{i}})\).
+
+Parameter \(\alpha\) decides the penalty, i.e, between \(L_2\) (\(\alpha=0\)) and \(L_1\) (\(\alpha=1\)). \(\lambda\) controls the weight of the whole penalty item. The higher \(\lambda\) is, the more weight the penalty carries comparing to likelihood. As discussed above, the ridge penalty shrinks the coefficients towards 0 but can't be exactly 0. The lasso penalty can set 0 estimates so it has the property of feature selection. The elastic net combines both. Here we have two tuning parameters, \(\alpha\) and \(\lambda\).
+
+\hypertarget{introduction-to-glmnet-package}{%
+\subsection{\texorpdfstring{Introduction to \texttt{glmnet} package}{Introduction to glmnet package}}\label{introduction-to-glmnet-package}}
+
+\texttt{glmnet} is a package that fits a penalized generalized linear model using \emph{cyclical coordinate descent}. It successively optimizes the objective function over each parameter with others fixed, and cycles repeatedly until convergence. Since the linear model is a special case of the generalized linear model, \texttt{glmnet} can also fit a penalized linear model. Other than that, it can also fit penalized logistic regression, multinomial, Poisson, and Cox regression models.
+
+The default family option in the function \texttt{glmnet()} is \texttt{gaussian}. It is the linear regression we discussed so far in this chapter. But the parameterization is a little different in the generalized linear model framework (we have \(\alpha\) and \(\lambda\)). Let's start from our previous example, using the same training data but \texttt{glmnet()} to fit model:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(glmnet)}
+\NormalTok{dat <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"http://bit.ly/2P5gTw4"}\NormalTok{)}
+\CommentTok{# data cleaning: delete wrong observations since expense can't be negative}
+\NormalTok{dat <-}\StringTok{ }\KeywordTok{subset}\NormalTok{(dat, store_exp }\OperatorTok{>}\StringTok{ }\DecValTok{0} \OperatorTok{&}\StringTok{ }\NormalTok{online_exp }\OperatorTok{>}\StringTok{ }\DecValTok{0}\NormalTok{)}
+\CommentTok{# get predictors}
+\NormalTok{trainx <-}\StringTok{ }\NormalTok{dat[, }\KeywordTok{grep}\NormalTok{(}\StringTok{"Q"}\NormalTok{, }\KeywordTok{names}\NormalTok{(dat))]}
+\CommentTok{# get response}
+\NormalTok{trainy <-}\StringTok{ }\NormalTok{dat}\OperatorTok{$}\NormalTok{store_exp }\OperatorTok{+}\StringTok{ }\NormalTok{dat}\OperatorTok{$}\NormalTok{online_exp}
+\NormalTok{glmfit =}\StringTok{ }\KeywordTok{glmnet}\NormalTok{(}\KeywordTok{as.matrix}\NormalTok{(trainx), trainy)}
+\end{Highlighting}
+\end{Shaded}
+
+The object glmfit returned by glmnet() has the information of the fitted model for the later operations. An easy way to extract the components is through various functions on glmfit, such as plot(), print(), coef() and predict() . For example, the following code visualizes the path of coefficients as penalty increases:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plot}\NormalTok{(glmfit, }\DataTypeTok{label =}\NormalTok{ T)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-99-1.pdf}
+
+Each curve in the plot represents one predictor. The default setting is \(\alpha=1\) which means there is only lasso penalty. From left to right, \(L_I\) norm is increasing which means \(\lambda\) is decreasing. The bottom x-axis is \(L_1\) norm (i.e. \(\parallel\mathbf{\beta}\parallel_{1}\)). The upper x-axis is the effective degrees of freedom (df) for the lasso. You can check the detail for every step by:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{print}\NormalTok{(glmfit)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+Call:  glmnet(x = as.matrix(trainx), y = trainy) 
+
+   Df  %Dev Lambda
+1   0 0.000   3040
+2   2 0.104   2770
+3   2 0.192   2530
+4   2 0.265   2300
+5   3 0.326   2100
+6   3 0.389   1910
+7   3 0.442   1740
+8   3 0.485   1590
+9   3 0.521   1450
+...
+\end{verbatim}
+
+The first column \texttt{Df} is the degree of freedom (i.e.~the number of non-zero coefficients), \texttt{\%Dev} is the percentage of deviance explained and \texttt{Lambda} is the value of tuning parameter \(\lambda\). By default, the function will try 100 different values of \(\lambda\). However, if as \(\lambda\) changes, the \texttt{\%Dev} doesn't change sufficiently, the algorithm will stop before it goes through all the values of \(\lambda\). We didn't show the full output above. But it only uses 68 different values of \(\lambda\). You can also set the value of \(\lambda\) using \texttt{s=} :
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{coef}\NormalTok{(glmfit, }\DataTypeTok{s =} \DecValTok{1200}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 11 x 1 sparse Matrix of class "dgCMatrix"
+##                  1
+## (Intercept) 2255.2
+## Q1          -390.9
+## Q2           653.6
+## Q3           624.4
+## Q4             .  
+## Q5             .  
+## Q6             .  
+## Q7             .  
+## Q8             .  
+## Q9             .  
+## Q10            .
+\end{verbatim}
 
 \hypertarget{tree-based-methods}{%
 \chapter{Tree-Based Methods}\label{tree-based-methods}}
@@ -5536,7 +5617,7 @@ A more convenient way is to use \texttt{train()} function in \texttt{caret} pack
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-101-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-104-1.pdf}
 
 RMSE doesn't change much when the maximum is larger than 2. So we set the maximum depth to be 2 and refit the model:
 
@@ -5577,7 +5658,7 @@ You can see that the final model picks \texttt{Q3} and \texttt{Q5} to predict to
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-104-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-107-1.pdf}
 
 \hypertarget{decision-tree}{%
 \subsection{Decision Tree}\label{decision-tree}}
@@ -5717,7 +5798,7 @@ Compare the results of the two approaches.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-108-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-111-1.pdf}
 
 You can see that in this case, the two approaches lead to similar model performance.
 
@@ -5977,7 +6058,7 @@ You can use varImpPlot() function to visualize the predictor importance:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-116-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-119-1.pdf}
 It is easy to see from the plot that \texttt{segment} and \texttt{Q4} are the top two variables to classify gender.
 
 \hypertarget{gradient-boosted-machine}{%
@@ -6203,7 +6284,7 @@ Now, let's compare the results from the three tree models.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-119-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-122-1.pdf}
 
 Since the data here doesn't have many variables, we don't see a significant difference among the models. But you can still see those ensemble methods are better than a single tree. In most of the real applications, ensemble methods perform much better. Random forest and boosting trees can be a baseline model. Before exploring different models, you can quickly run a random forest to see the performance and then try to improve that performance. If the performance you got from the random forest is not too much better than guessing, you should consider collecting more data or reviewing the problem to frame it a different way instead of trying other models. Because it usually means the current data is not enough to solve the problem.
 

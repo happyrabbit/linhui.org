@@ -243,7 +243,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="10.3" data-path="variable-selection-property-of-the-lasso.html"><a href="variable-selection-property-of-the-lasso.html"><i class="fa fa-check"></i><b>10.3</b> Variable selection property of the lasso</a></li>
 <li class="chapter" data-level="10.4" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.4</b> Elastic Net</a></li>
 <li class="chapter" data-level="10.5" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.5</b> Penalized Generalized Linear Model</a><ul>
-<li class="chapter" data-level="10.5.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.5.1</b> Introduction to glmnet package</a></li>
+<li class="chapter" data-level="10.5.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.5.1</b> Introduction to <code>glmnet</code> package</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="tree-based-methods.html"><a href="tree-based-methods.html"><i class="fa fa-check"></i><b>11</b> Tree-Based Methods</a><ul>
@@ -302,96 +302,96 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="swine-disease-breakout-data-1" class="section level2">
 <h2><span class="header-section-number">A.3</span> Swine Disease Breakout Data</h2>
-<div class="sourceCode" id="cb302"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb302-1" data-line-number="1"><span class="co"># sim1_da1.csv the 1st simulated data similar sim1_da2 and sim1_da3</span></a>
-<a class="sourceLine" id="cb302-2" data-line-number="2"><span class="co"># sim1.csv simulated data, the first simulation dummy.sim1.csv dummy</span></a>
-<a class="sourceLine" id="cb302-3" data-line-number="3"><span class="co"># variables for the first simulated data with all the baseline code for</span></a>
-<a class="sourceLine" id="cb302-4" data-line-number="4"><span class="co"># simulation</span></a>
-<a class="sourceLine" id="cb302-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb302-6" data-line-number="6"><span class="co"># setwd(dirname(file.choose())) library(grplasso)</span></a>
-<a class="sourceLine" id="cb302-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb302-8" data-line-number="8">nf &lt;-<span class="st"> </span><span class="dv">800</span></a>
-<a class="sourceLine" id="cb302-9" data-line-number="9"><span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">20</span>) {</a>
-<a class="sourceLine" id="cb302-10" data-line-number="10">    <span class="kw">set.seed</span>(<span class="dv">19870</span> <span class="op">+</span><span class="st"> </span>j)</a>
-<a class="sourceLine" id="cb302-11" data-line-number="11">    x &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>)</a>
-<a class="sourceLine" id="cb302-12" data-line-number="12">    sim.da1 &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
-<a class="sourceLine" id="cb302-13" data-line-number="13">    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>nf) {</a>
-<a class="sourceLine" id="cb302-14" data-line-number="14">        <span class="co"># sample(x, 120, replace=TRUE)-&gt;sam</span></a>
-<a class="sourceLine" id="cb302-15" data-line-number="15">        sim.da1 &lt;-<span class="st"> </span><span class="kw">rbind</span>(sim.da1, <span class="kw">sample</span>(x, <span class="dv">120</span>, <span class="dt">replace =</span> <span class="ot">TRUE</span>))</a>
-<a class="sourceLine" id="cb302-16" data-line-number="16">    }</a>
-<a class="sourceLine" id="cb302-17" data-line-number="17">    </a>
-<a class="sourceLine" id="cb302-18" data-line-number="18">    sim.da1 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(sim.da1)</a>
-<a class="sourceLine" id="cb302-19" data-line-number="19">    col &lt;-<span class="st"> </span><span class="kw">paste</span>(<span class="st">&quot;Q&quot;</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">120</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)</a>
-<a class="sourceLine" id="cb302-20" data-line-number="20">    row &lt;-<span class="st"> </span><span class="kw">paste</span>(<span class="st">&quot;Farm&quot;</span>, <span class="dv">1</span><span class="op">:</span>nf, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)</a>
-<a class="sourceLine" id="cb302-21" data-line-number="21">    <span class="kw">colnames</span>(sim.da1) &lt;-<span class="st"> </span>col</a>
-<a class="sourceLine" id="cb302-22" data-line-number="22">    <span class="kw">rownames</span>(sim.da1) &lt;-<span class="st"> </span>row</a>
-<a class="sourceLine" id="cb302-23" data-line-number="23">    </a>
-<a class="sourceLine" id="cb302-24" data-line-number="24">    <span class="co"># use class.ind() function in nnet package to encode dummy variables</span></a>
-<a class="sourceLine" id="cb302-25" data-line-number="25">    <span class="kw">library</span>(nnet)</a>
-<a class="sourceLine" id="cb302-26" data-line-number="26">    dummy.sim1 &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
-<a class="sourceLine" id="cb302-27" data-line-number="27">    <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(sim.da1)) {</a>
-<a class="sourceLine" id="cb302-28" data-line-number="28">        tmp =<span class="st"> </span><span class="kw">class.ind</span>(sim.da1[, k])</a>
-<a class="sourceLine" id="cb302-29" data-line-number="29">        <span class="kw">colnames</span>(tmp) =<span class="st"> </span><span class="kw">paste</span>(col[k], <span class="kw">colnames</span>(tmp))</a>
-<a class="sourceLine" id="cb302-30" data-line-number="30">        dummy.sim1 =<span class="st"> </span><span class="kw">cbind</span>(dummy.sim1, tmp)</a>
-<a class="sourceLine" id="cb302-31" data-line-number="31">    }</a>
-<a class="sourceLine" id="cb302-32" data-line-number="32">    dummy.sim1 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(dummy.sim1)</a>
-<a class="sourceLine" id="cb302-33" data-line-number="33">    </a>
-<a class="sourceLine" id="cb302-34" data-line-number="34">    <span class="co"># set &#39;C&#39; as the baseline delete baseline dummy variable</span></a>
-<a class="sourceLine" id="cb302-35" data-line-number="35">    </a>
-<a class="sourceLine" id="cb302-36" data-line-number="36">    base.idx &lt;-<span class="st"> </span><span class="dv">3</span> <span class="op">*</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">120</span>)</a>
-<a class="sourceLine" id="cb302-37" data-line-number="37">    dummy1 &lt;-<span class="st"> </span>dummy.sim1[, <span class="op">-</span>base.idx]</a>
-<a class="sourceLine" id="cb302-38" data-line-number="38">    </a>
-<a class="sourceLine" id="cb302-39" data-line-number="39">    <span class="co"># simulate independent variable for different values of r simulate</span></a>
-<a class="sourceLine" id="cb302-40" data-line-number="40">    <span class="co"># based on one value of r each time r=0.1, get the link function</span></a>
-<a class="sourceLine" id="cb302-41" data-line-number="41">    s1 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">1</span><span class="op">/</span><span class="dv">10</span>, <span class="dv">0</span>, <span class="dv">-1</span><span class="op">/</span><span class="dv">10</span>), <span class="dv">40</span>), <span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">1</span><span class="op">/</span><span class="dv">10</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="dv">40</span>), <span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">0</span>, </a>
-<a class="sourceLine" id="cb302-42" data-line-number="42">        <span class="dv">0</span>, <span class="dv">0</span>), <span class="dv">40</span>))</a>
-<a class="sourceLine" id="cb302-43" data-line-number="43">    link1 &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(dummy.sim1) <span class="op">%*%</span><span class="st"> </span>s1 <span class="op">-</span><span class="st"> </span><span class="dv">40</span><span class="op">/</span><span class="dv">3</span><span class="op">/</span><span class="dv">10</span></a>
-<a class="sourceLine" id="cb302-44" data-line-number="44">    </a>
-<a class="sourceLine" id="cb302-45" data-line-number="45">    <span class="co"># r=0.25</span></a>
-<a class="sourceLine" id="cb302-46" data-line-number="46">    <span class="co"># c(rep(c(1/4,0,-1/4),40),rep(c(1/4,0,0),40),rep(c(0,0,0),40))-&gt;s1</span></a>
-<a class="sourceLine" id="cb302-47" data-line-number="47">    <span class="co"># as.matrix(dummy.sim1)%*%s1-40/3/4-&gt;link1</span></a>
-<a class="sourceLine" id="cb302-48" data-line-number="48">    </a>
-<a class="sourceLine" id="cb302-49" data-line-number="49">    <span class="co"># r=0.5</span></a>
-<a class="sourceLine" id="cb302-50" data-line-number="50">    <span class="co"># c(rep(c(1/2,0,-1/2),40),rep(c(1/2,0,0),40),rep(c(0,0,0),40))-&gt;s1</span></a>
-<a class="sourceLine" id="cb302-51" data-line-number="51">    <span class="co"># as.matrix(dummy.sim1)%*%s1-40/3/2-&gt;link1</span></a>
-<a class="sourceLine" id="cb302-52" data-line-number="52">    </a>
-<a class="sourceLine" id="cb302-53" data-line-number="53">    <span class="co"># r=1 c(rep(c(1,0,-1),40),rep(c(1,0,0),40),rep(c(0,0,0),40))-&gt;s1</span></a>
-<a class="sourceLine" id="cb302-54" data-line-number="54">    <span class="co"># as.matrix(dummy.sim1)%*%s1-40/3-&gt;link1</span></a>
-<a class="sourceLine" id="cb302-55" data-line-number="55">    </a>
-<a class="sourceLine" id="cb302-56" data-line-number="56">    <span class="co"># r=2 c(rep(c(2,0,-2),40),rep(c(2,0,0),40),rep(c(0,0,0),40))-&gt;s1</span></a>
-<a class="sourceLine" id="cb302-57" data-line-number="57">    <span class="co"># as.matrix(dummy.sim1)%*%s1-40/3/0.5-&gt;link1</span></a>
-<a class="sourceLine" id="cb302-58" data-line-number="58">    </a>
-<a class="sourceLine" id="cb302-59" data-line-number="59">    </a>
-<a class="sourceLine" id="cb302-60" data-line-number="60">    <span class="co"># calculate the outbreak probability</span></a>
-<a class="sourceLine" id="cb302-61" data-line-number="61">    hp1 &lt;-<span class="st"> </span><span class="kw">exp</span>(link1)<span class="op">/</span>(<span class="kw">exp</span>(link1) <span class="op">+</span><span class="st"> </span><span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb302-62" data-line-number="62">    </a>
-<a class="sourceLine" id="cb302-63" data-line-number="63">    <span class="co"># based on the probability hp1, simulate response variable: res</span></a>
-<a class="sourceLine" id="cb302-64" data-line-number="64">    res &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">9</span>, nf)</a>
-<a class="sourceLine" id="cb302-65" data-line-number="65">    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>nf) {</a>
-<a class="sourceLine" id="cb302-66" data-line-number="66">        res[i] &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">0</span>), <span class="dv">1</span>, <span class="dt">prob =</span> <span class="kw">c</span>(hp1[i], <span class="dv">1</span> <span class="op">-</span><span class="st"> </span>hp1[i]))</a>
-<a class="sourceLine" id="cb302-67" data-line-number="67">    }</a>
-<a class="sourceLine" id="cb302-68" data-line-number="68">    </a>
-<a class="sourceLine" id="cb302-69" data-line-number="69">    <span class="co"># da1 with response variable, without group indicator da2 without</span></a>
-<a class="sourceLine" id="cb302-70" data-line-number="70">    <span class="co"># response variable, with group indicator da3 without response</span></a>
-<a class="sourceLine" id="cb302-71" data-line-number="71">    <span class="co"># variable, without group indicator</span></a>
-<a class="sourceLine" id="cb302-72" data-line-number="72">    </a>
-<a class="sourceLine" id="cb302-73" data-line-number="73">    dummy1<span class="op">$</span>y &lt;-<span class="st"> </span>res</a>
-<a class="sourceLine" id="cb302-74" data-line-number="74">    da1 &lt;-<span class="st"> </span>dummy1</a>
-<a class="sourceLine" id="cb302-75" data-line-number="75">    y &lt;-<span class="st"> </span>da1<span class="op">$</span>y</a>
-<a class="sourceLine" id="cb302-76" data-line-number="76">    ind &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
-<a class="sourceLine" id="cb302-77" data-line-number="77">    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">120</span>) {</a>
-<a class="sourceLine" id="cb302-78" data-line-number="78">        ind &lt;-<span class="st"> </span><span class="kw">c</span>(ind, <span class="kw">rep</span>(i, <span class="dv">2</span>))</a>
-<a class="sourceLine" id="cb302-79" data-line-number="79">    }</a>
-<a class="sourceLine" id="cb302-80" data-line-number="80">    </a>
-<a class="sourceLine" id="cb302-81" data-line-number="81">    da2 &lt;-<span class="st"> </span><span class="kw">rbind</span>(da1[, <span class="dv">1</span><span class="op">:</span><span class="dv">240</span>], ind)</a>
-<a class="sourceLine" id="cb302-82" data-line-number="82">    da3 &lt;-<span class="st"> </span>da1[, <span class="dv">1</span><span class="op">:</span><span class="dv">240</span>]</a>
-<a class="sourceLine" id="cb302-83" data-line-number="83">    </a>
-<a class="sourceLine" id="cb302-84" data-line-number="84">    <span class="co"># save simulated data</span></a>
-<a class="sourceLine" id="cb302-85" data-line-number="85">    <span class="kw">write.csv</span>(da1, <span class="kw">paste</span>(<span class="st">&quot;sim&quot;</span>, j, <span class="st">&quot;_da&quot;</span>, <span class="dv">1</span>, <span class="st">&quot;.csv&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>), <span class="dt">row.names =</span> F)</a>
-<a class="sourceLine" id="cb302-86" data-line-number="86">    <span class="kw">write.csv</span>(da2, <span class="kw">paste</span>(<span class="st">&quot;sim&quot;</span>, j, <span class="st">&quot;_da&quot;</span>, <span class="dv">2</span>, <span class="st">&quot;.csv&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>), <span class="dt">row.names =</span> F)</a>
-<a class="sourceLine" id="cb302-87" data-line-number="87">    <span class="kw">write.csv</span>(da3, <span class="kw">paste</span>(<span class="st">&quot;sim&quot;</span>, j, <span class="st">&quot;_da&quot;</span>, <span class="dv">3</span>, <span class="st">&quot;.csv&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>), <span class="dt">row.names =</span> F)</a>
-<a class="sourceLine" id="cb302-88" data-line-number="88">    <span class="kw">write.csv</span>(sim.da1, <span class="kw">paste</span>(<span class="st">&quot;sim&quot;</span>, j, <span class="st">&quot;.csv&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>), <span class="dt">row.names =</span> F)</a>
-<a class="sourceLine" id="cb302-89" data-line-number="89">    <span class="kw">write.csv</span>(dummy.sim1, <span class="kw">paste</span>(<span class="st">&quot;dummy.sim&quot;</span>, j, <span class="st">&quot;.csv&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>), <span class="dt">row.names =</span> F)</a>
-<a class="sourceLine" id="cb302-90" data-line-number="90">}</a></code></pre></div>
+<div class="sourceCode" id="cb321"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb321-1" data-line-number="1"><span class="co"># sim1_da1.csv the 1st simulated data similar sim1_da2 and sim1_da3</span></a>
+<a class="sourceLine" id="cb321-2" data-line-number="2"><span class="co"># sim1.csv simulated data, the first simulation dummy.sim1.csv dummy</span></a>
+<a class="sourceLine" id="cb321-3" data-line-number="3"><span class="co"># variables for the first simulated data with all the baseline code for</span></a>
+<a class="sourceLine" id="cb321-4" data-line-number="4"><span class="co"># simulation</span></a>
+<a class="sourceLine" id="cb321-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb321-6" data-line-number="6"><span class="co"># setwd(dirname(file.choose())) library(grplasso)</span></a>
+<a class="sourceLine" id="cb321-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb321-8" data-line-number="8">nf &lt;-<span class="st"> </span><span class="dv">800</span></a>
+<a class="sourceLine" id="cb321-9" data-line-number="9"><span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">20</span>) {</a>
+<a class="sourceLine" id="cb321-10" data-line-number="10">    <span class="kw">set.seed</span>(<span class="dv">19870</span> <span class="op">+</span><span class="st"> </span>j)</a>
+<a class="sourceLine" id="cb321-11" data-line-number="11">    x &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>)</a>
+<a class="sourceLine" id="cb321-12" data-line-number="12">    sim.da1 &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
+<a class="sourceLine" id="cb321-13" data-line-number="13">    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>nf) {</a>
+<a class="sourceLine" id="cb321-14" data-line-number="14">        <span class="co"># sample(x, 120, replace=TRUE)-&gt;sam</span></a>
+<a class="sourceLine" id="cb321-15" data-line-number="15">        sim.da1 &lt;-<span class="st"> </span><span class="kw">rbind</span>(sim.da1, <span class="kw">sample</span>(x, <span class="dv">120</span>, <span class="dt">replace =</span> <span class="ot">TRUE</span>))</a>
+<a class="sourceLine" id="cb321-16" data-line-number="16">    }</a>
+<a class="sourceLine" id="cb321-17" data-line-number="17">    </a>
+<a class="sourceLine" id="cb321-18" data-line-number="18">    sim.da1 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(sim.da1)</a>
+<a class="sourceLine" id="cb321-19" data-line-number="19">    col &lt;-<span class="st"> </span><span class="kw">paste</span>(<span class="st">&quot;Q&quot;</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">120</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)</a>
+<a class="sourceLine" id="cb321-20" data-line-number="20">    row &lt;-<span class="st"> </span><span class="kw">paste</span>(<span class="st">&quot;Farm&quot;</span>, <span class="dv">1</span><span class="op">:</span>nf, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)</a>
+<a class="sourceLine" id="cb321-21" data-line-number="21">    <span class="kw">colnames</span>(sim.da1) &lt;-<span class="st"> </span>col</a>
+<a class="sourceLine" id="cb321-22" data-line-number="22">    <span class="kw">rownames</span>(sim.da1) &lt;-<span class="st"> </span>row</a>
+<a class="sourceLine" id="cb321-23" data-line-number="23">    </a>
+<a class="sourceLine" id="cb321-24" data-line-number="24">    <span class="co"># use class.ind() function in nnet package to encode dummy variables</span></a>
+<a class="sourceLine" id="cb321-25" data-line-number="25">    <span class="kw">library</span>(nnet)</a>
+<a class="sourceLine" id="cb321-26" data-line-number="26">    dummy.sim1 &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
+<a class="sourceLine" id="cb321-27" data-line-number="27">    <span class="cf">for</span> (k <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(sim.da1)) {</a>
+<a class="sourceLine" id="cb321-28" data-line-number="28">        tmp =<span class="st"> </span><span class="kw">class.ind</span>(sim.da1[, k])</a>
+<a class="sourceLine" id="cb321-29" data-line-number="29">        <span class="kw">colnames</span>(tmp) =<span class="st"> </span><span class="kw">paste</span>(col[k], <span class="kw">colnames</span>(tmp))</a>
+<a class="sourceLine" id="cb321-30" data-line-number="30">        dummy.sim1 =<span class="st"> </span><span class="kw">cbind</span>(dummy.sim1, tmp)</a>
+<a class="sourceLine" id="cb321-31" data-line-number="31">    }</a>
+<a class="sourceLine" id="cb321-32" data-line-number="32">    dummy.sim1 &lt;-<span class="st"> </span><span class="kw">data.frame</span>(dummy.sim1)</a>
+<a class="sourceLine" id="cb321-33" data-line-number="33">    </a>
+<a class="sourceLine" id="cb321-34" data-line-number="34">    <span class="co"># set &#39;C&#39; as the baseline delete baseline dummy variable</span></a>
+<a class="sourceLine" id="cb321-35" data-line-number="35">    </a>
+<a class="sourceLine" id="cb321-36" data-line-number="36">    base.idx &lt;-<span class="st"> </span><span class="dv">3</span> <span class="op">*</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">120</span>)</a>
+<a class="sourceLine" id="cb321-37" data-line-number="37">    dummy1 &lt;-<span class="st"> </span>dummy.sim1[, <span class="op">-</span>base.idx]</a>
+<a class="sourceLine" id="cb321-38" data-line-number="38">    </a>
+<a class="sourceLine" id="cb321-39" data-line-number="39">    <span class="co"># simulate independent variable for different values of r simulate</span></a>
+<a class="sourceLine" id="cb321-40" data-line-number="40">    <span class="co"># based on one value of r each time r=0.1, get the link function</span></a>
+<a class="sourceLine" id="cb321-41" data-line-number="41">    s1 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">1</span><span class="op">/</span><span class="dv">10</span>, <span class="dv">0</span>, <span class="dv">-1</span><span class="op">/</span><span class="dv">10</span>), <span class="dv">40</span>), <span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">1</span><span class="op">/</span><span class="dv">10</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="dv">40</span>), <span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">0</span>, </a>
+<a class="sourceLine" id="cb321-42" data-line-number="42">        <span class="dv">0</span>, <span class="dv">0</span>), <span class="dv">40</span>))</a>
+<a class="sourceLine" id="cb321-43" data-line-number="43">    link1 &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(dummy.sim1) <span class="op">%*%</span><span class="st"> </span>s1 <span class="op">-</span><span class="st"> </span><span class="dv">40</span><span class="op">/</span><span class="dv">3</span><span class="op">/</span><span class="dv">10</span></a>
+<a class="sourceLine" id="cb321-44" data-line-number="44">    </a>
+<a class="sourceLine" id="cb321-45" data-line-number="45">    <span class="co"># r=0.25</span></a>
+<a class="sourceLine" id="cb321-46" data-line-number="46">    <span class="co"># c(rep(c(1/4,0,-1/4),40),rep(c(1/4,0,0),40),rep(c(0,0,0),40))-&gt;s1</span></a>
+<a class="sourceLine" id="cb321-47" data-line-number="47">    <span class="co"># as.matrix(dummy.sim1)%*%s1-40/3/4-&gt;link1</span></a>
+<a class="sourceLine" id="cb321-48" data-line-number="48">    </a>
+<a class="sourceLine" id="cb321-49" data-line-number="49">    <span class="co"># r=0.5</span></a>
+<a class="sourceLine" id="cb321-50" data-line-number="50">    <span class="co"># c(rep(c(1/2,0,-1/2),40),rep(c(1/2,0,0),40),rep(c(0,0,0),40))-&gt;s1</span></a>
+<a class="sourceLine" id="cb321-51" data-line-number="51">    <span class="co"># as.matrix(dummy.sim1)%*%s1-40/3/2-&gt;link1</span></a>
+<a class="sourceLine" id="cb321-52" data-line-number="52">    </a>
+<a class="sourceLine" id="cb321-53" data-line-number="53">    <span class="co"># r=1 c(rep(c(1,0,-1),40),rep(c(1,0,0),40),rep(c(0,0,0),40))-&gt;s1</span></a>
+<a class="sourceLine" id="cb321-54" data-line-number="54">    <span class="co"># as.matrix(dummy.sim1)%*%s1-40/3-&gt;link1</span></a>
+<a class="sourceLine" id="cb321-55" data-line-number="55">    </a>
+<a class="sourceLine" id="cb321-56" data-line-number="56">    <span class="co"># r=2 c(rep(c(2,0,-2),40),rep(c(2,0,0),40),rep(c(0,0,0),40))-&gt;s1</span></a>
+<a class="sourceLine" id="cb321-57" data-line-number="57">    <span class="co"># as.matrix(dummy.sim1)%*%s1-40/3/0.5-&gt;link1</span></a>
+<a class="sourceLine" id="cb321-58" data-line-number="58">    </a>
+<a class="sourceLine" id="cb321-59" data-line-number="59">    </a>
+<a class="sourceLine" id="cb321-60" data-line-number="60">    <span class="co"># calculate the outbreak probability</span></a>
+<a class="sourceLine" id="cb321-61" data-line-number="61">    hp1 &lt;-<span class="st"> </span><span class="kw">exp</span>(link1)<span class="op">/</span>(<span class="kw">exp</span>(link1) <span class="op">+</span><span class="st"> </span><span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb321-62" data-line-number="62">    </a>
+<a class="sourceLine" id="cb321-63" data-line-number="63">    <span class="co"># based on the probability hp1, simulate response variable: res</span></a>
+<a class="sourceLine" id="cb321-64" data-line-number="64">    res &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">9</span>, nf)</a>
+<a class="sourceLine" id="cb321-65" data-line-number="65">    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>nf) {</a>
+<a class="sourceLine" id="cb321-66" data-line-number="66">        res[i] &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">0</span>), <span class="dv">1</span>, <span class="dt">prob =</span> <span class="kw">c</span>(hp1[i], <span class="dv">1</span> <span class="op">-</span><span class="st"> </span>hp1[i]))</a>
+<a class="sourceLine" id="cb321-67" data-line-number="67">    }</a>
+<a class="sourceLine" id="cb321-68" data-line-number="68">    </a>
+<a class="sourceLine" id="cb321-69" data-line-number="69">    <span class="co"># da1 with response variable, without group indicator da2 without</span></a>
+<a class="sourceLine" id="cb321-70" data-line-number="70">    <span class="co"># response variable, with group indicator da3 without response</span></a>
+<a class="sourceLine" id="cb321-71" data-line-number="71">    <span class="co"># variable, without group indicator</span></a>
+<a class="sourceLine" id="cb321-72" data-line-number="72">    </a>
+<a class="sourceLine" id="cb321-73" data-line-number="73">    dummy1<span class="op">$</span>y &lt;-<span class="st"> </span>res</a>
+<a class="sourceLine" id="cb321-74" data-line-number="74">    da1 &lt;-<span class="st"> </span>dummy1</a>
+<a class="sourceLine" id="cb321-75" data-line-number="75">    y &lt;-<span class="st"> </span>da1<span class="op">$</span>y</a>
+<a class="sourceLine" id="cb321-76" data-line-number="76">    ind &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
+<a class="sourceLine" id="cb321-77" data-line-number="77">    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">120</span>) {</a>
+<a class="sourceLine" id="cb321-78" data-line-number="78">        ind &lt;-<span class="st"> </span><span class="kw">c</span>(ind, <span class="kw">rep</span>(i, <span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb321-79" data-line-number="79">    }</a>
+<a class="sourceLine" id="cb321-80" data-line-number="80">    </a>
+<a class="sourceLine" id="cb321-81" data-line-number="81">    da2 &lt;-<span class="st"> </span><span class="kw">rbind</span>(da1[, <span class="dv">1</span><span class="op">:</span><span class="dv">240</span>], ind)</a>
+<a class="sourceLine" id="cb321-82" data-line-number="82">    da3 &lt;-<span class="st"> </span>da1[, <span class="dv">1</span><span class="op">:</span><span class="dv">240</span>]</a>
+<a class="sourceLine" id="cb321-83" data-line-number="83">    </a>
+<a class="sourceLine" id="cb321-84" data-line-number="84">    <span class="co"># save simulated data</span></a>
+<a class="sourceLine" id="cb321-85" data-line-number="85">    <span class="kw">write.csv</span>(da1, <span class="kw">paste</span>(<span class="st">&quot;sim&quot;</span>, j, <span class="st">&quot;_da&quot;</span>, <span class="dv">1</span>, <span class="st">&quot;.csv&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>), <span class="dt">row.names =</span> F)</a>
+<a class="sourceLine" id="cb321-86" data-line-number="86">    <span class="kw">write.csv</span>(da2, <span class="kw">paste</span>(<span class="st">&quot;sim&quot;</span>, j, <span class="st">&quot;_da&quot;</span>, <span class="dv">2</span>, <span class="st">&quot;.csv&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>), <span class="dt">row.names =</span> F)</a>
+<a class="sourceLine" id="cb321-87" data-line-number="87">    <span class="kw">write.csv</span>(da3, <span class="kw">paste</span>(<span class="st">&quot;sim&quot;</span>, j, <span class="st">&quot;_da&quot;</span>, <span class="dv">3</span>, <span class="st">&quot;.csv&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>), <span class="dt">row.names =</span> F)</a>
+<a class="sourceLine" id="cb321-88" data-line-number="88">    <span class="kw">write.csv</span>(sim.da1, <span class="kw">paste</span>(<span class="st">&quot;sim&quot;</span>, j, <span class="st">&quot;.csv&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>), <span class="dt">row.names =</span> F)</a>
+<a class="sourceLine" id="cb321-89" data-line-number="89">    <span class="kw">write.csv</span>(dummy.sim1, <span class="kw">paste</span>(<span class="st">&quot;dummy.sim&quot;</span>, j, <span class="st">&quot;.csv&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>), <span class="dt">row.names =</span> F)</a>
+<a class="sourceLine" id="cb321-90" data-line-number="90">}</a></code></pre></div>
 
 </div>
 <!-- </div> -->
