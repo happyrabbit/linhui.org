@@ -169,7 +169,7 @@
 
 \title{Introduction to Data Science}
 \author{Hui Lin and Ming Li}
-\date{2019-11-16}
+\date{2019-11-17}
 
 \begin{document}
 \maketitle
@@ -1289,8 +1289,8 @@ Now check the data frame we have:
 
 Refer to Appendix for the simulation code.
 
-\hypertarget{swine-disease-breakout-data}{%
-\section{Swine Disease Breakout Data}\label{swine-disease-breakout-data}}
+\hypertarget{swinediseasedata}{%
+\section{Swine Disease Breakout Data}\label{swinediseasedata}}
 
 The swine disease data includes simulated 120 survey questions from 800 farms. There are three choices for each question. The outbreak status for the \(i^{th}\) farm is generated from a \(Bernoulli(1, p_i)\) distribution with \(p_i\) being a function of the question answers:
 
@@ -1317,7 +1317,7 @@ For each value of \(\gamma\), 20 data sets are simulated. The bigger \(\gamma\) 
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{disease_dat<-}\KeywordTok{read.csv}\NormalTok{(}\StringTok{"http://bit.ly/2KXb1Qi"}\NormalTok{)}
+\NormalTok{disease_dat <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"http://bit.ly/2KXb1Qi"}\NormalTok{)}
 \CommentTok{# only show the last 7 columns here}
 \KeywordTok{head}\NormalTok{(}\KeywordTok{subset}\NormalTok{(disease_dat,}\DataTypeTok{select=}\KeywordTok{c}\NormalTok{(}\StringTok{"Q118.A"}\NormalTok{,}\StringTok{"Q118.B"}\NormalTok{,}\StringTok{"Q119.A"}\NormalTok{,}
                                  \StringTok{"Q119.B"}\NormalTok{,}\StringTok{"Q120.A"}\NormalTok{,}\StringTok{"Q120.B"}\NormalTok{,}\StringTok{"y"}\NormalTok{))) }
@@ -1466,6 +1466,178 @@ For an R notebook, every cell by default will contain R scripts. But if we put \
 \section{Leverage Spark Using R Notebook}\label{leverage-spark-using-r-notebook}}
 
 R is a powerful tool for data analysis given the data can be fit into memory. Because of the memory bounded dataset limit, R itself cannot be used directly for big data analysis where the data is likely stored in Hadoop and Spark system. By leverage the \texttt{sparklyr} package created by RStudio, we can use Databricks' R notebook to analyze data stored in the Spark system. As the data are stored across different nodes, Spark enables parallel computation using the collection of memory and CPU across all nodes. The fundamental data element in the Spark system is called Spark DataFrames (SDF). In this section, we will illustrate how to use Databricks' R notebook for big data analysis on top of the Spark environment through \texttt{sparklyr} package.
+
+\textbf{Install pacakge}
+
+First, we need to install \texttt{sparklyr} package which enables the connection between master or local node to Spark cluster environments. As it will install more than 10 dependencies, it may take more than 10 minutes to finish. Be patient while it is installing! Once the installation finishes, load the \texttt{sparklyr} package as illustrated by the following code:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Install sparklyr}
+\ControlFlowTok{if}\NormalTok{ (}\OperatorTok{!}\KeywordTok{require}\NormalTok{(}\StringTok{"sparklyr"}\NormalTok{)) \{}
+\KeywordTok{install.packages}\NormalTok{(}\StringTok{"sparklyr"}\NormalTok{)}
+\NormalTok{\}}
+\CommentTok{# Load sparklyr package}
+\KeywordTok{library}\NormalTok{(sparklyr)}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Create a Spark Connection}
+
+Once the library is loaded, we need to create a Spark Connection to link the computing node (i.e.~local node) running the R notebook to the Spark environment. Here we use the \texttt{"databricks"} option for parameter \texttt{method} which is specific for databricks' cloud system. In other enterprise environments, please consult your administrator for details. The Spark Connection (i.e. \texttt{sc}) is the pipe to connect R notebook in the local node with the Spark Cluster. We can think of the R notebook is running on a local node that has its memory and CPU; the Spark system has a cluster of connected computation nodes, and the Spark Connection creates a mechanism to connect both systems. The Spark Connection can be established with:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# create a sparklyr connection}
+\NormalTok{sc <-}\StringTok{ }\KeywordTok{spark_connect}\NormalTok{(}\DataTypeTok{method =} \StringTok{"databricks"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+To simplify the learning process, let us use a very familiar small dataset: the iris dataset. It is part of the \texttt{dplyr} library and we can load that library to use the \texttt{iris} data frame. Now the \texttt{iris} dataset is still on the local node where the R notebook is running on. And we can check the first a few lines of the \texttt{iris} dataset using the code below:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(dplyr)}
+\KeywordTok{head}\NormalTok{(iris)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   Sepal.Length Sepal.Width Petal.Length Petal.Width
+## 1          5.1         3.5          1.4         0.2
+## 2          4.9         3.0          1.4         0.2
+## 3          4.7         3.2          1.3         0.2
+## 4          4.6         3.1          1.5         0.2
+## 5          5.0         3.6          1.4         0.2
+## 6          5.4         3.9          1.7         0.4
+##   Species
+## 1  setosa
+## 2  setosa
+## 3  setosa
+## 4  setosa
+## 5  setosa
+## 6  setosa
+\end{verbatim}
+
+\textbf{IMPORTANT - Copy Data to Spark Environment}
+
+In real applications, the data set may be massive and cannot fit in a single hard disk and most likely such data are already stored in the Spark system. If the data is already in Hadoop/Spark ecosystem in the form of SDF, we can create a local R object to link to the SDF by the \texttt{tbl()} function where \texttt{my\_sdf} is the SDF in the Spark system, and \texttt{my\_sdf\_tbl} is the R local object that referring to \texttt{my\_sdf}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{my_sdf_tbl <-}\StringTok{ }\KeywordTok{tbl}\NormalTok{(}\DataTypeTok{sc =}\NormalTok{ sc, my_sdf)}
+\end{Highlighting}
+\end{Shaded}
+
+As we just created a brand new Spark computing environment, there is no SDF in the system yet. We will need to copy a local dataset to the Spark environment. As we have already created the Spark Connection \texttt{sc}, it is easy to copy data to spark system using \texttt{sdf\_copy\_to()} function as below:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{iris_tbl <-}\StringTok{ }\KeywordTok{sdf_copy_to}\NormalTok{(}\DataTypeTok{sc =}\NormalTok{ sc, }\DataTypeTok{x =}\NormalTok{ iris, }\DataTypeTok{overwrite =}\NormalTok{ T)}
+\end{Highlighting}
+\end{Shaded}
+
+The above one-line code copies iris dataset from the local node to Spark cluster environment. ``\texttt{sc}'' is the Spark Connection we just created; ``\textbf{x}'' is the data frame that we want to copy; ``\texttt{overwrite}'' is the option whether we want to overwrite the target object if the same name SDF exists in the Spark environment. Finally, \texttt{sdf\_copy\_to()} function will return an R object representing the copied SDF (i.e.~creating a ``pointer'' to the SDF such that we can refer \texttt{iris\_tbl} in the R notebook to operate \texttt{iris} SDF). Now \texttt{irir\_tbl} in the local R environment can be used to refer to the \texttt{iris} SDF in the Spark system.
+
+To check whether the \texttt{iris} data was copied to the Spark environment successfully or not, we can use \texttt{src\_tbls()} function to the Spark Connection (\texttt{sc}):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{## code to return all the data frames associated with sc}
+\KeywordTok{src_tbls}\NormalTok{(sc) }
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Analyzing the Data}
+
+Now we have successfully copied the \texttt{iris} dataset to the Spark environment as a SDF. This means that \texttt{iris\_tbl} is an R object representing the \texttt{iris} SDF and we can use \texttt{iris\_tbl} in R to refer the \texttt{iris} dataset in the Spark system (i.e.~the \texttt{iris} SDF). With the \texttt{sparklyr} packages, we can nearly all the functions in \texttt{dplyr} to Spark DataFrame directly through \texttt{iris\_tbl}, same as we are applying \texttt{dplyr} functions to a local R data frame in our laptop. For example, we can use the \texttt{\%\textgreater{}\%} operator to pass \texttt{iris\_tbl} to the \texttt{count()} function:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{iris_tbl }\OperatorTok{%>%}\StringTok{ }\NormalTok{count}
+\end{Highlighting}
+\end{Shaded}
+
+or using the \texttt{head()} function to return the first few rows in \texttt{iris\_tbl}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{head}\NormalTok{(iris_tbl)}
+\end{Highlighting}
+\end{Shaded}
+
+or applying more advanced data manipulation directly to \texttt{iris\_tbl}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{iris_tbl }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{Sepal_Width =} \KeywordTok{round}\NormalTok{(Sepal_Width }\OperatorTok{*}\StringTok{ }\DecValTok{2}\NormalTok{) }\OperatorTok{/}\StringTok{ }\DecValTok{2}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(Species, Sepal_Width) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summarize}\NormalTok{(}\DataTypeTok{count =} \KeywordTok{n}\NormalTok{(), }\DataTypeTok{Sepal_Length =} \KeywordTok{mean}\NormalTok{(Sepal_Length), }
+            \DataTypeTok{stdev =} \KeywordTok{sd}\NormalTok{(Sepal_Length))}
+\end{Highlighting}
+\end{Shaded}
+
+\textbf{Collect Results Back to Master Node}
+
+Even though we can run nearly all of the \texttt{dplyr} functions on SDF, we cannot apply functions from other packages directly to SDF (such as \texttt{ggplot()}). For functions that can only work on local R data frames, we must copy the SDF back to the local node as an R data frame. To copy SDF back to the local node, we use the \texttt{collect()} function. The following code using \texttt{collect()} will collect the results of a few operations and assign the collected data to \texttt{iris\_summary}, a local R data frame:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{iris_summary <-}\StringTok{ }\NormalTok{iris_tbl }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{Sepal_Width =} \KeywordTok{round}\NormalTok{(Sepal_Width }\OperatorTok{*}\StringTok{ }\DecValTok{2}\NormalTok{) }\OperatorTok{/}\StringTok{ }\DecValTok{2}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{group_by}\NormalTok{(Species, Sepal_Width) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{summarize}\NormalTok{(}\DataTypeTok{count =} \KeywordTok{n}\NormalTok{(), }
+              \DataTypeTok{Sepal_Length =} \KeywordTok{mean}\NormalTok{(Sepal_Length), }
+              \DataTypeTok{stdev =} \KeywordTok{sd}\NormalTok{(Sepal_Length)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{collect}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+Now, \texttt{iris\_summary} is a local R object to the R notebook and we can use any R packages and functions to it. In the following code, we will apply \texttt{ggplot()} to it, exactly the same as a stand along R console:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(ggplot2)}
+\KeywordTok{ggplot}\NormalTok{(iris_summary, }\KeywordTok{aes}\NormalTok{(Sepal_Width, Sepal_Length, }\DataTypeTok{color =}\NormalTok{ Species)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_line}\NormalTok{(}\DataTypeTok{size =} \FloatTok{1.2}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_errorbar}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{ymin =}\NormalTok{ Sepal_Length }\OperatorTok{-}\StringTok{ }\NormalTok{stdev, }
+                    \DataTypeTok{ymax =}\NormalTok{ Sepal_Length }\OperatorTok{+}\StringTok{ }\NormalTok{stdev), }\DataTypeTok{width =} \FloatTok{0.05}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_text}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{label =}\NormalTok{ count), }\DataTypeTok{vjust =} \FloatTok{-0.2}\NormalTok{, }\DataTypeTok{hjust =} \FloatTok{1.2}\NormalTok{, }\DataTypeTok{color =} \StringTok{"black"}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{legend.position=}\StringTok{"top"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+In most cases, the heavy-duty data preprocessing and aggregation is done in Spark using functions in ·dplyr·. Once the data is aggregated, the size is usually dramatically reduced and such reduced data can be collected to an R local object for downstream analysis.
+
+\textbf{Fit Regression to SDF}
+
+One of the advantages of the Spark system is the parallel machine learning algorithm. There are many statistical and machine learning algorithms developed to run in parallel across many CPUs with data across many memory units for SDF. In this example, we have already uploaded the \texttt{iris} data to the Spark system, and the data in the SDF can be referred through \texttt{iris\_tbl} as in the last section. The linear regression algorithm implemented in the Spark system can be called through \texttt{ml\_linear\_regression()} function. The syntax to call the function is to define the local R object that representing the SDF (i.e. \texttt{iris\_tbl} (local R object) for \texttt{iris} (SDF)), response variable (i.e.~the y variable in linear regression in the SDF) and features (i.e.~the x variables in linear regression in the SDF). Now, we can easily fit a linear regression for large dataset far beyond the memory limit of one single computer, and it is truly scalable and only constrained by the resource of the Spark cluster. Below is an illustration of how to fit a linear regression to SDF using R notebook:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fit1 <-}\StringTok{ }\KeywordTok{ml_linear_regression}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ iris_tbl, }\DataTypeTok{response =} \StringTok{"Sepal_Length"}\NormalTok{,}
+        \DataTypeTok{features =} \KeywordTok{c}\NormalTok{(}\StringTok{"Sepal_Width"}\NormalTok{, }\StringTok{"Petal_Length"}\NormalTok{, }\StringTok{"Petal_Width"}\NormalTok{))}
+\KeywordTok{summary}\NormalTok{(fit1)}
+\end{Highlighting}
+\end{Shaded}
+
+In the above code, \texttt{x} is the R object pointing to the SDF; \texttt{response} is y-variable, \texttt{features} are the collection of explanatory variables. For this function, both the data and computation are in the Spark cluster which leverages multiple CPUs, distributed memories and parallel computing.
+
+\textbf{Fit a K-means Cluster}
+
+Through the \texttt{sparklyr} package, we can use an R notebook to access many Spark Machine Learning Library (MLlib) algorithms such as Linear Regression, Logistic Regression, Survival Regression, Generalized Linear Regression, Decision Trees, Random Forests, Gradient-Boosted Trees, Principal Components Analysis, Naive-Bayes, K-Means Clustering, and a few other methods. Below codes fit a k-means cluster algorithm:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{## Now fit a k-means clustering using iris_tbl data}
+\CommentTok{## with only two out of four features in iris_tbl}
+\NormalTok{fit2 <-}\StringTok{ }\KeywordTok{ml_kmeans}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ iris_tbl, }\DataTypeTok{centers =} \DecValTok{3}\NormalTok{,}
+                    \DataTypeTok{features =} \KeywordTok{c}\NormalTok{(}\StringTok{"Petal_Length"}\NormalTok{, }\StringTok{"Petal_Width"}\NormalTok{))}
+\CommentTok{# print our model fit}
+\KeywordTok{print}\NormalTok{(fit2)}
+\end{Highlighting}
+\end{Shaded}
 
 \hypertarget{data-pre-processing}{%
 \chapter{Data Pre-processing}\label{data-pre-processing}}
@@ -1816,7 +1988,7 @@ Skewness=0 means that the destribution is symmetric, i.e.~the probability of fal
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-9-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-10-1.pdf}
 
 There are different ways may help to remove skewness such as log, square root or inverse. However, it is often difficult to determine from plots which transformation is most appropriate for correcting skewness. The Box-Cox procedure automatically identified a transformation from the family of power transformations that are indexed by a parameter \(\lambda\)\citep{BOXCOX1}.
 
@@ -1888,7 +2060,7 @@ The last line of the output shows the estimates of \(\lambda\) for each variable
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-11-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-12-1.pdf}
 
 Before the transformation, the \texttt{stroe\_trans} is skewed right.
 \texttt{BoxCoxTrans\ ()} can also conduct Box-Cox transform. But note that \texttt{BoxCoxTrans\ ()} can only be applied to a single variable, and it is not possible to transform difference columns in a data frame at the same time.
@@ -1944,7 +2116,7 @@ Even under certain assumptions we can statistically define outliers, it can be h
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-14-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-15-1.pdf}
 
 It is also easy to observe the pair relationship from the plot. \texttt{age} is negatively correlated with \texttt{online\_trans} but positively correlated with \texttt{store\_trans}. It seems that older people tend to purchase from the local store. The amount of expense is positively correlated with income. Scatterplot matrix like this can reveal lots of information before modeling.
 
@@ -2008,7 +2180,7 @@ Function \texttt{spatialSign()} \texttt{caret} package can conduct the transform
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-16-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-17-1.pdf}
 
 Some readers may have found that the above code does not seem to standardize the data before transformation. Recall the introduction of KNN, \texttt{preProcess()} with \texttt{method="knnImpute"} by default will standardize data.
 
@@ -2034,7 +2206,7 @@ It is probably the technical term known by the most un-technical people. When tw
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-17-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-18-1.pdf}
 
 The closer the correlation is to 0, the lighter the color is and the closer the shape is to a circle. The elliptical means the correlation is not equal to 0 (because we set the \texttt{upper\ =\ "ellipse"}), the greater the correlation, the narrower the ellipse. Blue represents a positive correlation; red represents a negative correlation. The direction of the ellipse also changes with the correlation. The correlation coefficient is shown in the lower triangle of the matrix.
 
@@ -4037,7 +4209,7 @@ The resulting plot (Fig. \ref{fig:linearvar}) indicates the smoothing method fit
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-66-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-67-1.pdf}
 
 The fitted lines (blue) change over different samples which means it has high variance. People also call it overfitting. Fitting the linear model using the same four subsets, the result barely changes:
 
@@ -4055,7 +4227,7 @@ The fitted lines (blue) change over different samples which means it has high va
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-67-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-68-1.pdf}
 
 In general, the variance (\(Var(\hat{f}(\mathbf{X}))\)) \textbf{increases} and the bias (\(Bias(\hat{f}(\mathbf{X}))\)) \textbf{decreases} as the model flexibility increases. Variance and bias together determine the systematic error. As we increase the flexibility of the model, at first the rate at which \(Bias(\hat{f}(\mathbf{X}))\) decreases is faster than \(Var (\hat{f} (\mathbf{X}))\), so the MSE decreases. However, to some degree, higher flexibility has little effect on \(Bias(\hat{f}(\mathbf{X}))\) but \(Var(\hat{f} (\mathbf{X}))\) increases significantly, so the MSE increases.
 
@@ -5206,7 +5378,7 @@ The object glmfit returned by glmnet() has the information of the fitted model f
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-99-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-100-1.pdf}
 
 Each curve in the plot represents one predictor. The default setting is \(\alpha=1\) which means there is only lasso penalty. From left to right, \(L_I\) norm is increasing which means \(\lambda\) is decreasing. The bottom x-axis is \(L_1\) norm (i.e. \(\parallel\mathbf{\beta}\parallel_{1}\)). The upper x-axis is the effective degrees of freedom (df) for the lasso. You can check the detail for every step by:
 
@@ -5254,6 +5426,139 @@ The first column \texttt{Df} is the degree of freedom (i.e.~the number of non-ze
 ## Q8             .  
 ## Q9             .  
 ## Q10            .
+\end{verbatim}
+
+When \(\lambda=1200\), there are three coefficients with non-zero estimates(\texttt{Q1}, \texttt{Q2} and \texttt{Q3}). You can apply models with different values of tuning parameter to new data using \texttt{predict()}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{newdat =}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\KeywordTok{sample}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{9}\NormalTok{, }\DecValTok{30}\NormalTok{, }\DataTypeTok{replace =}\NormalTok{ T), }\DataTypeTok{nrow =} \DecValTok{3}\NormalTok{)}
+\KeywordTok{predict}\NormalTok{(glmfit, newdat, }\DataTypeTok{s =} \KeywordTok{c}\NormalTok{(}\DecValTok{1741}\NormalTok{, }\DecValTok{2000}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##         1    2
+## [1,] 6004 5968
+## [2,] 7101 6674
+## [3,] 9158 8411
+\end{verbatim}
+
+Each column corresponds to a value of \(\lambda\). To tune the value of \(\lambda\), we can easily use \texttt{cv.glmnet()} function to do cross-validation.\texttt{cv.glmnet()} returns the cross-validation results as a list object. We store the object in \texttt{cvfit} and use it for further operations.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cvfit =}\StringTok{ }\KeywordTok{cv.glmnet}\NormalTok{(}\KeywordTok{as.matrix}\NormalTok{(trainx), trainy)}
+\end{Highlighting}
+\end{Shaded}
+
+We can plot the object using \texttt{plot()}. The red dotted line is the cross-validation curve. Each red point is the cross-validation mean squared error for a value of \(\lambda\). The grey bars around the red points indicate the upper and lower standard deviation. The two gray dotted vertical lines represent the two selected values of \(\lambda\), one gives the minimum mean cross-validated error (\texttt{lambda.min}), the other gives the error that is within one standard error of the minimum (\texttt{lambda.1se}).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plot}\NormalTok{(cvfit)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-104-1.pdf}
+
+You can check the two selected \(\lambda\) values by:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# lambda with minimum mean cross-validated error}
+\NormalTok{cvfit}\OperatorTok{$}\NormalTok{lambda.min}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 12.57
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# lambda with one standard error of the minimum}
+\NormalTok{cvfit}\OperatorTok{$}\NormalTok{lambda}\FloatTok{.1}\NormalTok{se}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1200
+\end{verbatim}
+
+You can look at the coefficient estimates for different \(\lambda\) by:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# coefficient estimates for model with the error }
+\CommentTok{# that is within one standard error of the minimum}
+\KeywordTok{coef}\NormalTok{(cvfit, }\DataTypeTok{s =} \StringTok{"lambda.1se"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 11 x 1 sparse Matrix of class "dgCMatrix"
+##                  1
+## (Intercept) 2255.3
+## Q1          -391.1
+## Q2           653.7
+## Q3           624.5
+## Q4             .  
+## Q5             .  
+## Q6             .  
+## Q7             .  
+## Q8             .  
+## Q9             .  
+## Q10            .
+\end{verbatim}
+
+\hypertarget{penalized-logistic-regression}{%
+\subsection{Penalized logistic regression}\label{penalized-logistic-regression}}
+
+\hypertarget{multivariate-logistic-regression-model}{%
+\subsubsection{Multivariate logistic regression model}\label{multivariate-logistic-regression-model}}
+
+Logistic regression is a traditional statistical method for a two-category classification problem. It is simple yet useful. Here we use the swine disease breakout data as an example to illustrate the learning method and code implementation. Refer to section \ref{swinediseasedata} for more details about the dataset. The goal is to predict if a farm will have a swine disease outbreak (i.e build a risk scoring system).
+
+Consider risk scoring system construction using a sample of \(n\) observations, with information collected for \(G\) categorical predictors and one binary response variable for each observation. The predictors are 120 survey questions (i.e.~G=120). There were three possible answers for each question (A, B and C). So each predictor is encoded to two dummy variables (we consider C as the baseline.). Let \(\mathbf{x_{i,g}}\) be the vector of dummy variables associated with the \(g^{th}\) categorical predictor for the \(i^{th}\) observation, where \(i=1,\cdots,n\), \(g=1,\cdots,G\). For example, if the first farm chooses B for question 2, then the corresponding observation is \(\mathbf{x_{12}}=(0,1)^{T}\). Each question has a degree of freedom of 2.
+
+We denote the degrees of freedom of the \(g^{th}\) predictor by \(df_g\), which is also the length of vector \(\mathbf{x_{i,g}}\). Let \(y_i\) (= 1, diseased; or 0, not diseased) be the binary response for the \(i\)th observation. Denote the probability
+of disease for \(i\)th subject by \(\theta_i\), the model can be formulated as:
+
+\[y_{i}\sim Bounoulli(\theta_{i})\]
+
+\[log\left(\frac{\theta_{i}}{1-\theta_{i}}\right)=\eta_{\mathbf{\beta}}(x_{i})=\beta_{0}+\sum_{g=1}^{G}\mathbf{x_{i,g}}^{T}\mathbf{\mathbf{\beta_{g}}}\]
+
+where \(\beta_{0}\) is the intercept and \(\mathbf{\beta_{g}}\) is the parameter vector corresponding to the \(g^{th}\) predictor. As we mentioned, here \(\mathbf{\beta_{g}}\) has length 2.
+
+Traditional estimation of logistic
+parameters \(\mathbf{\beta}=(\beta_{0}^{T},\mathbf{\beta_{1}}^{T},\mathbf{\beta_{2}}^{T},...,\mathbf{\beta_{G}}^{T})^{T}\) is done through maximizing the log-likelihood
+
+\begin{eqnarray*}
+l(\mathbf{\beta})&=&log[\prod_{i=1}^{n}\theta_{i}^{y_{i}}(1-\theta_{i})^{1-y_{i}}]\\
+&=&\sum_{i=1}^{n}\{y_{i}log(\theta_{i})+(1-y_{i})log(1-\theta_{i})\}\\
+&=&\sum_{i=1}^{n}\{\ y_{i}\eta_{\mathbf{\beta}}(\mathbf{x_{i}})-log[1+exp(\eta_{\mathbf{\beta}}(\mathbf{x_{i}}))]\ \}
+\label{eq:logisticlikelihood}
+\end{eqnarray*}
+
+For logistic regression analysis with a large number of explanatory variables, complete- or quasi-complete-separation may result which makes
+the maximum likelihood estimation unstable \citep{Wed1976}, \citep{albert1984}. For example:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(MASS)}
+\NormalTok{dat <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"http://bit.ly/2KXb1Qi"}\NormalTok{)}
+\NormalTok{fit <-}\StringTok{ }\KeywordTok{glm}\NormalTok{(y}\OperatorTok{~}\NormalTok{., dat, }\DataTypeTok{family =} \StringTok{"binomial"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: glm.fit: algorithm did not converge
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: glm.fit: fitted probabilities numerically 0 or
+## 1 occurred
 \end{verbatim}
 
 \hypertarget{tree-based-methods}{%
@@ -5346,7 +5651,7 @@ The Gini impurity for the 50 samples in the parent node is \(\frac{1}{2}\). It i
 
 \textbf{Information gain}
 
-Looking at the samples in the following three nodes, which one is the easiest to describe? It is obviously C. Because all the samples in C are of the same type, so the description requires the least amount of information. On the contrary, B needs more information, and A needs the most information. In other words, C has the highest purity, B is the second, and A has the lowest purity. We need less information to describe nodes with lower purity.
+Looking at the samples in the following three nodes, which one is the easiest to describe? It is obviously C. Because all the samples in C are of the same type, so the description requires the least amount of information. On the contrary, B needs more information, and A needs the most information. In other words, C has the highest purity, B is the second, and A has the lowest purity. We need less information to describe nodes with higher purity.
 
 \includegraphics{images/InfoGainEN.PNG}
 
@@ -5617,7 +5922,7 @@ A more convenient way is to use \texttt{train()} function in \texttt{caret} pack
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-104-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-111-1.pdf}
 
 RMSE doesn't change much when the maximum is larger than 2. So we set the maximum depth to be 2 and refit the model:
 
@@ -5658,7 +5963,7 @@ You can see that the final model picks \texttt{Q3} and \texttt{Q5} to predict to
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-107-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-114-1.pdf}
 
 \hypertarget{decision-tree}{%
 \subsection{Decision Tree}\label{decision-tree}}
@@ -5798,7 +6103,7 @@ Compare the results of the two approaches.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-111-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-118-1.pdf}
 
 You can see that in this case, the two approaches lead to similar model performance.
 
@@ -6058,7 +6363,7 @@ You can use varImpPlot() function to visualize the predictor importance:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-119-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-126-1.pdf}
 It is easy to see from the plot that \texttt{segment} and \texttt{Q4} are the top two variables to classify gender.
 
 \hypertarget{gradient-boosted-machine}{%
@@ -6284,7 +6589,7 @@ Now, let's compare the results from the three tree models.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-122-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-129-1.pdf}
 
 Since the data here doesn't have many variables, we don't see a significant difference among the models. But you can still see those ensemble methods are better than a single tree. In most of the real applications, ensemble methods perform much better. Random forest and boosting trees can be a baseline model. Before exploring different models, you can quickly run a random forest to see the performance and then try to improve that performance. If the performance you got from the random forest is not too much better than guessing, you should consider collecting more data or reviewing the problem to frame it a different way instead of trying other models. Because it usually means the current data is not enough to solve the problem.
 
@@ -6838,8 +7143,8 @@ So far we have created part of the data. You can check it using \texttt{summary(
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{swine-disease-breakout-data-1}{%
-\section{Swine Disease Breakout Data}\label{swine-disease-breakout-data-1}}
+\hypertarget{swine-disease-breakout-data}{%
+\section{Swine Disease Breakout Data}\label{swine-disease-breakout-data}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
