@@ -323,7 +323,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb271-9" data-line-number="9">glmfit =<span class="st"> </span><span class="kw">glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy)</a></code></pre></div>
 <p>The object glmfit returned by glmnet() has the information of the fitted model for the later operations. An easy way to extract the components is through various functions on glmfit, such as plot(), print(), coef() and predict() . For example, the following code visualizes the path of coefficients as penalty increases:</p>
 <div class="sourceCode" id="cb272"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb272-1" data-line-number="1"><span class="kw">plot</span>(glmfit, <span class="dt">label =</span> T)</a></code></pre></div>
-<p><img src="IDS_files/figure-html/unnamed-chunk-100-1.svg" width="672" /></p>
+<p><img src="IDS_files/figure-html/unnamed-chunk-106-1.svg" width="672" /></p>
 <p>Each curve in the plot represents one predictor. The default setting is <span class="math inline">\(\alpha=1\)</span> which means there is only lasso penalty. From left to right, <span class="math inline">\(L_I\)</span> norm is increasing which means <span class="math inline">\(\lambda\)</span> is decreasing. The bottom x-axis is <span class="math inline">\(L_1\)</span> norm (i.e. <span class="math inline">\(\parallel\mathbf{\beta}\parallel_{1}\)</span>). The upper x-axis is the effective degrees of freedom (df) for the lasso. You can check the detail for every step by:</p>
 <div class="sourceCode" id="cb273"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb273-1" data-line-number="1"><span class="kw">print</span>(glmfit)</a></code></pre></div>
 <pre class="pre"><code>Call:  glmnet(x = as.matrix(trainx), y = trainy) 
@@ -347,6 +347,42 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## Q1          -390.9
 ## Q2           653.6
 ## Q3           624.4
+## Q4             .  
+## Q5             .  
+## Q6             .  
+## Q7             .  
+## Q8             .  
+## Q9             .  
+## Q10            .</code></pre>
+<p>When <span class="math inline">\(\lambda=1200\)</span>, there are three coefficients with non-zero estimates(<code>Q1</code>, <code>Q2</code> and <code>Q3</code>). You can apply models with different values of tuning parameter to new data using <code>predict()</code>:</p>
+<div class="sourceCode" id="cb277"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb277-1" data-line-number="1">newdat =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>, <span class="dv">30</span>, <span class="dt">replace =</span> T), <span class="dt">nrow =</span> <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb277-2" data-line-number="2"><span class="kw">predict</span>(glmfit, newdat, <span class="dt">s =</span> <span class="kw">c</span>(<span class="dv">1741</span>, <span class="dv">2000</span>))</a></code></pre></div>
+<pre><code>##         1    2
+## [1,] 6004 5968
+## [2,] 7101 6674
+## [3,] 9158 8411</code></pre>
+<p>Each column corresponds to a value of <span class="math inline">\(\lambda\)</span>. To tune the value of <span class="math inline">\(\lambda\)</span>, we can easily use <code>cv.glmnet()</code> function to do cross-validation.<code>cv.glmnet()</code> returns the cross-validation results as a list object. We store the object in <code>cvfit</code> and use it for further operations.</p>
+<div class="sourceCode" id="cb279"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb279-1" data-line-number="1">cvfit =<span class="st"> </span><span class="kw">cv.glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy)</a></code></pre></div>
+<p>We can plot the object using <code>plot()</code>. The red dotted line is the cross-validation curve. Each red point is the cross-validation mean squared error for a value of <span class="math inline">\(\lambda\)</span>. The grey bars around the red points indicate the upper and lower standard deviation. The two gray dotted vertical lines represent the two selected values of <span class="math inline">\(\lambda\)</span>, one gives the minimum mean cross-validated error (<code>lambda.min</code>), the other gives the error that is within one standard error of the minimum (<code>lambda.1se</code>).</p>
+<div class="sourceCode" id="cb280"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb280-1" data-line-number="1"><span class="kw">plot</span>(cvfit)</a></code></pre></div>
+<p><img src="IDS_files/figure-html/unnamed-chunk-110-1.svg" width="672" /></p>
+<p>You can check the two selected <span class="math inline">\(\lambda\)</span> values by:</p>
+<div class="sourceCode" id="cb281"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb281-1" data-line-number="1"><span class="co"># lambda with minimum mean cross-validated error</span></a>
+<a class="sourceLine" id="cb281-2" data-line-number="2">cvfit<span class="op">$</span>lambda.min</a></code></pre></div>
+<pre><code>## [1] 12.57</code></pre>
+<div class="sourceCode" id="cb283"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb283-1" data-line-number="1"><span class="co"># lambda with one standard error of the minimum</span></a>
+<a class="sourceLine" id="cb283-2" data-line-number="2">cvfit<span class="op">$</span>lambda<span class="fl">.1</span>se</a></code></pre></div>
+<pre><code>## [1] 1200</code></pre>
+<p>You can look at the coefficient estimates for different <span class="math inline">\(\lambda\)</span> by:</p>
+<div class="sourceCode" id="cb285"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb285-1" data-line-number="1"><span class="co"># coefficient estimates for model with the error </span></a>
+<a class="sourceLine" id="cb285-2" data-line-number="2"><span class="co"># that is within one standard error of the minimum</span></a>
+<a class="sourceLine" id="cb285-3" data-line-number="3"><span class="kw">coef</span>(cvfit, <span class="dt">s =</span> <span class="st">&quot;lambda.1se&quot;</span>)</a></code></pre></div>
+<pre><code>## 11 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
+##                  1
+## (Intercept) 2255.3
+## Q1          -391.1
+## Q2           653.7
+## Q3           624.5
 ## Q4             .  
 ## Q5             .  
 ## Q6             .  
