@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2019-11-17" />
+<meta name="date" content="2019-11-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -385,6 +385,34 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb20-4" data-line-number="4">                    <span class="dt">features =</span> <span class="kw">c</span>(<span class="st">&quot;Petal_Length&quot;</span>, <span class="st">&quot;Petal_Width&quot;</span>))</a>
 <a class="sourceLine" id="cb20-5" data-line-number="5"><span class="co"># print our model fit</span></a>
 <a class="sourceLine" id="cb20-6" data-line-number="6"><span class="kw">print</span>(fit2)</a></code></pre></div>
+<p>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+After fitting the k-means model, we can apply the model to predict other datasets through <code>sdf_predict()</code> function. Following code applies the model to <code>iris_tbl</code> again to predict the cluster and collect the results as a local R object (i.e. <code>prediction</code>) using <code>collect()</code> function:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1">prediction =<span class="st"> </span><span class="kw">collect</span>(<span class="kw">sdf_predict</span>(fit2, iris_tbl))</a></code></pre></div>
+<p>As <code>prediction</code> is a local R object, we can apply any R functions from any libraries to it. For example:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1">prediction <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb22-2" data-line-number="2"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(Petal_Length, Petal_Width)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb22-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(Petal_Width, Petal_Length, </a>
+<a class="sourceLine" id="cb22-4" data-line-number="4">                 <span class="dt">col =</span> <span class="kw">factor</span>(prediction <span class="op">+</span><span class="st"> </span><span class="dv">1</span>)),</a>
+<a class="sourceLine" id="cb22-5" data-line-number="5">             <span class="dt">size =</span> <span class="dv">2</span>, <span class="dt">alpha =</span> <span class="fl">0.5</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb22-6" data-line-number="6"><span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">data =</span> fit2<span class="op">$</span>centers, <span class="kw">aes</span>(Petal_Width, Petal_Length),</a>
+<a class="sourceLine" id="cb22-7" data-line-number="7">             <span class="dt">col =</span> scales<span class="op">::</span><span class="kw">muted</span>(<span class="kw">c</span>(<span class="st">&quot;red&quot;</span>, <span class="st">&quot;green&quot;</span>, <span class="st">&quot;blue&quot;</span>)),</a>
+<a class="sourceLine" id="cb22-8" data-line-number="8">             <span class="dt">pch =</span> <span class="st">&#39;x&#39;</span>, <span class="dt">size =</span> <span class="dv">12</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb22-9" data-line-number="9"><span class="st">  </span><span class="kw">scale_color_discrete</span>(<span class="dt">name =</span> <span class="st">&quot;Predicted Cluster&quot;</span>,</a>
+<a class="sourceLine" id="cb22-10" data-line-number="10">                       <span class="dt">labels =</span> <span class="kw">paste</span>(<span class="st">&quot;Cluster&quot;</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>)) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb22-11" data-line-number="11"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Petal Length&quot;</span>, </a>
+<a class="sourceLine" id="cb22-12" data-line-number="12">       <span class="dt">y =</span> <span class="st">&quot;Petal Width&quot;</span>, </a>
+<a class="sourceLine" id="cb22-13" data-line-number="13">       <span class="dt">title =</span> <span class="st">&quot;K-Means Clustering&quot;</span>,</a>
+<a class="sourceLine" id="cb22-14" data-line-number="14">       <span class="dt">subtitle =</span> <span class="st">&quot;Use Spark ML to predict cluster </span></a>
+<a class="sourceLine" id="cb22-15" data-line-number="15"><span class="st">       membership with the iris dataset&quot;</span>)</a></code></pre></div>
+<p>So far, we have illustrated</p>
+<ol style="list-style-type: decimal">
+<li>the relationship between a local node (i.e. where R notebook is running) and Spark Clusters (i..e where data are stored and computation are done);</li>
+<li>how to copy a local data frame to a Spark DataFrames (please note if your data is already in Spark environment, there is no need to copy and we only need to build the connection. This is likely to be the case for enterprise environment);</li>
+<li>how to manipulate Spark DataFrames for data cleaning and preprocessing through <code>dplyr</code> functions with the installation of <code>sparklyr</code> package;</li>
+<li>how to fit statistical and machine learning models to Spark DataFrame in a truly parallel manner;</li>
+<li>how to collect information from Spark DataFrames back to a local R object (i.e. local R data frame) for future analysis.</li>
+</ol>
+<p>These procedures cover the basics of big data analysis that a data scientist needs to know as a beginner. We have an R notebook on the book website that contains the contents of this chapter. We also have a Python notebook on the book website.</p>
 
 </div>
 <!-- </div> -->

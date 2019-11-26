@@ -169,7 +169,7 @@
 
 \title{Introduction to Data Science}
 \author{Hui Lin and Ming Li}
-\date{2019-11-17}
+\date{2019-11-26}
 
 \begin{document}
 \maketitle
@@ -1358,7 +1358,7 @@ The IMDB dataset (\url{http://ai.stanford.edu/~amaas/data/sentiment/}) is a popu
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
-  Convert text data into numerical data. Machine learning models cannot work with raw text data directly, and we have to convert text into numbers. There are many different ways for the conversion and Keras' build-in function uses each word's rank of frequency in the entire training dataset to replace the raw text in both the training and testing dataset. For example, the 10th most frequent word is replaced by integer 10. There are a few additional setups for this process, including:~
+  Convert text data into numerical data. Machine learning models cannot work with raw text data directly, and we have to convert text into numbers. There are many different ways for the conversion and Keras' build-in function uses each word's rank of frequency in the entire training dataset to replace the raw text in both the training and testing dataset. For example, the 10th most frequent word is replaced by integer 10. There are a few additional setups for this process, including:
 
   \begin{enumerate}
   \def\labelenumii{\alph{enumii}.}
@@ -1366,10 +1366,10 @@ The IMDB dataset (\url{http://ai.stanford.edu/~amaas/data/sentiment/}) is a popu
   \item
     Skip top frequent words. We usually skip a few top frequent words as they are mainly stopwords like ``the'' ``and'' or ``a,'' which usually do not provide much information. There is a parameter in the build-in function to specify how many top words to skip.\\
   \item
-    Set the maximum number of unique words. The entire vocabulary of the unique words in the training dataset may be large, and many of them have very low frequencies such as just appearing once in the entire training dataset.~To keep the size of the vocabulary, we can also set up the maximum number of the unique words using Keras' built-in function such that any words with least frequencies will be replaced with a special index such as ``2''.~
+    Set the maximum number of unique words. The entire vocabulary of the unique words in the training dataset may be large, and many of them have very low frequencies such as just appearing once in the entire training dataset.~To keep the size of the vocabulary, we can also set up the maximum number of the unique words using Keras' built-in function such that any words with least frequencies will be replaced with a special index such as ``2''.
   \end{enumerate}
 \item
-  Padding or truncation to keep all the reviews to be the same length. For most machine learning models, the algorithms expect to see the same number of features (i.e., same number of input columns in the data frame). There is a parameter in the Keras build-in function to set the maximum number of words in each review (i.e., max\_length). For reviews that have less than max\_legth words, we pad them with ``0''. For reviews that have more than max\_length words, we truncate them.~
+  Padding or truncation to keep all the reviews to be the same length. For most machine learning models, the algorithms expect to see the same number of features (i.e., same number of input columns in the data frame). There is a parameter in the Keras build-in function to set the maximum number of words in each review (i.e., max\_length). For reviews that have less than max\_legth words, we pad them with ``0''. For reviews that have more than max\_length words, we truncate them.
 \end{enumerate}
 
 After the above pre-processing, each review is represented by one row in the data frame. There is one column for the binary positive/negative sentiment, and max\_length columns input features converted from the raw review text. In the corresponding R and Python notebooks, we will go over the details of the data pre-processing using Keras' built-in functions.
@@ -1638,6 +1638,56 @@ Through the \texttt{sparklyr} package, we can use an R notebook to access many S
 \KeywordTok{print}\NormalTok{(fit2)}
 \end{Highlighting}
 \end{Shaded}
+
+\textless{}\textless{}\textless{}\textless{}\textless{}\textless{}\textless{} HEAD
+After fitting the k-means model, we can apply the model to predict other datasets through \texttt{sdf\_predict()} function. Following code applies the model to \texttt{iris\_tbl} again to predict the cluster and collect the results as a local R object (i.e. \texttt{prediction}) using \texttt{collect()} function:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{prediction =}\StringTok{ }\KeywordTok{collect}\NormalTok{(}\KeywordTok{sdf_predict}\NormalTok{(fit2, iris_tbl))}
+\end{Highlighting}
+\end{Shaded}
+
+As \texttt{prediction} is a local R object, we can apply any R functions from any libraries to it. For example:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{prediction }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{ggplot}\NormalTok{(}\KeywordTok{aes}\NormalTok{(Petal_Length, Petal_Width)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{(}\KeywordTok{aes}\NormalTok{(Petal_Width, Petal_Length, }
+                 \DataTypeTok{col =} \KeywordTok{factor}\NormalTok{(prediction }\OperatorTok{+}\StringTok{ }\DecValTok{1}\NormalTok{)),}
+             \DataTypeTok{size =} \DecValTok{2}\NormalTok{, }\DataTypeTok{alpha =} \FloatTok{0.5}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ fit2}\OperatorTok{$}\NormalTok{centers, }\KeywordTok{aes}\NormalTok{(Petal_Width, Petal_Length),}
+             \DataTypeTok{col =}\NormalTok{ scales}\OperatorTok{::}\KeywordTok{muted}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{"red"}\NormalTok{, }\StringTok{"green"}\NormalTok{, }\StringTok{"blue"}\NormalTok{)),}
+             \DataTypeTok{pch =} \StringTok{'x'}\NormalTok{, }\DataTypeTok{size =} \DecValTok{12}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{scale_color_discrete}\NormalTok{(}\DataTypeTok{name =} \StringTok{"Predicted Cluster"}\NormalTok{,}
+                       \DataTypeTok{labels =} \KeywordTok{paste}\NormalTok{(}\StringTok{"Cluster"}\NormalTok{, }\DecValTok{1}\OperatorTok{:}\DecValTok{3}\NormalTok{)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{labs}\NormalTok{(}\DataTypeTok{x =} \StringTok{"Petal Length"}\NormalTok{, }
+       \DataTypeTok{y =} \StringTok{"Petal Width"}\NormalTok{, }
+       \DataTypeTok{title =} \StringTok{"K-Means Clustering"}\NormalTok{,}
+       \DataTypeTok{subtitle =} \StringTok{"Use Spark ML to predict cluster }
+\StringTok{       membership with the iris dataset"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+So far, we have illustrated
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  the relationship between a local node (i.e.~where R notebook is running) and Spark Clusters (i..e where data are stored and computation are done);
+\item
+  how to copy a local data frame to a Spark DataFrames (please note if your data is already in Spark environment, there is no need to copy and we only need to build the connection. This is likely to be the case for enterprise environment);
+\item
+  how to manipulate Spark DataFrames for data cleaning and preprocessing through \texttt{dplyr} functions with the installation of \texttt{sparklyr} package;
+\item
+  how to fit statistical and machine learning models to Spark DataFrame in a truly parallel manner;
+\item
+  how to collect information from Spark DataFrames back to a local R object (i.e.~local R data frame) for future analysis.
+\end{enumerate}
+
+These procedures cover the basics of big data analysis that a data scientist needs to know as a beginner. We have an R notebook on the book website that contains the contents of this chapter. We also have a Python notebook on the book website.
 
 \hypertarget{data-pre-processing}{%
 \chapter{Data Pre-processing}\label{data-pre-processing}}
@@ -5370,7 +5420,7 @@ The default family option in the function \texttt{glmnet()} is \texttt{gaussian}
 \end{Highlighting}
 \end{Shaded}
 
-The object glmfit returned by glmnet() has the information of the fitted model for the later operations. An easy way to extract the components is through various functions on glmfit, such as plot(), print(), coef() and predict() . For example, the following code visualizes the path of coefficients as penalty increases:
+The object \texttt{glmfit} returned by \texttt{glmnet()} has the information of the fitted model for the later operations. An easy way to extract the components is through various functions on \texttt{glmfit}, such as \texttt{plot()}, \texttt{print()}, \texttt{coef()} and \texttt{predict()} . For example, the following code visualizes the path of coefficients as penalty increases:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -5560,6 +5610,137 @@ the maximum likelihood estimation unstable \citep{Wed1976}, \citep{albert1984}. 
 ## Warning: glm.fit: fitted probabilities numerically 0 or
 ## 1 occurred
 \end{verbatim}
+
+There is an error saying ``\texttt{algorithm\ did\ not\ converge}''. It is because there is complete separation. It happens when there are a large number of explanatory variables which makes the estimation of the coefficients unstable. To stabilize the estimation of parameter coefficients, one popular approach is the lasso algorithm with \(L_1\) norm penalty proposed by Tibshirani\citep{Tibshirani1996}. Because the lasso algorithm can estimate some variable coefficients to be 0, it can also be used as a variable selection tool.
+
+\hypertarget{penalized-logistic-regression-1}{%
+\subsubsection{Penalized logistic regression}\label{penalized-logistic-regression-1}}
+
+Penalized logistic regression adds penalty to the likelihood function:
+
+\[
+\underset{\mathbf{\beta}\in \mathbb{R}^{p+1}}{min} -\sum_{i=1}^{n}\{\ y_{i}\eta_{\mathbf{\beta}}(\mathbf{x_{i}})-log[1+exp(\eta_{\mathbf{\beta}}(\mathbf{x_{i}}))]\ \}+\lambda [(1-\alpha) \parallel \mathbf{\beta}\parallel _{2}^{2}/2] + \alpha \parallel \mathbf{\beta}\parallel _{1} ]
+\]
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dat <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"http://bit.ly/2KXb1Qi"}\NormalTok{)}
+\NormalTok{trainx =}\StringTok{ }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{select}\NormalTok{(dat, }\OperatorTok{-}\NormalTok{y)}
+\NormalTok{trainy =}\StringTok{ }\NormalTok{dat}\OperatorTok{$}\NormalTok{y}
+\NormalTok{fit <-}\StringTok{ }\KeywordTok{glmnet}\NormalTok{(}\KeywordTok{as.matrix}\NormalTok{(trainx), trainy, }\DataTypeTok{family =} \StringTok{"binomial"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+The error message is gone when we use penalized regression. We can visualize the shrinking path of coefficients as penalty increases. The use of \texttt{predict()} function is a little different. For the generalized linear model, you can return different results by setting the \texttt{type} argument. The choices are:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{link}: return the link function value
+\item
+  \texttt{response}: return the probability
+\item
+  \texttt{class}: return the category (0/1)
+\item
+  \texttt{coefficients}: return the coefficient estimates
+\item
+  \texttt{nonzero}: return an indicator for non-zero estimates (i.e.~which variables are selected)
+\end{itemize}
+
+The default setting is to predict the probability of the second level of the response variable. For example, the second level of the response variable for \texttt{trainy} here is:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{levels}\NormalTok{(}\KeywordTok{as.factor}\NormalTok{(trainy))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "0" "1"
+\end{verbatim}
+
+The first column of the above output is the predicted link function value when \(\lambda=0.02833\). The second column of the output is the predicted link function when \(\lambda=0.0311\). Similarly, you can change the setting for \texttt{type} to produce different outputs. You can use the \texttt{cv.glmnet()} function to tune parameters. The parameter setting is nearly the same as before, the only difference is the setting of \texttt{type.measure}. Since the response is categorical, not continuous, we have different performance measurements. The most common settings of \texttt{type.measure} for classification are:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{class}: error rate
+\item
+  \texttt{auc}: it is the area under the ROC for the dichotomous problem
+  So the model is to predict the probability of outcome ``1''. Take a baby example of 3 observations and 2 values of \(\lambda\) to show the usage of \texttt{predict()} function:
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{newdat =}\StringTok{ }\KeywordTok{as.matrix}\NormalTok{(trainx[}\DecValTok{1}\OperatorTok{:}\DecValTok{3}\NormalTok{, ])}
+\KeywordTok{predict}\NormalTok{(fit, newdat, }\DataTypeTok{type =} \StringTok{"link"}\NormalTok{, }\DataTypeTok{s =} \KeywordTok{c}\NormalTok{(}\FloatTok{2.833e-02}\NormalTok{, }\FloatTok{3.110e-02}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##         1       2
+## 1  0.1943  0.1443
+## 2 -0.9913 -1.0077
+## 3 -0.5841 -0.5496
+\end{verbatim}
+
+For example:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cvfit =}\StringTok{ }\KeywordTok{cv.glmnet}\NormalTok{(}\KeywordTok{as.matrix}\NormalTok{(trainx), trainy, }\DataTypeTok{family =} \StringTok{"binomial"}\NormalTok{, }\DataTypeTok{type.measure =} \StringTok{"class"}\NormalTok{)}
+\KeywordTok{plot}\NormalTok{(cvfit)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-111-1.pdf}
+
+The above uses error rate as performance criteria and use 10-fold cross-validation. Similarly, you can get the \(\lambda\) value for the minimum error rate and the error rate that is 1 standard error from the minimum:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cvfit}\OperatorTok{$}\NormalTok{lambda.min}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 2.643e-05
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cvfit}\OperatorTok{$}\NormalTok{lambda}\FloatTok{.1}\NormalTok{se}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.003334
+\end{verbatim}
+
+You can use the same way to get the parameter estimates and make prediction.
+
+\hypertarget{group-lasso-logistic-regression}{%
+\subsubsection{Group lasso logistic regression}\label{group-lasso-logistic-regression}}
+
+For models with categorical survey questions (explanatory variables), however, the original lasso algorithm only selects individual dummy variables instead of sets of the dummy variables grouped by the question in the survey. Another disadvantage of applying lasso to grouped variables is that the estimates are affected by the way dummy variables are encoded. Thus the group lasso \citep{Yuan2007} method has been proposed to enable variable selection in linear regression models on groups of variables, instead of on single variables. For logistic regression models, the group lasso algorithm was first studied by Kim et al. \citep{Kim2006}. They proposed a gradient descent algorithm to solve the corresponding constrained problem, which does, however, depend on unknown constants. Meier et al. \citep{Meier2008} proposed a new algorithm that could work directly on the penalized problem and its convergence property does not depend on unknown constants. The algorithm is especially suitable for high-dimensional problems. It can also be applied to solve the corresponding convex optimization problem in generalized linear models. The group lasso estimator proposed by Meier et al. \citep{Meier2008} for logistic regression has been shown to be statistically consistent, even with a large number of categorical predictors.
+
+In this section, we illustrate how to use the logistic group lasso algorithm to construct risk scoring systems for predicting disease. Instead of maximizing the log-likelihood in the maximum likelihood method, the logistic group lasso estimates are calculated by minimizing the convex function:
+
+\[
+S_{\lambda}(\mathbf{\beta})=-l(\mathbf{\beta})+\lambda\sum_{g=1}^{G}s(df_{g})\parallel\mathbf{\beta_{g}}\parallel_{2}
+\]
+
+where \(\lambda\) is a tuning parameter for the penalty and \(s(\cdot)\) is a function to rescale the penalty. In lasso algorithms, the selection of \(\lambda\) is usually determined by cross-validation using data. For \(s(\cdot)\), we use the square root function \(s(df_g)=df_g^{0.5}\) as suggested in Meier et al.\citep{Meier2008}. It ensures the penalty is of the order of the number of parameters \(df_g\) as used in \citep{Yuan2007}.
+
+Here we consider selection of the tuning parameter \(\lambda\) from a multiplicative grid of 148 values \(\{0.96\lambda_{max},0.96^{2}\lambda_{max},0.96^{3}\lambda_{max},...,0.96^{148}\lambda_{max}\}\), as in Meier et al. \citep{Meier2008}. Here \(\lambda_{max}\) is defined as
+
+\begin{equation}
+\lambda_{max}=\underset{g\in\{1,...,G\}}{max}\left\{\frac{1}{s(df_{g})}\parallel \mathbf{x_{g}}^{T}(\mathbf{y}-\bar{\mathbf{y}} )\parallel_{2}\right\},
+\end{equation}
+
+such that when \(\lambda=\lambda_{max}\), only the intercept is
+in the model. When \(\lambda\) goes to \(0\), the model is equivalent to ordinary
+logistic regression.
 
 \hypertarget{tree-based-methods}{%
 \chapter{Tree-Based Methods}\label{tree-based-methods}}
@@ -5922,7 +6103,7 @@ A more convenient way is to use \texttt{train()} function in \texttt{caret} pack
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-111-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-116-1.pdf}
 
 RMSE doesn't change much when the maximum is larger than 2. So we set the maximum depth to be 2 and refit the model:
 
@@ -5963,7 +6144,7 @@ You can see that the final model picks \texttt{Q3} and \texttt{Q5} to predict to
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-114-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-119-1.pdf}
 
 \hypertarget{decision-tree}{%
 \subsection{Decision Tree}\label{decision-tree}}
@@ -6103,7 +6284,7 @@ Compare the results of the two approaches.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-118-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-123-1.pdf}
 
 You can see that in this case, the two approaches lead to similar model performance.
 
@@ -6363,7 +6544,7 @@ You can use varImpPlot() function to visualize the predictor importance:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-126-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-131-1.pdf}
 It is easy to see from the plot that \texttt{segment} and \texttt{Q4} are the top two variables to classify gender.
 
 \hypertarget{gradient-boosted-machine}{%
@@ -6589,7 +6770,7 @@ Now, let's compare the results from the three tree models.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-129-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-134-1.pdf}
 
 Since the data here doesn't have many variables, we don't see a significant difference among the models. But you can still see those ensemble methods are better than a single tree. In most of the real applications, ensemble methods perform much better. Random forest and boosting trees can be a baseline model. Before exploring different models, you can quickly run a random forest to see the performance and then try to improve that performance. If the performance you got from the random forest is not too much better than guessing, you should consider collecting more data or reviewing the problem to frame it a different way instead of trying other models. Because it usually means the current data is not enough to solve the problem.
 

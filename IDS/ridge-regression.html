@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2019-11-17" />
+<meta name="date" content="2019-11-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -312,35 +312,35 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 \end{equation}\]</span></p>
 <p>where <span class="math inline">\(\lambda &gt;0\)</span> is a tuning parameter. As with the least squares, ridge regression considers minimizing RSS. However, it adds a shrinkage penalty <span class="math inline">\(\lambda\Sigma_{j=1}^{p}\beta_{j}^{2}\)</span> that takes account of the number of parameters in the model. When <span class="math inline">\(\lambda = 0\)</span>, it is identical to least squares. As <span class="math inline">\(\lambda\)</span> gets larger, the coefficients start shrinking towards 0. When <span class="math inline">\(\lambda\rightarrow\infty\)</span>, the rest of the coefficients <span class="math inline">\(\beta_{1},...,\beta_{p}\)</span> are close to 0. Here, the penalty is not applied to <span class="math inline">\(\beta_{0}\)</span>. The tuning parameter <span class="math inline">\(\lambda\)</span> is used to adjust the impact of the two parts in equation <a href="ridge-regression.html#eq:ridge">(10.1)</a>. Every value of <span class="math inline">\(\lambda\)</span> corresponds to a set of parameter estimates.</p>
 <p>There are many R packages for ridge regression, such as lm.ridge() function from MASS, function enet() from, elasticnet. If you know the value of <span class="math inline">\(\lambda\)</span>, you can use either of the function to fit ridge regression. A more convenient way is to use train() function from caret. Let’s use the 10 survey questions to predict the total purchase amount (sum of online and store purchase).</p>
-<div class="sourceCode" id="cb247"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb247-1" data-line-number="1"><span class="co"># install packages from CRAN</span></a>
-<a class="sourceLine" id="cb247-2" data-line-number="2">p_needed &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;caret&#39;</span>, <span class="st">&#39;elasticnet&#39;</span>, <span class="st">&#39;glmnet&#39;</span>, <span class="st">&#39;devtools&#39;</span>)</a>
-<a class="sourceLine" id="cb247-3" data-line-number="3">packages &lt;-<span class="st"> </span><span class="kw">rownames</span>(<span class="kw">installed.packages</span>())</a>
-<a class="sourceLine" id="cb247-4" data-line-number="4">p_to_install &lt;-<span class="st"> </span>p_needed[<span class="op">!</span>(p_needed <span class="op">%in%</span><span class="st"> </span>packages)]</a>
-<a class="sourceLine" id="cb247-5" data-line-number="5"><span class="cf">if</span> (<span class="kw">length</span>(p_to_install) <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>) {</a>
-<a class="sourceLine" id="cb247-6" data-line-number="6">    <span class="kw">install.packages</span>(p_to_install)</a>
-<a class="sourceLine" id="cb247-7" data-line-number="7">}</a>
-<a class="sourceLine" id="cb247-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb247-9" data-line-number="9"><span class="kw">lapply</span>(p_needed, require, <span class="dt">character.only =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
-<div class="sourceCode" id="cb248"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb248-1" data-line-number="1">dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)</a>
-<a class="sourceLine" id="cb248-2" data-line-number="2"><span class="co"># data cleaning: delete wrong observations since expense can&#39;t be negative</span></a>
-<a class="sourceLine" id="cb248-3" data-line-number="3">dat &lt;-<span class="st"> </span><span class="kw">subset</span>(dat, store_exp <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span> <span class="op">&amp;</span><span class="st"> </span>online_exp <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</a>
-<a class="sourceLine" id="cb248-4" data-line-number="4"><span class="co"># get predictors</span></a>
-<a class="sourceLine" id="cb248-5" data-line-number="5">trainx &lt;-<span class="st"> </span>dat[ , <span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>, <span class="kw">names</span>(dat))]</a>
-<a class="sourceLine" id="cb248-6" data-line-number="6"><span class="co"># get response</span></a>
-<a class="sourceLine" id="cb248-7" data-line-number="7">trainy &lt;-<span class="st"> </span>dat<span class="op">$</span>store_exp <span class="op">+</span><span class="st"> </span>dat<span class="op">$</span>online_exp</a></code></pre></div>
+<div class="sourceCode" id="cb249"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb249-1" data-line-number="1"><span class="co"># install packages from CRAN</span></a>
+<a class="sourceLine" id="cb249-2" data-line-number="2">p_needed &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;caret&#39;</span>, <span class="st">&#39;elasticnet&#39;</span>, <span class="st">&#39;glmnet&#39;</span>, <span class="st">&#39;devtools&#39;</span>)</a>
+<a class="sourceLine" id="cb249-3" data-line-number="3">packages &lt;-<span class="st"> </span><span class="kw">rownames</span>(<span class="kw">installed.packages</span>())</a>
+<a class="sourceLine" id="cb249-4" data-line-number="4">p_to_install &lt;-<span class="st"> </span>p_needed[<span class="op">!</span>(p_needed <span class="op">%in%</span><span class="st"> </span>packages)]</a>
+<a class="sourceLine" id="cb249-5" data-line-number="5"><span class="cf">if</span> (<span class="kw">length</span>(p_to_install) <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>) {</a>
+<a class="sourceLine" id="cb249-6" data-line-number="6">    <span class="kw">install.packages</span>(p_to_install)</a>
+<a class="sourceLine" id="cb249-7" data-line-number="7">}</a>
+<a class="sourceLine" id="cb249-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb249-9" data-line-number="9"><span class="kw">lapply</span>(p_needed, require, <span class="dt">character.only =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb250"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb250-1" data-line-number="1">dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)</a>
+<a class="sourceLine" id="cb250-2" data-line-number="2"><span class="co"># data cleaning: delete wrong observations since expense can&#39;t be negative</span></a>
+<a class="sourceLine" id="cb250-3" data-line-number="3">dat &lt;-<span class="st"> </span><span class="kw">subset</span>(dat, store_exp <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span> <span class="op">&amp;</span><span class="st"> </span>online_exp <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb250-4" data-line-number="4"><span class="co"># get predictors</span></a>
+<a class="sourceLine" id="cb250-5" data-line-number="5">trainx &lt;-<span class="st"> </span>dat[ , <span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>, <span class="kw">names</span>(dat))]</a>
+<a class="sourceLine" id="cb250-6" data-line-number="6"><span class="co"># get response</span></a>
+<a class="sourceLine" id="cb250-7" data-line-number="7">trainy &lt;-<span class="st"> </span>dat<span class="op">$</span>store_exp <span class="op">+</span><span class="st"> </span>dat<span class="op">$</span>online_exp</a></code></pre></div>
 <p>Use <code>train()</code> function to tune parameter. Since ridge regression adds the penalty parameter <span class="math inline">\(\lambda\)</span> in front of the sum of squares of the parameters, the scale of the parameters matters. So here it is better to center and scale the predictors. This preprocessing is recommended for all techniques that put penalty to parameter estimates. In this example, the 10 survey questions are already with the same scale so data preprocessing doesn’t make too much different. It is a good idea to set the preprocessing as a standard.</p>
-<div class="sourceCode" id="cb249"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb249-1" data-line-number="1"><span class="co"># set cross validation</span></a>
-<a class="sourceLine" id="cb249-2" data-line-number="2">ctrl &lt;-<span class="st"> </span><span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>, <span class="dt">number =</span> <span class="dv">10</span>)</a>
-<a class="sourceLine" id="cb249-3" data-line-number="3"><span class="co"># set the parameter range </span></a>
-<a class="sourceLine" id="cb249-4" data-line-number="4">ridgeGrid &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">.lambda =</span> <span class="kw">seq</span>(<span class="dv">0</span>, <span class="fl">.1</span>, <span class="dt">length =</span> <span class="dv">20</span>))</a>
-<a class="sourceLine" id="cb249-5" data-line-number="5"><span class="kw">set.seed</span>(<span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb249-6" data-line-number="6">ridgeRegTune &lt;-<span class="st"> </span><span class="kw">train</span>(trainx, trainy,</a>
-<a class="sourceLine" id="cb249-7" data-line-number="7">                      <span class="dt">method =</span> <span class="st">&quot;ridge&quot;</span>,</a>
-<a class="sourceLine" id="cb249-8" data-line-number="8">                      <span class="dt">tuneGrid =</span> ridgeGrid,</a>
-<a class="sourceLine" id="cb249-9" data-line-number="9">                      <span class="dt">trControl =</span> ctrl,</a>
-<a class="sourceLine" id="cb249-10" data-line-number="10">                      <span class="co">## center and scale predictors</span></a>
-<a class="sourceLine" id="cb249-11" data-line-number="11">                      <span class="dt">preProc =</span> <span class="kw">c</span>(<span class="st">&quot;center&quot;</span>, <span class="st">&quot;scale&quot;</span>))</a>
-<a class="sourceLine" id="cb249-12" data-line-number="12">ridgeRegTune</a></code></pre></div>
+<div class="sourceCode" id="cb251"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb251-1" data-line-number="1"><span class="co"># set cross validation</span></a>
+<a class="sourceLine" id="cb251-2" data-line-number="2">ctrl &lt;-<span class="st"> </span><span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>, <span class="dt">number =</span> <span class="dv">10</span>)</a>
+<a class="sourceLine" id="cb251-3" data-line-number="3"><span class="co"># set the parameter range </span></a>
+<a class="sourceLine" id="cb251-4" data-line-number="4">ridgeGrid &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">.lambda =</span> <span class="kw">seq</span>(<span class="dv">0</span>, <span class="fl">.1</span>, <span class="dt">length =</span> <span class="dv">20</span>))</a>
+<a class="sourceLine" id="cb251-5" data-line-number="5"><span class="kw">set.seed</span>(<span class="dv">100</span>)</a>
+<a class="sourceLine" id="cb251-6" data-line-number="6">ridgeRegTune &lt;-<span class="st"> </span><span class="kw">train</span>(trainx, trainy,</a>
+<a class="sourceLine" id="cb251-7" data-line-number="7">                      <span class="dt">method =</span> <span class="st">&quot;ridge&quot;</span>,</a>
+<a class="sourceLine" id="cb251-8" data-line-number="8">                      <span class="dt">tuneGrid =</span> ridgeGrid,</a>
+<a class="sourceLine" id="cb251-9" data-line-number="9">                      <span class="dt">trControl =</span> ctrl,</a>
+<a class="sourceLine" id="cb251-10" data-line-number="10">                      <span class="co">## center and scale predictors</span></a>
+<a class="sourceLine" id="cb251-11" data-line-number="11">                      <span class="dt">preProc =</span> <span class="kw">c</span>(<span class="st">&quot;center&quot;</span>, <span class="st">&quot;scale&quot;</span>))</a>
+<a class="sourceLine" id="cb251-12" data-line-number="12">ridgeRegTune</a></code></pre></div>
 <pre><code>## Ridge Regression 
 ## 
 ## 999 samples
@@ -378,7 +378,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## The final value used for the model was lambda
 ##  = 0.005263.</code></pre>
 <p>The results show that the best value of <span class="math inline">\(\lambda\)</span> is 0.005 and the RMSE and <span class="math inline">\(R^{2}\)</span> are 1744 and 0.7954 correspondingly. You can see from the figure <a href="ridge-regression.html#fig:ridgeregtune">10.1</a>, as the <span class="math inline">\(\lambda\)</span> increase, the RMSE first slightly decreases and then increases.</p>
-<div class="sourceCode" id="cb251"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb251-1" data-line-number="1"><span class="kw">plot</span>(ridgeRegTune)</a></code></pre></div>
+<div class="sourceCode" id="cb253"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb253-1" data-line-number="1"><span class="kw">plot</span>(ridgeRegTune)</a></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:ridgeregtune"></span>
 <img src="IDS_files/figure-html/ridgeregtune-1.svg" alt="Test mean squared error for the ridge regression" width="80%" />
 <p class="caption">
@@ -386,24 +386,24 @@ FIGURE 10.1: Test mean squared error for the ridge regression
 </p>
 </div>
 <p>Once you have the tuning parameter value, there are different functions to fit a ridge regression. Let’s look at how to use <code>enet()</code> in <code>elasticnet</code> package.</p>
-<div class="sourceCode" id="cb252"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb252-1" data-line-number="1">ridgefit =<span class="st"> </span><span class="kw">enet</span>(<span class="dt">x =</span> <span class="kw">as.matrix</span>(trainx), <span class="dt">y =</span> trainy, <span class="dt">lambda =</span> <span class="fl">0.01</span>,</a>
-<a class="sourceLine" id="cb252-2" data-line-number="2">                <span class="co"># center and scale predictors</span></a>
-<a class="sourceLine" id="cb252-3" data-line-number="3">                <span class="dt">normalize =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb254"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb254-1" data-line-number="1">ridgefit =<span class="st"> </span><span class="kw">enet</span>(<span class="dt">x =</span> <span class="kw">as.matrix</span>(trainx), <span class="dt">y =</span> trainy, <span class="dt">lambda =</span> <span class="fl">0.01</span>,</a>
+<a class="sourceLine" id="cb254-2" data-line-number="2">                <span class="co"># center and scale predictors</span></a>
+<a class="sourceLine" id="cb254-3" data-line-number="3">                <span class="dt">normalize =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <p>Note here <code>ridgefit</code> only assigns the value of the tuning parameter for ridge regression. Since the elastic net model include both ridge and lasso penalty, we need to use <code>predict()</code> function to get the model fit. You can get the fitted results by setting <code>s = 1</code> and <code>mode = &quot;fraction&quot;</code>. Here <code>s = 1</code> means we only use the ridge parameter. We will come back to this when we get to lasso regression.</p>
-<div class="sourceCode" id="cb253"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb253-1" data-line-number="1">ridgePred &lt;-<span class="st"> </span><span class="kw">predict</span>(ridgefit, <span class="dt">newx =</span> <span class="kw">as.matrix</span>(trainx), </a>
-<a class="sourceLine" id="cb253-2" data-line-number="2">                     <span class="dt">s =</span> <span class="dv">1</span>, <span class="dt">mode =</span> <span class="st">&quot;fraction&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;fit&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb255"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb255-1" data-line-number="1">ridgePred &lt;-<span class="st"> </span><span class="kw">predict</span>(ridgefit, <span class="dt">newx =</span> <span class="kw">as.matrix</span>(trainx), </a>
+<a class="sourceLine" id="cb255-2" data-line-number="2">                     <span class="dt">s =</span> <span class="dv">1</span>, <span class="dt">mode =</span> <span class="st">&quot;fraction&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;fit&quot;</span>)</a></code></pre></div>
 <p>By setting <code>type = &quot;fit&quot;</code>, the above returns a list object. The <code>fit</code> item has the predictions:</p>
-<div class="sourceCode" id="cb254"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb254-1" data-line-number="1"><span class="kw">names</span>(ridgePred)</a></code></pre></div>
+<div class="sourceCode" id="cb256"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb256-1" data-line-number="1"><span class="kw">names</span>(ridgePred)</a></code></pre></div>
 <pre><code>## [1] &quot;s&quot;        &quot;fraction&quot; &quot;mode&quot;     &quot;fit&quot;</code></pre>
-<div class="sourceCode" id="cb256"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb256-1" data-line-number="1"><span class="kw">head</span>(ridgePred<span class="op">$</span>fit)</a></code></pre></div>
+<div class="sourceCode" id="cb258"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb258-1" data-line-number="1"><span class="kw">head</span>(ridgePred<span class="op">$</span>fit)</a></code></pre></div>
 <pre><code>##      1      2      3      4      5      6 
 ## 1290.5  224.2  591.4 1220.6  853.4  908.2</code></pre>
 <p>If you want to check the estimated coefficients, you can set <code>type=&quot;coefficients&quot;</code>:</p>
-<div class="sourceCode" id="cb258"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb258-1" data-line-number="1">ridgeCoef&lt;-<span class="kw">predict</span>(ridgefit,<span class="dt">newx =</span> <span class="kw">as.matrix</span>(trainx), </a>
-<a class="sourceLine" id="cb258-2" data-line-number="2">                   <span class="dt">s=</span><span class="dv">1</span>, <span class="dt">mode=</span><span class="st">&quot;fraction&quot;</span>, <span class="dt">type=</span><span class="st">&quot;coefficients&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb260"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb260-1" data-line-number="1">ridgeCoef&lt;-<span class="kw">predict</span>(ridgefit,<span class="dt">newx =</span> <span class="kw">as.matrix</span>(trainx), </a>
+<a class="sourceLine" id="cb260-2" data-line-number="2">                   <span class="dt">s=</span><span class="dv">1</span>, <span class="dt">mode=</span><span class="st">&quot;fraction&quot;</span>, <span class="dt">type=</span><span class="st">&quot;coefficients&quot;</span>)</a></code></pre></div>
 <p>It also returns a list and the estimates are in the <code>coefficients</code> item:</p>
-<div class="sourceCode" id="cb259"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb259-1" data-line-number="1"><span class="co"># didn&#39;t show the results</span></a>
-<a class="sourceLine" id="cb259-2" data-line-number="2">RidgeCoef =<span class="st"> </span>ridgeCoef<span class="op">$</span>coefficients</a></code></pre></div>
+<div class="sourceCode" id="cb261"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb261-1" data-line-number="1"><span class="co"># didn&#39;t show the results</span></a>
+<a class="sourceLine" id="cb261-2" data-line-number="2">RidgeCoef =<span class="st"> </span>ridgeCoef<span class="op">$</span>coefficients</a></code></pre></div>
 <p>Comparing to the least square regression, ridge regression performs better because of the bias-variance-trade-off we mentioned in section <a href="systematic-error-and-random-error.html#vbtradeoff">7.1.1</a>. As the penalty parameter <span class="math inline">\(\lambda\)</span> increases, the flexibility of the ridge regression decreases. It decreases the variance of the model but increases the bias at the same time.</p>
 </div>
 <h3>References</h3>

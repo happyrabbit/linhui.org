@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2019-11-17" />
+<meta name="date" content="2019-11-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -313,20 +313,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h3><span class="header-section-number">10.5.1</span> Introduction to <code>glmnet</code> package</h3>
 <p><code>glmnet</code> is a package that fits a penalized generalized linear model using <em>cyclical coordinate descent</em>. It successively optimizes the objective function over each parameter with others fixed, and cycles repeatedly until convergence. Since the linear model is a special case of the generalized linear model, <code>glmnet</code> can also fit a penalized linear model. Other than that, it can also fit penalized logistic regression, multinomial, Poisson, and Cox regression models.</p>
 <p>The default family option in the function <code>glmnet()</code> is <code>gaussian</code>. It is the linear regression we discussed so far in this chapter. But the parameterization is a little different in the generalized linear model framework (we have <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\lambda\)</span>). Let’s start from our previous example, using the same training data but <code>glmnet()</code> to fit model:</p>
-<div class="sourceCode" id="cb271"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb271-1" data-line-number="1"><span class="kw">library</span>(glmnet)</a>
-<a class="sourceLine" id="cb271-2" data-line-number="2">dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)</a>
-<a class="sourceLine" id="cb271-3" data-line-number="3"><span class="co"># data cleaning: delete wrong observations since expense can&#39;t be negative</span></a>
-<a class="sourceLine" id="cb271-4" data-line-number="4">dat &lt;-<span class="st"> </span><span class="kw">subset</span>(dat, store_exp <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span> <span class="op">&amp;</span><span class="st"> </span>online_exp <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</a>
-<a class="sourceLine" id="cb271-5" data-line-number="5"><span class="co"># get predictors</span></a>
-<a class="sourceLine" id="cb271-6" data-line-number="6">trainx &lt;-<span class="st"> </span>dat[, <span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>, <span class="kw">names</span>(dat))]</a>
-<a class="sourceLine" id="cb271-7" data-line-number="7"><span class="co"># get response</span></a>
-<a class="sourceLine" id="cb271-8" data-line-number="8">trainy &lt;-<span class="st"> </span>dat<span class="op">$</span>store_exp <span class="op">+</span><span class="st"> </span>dat<span class="op">$</span>online_exp</a>
-<a class="sourceLine" id="cb271-9" data-line-number="9">glmfit =<span class="st"> </span><span class="kw">glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy)</a></code></pre></div>
-<p>The object glmfit returned by glmnet() has the information of the fitted model for the later operations. An easy way to extract the components is through various functions on glmfit, such as plot(), print(), coef() and predict() . For example, the following code visualizes the path of coefficients as penalty increases:</p>
-<div class="sourceCode" id="cb272"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb272-1" data-line-number="1"><span class="kw">plot</span>(glmfit, <span class="dt">label =</span> T)</a></code></pre></div>
+<div class="sourceCode" id="cb273"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb273-1" data-line-number="1"><span class="kw">library</span>(glmnet)</a>
+<a class="sourceLine" id="cb273-2" data-line-number="2">dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)</a>
+<a class="sourceLine" id="cb273-3" data-line-number="3"><span class="co"># data cleaning: delete wrong observations since expense can&#39;t be negative</span></a>
+<a class="sourceLine" id="cb273-4" data-line-number="4">dat &lt;-<span class="st"> </span><span class="kw">subset</span>(dat, store_exp <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span> <span class="op">&amp;</span><span class="st"> </span>online_exp <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb273-5" data-line-number="5"><span class="co"># get predictors</span></a>
+<a class="sourceLine" id="cb273-6" data-line-number="6">trainx &lt;-<span class="st"> </span>dat[, <span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>, <span class="kw">names</span>(dat))]</a>
+<a class="sourceLine" id="cb273-7" data-line-number="7"><span class="co"># get response</span></a>
+<a class="sourceLine" id="cb273-8" data-line-number="8">trainy &lt;-<span class="st"> </span>dat<span class="op">$</span>store_exp <span class="op">+</span><span class="st"> </span>dat<span class="op">$</span>online_exp</a>
+<a class="sourceLine" id="cb273-9" data-line-number="9">glmfit =<span class="st"> </span><span class="kw">glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy)</a></code></pre></div>
+<p>The object <code>glmfit</code> returned by <code>glmnet()</code> has the information of the fitted model for the later operations. An easy way to extract the components is through various functions on <code>glmfit</code>, such as <code>plot()</code>, <code>print()</code>, <code>coef()</code> and <code>predict()</code> . For example, the following code visualizes the path of coefficients as penalty increases:</p>
+<div class="sourceCode" id="cb274"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb274-1" data-line-number="1"><span class="kw">plot</span>(glmfit, <span class="dt">label =</span> T)</a></code></pre></div>
 <p><img src="IDS_files/figure-html/unnamed-chunk-100-1.svg" width="672" /></p>
 <p>Each curve in the plot represents one predictor. The default setting is <span class="math inline">\(\alpha=1\)</span> which means there is only lasso penalty. From left to right, <span class="math inline">\(L_I\)</span> norm is increasing which means <span class="math inline">\(\lambda\)</span> is decreasing. The bottom x-axis is <span class="math inline">\(L_1\)</span> norm (i.e. <span class="math inline">\(\parallel\mathbf{\beta}\parallel_{1}\)</span>). The upper x-axis is the effective degrees of freedom (df) for the lasso. You can check the detail for every step by:</p>
-<div class="sourceCode" id="cb273"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb273-1" data-line-number="1"><span class="kw">print</span>(glmfit)</a></code></pre></div>
+<div class="sourceCode" id="cb275"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb275-1" data-line-number="1"><span class="kw">print</span>(glmfit)</a></code></pre></div>
 <pre class="pre"><code>Call:  glmnet(x = as.matrix(trainx), y = trainy) 
 
    Df  %Dev Lambda
@@ -341,7 +341,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 9   3 0.521   1450
 ...</code></pre>
 <p>The first column <code>Df</code> is the degree of freedom (i.e. the number of non-zero coefficients), <code>%Dev</code> is the percentage of deviance explained and <code>Lambda</code> is the value of tuning parameter <span class="math inline">\(\lambda\)</span>. By default, the function will try 100 different values of <span class="math inline">\(\lambda\)</span>. However, if as <span class="math inline">\(\lambda\)</span> changes, the <code>%Dev</code> doesn’t change sufficiently, the algorithm will stop before it goes through all the values of <span class="math inline">\(\lambda\)</span>. We didn’t show the full output above. But it only uses 68 different values of <span class="math inline">\(\lambda\)</span>. You can also set the value of <span class="math inline">\(\lambda\)</span> using <code>s=</code> :</p>
-<div class="sourceCode" id="cb275"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb275-1" data-line-number="1"><span class="kw">coef</span>(glmfit, <span class="dt">s =</span> <span class="dv">1200</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb277"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb277-1" data-line-number="1"><span class="kw">coef</span>(glmfit, <span class="dt">s =</span> <span class="dv">1200</span>)</a></code></pre></div>
 <pre><code>## 11 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
 ##                  1
 ## (Intercept) 2255.2
@@ -356,28 +356,28 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## Q9             .  
 ## Q10            .</code></pre>
 <p>When <span class="math inline">\(\lambda=1200\)</span>, there are three coefficients with non-zero estimates(<code>Q1</code>, <code>Q2</code> and <code>Q3</code>). You can apply models with different values of tuning parameter to new data using <code>predict()</code>:</p>
-<div class="sourceCode" id="cb277"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb277-1" data-line-number="1">newdat =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>, <span class="dv">30</span>, <span class="dt">replace =</span> T), <span class="dt">nrow =</span> <span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb277-2" data-line-number="2"><span class="kw">predict</span>(glmfit, newdat, <span class="dt">s =</span> <span class="kw">c</span>(<span class="dv">1741</span>, <span class="dv">2000</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb279"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb279-1" data-line-number="1">newdat =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">9</span>, <span class="dv">30</span>, <span class="dt">replace =</span> T), <span class="dt">nrow =</span> <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb279-2" data-line-number="2"><span class="kw">predict</span>(glmfit, newdat, <span class="dt">s =</span> <span class="kw">c</span>(<span class="dv">1741</span>, <span class="dv">2000</span>))</a></code></pre></div>
 <pre><code>##         1    2
 ## [1,] 6004 5968
 ## [2,] 7101 6674
 ## [3,] 9158 8411</code></pre>
 <p>Each column corresponds to a value of <span class="math inline">\(\lambda\)</span>. To tune the value of <span class="math inline">\(\lambda\)</span>, we can easily use <code>cv.glmnet()</code> function to do cross-validation.<code>cv.glmnet()</code> returns the cross-validation results as a list object. We store the object in <code>cvfit</code> and use it for further operations.</p>
-<div class="sourceCode" id="cb279"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb279-1" data-line-number="1">cvfit =<span class="st"> </span><span class="kw">cv.glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy)</a></code></pre></div>
+<div class="sourceCode" id="cb281"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb281-1" data-line-number="1">cvfit =<span class="st"> </span><span class="kw">cv.glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy)</a></code></pre></div>
 <p>We can plot the object using <code>plot()</code>. The red dotted line is the cross-validation curve. Each red point is the cross-validation mean squared error for a value of <span class="math inline">\(\lambda\)</span>. The grey bars around the red points indicate the upper and lower standard deviation. The two gray dotted vertical lines represent the two selected values of <span class="math inline">\(\lambda\)</span>, one gives the minimum mean cross-validated error (<code>lambda.min</code>), the other gives the error that is within one standard error of the minimum (<code>lambda.1se</code>).</p>
-<div class="sourceCode" id="cb280"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb280-1" data-line-number="1"><span class="kw">plot</span>(cvfit)</a></code></pre></div>
+<div class="sourceCode" id="cb282"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb282-1" data-line-number="1"><span class="kw">plot</span>(cvfit)</a></code></pre></div>
 <p><img src="IDS_files/figure-html/unnamed-chunk-104-1.svg" width="672" /></p>
 <p>You can check the two selected <span class="math inline">\(\lambda\)</span> values by:</p>
-<div class="sourceCode" id="cb281"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb281-1" data-line-number="1"><span class="co"># lambda with minimum mean cross-validated error</span></a>
-<a class="sourceLine" id="cb281-2" data-line-number="2">cvfit<span class="op">$</span>lambda.min</a></code></pre></div>
+<div class="sourceCode" id="cb283"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb283-1" data-line-number="1"><span class="co"># lambda with minimum mean cross-validated error</span></a>
+<a class="sourceLine" id="cb283-2" data-line-number="2">cvfit<span class="op">$</span>lambda.min</a></code></pre></div>
 <pre><code>## [1] 12.57</code></pre>
-<div class="sourceCode" id="cb283"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb283-1" data-line-number="1"><span class="co"># lambda with one standard error of the minimum</span></a>
-<a class="sourceLine" id="cb283-2" data-line-number="2">cvfit<span class="op">$</span>lambda<span class="fl">.1</span>se</a></code></pre></div>
+<div class="sourceCode" id="cb285"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb285-1" data-line-number="1"><span class="co"># lambda with one standard error of the minimum</span></a>
+<a class="sourceLine" id="cb285-2" data-line-number="2">cvfit<span class="op">$</span>lambda<span class="fl">.1</span>se</a></code></pre></div>
 <pre><code>## [1] 1200</code></pre>
 <p>You can look at the coefficient estimates for different <span class="math inline">\(\lambda\)</span> by:</p>
-<div class="sourceCode" id="cb285"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb285-1" data-line-number="1"><span class="co"># coefficient estimates for model with the error </span></a>
-<a class="sourceLine" id="cb285-2" data-line-number="2"><span class="co"># that is within one standard error of the minimum</span></a>
-<a class="sourceLine" id="cb285-3" data-line-number="3"><span class="kw">coef</span>(cvfit, <span class="dt">s =</span> <span class="st">&quot;lambda.1se&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb287"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb287-1" data-line-number="1"><span class="co"># coefficient estimates for model with the error </span></a>
+<a class="sourceLine" id="cb287-2" data-line-number="2"><span class="co"># that is within one standard error of the minimum</span></a>
+<a class="sourceLine" id="cb287-3" data-line-number="3"><span class="kw">coef</span>(cvfit, <span class="dt">s =</span> <span class="st">&quot;lambda.1se&quot;</span>)</a></code></pre></div>
 <pre><code>## 11 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
 ##                  1
 ## (Intercept) 2255.3
@@ -405,21 +405,81 @@ of disease for <span class="math inline">\(i\)</span>th subject by <span class="
 <p>where <span class="math inline">\(\beta_{0}\)</span> is the intercept and <span class="math inline">\(\mathbf{\beta_{g}}\)</span> is the parameter vector corresponding to the <span class="math inline">\(g^{th}\)</span> predictor. As we mentioned, here <span class="math inline">\(\mathbf{\beta_{g}}\)</span> has length 2.</p>
 <p>Traditional estimation of logistic
 parameters <span class="math inline">\(\mathbf{\beta}=(\beta_{0}^{T},\mathbf{\beta_{1}}^{T},\mathbf{\beta_{2}}^{T},...,\mathbf{\beta_{G}}^{T})^{T}\)</span> is done through maximizing the log-likelihood</p>
-<p><span class="math display">\[
-\begin{eqnarray*}
+<p><span class="math display" id="eq:logisticlikelihood">\[\begin{eqnarray*}
 l(\mathbf{\beta})&amp;=&amp;log[\prod_{i=1}^{n}\theta_{i}^{y_{i}}(1-\theta_{i})^{1-y_{i}}]\\
 &amp;=&amp;\sum_{i=1}^{n}\{y_{i}log(\theta_{i})+(1-y_{i})log(1-\theta_{i})\}\\
-&amp;=&amp;\sum_{i=1}^{n}\{\ y_{i}\eta_{\mathbf{\beta}}(\mathbf{x_{i}})-log[1+exp(\eta_{\mathbf{\beta}}(\mathbf{x_{i}}))]\ \}.
-\end{eqnarray*}
-\]</span></p>
+&amp;=&amp;\sum_{i=1}^{n}\{\ y_{i}\eta_{\mathbf{\beta}}(\mathbf{x_{i}})-log[1+exp(\eta_{\mathbf{\beta}}(\mathbf{x_{i}}))]\ \}
+\tag{10.8}
+\end{eqnarray*}\]</span></p>
 <p>For logistic regression analysis with a large number of explanatory variables, complete- or quasi-complete-separation may result which makes
 the maximum likelihood estimation unstable <span class="citation">(Wedderburn <a href="#ref-Wed1976">1976</a>)</span>, <span class="citation">(A and J <a href="#ref-albert1984">1984</a>)</span>. For example:</p>
-<div class="sourceCode" id="cb287"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb287-1" data-line-number="1"><span class="kw">library</span>(MASS)</a>
-<a class="sourceLine" id="cb287-2" data-line-number="2">dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2KXb1Qi&quot;</span>)</a>
-<a class="sourceLine" id="cb287-3" data-line-number="3">fit &lt;-<span class="st"> </span><span class="kw">glm</span>(y<span class="op">~</span>., dat, <span class="dt">family =</span> <span class="st">&quot;binomial&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb289"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb289-1" data-line-number="1"><span class="kw">library</span>(MASS)</a>
+<a class="sourceLine" id="cb289-2" data-line-number="2">dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2KXb1Qi&quot;</span>)</a>
+<a class="sourceLine" id="cb289-3" data-line-number="3">fit &lt;-<span class="st"> </span><span class="kw">glm</span>(y<span class="op">~</span>., dat, <span class="dt">family =</span> <span class="st">&quot;binomial&quot;</span>)</a></code></pre></div>
 <pre><code>## Warning: glm.fit: algorithm did not converge</code></pre>
 <pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or
 ## 1 occurred</code></pre>
+<p>There is an error saying “<code>algorithm did not converge</code>”. It is because there is complete separation. It happens when there are a large number of explanatory variables which makes the estimation of the coefficients unstable. To stabilize the estimation of parameter coefficients, one popular approach is the lasso algorithm with <span class="math inline">\(L_1\)</span> norm penalty proposed by Tibshirani<span class="citation">(R <a href="#ref-Tibshirani1996">1996</a>)</span>. Because the lasso algorithm can estimate some variable coefficients to be 0, it can also be used as a variable selection tool.</p>
+</div>
+<div id="penalized-logistic-regression-1" class="section level4">
+<h4><span class="header-section-number">10.5.2.2</span> Penalized logistic regression</h4>
+<p>Penalized logistic regression adds penalty to the likelihood function:</p>
+<p><span class="math display">\[
+\underset{\mathbf{\beta}\in \mathbb{R}^{p+1}}{min} -\sum_{i=1}^{n}\{\ y_{i}\eta_{\mathbf{\beta}}(\mathbf{x_{i}})-log[1+exp(\eta_{\mathbf{\beta}}(\mathbf{x_{i}}))]\ \}+\lambda [(1-\alpha) \parallel \mathbf{\beta}\parallel _{2}^{2}/2] + \alpha \parallel \mathbf{\beta}\parallel _{1} ]
+\]</span></p>
+<div class="sourceCode" id="cb292"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb292-1" data-line-number="1">dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2KXb1Qi&quot;</span>)</a>
+<a class="sourceLine" id="cb292-2" data-line-number="2">trainx =<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(dat, <span class="op">-</span>y)</a>
+<a class="sourceLine" id="cb292-3" data-line-number="3">trainy =<span class="st"> </span>dat<span class="op">$</span>y</a>
+<a class="sourceLine" id="cb292-4" data-line-number="4">fit &lt;-<span class="st"> </span><span class="kw">glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy, <span class="dt">family =</span> <span class="st">&quot;binomial&quot;</span>)</a></code></pre></div>
+<p>The error message is gone when we use penalized regression. We can visualize the shrinking path of coefficients as penalty increases. The use of <code>predict()</code> function is a little different. For the generalized linear model, you can return different results by setting the <code>type</code> argument. The choices are:</p>
+<ul>
+<li><code>link</code>: return the link function value</li>
+<li><code>response</code>: return the probability</li>
+<li><code>class</code>: return the category (0/1)</li>
+<li><code>coefficients</code>: return the coefficient estimates</li>
+<li><code>nonzero</code>: return an indicator for non-zero estimates (i.e. which variables are selected)</li>
+</ul>
+<p>The default setting is to predict the probability of the second level of the response variable. For example, the second level of the response variable for <code>trainy</code> here is:</p>
+<div class="sourceCode" id="cb293"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb293-1" data-line-number="1"><span class="kw">levels</span>(<span class="kw">as.factor</span>(trainy))</a></code></pre></div>
+<pre><code>## [1] &quot;0&quot; &quot;1&quot;</code></pre>
+<p>The first column of the above output is the predicted link function value when <span class="math inline">\(\lambda=0.02833\)</span>. The second column of the output is the predicted link function when <span class="math inline">\(\lambda=0.0311\)</span>. Similarly, you can change the setting for <code>type</code> to produce different outputs. You can use the <code>cv.glmnet()</code> function to tune parameters. The parameter setting is nearly the same as before, the only difference is the setting of <code>type.measure</code>. Since the response is categorical, not continuous, we have different performance measurements. The most common settings of <code>type.measure</code> for classification are:</p>
+<ul>
+<li><code>class</code>: error rate</li>
+<li><code>auc</code>: it is the area under the ROC for the dichotomous problem
+So the model is to predict the probability of outcome “1”. Take a baby example of 3 observations and 2 values of <span class="math inline">\(\lambda\)</span> to show the usage of <code>predict()</code> function:</li>
+</ul>
+<div class="sourceCode" id="cb295"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb295-1" data-line-number="1">newdat =<span class="st"> </span><span class="kw">as.matrix</span>(trainx[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>, ])</a>
+<a class="sourceLine" id="cb295-2" data-line-number="2"><span class="kw">predict</span>(fit, newdat, <span class="dt">type =</span> <span class="st">&quot;link&quot;</span>, <span class="dt">s =</span> <span class="kw">c</span>(<span class="fl">2.833e-02</span>, <span class="fl">3.110e-02</span>))</a></code></pre></div>
+<pre><code>##         1       2
+## 1  0.1943  0.1443
+## 2 -0.9913 -1.0077
+## 3 -0.5841 -0.5496</code></pre>
+<p>For example:</p>
+<div class="sourceCode" id="cb297"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb297-1" data-line-number="1">cvfit =<span class="st"> </span><span class="kw">cv.glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy, <span class="dt">family =</span> <span class="st">&quot;binomial&quot;</span>, <span class="dt">type.measure =</span> <span class="st">&quot;class&quot;</span>)</a>
+<a class="sourceLine" id="cb297-2" data-line-number="2"><span class="kw">plot</span>(cvfit)</a></code></pre></div>
+<p><img src="IDS_files/figure-html/unnamed-chunk-111-1.svg" width="672" /></p>
+<p>The above uses error rate as performance criteria and use 10-fold cross-validation. Similarly, you can get the <span class="math inline">\(\lambda\)</span> value for the minimum error rate and the error rate that is 1 standard error from the minimum:</p>
+<div class="sourceCode" id="cb298"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb298-1" data-line-number="1">cvfit<span class="op">$</span>lambda.min</a></code></pre></div>
+<pre><code>## [1] 2.643e-05</code></pre>
+<div class="sourceCode" id="cb300"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb300-1" data-line-number="1">cvfit<span class="op">$</span>lambda<span class="fl">.1</span>se</a></code></pre></div>
+<pre><code>## [1] 0.003334</code></pre>
+<p>You can use the same way to get the parameter estimates and make prediction.</p>
+</div>
+<div id="group-lasso-logistic-regression" class="section level4">
+<h4><span class="header-section-number">10.5.2.3</span> Group lasso logistic regression</h4>
+<p>For models with categorical survey questions (explanatory variables), however, the original lasso algorithm only selects individual dummy variables instead of sets of the dummy variables grouped by the question in the survey. Another disadvantage of applying lasso to grouped variables is that the estimates are affected by the way dummy variables are encoded. Thus the group lasso <span class="citation">(Yuan and Lin <a href="#ref-Yuan2007">2007</a>)</span> method has been proposed to enable variable selection in linear regression models on groups of variables, instead of on single variables. For logistic regression models, the group lasso algorithm was first studied by Kim et al. <span class="citation">(Y. Kim and Kim <a href="#ref-Kim2006">2006</a>)</span>. They proposed a gradient descent algorithm to solve the corresponding constrained problem, which does, however, depend on unknown constants. Meier et al. <span class="citation">(L. Meier and Buhlmann <a href="#ref-Meier2008">2008</a>)</span> proposed a new algorithm that could work directly on the penalized problem and its convergence property does not depend on unknown constants. The algorithm is especially suitable for high-dimensional problems. It can also be applied to solve the corresponding convex optimization problem in generalized linear models. The group lasso estimator proposed by Meier et al. <span class="citation">(L. Meier and Buhlmann <a href="#ref-Meier2008">2008</a>)</span> for logistic regression has been shown to be statistically consistent, even with a large number of categorical predictors.</p>
+<p>In this section, we illustrate how to use the logistic group lasso algorithm to construct risk scoring systems for predicting disease. Instead of maximizing the log-likelihood in the maximum likelihood method, the logistic group lasso estimates are calculated by minimizing the convex function:</p>
+<p><span class="math display">\[
+S_{\lambda}(\mathbf{\beta})=-l(\mathbf{\beta})+\lambda\sum_{g=1}^{G}s(df_{g})\parallel\mathbf{\beta_{g}}\parallel_{2}
+\]</span></p>
+<p>where <span class="math inline">\(\lambda\)</span> is a tuning parameter for the penalty and <span class="math inline">\(s(\cdot)\)</span> is a function to rescale the penalty. In lasso algorithms, the selection of <span class="math inline">\(\lambda\)</span> is usually determined by cross-validation using data. For <span class="math inline">\(s(\cdot)\)</span>, we use the square root function <span class="math inline">\(s(df_g)=df_g^{0.5}\)</span> as suggested in Meier et al.<span class="citation">(L. Meier and Buhlmann <a href="#ref-Meier2008">2008</a>)</span>. It ensures the penalty is of the order of the number of parameters <span class="math inline">\(df_g\)</span> as used in <span class="citation">(Yuan and Lin <a href="#ref-Yuan2007">2007</a>)</span>.</p>
+<p>Here we consider selection of the tuning parameter <span class="math inline">\(\lambda\)</span> from a multiplicative grid of 148 values <span class="math inline">\(\{0.96\lambda_{max},0.96^{2}\lambda_{max},0.96^{3}\lambda_{max},...,0.96^{148}\lambda_{max}\}\)</span>, as in Meier et al. <span class="citation">(L. Meier and Buhlmann <a href="#ref-Meier2008">2008</a>)</span>. Here <span class="math inline">\(\lambda_{max}\)</span> is defined as</p>
+<p><span class="math display">\[\begin{equation}
+\lambda_{max}=\underset{g\in\{1,...,G\}}{max}\left\{\frac{1}{s(df_{g})}\parallel \mathbf{x_{g}}^{T}(\mathbf{y}-\bar{\mathbf{y}} )\parallel_{2}\right\},
+\end{equation}\]</span></p>
+<p>such that when <span class="math inline">\(\lambda=\lambda_{max}\)</span>, only the intercept is
+in the model. When <span class="math inline">\(\lambda\)</span> goes to <span class="math inline">\(0\)</span>, the model is equivalent to ordinary
+logistic regression.</p>
 
 </div>
 </div>
@@ -430,8 +490,20 @@ the maximum likelihood estimation unstable <span class="citation">(Wedderburn <a
 <div id="ref-albert1984">
 <p>A, Albert, and Anderson A. J. 1984. “On the Existence of the Maximum Likelihood Estimates in Logistic Regression Models.” <em>Biometrika</em> 71 (1): 1–10.</p>
 </div>
+<div id="ref-Meier2008">
+<p>L. Meier, S. van de Geer, and P. Buhlmann. 2008. “The Group Lasso for Logistic Regression.” <em>J. R. Stat. Soc. Ser. B Stat. Methodol</em> 70: 53–71.</p>
+</div>
+<div id="ref-Tibshirani1996">
+<p>R, Tibshirani. 1996. “Regression Shrinkage and Selection via the Lasso.” <em>Journal of the Royal Statistical Society Series B (Methodological)</em> 58 (1): 267–88.</p>
+</div>
 <div id="ref-Wed1976">
 <p>Wedderburn, R. W. M. 1976. “On the Existence and Uniqueness of the Maximum Likelihood Estimates for Certain Generalized Linear Models.” <em>Biometrika</em> 63: 27–32.</p>
+</div>
+<div id="ref-Kim2006">
+<p>Y. Kim, J. Kim, and Y. Kim. 2006. “Blockwise Sparse Regression.” <em>Statist. Sin</em> 16: 375–90.</p>
+</div>
+<div id="ref-Yuan2007">
+<p>Yuan, M., and Y. Lin. 2007. “Model Selection and Estimation in Regression with Grouped Variables.” <em>J. R. Stat. Soc. Ser. B Stat. Methodol</em> 68: 49–67.</p>
 </div>
 </div>
             </section>
