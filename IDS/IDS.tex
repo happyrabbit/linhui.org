@@ -169,7 +169,7 @@
 
 \title{Introduction to Data Science}
 \author{Hui Lin and Ming Li}
-\date{2019-11-26}
+\date{2019-11-29}
 
 \begin{document}
 \maketitle
@@ -4933,7 +4933,7 @@ The apparent error rate is the error rate when the data is used twice, both to f
 \hypertarget{measuring-performance}{%
 \chapter{Measuring Performance}\label{measuring-performance}}
 
-In order to compare different models, we need a way to measure model performance. There are different metrics to use. Sometimes, it is better to look at models through multiple lens. In this chapter, we will introduce some of the most common measurement metrics.
+To compare different models, we need a way to measure model performance. There are various metrics to use. Sometimes, it is better to look at models through multiple lenses. In this chapter, we will introduce some of the most common performance measurement metrics. You need to select a performance measurement when tuning the model.
 
 \hypertarget{regression-model-performance}{%
 \section{Regression Model Performance}\label{regression-model-performance}}
@@ -5732,7 +5732,7 @@ S_{\lambda}(\mathbf{\beta})=-l(\mathbf{\beta})+\lambda\sum_{g=1}^{G}s(df_{g})\pa
 
 where \(\lambda\) is a tuning parameter for the penalty and \(s(\cdot)\) is a function to rescale the penalty. In lasso algorithms, the selection of \(\lambda\) is usually determined by cross-validation using data. For \(s(\cdot)\), we use the square root function \(s(df_g)=df_g^{0.5}\) as suggested in Meier et al.\citep{Meier2008}. It ensures the penalty is of the order of the number of parameters \(df_g\) as used in \citep{Yuan2007}.
 
-Here we consider selection of the tuning parameter \(\lambda\) from a multiplicative grid of 148 values \(\{0.96\lambda_{max},0.96^{2}\lambda_{max},0.96^{3}\lambda_{max},...,0.96^{148}\lambda_{max}\}\), as in Meier et al. \citep{Meier2008}. Here \(\lambda_{max}\) is defined as
+Here we consider selection of the tuning parameter \(\lambda\) from a multiplicative grid of 100 values \(\{0.96\lambda_{max},0.96^{2}\lambda_{max},0.96^{3}\lambda_{max},...,0.96^{100}\lambda_{max}\}\). Here \(\lambda_{max}\) is defined as
 
 \begin{equation}
 \lambda_{max}=\underset{g\in\{1,...,G\}}{max}\left\{\frac{1}{s(df_{g})}\parallel \mathbf{x_{g}}^{T}(\mathbf{y}-\bar{\mathbf{y}} )\parallel_{2}\right\},
@@ -5741,6 +5741,186 @@ Here we consider selection of the tuning parameter \(\lambda\) from a multiplica
 such that when \(\lambda=\lambda_{max}\), only the intercept is
 in the model. When \(\lambda\) goes to \(0\), the model is equivalent to ordinary
 logistic regression.
+
+Three criteria may be used to select the optimal value of \(\lambda\). One is AUC which you should have seem many times in this book by now. The log-likelihood score used in Meier et al. \citep{Meier2008} is taken as the average of log-likelihood of the validation data overall cross-validation sets. Another one is the maximum correlation coefficient in Yeo and Burge \citep{Yeo2004} that is defined as:
+
+\[
+\rho_{max}=max\{\rho_{\tau}|\tau\in(0,1)\},
+\]
+
+where \(\tau\in(0,1)\) is a threshold to classify the predicted probability into binary disease status and \(\rho_\tau\) is the Pearson correlation coefficient between the true binary disease status and the predictive disease status with threshold \(\tau\).
+
+You can use the following package to implement the model. Install the package using:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{devtools}\OperatorTok{::}\KeywordTok{install_github}\NormalTok{(}\StringTok{"netlify/NetlifyDS"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Load the package:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(}\StringTok{"NetlifyDS"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+The package includes the swine disease breakout data and you can load the data by:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{data}\NormalTok{(}\StringTok{"sim1_da1"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+You can use \texttt{cv\_glasso()} function to tune the parameters:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# the last column of sim1_da1 response variable y}
+\CommentTok{# trainx is the explanatory variable matrix}
+\NormalTok{trainx =}\StringTok{ }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{select}\NormalTok{(sim1_da1, }\OperatorTok{-}\NormalTok{y)}
+\CommentTok{# save response variable as as trainy}
+\NormalTok{trainy =}\StringTok{ }\NormalTok{sim1_da1}\OperatorTok{$}\NormalTok{y}
+\CommentTok{# get the group indicator}
+\NormalTok{index <-}\StringTok{ }\KeywordTok{gsub}\NormalTok{(}\StringTok{"}\CharTok{\textbackslash{}\textbackslash{}}\StringTok{..*"}\NormalTok{, }\StringTok{""}\NormalTok{, }\KeywordTok{names}\NormalTok{(trainx))}
+\end{Highlighting}
+\end{Shaded}
+
+Dummy variables from the same question are in the same group:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{index[}\DecValTok{1}\OperatorTok{:}\DecValTok{50}\NormalTok{]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] "Q1"  "Q1"  "Q2"  "Q2"  "Q3"  "Q3"  "Q4"  "Q4" 
+##  [9] "Q5"  "Q5"  "Q6"  "Q6"  "Q7"  "Q7"  "Q8"  "Q8" 
+## [17] "Q9"  "Q9"  "Q10" "Q10" "Q11" "Q11" "Q12" "Q12"
+## [25] "Q13" "Q13" "Q14" "Q14" "Q15" "Q15" "Q16" "Q16"
+## [33] "Q17" "Q17" "Q18" "Q18" "Q19" "Q19" "Q20" "Q20"
+## [41] "Q21" "Q21" "Q22" "Q22" "Q23" "Q23" "Q24" "Q24"
+## [49] "Q25" "Q25"
+\end{verbatim}
+
+Set a series of tuning parameter values. nlam is the number of values we want to tune. It is the parameter \(m\) in \{0.96\lambda\emph{\{max\},0.96\textsuperscript{\{2\}\lambda\emph{\{max\},0.96\^{}\{3\}\lambda}\{max\},\ldots{},0.96}\{m\}\lambda}\{max\}\}\$. The tuning process returns a long output and we will not report all:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Tune over 100 values}
+\NormalTok{nlam <-}\StringTok{ }\DecValTok{100}
+\CommentTok{# set the type of prediction}
+\CommentTok{# - `link`: return the predicted link function}
+\CommentTok{# - `response`: return the predicted probability}
+\CommentTok{# number of cross-validation folds}
+\NormalTok{kfold <-}\StringTok{ }\DecValTok{10}
+\NormalTok{cv_fit <-}\StringTok{ }\KeywordTok{cv_glasso}\NormalTok{(trainx, trainy, }\DataTypeTok{nlam =}\NormalTok{ nlam, }\DataTypeTok{kfold =}\NormalTok{ kfold, }\DataTypeTok{type =} \StringTok{"link"}\NormalTok{)}
+\CommentTok{# 只展示部分结果}
+\KeywordTok{str}\NormalTok{(cv_fit)}
+\end{Highlighting}
+\end{Shaded}
+
+Here we only show part of the output:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{...}
+\NormalTok{ $ auc               : num [1:100] 0.573 0.567 0.535 0.484 0.514 ...}
+\NormalTok{ $ log_likelihood    : num [1:100] -554 -554 -553 -553 -552 ...}
+\NormalTok{ $ maxrho            : num [1:100] -0.0519 0.00666 0.04631 0.0486 0.06269 ...}
+\NormalTok{ $ lambda.max.auc    : Named num [1:2] 0.922 0.94}
+\NormalTok{  ..- attr(*, "names")= chr [1:2] "lambda" "auc"}
+\NormalTok{ $ lambda.1se.auc    : Named num [1:2] 16.74 0.81}
+\NormalTok{  ..- attr(*, "names")= chr [1:2] "" "se.auc"}
+\NormalTok{ $ lambda.max.loglike: Named num [1:2] 1.77 -248.86}
+\NormalTok{  ..- attr(*, "names")= chr [1:2] "lambda" "loglike"}
+\NormalTok{ $ lambda.1se.loglike: Named num [1:2] 9.45 -360.13}
+\NormalTok{  ..- attr(*, "names")= chr [1:2] "lambda" "se.loglike"}
+\NormalTok{ $ lambda.max.maxco  : Named num [1:2] 0.922 0.708}
+\NormalTok{  ..- attr(*, "names")= chr [1:2] "lambda" "maxco"}
+\NormalTok{ $ lambda.1se.maxco  : Named num [1:2] 14.216 0.504}
+\NormalTok{  ..- attr(*, "names")= chr [1:2] "lambda" "se.maxco"}
+\end{Highlighting}
+\end{Shaded}
+
+In the returned results:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{\$\ auc}: the AUC values
+\item
+  \texttt{\$\ log\_likelihood}: log-likelihood
+\item
+  \texttt{\$\ maxrho}: maximum correlation coefficient
+\item
+  \texttt{\$\ lambda.max.auc}: the max AUC and the corresponding value of \(\lambda\)
+\item
+  \texttt{\$\ lambda.1se.auc}: one standard error to the max AUC and the corresponding \(\lambda\)
+\item
+  \texttt{\$\ lambda.max.loglike}: max log-likelihood and the corresponding \(\lambda\)
+\item
+  \texttt{\$\ lambda.1se.loglike}: one standard error to the max log-likelihood and the corresponding \(\lambda\)
+\item
+  \texttt{\$\ lambda.max.maxco}: maximum correlation coefficient and the corresponding \(\lambda\)
+\item
+  \texttt{\$\ lambda.1se.maxco}: one standard error to the maximum correlation coefficient and the corresponding \(\lambda\)
+\end{itemize}
+
+The most common criterion is AUC. You can compare the selections from different criteria. If they all point to the same value of the tuning parameter, you can have more confidence about the choice. If they suggest very different values, then you need to concern if the tuning process is stable. You can visualize the cross validation result:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plot}\NormalTok{(cv_fit)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-118-1.pdf}
+
+The x-axis is the value of the tuning parameter, the y-axis is AUC. The two dash lines are the value of \(\lambda\) for max AUC and the value for the one standard deviation to the max AUC. Once you choose the value of the tuning parameter, you can use \texttt{fitglasso()} to fit the model. For example, we can fit the model using the parameter value that gives the max AUC, which is \(\lambda=0.922\):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fitgl <-}\StringTok{ }\KeywordTok{fitglasso}\NormalTok{(trainx, trainy, }\DataTypeTok{lambda =} \FloatTok{0.922}\NormalTok{, }\DataTypeTok{na_action =}\NormalTok{ na.pass)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Lambda: 0.922  nr.var: 229}
+\end{Highlighting}
+\end{Shaded}
+
+You can use \texttt{coef()} to get the estimates of coefficients:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{coef}\NormalTok{(fitgl)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+               0.922
+Intercept -5.318e+01
+Q1.A       1.757e+00
+Q1.B       1.719e+00
+Q2.A       2.170e+00
+Q2.B       6.939e-01
+Q3.A       2.102e+00
+Q3.B       1.359e+00
+...
+\end{verbatim}
+
+Use \texttt{predict\_glasso()} to predict new samples:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{prey <-}\StringTok{ }\KeywordTok{predict_glasso}\NormalTok{(fitgl, trainx)}
+\end{Highlighting}
+\end{Shaded}
 
 \hypertarget{tree-based-methods}{%
 \chapter{Tree-Based Methods}\label{tree-based-methods}}
@@ -6103,7 +6283,7 @@ A more convenient way is to use \texttt{train()} function in \texttt{caret} pack
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-116-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-122-1.pdf}
 
 RMSE doesn't change much when the maximum is larger than 2. So we set the maximum depth to be 2 and refit the model:
 
@@ -6144,7 +6324,7 @@ You can see that the final model picks \texttt{Q3} and \texttt{Q5} to predict to
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-119-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-125-1.pdf}
 
 \hypertarget{decision-tree}{%
 \subsection{Decision Tree}\label{decision-tree}}
@@ -6284,7 +6464,7 @@ Compare the results of the two approaches.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-123-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-129-1.pdf}
 
 You can see that in this case, the two approaches lead to similar model performance.
 
@@ -6544,7 +6724,7 @@ You can use varImpPlot() function to visualize the predictor importance:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-131-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-137-1.pdf}
 It is easy to see from the plot that \texttt{segment} and \texttt{Q4} are the top two variables to classify gender.
 
 \hypertarget{gradient-boosted-machine}{%
@@ -6770,7 +6950,7 @@ Now, let's compare the results from the three tree models.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-134-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-140-1.pdf}
 
 Since the data here doesn't have many variables, we don't see a significant difference among the models. But you can still see those ensemble methods are better than a single tree. In most of the real applications, ensemble methods perform much better. Random forest and boosting trees can be a baseline model. Before exploring different models, you can quickly run a random forest to see the performance and then try to improve that performance. If the performance you got from the random forest is not too much better than guessing, you should consider collecting more data or reviewing the problem to frame it a different way instead of trying other models. Because it usually means the current data is not enough to solve the problem.
 
@@ -7027,9 +7207,6 @@ You need to choose activation function in the hidden layers. Logistic regression
 
 \hypertarget{recurrent-neural-network}{%
 \section{Recurrent Neural Network}\label{recurrent-neural-network}}
-
-\hypertarget{section}{%
-\subsection{}\label{section}}
 
 \hypertarget{appendix-appendix}{%
 \appendix \addcontentsline{toc}{chapter}{\appendixname}}

@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2019-11-26" />
+<meta name="date" content="2019-11-27" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -270,9 +270,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="12.2.3" data-path="standard-neural-network.html"><a href="standard-neural-network.html#activation-function"><i class="fa fa-check"></i><b>12.2.3</b> Activation Function</a></li>
 </ul></li>
 <li class="chapter" data-level="12.3" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html"><i class="fa fa-check"></i><b>12.3</b> Convolutional Neural Network</a></li>
-<li class="chapter" data-level="12.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html"><i class="fa fa-check"></i><b>12.4</b> Recurrent Neural Network</a><ul>
-<li class="chapter" data-level="12.4.1" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#section"><i class="fa fa-check"></i><b>12.4.1</b> </a></li>
-</ul></li>
+<li class="chapter" data-level="12.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html"><i class="fa fa-check"></i><b>12.4</b> Recurrent Neural Network</a></li>
 </ul></li>
 <li class="appendix"><span><b>Appendix</b></span></li>
 <li class="chapter" data-level="A" data-path="r-code-for-data-simulation.html"><a href="r-code-for-data-simulation.html"><i class="fa fa-check"></i><b>A</b> R code for data simulation</a><ul>
@@ -348,95 +346,95 @@ where <span class="math inline">\(\alpha_1,\alpha_2,...,\alpha_M\)</span> are th
 <p>The way to calculate variable importance in boosting is similar to a bagging model. You get variable importance by combining measures of importance across the ensemble. For example, we can calculate the Gini index improvement for each variable across all trees and use the average as the measurement of the importance.</p>
 <p>Boosting is a very popular method for classification. It is one of the methods that can be directly applied to the data without requiring a great deal of time-consuming data preprocessing. Applying boosting on tree models significantly improves predictive accuracy. Some advantages of trees that are sacrificed by boosting are speed and interpretability.</p>
 <p>Let’s look at the R implementation.</p>
-<div class="sourceCode" id="cb336"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb336-1" data-line-number="1">gbmGrid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">interaction.depth =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">9</span>),</a>
-<a class="sourceLine" id="cb336-2" data-line-number="2">                       <span class="dt">n.trees =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>,</a>
-<a class="sourceLine" id="cb336-3" data-line-number="3">                       <span class="dt">shrinkage =</span> <span class="kw">c</span>(.<span class="dv">01</span>, <span class="fl">.1</span>),</a>
-<a class="sourceLine" id="cb336-4" data-line-number="4">                       <span class="dt">n.minobsinnode =</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>))</a>
-<a class="sourceLine" id="cb336-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb336-6" data-line-number="6"><span class="kw">set.seed</span>(<span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb336-7" data-line-number="7">gbmTune &lt;-<span class="st"> </span><span class="kw">train</span>(<span class="dt">x =</span> trainx, </a>
-<a class="sourceLine" id="cb336-8" data-line-number="8">                <span class="dt">y =</span> trainy,</a>
-<a class="sourceLine" id="cb336-9" data-line-number="9">                <span class="dt">method =</span> <span class="st">&quot;gbm&quot;</span>,</a>
-<a class="sourceLine" id="cb336-10" data-line-number="10">                <span class="dt">tuneGrid =</span> gbmGrid,</a>
-<a class="sourceLine" id="cb336-11" data-line-number="11">                <span class="dt">metric =</span> <span class="st">&quot;ROC&quot;</span>,</a>
-<a class="sourceLine" id="cb336-12" data-line-number="12">                <span class="dt">verbose =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb336-13" data-line-number="13">                <span class="dt">trControl =</span> <span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>,</a>
-<a class="sourceLine" id="cb336-14" data-line-number="14">                           <span class="dt">summaryFunction =</span> twoClassSummary,</a>
-<a class="sourceLine" id="cb336-15" data-line-number="15">                           <span class="dt">classProbs =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb336-16" data-line-number="16">                           <span class="dt">savePredictions =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
-<div class="sourceCode" id="cb337"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb337-1" data-line-number="1"><span class="co"># only show part of the output</span></a>
-<a class="sourceLine" id="cb337-2" data-line-number="2">gbmTune</a></code></pre></div>
-<div class="sourceCode" id="cb338"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb338-1" data-line-number="1">Stochastic Gradient Boosting </a>
-<a class="sourceLine" id="cb338-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb338-3" data-line-number="3">1000 samples</a>
-<a class="sourceLine" id="cb338-4" data-line-number="4">  11 predictor</a>
-<a class="sourceLine" id="cb338-5" data-line-number="5">   2 classes: &#39;Female&#39;, &#39;Male&#39; </a>
-<a class="sourceLine" id="cb338-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb338-7" data-line-number="7">No pre-processing</a>
-<a class="sourceLine" id="cb338-8" data-line-number="8">Resampling: Cross-Validated (10 fold) </a>
-<a class="sourceLine" id="cb338-9" data-line-number="9">Summary of sample sizes: 899, 900, 900, 899, 899, 901, ... </a>
-<a class="sourceLine" id="cb338-10" data-line-number="10">Resampling results across tuning parameters:</a>
-<a class="sourceLine" id="cb338-11" data-line-number="11"></a>
-<a class="sourceLine" id="cb338-12" data-line-number="12">  shrinkage  interaction.depth  n.minobsinnode  n.trees  ROC     Sens    Spec    </a>
-<a class="sourceLine" id="cb338-13" data-line-number="13">  0.01       1                   1              1        0.6821  1.0000  0.000000</a>
-<a class="sourceLine" id="cb338-14" data-line-number="14">  0.01       1                   1              2        0.6882  1.0000  0.000000</a>
-<a class="sourceLine" id="cb338-15" data-line-number="15">  0.01       1                   1              3        0.6936  1.0000  0.000000</a>
-<a class="sourceLine" id="cb338-16" data-line-number="16">  .</a>
-<a class="sourceLine" id="cb338-17" data-line-number="17">  .</a>
-<a class="sourceLine" id="cb338-18" data-line-number="18">  .</a>
-<a class="sourceLine" id="cb338-19" data-line-number="19">  0.01       5                   8              2        0.7127  1.0000  0.000000</a>
-<a class="sourceLine" id="cb338-20" data-line-number="20">  0.01       5                   8              3        0.7148  1.0000  0.000000</a>
-<a class="sourceLine" id="cb338-21" data-line-number="21">  0.01       5                   8              4        0.7096  1.0000  0.000000</a>
-<a class="sourceLine" id="cb338-22" data-line-number="22">  0.01       5                   8              5        0.7100  1.0000  0.000000</a>
-<a class="sourceLine" id="cb338-23" data-line-number="23">  0.01       5                   9              1        0.7006  1.0000  0.000000</a>
-<a class="sourceLine" id="cb338-24" data-line-number="24">  0.01       5                   9              2        0.7055  1.0000  0.000000</a>
-<a class="sourceLine" id="cb338-25" data-line-number="25"> [ reached getOption(&quot;max.print&quot;) -- omitted 358 rows ]</a>
-<a class="sourceLine" id="cb338-26" data-line-number="26"></a>
-<a class="sourceLine" id="cb338-27" data-line-number="27">ROC was used to select the optimal model using the largest value.</a>
-<a class="sourceLine" id="cb338-28" data-line-number="28">The final values used for the model were n.trees = 4, interaction.depth = 3, shrinkage</a>
-<a class="sourceLine" id="cb338-29" data-line-number="29"> = 0.01 and n.minobsinnode = 6.</a></code></pre></div>
+<div class="sourceCode" id="cb341"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb341-1" data-line-number="1">gbmGrid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">interaction.depth =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">9</span>),</a>
+<a class="sourceLine" id="cb341-2" data-line-number="2">                       <span class="dt">n.trees =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>,</a>
+<a class="sourceLine" id="cb341-3" data-line-number="3">                       <span class="dt">shrinkage =</span> <span class="kw">c</span>(.<span class="dv">01</span>, <span class="fl">.1</span>),</a>
+<a class="sourceLine" id="cb341-4" data-line-number="4">                       <span class="dt">n.minobsinnode =</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>))</a>
+<a class="sourceLine" id="cb341-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb341-6" data-line-number="6"><span class="kw">set.seed</span>(<span class="dv">100</span>)</a>
+<a class="sourceLine" id="cb341-7" data-line-number="7">gbmTune &lt;-<span class="st"> </span><span class="kw">train</span>(<span class="dt">x =</span> trainx, </a>
+<a class="sourceLine" id="cb341-8" data-line-number="8">                <span class="dt">y =</span> trainy,</a>
+<a class="sourceLine" id="cb341-9" data-line-number="9">                <span class="dt">method =</span> <span class="st">&quot;gbm&quot;</span>,</a>
+<a class="sourceLine" id="cb341-10" data-line-number="10">                <span class="dt">tuneGrid =</span> gbmGrid,</a>
+<a class="sourceLine" id="cb341-11" data-line-number="11">                <span class="dt">metric =</span> <span class="st">&quot;ROC&quot;</span>,</a>
+<a class="sourceLine" id="cb341-12" data-line-number="12">                <span class="dt">verbose =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb341-13" data-line-number="13">                <span class="dt">trControl =</span> <span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>,</a>
+<a class="sourceLine" id="cb341-14" data-line-number="14">                           <span class="dt">summaryFunction =</span> twoClassSummary,</a>
+<a class="sourceLine" id="cb341-15" data-line-number="15">                           <span class="dt">classProbs =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb341-16" data-line-number="16">                           <span class="dt">savePredictions =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb342"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb342-1" data-line-number="1"><span class="co"># only show part of the output</span></a>
+<a class="sourceLine" id="cb342-2" data-line-number="2">gbmTune</a></code></pre></div>
+<div class="sourceCode" id="cb343"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb343-1" data-line-number="1">Stochastic Gradient Boosting </a>
+<a class="sourceLine" id="cb343-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb343-3" data-line-number="3">1000 samples</a>
+<a class="sourceLine" id="cb343-4" data-line-number="4">  11 predictor</a>
+<a class="sourceLine" id="cb343-5" data-line-number="5">   2 classes: &#39;Female&#39;, &#39;Male&#39; </a>
+<a class="sourceLine" id="cb343-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb343-7" data-line-number="7">No pre-processing</a>
+<a class="sourceLine" id="cb343-8" data-line-number="8">Resampling: Cross-Validated (10 fold) </a>
+<a class="sourceLine" id="cb343-9" data-line-number="9">Summary of sample sizes: 899, 900, 900, 899, 899, 901, ... </a>
+<a class="sourceLine" id="cb343-10" data-line-number="10">Resampling results across tuning parameters:</a>
+<a class="sourceLine" id="cb343-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb343-12" data-line-number="12">  shrinkage  interaction.depth  n.minobsinnode  n.trees  ROC     Sens    Spec    </a>
+<a class="sourceLine" id="cb343-13" data-line-number="13">  0.01       1                   1              1        0.6821  1.0000  0.000000</a>
+<a class="sourceLine" id="cb343-14" data-line-number="14">  0.01       1                   1              2        0.6882  1.0000  0.000000</a>
+<a class="sourceLine" id="cb343-15" data-line-number="15">  0.01       1                   1              3        0.6936  1.0000  0.000000</a>
+<a class="sourceLine" id="cb343-16" data-line-number="16">  .</a>
+<a class="sourceLine" id="cb343-17" data-line-number="17">  .</a>
+<a class="sourceLine" id="cb343-18" data-line-number="18">  .</a>
+<a class="sourceLine" id="cb343-19" data-line-number="19">  0.01       5                   8              2        0.7127  1.0000  0.000000</a>
+<a class="sourceLine" id="cb343-20" data-line-number="20">  0.01       5                   8              3        0.7148  1.0000  0.000000</a>
+<a class="sourceLine" id="cb343-21" data-line-number="21">  0.01       5                   8              4        0.7096  1.0000  0.000000</a>
+<a class="sourceLine" id="cb343-22" data-line-number="22">  0.01       5                   8              5        0.7100  1.0000  0.000000</a>
+<a class="sourceLine" id="cb343-23" data-line-number="23">  0.01       5                   9              1        0.7006  1.0000  0.000000</a>
+<a class="sourceLine" id="cb343-24" data-line-number="24">  0.01       5                   9              2        0.7055  1.0000  0.000000</a>
+<a class="sourceLine" id="cb343-25" data-line-number="25"> [ reached getOption(&quot;max.print&quot;) -- omitted 358 rows ]</a>
+<a class="sourceLine" id="cb343-26" data-line-number="26"></a>
+<a class="sourceLine" id="cb343-27" data-line-number="27">ROC was used to select the optimal model using the largest value.</a>
+<a class="sourceLine" id="cb343-28" data-line-number="28">The final values used for the model were n.trees = 4, interaction.depth = 3, shrinkage</a>
+<a class="sourceLine" id="cb343-29" data-line-number="29"> = 0.01 and n.minobsinnode = 6.</a></code></pre></div>
 <p>The results show that the tuning parameter settings that lead to the best ROC are <code>n.trees = 4</code> (number of trees), <code>interaction.depth = 3</code> (depth of tree), <code>shrinkage = 0.01</code> (learning rate) and <code>n.minobsinnode = 6</code> (minimum number of observations in each node).</p>
 <p>Now, let’s compare the results from the three tree models.</p>
-<div class="sourceCode" id="cb339"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb339-1" data-line-number="1">treebagRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span class="dt">response =</span> bagTune<span class="op">$</span>pred<span class="op">$</span>obs,</a>
-<a class="sourceLine" id="cb339-2" data-line-number="2">                        <span class="dt">predictor =</span> bagTune<span class="op">$</span>pred<span class="op">$</span>Female,</a>
-<a class="sourceLine" id="cb339-3" data-line-number="3">                        <span class="dt">levels =</span> <span class="kw">rev</span>(<span class="kw">levels</span>(bagTune<span class="op">$</span>pred<span class="op">$</span>obs)))</a></code></pre></div>
+<div class="sourceCode" id="cb344"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb344-1" data-line-number="1">treebagRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span class="dt">response =</span> bagTune<span class="op">$</span>pred<span class="op">$</span>obs,</a>
+<a class="sourceLine" id="cb344-2" data-line-number="2">                        <span class="dt">predictor =</span> bagTune<span class="op">$</span>pred<span class="op">$</span>Female,</a>
+<a class="sourceLine" id="cb344-3" data-line-number="3">                        <span class="dt">levels =</span> <span class="kw">rev</span>(<span class="kw">levels</span>(bagTune<span class="op">$</span>pred<span class="op">$</span>obs)))</a></code></pre></div>
 <pre><code>## Setting direction: controls &lt; cases</code></pre>
-<div class="sourceCode" id="cb341"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb341-1" data-line-number="1">rfRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span class="dt">response =</span> rfTune<span class="op">$</span>pred<span class="op">$</span>obs,</a>
-<a class="sourceLine" id="cb341-2" data-line-number="2">             <span class="dt">predictor =</span> rfTune<span class="op">$</span>pred<span class="op">$</span>Female,</a>
-<a class="sourceLine" id="cb341-3" data-line-number="3">             <span class="dt">levels =</span> <span class="kw">rev</span>(<span class="kw">levels</span>(rfTune<span class="op">$</span>pred<span class="op">$</span>obs)))</a></code></pre></div>
+<div class="sourceCode" id="cb346"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb346-1" data-line-number="1">rfRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span class="dt">response =</span> rfTune<span class="op">$</span>pred<span class="op">$</span>obs,</a>
+<a class="sourceLine" id="cb346-2" data-line-number="2">             <span class="dt">predictor =</span> rfTune<span class="op">$</span>pred<span class="op">$</span>Female,</a>
+<a class="sourceLine" id="cb346-3" data-line-number="3">             <span class="dt">levels =</span> <span class="kw">rev</span>(<span class="kw">levels</span>(rfTune<span class="op">$</span>pred<span class="op">$</span>obs)))</a></code></pre></div>
 <pre><code>## Setting direction: controls &lt; cases</code></pre>
-<div class="sourceCode" id="cb343"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb343-1" data-line-number="1">gbmRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span class="dt">response =</span> gbmTune<span class="op">$</span>pred<span class="op">$</span>obs,</a>
-<a class="sourceLine" id="cb343-2" data-line-number="2">              <span class="dt">predictor =</span> gbmTune<span class="op">$</span>pred<span class="op">$</span>Female,</a>
-<a class="sourceLine" id="cb343-3" data-line-number="3">              <span class="dt">levels =</span> <span class="kw">rev</span>(<span class="kw">levels</span>(gbmTune<span class="op">$</span>pred<span class="op">$</span>obs)))</a></code></pre></div>
+<div class="sourceCode" id="cb348"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb348-1" data-line-number="1">gbmRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span class="dt">response =</span> gbmTune<span class="op">$</span>pred<span class="op">$</span>obs,</a>
+<a class="sourceLine" id="cb348-2" data-line-number="2">              <span class="dt">predictor =</span> gbmTune<span class="op">$</span>pred<span class="op">$</span>Female,</a>
+<a class="sourceLine" id="cb348-3" data-line-number="3">              <span class="dt">levels =</span> <span class="kw">rev</span>(<span class="kw">levels</span>(gbmTune<span class="op">$</span>pred<span class="op">$</span>obs)))</a></code></pre></div>
 <pre><code>## Setting direction: controls &lt; cases</code></pre>
-<div class="sourceCode" id="cb345"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb345-1" data-line-number="1"><span class="kw">plot</span>(rpartRoc, <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>, <span class="dt">print.thres =</span> <span class="kw">c</span>(.<span class="dv">5</span>),</a>
-<a class="sourceLine" id="cb345-2" data-line-number="2">     <span class="dt">print.thres.pch =</span> <span class="dv">16</span>,</a>
-<a class="sourceLine" id="cb345-3" data-line-number="3">     <span class="dt">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>,</a>
-<a class="sourceLine" id="cb345-4" data-line-number="4">     <span class="dt">print.thres.cex =</span> <span class="fl">1.2</span>,</a>
-<a class="sourceLine" id="cb345-5" data-line-number="5">     <span class="dt">col =</span> <span class="st">&quot;black&quot;</span>, <span class="dt">legacy.axes =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb345-6" data-line-number="6">     <span class="dt">print.thres.col =</span> <span class="st">&quot;black&quot;</span>)</a>
-<a class="sourceLine" id="cb345-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb345-8" data-line-number="8"><span class="kw">plot</span>(treebagRoc, <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">print.thres =</span> <span class="kw">c</span>(.<span class="dv">5</span>), </a>
-<a class="sourceLine" id="cb345-9" data-line-number="9">     <span class="dt">print.thres.pch =</span> <span class="dv">3</span>, <span class="dt">legacy.axes =</span> <span class="ot">TRUE</span>, <span class="dt">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>, </a>
-<a class="sourceLine" id="cb345-10" data-line-number="10">     <span class="dt">print.thres.cex =</span> <span class="fl">1.2</span>,</a>
-<a class="sourceLine" id="cb345-11" data-line-number="11">     <span class="dt">col =</span> <span class="st">&quot;red&quot;</span>, <span class="dt">print.thres.col =</span> <span class="st">&quot;red&quot;</span>)</a>
-<a class="sourceLine" id="cb345-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb345-13" data-line-number="13"><span class="kw">plot</span>(rfRoc, <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">print.thres =</span> <span class="kw">c</span>(.<span class="dv">5</span>), </a>
-<a class="sourceLine" id="cb345-14" data-line-number="14">     <span class="dt">print.thres.pch =</span> <span class="dv">1</span>, <span class="dt">legacy.axes =</span> <span class="ot">TRUE</span>, <span class="dt">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>, </a>
-<a class="sourceLine" id="cb345-15" data-line-number="15">     <span class="dt">print.thres.cex =</span> <span class="fl">1.2</span>,</a>
-<a class="sourceLine" id="cb345-16" data-line-number="16">     <span class="dt">col =</span> <span class="st">&quot;green&quot;</span>, <span class="dt">print.thres.col =</span> <span class="st">&quot;green&quot;</span>)</a>
-<a class="sourceLine" id="cb345-17" data-line-number="17"></a>
-<a class="sourceLine" id="cb345-18" data-line-number="18"><span class="kw">plot</span>(gbmRoc, <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">print.thres =</span> <span class="kw">c</span>(.<span class="dv">5</span>), </a>
-<a class="sourceLine" id="cb345-19" data-line-number="19">     <span class="dt">print.thres.pch =</span> <span class="dv">10</span>, <span class="dt">legacy.axes =</span> <span class="ot">TRUE</span>, <span class="dt">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>, </a>
-<a class="sourceLine" id="cb345-20" data-line-number="20">     <span class="dt">print.thres.cex =</span> <span class="fl">1.2</span>,</a>
-<a class="sourceLine" id="cb345-21" data-line-number="21">     <span class="dt">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="dt">print.thres.col =</span> <span class="st">&quot;blue&quot;</span>)</a>
-<a class="sourceLine" id="cb345-22" data-line-number="22"></a>
-<a class="sourceLine" id="cb345-23" data-line-number="23"><span class="kw">legend</span>(<span class="fl">0.2</span>, <span class="fl">0.5</span>, <span class="dt">cex =</span> <span class="fl">0.8</span>,</a>
-<a class="sourceLine" id="cb345-24" data-line-number="24">       <span class="kw">c</span>(<span class="st">&quot;Single Tree&quot;</span>, <span class="st">&quot;Bagged Tree&quot;</span>, <span class="st">&quot;Random Forest&quot;</span>, <span class="st">&quot;Boosted Tree&quot;</span>),</a>
-<a class="sourceLine" id="cb345-25" data-line-number="25">       <span class="dt">lwd =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb345-26" data-line-number="26">       <span class="dt">col =</span> <span class="kw">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;red&quot;</span>, <span class="st">&quot;green&quot;</span>, <span class="st">&quot;blue&quot;</span>),</a>
-<a class="sourceLine" id="cb345-27" data-line-number="27">       <span class="dt">pch =</span> <span class="kw">c</span>(<span class="dv">16</span>, <span class="dv">3</span>, <span class="dv">1</span>, <span class="dv">10</span>))</a></code></pre></div>
-<p><img src="IDS_files/figure-html/unnamed-chunk-142-1.svg" width="672" /></p>
+<div class="sourceCode" id="cb350"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb350-1" data-line-number="1"><span class="kw">plot</span>(rpartRoc, <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>, <span class="dt">print.thres =</span> <span class="kw">c</span>(.<span class="dv">5</span>),</a>
+<a class="sourceLine" id="cb350-2" data-line-number="2">     <span class="dt">print.thres.pch =</span> <span class="dv">16</span>,</a>
+<a class="sourceLine" id="cb350-3" data-line-number="3">     <span class="dt">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>,</a>
+<a class="sourceLine" id="cb350-4" data-line-number="4">     <span class="dt">print.thres.cex =</span> <span class="fl">1.2</span>,</a>
+<a class="sourceLine" id="cb350-5" data-line-number="5">     <span class="dt">col =</span> <span class="st">&quot;black&quot;</span>, <span class="dt">legacy.axes =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb350-6" data-line-number="6">     <span class="dt">print.thres.col =</span> <span class="st">&quot;black&quot;</span>)</a>
+<a class="sourceLine" id="cb350-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb350-8" data-line-number="8"><span class="kw">plot</span>(treebagRoc, <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">print.thres =</span> <span class="kw">c</span>(.<span class="dv">5</span>), </a>
+<a class="sourceLine" id="cb350-9" data-line-number="9">     <span class="dt">print.thres.pch =</span> <span class="dv">3</span>, <span class="dt">legacy.axes =</span> <span class="ot">TRUE</span>, <span class="dt">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>, </a>
+<a class="sourceLine" id="cb350-10" data-line-number="10">     <span class="dt">print.thres.cex =</span> <span class="fl">1.2</span>,</a>
+<a class="sourceLine" id="cb350-11" data-line-number="11">     <span class="dt">col =</span> <span class="st">&quot;red&quot;</span>, <span class="dt">print.thres.col =</span> <span class="st">&quot;red&quot;</span>)</a>
+<a class="sourceLine" id="cb350-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb350-13" data-line-number="13"><span class="kw">plot</span>(rfRoc, <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">print.thres =</span> <span class="kw">c</span>(.<span class="dv">5</span>), </a>
+<a class="sourceLine" id="cb350-14" data-line-number="14">     <span class="dt">print.thres.pch =</span> <span class="dv">1</span>, <span class="dt">legacy.axes =</span> <span class="ot">TRUE</span>, <span class="dt">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>, </a>
+<a class="sourceLine" id="cb350-15" data-line-number="15">     <span class="dt">print.thres.cex =</span> <span class="fl">1.2</span>,</a>
+<a class="sourceLine" id="cb350-16" data-line-number="16">     <span class="dt">col =</span> <span class="st">&quot;green&quot;</span>, <span class="dt">print.thres.col =</span> <span class="st">&quot;green&quot;</span>)</a>
+<a class="sourceLine" id="cb350-17" data-line-number="17"></a>
+<a class="sourceLine" id="cb350-18" data-line-number="18"><span class="kw">plot</span>(gbmRoc, <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>, <span class="dt">add =</span> <span class="ot">TRUE</span>, <span class="dt">print.thres =</span> <span class="kw">c</span>(.<span class="dv">5</span>), </a>
+<a class="sourceLine" id="cb350-19" data-line-number="19">     <span class="dt">print.thres.pch =</span> <span class="dv">10</span>, <span class="dt">legacy.axes =</span> <span class="ot">TRUE</span>, <span class="dt">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>, </a>
+<a class="sourceLine" id="cb350-20" data-line-number="20">     <span class="dt">print.thres.cex =</span> <span class="fl">1.2</span>,</a>
+<a class="sourceLine" id="cb350-21" data-line-number="21">     <span class="dt">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="dt">print.thres.col =</span> <span class="st">&quot;blue&quot;</span>)</a>
+<a class="sourceLine" id="cb350-22" data-line-number="22"></a>
+<a class="sourceLine" id="cb350-23" data-line-number="23"><span class="kw">legend</span>(<span class="fl">0.2</span>, <span class="fl">0.5</span>, <span class="dt">cex =</span> <span class="fl">0.8</span>,</a>
+<a class="sourceLine" id="cb350-24" data-line-number="24">       <span class="kw">c</span>(<span class="st">&quot;Single Tree&quot;</span>, <span class="st">&quot;Bagged Tree&quot;</span>, <span class="st">&quot;Random Forest&quot;</span>, <span class="st">&quot;Boosted Tree&quot;</span>),</a>
+<a class="sourceLine" id="cb350-25" data-line-number="25">       <span class="dt">lwd =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>),</a>
+<a class="sourceLine" id="cb350-26" data-line-number="26">       <span class="dt">col =</span> <span class="kw">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;red&quot;</span>, <span class="st">&quot;green&quot;</span>, <span class="st">&quot;blue&quot;</span>),</a>
+<a class="sourceLine" id="cb350-27" data-line-number="27">       <span class="dt">pch =</span> <span class="kw">c</span>(<span class="dv">16</span>, <span class="dv">3</span>, <span class="dv">1</span>, <span class="dv">10</span>))</a></code></pre></div>
+<p><img src="IDS_files/figure-html/unnamed-chunk-140-1.svg" width="672" /></p>
 <p>Since the data here doesn’t have many variables, we don’t see a significant difference among the models. But you can still see those ensemble methods are better than a single tree. In most of the real applications, ensemble methods perform much better. Random forest and boosting trees can be a baseline model. Before exploring different models, you can quickly run a random forest to see the performance and then try to improve that performance. If the performance you got from the random forest is not too much better than guessing, you should consider collecting more data or reviewing the problem to frame it a different way instead of trying other models. Because it usually means the current data is not enough to solve the problem.</p>
 </div>
 <div id="boosting-as-additive-model" class="section level3">
