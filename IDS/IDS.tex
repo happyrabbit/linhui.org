@@ -169,7 +169,7 @@
 
 \title{Introduction to Data Science}
 \author{Hui Lin and Ming Li}
-\date{2019-11-29}
+\date{2019-12-06}
 
 \begin{document}
 \maketitle
@@ -1059,8 +1059,8 @@ The data science project is a combination of art and engineering. A data science
 
 Before tackling analytics problem, we start by introducing data to be analyzed in later chapters.
 
-\hypertarget{customer-data-for-clothing-company}{%
-\section{Customer Data for Clothing Company}\label{customer-data-for-clothing-company}}
+\hypertarget{customer-data-for-a-clothing-company}{%
+\section{Customer Data for A Clothing Company}\label{customer-data-for-a-clothing-company}}
 
 Our first data set represents customers of a clothing company who sells products in physical stores and online. This data is typical of what one might get from a company's marketing data base (the data base will have more data than the one we show here). This data includes 1000 customers:
 
@@ -1688,6 +1688,183 @@ So far, we have illustrated
 \end{enumerate}
 
 These procedures cover the basics of big data analysis that a data scientist needs to know as a beginner. We have an R notebook on the book website that contains the contents of this chapter. We also have a Python notebook on the book website.
+
+\hypertarget{databases-and-sql}{%
+\section{Databases and SQL}\label{databases-and-sql}}
+
+\hypertarget{history}{%
+\subsection{History}\label{history}}
+
+Databases have been around for many years to efficiently organize, store, retrieve, and update data systematically. In the past, statisticians and analysts usually dealt with small datasets stored in text or Excel files and often did not interact with database systems. Students from the traditional statistics department usually lack the necessary database knowledge. However, as data grow bigger, database knowledge becomes essential and required for statisticians, analysts and data scientists in an enterprise environment where data are stored in some form of database systems. Databases often contain a collection of tables and the relationship among these tables (i.e.~schema). The table is the fundamental structure for databases that contain rows and columns similar to data frames in R or Python. Database management systems (DBMS) ensure data integration and security in real time operations. There are many different DBMS such as Oracle, SQL Server, MySQL, Teradata, Hive, Redshift and Hana. The majority of database operations are very similar among different DBMS, and Structured Query Language (SQL) is the standard language to use these systems.
+
+SQL became a standard of the American National Standards Institute (ANSI) in 1986, and of the International Organization for Standardization (ISO) in 1987. The most recent version is published in December 2016. For typical users, fundamental knowledge is nearly the same across all database systems. In addition to the standard features, each DBMS providers include their own specific functions and features. So, for the same query, there may be slightly different implementations (i.e.~SQL script) for different systems. In this section, we use the Databricks' SQL implementation (i.e.~all the SQL scripts can run in Databricks SQL notebook).
+
+More recent data is stored in a distributed system such as Hive for disk storage or Hana for in-memory storage. Most relational databases are row-based (i.e.~data for each row are stored closely), whereas analytics workflows often favor column-based systems (i.e.~data for each column are stored closely). Fortunately, as a database user, we only need to learn how to write SQL scripts to retrieve and manipulate data. Even though there are different implantations of SQL across different DBMS, SQL is nearly universal across relational databases including Hive and Spark, which means once we know SQL, our knowledge can be transferred among different database systems. SQL is easy to learn even if you do not have previous experience. In this session, we will go over the key concepts in the database and SQL.
+
+\hypertarget{database-table-and-view}{%
+\subsection{Database, Table and View}\label{database-table-and-view}}
+
+A database is a collection of tables that are related to each other. A database has its own database name and each table has its name as well. We can think a database is a ``folder'' where tables within a database are ``files'' within the folder. A table has rows and columns exactly as an R or Python pandas data frame. Each row (also called record) represents a unique instance of the subject and each column (also called field or attribute) represents a characteristic of the subject on the table. For each table, there is a special column called the primary key which uniquely identifies each of its records.
+
+Tables within a specific database contain related information and the schema of a database illustrates all fields in every table as well as how these tables and fields relate to each other (i.e.~the structure of a database). Tables can be filtered, joined and aggregated to return specific information. The view is a virtual table composed of fields from one or more base tables. The view does not store data and only store table structure. The view is also referred to as a saved query. The view is typically used to protect the data stored in the table and users can only query information from a view and cannot change or update its contents.
+
+We will use two simple tables to illustrate basic SQL operations. These two tables are from an R dataset which contains the 50 states' population and income (\url{https://stat.ethz.ch/R-manual/R-patched/library/datasets/html/state.html}). The first table is called \texttt{divisions} which has two columns: \texttt{state} and \texttt{division} and the first few rows are shown in the following table:
+
+\begin{longtable}[]{@{}cc@{}}
+\toprule
+state & division\tabularnewline
+\midrule
+\endhead
+Alabama & East South Central\tabularnewline
+Alaska & Pacific\tabularnewline
+Arizona & Mountain\tabularnewline
+Arkansas & West South Central\tabularnewline
+California & Pacific\tabularnewline
+\bottomrule
+\end{longtable}
+
+The second table is called \texttt{metrics} which contains three columns: \texttt{state}, \texttt{population} and \texttt{income} and first few rows of the table are shown below:
+
+\begin{longtable}[]{@{}ccc@{}}
+\toprule
+state & population & income\tabularnewline
+\midrule
+\endhead
+Alabama & 3615 & 3624\tabularnewline
+Alaska & 365 & 6315\tabularnewline
+Arizona & 2212 & 4530\tabularnewline
+Arkansas & 2110 & 3378\tabularnewline
+California & 21198 & 5114\tabularnewline
+\bottomrule
+\end{longtable}
+
+To illustrate missing information, three more rows are added at the end of the original division table with state Alberta, Ontario, and Quebec with their corresponding division NULL. We first creat these two tables and save them as csv files, and then we upload these two files as Databricks tables.
+
+\hypertarget{basic-sql-statement}{%
+\subsection{Basic SQL Statement}\label{basic-sql-statement}}
+
+After logging into Databricks and creating two tables, we can now create a notebook and choose the default language of the notebook to be SQL. There are a few very easy SQL statements to help us understand the database and table structure:
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{show\ database}: show current databases in the system
+\item
+  \texttt{create\ database\ db\_name}: create a new database with name \texttt{db\_name}
+\item
+  \texttt{drop\ database\ db\_name}: delete database \texttt{db\_name} (be careful when using it!)
+\item
+  \texttt{use\ db\_name}: set up the current database to be used
+\item
+  \texttt{show\ tables}: show all the tables within the currently used database
+\item
+  \texttt{describe\ tbl\_name}: show the structure of table with name \texttt{tbl\_name} (i.e.~list of column name and data type)
+\item
+  \texttt{drop\ tbl\_name}: delete a table with name \texttt{tbl\_name} (be careful when using it!)
+\item
+  \texttt{select\ *\ from\ metrics\ limit\ 10}: show the first 10 rows of a table
+\end{itemize}
+
+If you are familiar with a procedural programming language such as C and FORTRAN or scripting languages such as R and Python, you may find SQL code a little bit strange. We should view SQL code by each specific chunk where it defines a specific task. SQL codes descript a specific task and DBMS will run and finish the task. SQL does not follow typical procedure program rules and we can think SQL is ``descriptive'' (i.e.~we describe what we want using SQL and DBMS figures out how to do it).
+
+\hypertarget{select-statement}{%
+\subsubsection{\texorpdfstring{\texttt{SELECT} Statement}{SELECT Statement}}\label{select-statement}}
+
+\texttt{SELECT} is the most used statement in SQL, especially for database users and business analysts. It is used to extract specific information (i.e.~column or columns) \texttt{FROM} one or multiple tables. It can be used to combine multiple tables. \texttt{WHERE} can be used in the \texttt{SELECT} statement to selected rows with specific conditions (i.e.~filters). \texttt{ORDER\ BY} can be used in the \texttt{SELECT} statement to order the results in descending or ascending order of one or multiple columns. We can use \texttt{*} after \texttt{SELECT} to represent all columns in the table, or specifically write the column names separated by a comma. Below is the basic structure of a \texttt{SELECT} statement:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT}\NormalTok{ Col_Name1, Col_Name2}
+\KeywordTok{FROM}\NormalTok{ Table_Name}
+\KeywordTok{WHERE}\NormalTok{ Specific_Condition}
+\KeywordTok{ORDER} \KeywordTok{BY}\NormalTok{ Col_Name1, Col_Name2;}
+\end{Highlighting}
+\end{Shaded}
+
+Here \texttt{Specific\_Condition} is the typical logical conditions and only columns with \texttt{TRUE} for this condition will be chosen. For example, if we want to choose states and its total income where the population larger than 10000 and individual income less than 5000 with the result order by state name, we can use the following query:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{select}\NormalTok{ state, income*population }\KeywordTok{as}\NormalTok{ total_income}
+\KeywordTok{from}\NormalTok{ metrics}
+\KeywordTok{where}\NormalTok{ population > }\DecValTok{10000} \KeywordTok{and}\NormalTok{ income < }\DecValTok{5000}
+\KeywordTok{order} \KeywordTok{by}\NormalTok{ state}
+\end{Highlighting}
+\end{Shaded}
+
+The \texttt{SELECT} statement is used to slicing and dicing the dataset as well as create new columns of interest (such as \texttt{total\_income}) using basic computation functions.
+
+\hypertarget{aggregation-functions-and-group-by}{%
+\subsubsection{\texorpdfstring{Aggregation Functions and \texttt{GROUP\ BY}}{Aggregation Functions and GROUP BY}}\label{aggregation-functions-and-group-by}}
+
+We can also use aggregation functions in the \texttt{SELECT} statement to summarize the data. For example, \texttt{count(col\_name)} function will return the total number of not \texttt{NULL} rows for a specific column. Other aggregation function on numerical values include \texttt{min(col\_name)}, \texttt{max(col\_name)}, \texttt{avg(col\_name)}. Let's use the \texttt{metrics} table again to illustrate aggregation functions. For aggregation function, it takes all the rows that match WHERE condition (if any) and return one number. The following statement will calculate the maximum, minimum, and average population for all states starts with letter A to E.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{select} \FunctionTok{sum}\NormalTok{(population) }\KeywordTok{as}\NormalTok{ sum_pop, }\FunctionTok{max}\NormalTok{(population) }\KeywordTok{as}
+\NormalTok{max_pop, }\FunctionTok{min}\NormalTok{(population) }\KeywordTok{as}\NormalTok{ min_pop, }\FunctionTok{avg}\NormalTok{(population)}
+\KeywordTok{as}\NormalTok{ avg_pop, }\FunctionTok{count}\NormalTok{(population) }\KeywordTok{as}\NormalTok{ count_pop}
+\KeywordTok{from}\NormalTok{ metrics}
+\KeywordTok{where}\NormalTok{ substring(state, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{) }\KeywordTok{in}\NormalTok{ (}\StringTok{'A'}\NormalTok{, }\StringTok{'B'}\NormalTok{, }\StringTok{'C'}\NormalTok{, }\StringTok{'D'}\NormalTok{, }\StringTok{'E'}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+The results from the above query only return one row as expected. Sometimes we want to find the aggregated value based on groups that can be defined by one or more columns. Instead of writing multiple SQL to calculate the aggregated value for each group, we can easily use the GROUP BY to calculate the aggregated value for each group in the \texttt{SELECT} statement. For example, if we want to find how many states in each division, we can use the following:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{select}\NormalTok{ division, }\FunctionTok{count}\NormalTok{(state) }\KeywordTok{as}\NormalTok{ number_of_states}
+\KeywordTok{from}\NormalTok{ divisions}
+\KeywordTok{group} \KeywordTok{by}\NormalTok{ division}
+\end{Highlighting}
+\end{Shaded}
+
+Another special aggregation function is to return distinct values for one column or a combination of multiple columns. Simple use \texttt{SELECT\ DISTINCT\ col\_name1,\ col\_name2} in the first line of the \texttt{SELECT} statement.
+
+\hypertarget{join-multiple-tables}{%
+\subsubsection{Join Multiple Tables}\label{join-multiple-tables}}
+
+The database system is usually designed such that each table contains a piece of specific information and oftentimes we need to JOIN multiple tables to achieve a specific task. There are few types typically JOINs: inner join (keep only rows that match the join condition from both tables), left outer join (rows from inner join + unmatched rows from the first table), right outer join (rows from inner join + unmatched rows from the second table) and full outer join (rows from inner join + unmatched rows from both tables). The typical \texttt{JOIN} statement is illustrated below:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{SELECT}\NormalTok{ a.col_name1 }\KeywordTok{as}\NormalTok{ var1, b.col_name2 }\KeywordTok{as}\NormalTok{ var2}
+\KeywordTok{FROM}\NormalTok{ tbl_one }\KeywordTok{as}\NormalTok{ a}
+\KeywordTok{LEFT} \KeywordTok{JOIN}\NormalTok{ tabl_two }\KeywordTok{as}\NormalTok{ b}
+\KeywordTok{ON}\NormalTok{ a.col_to_match = b.col_to_match}
+\end{Highlighting}
+\end{Shaded}
+
+For example, let us join the division table and metrics table to find what is the average population and income for each division, and the results order by division names:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{select}\NormalTok{ a.division, }\FunctionTok{avg}\NormalTok{(b.population) }\KeywordTok{as}\NormalTok{ avg_pop,}
+\FunctionTok{avg}\NormalTok{(b.income) }\KeywordTok{as}\NormalTok{ avg_inc}
+\KeywordTok{from}\NormalTok{ divisions }\KeywordTok{as}\NormalTok{ a}
+\KeywordTok{inner} \KeywordTok{join}\NormalTok{ metrics }\KeywordTok{as}\NormalTok{ b}
+\KeywordTok{on}\NormalTok{ a.state = b.state}
+\KeywordTok{group} \KeywordTok{by}\NormalTok{ division}
+\KeywordTok{order} \KeywordTok{by}\NormalTok{ division}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{add-more-content-into-a-table}{%
+\subsubsection{Add More Content into a Table}\label{add-more-content-into-a-table}}
+
+We can use the \texttt{INSERT} statement to add additional rows into a particular table, for example, we can add one more row to the metrics table by using the following query:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{insert} \KeywordTok{into}\NormalTok{ metrics}
+\KeywordTok{values}\NormalTok{ (}\StringTok{'Alberta'}\NormalTok{, }\DecValTok{4146}\NormalTok{, }\DecValTok{7370}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{advanced-topics-in-database}{%
+\subsection{Advanced Topics in Database}\label{advanced-topics-in-database}}
+
+There are many advanced topics such as how to efficiently query data using index; how to take care of data integrity when multiple users are using the same table; algorithm behind data storage (i.e.~column-wise or row-wise data storage); how to design the database schema. Users can learn these advanced topics gradually. We hope the basic knowledge covered in this section will kick off the initial momentum to learn SQL. As you can see, it is easy to write SQL statement to retrieve, join, slice, dice and aggregate data. The SQL notebook that contains all the above operations is included in the book's website.
 
 \hypertarget{data-pre-processing}{%
 \chapter{Data Pre-processing}\label{data-pre-processing}}
@@ -4112,8 +4289,8 @@ The \texttt{unite()} function will do the opposite: combining two columns. It is
 
 The reshaping manipulations may be the trickiest part. You have to practice a lot to get familiar with those functions. Unfortunately, there is no shortcut.
 
-\hypertarget{model-tuning-strategy}{%
-\chapter{Model Tuning Strategy}\label{model-tuning-strategy}}
+\hypertarget{modeltuningstrategy}{%
+\chapter{Model Tuning Strategy}\label{modeltuningstrategy}}
 
 When training a machine learning model, there are many decisions to make. For example, when training a random forest, you need to decide the number of trees and the number of variables at each node. For lasso method, you need to determine the penalty parameter. There may be standard settings for some of the parameters, but it's unlikely to guess the right values for all of these correctly. Other than that, making good choices on how you split the data into training and testing sets can make a huge difference in helping you find a high-performance model efficiently.
 
@@ -4933,13 +5110,248 @@ The apparent error rate is the error rate when the data is used twice, both to f
 \hypertarget{measuring-performance}{%
 \chapter{Measuring Performance}\label{measuring-performance}}
 
-To compare different models, we need a way to measure model performance. There are various metrics to use. Sometimes, it is better to look at models through multiple lenses. In this chapter, we will introduce some of the most common performance measurement metrics. You need to select a performance measurement when tuning the model.
+To compare different models, we need a way to measure model performance. There are various metrics to use. To better understand the strengths and weaknesses of a model, you need to look at it through multiple metrics. In this chapter, we will introduce some of the most common performance measurement metrics.
 
 \hypertarget{regression-model-performance}{%
 \section{Regression Model Performance}\label{regression-model-performance}}
 
+\textbf{MSE and RMSE}
+
+Mean Squared Error (MSE) measures the average of the squares of the errors---that is, the average squared difference between the estimated values and the actual value. The Root Mean Squared Error (RMSE) is the root square of the MSE.
+
+\[MSE=\frac{1}{n}\sum_{i=1}^{n}(y_{i}-\hat{y}*{i})^{2}\]
+\[RMSE=\sqrt{\frac{1}{n}\sum*{i=1}^{n}(y_{i}-\hat{y}_{i})^{2}}\]
+
+Both are the common measurements for the regression model performance. Let's use the previous \texttt{income} prediction as an example. Fit a simple linear model:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sim.dat <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"http://bit.ly/2P5gTw4"}\NormalTok{)}
+\NormalTok{fit<-}\StringTok{ }\KeywordTok{lm}\NormalTok{(}\DataTypeTok{formula =}\NormalTok{ income }\OperatorTok{~}\StringTok{ }\NormalTok{store_exp }\OperatorTok{+}\StringTok{ }\NormalTok{online_exp }\OperatorTok{+}\StringTok{ }\NormalTok{store_trans }\OperatorTok{+}\StringTok{ }
+\StringTok{    }\NormalTok{online_trans, }\DataTypeTok{data =}\NormalTok{ sim.dat)}
+\KeywordTok{summary}\NormalTok{(fit)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = income ~ store_exp + online_exp + store_trans + 
+##     online_trans, data = sim.dat)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -128768  -15804     441   13375  150945 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  85711.680   3651.599   23.47  < 2e-16 ***
+## store_exp        3.198      0.475    6.73  3.3e-11 ***
+## online_exp       8.995      0.894   10.06  < 2e-16 ***
+## store_trans   4631.751    436.478   10.61  < 2e-16 ***
+## online_trans -1451.162    178.835   -8.11  1.8e-15 ***
+## ---
+## Signif. codes:  
+## 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 31500 on 811 degrees of freedom
+##   (184 observations deleted due to missingness)
+## Multiple R-squared:  0.602,  Adjusted R-squared:   0.6 
+## F-statistic:  306 on 4 and 811 DF,  p-value: <2e-16
+\end{verbatim}
+
+The fitted results \texttt{fit} shows the RMSE is 31530 (at the bottom of the output after \texttt{Residual\ standard\ error:}).
+
+Another common performance measure for the regression model is R-Squared, often denoted as \(R^2\). It is the square of the correlation between the fitted value and the observed value. It is often explained as the percentage of the information in the data that can be explained by the model. The above model returns a R-squared＝0.6, which indicates the model can explain 60\% of the variance in variable \texttt{income}. While \(R^2\) is easy to explain, it is not a direct measure of model accuracy but correlation. Here the \(R^2\) value is not low but the RMSE is 0.6 which means the average difference between model fitting and the observation is \ensuremath{3.153\times 10^{4}}. It is a big discrepancy from an application point of view. When the response variable has a large scale and high variance, a high \(R^2\) doesn't mean the model has enough accuracy. It is also important to remember that \(R^2\) is dependent on the variation of the outcome variable. If the data has a response variable with a higher variance, the model based on it tends to have a higher \(R^2\).
+
+We used \(R^2\) to show the impact of the error from independent and response variables in Chapter \ref{modeltuningstrategy} where we didn't consider the impact of the number of parameters (because the number of parameters is very small compared to the number of observations). However, \(R^2\) increases as the number of parameters increases. So people usually use Adjusted R-squared which is designed to mitigate the issue. The original \(R^2\) is defined as:
+
+\[R^{2}=1-\frac{RSS}{TSS}\]
+
+where \(RSS=\sum_{i=1}^{n}(y_{i}-\hat{y_{i}})^{2}\) and \(TSS=\sum_{i=1}^{n}(y_{i}-\bar{y})^{2}\).
+
+Since RSS is always decreasing as the number of parameters increases, \(R^2\) increases as a result. For a model with \(p\) parameters, the adjusted \(R^2\) is defined as:
+
+\[Adjusted\ R^{2}=1-\frac{RSS/(n-p-1)}{TSS/(n-1)}\]
+
+To maximize the adjusted \(R^{2}\) is identical to minimize \(RSS/(n-p-1)\). Since the number of parameters \(p\) is reflected in the equation, \(RSS/(n-p-1)\) can increase or decrease as \(p\) increases. The idea behind this is that the adjusted R-squared increases if the new variable improves the model more than would be expected by chance. It decreases when a predictor improves the model by less than expected by chance. While~values are usually positive,~they can be~negative~as well.
+
+Another measurement is \(C_{p}\). For a least squared model with \(p\) parameters:
+
+\[C_{p}=\frac{1}{n}(RSS+2p\hat{\sigma}^{2})\]
+
+where \(\hat{\sigma}^{2}\) is the estimator of the model random effect \(\epsilon\). \(C_{p}\) is to add penalty \(2p\hat{\sigma}^{2}\) to the training set \(RSS\). The goal is to adjust the over-optimistic measurement based on training data. As the number of parameters increases, the penalty increases. It counteracts the decrease of \(RSS\) due to increasing the number of parameters. We choose the model with a smaller \(C_{p}\).
+
+Both AIC and BIC are based on the maximum likelihood. In linear regression, the maximum likelihood estimate is the least squared estimate. The definitions of the two are:
+
+\[AIC=n+nlog(2\pi)+nlog(RSS/n)+2(p+1)\]
+
+\[BIC=n+nlog(2\pi)+nlog(RSS/n)+log(n)(p+1)\]
+
+R function AIC() and BIC() will calculate the AIC and BIC value according to the above equations. Many textbooks ignore content item \(n+nlog(2\pi)\), and use \(p\) instead of \(p+1\). Those slightly different versions give the same results since we are only interested in the relative value. Comparing to AIC, BIC puts a heavier penalty on the number of parameters.
+
 \hypertarget{classification-model-performance}{%
 \section{Classification Model Performance}\label{classification-model-performance}}
+
+This section focuses on performance measurement for models with a categorical response. The metrics in the previous section are for models with a continuous response and they are not appropriate in the context of classification. Most of the classification problems are dichotomous, such as an outbreak of disease, spam email, etc. There are also cases with more than two categories as the segments in the clothing company data. We use swine disease data to illustrate different metrics. Let's train a random forest model as an example. We will discuss the model in Chapter \ref{treemodel}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(dplyr)}
+\KeywordTok{library}\NormalTok{(randomForest)}
+\KeywordTok{library}\NormalTok{(caret)}
+\KeywordTok{library}\NormalTok{(readr)}
+\NormalTok{disease_dat <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"http://bit.ly/2KXb1Qi"}\NormalTok{)}
+\CommentTok{# you can check the data using glimpse()}
+\CommentTok{# glimpse(disease_dat)}
+\end{Highlighting}
+\end{Shaded}
+
+Separate the data to be training and testing sets. Fit model using training data (\texttt{xTrain} and \texttt{yTrain}) and applied the trained model on testing data (\texttt{xTest} and \texttt{yTest}) to evaluate model performance. We use 70\% of the sample as training and the rest 30\% as testing.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# separate the data to be training and testing}
+\NormalTok{trainIndex <-}\StringTok{ }\KeywordTok{createDataPartition}\NormalTok{(disease_dat}\OperatorTok{$}\NormalTok{y, }\DataTypeTok{p =} \FloatTok{0.8}\NormalTok{, }
+    \DataTypeTok{list =}\NormalTok{ F, }\DataTypeTok{times =} \DecValTok{1}\NormalTok{)}
+\NormalTok{xTrain <-}\StringTok{ }\NormalTok{disease_dat[trainIndex, ] }\OperatorTok{%>%}\StringTok{ }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{select}\NormalTok{(}\OperatorTok{-}\NormalTok{y)}
+\NormalTok{xTest <-}\StringTok{ }\NormalTok{disease_dat[}\OperatorTok{-}\NormalTok{trainIndex, ] }\OperatorTok{%>%}\StringTok{ }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{select}\NormalTok{(}\OperatorTok{-}\NormalTok{y)}
+\CommentTok{# the response variable need to be factor}
+\NormalTok{yTrain <-}\StringTok{ }\NormalTok{disease_dat}\OperatorTok{$}\NormalTok{y[trainIndex] }\OperatorTok{%>%}\StringTok{ }\KeywordTok{as.factor}\NormalTok{()}
+\NormalTok{yTest <-}\StringTok{ }\NormalTok{disease_dat}\OperatorTok{$}\NormalTok{y[}\OperatorTok{-}\NormalTok{trainIndex] }\OperatorTok{%>%}\StringTok{ }\KeywordTok{as.factor}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+Train a random forest model:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{train_rf <-}\StringTok{ }\KeywordTok{randomForest}\NormalTok{(yTrain }\OperatorTok{~}\StringTok{ }\NormalTok{., }\DataTypeTok{data =}\NormalTok{ xTrain, }\DataTypeTok{mtry =} \KeywordTok{trunc}\NormalTok{(}\KeywordTok{sqrt}\NormalTok{(}\KeywordTok{ncol}\NormalTok{(xTrain) }\OperatorTok{-}\StringTok{ }
+\StringTok{    }\DecValTok{1}\NormalTok{)), }\DataTypeTok{ntree =} \DecValTok{1000}\NormalTok{, }\DataTypeTok{importance =}\NormalTok{ T)}
+\end{Highlighting}
+\end{Shaded}
+
+Apply the trained random forest model to the testing data to get two types of predictions:
+
+\begin{itemize}
+\tightlist
+\item
+  probability (a value between 0 to 1)
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{yhatprob <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(train_rf, xTest, }\StringTok{"prob"}\NormalTok{)}
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{100}\NormalTok{)}
+\NormalTok{car}\OperatorTok{::}\KeywordTok{some}\NormalTok{(yhatprob)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##         0     1
+## 33  0.504 0.496
+## 101 0.177 0.823
+## 171 0.841 0.159
+## 219 0.580 0.420
+## 248 0.535 0.465
+## 331 0.188 0.812
+## 332 0.824 0.176
+## 365 0.203 0.797
+## 381 0.881 0.119
+## 621 0.219 0.781
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  category prediction (0 or 1)
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{yhat <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(train_rf, xTest)}
+\NormalTok{car}\OperatorTok{::}\KeywordTok{some}\NormalTok{(yhat)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 124 196 238 284 440 477 482 594 704 765 
+##   0   0   1   0   0   1   0   1   1   1 
+## Levels: 0 1
+\end{verbatim}
+
+We will use the above two types of predictions to show different performance metrics.
+
+\textbf{Kappa Statistics}
+
+\textbf{Confusion Matrix} is a counting table to describe the performance of a classification model. For the true response \texttt{yTest} and prediction \texttt{yhat}, the confusion matrix is:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{yhat =}\StringTok{ }\KeywordTok{as.factor}\NormalTok{(yhat) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{relevel}\NormalTok{(}\StringTok{"1"}\NormalTok{)}
+\NormalTok{yTest =}\StringTok{ }\KeywordTok{as.factor}\NormalTok{(yTest) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{relevel}\NormalTok{(}\StringTok{"1"}\NormalTok{)}
+\KeywordTok{table}\NormalTok{(yhat,yTest)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##     yTest
+## yhat  1  0
+##    1 63  0
+##    0 12 85
+\end{verbatim}
+
+The top-left and bottom-right are the numbers of correctly classified samples. The top-right and bottom-left are the numbers of wrongly classified samples. A general confusion matrix for a binary classifier is following:
+
+\begin{longtable}[]{@{}ccc@{}}
+\toprule
+& Predicted Yes & Predicted No\tabularnewline
+\midrule
+\endhead
+Actual Yes & TP & FN\tabularnewline
+Actual No & FP & TN\tabularnewline
+\bottomrule
+\end{longtable}
+
+where TP is true positive, FP is false positive, TN is true negative, FN is false negative. The cells along the diagonal line from top-left to bottom-right contain the counts of correctly classified samples. The cells along the other diagonal line contain the counts of wrongly classified samples. The most straightforward performance measure is the \textbf{total accuracy} which is the percentage of correctly classified samples:
+
+\[Total\ accuracy = \frac{TP+TN}{TP+TN+FP+FN}\]
+
+You can calculate the total accuracy when there are more than two categories. This statistic is straightforward but has some disadvantages. First, it doesn't differentiate different error types. In a real application, different types of error may have different impacts. For example, it is much worse to tag an important email as spam and miss it than failing to filter out a spam email. Provost et al. \citep{Provost1998} discussed in detail the problem of using total accuracy on different classifiers. There are some other metrics based on the confusion matrix that measure different types of error. P\textbf{recision} is a metric to measure how accurate positive predictions are (i.e.~among those emails predicted as spam, how many percentages of them are spam emails?):
+
+\[precision = \frac{TP}{TP+FP}\]
+
+\textbf{Recall sensitivity} is to measure the coverage of actual positive samples (i.e.~among those spam emails, how many percentages of them are predicted as spam) :
+
+\[Recall\ sensitivity = \frac{TP}{TP+FN}\]
+
+Specificity is to measure the coverage of actual negative samples (i.e.~among those non-spam emails, how many percentages of them pass the filter):
+
+\[Specificity = \frac{TN}{TN+FP}\]
+
+Since wrongly tagging an important email as spam has a bigger impact, in the spam email case, we want to make sure the model specificity is high enough.
+
+Second, total accuracy doesn't reflect the natural frequencies of each class. For example, the percentage of fraud cases for insurance may be very low, like 0.1\%. A model can achieve nearly perfect accuracy (99.9\%) by predicting all samples to be negative. The percentage of the largest class in the training set is also called the no-information rate. In this example, the no-information rate is 99.9\%. You need to get a model that at least beats this rate.
+
+Another metric is the Kappa statistic. It measures the agreement between the observed and predicted classes. It was originally come up by Cohen etc. \citep{Cohen1960}. Kappa takes into account the accuracy generated simply by chance. It is defined as:
+
+\[Kappa=\frac{P_{0}+P_{e}}{1-P_{e}}\]
+
+Let \(n=TP+TN+FP+FN\) be the total number of samples, where \(P_{0}=\frac{TP+TN}{n}\) is the observed accuracy, \(P_{e}=\frac{(TP+FP)(TP+FN)+(FN+TN)(FP+TN)}{n^{2}}\) is the expected accuracy based on the marginal totals of the confusion matrix. Kappa can take on a value from -1 to 1. The higher the value, the higher the agreement. A value of 0 means there is no agreement between the observed and predicted classes, while a value of 1 indicates perfect agreement. A negative value indicates that the prediction is in the opposite direction of the observed value. The following table may help you ``visualize'' the interpretation of kappa \citep{landis1977}:
+
+\begin{longtable}[]{@{}cc@{}}
+\toprule
+Kappa & Agreement\tabularnewline
+\midrule
+\endhead
+\textless{} 0 & Less than chance agreement\tabularnewline
+0.01--0.20 & Slight agreement\tabularnewline
+0.21-- 0.40 & Fair agreement\tabularnewline
+0.41--0.60 & Moderate agreement\tabularnewline
+0.61--0.80 & Substantial agreement\tabularnewline
+0.81--0.99 & Almost perfect agreement\tabularnewline
+\bottomrule
+\end{longtable}
 
 \hypertarget{regression-models}{%
 \chapter{Regression Models}\label{regression-models}}
@@ -5428,7 +5840,7 @@ The object \texttt{glmfit} returned by \texttt{glmnet()} has the information of 
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-100-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-107-1.pdf}
 
 Each curve in the plot represents one predictor. The default setting is \(\alpha=1\) which means there is only lasso penalty. From left to right, \(L_I\) norm is increasing which means \(\lambda\) is decreasing. The bottom x-axis is \(L_1\) norm (i.e. \(\parallel\mathbf{\beta}\parallel_{1}\)). The upper x-axis is the effective degrees of freedom (df) for the lasso. You can check the detail for every step by:
 
@@ -5510,7 +5922,7 @@ We can plot the object using \texttt{plot()}. The red dotted line is the cross-v
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-104-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-111-1.pdf}
 
 You can check the two selected \(\lambda\) values by:
 
@@ -5693,7 +6105,7 @@ For example:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-111-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-118-1.pdf}
 
 The above uses error rate as performance criteria and use 10-fold cross-validation. Similarly, you can get the \(\lambda\) value for the minimum error rate and the error rate that is 1 standard error from the minimum:
 
@@ -5878,7 +6290,7 @@ The most common criterion is AUC. You can compare the selections from different 
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-118-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-125-1.pdf}
 
 The x-axis is the value of the tuning parameter, the y-axis is AUC. The two dash lines are the value of \(\lambda\) for max AUC and the value for the one standard deviation to the max AUC. Once you choose the value of the tuning parameter, you can use \texttt{fitglasso()} to fit the model. For example, we can fit the model using the parameter value that gives the max AUC, which is \(\lambda=0.922\):
 
@@ -5922,8 +6334,8 @@ Use \texttt{predict\_glasso()} to predict new samples:
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{tree-based-methods}{%
-\chapter{Tree-Based Methods}\label{tree-based-methods}}
+\hypertarget{treemodel}{%
+\chapter{Tree-Based Methods}\label{treemodel}}
 
 The tree-based models can be used for regression and classification. The goal is to stratify or segment the predictor space into a number of sub-regions. For a given observation, use the mean or the mode of the training observations in the sub-region as the prediction. Tree-based methods are conceptually simple yet powerful. This type of model is often referred to as Classification And Regression Trees (CART). They are popular tools for many reasons:
 
@@ -6283,7 +6695,7 @@ A more convenient way is to use \texttt{train()} function in \texttt{caret} pack
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-122-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-129-1.pdf}
 
 RMSE doesn't change much when the maximum is larger than 2. So we set the maximum depth to be 2 and refit the model:
 
@@ -6324,7 +6736,7 @@ You can see that the final model picks \texttt{Q3} and \texttt{Q5} to predict to
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-125-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-132-1.pdf}
 
 \hypertarget{decision-tree}{%
 \subsection{Decision Tree}\label{decision-tree}}
@@ -6464,7 +6876,7 @@ Compare the results of the two approaches.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-129-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-136-1.pdf}
 
 You can see that in this case, the two approaches lead to similar model performance.
 
@@ -6724,7 +7136,7 @@ You can use varImpPlot() function to visualize the predictor importance:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-137-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-144-1.pdf}
 It is easy to see from the plot that \texttt{segment} and \texttt{Q4} are the top two variables to classify gender.
 
 \hypertarget{gradient-boosted-machine}{%
@@ -6950,7 +7362,7 @@ Now, let's compare the results from the three tree models.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-140-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-147-1.pdf}
 
 Since the data here doesn't have many variables, we don't see a significant difference among the models. But you can still see those ensemble methods are better than a single tree. In most of the real applications, ensemble methods perform much better. Random forest and boosting trees can be a baseline model. Before exploring different models, you can quickly run a random forest to see the performance and then try to improve that performance. If the performance you got from the random forest is not too much better than guessing, you should consider collecting more data or reviewing the problem to frame it a different way instead of trying other models. Because it usually means the current data is not enough to solve the problem.
 
@@ -7074,6 +7486,37 @@ where \(\alpha_m=2\beta_m=log\frac{1-err_m}{err_m}\) is the same with the \(\alp
 \hypertarget{deep-learning}{%
 \chapter{Deep Learning}\label{deep-learning}}
 
+\hypertarget{deep-learning-introduction-and-history}{%
+\section{Deep Learning Introduction and History}\label{deep-learning-introduction-and-history}}
+
+With everyday applications in language, voice, image and automatic driving cars, deep learning becomes a popular concept to the general public in the past few years. However, many of the concepts of deep learning started as early as the 1940s. For example, the concept of binary classifier of perceptron used a linear combination of input signals and a step activation function. It is basically the same as the single neuron in a modern deep learning framework that uses the exact same linear combination of input signals from neurons at previously layer and a more efficient non-linear activation function. The perceptron model was further defined by minimizing the classification error and it was trained by using one data point at a time to update the model parameters during the optimization process. In the modern neural network framework, there is a loss function to be minimized based on the problem to solve and the stochastics gradience descent and its variations are the major optimization algorithms.
+
+Even though the theoretical foundation of deep learning has gradually developed in the past few decades, real-world applications of deep learning started in the past few years primarily due to the following constraints: data, network structure, algorithm, and computation power.
+
+\textbf{Data}
+
+We are all familiar with all sorts of data today: structured tabulated data in database tables or CSV files, free form text, images, and other unstructured datasets. However, historical data are relatively small in size, especially for data with accurately labeled ground truth. Statisticians have been working on datasets that only have a few thousand rows and a few dozen columns for decades to solve business problems. Even with modern computers, the size of the data is usually limited to the memory of a computer. Now we know, to enable deep learning applications, the algorithm needs a much larger dataset than traditional machine learning methods. It is usually at the order of millions of samples with high-quality ground truth labels for supervised deep learning models.
+
+The first widely used large dataset with accurate labels is the ImageNet dataset which was first created in 2010. It now contains more than 14 million images with more than 20k synsets (i.e.~meaningful categories). Every image in the dataset was human-annotated with quality control to ensure the ground truth labels are accurate. One of the direct results of ImageNet was the Large Scale Visual Recognition Challenge (ILSVRC) which evaluated different algorithms in image-related tasks. The ILSVRC competition provided a perfect stage for deep learning applications to debut to the general public. For 2010 and 2011, the best record of error from traditional image classifications methods was around 26\%. In 2012, a method based on the convolutional neural network became the state of the art with an error rate of around 16\%, a dramatic improvement from the traditional methods.
+
+With the prevalence of consumer internet, users created much high-quality content and historical text, voice, image, and video were digitized. The quality and quantity of data for deep learning applications became available and it exceeded the threshold of the requirement for many deep learning applications such as image classification, voice recognition, and natural language understanding. Data is the fuel for deep learning engines. With more and more varieties of data created, captured, and saved, there will be more deep learning applications to create values across many business sectors.
+
+\textbf{Network Structure}
+
+Lacking high-quality high-volume data was not the only constraint for early deep learning years. For perceptron with just one single neural, it is just a linear classifier. Real applications are nearly always non-linear. To solve that problem, we have to grow one neural to multiple layers of neural network with multiple neurons per layer - the multiple layer perceptron (MLP) and it is called feedforward neural network. In the 1990s, the universal approximation theorem was proved and it assured us that a feedforward network with a single hidden layer containing a finite number of neurons can approximate continuous functions. Even though the one-layer neural network theoretically can solve a general non-linear problem, the reality is that we have grown the neural network to many layers of neural network. The number of layers in the network is the ``depth'' of a network. Loosely speaking, deep learning is a neural network with the many layers (i.e.~the depth is deep).
+
+The MLP is the basic structure for the modern deep learning applications. MLP can be used for classification problems or regression problems with response variables as the output and a collection of explanatory variables as the input (i.e.~the traditionally structured datasets). Many of the problems that can be solved using classical classification methods such as random forest can be solved by MLP. However, MLP is not the best option for image and language-related tasks. For image-related tasks, pixels for a local neighbor region collectively provide useful information to solve a task. To take advantage of the 2D spatial relationship among pixels, the convolutional neural network (CNN) structure is a better choice. For language-related tasks, the sequence of the text provides additional information than just a collection of single words. The recurrent neural network (RNN) is a better structure for such sequence-related data. There are other more complicated neural network structures and it is still a fast-developing area. MLP, CNN, and RNN are just the starting point of deep learning methods.
+
+\textbf{Algorithm}
+
+In addition to data and neural network structure, there were a few key algorithm breakthroughs before deep learning became a household terminology. For an entry-level neural network structure, there are hundreds of thousands of parameters to be estimated from the data. With a large amount of training data, stochastic gradience decent and mini-batch gradience decent are efficient ways to utilize a subset of training data to update the model parameters. Within the process, one of the key steps is back-propagation which was introduced in the 1980s for efficient weight update. There is a non-linear activation for each neuron in deep learning models, and \textbf{sigmoid} or \textbf{hyperbolic tangent} functions were often used. However, it has the problem of gradient vanishing when the number of layers of the network grows large (i.e.~deeper network). To solve this problem, the \textbf{rectified linear unit (ReLu)} was introduced to deep learning in the 2000s and it increases the convergence speed dramatically. ReLu is so simple (i.e.~y = x when x \textgreater{}= 0 and y = 0 otherwise), but it indeed cleverly solved one of the big headaches in deep learning. With hundreds of thousands of parameters in the model, deep learning is easy to get overfitted. The dropout concept was introduced in 2012 to mitigate overfitting. It randomly drops out a certain percentage of neurons in the network during the optimization process to achieve more robust model performance. It is similar to the concept of random forest where features and training data are randomly chosen. There are many other algorithm improvements to get better models such as batch normalization and using residuals from previous layers. With backpropagation in stochastic gradience decent, ReLu activation function, dropout, and other technics, modern deep learning methods begin to outperform traditional machine learning methods.
+
+\textbf{Computation Power}
+
+With data, network structure and algorithms ready, it still requires certain computation power to train a deep learning model. The entire framework involves heavy linear algebra operations with large matrixes and tensors. The general CPU architecture is not the ideal platform and GPU is a much faster choice. With the vast potential application of deep learning, major tech companies contribute heavily to open-source deep learning frameworks. For example, Google has open-sourced its TensorFlow framework; Facebook has open-sourced its PyTorch framework, and Amazon has significantly contributed to the MXNet open-source framework. With thousands of well-trained software developers and scientists behind these deep learning frameworks, users can confidently pick one framework and start training their deep learning models right away in popular cloud environments. Much of the heavy lifting to train a deep learning model has been embedded in these open-source frameworks and there are also many pre-trained models available for users to adopt. Users can now enjoy the relatively easy access to software and hardware to develop their own deep learning applications. In this book, we will demo deep learning examples using Keras, a high-level abstraction of TensorFlow, using the Databricks Community Edition platform.
+
+In summary, deep learning applications are not developed just in the past few years and it has been ongoing research in the past few decades. The accumulation of data, the advance of algorithm and the improvement of computation power finally enable every day deep learning applications. In the foreseeable future, deep learning will continue to revolutionize machine learning methods across more areas to provide significant improvement.
+
 \hypertarget{projection-pursuit-regression}{%
 \section{Projection Pursuit Regression}\label{projection-pursuit-regression}}
 
@@ -7105,11 +7548,13 @@ Here is how you can simulate the data and plot it using R:
 \begin{Highlighting}[]
 \CommentTok{# use plot3D package to generate 3D plot}
 \KeywordTok{library}\NormalTok{(plot3D)}
-\CommentTok{# get x1 and x2 note here x1 and x2 need to be matrix if you check the}
-\CommentTok{# two objects, you will find: columns in x1 are identical rows in x2}
-\CommentTok{# are identical mesh() is funciton from plot3D package you may need to}
-\CommentTok{# think a little here}
-\NormalTok{M <-}\StringTok{ }\KeywordTok{mesh}\NormalTok{(}\KeywordTok{seq}\NormalTok{(}\OperatorTok{-}\FloatTok{13.2}\NormalTok{, }\FloatTok{13.2}\NormalTok{, }\DataTypeTok{length.out =} \DecValTok{50}\NormalTok{), }\KeywordTok{seq}\NormalTok{(}\OperatorTok{-}\FloatTok{37.4}\NormalTok{, }\FloatTok{37.4}\NormalTok{, }\DataTypeTok{length.out =} \DecValTok{50}\NormalTok{))}
+\CommentTok{# get x1 and x2 note here x1 and x2 need to be matrix if}
+\CommentTok{# you check the two objects, you will find: columns in}
+\CommentTok{# x1 are identical rows in x2 are identical mesh() is}
+\CommentTok{# funciton from plot3D package you may need to think a}
+\CommentTok{# little here}
+\NormalTok{M <-}\StringTok{ }\KeywordTok{mesh}\NormalTok{(}\KeywordTok{seq}\NormalTok{(}\OperatorTok{-}\FloatTok{13.2}\NormalTok{, }\FloatTok{13.2}\NormalTok{, }\DataTypeTok{length.out =} \DecValTok{50}\NormalTok{), }\KeywordTok{seq}\NormalTok{(}\OperatorTok{-}\FloatTok{37.4}\NormalTok{, }
+    \FloatTok{37.4}\NormalTok{, }\DataTypeTok{length.out =} \DecValTok{50}\NormalTok{))}
 \NormalTok{x1 <-}\StringTok{ }\NormalTok{M}\OperatorTok{$}\NormalTok{x}
 \NormalTok{x2 <-}\StringTok{ }\NormalTok{M}\OperatorTok{$}\NormalTok{y}
 \CommentTok{## setting 1 map X using w to get v}
@@ -7117,23 +7562,23 @@ Here is how you can simulate the data and plot it using R:
 \CommentTok{# apply g() on v}
 \NormalTok{g1 <-}\StringTok{ }\DecValTok{1}\OperatorTok{/}\NormalTok{(}\DecValTok{1} \OperatorTok{+}\StringTok{ }\KeywordTok{exp}\NormalTok{(}\OperatorTok{-}\NormalTok{v))}
 \KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow =} \KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{), }\DataTypeTok{mar =} \KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{))}
-\KeywordTok{surf3D}\NormalTok{(x1, x2, g1, }\DataTypeTok{colvar =}\NormalTok{ g1, }\DataTypeTok{border =} \StringTok{"black"}\NormalTok{, }\DataTypeTok{colkey =} \OtherTok{FALSE}\NormalTok{, }\DataTypeTok{box =} \OtherTok{FALSE}\NormalTok{, }
-    \DataTypeTok{main =} \StringTok{"Setting 1"}\NormalTok{)}
+\KeywordTok{surf3D}\NormalTok{(x1, x2, g1, }\DataTypeTok{colvar =}\NormalTok{ g1, }\DataTypeTok{border =} \StringTok{"black"}\NormalTok{, }\DataTypeTok{colkey =} \OtherTok{FALSE}\NormalTok{, }
+    \DataTypeTok{box =} \OtherTok{FALSE}\NormalTok{, }\DataTypeTok{main =} \StringTok{"Setting 1"}\NormalTok{)}
 \CommentTok{## setting 2}
 \NormalTok{v <-}\StringTok{ }\NormalTok{x1}
 \NormalTok{g2 <-}\StringTok{ }\NormalTok{(v }\OperatorTok{+}\StringTok{ }\DecValTok{5}\NormalTok{) }\OperatorTok{*}\StringTok{ }\KeywordTok{sin}\NormalTok{(}\DecValTok{1}\OperatorTok{/}\NormalTok{(v}\OperatorTok{/}\DecValTok{3} \OperatorTok{+}\StringTok{ }\FloatTok{0.1}\NormalTok{))}
-\KeywordTok{surf3D}\NormalTok{(x1, x2, g2, }\DataTypeTok{colvar =}\NormalTok{ g2, }\DataTypeTok{border =} \StringTok{"black"}\NormalTok{, }\DataTypeTok{colkey =} \OtherTok{FALSE}\NormalTok{, }\DataTypeTok{box =} \OtherTok{FALSE}\NormalTok{, }
-    \DataTypeTok{main =} \StringTok{"Setting 2"}\NormalTok{)}
+\KeywordTok{surf3D}\NormalTok{(x1, x2, g2, }\DataTypeTok{colvar =}\NormalTok{ g2, }\DataTypeTok{border =} \StringTok{"black"}\NormalTok{, }\DataTypeTok{colkey =} \OtherTok{FALSE}\NormalTok{, }
+    \DataTypeTok{box =} \OtherTok{FALSE}\NormalTok{, }\DataTypeTok{main =} \StringTok{"Setting 2"}\NormalTok{)}
 \CommentTok{## setting 3}
 \NormalTok{v <-}\StringTok{ }\NormalTok{x2}
 \NormalTok{g3 <-}\StringTok{ }\KeywordTok{exp}\NormalTok{(v}\OperatorTok{^}\DecValTok{2}\OperatorTok{/}\DecValTok{5}\NormalTok{)}
-\KeywordTok{surf3D}\NormalTok{(x1, x2, g3, }\DataTypeTok{colvar =}\NormalTok{ g3, }\DataTypeTok{border =} \StringTok{"black"}\NormalTok{, }\DataTypeTok{colkey =} \OtherTok{FALSE}\NormalTok{, }\DataTypeTok{box =} \OtherTok{FALSE}\NormalTok{, }
-    \DataTypeTok{main =} \StringTok{"Setting 3"}\NormalTok{)}
+\KeywordTok{surf3D}\NormalTok{(x1, x2, g3, }\DataTypeTok{colvar =}\NormalTok{ g3, }\DataTypeTok{border =} \StringTok{"black"}\NormalTok{, }\DataTypeTok{colkey =} \OtherTok{FALSE}\NormalTok{, }
+    \DataTypeTok{box =} \OtherTok{FALSE}\NormalTok{, }\DataTypeTok{main =} \StringTok{"Setting 3"}\NormalTok{)}
 \CommentTok{## setting 4}
 \NormalTok{v <-}\StringTok{ }\NormalTok{x1}
 \NormalTok{g4 <-}\StringTok{ }\NormalTok{(v }\OperatorTok{+}\StringTok{ }\FloatTok{0.1}\NormalTok{) }\OperatorTok{*}\StringTok{ }\KeywordTok{sin}\NormalTok{(}\DecValTok{1}\OperatorTok{/}\NormalTok{(v}\OperatorTok{/}\DecValTok{3} \OperatorTok{+}\StringTok{ }\FloatTok{0.1}\NormalTok{))}
-\KeywordTok{surf3D}\NormalTok{(x1, x2, g4, }\DataTypeTok{colvar =}\NormalTok{ g4, }\DataTypeTok{border =} \StringTok{"black"}\NormalTok{, }\DataTypeTok{colkey =} \OtherTok{FALSE}\NormalTok{, }\DataTypeTok{box =} \OtherTok{FALSE}\NormalTok{, }
-    \DataTypeTok{main =} \StringTok{"Setting 4"}\NormalTok{)}
+\KeywordTok{surf3D}\NormalTok{(x1, x2, g4, }\DataTypeTok{colvar =}\NormalTok{ g4, }\DataTypeTok{border =} \StringTok{"black"}\NormalTok{, }\DataTypeTok{colkey =} \OtherTok{FALSE}\NormalTok{, }
+    \DataTypeTok{box =} \OtherTok{FALSE}\NormalTok{, }\DataTypeTok{main =} \StringTok{"Setting 4"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -7215,8 +7660,8 @@ You need to choose activation function in the hidden layers. Logistic regression
 \hypertarget{r-code-for-data-simulation}{%
 \chapter{R code for data simulation}\label{r-code-for-data-simulation}}
 
-\hypertarget{customer-data-for-clothing-company-1}{%
-\section{Customer Data for Clothing Company}\label{customer-data-for-clothing-company-1}}
+\hypertarget{customer-data-for-clothing-company}{%
+\section{Customer Data for Clothing Company}\label{customer-data-for-clothing-company}}
 
 The simulation is not very straightforward and we will break it into three parts:
 1. Define data structure: variable names, variable distribution, customer segment names, segment size
