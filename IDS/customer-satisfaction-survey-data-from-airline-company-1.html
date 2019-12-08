@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2019-12-06" />
+<meta name="date" content="2019-12-07" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -235,7 +235,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="8" data-path="measuring-performance.html"><a href="measuring-performance.html"><i class="fa fa-check"></i><b>8</b> Measuring Performance</a><ul>
 <li class="chapter" data-level="8.1" data-path="regression-model-performance.html"><a href="regression-model-performance.html"><i class="fa fa-check"></i><b>8.1</b> Regression Model Performance</a></li>
-<li class="chapter" data-level="8.2" data-path="classification-model-performance.html"><a href="classification-model-performance.html"><i class="fa fa-check"></i><b>8.2</b> Classification Model Performance</a></li>
+<li class="chapter" data-level="8.2" data-path="classification-model-performance.html"><a href="classification-model-performance.html"><i class="fa fa-check"></i><b>8.2</b> Classification Model Performance</a><ul>
+<li class="chapter" data-level="8.2.1" data-path="classification-model-performance.html"><a href="classification-model-performance.html#confusion-matrix"><i class="fa fa-check"></i><b>8.2.1</b> Confusion Matrix</a></li>
+<li class="chapter" data-level="8.2.2" data-path="classification-model-performance.html"><a href="classification-model-performance.html#kappa-statistic"><i class="fa fa-check"></i><b>8.2.2</b> Kappa Statistic</a></li>
+<li class="chapter" data-level="8.2.3" data-path="classification-model-performance.html"><a href="classification-model-performance.html#roc"><i class="fa fa-check"></i><b>8.2.3</b> ROC</a></li>
+<li class="chapter" data-level="8.2.4" data-path="classification-model-performance.html"><a href="classification-model-performance.html#gain-and-lift-charts"><i class="fa fa-check"></i><b>8.2.4</b> Gain and Lift Charts</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="9" data-path="regression-models.html"><a href="regression-models.html"><i class="fa fa-check"></i><b>9</b> Regression Models</a><ul>
 <li class="chapter" data-level="9.1" data-path="ordinary-least-squares.html"><a href="ordinary-least-squares.html"><i class="fa fa-check"></i><b>9.1</b> Ordinary Least Squares</a></li>
@@ -308,101 +313,101 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
             <section class="normal" id="section-">
 <div id="customer-satisfaction-survey-data-from-airline-company-1" class="section level2">
 <h2><span class="header-section-number">A.2</span> Customer Satisfaction Survey Data from Airline Company</h2>
-<div class="sourceCode" id="cb377"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb377-1" data-line-number="1"><span class="co"># Create a matrix of factor loadings</span></a>
-<a class="sourceLine" id="cb377-2" data-line-number="2"><span class="co"># This pattern is called bifactor because it has a general factor for separate components.</span></a>
-<a class="sourceLine" id="cb377-3" data-line-number="3"><span class="co"># For example, &quot;Ease of making reservation&quot; has general factor loading 0.33, specific factor loading 0.58</span></a>
-<a class="sourceLine" id="cb377-4" data-line-number="4"><span class="co"># The outcome variables are formed as combinations of these general and specific factors</span></a>
-<a class="sourceLine" id="cb377-5" data-line-number="5">loadings &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span> (</a>
-<a class="sourceLine" id="cb377-6" data-line-number="6">  <span class="co"># Ticketing</span></a>
-<a class="sourceLine" id="cb377-7" data-line-number="7">  <span class="fl">.33</span>, <span class="fl">.58</span>, <span class="fl">.00</span>, <span class="fl">.00</span>,  <span class="co"># Ease of making reservation </span></a>
-<a class="sourceLine" id="cb377-8" data-line-number="8">  <span class="fl">.35</span>, <span class="fl">.55</span>, <span class="fl">.00</span>, <span class="fl">.00</span>,  <span class="co"># Availability of preferred seats</span></a>
-<a class="sourceLine" id="cb377-9" data-line-number="9">  <span class="fl">.30</span>, <span class="fl">.52</span>, <span class="fl">.00</span>, <span class="fl">.00</span>,  <span class="co"># Variety of flight options</span></a>
-<a class="sourceLine" id="cb377-10" data-line-number="10">  <span class="fl">.40</span>, <span class="fl">.50</span>, <span class="fl">.00</span>, <span class="fl">.00</span>,  <span class="co"># Ticket prices</span></a>
-<a class="sourceLine" id="cb377-11" data-line-number="11">  <span class="co"># Aircraft</span></a>
-<a class="sourceLine" id="cb377-12" data-line-number="12">  <span class="fl">.50</span>, <span class="fl">.00</span>, <span class="fl">.55</span>, <span class="fl">.00</span>,  <span class="co"># Seat comfort</span></a>
-<a class="sourceLine" id="cb377-13" data-line-number="13">  <span class="fl">.41</span>, <span class="fl">.00</span>, <span class="fl">.51</span>, <span class="fl">.00</span>,  <span class="co"># Roominess of seat area</span></a>
-<a class="sourceLine" id="cb377-14" data-line-number="14">  <span class="fl">.45</span>, <span class="fl">.00</span>, <span class="fl">.57</span>, <span class="fl">.00</span>,  <span class="co"># Availability of Overhead</span></a>
-<a class="sourceLine" id="cb377-15" data-line-number="15">  <span class="fl">.32</span>, <span class="fl">.00</span>, <span class="fl">.54</span>, <span class="fl">.00</span>,  <span class="co"># Cleanliness of aircraft</span></a>
-<a class="sourceLine" id="cb377-16" data-line-number="16">  <span class="co"># Service</span></a>
-<a class="sourceLine" id="cb377-17" data-line-number="17">  <span class="fl">.35</span>, <span class="fl">.00</span>, <span class="fl">.00</span>, <span class="fl">.50</span>,  <span class="co"># Courtesy of flight attendant</span></a>
-<a class="sourceLine" id="cb377-18" data-line-number="18">  <span class="fl">.38</span>, <span class="fl">.00</span>, <span class="fl">.00</span>, <span class="fl">.57</span>,  <span class="co"># Friendliness</span></a>
-<a class="sourceLine" id="cb377-19" data-line-number="19">  <span class="fl">.60</span>, <span class="fl">.00</span>, <span class="fl">.00</span>, <span class="fl">.50</span>,  <span class="co"># Helpfulness</span></a>
-<a class="sourceLine" id="cb377-20" data-line-number="20">  <span class="fl">.52</span>, <span class="fl">.00</span>, <span class="fl">.00</span>, <span class="fl">.58</span>,  <span class="co"># Food and drinks</span></a>
-<a class="sourceLine" id="cb377-21" data-line-number="21">  <span class="co"># General   </span></a>
-<a class="sourceLine" id="cb377-22" data-line-number="22">  <span class="fl">.43</span>, <span class="fl">.10</span>, <span class="fl">.30</span>, <span class="fl">.30</span>,  <span class="co"># Overall satisfaction</span></a>
-<a class="sourceLine" id="cb377-23" data-line-number="23">  <span class="fl">.35</span>, <span class="fl">.50</span>, <span class="fl">.40</span>, <span class="fl">.20</span>,  <span class="co"># Purchase again</span></a>
-<a class="sourceLine" id="cb377-24" data-line-number="24">  <span class="fl">.25</span>, <span class="fl">.50</span>, <span class="fl">.50</span>, <span class="fl">.20</span>), <span class="co"># Willingness to recommend</span></a>
-<a class="sourceLine" id="cb377-25" data-line-number="25">  <span class="dt">nrow=</span><span class="dv">15</span>,<span class="dt">ncol=</span><span class="dv">4</span>, <span class="dt">byrow=</span><span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb377-26" data-line-number="26">  </a>
-<a class="sourceLine" id="cb377-27" data-line-number="27"><span class="co"># Matrix multiplication produces the correlation matrix except for the diagonal</span></a>
-<a class="sourceLine" id="cb377-28" data-line-number="28">cor_matrix&lt;-loadings <span class="op">%*%</span><span class="st"> </span><span class="kw">t</span>(loadings)</a>
-<a class="sourceLine" id="cb377-29" data-line-number="29"><span class="co"># Diagonal set to ones</span></a>
-<a class="sourceLine" id="cb377-30" data-line-number="30"><span class="kw">diag</span>(cor_matrix)&lt;-<span class="dv">1</span></a>
-<a class="sourceLine" id="cb377-31" data-line-number="31"></a>
-<a class="sourceLine" id="cb377-32" data-line-number="32"><span class="co"># use the mvtnorm package to randomly generate a data set with a given correlation pattern</span></a>
-<a class="sourceLine" id="cb377-33" data-line-number="33"></a>
-<a class="sourceLine" id="cb377-34" data-line-number="34"><span class="kw">library</span>(mvtnorm)</a>
-<a class="sourceLine" id="cb377-35" data-line-number="35"><span class="co"># mean vectors of the 3 airline companies</span></a>
-<a class="sourceLine" id="cb377-36" data-line-number="36">mu1=<span class="kw">c</span>(<span class="dv">5</span>,<span class="dv">6</span>,<span class="dv">5</span>,<span class="dv">6</span>, <span class="dv">7</span>,<span class="dv">8</span>,<span class="dv">6</span>,<span class="dv">7</span>, <span class="dv">5</span>,<span class="dv">5</span>,<span class="dv">5</span>,<span class="dv">5</span>, <span class="dv">6</span>,<span class="dv">6</span>,<span class="dv">6</span>)</a>
-<a class="sourceLine" id="cb377-37" data-line-number="37">mu2=<span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">2</span>,<span class="dv">3</span>, <span class="dv">5</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>, <span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">8</span>, <span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb377-38" data-line-number="38">mu3=<span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>, <span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">8</span>, <span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">8</span>, <span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">8</span>)</a>
-<a class="sourceLine" id="cb377-39" data-line-number="39"></a>
-<a class="sourceLine" id="cb377-40" data-line-number="40"><span class="co"># set random seed</span></a>
-<a class="sourceLine" id="cb377-41" data-line-number="41"><span class="kw">set.seed</span>(<span class="dv">123456</span>) </a>
-<a class="sourceLine" id="cb377-42" data-line-number="42"><span class="co"># respondent ID</span></a>
-<a class="sourceLine" id="cb377-43" data-line-number="43">resp.id &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">1000</span> </a>
-<a class="sourceLine" id="cb377-44" data-line-number="44"></a>
-<a class="sourceLine" id="cb377-45" data-line-number="45"><span class="kw">library</span>(MASS) </a>
-<a class="sourceLine" id="cb377-46" data-line-number="46">rating1 &lt;-<span class="st"> </span><span class="kw">mvrnorm</span>(<span class="kw">length</span>(resp.id),</a>
-<a class="sourceLine" id="cb377-47" data-line-number="47">                     <span class="dt">mu=</span>mu1,</a>
-<a class="sourceLine" id="cb377-48" data-line-number="48">                     <span class="dt">Sigma=</span>cor_matrix)</a>
-<a class="sourceLine" id="cb377-49" data-line-number="49">rating2 &lt;-<span class="st"> </span><span class="kw">mvrnorm</span>(<span class="kw">length</span>(resp.id),</a>
-<a class="sourceLine" id="cb377-50" data-line-number="50">                   <span class="dt">mu=</span>mu2,</a>
-<a class="sourceLine" id="cb377-51" data-line-number="51">                   <span class="dt">Sigma=</span>cor_matrix)</a>
-<a class="sourceLine" id="cb377-52" data-line-number="52">rating3 &lt;-<span class="st"> </span><span class="kw">mvrnorm</span>(<span class="kw">length</span>(resp.id),</a>
-<a class="sourceLine" id="cb377-53" data-line-number="53">                   <span class="dt">mu=</span>mu3,</a>
-<a class="sourceLine" id="cb377-54" data-line-number="54">                   <span class="dt">Sigma=</span>cor_matrix)</a>
-<a class="sourceLine" id="cb377-55" data-line-number="55"></a>
-<a class="sourceLine" id="cb377-56" data-line-number="56"></a>
-<a class="sourceLine" id="cb377-57" data-line-number="57"><span class="co"># truncates scale to be between 1 and 9</span></a>
-<a class="sourceLine" id="cb377-58" data-line-number="58">rating1[rating1<span class="op">&gt;</span><span class="dv">9</span>]&lt;-<span class="dv">9</span></a>
-<a class="sourceLine" id="cb377-59" data-line-number="59">rating1[rating1<span class="op">&lt;</span><span class="dv">1</span>]&lt;-<span class="dv">1</span></a>
-<a class="sourceLine" id="cb377-60" data-line-number="60">rating2[rating2<span class="op">&gt;</span><span class="dv">9</span>]&lt;-<span class="dv">9</span></a>
-<a class="sourceLine" id="cb377-61" data-line-number="61">rating2[rating2<span class="op">&lt;</span><span class="dv">1</span>]&lt;-<span class="dv">1</span></a>
-<a class="sourceLine" id="cb377-62" data-line-number="62">rating3[rating3<span class="op">&gt;</span><span class="dv">9</span>]&lt;-<span class="dv">9</span></a>
-<a class="sourceLine" id="cb377-63" data-line-number="63">rating3[rating3<span class="op">&lt;</span><span class="dv">1</span>]&lt;-<span class="dv">1</span></a>
-<a class="sourceLine" id="cb377-64" data-line-number="64"></a>
-<a class="sourceLine" id="cb377-65" data-line-number="65"><span class="co"># Round to single digit</span></a>
-<a class="sourceLine" id="cb377-66" data-line-number="66">rating1&lt;-<span class="kw">data.frame</span>(<span class="kw">round</span>(rating1,<span class="dv">0</span>))</a>
-<a class="sourceLine" id="cb377-67" data-line-number="67">rating2&lt;-<span class="kw">data.frame</span>(<span class="kw">round</span>(rating2,<span class="dv">0</span>))</a>
-<a class="sourceLine" id="cb377-68" data-line-number="68">rating3&lt;-<span class="kw">data.frame</span>(<span class="kw">round</span>(rating3,<span class="dv">0</span>))</a>
-<a class="sourceLine" id="cb377-69" data-line-number="69">rating1<span class="op">$</span>ID&lt;-resp.id</a>
-<a class="sourceLine" id="cb377-70" data-line-number="70">rating2<span class="op">$</span>ID&lt;-resp.id</a>
-<a class="sourceLine" id="cb377-71" data-line-number="71">rating3<span class="op">$</span>ID&lt;-resp.id</a>
-<a class="sourceLine" id="cb377-72" data-line-number="72">rating1<span class="op">$</span>Airline&lt;-<span class="kw">rep</span>(<span class="st">&quot;AirlineCo.1&quot;</span>,<span class="kw">length</span>(resp.id))</a>
-<a class="sourceLine" id="cb377-73" data-line-number="73">rating2<span class="op">$</span>Airline&lt;-<span class="kw">rep</span>(<span class="st">&quot;AirlineCo.2&quot;</span>,<span class="kw">length</span>(resp.id))</a>
-<a class="sourceLine" id="cb377-74" data-line-number="74">rating3<span class="op">$</span>Airline&lt;-<span class="kw">rep</span>(<span class="st">&quot;AirlineCo.3&quot;</span>,<span class="kw">length</span>(resp.id))</a>
-<a class="sourceLine" id="cb377-75" data-line-number="75">rating&lt;-<span class="kw">rbind</span>(rating1,rating2,rating3)</a>
-<a class="sourceLine" id="cb377-76" data-line-number="76"></a>
-<a class="sourceLine" id="cb377-77" data-line-number="77"><span class="co"># assign names to the variables in the data frame</span></a>
-<a class="sourceLine" id="cb377-78" data-line-number="78"><span class="kw">names</span>(rating)&lt;-<span class="kw">c</span>(</a>
-<a class="sourceLine" id="cb377-79" data-line-number="79">  <span class="st">&quot;Easy_Reservation&quot;</span>,</a>
-<a class="sourceLine" id="cb377-80" data-line-number="80">  <span class="st">&quot;Preferred_Seats&quot;</span>,</a>
-<a class="sourceLine" id="cb377-81" data-line-number="81">  <span class="st">&quot;Flight_Options&quot;</span>,</a>
-<a class="sourceLine" id="cb377-82" data-line-number="82">  <span class="st">&quot;Ticket_Prices&quot;</span>,</a>
-<a class="sourceLine" id="cb377-83" data-line-number="83">  <span class="st">&quot;Seat_Comfort&quot;</span>,</a>
-<a class="sourceLine" id="cb377-84" data-line-number="84">  <span class="st">&quot;Seat_Roominess&quot;</span>,</a>
-<a class="sourceLine" id="cb377-85" data-line-number="85">  <span class="st">&quot;Overhead_Storage&quot;</span>,</a>
-<a class="sourceLine" id="cb377-86" data-line-number="86">  <span class="st">&quot;Clean_Aircraft&quot;</span>,</a>
-<a class="sourceLine" id="cb377-87" data-line-number="87">  <span class="st">&quot;Courtesy&quot;</span>,</a>
-<a class="sourceLine" id="cb377-88" data-line-number="88">  <span class="st">&quot;Friendliness&quot;</span>,</a>
-<a class="sourceLine" id="cb377-89" data-line-number="89">  <span class="st">&quot;Helpfulness&quot;</span>,</a>
-<a class="sourceLine" id="cb377-90" data-line-number="90">  <span class="st">&quot;Service&quot;</span>,</a>
-<a class="sourceLine" id="cb377-91" data-line-number="91">  <span class="st">&quot;Satisfaction&quot;</span>,</a>
-<a class="sourceLine" id="cb377-92" data-line-number="92">  <span class="st">&quot;Fly_Again&quot;</span>,</a>
-<a class="sourceLine" id="cb377-93" data-line-number="93">  <span class="st">&quot;Recommend&quot;</span>,</a>
-<a class="sourceLine" id="cb377-94" data-line-number="94">  <span class="st">&quot;ID&quot;</span>,</a>
-<a class="sourceLine" id="cb377-95" data-line-number="95">  <span class="st">&quot;Airline&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb392"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb392-1" data-line-number="1"><span class="co"># Create a matrix of factor loadings</span></a>
+<a class="sourceLine" id="cb392-2" data-line-number="2"><span class="co"># This pattern is called bifactor because it has a general factor for separate components.</span></a>
+<a class="sourceLine" id="cb392-3" data-line-number="3"><span class="co"># For example, &quot;Ease of making reservation&quot; has general factor loading 0.33, specific factor loading 0.58</span></a>
+<a class="sourceLine" id="cb392-4" data-line-number="4"><span class="co"># The outcome variables are formed as combinations of these general and specific factors</span></a>
+<a class="sourceLine" id="cb392-5" data-line-number="5">loadings &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span> (</a>
+<a class="sourceLine" id="cb392-6" data-line-number="6">  <span class="co"># Ticketing</span></a>
+<a class="sourceLine" id="cb392-7" data-line-number="7">  <span class="fl">.33</span>, <span class="fl">.58</span>, <span class="fl">.00</span>, <span class="fl">.00</span>,  <span class="co"># Ease of making reservation </span></a>
+<a class="sourceLine" id="cb392-8" data-line-number="8">  <span class="fl">.35</span>, <span class="fl">.55</span>, <span class="fl">.00</span>, <span class="fl">.00</span>,  <span class="co"># Availability of preferred seats</span></a>
+<a class="sourceLine" id="cb392-9" data-line-number="9">  <span class="fl">.30</span>, <span class="fl">.52</span>, <span class="fl">.00</span>, <span class="fl">.00</span>,  <span class="co"># Variety of flight options</span></a>
+<a class="sourceLine" id="cb392-10" data-line-number="10">  <span class="fl">.40</span>, <span class="fl">.50</span>, <span class="fl">.00</span>, <span class="fl">.00</span>,  <span class="co"># Ticket prices</span></a>
+<a class="sourceLine" id="cb392-11" data-line-number="11">  <span class="co"># Aircraft</span></a>
+<a class="sourceLine" id="cb392-12" data-line-number="12">  <span class="fl">.50</span>, <span class="fl">.00</span>, <span class="fl">.55</span>, <span class="fl">.00</span>,  <span class="co"># Seat comfort</span></a>
+<a class="sourceLine" id="cb392-13" data-line-number="13">  <span class="fl">.41</span>, <span class="fl">.00</span>, <span class="fl">.51</span>, <span class="fl">.00</span>,  <span class="co"># Roominess of seat area</span></a>
+<a class="sourceLine" id="cb392-14" data-line-number="14">  <span class="fl">.45</span>, <span class="fl">.00</span>, <span class="fl">.57</span>, <span class="fl">.00</span>,  <span class="co"># Availability of Overhead</span></a>
+<a class="sourceLine" id="cb392-15" data-line-number="15">  <span class="fl">.32</span>, <span class="fl">.00</span>, <span class="fl">.54</span>, <span class="fl">.00</span>,  <span class="co"># Cleanliness of aircraft</span></a>
+<a class="sourceLine" id="cb392-16" data-line-number="16">  <span class="co"># Service</span></a>
+<a class="sourceLine" id="cb392-17" data-line-number="17">  <span class="fl">.35</span>, <span class="fl">.00</span>, <span class="fl">.00</span>, <span class="fl">.50</span>,  <span class="co"># Courtesy of flight attendant</span></a>
+<a class="sourceLine" id="cb392-18" data-line-number="18">  <span class="fl">.38</span>, <span class="fl">.00</span>, <span class="fl">.00</span>, <span class="fl">.57</span>,  <span class="co"># Friendliness</span></a>
+<a class="sourceLine" id="cb392-19" data-line-number="19">  <span class="fl">.60</span>, <span class="fl">.00</span>, <span class="fl">.00</span>, <span class="fl">.50</span>,  <span class="co"># Helpfulness</span></a>
+<a class="sourceLine" id="cb392-20" data-line-number="20">  <span class="fl">.52</span>, <span class="fl">.00</span>, <span class="fl">.00</span>, <span class="fl">.58</span>,  <span class="co"># Food and drinks</span></a>
+<a class="sourceLine" id="cb392-21" data-line-number="21">  <span class="co"># General   </span></a>
+<a class="sourceLine" id="cb392-22" data-line-number="22">  <span class="fl">.43</span>, <span class="fl">.10</span>, <span class="fl">.30</span>, <span class="fl">.30</span>,  <span class="co"># Overall satisfaction</span></a>
+<a class="sourceLine" id="cb392-23" data-line-number="23">  <span class="fl">.35</span>, <span class="fl">.50</span>, <span class="fl">.40</span>, <span class="fl">.20</span>,  <span class="co"># Purchase again</span></a>
+<a class="sourceLine" id="cb392-24" data-line-number="24">  <span class="fl">.25</span>, <span class="fl">.50</span>, <span class="fl">.50</span>, <span class="fl">.20</span>), <span class="co"># Willingness to recommend</span></a>
+<a class="sourceLine" id="cb392-25" data-line-number="25">  <span class="dt">nrow=</span><span class="dv">15</span>,<span class="dt">ncol=</span><span class="dv">4</span>, <span class="dt">byrow=</span><span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb392-26" data-line-number="26">  </a>
+<a class="sourceLine" id="cb392-27" data-line-number="27"><span class="co"># Matrix multiplication produces the correlation matrix except for the diagonal</span></a>
+<a class="sourceLine" id="cb392-28" data-line-number="28">cor_matrix&lt;-loadings <span class="op">%*%</span><span class="st"> </span><span class="kw">t</span>(loadings)</a>
+<a class="sourceLine" id="cb392-29" data-line-number="29"><span class="co"># Diagonal set to ones</span></a>
+<a class="sourceLine" id="cb392-30" data-line-number="30"><span class="kw">diag</span>(cor_matrix)&lt;-<span class="dv">1</span></a>
+<a class="sourceLine" id="cb392-31" data-line-number="31"></a>
+<a class="sourceLine" id="cb392-32" data-line-number="32"><span class="co"># use the mvtnorm package to randomly generate a data set with a given correlation pattern</span></a>
+<a class="sourceLine" id="cb392-33" data-line-number="33"></a>
+<a class="sourceLine" id="cb392-34" data-line-number="34"><span class="kw">library</span>(mvtnorm)</a>
+<a class="sourceLine" id="cb392-35" data-line-number="35"><span class="co"># mean vectors of the 3 airline companies</span></a>
+<a class="sourceLine" id="cb392-36" data-line-number="36">mu1=<span class="kw">c</span>(<span class="dv">5</span>,<span class="dv">6</span>,<span class="dv">5</span>,<span class="dv">6</span>, <span class="dv">7</span>,<span class="dv">8</span>,<span class="dv">6</span>,<span class="dv">7</span>, <span class="dv">5</span>,<span class="dv">5</span>,<span class="dv">5</span>,<span class="dv">5</span>, <span class="dv">6</span>,<span class="dv">6</span>,<span class="dv">6</span>)</a>
+<a class="sourceLine" id="cb392-37" data-line-number="37">mu2=<span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">2</span>,<span class="dv">3</span>, <span class="dv">5</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>, <span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">8</span>, <span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb392-38" data-line-number="38">mu3=<span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">2</span>, <span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">8</span>, <span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">8</span>, <span class="dv">8</span>,<span class="dv">8</span>,<span class="dv">8</span>)</a>
+<a class="sourceLine" id="cb392-39" data-line-number="39"></a>
+<a class="sourceLine" id="cb392-40" data-line-number="40"><span class="co"># set random seed</span></a>
+<a class="sourceLine" id="cb392-41" data-line-number="41"><span class="kw">set.seed</span>(<span class="dv">123456</span>) </a>
+<a class="sourceLine" id="cb392-42" data-line-number="42"><span class="co"># respondent ID</span></a>
+<a class="sourceLine" id="cb392-43" data-line-number="43">resp.id &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">1000</span> </a>
+<a class="sourceLine" id="cb392-44" data-line-number="44"></a>
+<a class="sourceLine" id="cb392-45" data-line-number="45"><span class="kw">library</span>(MASS) </a>
+<a class="sourceLine" id="cb392-46" data-line-number="46">rating1 &lt;-<span class="st"> </span><span class="kw">mvrnorm</span>(<span class="kw">length</span>(resp.id),</a>
+<a class="sourceLine" id="cb392-47" data-line-number="47">                     <span class="dt">mu=</span>mu1,</a>
+<a class="sourceLine" id="cb392-48" data-line-number="48">                     <span class="dt">Sigma=</span>cor_matrix)</a>
+<a class="sourceLine" id="cb392-49" data-line-number="49">rating2 &lt;-<span class="st"> </span><span class="kw">mvrnorm</span>(<span class="kw">length</span>(resp.id),</a>
+<a class="sourceLine" id="cb392-50" data-line-number="50">                   <span class="dt">mu=</span>mu2,</a>
+<a class="sourceLine" id="cb392-51" data-line-number="51">                   <span class="dt">Sigma=</span>cor_matrix)</a>
+<a class="sourceLine" id="cb392-52" data-line-number="52">rating3 &lt;-<span class="st"> </span><span class="kw">mvrnorm</span>(<span class="kw">length</span>(resp.id),</a>
+<a class="sourceLine" id="cb392-53" data-line-number="53">                   <span class="dt">mu=</span>mu3,</a>
+<a class="sourceLine" id="cb392-54" data-line-number="54">                   <span class="dt">Sigma=</span>cor_matrix)</a>
+<a class="sourceLine" id="cb392-55" data-line-number="55"></a>
+<a class="sourceLine" id="cb392-56" data-line-number="56"></a>
+<a class="sourceLine" id="cb392-57" data-line-number="57"><span class="co"># truncates scale to be between 1 and 9</span></a>
+<a class="sourceLine" id="cb392-58" data-line-number="58">rating1[rating1<span class="op">&gt;</span><span class="dv">9</span>]&lt;-<span class="dv">9</span></a>
+<a class="sourceLine" id="cb392-59" data-line-number="59">rating1[rating1<span class="op">&lt;</span><span class="dv">1</span>]&lt;-<span class="dv">1</span></a>
+<a class="sourceLine" id="cb392-60" data-line-number="60">rating2[rating2<span class="op">&gt;</span><span class="dv">9</span>]&lt;-<span class="dv">9</span></a>
+<a class="sourceLine" id="cb392-61" data-line-number="61">rating2[rating2<span class="op">&lt;</span><span class="dv">1</span>]&lt;-<span class="dv">1</span></a>
+<a class="sourceLine" id="cb392-62" data-line-number="62">rating3[rating3<span class="op">&gt;</span><span class="dv">9</span>]&lt;-<span class="dv">9</span></a>
+<a class="sourceLine" id="cb392-63" data-line-number="63">rating3[rating3<span class="op">&lt;</span><span class="dv">1</span>]&lt;-<span class="dv">1</span></a>
+<a class="sourceLine" id="cb392-64" data-line-number="64"></a>
+<a class="sourceLine" id="cb392-65" data-line-number="65"><span class="co"># Round to single digit</span></a>
+<a class="sourceLine" id="cb392-66" data-line-number="66">rating1&lt;-<span class="kw">data.frame</span>(<span class="kw">round</span>(rating1,<span class="dv">0</span>))</a>
+<a class="sourceLine" id="cb392-67" data-line-number="67">rating2&lt;-<span class="kw">data.frame</span>(<span class="kw">round</span>(rating2,<span class="dv">0</span>))</a>
+<a class="sourceLine" id="cb392-68" data-line-number="68">rating3&lt;-<span class="kw">data.frame</span>(<span class="kw">round</span>(rating3,<span class="dv">0</span>))</a>
+<a class="sourceLine" id="cb392-69" data-line-number="69">rating1<span class="op">$</span>ID&lt;-resp.id</a>
+<a class="sourceLine" id="cb392-70" data-line-number="70">rating2<span class="op">$</span>ID&lt;-resp.id</a>
+<a class="sourceLine" id="cb392-71" data-line-number="71">rating3<span class="op">$</span>ID&lt;-resp.id</a>
+<a class="sourceLine" id="cb392-72" data-line-number="72">rating1<span class="op">$</span>Airline&lt;-<span class="kw">rep</span>(<span class="st">&quot;AirlineCo.1&quot;</span>,<span class="kw">length</span>(resp.id))</a>
+<a class="sourceLine" id="cb392-73" data-line-number="73">rating2<span class="op">$</span>Airline&lt;-<span class="kw">rep</span>(<span class="st">&quot;AirlineCo.2&quot;</span>,<span class="kw">length</span>(resp.id))</a>
+<a class="sourceLine" id="cb392-74" data-line-number="74">rating3<span class="op">$</span>Airline&lt;-<span class="kw">rep</span>(<span class="st">&quot;AirlineCo.3&quot;</span>,<span class="kw">length</span>(resp.id))</a>
+<a class="sourceLine" id="cb392-75" data-line-number="75">rating&lt;-<span class="kw">rbind</span>(rating1,rating2,rating3)</a>
+<a class="sourceLine" id="cb392-76" data-line-number="76"></a>
+<a class="sourceLine" id="cb392-77" data-line-number="77"><span class="co"># assign names to the variables in the data frame</span></a>
+<a class="sourceLine" id="cb392-78" data-line-number="78"><span class="kw">names</span>(rating)&lt;-<span class="kw">c</span>(</a>
+<a class="sourceLine" id="cb392-79" data-line-number="79">  <span class="st">&quot;Easy_Reservation&quot;</span>,</a>
+<a class="sourceLine" id="cb392-80" data-line-number="80">  <span class="st">&quot;Preferred_Seats&quot;</span>,</a>
+<a class="sourceLine" id="cb392-81" data-line-number="81">  <span class="st">&quot;Flight_Options&quot;</span>,</a>
+<a class="sourceLine" id="cb392-82" data-line-number="82">  <span class="st">&quot;Ticket_Prices&quot;</span>,</a>
+<a class="sourceLine" id="cb392-83" data-line-number="83">  <span class="st">&quot;Seat_Comfort&quot;</span>,</a>
+<a class="sourceLine" id="cb392-84" data-line-number="84">  <span class="st">&quot;Seat_Roominess&quot;</span>,</a>
+<a class="sourceLine" id="cb392-85" data-line-number="85">  <span class="st">&quot;Overhead_Storage&quot;</span>,</a>
+<a class="sourceLine" id="cb392-86" data-line-number="86">  <span class="st">&quot;Clean_Aircraft&quot;</span>,</a>
+<a class="sourceLine" id="cb392-87" data-line-number="87">  <span class="st">&quot;Courtesy&quot;</span>,</a>
+<a class="sourceLine" id="cb392-88" data-line-number="88">  <span class="st">&quot;Friendliness&quot;</span>,</a>
+<a class="sourceLine" id="cb392-89" data-line-number="89">  <span class="st">&quot;Helpfulness&quot;</span>,</a>
+<a class="sourceLine" id="cb392-90" data-line-number="90">  <span class="st">&quot;Service&quot;</span>,</a>
+<a class="sourceLine" id="cb392-91" data-line-number="91">  <span class="st">&quot;Satisfaction&quot;</span>,</a>
+<a class="sourceLine" id="cb392-92" data-line-number="92">  <span class="st">&quot;Fly_Again&quot;</span>,</a>
+<a class="sourceLine" id="cb392-93" data-line-number="93">  <span class="st">&quot;Recommend&quot;</span>,</a>
+<a class="sourceLine" id="cb392-94" data-line-number="94">  <span class="st">&quot;ID&quot;</span>,</a>
+<a class="sourceLine" id="cb392-95" data-line-number="95">  <span class="st">&quot;Airline&quot;</span>)</a></code></pre></div>
 </div>
             </section>
 

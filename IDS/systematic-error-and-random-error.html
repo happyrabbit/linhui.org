@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2019-12-06" />
+<meta name="date" content="2019-12-07" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -235,7 +235,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="8" data-path="measuring-performance.html"><a href="measuring-performance.html"><i class="fa fa-check"></i><b>8</b> Measuring Performance</a><ul>
 <li class="chapter" data-level="8.1" data-path="regression-model-performance.html"><a href="regression-model-performance.html"><i class="fa fa-check"></i><b>8.1</b> Regression Model Performance</a></li>
-<li class="chapter" data-level="8.2" data-path="classification-model-performance.html"><a href="classification-model-performance.html"><i class="fa fa-check"></i><b>8.2</b> Classification Model Performance</a></li>
+<li class="chapter" data-level="8.2" data-path="classification-model-performance.html"><a href="classification-model-performance.html"><i class="fa fa-check"></i><b>8.2</b> Classification Model Performance</a><ul>
+<li class="chapter" data-level="8.2.1" data-path="classification-model-performance.html"><a href="classification-model-performance.html#confusion-matrix"><i class="fa fa-check"></i><b>8.2.1</b> Confusion Matrix</a></li>
+<li class="chapter" data-level="8.2.2" data-path="classification-model-performance.html"><a href="classification-model-performance.html#kappa-statistic"><i class="fa fa-check"></i><b>8.2.2</b> Kappa Statistic</a></li>
+<li class="chapter" data-level="8.2.3" data-path="classification-model-performance.html"><a href="classification-model-performance.html#roc"><i class="fa fa-check"></i><b>8.2.3</b> ROC</a></li>
+<li class="chapter" data-level="8.2.4" data-path="classification-model-performance.html"><a href="classification-model-performance.html#gain-and-lift-charts"><i class="fa fa-check"></i><b>8.2.4</b> Gain and Lift Charts</a></li>
+</ul></li>
 </ul></li>
 <li class="chapter" data-level="9" data-path="regression-models.html"><a href="regression-models.html"><i class="fa fa-check"></i><b>9</b> Regression Models</a><ul>
 <li class="chapter" data-level="9.1" data-path="ordinary-least-squares.html"><a href="ordinary-least-squares.html"><i class="fa fa-check"></i><b>9.1</b> Ordinary Least Squares</a></li>
@@ -392,7 +397,7 @@ FIGURE 7.2: High variance model
 <a class="sourceLine" id="cb222-17" data-line-number="17">dat4 =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x4 =</span> x[idx4], <span class="dt">fx4 =</span> fx[idx4])</a>
 <a class="sourceLine" id="cb222-18" data-line-number="18">p4 =<span class="st"> </span><span class="kw">ggplot</span>(dat4, <span class="kw">aes</span>(x4, fx4)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)</a>
 <a class="sourceLine" id="cb222-19" data-line-number="19"><span class="kw">multiplot</span>(p1, p2, p3, p4, <span class="dt">cols =</span> <span class="dv">2</span>)</a></code></pre></div>
-<p><img src="IDS_files/figure-html/unnamed-chunk-67-1.svg" width="672" /></p>
+<p><img src="IDS_files/figure-html/unnamed-chunk-69-1.svg" width="672" /></p>
 <p>The fitted lines (blue) change over different samples which means it has high variance. People also call it overfitting. Fitting the linear model using the same four subsets, the result barely changes:</p>
 <div class="sourceCode" id="cb223"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb223-1" data-line-number="1">p1 =<span class="st"> </span><span class="kw">ggplot</span>(dat1, <span class="kw">aes</span>(x1, fx1)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, </a>
 <a class="sourceLine" id="cb223-2" data-line-number="2">    <span class="dt">se =</span> <span class="ot">FALSE</span>)</a>
@@ -403,7 +408,7 @@ FIGURE 7.2: High variance model
 <a class="sourceLine" id="cb223-7" data-line-number="7">p4 =<span class="st"> </span><span class="kw">ggplot</span>(dat4, <span class="kw">aes</span>(x4, fx4)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, </a>
 <a class="sourceLine" id="cb223-8" data-line-number="8">    <span class="dt">se =</span> <span class="ot">FALSE</span>)</a>
 <a class="sourceLine" id="cb223-9" data-line-number="9"><span class="kw">multiplot</span>(p1, p2, p3, p4, <span class="dt">cols =</span> <span class="dv">2</span>)</a></code></pre></div>
-<p><img src="IDS_files/figure-html/unnamed-chunk-68-1.svg" width="672" /></p>
+<p><img src="IDS_files/figure-html/unnamed-chunk-70-1.svg" width="672" /></p>
 <p>In general, the variance (<span class="math inline">\(Var(\hat{f}(\mathbf{X}))\)</span>) <strong>increases</strong> and the bias (<span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span>) <strong>decreases</strong> as the model flexibility increases. Variance and bias together determine the systematic error. As we increase the flexibility of the model, at first the rate at which <span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span> decreases is faster than <span class="math inline">\(Var (\hat{f} (\mathbf{X}))\)</span>, so the MSE decreases. However, to some degree, higher flexibility has little effect on <span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span> but <span class="math inline">\(Var(\hat{f} (\mathbf{X}))\)</span> increases significantly, so the MSE increases.</p>
 </div>
 <div id="measurement-error-in-the-response" class="section level3">

@@ -169,7 +169,7 @@
 
 \title{Introduction to Data Science}
 \author{Hui Lin and Ming Li}
-\date{2019-12-06}
+\date{2019-12-07}
 
 \begin{document}
 \maketitle
@@ -5211,6 +5211,7 @@ Separate the data to be training and testing sets. Fit model using training data
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{100}\NormalTok{)}
 \CommentTok{# separate the data to be training and testing}
 \NormalTok{trainIndex <-}\StringTok{ }\KeywordTok{createDataPartition}\NormalTok{(disease_dat}\OperatorTok{$}\NormalTok{y, }\DataTypeTok{p =} \FloatTok{0.8}\NormalTok{, }
     \DataTypeTok{list =}\NormalTok{ F, }\DataTypeTok{times =} \DecValTok{1}\NormalTok{)}
@@ -5249,16 +5250,16 @@ Apply the trained random forest model to the testing data to get two types of pr
 
 \begin{verbatim}
 ##         0     1
-## 33  0.504 0.496
+## 47  0.831 0.169
 ## 101 0.177 0.823
-## 171 0.841 0.159
-## 219 0.580 0.420
-## 248 0.535 0.465
-## 331 0.188 0.812
-## 332 0.824 0.176
-## 365 0.203 0.797
-## 381 0.881 0.119
-## 621 0.219 0.781
+## 196 0.543 0.457
+## 258 0.858 0.142
+## 274 0.534 0.466
+## 369 0.827 0.173
+## 389 0.852 0.148
+## 416 0.183 0.817
+## 440 0.523 0.477
+## 642 0.836 0.164
 \end{verbatim}
 
 \begin{itemize}
@@ -5275,14 +5276,15 @@ Apply the trained random forest model to the testing data to get two types of pr
 \end{Shaded}
 
 \begin{verbatim}
-## 124 196 238 284 440 477 482 594 704 765 
-##   0   0   1   0   0   1   0   1   1   1 
+## 146 232 269 302 500 520 521 575 738 781 
+##   0   0   1   0   0   0   1   0   0   0 
 ## Levels: 0 1
 \end{verbatim}
 
 We will use the above two types of predictions to show different performance metrics.
 
-\textbf{Kappa Statistics}
+\hypertarget{confusion-matrix}{%
+\subsection{Confusion Matrix}\label{confusion-matrix}}
 
 \textbf{Confusion Matrix} is a counting table to describe the performance of a classification model. For the true response \texttt{yTest} and prediction \texttt{yhat}, the confusion matrix is:
 
@@ -5297,8 +5299,8 @@ We will use the above two types of predictions to show different performance met
 \begin{verbatim}
 ##     yTest
 ## yhat  1  0
-##    1 63  0
-##    0 12 85
+##    1 56  1
+##    0 15 88
 \end{verbatim}
 
 The top-left and bottom-right are the numbers of correctly classified samples. The top-right and bottom-left are the numbers of wrongly classified samples. A general confusion matrix for a binary classifier is following:
@@ -5321,9 +5323,9 @@ You can calculate the total accuracy when there are more than two categories. Th
 
 \[precision = \frac{TP}{TP+FP}\]
 
-\textbf{Recall sensitivity} is to measure the coverage of actual positive samples (i.e.~among those spam emails, how many percentages of them are predicted as spam) :
+\textbf{Sensitivity} is to measure the coverage of actual positive samples (i.e.~among those spam emails, how many percentages of them are predicted as spam) :
 
-\[Recall\ sensitivity = \frac{TP}{TP+FN}\]
+\[Sensitivity = \frac{TP}{TP+FN}\]
 
 Specificity is to measure the coverage of actual negative samples (i.e.~among those non-spam emails, how many percentages of them pass the filter):
 
@@ -5333,9 +5335,12 @@ Since wrongly tagging an important email as spam has a bigger impact, in the spa
 
 Second, total accuracy doesn't reflect the natural frequencies of each class. For example, the percentage of fraud cases for insurance may be very low, like 0.1\%. A model can achieve nearly perfect accuracy (99.9\%) by predicting all samples to be negative. The percentage of the largest class in the training set is also called the no-information rate. In this example, the no-information rate is 99.9\%. You need to get a model that at least beats this rate.
 
+\hypertarget{kappa-statistic}{%
+\subsection{Kappa Statistic}\label{kappa-statistic}}
+
 Another metric is the Kappa statistic. It measures the agreement between the observed and predicted classes. It was originally come up by Cohen etc. \citep{Cohen1960}. Kappa takes into account the accuracy generated simply by chance. It is defined as:
 
-\[Kappa=\frac{P_{0}+P_{e}}{1-P_{e}}\]
+\[Kappa=\frac{P_{0}-P_{e}}{1-P_{e}}\]
 
 Let \(n=TP+TN+FP+FN\) be the total number of samples, where \(P_{0}=\frac{TP+TN}{n}\) is the observed accuracy, \(P_{e}=\frac{(TP+FP)(TP+FN)+(FN+TN)(FP+TN)}{n^{2}}\) is the expected accuracy based on the marginal totals of the confusion matrix. Kappa can take on a value from -1 to 1. The higher the value, the higher the agreement. A value of 0 means there is no agreement between the observed and predicted classes, while a value of 1 indicates perfect agreement. A negative value indicates that the prediction is in the opposite direction of the observed value. The following table may help you ``visualize'' the interpretation of kappa \citep{landis1977}:
 
@@ -5352,6 +5357,143 @@ Kappa & Agreement\tabularnewline
 0.81--0.99 & Almost perfect agreement\tabularnewline
 \bottomrule
 \end{longtable}
+
+In general, a value between 0.3 to 0.5 indicates a reasonable agreement. If a model has a high accuracy of 90\%, while the expected accuracy is also high, say 85\%. The Kappa statistics is \(\frac{1}{3}\). It means the prediction and the observation have a fair agreement. You can calculate Kappa when the number of categories is larger than 2. The package \texttt{fmsb} has a function \texttt{Kappa.test()} to calculate Cohen's Kappa statistics. The function can also return the hypothesis test result and a confidence interval. Use the above observation vector \texttt{yTest} and prediction vector \texttt{yhat} as an example, you can calculate the statistics:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# install.packages("fmsb")}
+\NormalTok{kt<-fmsb}\OperatorTok{::}\KeywordTok{Kappa.test}\NormalTok{(}\KeywordTok{table}\NormalTok{(yhat,yTest))}
+\NormalTok{kt}\OperatorTok{$}\NormalTok{Result}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  Estimate Cohen's kappa statistics and test the
+##  null hypothesis that the extent of agreement is
+##  same as random (kappa=0)
+## 
+## data:  table(yhat, yTest)
+## Z = 9.7, p-value <2e-16
+## 95 percent confidence interval:
+##  0.6972 0.8894
+## sample estimates:
+## [1] 0.7933
+\end{verbatim}
+
+The output of the above function contains an object named \texttt{Judgement}:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{kt}\OperatorTok{$}\NormalTok{Judgement}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Substantial agreement"
+\end{verbatim}
+
+\hypertarget{roc}{%
+\subsection{ROC}\label{roc}}
+
+Receiver Operating Characteristic (ROC) curve uses the predicted class probabilities and determines an effective threshold such that values above the threshold are indicative of a specific event. We have shown the definitions of sensitivity and specificity above. The sensitivity is the true positive rate and specificity is true negative rate. ``1 - specificity'' is the false negative rate. ROC is a graph of pairs of true positive rate (sensitivity) and false positive rate (1-specificity) values that result as the test's cutoff value is varied. The Area Under the Curve(AUC) is a common measure for two-class problem. There is usually a trade-off between sensitivity and specificity. If the threshold is set lower, then there are more samples predicted as positive and hence the sensitivity is higher. Let's look at the predicted probability \texttt{yhatprob} in the swine disease example. The predicted probability object \texttt{yhatprob} has two columns, one is the predicted probability that a farm will have an outbreak, the other is the probability that farm will NOT have an outbreak. So the two add up to have value 1. We use the probability of outbreak (the 2nd column) for further illustration. You can use \texttt{roc()} function to get an ROC object (\texttt{rocCurve}) and then apply different functions on that object to get needed plot or ROC statistics. For example, the following code produces the ROC curve:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(pROC)}
+\NormalTok{rocCurve<-}\KeywordTok{roc}\NormalTok{(}\DataTypeTok{response=}\NormalTok{yTest,}
+              \DataTypeTok{predictor=}\NormalTok{yhatprob[,}\DecValTok{2}\NormalTok{])}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Setting levels: control = 1, case = 0
+\end{verbatim}
+
+\begin{verbatim}
+## Setting direction: controls > cases
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plot}\NormalTok{(rocCurve)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-92-1.pdf}
+
+The first argument of the \texttt{roc()} is, \texttt{response}, the observation vector. The second argument is \texttt{predictor} is the continuous prediction (probability or link function value). The x-axis of ROC curve is ``1 - specificity'' and the y-axis is ``sensitivity''. ROC curve starts from (0, 0) and ends with (1, 1). A perfect model that correctly identifies all the samples will have 100\% sensitivity and specificity which corresponds to the curve that also goes through (0, 1). The area under the perfect curve is 1. A model that is totally useless corresponds to a curve that is close to the diagonal line and an area under the curve about 0.5.
+
+You can visually compare different models by putting their ROC curves on one plot. Or use the AUC to compare them. DeLong et al.~came up a statistic test to compare AUC based on U-statistics \citep{delong1988} which can give a p-value and confidence interval. You can also use bootstrap to get a confidence interval for AUC \citep{hall2004}.
+
+We can use the following code in R to get an estimate of AUC and its confidence interval:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# get the estimate of AUC}
+\KeywordTok{auc}\NormalTok{(rocCurve)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Area under the curve: 0.989
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# get a confidence interval based on DeLong et al.}
+\KeywordTok{ci.auc}\NormalTok{(rocCurve)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 95% CI: 0.979-0.999 (DeLong)
+\end{verbatim}
+
+AUC is robust to class imbalance\citep{Provost1998, Fawcett2006} hence a popular measurement. But it still boils a lot of information down to one number so there is inevitably a loss of information. It is better to double check by comparing the curve at the same time. If you care more about getting a model that will have high specificity, which is the lower part of the curve, as in the spam filtering case, you can use the area of the lower part of the curve as the performance measurement \citep{McClish1989}. ROC is only for two-class case. Some researchers generalized it to situations with more than two categories \citep{Hand2001, Lachiche2003, Li2008}.
+
+\hypertarget{gain-and-lift-charts}{%
+\subsection{Gain and Lift Charts}\label{gain-and-lift-charts}}
+
+Gain and lift chart is a visual tool for evaluating the performance of a classification model. In the previous swine disease example, there are 160 samples in the testing data and 89 of them have a positive outcome.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{table}\NormalTok{(yTest)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## yTest
+##  1  0 
+## 71 89
+\end{verbatim}
+
+If we order the testing samples by the predicted probability, one would hope that the positive samples are ranked higher than the negative ones. That is what the lift charts do: rank the samples by their scores and calculate the cumulative positive rate as more samples are evaluated. In the perfect scenario, the highest-ranked 71 samples would contain all 71 positive samples. When the model is totally random, the highest-ranked x\% of the data would contain about x\% of the positive sample. The gain/lift charts compare the ratio between the results obtained with and without a model.
+
+Let's plot the lift charts to compare the predicted outbreak probability (\texttt{modelscore\ \textless{}-\ yhatprob{[}\ ,2{]}}) from random forest model we fit before with some random scores generated from a uniform distribution (\texttt{randomscore\ \textless{}-\ runif(length(yTest))}).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# predicted outbreak probability}
+\NormalTok{modelscore <-}\StringTok{ }\NormalTok{yhatprob[ ,}\DecValTok{2}\NormalTok{]}
+\CommentTok{# randomly sample from a uniform distribution}
+\NormalTok{randomscore <-}\StringTok{ }\KeywordTok{runif}\NormalTok{(}\KeywordTok{length}\NormalTok{(yTest))}
+\NormalTok{labs<-}\KeywordTok{c}\NormalTok{(}\DataTypeTok{modelscore=}\StringTok{"Random Forest Prediction"}\NormalTok{,}
+        \DataTypeTok{randomscore=}\StringTok{"Random Number"}\NormalTok{)}
+\NormalTok{liftCurve <-}\StringTok{ }\NormalTok{caret}\OperatorTok{::}\KeywordTok{lift}\NormalTok{(yTest }\OperatorTok{~}\StringTok{ }\NormalTok{modelscore }\OperatorTok{+}\StringTok{ }\NormalTok{randomscore,}
+                  \DataTypeTok{class =} \StringTok{"1"}\NormalTok{, }
+                  \DataTypeTok{labels =}\NormalTok{ labs)}
+\KeywordTok{xyplot}\NormalTok{(liftCurve, }\DataTypeTok{auto.key =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{columns =} \DecValTok{2}\NormalTok{, }\DataTypeTok{lines =}\NormalTok{ T, }\DataTypeTok{points =}\NormalTok{ F))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-95-1.pdf}
+
+The x-axis is the percentage of samples tested and the y-axis is the percentage of positive samples that are detected by the model. For example, the point on the curve of random forest prediction, （8.125,18.31）, indicates that if you order the testing samples by the predicted probability from high to low, the top 8.125\% of the samples contain 0.1831\% of the total positive outcomes.
+
+Similar to the ROC curve, we can choose the model by comparing their lift charts. Some parts of the lift curves may be more interesting than the rest. For example, if you only have a budget to clean 50\% of the farms, then you should pick the model that gives the highest point when the x-axis is 50\%.
 
 \hypertarget{regression-models}{%
 \chapter{Regression Models}\label{regression-models}}
@@ -5840,7 +5982,7 @@ The object \texttt{glmfit} returned by \texttt{glmnet()} has the information of 
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-107-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-113-1.pdf}
 
 Each curve in the plot represents one predictor. The default setting is \(\alpha=1\) which means there is only lasso penalty. From left to right, \(L_I\) norm is increasing which means \(\lambda\) is decreasing. The bottom x-axis is \(L_1\) norm (i.e. \(\parallel\mathbf{\beta}\parallel_{1}\)). The upper x-axis is the effective degrees of freedom (df) for the lasso. You can check the detail for every step by:
 
@@ -5922,7 +6064,7 @@ We can plot the object using \texttt{plot()}. The red dotted line is the cross-v
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-111-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-117-1.pdf}
 
 You can check the two selected \(\lambda\) values by:
 
@@ -6105,7 +6247,7 @@ For example:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-118-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-124-1.pdf}
 
 The above uses error rate as performance criteria and use 10-fold cross-validation. Similarly, you can get the \(\lambda\) value for the minimum error rate and the error rate that is 1 standard error from the minimum:
 
@@ -6290,7 +6432,7 @@ The most common criterion is AUC. You can compare the selections from different 
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-125-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-131-1.pdf}
 
 The x-axis is the value of the tuning parameter, the y-axis is AUC. The two dash lines are the value of \(\lambda\) for max AUC and the value for the one standard deviation to the max AUC. Once you choose the value of the tuning parameter, you can use \texttt{fitglasso()} to fit the model. For example, we can fit the model using the parameter value that gives the max AUC, which is \(\lambda=0.922\):
 
@@ -6695,7 +6837,7 @@ A more convenient way is to use \texttt{train()} function in \texttt{caret} pack
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-129-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-135-1.pdf}
 
 RMSE doesn't change much when the maximum is larger than 2. So we set the maximum depth to be 2 and refit the model:
 
@@ -6736,7 +6878,7 @@ You can see that the final model picks \texttt{Q3} and \texttt{Q5} to predict to
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-132-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-138-1.pdf}
 
 \hypertarget{decision-tree}{%
 \subsection{Decision Tree}\label{decision-tree}}
@@ -6876,7 +7018,7 @@ Compare the results of the two approaches.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-136-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-142-1.pdf}
 
 You can see that in this case, the two approaches lead to similar model performance.
 
@@ -7136,7 +7278,7 @@ You can use varImpPlot() function to visualize the predictor importance:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-144-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-150-1.pdf}
 It is easy to see from the plot that \texttt{segment} and \texttt{Q4} are the top two variables to classify gender.
 
 \hypertarget{gradient-boosted-machine}{%
@@ -7362,7 +7504,7 @@ Now, let's compare the results from the three tree models.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-147-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-153-1.pdf}
 
 Since the data here doesn't have many variables, we don't see a significant difference among the models. But you can still see those ensemble methods are better than a single tree. In most of the real applications, ensemble methods perform much better. Random forest and boosting trees can be a baseline model. Before exploring different models, you can quickly run a random forest to see the performance and then try to improve that performance. If the performance you got from the random forest is not too much better than guessing, you should consider collecting more data or reviewing the problem to frame it a different way instead of trying other models. Because it usually means the current data is not enough to solve the problem.
 
