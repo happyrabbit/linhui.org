@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2019-12-07" />
+<meta name="date" content="2019-12-08" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -278,8 +278,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="12.2" data-path="projection-pursuit-regression.html"><a href="projection-pursuit-regression.html"><i class="fa fa-check"></i><b>12.2</b> Projection Pursuit Regression</a></li>
 <li class="chapter" data-level="12.3" data-path="standard-neural-network.html"><a href="standard-neural-network.html"><i class="fa fa-check"></i><b>12.3</b> Standard Neural Network</a><ul>
 <li class="chapter" data-level="12.3.1" data-path="standard-neural-network.html"><a href="standard-neural-network.html#logistic_reg_as_neural_network"><i class="fa fa-check"></i><b>12.3.1</b> Logistic Regression as Neural Network</a></li>
-<li class="chapter" data-level="12.3.2" data-path="standard-neural-network.html"><a href="standard-neural-network.html#deep-neural-network"><i class="fa fa-check"></i><b>12.3.2</b> Deep Neural Network</a></li>
-<li class="chapter" data-level="12.3.3" data-path="standard-neural-network.html"><a href="standard-neural-network.html#activation-function"><i class="fa fa-check"></i><b>12.3.3</b> Activation Function</a></li>
+<li class="chapter" data-level="12.3.2" data-path="standard-neural-network.html"><a href="standard-neural-network.html#gradient-descent"><i class="fa fa-check"></i><b>12.3.2</b> Gradient Descent</a></li>
+<li class="chapter" data-level="12.3.3" data-path="standard-neural-network.html"><a href="standard-neural-network.html#deep-neural-network"><i class="fa fa-check"></i><b>12.3.3</b> Deep Neural Network</a></li>
+<li class="chapter" data-level="12.3.4" data-path="standard-neural-network.html"><a href="standard-neural-network.html#activation-function"><i class="fa fa-check"></i><b>12.3.4</b> Activation Function</a></li>
+<li class="chapter" data-level="12.3.5" data-path="standard-neural-network.html"><a href="standard-neural-network.html#deal-with-overfitting"><i class="fa fa-check"></i><b>12.3.5</b> Deal with Overfitting</a></li>
+<li class="chapter" data-level="12.3.6" data-path="standard-neural-network.html"><a href="standard-neural-network.html#optimization"><i class="fa fa-check"></i><b>12.3.6</b> Optimization</a></li>
 </ul></li>
 <li class="chapter" data-level="12.4" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html"><i class="fa fa-check"></i><b>12.4</b> Convolutional Neural Network</a></li>
 <li class="chapter" data-level="12.5" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html"><i class="fa fa-check"></i><b>12.5</b> Recurrent Neural Network</a></li>
@@ -337,6 +340,10 @@ x_{n_{x}}^{(1)} &amp; x_{n_{x}}^{(2)} &amp; \dots &amp; x_{n_{x}}^{(m)}
 J(w,b)=\frac{1}{m} \Sigma_{i=1}^m L(\hat{y}^{(i)}, y^{(i)}) = \frac{1}{m} \Sigma_{i=1}^{m} \{\ -y^{(i)}log(\hat{y}^{(i)})-(1-y^{(i)})log(1-\hat{y}^{(i)}) \}
 \tag{11.8}
 \end{equation}\]</span></p>
+<p>To fit the model is to minimize the cost function.</p>
+</div>
+<div id="gradient-descent" class="section level3">
+<h3><span class="header-section-number">12.3.2</span> Gradient Descent</h3>
 <p>The general approach to minimize <span class="math inline">\(J(w,b)\)</span> is by gradient descent, also known as <em>back-propagation</em>. In logistic regression, it is easy to calculate the gradient w.r.t the parameters <span class="math inline">\((w, b)\)</span> using the chain rule for differentiation. The optimization process is a forward and backward sweep over the network. Let’s look at the gradient descent for logistic regression across m sample. The non-vectorized process is as follows.</p>
 <center>
 <img src="images/GradientDescent.png" style="width:100.0%" />
@@ -347,15 +354,57 @@ J(w,b)=\frac{1}{m} \Sigma_{i=1}^m L(\hat{y}^{(i)}, y^{(i)}) = \frac{1}{m} \Sigma
 <p>Repeat the progapation process using the updated parameter until the cost <span class="math inline">\(J\)</span> stabilizes.</p>
 </div>
 <div id="deep-neural-network" class="section level3">
-<h3><span class="header-section-number">12.3.2</span> Deep Neural Network</h3>
+<h3><span class="header-section-number">12.3.3</span> Deep Neural Network</h3>
 <p>Before people coined the term <em>deep learning</em>, a neural network refers to <em>single hidden layer network</em>. Neural networks with more than one layers are called <em>deep learning</em>.</p>
-<center>
-<img src="images/dnn_str.png" />
-</center>
+<p>Network with the structure in figure <a href="standard-neural-network.html#fig:ffnn">11.1</a> is the <strong>multiple layer perceptron (MLP)</strong> or <strong>feedforward neural network (FFNN)</strong>.</p>
+<div class="figure" style="text-align: center"><span id="fig:ffnn"></span>
+<img src="images/dnn_str.png" alt="Feedforward Neural Network" width="80%" />
+<p class="caption">
+FIGURE 11.1: Feedforward Neural Network
+</p>
+</div>
 </div>
 <div id="activation-function" class="section level3">
-<h3><span class="header-section-number">12.3.3</span> Activation Function</h3>
+<h3><span class="header-section-number">12.3.4</span> Activation Function</h3>
 <p>You need to choose activation function in the hidden layers. Logistic regression only uses sigmoid activation function. But there are other choices. Intermediate layers usually use different activation function than the last layer. Let’s first look at some of the common options other than sigmoid.</p>
+</div>
+<div id="deal-with-overfitting" class="section level3">
+<h3><span class="header-section-number">12.3.5</span> Deal with Overfitting</h3>
+<p>The biggest problem for deep learning is overfitting.</p>
+<div id="regularization" class="section level4">
+<h4><span class="header-section-number">12.3.5.1</span> Regularization</h4>
+<p>For logistic regression,</p>
+<p><span class="math display">\[\underset{w,b}{min}J(w,b)= \frac{1}{m} \Sigma_{i=1}^{m}L(\hat{y}^{(i)}, y^{(i)}) + penalty\]</span></p>
+<p>Common penalties are L1 or L2 as follows:</p>
+<p><span class="math display">\[L_2\ penalty=\frac{\lambda}{2m}\parallel w \parallel_2^2 = \frac{\lambda}{2m}\Sigma_{i=1}^{n_x}w_i^2\]</span></p>
+<p><span class="math display">\[L_1\ penalty = \frac{\lambda}{m}\Sigma_{i=1}^{n_x}|w|\]</span></p>
+<p>For neural network,</p>
+<p><span class="math display">\[J(w^{[1]},b^{[1]},\dots,w^{[L]},b^{[L]})=\frac{1}{m}\Sigma_{i=1}^{m}L(\hat{y}^{(i)},y^{(i)}) + \frac{\lambda}{2m}\Sigma_{l=1}^{L} \parallel w^{[l]} \parallel^2_F\]</span></p>
+<p>where</p>
+<p><span class="math display">\[\parallel w^{[l]} \parallel^2_F = \Sigma_{i=1}^{l}\Sigma_{j=1}^{l-1} (w^{[l]}_{ij})^2\]</span></p>
+<p>Many people call it “Frobenius Norm” instead of L2-norm.</p>
+</div>
+<div id="dropout" class="section level4">
+<h4><span class="header-section-number">12.3.5.2</span> Dropout</h4>
+</div>
+</div>
+<div id="optimization" class="section level3">
+<h3><span class="header-section-number">12.3.6</span> Optimization</h3>
+<div id="batch-mini-batch-stochastic-gradient-descent" class="section level4">
+<h4><span class="header-section-number">12.3.6.1</span> Batch, Mini-batch, Stochastic Gradient Descent</h4>
+<p><span class="math display">\[\begin{array}{ccc} x= &amp; [\underbrace{x^{(1)},x^{(2)},\cdots,x^{(1000)}}/ &amp; \cdots/\cdots x^{(m)}]\\ (n_{x},m) &amp; mini-batch\ 1 \end{array}\]</span></p>
+<p><span class="math display">\[\begin{array}{ccc} y= &amp; [\underbrace{y^{(1)},y^{(2)},\cdots,y^{(1000)}}/ &amp; \cdots/\cdots y^{(m)}]\\ (1,m) &amp; mini-batch\ 1 \end{array}\]</span></p>
+<ul>
+<li>Mini-batch size = m: batch gradient descent, too long per iteration</li>
+<li>Mini-batch size = 1: stochastic gradient descent, lose speed from vectorization</li>
+<li>Mini-batch size in between: mini-batch gradient descent, make progress without processing all training set, typical batch sizes are <span class="math inline">\(2^6=64\)</span>, <span class="math inline">\(2^7=128\)</span>, <span class="math inline">\(2^7=256\)</span>, <span class="math inline">\(2^8=512\)</span></li>
+</ul>
+</div>
+<div id="optimization-algorithms" class="section level4">
+<h4><span class="header-section-number">12.3.6.2</span> Optimization Algorithms</h4>
+<p>In the history of deep learning, researchers proposed different optimization algorithms and showed that they worked well in a specific scenario. But the optimization algorithms didn’t generalize well to a wide range of neural networks. So you will need to try different optimizers in your application. We will introduce three commonly used optimizers here.</p>
+<p><strong>Exponentially Weighted Averages</strong></p>
+</div>
 </div>
 </div>
             </section>

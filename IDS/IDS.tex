@@ -169,7 +169,7 @@
 
 \title{Introduction to Data Science}
 \author{Hui Lin and Ming Li}
-\date{2019-12-07}
+\date{2019-12-08}
 
 \begin{document}
 \maketitle
@@ -5319,7 +5319,9 @@ where TP is true positive, FP is false positive, TN is true negative, FN is fals
 
 \[Total\ accuracy = \frac{TP+TN}{TP+TN+FP+FN}\]
 
-You can calculate the total accuracy when there are more than two categories. This statistic is straightforward but has some disadvantages. First, it doesn't differentiate different error types. In a real application, different types of error may have different impacts. For example, it is much worse to tag an important email as spam and miss it than failing to filter out a spam email. Provost et al. \citep{Provost1998} discussed in detail the problem of using total accuracy on different classifiers. There are some other metrics based on the confusion matrix that measure different types of error. P\textbf{recision} is a metric to measure how accurate positive predictions are (i.e.~among those emails predicted as spam, how many percentages of them are spam emails?):
+You can calculate the total accuracy when there are more than two categories. This statistic is straightforward but has some disadvantages. First, it doesn't differentiate different error types. In a real application, different types of error may have different impacts. For example, it is much worse to tag an important email as spam and miss it than failing to filter out a spam email. Provost et al. \citep{Provost1998} discussed in detail the problem of using total accuracy on different classifiers. There are some other metrics based on the confusion matrix that measure different types of error.
+
+\textbf{Precision} is a metric to measure how accurate positive predictions are (i.e.~among those emails predicted as spam, how many percentages of them are spam emails?):
 
 \[precision = \frac{TP}{TP+FP}\]
 
@@ -5327,7 +5329,7 @@ You can calculate the total accuracy when there are more than two categories. Th
 
 \[Sensitivity = \frac{TP}{TP+FN}\]
 
-Specificity is to measure the coverage of actual negative samples (i.e.~among those non-spam emails, how many percentages of them pass the filter):
+\textbf{Specificity} is to measure the coverage of actual negative samples (i.e.~among those non-spam emails, how many percentages of them pass the filter):
 
 \[Specificity = \frac{TN}{TN+FP}\]
 
@@ -7789,8 +7791,68 @@ Before people coined the term \emph{deep learning}, a neural network refers to \
 
 You need to choose activation function in the hidden layers. Logistic regression only uses sigmoid activation function. But there are other choices. Intermediate layers usually use different activation function than the last layer. Let's first look at some of the common options other than sigmoid.
 
+\hypertarget{deal-with-overfitting}{%
+\subsection{Deal with Overfitting}\label{deal-with-overfitting}}
+
+The biggest problem for deep learning is overfitting.
+
+\hypertarget{regularization}{%
+\subsubsection{Regularization}\label{regularization}}
+
+For logistic regression,
+
+\[\underset{w,b}{min}J(w,b)= \frac{1}{m} \Sigma_{i=1}^{m}L(\hat{y}^{(i)}, y^{(i)}) + penalty\]
+
+Common penalties are L1 or L2 as follows:
+
+\[L_2\ penalty=\frac{\lambda}{2m}\parallel w \parallel_2^2 = \frac{\lambda}{2m}\Sigma_{i=1}^{n_x}w_i^2\]
+
+\[L_1\ penalty = \frac{\lambda}{m}\Sigma_{i=1}^{n_x}|w|\]
+
+For neural network,
+
+\[J(w^{[1]},b^{[1]},\dots,w^{[L]},b^{[L]})=\frac{1}{m}\Sigma_{i=1}^{m}L(\hat{y}^{(i)},y^{(i)}) + \frac{\lambda}{2m}\Sigma_{l=1}^{L} \parallel w^{[l]} \parallel^2_F\]
+
+where
+
+\[\parallel w^{[l]} \parallel^2_F = \Sigma_{i=1}^{l}\Sigma_{j=1}^{l-1} (w^{[l]}_{ij})^2\]
+
+Many people call it ``Frobenius Norm'' instead of L2-norm.
+
+\hypertarget{dropout}{%
+\subsubsection{Dropout}\label{dropout}}
+
+\hypertarget{optimization}{%
+\subsection{Optimization}\label{optimization}}
+
+\hypertarget{batch-mini-batch-stochastic-gradient-descent}{%
+\subsubsection{Batch, Mini-batch, Stochastic Gradient Descent}\label{batch-mini-batch-stochastic-gradient-descent}}
+
+\[\begin{array}{ccc} x= & [\underbrace{x^{(1)},x^{(2)},\cdots,x^{(1000)}}/ & \cdots/\cdots x^{(m)}]\\ (n_{x},m) & mini-batch\ 1 \end{array}\]
+
+\[\begin{array}{ccc} y= & [\underbrace{y^{(1)},y^{(2)},\cdots,y^{(1000)}}/ & \cdots/\cdots y^{(m)}]\\ (1,m) & mini-batch\ 1 \end{array}\]
+
+\begin{itemize}
+\tightlist
+\item
+  Mini-batch size = m: batch gradient descent, too long per iteration
+\item
+  Mini-batch size = 1: stochastic gradient descent, lose speed from vectorization
+\item
+  Mini-batch size in between: mini-batch gradient descent, make progress without processing all training set, typical batch sizes are \(2^6=64\), \(2^7=128\), \(2^7=256\), \(2^8=512\)
+\end{itemize}
+
+\hypertarget{optimization-algorithms}{%
+\subsubsection{Optimization Algorithms}\label{optimization-algorithms}}
+
+In the history of deep learning, researchers proposed different optimization algorithms and showed that they worked well in a specific scenario. But the optimization algorithms didn't generalize well to a wide range of neural networks. So you will need to try different optimizers in your application. We will introduce three commonly used optimizers here.
+
+\textbf{Exponentially Weighted Averages}
+
 \hypertarget{convolutional-neural-network}{%
 \section{Convolutional Neural Network}\label{convolutional-neural-network}}
+
+This section introduces the Convolutional Neural Network (CNN), the deep learning model that is almost universally used in computer vision applications. Computer vision has been advancing rapidly which enables many new applications such as self-driving cars and unlock a phone using face.
 
 \hypertarget{recurrent-neural-network}{%
 \section{Recurrent Neural Network}\label{recurrent-neural-network}}
@@ -7816,20 +7878,23 @@ Here is code to define data structure:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{# set a random number seed to make the process repeatable}
+\CommentTok{# set a random number seed to }
+\CommentTok{# make the process repeatable}
 \KeywordTok{set.seed}\NormalTok{(}\DecValTok{12345}\NormalTok{)}
 \CommentTok{# define the number of observations}
-\NormalTok{ncust<-}\DecValTok{1000}
+\NormalTok{ncust <-}\StringTok{ }\DecValTok{1000}
 \CommentTok{# create a data frmae for simulated data}
-\NormalTok{seg_dat<-}\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{id=}\KeywordTok{as.factor}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\NormalTok{ncust)))}
+\NormalTok{seg_dat <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{id =} \KeywordTok{as.factor}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\NormalTok{ncust)))}
 \CommentTok{# assign the variable names}
-\NormalTok{vars<-}\KeywordTok{c}\NormalTok{(}\StringTok{"age"}\NormalTok{,}\StringTok{"gender"}\NormalTok{,}\StringTok{"income"}\NormalTok{,}\StringTok{"house"}\NormalTok{,}\StringTok{"store_exp"}\NormalTok{,}\StringTok{"online_exp"}\NormalTok{,}\StringTok{"store_trans"}\NormalTok{,}\StringTok{"online_trans"}\NormalTok{)}
+\NormalTok{vars <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"age"}\NormalTok{, }\StringTok{"gender"}\NormalTok{, }\StringTok{"income"}\NormalTok{, }\StringTok{"house"}\NormalTok{, }\StringTok{"store_exp"}\NormalTok{, }
+    \StringTok{"online_exp"}\NormalTok{, }\StringTok{"store_trans"}\NormalTok{, }\StringTok{"online_trans"}\NormalTok{)}
 \CommentTok{# assign distribution for each variable}
-\NormalTok{vartype<-}\KeywordTok{c}\NormalTok{(}\StringTok{"norm"}\NormalTok{,}\StringTok{"binom"}\NormalTok{,}\StringTok{"norm"}\NormalTok{,}\StringTok{"binom"}\NormalTok{,}\StringTok{"norm"}\NormalTok{,}\StringTok{"norm"}\NormalTok{,}\StringTok{"pois"}\NormalTok{,}\StringTok{"pois"}\NormalTok{)}
+\NormalTok{vartype <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"norm"}\NormalTok{, }\StringTok{"binom"}\NormalTok{, }\StringTok{"norm"}\NormalTok{, }\StringTok{"binom"}\NormalTok{, }\StringTok{"norm"}\NormalTok{, }\StringTok{"norm"}\NormalTok{, }
+    \StringTok{"pois"}\NormalTok{, }\StringTok{"pois"}\NormalTok{)}
 \CommentTok{# names of 4 segments}
-\NormalTok{group_name<-}\KeywordTok{c}\NormalTok{(}\StringTok{"Price"}\NormalTok{,}\StringTok{"Conspicuous"}\NormalTok{,}\StringTok{"Quality"}\NormalTok{,}\StringTok{"Style"}\NormalTok{)}
+\NormalTok{group_name <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"Price"}\NormalTok{, }\StringTok{"Conspicuous"}\NormalTok{, }\StringTok{"Quality"}\NormalTok{, }\StringTok{"Style"}\NormalTok{)}
 \CommentTok{# size of each segments}
-\NormalTok{group_size<-}\KeywordTok{c}\NormalTok{(}\DecValTok{250}\NormalTok{,}\DecValTok{200}\NormalTok{,}\DecValTok{200}\NormalTok{,}\DecValTok{350}\NormalTok{)}
+\NormalTok{group_size <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{250}\NormalTok{, }\DecValTok{200}\NormalTok{, }\DecValTok{200}\NormalTok{, }\DecValTok{350}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -7846,7 +7911,8 @@ The next step is to define variable distribution parameters. There are 4 segment
   \CommentTok{# Quality}
   \DecValTok{36}\NormalTok{, }\FloatTok{0.5}\NormalTok{, }\DecValTok{70000}\NormalTok{, }\FloatTok{0.4}\NormalTok{, }\DecValTok{300}\NormalTok{, }\DecValTok{2000}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{15}\NormalTok{,}
   \CommentTok{# Style}
-  \DecValTok{25}\NormalTok{, }\FloatTok{0.2}\NormalTok{, }\DecValTok{90000}\NormalTok{, }\FloatTok{0.2}\NormalTok{, }\DecValTok{200}\NormalTok{, }\DecValTok{2000}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{20}\NormalTok{), }\DataTypeTok{ncol=}\KeywordTok{length}\NormalTok{(vars), }\DataTypeTok{byrow=}\OtherTok{TRUE}\NormalTok{)}
+  \DecValTok{25}\NormalTok{, }\FloatTok{0.2}\NormalTok{, }\DecValTok{90000}\NormalTok{, }\FloatTok{0.2}\NormalTok{, }\DecValTok{200}\NormalTok{, }\DecValTok{2000}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{20}\NormalTok{), }
+  \DataTypeTok{ncol=}\KeywordTok{length}\NormalTok{(vars), }\DataTypeTok{byrow=}\OtherTok{TRUE}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -7861,7 +7927,8 @@ The next step is to define variable distribution parameters. There are 4 segment
   \CommentTok{# Quality}
   \DecValTok{7}\NormalTok{,}\OtherTok{NA}\NormalTok{,}\DecValTok{10000}\NormalTok{,}\OtherTok{NA}\NormalTok{,}\DecValTok{50}\NormalTok{,}\DecValTok{200}\NormalTok{,}\OtherTok{NA}\NormalTok{,}\OtherTok{NA}\NormalTok{,}
   \CommentTok{# Style}
-  \DecValTok{2}\NormalTok{,}\OtherTok{NA}\NormalTok{,}\DecValTok{5000}\NormalTok{,}\OtherTok{NA}\NormalTok{,}\DecValTok{10}\NormalTok{,}\DecValTok{500}\NormalTok{,}\OtherTok{NA}\NormalTok{,}\OtherTok{NA}\NormalTok{), }\DataTypeTok{ncol=}\KeywordTok{length}\NormalTok{(vars), }\DataTypeTok{byrow=}\OtherTok{TRUE}\NormalTok{)}
+  \DecValTok{2}\NormalTok{,}\OtherTok{NA}\NormalTok{,}\DecValTok{5000}\NormalTok{,}\OtherTok{NA}\NormalTok{,}\DecValTok{10}\NormalTok{,}\DecValTok{500}\NormalTok{,}\OtherTok{NA}\NormalTok{,}\OtherTok{NA}\NormalTok{), }
+  \DataTypeTok{ncol=}\KeywordTok{length}\NormalTok{(vars), }\DataTypeTok{byrow=}\OtherTok{TRUE}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -7870,37 +7937,42 @@ Now we are ready to simulate data using the parameters defined above:
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# simulate non-survey data}
-\NormalTok{sim.dat<-}\OtherTok{NULL}
+\NormalTok{sim.dat <-}\StringTok{ }\OtherTok{NULL}
 \KeywordTok{set.seed}\NormalTok{(}\DecValTok{2016}\NormalTok{)}
 \CommentTok{# loop on customer segment (i)}
- \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \KeywordTok{seq_along}\NormalTok{(group_name))\{}
- 
-   \CommentTok{# add this line in order to moniter the process}
-   \KeywordTok{cat}\NormalTok{ (i, group_name[i],}\StringTok{"}\CharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
- 
-  \CommentTok{# create an empty matrix to store relevent data}
-\NormalTok{  seg<-}\KeywordTok{data.frame}\NormalTok{(}\KeywordTok{matrix}\NormalTok{(}\OtherTok{NA}\NormalTok{,}\DataTypeTok{nrow=}\NormalTok{group_size[i], }\DataTypeTok{ncol=}\KeywordTok{length}\NormalTok{(vars)))  }
- 
-  \CommentTok{# Simulate data within segment i}
-  \ControlFlowTok{for}\NormalTok{ (j }\ControlFlowTok{in} \KeywordTok{seq_along}\NormalTok{(vars))\{}
- 
-    \CommentTok{# loop on every variable (j)}
-    \ControlFlowTok{if}\NormalTok{ (vartype[j]}\OperatorTok{==}\StringTok{"norm"}\NormalTok{)\{}
-      \CommentTok{# simulate normal distribution}
-\NormalTok{      seg[,j]<-}\KeywordTok{rnorm}\NormalTok{(group_size[i], }\DataTypeTok{mean=}\NormalTok{mus[i,j], }\DataTypeTok{sd=}\NormalTok{sds[i,j])}
-\NormalTok{    \} }\ControlFlowTok{else} \ControlFlowTok{if}\NormalTok{ (vartype[j]}\OperatorTok{==}\StringTok{"pois"}\NormalTok{) \{}
-      \CommentTok{# simulate poisson distribution}
-\NormalTok{      seg[,j]<-}\KeywordTok{rpois}\NormalTok{(group_size[i], }\DataTypeTok{lambda=}\NormalTok{mus[i,j])}
-\NormalTok{    \} }\ControlFlowTok{else} \ControlFlowTok{if}\NormalTok{ (vartype[j]}\OperatorTok{==}\StringTok{"binom"}\NormalTok{)\{}
-      \CommentTok{# simulate binomial distribution}
-\NormalTok{      seg[,j]<-}\KeywordTok{rbinom}\NormalTok{(group_size[i],}\DataTypeTok{size=}\DecValTok{1}\NormalTok{,}\DataTypeTok{prob=}\NormalTok{mus[i,j])}
-\NormalTok{    \} }\ControlFlowTok{else}\NormalTok{\{}
-      \CommentTok{# if the distribution name is not one of the above, stop and return a message}
-      \KeywordTok{stop}\NormalTok{ (}\StringTok{"Don't have type:"}\NormalTok{,vartype[j])}
-\NormalTok{    \}        }
-\NormalTok{  \}}
-\NormalTok{  sim.dat<-}\KeywordTok{rbind}\NormalTok{(sim.dat,seg)}
-\NormalTok{ \}}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \KeywordTok{seq_along}\NormalTok{(group_name)) \{}
+    
+    \CommentTok{# add this line in order to moniter the process}
+    \KeywordTok{cat}\NormalTok{(i, group_name[i], }\StringTok{"}\CharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+    
+    \CommentTok{# create an empty matrix to store relevent data}
+\NormalTok{    seg <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\KeywordTok{matrix}\NormalTok{(}\OtherTok{NA}\NormalTok{, }\DataTypeTok{nrow =}\NormalTok{ group_size[i], }
+    \DataTypeTok{ncol =} \KeywordTok{length}\NormalTok{(vars)))}
+    
+    \CommentTok{# Simulate data within segment i}
+    \ControlFlowTok{for}\NormalTok{ (j }\ControlFlowTok{in} \KeywordTok{seq_along}\NormalTok{(vars)) \{}
+        
+        \CommentTok{# loop on every variable (j)}
+        \ControlFlowTok{if}\NormalTok{ (vartype[j] }\OperatorTok{==}\StringTok{ "norm"}\NormalTok{) \{}
+            \CommentTok{# simulate normal distribution}
+\NormalTok{            seg[, j] <-}\StringTok{ }\KeywordTok{rnorm}\NormalTok{(group_size[i], }\DataTypeTok{mean =}\NormalTok{ mus[i, }
+\NormalTok{                j], }\DataTypeTok{sd =}\NormalTok{ sds[i, j])}
+\NormalTok{        \} }\ControlFlowTok{else} \ControlFlowTok{if}\NormalTok{ (vartype[j] }\OperatorTok{==}\StringTok{ "pois"}\NormalTok{) \{}
+            \CommentTok{# simulate poisson distribution}
+\NormalTok{            seg[, j] <-}\StringTok{ }\KeywordTok{rpois}\NormalTok{(group_size[i], }\DataTypeTok{lambda =}\NormalTok{ mus[i, }
+\NormalTok{                j])}
+\NormalTok{        \} }\ControlFlowTok{else} \ControlFlowTok{if}\NormalTok{ (vartype[j] }\OperatorTok{==}\StringTok{ "binom"}\NormalTok{) \{}
+            \CommentTok{# simulate binomial distribution}
+\NormalTok{            seg[, j] <-}\StringTok{ }\KeywordTok{rbinom}\NormalTok{(group_size[i], }\DataTypeTok{size =} \DecValTok{1}\NormalTok{, }
+                \DataTypeTok{prob =}\NormalTok{ mus[i, j])}
+\NormalTok{        \} }\ControlFlowTok{else}\NormalTok{ \{}
+            \CommentTok{# if the distribution name is not one of the above, stop}
+            \CommentTok{# and return a message}
+            \KeywordTok{stop}\NormalTok{(}\StringTok{"Don't have type:"}\NormalTok{, vartype[j])}
+\NormalTok{        \}}
+\NormalTok{    \}}
+\NormalTok{    sim.dat <-}\StringTok{ }\KeywordTok{rbind}\NormalTok{(sim.dat, seg)}
+\NormalTok{\}}
 \end{Highlighting}
 \end{Shaded}
 
@@ -7909,17 +7981,19 @@ Now let's edit the data we just simulated a little by adding tags to 0/1 binomia
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# assign variable names}
-\KeywordTok{names}\NormalTok{(sim.dat)<-vars}
+\KeywordTok{names}\NormalTok{(sim.dat) <-}\StringTok{ }\NormalTok{vars}
 \CommentTok{# assign factor levels to segment variable}
-\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{segment<-}\KeywordTok{factor}\NormalTok{(}\KeywordTok{rep}\NormalTok{(group_name,}\DataTypeTok{times=}\NormalTok{group_size))}
+\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{segment <-}\StringTok{ }\KeywordTok{factor}\NormalTok{(}\KeywordTok{rep}\NormalTok{(group_name, }\DataTypeTok{times =}\NormalTok{ group_size))}
 \CommentTok{# recode gender and house variable}
-\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{gender<-}\KeywordTok{factor}\NormalTok{(sim.dat}\OperatorTok{$}\NormalTok{gender, }\DataTypeTok{labels=}\KeywordTok{c}\NormalTok{(}\StringTok{"Female"}\NormalTok{,}\StringTok{"Male"}\NormalTok{))}
-\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{house<-}\KeywordTok{factor}\NormalTok{(sim.dat}\OperatorTok{$}\NormalTok{house, }\DataTypeTok{labels=}\KeywordTok{c}\NormalTok{(}\StringTok{"No"}\NormalTok{,}\StringTok{"Yes"}\NormalTok{))}
+\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{gender <-}\StringTok{ }\KeywordTok{factor}\NormalTok{(sim.dat}\OperatorTok{$}\NormalTok{gender, }\DataTypeTok{labels =} \KeywordTok{c}\NormalTok{(}\StringTok{"Female"}\NormalTok{, }
+    \StringTok{"Male"}\NormalTok{))}
+\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{house <-}\StringTok{ }\KeywordTok{factor}\NormalTok{(sim.dat}\OperatorTok{$}\NormalTok{house, }\DataTypeTok{labels =} \KeywordTok{c}\NormalTok{(}\StringTok{"No"}\NormalTok{, }
+    \StringTok{"Yes"}\NormalTok{))}
 \CommentTok{# store_trans and online_trans are at least 1}
-\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{store_trans<-sim.dat}\OperatorTok{$}\NormalTok{store_trans}\OperatorTok{+}\DecValTok{1}
-\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{online_trans<-sim.dat}\OperatorTok{$}\NormalTok{online_trans}\OperatorTok{+}\DecValTok{1}
+\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{store_trans <-}\StringTok{ }\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{store_trans }\OperatorTok{+}\StringTok{ }\DecValTok{1}
+\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{online_trans <-}\StringTok{ }\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{online_trans }\OperatorTok{+}\StringTok{ }\DecValTok{1}
 \CommentTok{# age is integer}
-\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{age<-}\KeywordTok{floor}\NormalTok{(sim.dat}\OperatorTok{$}\NormalTok{age)}
+\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{age <-}\StringTok{ }\KeywordTok{floor}\NormalTok{(sim.dat}\OperatorTok{$}\NormalTok{age)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -7928,14 +8002,14 @@ In the real world, the data always includes some noise such as missing, wrong im
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# add missing values}
-\NormalTok{idxm <-}\StringTok{ }\KeywordTok{as.logical}\NormalTok{(}\KeywordTok{rbinom}\NormalTok{(ncust, }\DataTypeTok{size=}\DecValTok{1}\NormalTok{, }\DataTypeTok{prob=}\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{age}\OperatorTok{/}\DecValTok{200}\NormalTok{))}
-\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{income[idxm]<-}\OtherTok{NA}
+\NormalTok{idxm <-}\StringTok{ }\KeywordTok{as.logical}\NormalTok{(}\KeywordTok{rbinom}\NormalTok{(ncust, }\DataTypeTok{size =} \DecValTok{1}\NormalTok{, }\DataTypeTok{prob =}\NormalTok{ sim.dat}\OperatorTok{$}\NormalTok{age}\OperatorTok{/}\DecValTok{200}\NormalTok{))}
+\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{income[idxm] <-}\StringTok{ }\OtherTok{NA}
 \CommentTok{# add wrong imputations and outliers}
 \KeywordTok{set.seed}\NormalTok{(}\DecValTok{123}\NormalTok{)}
-\NormalTok{idx<-}\KeywordTok{sample}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\NormalTok{ncust,}\DecValTok{5}\NormalTok{)}
-\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{age[idx[}\DecValTok{1}\NormalTok{]]<-}\DecValTok{300}
-\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{store_exp[idx[}\DecValTok{2}\NormalTok{]]<-}\StringTok{ }\DecValTok{-500}
-\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{store_exp[idx[}\DecValTok{3}\OperatorTok{:}\DecValTok{5}\NormalTok{]]<-}\KeywordTok{c}\NormalTok{(}\DecValTok{50000}\NormalTok{,}\DecValTok{30000}\NormalTok{,}\DecValTok{30000}\NormalTok{)}
+\NormalTok{idx <-}\StringTok{ }\KeywordTok{sample}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\NormalTok{ncust, }\DecValTok{5}\NormalTok{)}
+\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{age[idx[}\DecValTok{1}\NormalTok{]] <-}\StringTok{ }\DecValTok{300}
+\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{store_exp[idx[}\DecValTok{2}\NormalTok{]] <-}\StringTok{ }\DecValTok{-500}
+\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{store_exp[idx[}\DecValTok{3}\OperatorTok{:}\DecValTok{5}\NormalTok{]] <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{50000}\NormalTok{, }\DecValTok{30000}\NormalTok{, }\DecValTok{30000}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -7944,44 +8018,43 @@ So far we have created part of the data. You can check it using \texttt{summary(
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# number of survey questions}
-\NormalTok{nq<-}\DecValTok{10}
+\NormalTok{nq <-}\StringTok{ }\DecValTok{10}
+
 \CommentTok{# mean matrix for different segments }
-\NormalTok{mus2 <-}\StringTok{ }\KeywordTok{matrix}\NormalTok{( }\KeywordTok{c}\NormalTok{(}
-  \CommentTok{# Price}
- \DecValTok{5}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{3}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{4}\NormalTok{,}
-  \CommentTok{# Conspicuous}
- \DecValTok{1}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{5}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{2}\NormalTok{,}
-  \CommentTok{# Quality}
- \DecValTok{5}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{3}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{3}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{3}\NormalTok{,}\DecValTok{3}\NormalTok{,}
-  \CommentTok{# Style}
- \DecValTok{3}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{5}\NormalTok{,}\DecValTok{3}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{2}\NormalTok{), }\DataTypeTok{ncol=}\NormalTok{nq, }\DataTypeTok{byrow=}\OtherTok{TRUE}\NormalTok{)}
+\NormalTok{mus2 <-}\StringTok{ }\KeywordTok{matrix}\NormalTok{( }\KeywordTok{c}\NormalTok{( }\DecValTok{5}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{3}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{4}\NormalTok{, }\CommentTok{# Price}
+  \DecValTok{1}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{5}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{2}\NormalTok{, }\CommentTok{# Conspicuous}
+  \DecValTok{5}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{3}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{3}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{3}\NormalTok{,}\DecValTok{3}\NormalTok{, }\CommentTok{# Quality}
+  \DecValTok{3}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{1}\NormalTok{,}\DecValTok{5}\NormalTok{,}\DecValTok{3}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{2}\NormalTok{), }\CommentTok{# Style}
+\DataTypeTok{ncol=}\NormalTok{nq, }\DataTypeTok{byrow=}\OtherTok{TRUE}\NormalTok{) }
 
 \CommentTok{# assume the variance is 0.2 for all}
-\NormalTok{sd2<-}\FloatTok{0.2}
-\NormalTok{sim.dat2<-}\OtherTok{NULL}
+\NormalTok{sd2 <-}\StringTok{ }\FloatTok{0.2}
+\NormalTok{sim.dat2 <-}\StringTok{ }\OtherTok{NULL}
 \KeywordTok{set.seed}\NormalTok{(}\DecValTok{1000}\NormalTok{)}
 \CommentTok{# loop for customer segment (i)}
-\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \KeywordTok{seq_along}\NormalTok{(group_name))\{}
-  \CommentTok{# the following line is used for checking the progress}
-  \CommentTok{# cat (i, group_name[i],"\textbackslash{}n")}
-  \CommentTok{# create an empty data frame to store data}
-\NormalTok{  seg<-}\KeywordTok{data.frame}\NormalTok{(}\KeywordTok{matrix}\NormalTok{(}\OtherTok{NA}\NormalTok{,}\DataTypeTok{nrow=}\NormalTok{group_size[i], }\DataTypeTok{ncol=}\NormalTok{nq))  }
-  \CommentTok{# simulate data within segment}
-  \ControlFlowTok{for}\NormalTok{ (j }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{nq)\{}
-    \CommentTok{# simulate normal distribution}
-\NormalTok{    res<-}\KeywordTok{rnorm}\NormalTok{(group_size[i], }\DataTypeTok{mean=}\NormalTok{mus2[i,j], }\DataTypeTok{sd=}\NormalTok{sd2)}
-    \CommentTok{# set upper and lower limit}
-\NormalTok{    res[res}\OperatorTok{>}\DecValTok{5}\NormalTok{]<-}\DecValTok{5}
-\NormalTok{    res[res}\OperatorTok{<}\DecValTok{1}\NormalTok{]<-}\DecValTok{1}
-    \CommentTok{# convert continuous values to discrete integers}
-\NormalTok{    seg[,j]<-}\KeywordTok{floor}\NormalTok{(res)}
-\NormalTok{  \}}
-\NormalTok{  sim.dat2<-}\KeywordTok{rbind}\NormalTok{(sim.dat2,seg)}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \KeywordTok{seq_along}\NormalTok{(group_name)) \{}
+    \CommentTok{# the following line is used for checking the}
+    \CommentTok{# progress cat (i, group_name[i],'\textbackslash{}n') create an}
+    \CommentTok{# empty data frame to store data}
+\NormalTok{    seg <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\KeywordTok{matrix}\NormalTok{(}\OtherTok{NA}\NormalTok{, }\DataTypeTok{nrow =}\NormalTok{ group_size[i], }
+        \DataTypeTok{ncol =}\NormalTok{ nq))}
+    \CommentTok{# simulate data within segment}
+    \ControlFlowTok{for}\NormalTok{ (j }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{nq) \{}
+        \CommentTok{# simulate normal distribution}
+\NormalTok{        res <-}\StringTok{ }\KeywordTok{rnorm}\NormalTok{(group_size[i], }\DataTypeTok{mean =}\NormalTok{ mus2[i, }
+\NormalTok{            j], }\DataTypeTok{sd =}\NormalTok{ sd2)}
+        \CommentTok{# set upper and lower limit}
+\NormalTok{        res[res }\OperatorTok{>}\StringTok{ }\DecValTok{5}\NormalTok{] <-}\StringTok{ }\DecValTok{5}
+\NormalTok{        res[res }\OperatorTok{<}\StringTok{ }\DecValTok{1}\NormalTok{] <-}\StringTok{ }\DecValTok{1}
+        \CommentTok{# convert continuous values to discrete integers}
+\NormalTok{        seg[, j] <-}\StringTok{ }\KeywordTok{floor}\NormalTok{(res)}
+\NormalTok{    \}}
+\NormalTok{    sim.dat2 <-}\StringTok{ }\KeywordTok{rbind}\NormalTok{(sim.dat2, seg)}
 \NormalTok{\}}
 
-\KeywordTok{names}\NormalTok{(sim.dat2)<-}\KeywordTok{paste}\NormalTok{(}\StringTok{"Q"}\NormalTok{,}\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{,}\DataTypeTok{sep=}\StringTok{""}\NormalTok{)}
-\NormalTok{sim.dat<-}\KeywordTok{cbind}\NormalTok{(sim.dat,sim.dat2)}
-\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{segment<-}\KeywordTok{factor}\NormalTok{(}\KeywordTok{rep}\NormalTok{(group_name,}\DataTypeTok{times=}\NormalTok{group_size))}
+\KeywordTok{names}\NormalTok{(sim.dat2) <-}\StringTok{ }\KeywordTok{paste}\NormalTok{(}\StringTok{"Q"}\NormalTok{, }\DecValTok{1}\OperatorTok{:}\DecValTok{10}\NormalTok{, }\DataTypeTok{sep =} \StringTok{""}\NormalTok{)}
+\NormalTok{sim.dat <-}\StringTok{ }\KeywordTok{cbind}\NormalTok{(sim.dat, sim.dat2)}
+\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{segment <-}\StringTok{ }\KeywordTok{factor}\NormalTok{(}\KeywordTok{rep}\NormalTok{(group_name, }\DataTypeTok{times =}\NormalTok{ group_size))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -7990,11 +8063,15 @@ So far we have created part of the data. You can check it using \texttt{summary(
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{# Create a matrix of factor loadings}
-\CommentTok{# This pattern is called bifactor because it has a general factor for separate components.}
-\CommentTok{# For example, "Ease of making reservation" has general factor loading 0.33, specific factor loading 0.58}
-\CommentTok{# The outcome variables are formed as combinations of these general and specific factors}
-\NormalTok{loadings <-}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\KeywordTok{c}\NormalTok{ (}
+\CommentTok{# Create a matrix of factor loadings This pattern}
+\CommentTok{# is called bifactor because it has a general}
+\CommentTok{# factor for separate components.  For example,}
+\CommentTok{# 'Ease of making reservation' has general factor}
+\CommentTok{# loading 0.33, specific factor loading 0.58 The}
+\CommentTok{# outcome variables are formed as combinations of}
+\CommentTok{# these general and specific factors}
+
+\NormalTok{loadings <-}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\KeywordTok{c}\NormalTok{ ( }
   \CommentTok{# Ticketing}
   \FloatTok{.33}\NormalTok{, }\FloatTok{.58}\NormalTok{, }\FloatTok{.00}\NormalTok{, }\FloatTok{.00}\NormalTok{,  }\CommentTok{# Ease of making reservation }
   \FloatTok{.35}\NormalTok{, }\FloatTok{.55}\NormalTok{, }\FloatTok{.00}\NormalTok{, }\FloatTok{.00}\NormalTok{,  }\CommentTok{# Availability of preferred seats}
@@ -8015,76 +8092,60 @@ So far we have created part of the data. You can check it using \texttt{summary(
   \FloatTok{.35}\NormalTok{, }\FloatTok{.50}\NormalTok{, }\FloatTok{.40}\NormalTok{, }\FloatTok{.20}\NormalTok{,  }\CommentTok{# Purchase again}
   \FloatTok{.25}\NormalTok{, }\FloatTok{.50}\NormalTok{, }\FloatTok{.50}\NormalTok{, }\FloatTok{.20}\NormalTok{), }\CommentTok{# Willingness to recommend}
   \DataTypeTok{nrow=}\DecValTok{15}\NormalTok{,}\DataTypeTok{ncol=}\DecValTok{4}\NormalTok{, }\DataTypeTok{byrow=}\OtherTok{TRUE}\NormalTok{)}
-  
-\CommentTok{# Matrix multiplication produces the correlation matrix except for the diagonal}
-\NormalTok{cor_matrix<-loadings }\OperatorTok{%*%}\StringTok{ }\KeywordTok{t}\NormalTok{(loadings)}
-\CommentTok{# Diagonal set to ones}
-\KeywordTok{diag}\NormalTok{(cor_matrix)<-}\DecValTok{1}
 
-\CommentTok{# use the mvtnorm package to randomly generate a data set with a given correlation pattern}
+\CommentTok{# Matrix multiplication produces the correlation}
+\CommentTok{# matrix except for the diagonal}
+\NormalTok{cor_matrix <-}\StringTok{ }\NormalTok{loadings }\OperatorTok{%*%}\StringTok{ }\KeywordTok{t}\NormalTok{(loadings)}
+\CommentTok{# Diagonal set to ones}
+\KeywordTok{diag}\NormalTok{(cor_matrix) <-}\StringTok{ }\DecValTok{1}
+
+\CommentTok{# use the mvtnorm package to randomly generate a}
+\CommentTok{# data set with a given correlation pattern}
 
 \KeywordTok{library}\NormalTok{(mvtnorm)}
 \CommentTok{# mean vectors of the 3 airline companies}
-\NormalTok{mu1=}\KeywordTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{,}\DecValTok{6}\NormalTok{,}\DecValTok{5}\NormalTok{,}\DecValTok{6}\NormalTok{, }\DecValTok{7}\NormalTok{,}\DecValTok{8}\NormalTok{,}\DecValTok{6}\NormalTok{,}\DecValTok{7}\NormalTok{, }\DecValTok{5}\NormalTok{,}\DecValTok{5}\NormalTok{,}\DecValTok{5}\NormalTok{,}\DecValTok{5}\NormalTok{, }\DecValTok{6}\NormalTok{,}\DecValTok{6}\NormalTok{,}\DecValTok{6}\NormalTok{)}
-\NormalTok{mu2=}\KeywordTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{,}\DecValTok{3}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{3}\NormalTok{, }\DecValTok{5}\NormalTok{,}\DecValTok{4}\NormalTok{,}\DecValTok{5}\NormalTok{,}\DecValTok{6}\NormalTok{, }\DecValTok{8}\NormalTok{,}\DecValTok{8}\NormalTok{,}\DecValTok{8}\NormalTok{,}\DecValTok{8}\NormalTok{, }\DecValTok{3}\NormalTok{,}\DecValTok{3}\NormalTok{,}\DecValTok{3}\NormalTok{)}
-\NormalTok{mu3=}\KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{, }\DecValTok{8}\NormalTok{,}\DecValTok{8}\NormalTok{,}\DecValTok{8}\NormalTok{,}\DecValTok{8}\NormalTok{, }\DecValTok{8}\NormalTok{,}\DecValTok{8}\NormalTok{,}\DecValTok{8}\NormalTok{,}\DecValTok{8}\NormalTok{, }\DecValTok{8}\NormalTok{,}\DecValTok{8}\NormalTok{,}\DecValTok{8}\NormalTok{)}
+\NormalTok{mu1 =}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{, }\DecValTok{6}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{6}\NormalTok{, }\DecValTok{7}\NormalTok{, }\DecValTok{8}\NormalTok{, }\DecValTok{6}\NormalTok{, }\DecValTok{7}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{6}\NormalTok{, }\DecValTok{6}\NormalTok{, }\DecValTok{6}\NormalTok{)}
+\NormalTok{mu2 =}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{, }\DecValTok{3}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{3}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{4}\NormalTok{, }\DecValTok{5}\NormalTok{, }\DecValTok{6}\NormalTok{, }\DecValTok{8}\NormalTok{, }\DecValTok{8}\NormalTok{, }\DecValTok{8}\NormalTok{, }\DecValTok{8}\NormalTok{, }\DecValTok{3}\NormalTok{, }\DecValTok{3}\NormalTok{, }\DecValTok{3}\NormalTok{)}
+\NormalTok{mu3 =}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{8}\NormalTok{, }\DecValTok{8}\NormalTok{, }\DecValTok{8}\NormalTok{, }\DecValTok{8}\NormalTok{, }\DecValTok{8}\NormalTok{, }\DecValTok{8}\NormalTok{, }\DecValTok{8}\NormalTok{, }\DecValTok{8}\NormalTok{, }\DecValTok{8}\NormalTok{, }\DecValTok{8}\NormalTok{, }\DecValTok{8}\NormalTok{)}
 
 \CommentTok{# set random seed}
-\KeywordTok{set.seed}\NormalTok{(}\DecValTok{123456}\NormalTok{) }
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{123456}\NormalTok{)}
 \CommentTok{# respondent ID}
-\NormalTok{resp.id <-}\StringTok{ }\DecValTok{1}\OperatorTok{:}\DecValTok{1000} 
+\NormalTok{resp.id <-}\StringTok{ }\DecValTok{1}\OperatorTok{:}\DecValTok{1000}
 
-\KeywordTok{library}\NormalTok{(MASS) }
-\NormalTok{rating1 <-}\StringTok{ }\KeywordTok{mvrnorm}\NormalTok{(}\KeywordTok{length}\NormalTok{(resp.id),}
-                     \DataTypeTok{mu=}\NormalTok{mu1,}
-                     \DataTypeTok{Sigma=}\NormalTok{cor_matrix)}
-\NormalTok{rating2 <-}\StringTok{ }\KeywordTok{mvrnorm}\NormalTok{(}\KeywordTok{length}\NormalTok{(resp.id),}
-                   \DataTypeTok{mu=}\NormalTok{mu2,}
-                   \DataTypeTok{Sigma=}\NormalTok{cor_matrix)}
-\NormalTok{rating3 <-}\StringTok{ }\KeywordTok{mvrnorm}\NormalTok{(}\KeywordTok{length}\NormalTok{(resp.id),}
-                   \DataTypeTok{mu=}\NormalTok{mu3,}
-                   \DataTypeTok{Sigma=}\NormalTok{cor_matrix)}
+\KeywordTok{library}\NormalTok{(MASS)}
+\NormalTok{rating1 <-}\StringTok{ }\KeywordTok{mvrnorm}\NormalTok{(}\KeywordTok{length}\NormalTok{(resp.id), }\DataTypeTok{mu =}\NormalTok{ mu1, }\DataTypeTok{Sigma =}\NormalTok{ cor_matrix)}
+\NormalTok{rating2 <-}\StringTok{ }\KeywordTok{mvrnorm}\NormalTok{(}\KeywordTok{length}\NormalTok{(resp.id), }\DataTypeTok{mu =}\NormalTok{ mu2, }\DataTypeTok{Sigma =}\NormalTok{ cor_matrix)}
+\NormalTok{rating3 <-}\StringTok{ }\KeywordTok{mvrnorm}\NormalTok{(}\KeywordTok{length}\NormalTok{(resp.id), }\DataTypeTok{mu =}\NormalTok{ mu3, }\DataTypeTok{Sigma =}\NormalTok{ cor_matrix)}
 
 
 \CommentTok{# truncates scale to be between 1 and 9}
-\NormalTok{rating1[rating1}\OperatorTok{>}\DecValTok{9}\NormalTok{]<-}\DecValTok{9}
-\NormalTok{rating1[rating1}\OperatorTok{<}\DecValTok{1}\NormalTok{]<-}\DecValTok{1}
-\NormalTok{rating2[rating2}\OperatorTok{>}\DecValTok{9}\NormalTok{]<-}\DecValTok{9}
-\NormalTok{rating2[rating2}\OperatorTok{<}\DecValTok{1}\NormalTok{]<-}\DecValTok{1}
-\NormalTok{rating3[rating3}\OperatorTok{>}\DecValTok{9}\NormalTok{]<-}\DecValTok{9}
-\NormalTok{rating3[rating3}\OperatorTok{<}\DecValTok{1}\NormalTok{]<-}\DecValTok{1}
+\NormalTok{rating1[rating1 }\OperatorTok{>}\StringTok{ }\DecValTok{9}\NormalTok{] <-}\StringTok{ }\DecValTok{9}
+\NormalTok{rating1[rating1 }\OperatorTok{<}\StringTok{ }\DecValTok{1}\NormalTok{] <-}\StringTok{ }\DecValTok{1}
+\NormalTok{rating2[rating2 }\OperatorTok{>}\StringTok{ }\DecValTok{9}\NormalTok{] <-}\StringTok{ }\DecValTok{9}
+\NormalTok{rating2[rating2 }\OperatorTok{<}\StringTok{ }\DecValTok{1}\NormalTok{] <-}\StringTok{ }\DecValTok{1}
+\NormalTok{rating3[rating3 }\OperatorTok{>}\StringTok{ }\DecValTok{9}\NormalTok{] <-}\StringTok{ }\DecValTok{9}
+\NormalTok{rating3[rating3 }\OperatorTok{<}\StringTok{ }\DecValTok{1}\NormalTok{] <-}\StringTok{ }\DecValTok{1}
 
 \CommentTok{# Round to single digit}
-\NormalTok{rating1<-}\KeywordTok{data.frame}\NormalTok{(}\KeywordTok{round}\NormalTok{(rating1,}\DecValTok{0}\NormalTok{))}
-\NormalTok{rating2<-}\KeywordTok{data.frame}\NormalTok{(}\KeywordTok{round}\NormalTok{(rating2,}\DecValTok{0}\NormalTok{))}
-\NormalTok{rating3<-}\KeywordTok{data.frame}\NormalTok{(}\KeywordTok{round}\NormalTok{(rating3,}\DecValTok{0}\NormalTok{))}
-\NormalTok{rating1}\OperatorTok{$}\NormalTok{ID<-resp.id}
-\NormalTok{rating2}\OperatorTok{$}\NormalTok{ID<-resp.id}
-\NormalTok{rating3}\OperatorTok{$}\NormalTok{ID<-resp.id}
-\NormalTok{rating1}\OperatorTok{$}\NormalTok{Airline<-}\KeywordTok{rep}\NormalTok{(}\StringTok{"AirlineCo.1"}\NormalTok{,}\KeywordTok{length}\NormalTok{(resp.id))}
-\NormalTok{rating2}\OperatorTok{$}\NormalTok{Airline<-}\KeywordTok{rep}\NormalTok{(}\StringTok{"AirlineCo.2"}\NormalTok{,}\KeywordTok{length}\NormalTok{(resp.id))}
-\NormalTok{rating3}\OperatorTok{$}\NormalTok{Airline<-}\KeywordTok{rep}\NormalTok{(}\StringTok{"AirlineCo.3"}\NormalTok{,}\KeywordTok{length}\NormalTok{(resp.id))}
-\NormalTok{rating<-}\KeywordTok{rbind}\NormalTok{(rating1,rating2,rating3)}
+\NormalTok{rating1 <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\KeywordTok{round}\NormalTok{(rating1, }\DecValTok{0}\NormalTok{))}
+\NormalTok{rating2 <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\KeywordTok{round}\NormalTok{(rating2, }\DecValTok{0}\NormalTok{))}
+\NormalTok{rating3 <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\KeywordTok{round}\NormalTok{(rating3, }\DecValTok{0}\NormalTok{))}
+\NormalTok{rating1}\OperatorTok{$}\NormalTok{ID <-}\StringTok{ }\NormalTok{resp.id}
+\NormalTok{rating2}\OperatorTok{$}\NormalTok{ID <-}\StringTok{ }\NormalTok{resp.id}
+\NormalTok{rating3}\OperatorTok{$}\NormalTok{ID <-}\StringTok{ }\NormalTok{resp.id}
+\NormalTok{rating1}\OperatorTok{$}\NormalTok{Airline <-}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\StringTok{"AirlineCo.1"}\NormalTok{, }\KeywordTok{length}\NormalTok{(resp.id))}
+\NormalTok{rating2}\OperatorTok{$}\NormalTok{Airline <-}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\StringTok{"AirlineCo.2"}\NormalTok{, }\KeywordTok{length}\NormalTok{(resp.id))}
+\NormalTok{rating3}\OperatorTok{$}\NormalTok{Airline <-}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\StringTok{"AirlineCo.3"}\NormalTok{, }\KeywordTok{length}\NormalTok{(resp.id))}
+\NormalTok{rating <-}\StringTok{ }\KeywordTok{rbind}\NormalTok{(rating1, rating2, rating3)}
 
 \CommentTok{# assign names to the variables in the data frame}
-\KeywordTok{names}\NormalTok{(rating)<-}\KeywordTok{c}\NormalTok{(}
-  \StringTok{"Easy_Reservation"}\NormalTok{,}
-  \StringTok{"Preferred_Seats"}\NormalTok{,}
-  \StringTok{"Flight_Options"}\NormalTok{,}
-  \StringTok{"Ticket_Prices"}\NormalTok{,}
-  \StringTok{"Seat_Comfort"}\NormalTok{,}
-  \StringTok{"Seat_Roominess"}\NormalTok{,}
-  \StringTok{"Overhead_Storage"}\NormalTok{,}
-  \StringTok{"Clean_Aircraft"}\NormalTok{,}
-  \StringTok{"Courtesy"}\NormalTok{,}
-  \StringTok{"Friendliness"}\NormalTok{,}
-  \StringTok{"Helpfulness"}\NormalTok{,}
-  \StringTok{"Service"}\NormalTok{,}
-  \StringTok{"Satisfaction"}\NormalTok{,}
-  \StringTok{"Fly_Again"}\NormalTok{,}
-  \StringTok{"Recommend"}\NormalTok{,}
-  \StringTok{"ID"}\NormalTok{,}
-  \StringTok{"Airline"}\NormalTok{)}
+\KeywordTok{names}\NormalTok{(rating) <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"Easy_Reservation"}\NormalTok{, }\StringTok{"Preferred_Seats"}\NormalTok{, }
+    \StringTok{"Flight_Options"}\NormalTok{, }\StringTok{"Ticket_Prices"}\NormalTok{, }\StringTok{"Seat_Comfort"}\NormalTok{, }
+    \StringTok{"Seat_Roominess"}\NormalTok{, }\StringTok{"Overhead_Storage"}\NormalTok{, }\StringTok{"Clean_Aircraft"}\NormalTok{, }
+    \StringTok{"Courtesy"}\NormalTok{, }\StringTok{"Friendliness"}\NormalTok{, }\StringTok{"Helpfulness"}\NormalTok{, }\StringTok{"Service"}\NormalTok{, }
+    \StringTok{"Satisfaction"}\NormalTok{, }\StringTok{"Fly_Again"}\NormalTok{, }\StringTok{"Recommend"}\NormalTok{, }\StringTok{"ID"}\NormalTok{, }
+    \StringTok{"Airline"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -8093,12 +8154,11 @@ So far we have created part of the data. You can check it using \texttt{summary(
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{# sim1_da1.csv the 1st simulated data similar sim1_da2 and sim1_da3}
-\CommentTok{# sim1.csv simulated data, the first simulation dummy.sim1.csv dummy}
-\CommentTok{# variables for the first simulated data with all the baseline code for}
-\CommentTok{# simulation}
-
-\CommentTok{# setwd(dirname(file.choose())) library(grplasso)}
+\CommentTok{# sim1_da1.csv the 1st simulated data similar}
+\CommentTok{# sim1_da2 and sim1_da3 sim1.csv simulated data,}
+\CommentTok{# the first simulation dummy.sim1.csv dummy}
+\CommentTok{# variables for the first simulated data with all}
+\CommentTok{# the baseline code for simulation}
 
 \NormalTok{nf <-}\StringTok{ }\DecValTok{800}
 \ControlFlowTok{for}\NormalTok{ (j }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{20}\NormalTok{) \{}
@@ -8116,7 +8176,8 @@ So far we have created part of the data. You can check it using \texttt{summary(
     \KeywordTok{colnames}\NormalTok{(sim.da1) <-}\StringTok{ }\NormalTok{col}
     \KeywordTok{rownames}\NormalTok{(sim.da1) <-}\StringTok{ }\NormalTok{row}
     
-    \CommentTok{# use class.ind() function in nnet package to encode dummy variables}
+    \CommentTok{# use class.ind() function in nnet package to}
+    \CommentTok{# encode dummy variables}
     \KeywordTok{library}\NormalTok{(nnet)}
 \NormalTok{    dummy.sim1 <-}\StringTok{ }\OtherTok{NULL}
     \ControlFlowTok{for}\NormalTok{ (k }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{ncol}\NormalTok{(sim.da1)) \{}
@@ -8126,15 +8187,17 @@ So far we have created part of the data. You can check it using \texttt{summary(
 \NormalTok{    \}}
 \NormalTok{    dummy.sim1 <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(dummy.sim1)}
     
-    \CommentTok{# set 'C' as the baseline delete baseline dummy variable}
+    \CommentTok{# set 'C' as the baseline delete baseline dummy}
+    \CommentTok{# variable}
     
 \NormalTok{    base.idx <-}\StringTok{ }\DecValTok{3} \OperatorTok{*}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{120}\NormalTok{)}
 \NormalTok{    dummy1 <-}\StringTok{ }\NormalTok{dummy.sim1[, }\OperatorTok{-}\NormalTok{base.idx]}
     
-    \CommentTok{# simulate independent variable for different values of r simulate}
-    \CommentTok{# based on one value of r each time r=0.1, get the link function}
-\NormalTok{    s1 <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\OperatorTok{/}\DecValTok{10}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{-1}\OperatorTok{/}\DecValTok{10}\NormalTok{), }\DecValTok{40}\NormalTok{), }\KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\OperatorTok{/}\DecValTok{10}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{), }\DecValTok{40}\NormalTok{), }\KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }
-        \DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{), }\DecValTok{40}\NormalTok{))}
+    \CommentTok{# simulate independent variable for different}
+    \CommentTok{# values of r simulate based on one value of r each}
+    \CommentTok{# time r=0.1, get the link function}
+\NormalTok{    s1 <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\OperatorTok{/}\DecValTok{10}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{-1}\OperatorTok{/}\DecValTok{10}\NormalTok{), }\DecValTok{40}\NormalTok{), }\KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\OperatorTok{/}\DecValTok{10}\NormalTok{, }
+        \DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{), }\DecValTok{40}\NormalTok{), }\KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{), }\DecValTok{40}\NormalTok{))}
 \NormalTok{    link1 <-}\StringTok{ }\KeywordTok{as.matrix}\NormalTok{(dummy.sim1) }\OperatorTok{%*%}\StringTok{ }\NormalTok{s1 }\OperatorTok{-}\StringTok{ }\DecValTok{40}\OperatorTok{/}\DecValTok{3}\OperatorTok{/}\DecValTok{10}
     
     \CommentTok{# r=0.25}
@@ -8145,25 +8208,30 @@ So far we have created part of the data. You can check it using \texttt{summary(
     \CommentTok{# c(rep(c(1/2,0,-1/2),40),rep(c(1/2,0,0),40),rep(c(0,0,0),40))->s1}
     \CommentTok{# as.matrix(dummy.sim1)%*%s1-40/3/2->link1}
     
-    \CommentTok{# r=1 c(rep(c(1,0,-1),40),rep(c(1,0,0),40),rep(c(0,0,0),40))->s1}
+    \CommentTok{# r=1}
+    \CommentTok{# c(rep(c(1,0,-1),40),rep(c(1,0,0),40),rep(c(0,0,0),40))->s1}
     \CommentTok{# as.matrix(dummy.sim1)%*%s1-40/3->link1}
     
-    \CommentTok{# r=2 c(rep(c(2,0,-2),40),rep(c(2,0,0),40),rep(c(0,0,0),40))->s1}
+    \CommentTok{# r=2}
+    \CommentTok{# c(rep(c(2,0,-2),40),rep(c(2,0,0),40),rep(c(0,0,0),40))->s1}
     \CommentTok{# as.matrix(dummy.sim1)%*%s1-40/3/0.5->link1}
     
     
     \CommentTok{# calculate the outbreak probability}
 \NormalTok{    hp1 <-}\StringTok{ }\KeywordTok{exp}\NormalTok{(link1)}\OperatorTok{/}\NormalTok{(}\KeywordTok{exp}\NormalTok{(link1) }\OperatorTok{+}\StringTok{ }\DecValTok{1}\NormalTok{)}
     
-    \CommentTok{# based on the probability hp1, simulate response variable: res}
+    \CommentTok{# based on the probability hp1, simulate response}
+    \CommentTok{# variable: res}
 \NormalTok{    res <-}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{9}\NormalTok{, nf)}
     \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{nf) \{}
-\NormalTok{        res[i] <-}\StringTok{ }\KeywordTok{sample}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{), }\DecValTok{1}\NormalTok{, }\DataTypeTok{prob =} \KeywordTok{c}\NormalTok{(hp1[i], }\DecValTok{1} \OperatorTok{-}\StringTok{ }\NormalTok{hp1[i]))}
+\NormalTok{        res[i] <-}\StringTok{ }\KeywordTok{sample}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{), }\DecValTok{1}\NormalTok{, }\DataTypeTok{prob =} \KeywordTok{c}\NormalTok{(hp1[i], }
+            \DecValTok{1} \OperatorTok{-}\StringTok{ }\NormalTok{hp1[i]))}
 \NormalTok{    \}}
     
-    \CommentTok{# da1 with response variable, without group indicator da2 without}
-    \CommentTok{# response variable, with group indicator da3 without response}
-    \CommentTok{# variable, without group indicator}
+    \CommentTok{# da1 with response variable, without group}
+    \CommentTok{# indicator da2 without response variable, with}
+    \CommentTok{# group indicator da3 without response variable,}
+    \CommentTok{# without group indicator}
     
 \NormalTok{    dummy1}\OperatorTok{$}\NormalTok{y <-}\StringTok{ }\NormalTok{res}
 \NormalTok{    da1 <-}\StringTok{ }\NormalTok{dummy1}
@@ -8177,11 +8245,16 @@ So far we have created part of the data. You can check it using \texttt{summary(
 \NormalTok{    da3 <-}\StringTok{ }\NormalTok{da1[, }\DecValTok{1}\OperatorTok{:}\DecValTok{240}\NormalTok{]}
     
     \CommentTok{# save simulated data}
-    \KeywordTok{write.csv}\NormalTok{(da1, }\KeywordTok{paste}\NormalTok{(}\StringTok{"sim"}\NormalTok{, j, }\StringTok{"_da"}\NormalTok{, }\DecValTok{1}\NormalTok{, }\StringTok{".csv"}\NormalTok{, }\DataTypeTok{sep =} \StringTok{""}\NormalTok{), }\DataTypeTok{row.names =}\NormalTok{ F)}
-    \KeywordTok{write.csv}\NormalTok{(da2, }\KeywordTok{paste}\NormalTok{(}\StringTok{"sim"}\NormalTok{, j, }\StringTok{"_da"}\NormalTok{, }\DecValTok{2}\NormalTok{, }\StringTok{".csv"}\NormalTok{, }\DataTypeTok{sep =} \StringTok{""}\NormalTok{), }\DataTypeTok{row.names =}\NormalTok{ F)}
-    \KeywordTok{write.csv}\NormalTok{(da3, }\KeywordTok{paste}\NormalTok{(}\StringTok{"sim"}\NormalTok{, j, }\StringTok{"_da"}\NormalTok{, }\DecValTok{3}\NormalTok{, }\StringTok{".csv"}\NormalTok{, }\DataTypeTok{sep =} \StringTok{""}\NormalTok{), }\DataTypeTok{row.names =}\NormalTok{ F)}
-    \KeywordTok{write.csv}\NormalTok{(sim.da1, }\KeywordTok{paste}\NormalTok{(}\StringTok{"sim"}\NormalTok{, j, }\StringTok{".csv"}\NormalTok{, }\DataTypeTok{sep =} \StringTok{""}\NormalTok{), }\DataTypeTok{row.names =}\NormalTok{ F)}
-    \KeywordTok{write.csv}\NormalTok{(dummy.sim1, }\KeywordTok{paste}\NormalTok{(}\StringTok{"dummy.sim"}\NormalTok{, j, }\StringTok{".csv"}\NormalTok{, }\DataTypeTok{sep =} \StringTok{""}\NormalTok{), }\DataTypeTok{row.names =}\NormalTok{ F)}
+    \KeywordTok{write.csv}\NormalTok{(da1, }\KeywordTok{paste}\NormalTok{(}\StringTok{"sim"}\NormalTok{, j, }\StringTok{"_da"}\NormalTok{, }\DecValTok{1}\NormalTok{, }\StringTok{".csv"}\NormalTok{, }
+        \DataTypeTok{sep =} \StringTok{""}\NormalTok{), }\DataTypeTok{row.names =}\NormalTok{ F)}
+    \KeywordTok{write.csv}\NormalTok{(da2, }\KeywordTok{paste}\NormalTok{(}\StringTok{"sim"}\NormalTok{, j, }\StringTok{"_da"}\NormalTok{, }\DecValTok{2}\NormalTok{, }\StringTok{".csv"}\NormalTok{, }
+        \DataTypeTok{sep =} \StringTok{""}\NormalTok{), }\DataTypeTok{row.names =}\NormalTok{ F)}
+    \KeywordTok{write.csv}\NormalTok{(da3, }\KeywordTok{paste}\NormalTok{(}\StringTok{"sim"}\NormalTok{, j, }\StringTok{"_da"}\NormalTok{, }\DecValTok{3}\NormalTok{, }\StringTok{".csv"}\NormalTok{, }
+        \DataTypeTok{sep =} \StringTok{""}\NormalTok{), }\DataTypeTok{row.names =}\NormalTok{ F)}
+    \KeywordTok{write.csv}\NormalTok{(sim.da1, }\KeywordTok{paste}\NormalTok{(}\StringTok{"sim"}\NormalTok{, j, }\StringTok{".csv"}\NormalTok{, }\DataTypeTok{sep =} \StringTok{""}\NormalTok{), }
+        \DataTypeTok{row.names =}\NormalTok{ F)}
+    \KeywordTok{write.csv}\NormalTok{(dummy.sim1, }\KeywordTok{paste}\NormalTok{(}\StringTok{"dummy.sim"}\NormalTok{, j, }\StringTok{".csv"}\NormalTok{, }
+        \DataTypeTok{sep =} \StringTok{""}\NormalTok{), }\DataTypeTok{row.names =}\NormalTok{ F)}
 \NormalTok{\}}
 \end{Highlighting}
 \end{Shaded}

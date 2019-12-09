@@ -4,21 +4,21 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Chapter 11 Tree-Based Methods | Introduction to Data Science</title>
-  <meta name="description" content="Chapter 11 Tree-Based Methods | Introduction to Data Science" />
+  <title>12.3 Feedforward Neural Network | Introduction to Data Science</title>
+  <meta name="description" content="12.3 Feedforward Neural Network | Introduction to Data Science" />
   <meta name="generator" content="bookdown 0.15 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Chapter 11 Tree-Based Methods | Introduction to Data Science" />
+  <meta property="og:title" content="12.3 Feedforward Neural Network | Introduction to Data Science" />
   <meta property="og:type" content="book" />
   <meta property="og:url" content="http://scientistcafe.com/IDS/" />
   
-  <meta property="og:description" content="Chapter 11 Tree-Based Methods | Introduction to Data Science" />
+  <meta property="og:description" content="12.3 Feedforward Neural Network | Introduction to Data Science" />
   <meta name="github-repo" content="happyrabbit/IntroDataScience" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Chapter 11 Tree-Based Methods | Introduction to Data Science" />
+  <meta name="twitter:title" content="12.3 Feedforward Neural Network | Introduction to Data Science" />
   
-  <meta name="twitter:description" content="Chapter 11 Tree-Based Methods | Introduction to Data Science" />
+  <meta name="twitter:description" content="12.3 Feedforward Neural Network | Introduction to Data Science" />
   
 
 <meta name="author" content="Hui Lin and Ming Li" />
@@ -31,8 +31,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   
   
-<link rel="prev" href="penalized-generalized-linear-model.html"/>
-<link rel="next" href="splitting-criteria.html"/>
+<link rel="prev" href="projection-pursuit-regression.html"/>
+<link rel="next" href="convolutional-neural-network.html"/>
 <script src="libs/jquery/jquery.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
@@ -314,41 +314,99 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="treemodel" class="section level1">
-<h1><span class="header-section-number">Chapter 11</span> Tree-Based Methods</h1>
-<p>The tree-based models can be used for regression and classification. The goal is to stratify or segment the predictor space into a number of sub-regions. For a given observation, use the mean or the mode of the training observations in the sub-region as the prediction. Tree-based methods are conceptually simple yet powerful. This type of model is often referred to as Classification And Regression Trees (CART). They are popular tools for many reasons:</p>
-<ol style="list-style-type: decimal">
-<li>Do not require user to specify the form of the relationship between predictors and response</li>
-<li>Do not require (or if they do, very limited) data preprocessing and can handle different types of predictors (sparse, skewed, continuous, categorical, etc.)</li>
-<li>Robust to co-linearity</li>
-<li>Can handle missing data</li>
-<li>Many pre-built packages make implementation as easy as a button push</li>
-</ol>
-<p>CART can refer to the tree model in general, but most of the time, it represents the algorithm initially proposed by Breiman <span class="citation">(al <a href="#ref-Breiman1984">1984</a>)</span>. After Breiman, there are many new algorithms, such as ID3, C4.5, and C5.0. C5.0 is an improved version of C4.5, but since C5.0 is not open source, the C4.5 algorithm is more popular. C4.5 was a major competitor of CART. But now, all those seem outdated. The most popular tree models are Random Forest (RF) and Gradient Boosting Machine (GBM). Despite being out of favor in application, it is important to understand the mechanism of the basic tree algorithm. Because the later models are based on the same foundation.</p>
-<p>The original CART algorithm targets binary classification, and the later algorithms can handle multi-category classification. A single tree is easy to explain but has poor accuracy. More complicated tree models, such as RF and GBM, can provide much better prediction at the cost of explainability. As the model becoming more complicated, it is more like a black-box which makes it very difficult to explain the relationship among predictors. There is always a trade-off between explainability and predictability.</p>
+<div id="feedforward-neural-network" class="section level2">
+<h2><span class="header-section-number">12.3</span> Feedforward Neural Network</h2>
+<div id="logistic_reg_as_neural_network" class="section level3">
+<h3><span class="header-section-number">12.3.1</span> Logistic Regression as Neural Network</h3>
+<p>Let’s look at logistic regression from the lens of neural network. For a binary classification problem, for example spam classifier, given <span class="math inline">\(m\)</span> samples <span class="math inline">\(\{(x^{(1)}, y^{(1)}),(x^{(2)}, y^{(2)}),...,(x^{(m)}, y^{(m)})\}\)</span>, we need to use the input feature <span class="math inline">\(x^{(i)}\)</span> (they may be the frequency of various words such as “money”, special characters like dollar signs, and the use of capital letters in the message etc.) to predict the output <span class="math inline">\(y^{(i)}\)</span> (if it is a spam email). Assume that for each sample <span class="math inline">\(i\)</span>, there are <span class="math inline">\(n_{x}\)</span> input features. Then we have:</p>
+<p><span class="math display" id="eq:input">\[\begin{equation}
+X=\left[\begin{array}{cccc}
+x_{1}^{(1)} &amp; x_{1}^{(2)} &amp; \dotsb &amp; x_{1}^{(m)}\\
+x_{2}^{(1)} &amp; x_{2}^{(2)} &amp; \dotsb &amp; x_{2}^{(m)}\\
+\vdots &amp; \vdots &amp; \vdots &amp; \vdots\\
+x_{n_{x}}^{(1)} &amp; x_{n_{x}}^{(2)} &amp; \dots &amp; x_{n_{x}}^{(m)}
+\end{array}\right]\in\mathbb{R}^{n_{x}\times m}
+\tag{11.7}
+\end{equation}\]</span></p>
+<p><span class="math display">\[y=[y^{(1)},y^{(2)},\dots,y^{(m)}] \in \mathbb{R}^{1 \times m}\]</span></p>
+<p>To predict if sample <span class="math inline">\(i\)</span> is a spam email, we first get the inactivated <strong>neuro</strong> <span class="math inline">\(z^{(i)}\)</span> by a linear transformation of the input <span class="math inline">\(x^{(i)}\)</span>, which is <span class="math inline">\(z^{(i)}=w^Tx^{(i)} + b\)</span>. Then we apply a function to “activate” the neuro <span class="math inline">\(z^{(i)}\)</span> and we call it “activation function”. In logistic regression, the activation function is sigmoid function and the “activated” <span class="math inline">\(z^{(i)}\)</span> is the prediction:</p>
+<p><span class="math display">\[\hat{y}^{(i)} = \sigma(w^Tx^{(i)} + b)\]</span></p>
+<p>where <span class="math inline">\(\sigma(z) = \frac{1}{1+e^{-z}}\)</span>. The following figure summarizes the process:</p>
 <center>
-<img src="../linhui.org/book/Figure/treeEN.png" />
+<img src="images/dnn0.png" style="width:30.0%" />
 </center>
-<p>The reason why it is called “tree” is of course because the structure has similarities. But the direction of the decision tree is opposite to the real tree, the root is on the top, and the leaf is on the bottom. From the root node, a decision tree divides to different branches and generates more nodes. The new nodes are child nodes, and the previous node is the parent node. At each child node, the algorithm will decide whether to continue dividing. If it stops, the node is called a leaf node. If it continues, then the node becomes the new parent node and splits to produce the next layer of child nodes. At each non-leaf node, the algorithm needs to decide split into branches. The leaf node contains the final “decision,” final class the sample belongs to or the sample’s value has. Here are the important definitions in the tree model:</p>
-<ul>
-<li><strong>Classification tree</strong>: the outcome is discrete</li>
-<li><strong>Regression tree</strong>: the outcome is continuous (e.g. the price of a house, or a patient’s length of stay in a hospital)</li>
-<li><strong>Non-leaf node (or split node)</strong>: the algorithm needs to decide a split at each non-leaf node (eg: <span class="math inline">\(age \leq 25\)</span>, <span class="math inline">\(25 &lt; age \leq 35\)</span>, <span class="math inline">\(age &gt; 35\)</span>)</li>
-<li><strong>Root node</strong>：the beginning node where the tree starts</li>
-<li><strong>Leaf node (or Terminal node)</strong>: the node stops splitting. It has the final decision of the model</li>
-<li><strong>Degree of the node</strong>: the number of subtrees of a node</li>
-<li><strong>Degree of the tree</strong>: the maximum degree of a node in the tree</li>
-<li><strong>Pruning</strong>: remove parts of the tree that do not provide power to classify instances</li>
-<li><strong>Branch (or Subtree)</strong>: the whole part under a non-leaf node</li>
-<li><strong>Child</strong>: the node directly after and connected to another node</li>
-<li><strong>Parent</strong>: the converse notion of a child</li>
-</ul>
-<p>Single tree is easy to explain but has high variance and low accuracy, and hence is very limited. Minor changes in the training data can lead to large changes in the fitted tree. A series of rectangular decision regions defined by a single tree is often too naive to represent the relationship between the dependent variable and the predictors. To overcome these shortcomings, researchers have proposed ensemble methods which combine many trees. Ensemble tree models typically have much better predictive performance than a single tree. We will introduce those models in later sections.</p> 
+<p>There are two types of layers. The last layer connects directly to the output. All the rest are <em>intermediate layers</em>. Depending on your definition, we call it “0-layer neural network” where the layer count only considers <em>intermediate layers</em>. To train the model, you need a cost function which is defined as equation <a href="feedforward-neural-network.html#eq:costlogistic">(11.8)</a>.</p>
+<p><span class="math display" id="eq:costlogistic">\[\begin{equation}
+J(w,b)=\frac{1}{m} \Sigma_{i=1}^m L(\hat{y}^{(i)}, y^{(i)})
+\tag{11.8}
+\end{equation}\]</span></p>
+<p>where</p>
+<p><span class="math display">\[L(\hat{y}^{(i)}, y^{(i)}) =  -y^{(i)}log(\hat{y}^{(i)})-(1-y^{(i)})log(1-\hat{y}^{(i)})\]</span></p>
+<p>To fit the model is to minimize the cost function.</p>
 </div>
-<h3>References</h3>
-<div id="refs" class="references">
-<div id="ref-Breiman1984">
-<p>al, Leo Breiman et. 1984. <em>Classification and Regression Trees</em>. ISBN 978-0412048418. Chapman; Hall/CRC.</p>
+<div id="gradient-descent" class="section level3">
+<h3><span class="header-section-number">12.3.2</span> Gradient Descent</h3>
+<p>The general approach to minimize <span class="math inline">\(J(w,b)\)</span> is by gradient descent, also known as <em>back-propagation</em>. In logistic regression, it is easy to calculate the gradient w.r.t the parameters <span class="math inline">\((w, b)\)</span> using the chain rule for differentiation. The optimization process is a forward and backward sweep over the network. Let’s look at the gradient descent for logistic regression across m sample. The non-vectorized process is as follows.</p>
+<center>
+<img src="images/GradientDescent.png" style="width:100.0%" />
+</center>
+<p>First initialize <span class="math inline">\(w_1\)</span>, <span class="math inline">\(w_2\)</span>, … , <span class="math inline">\(w_{n_x}\)</span>, and <span class="math inline">\(b\)</span>. Then plug in the initialized value to the forward and backward propagation. The forward propagation takes the current weights and calculates the prediction <span class="math inline">\(\hat{h}^{(i)}\)</span> and cost <span class="math inline">\(J^{(i)}\)</span>. The backward propagation calculates the gradient descent for the parameters. After iterating through all <span class="math inline">\(m\)</span> samples, you can calculate gradient descent for the parameters. Then update the parameter by:
+<span class="math display">\[w := w - \gamma \frac{\partial J}{\partial w}\]</span>
+<span class="math display">\[b := b - \gamma \frac{\partial J}{\partial b}\]</span></p>
+<p>Repeat the progapation process using the updated parameter until the cost <span class="math inline">\(J\)</span> stabilizes.</p>
+</div>
+<div id="deep-neural-network" class="section level3">
+<h3><span class="header-section-number">12.3.3</span> Deep Neural Network</h3>
+<p>Before people coined the term <em>deep learning</em>, a neural network refers to <em>single hidden layer network</em>. Neural networks with more than one layers are called <em>deep learning</em>.</p>
+<p>Network with the structure in figure <a href="feedforward-neural-network.html#fig:ffnn">11.1</a> is the <strong>multiple layer perceptron (MLP)</strong> or <strong>feedforward neural network (FFNN)</strong>.</p>
+<div class="figure" style="text-align: center"><span id="fig:ffnn"></span>
+<img src="images/dnn_str.png" alt="Feedforward Neural Network" width="80%" />
+<p class="caption">
+FIGURE 11.1: Feedforward Neural Network
+</p>
+</div>
+</div>
+<div id="activation-function" class="section level3">
+<h3><span class="header-section-number">12.3.4</span> Activation Function</h3>
+<p>You need to choose activation function in the hidden layers. Logistic regression only uses sigmoid activation function. But there are other choices. Intermediate layers usually use different activation function than the last layer. Let’s first look at some of the common options other than sigmoid.</p>
+</div>
+<div id="deal-with-overfitting" class="section level3">
+<h3><span class="header-section-number">12.3.5</span> Deal with Overfitting</h3>
+<p>The biggest problem for deep learning is overfitting.</p>
+<div id="regularization" class="section level4">
+<h4><span class="header-section-number">12.3.5.1</span> Regularization</h4>
+<p>For logistic regression,</p>
+<p><span class="math display">\[\underset{w,b}{min}J(w,b)= \frac{1}{m} \Sigma_{i=1}^{m}L(\hat{y}^{(i)}, y^{(i)}) + penalty\]</span></p>
+<p>Common penalties are L1 or L2 as follows:</p>
+<p><span class="math display">\[L_2\ penalty=\frac{\lambda}{2m}\parallel w \parallel_2^2 = \frac{\lambda}{2m}\Sigma_{i=1}^{n_x}w_i^2\]</span></p>
+<p><span class="math display">\[L_1\ penalty = \frac{\lambda}{m}\Sigma_{i=1}^{n_x}|w|\]</span></p>
+<p>For neural network,</p>
+<p><span class="math display">\[J(w^{[1]},b^{[1]},\dots,w^{[L]},b^{[L]})=\frac{1}{m}\Sigma_{i=1}^{m}L(\hat{y}^{(i)},y^{(i)}) + \frac{\lambda}{2m}\Sigma_{l=1}^{L} \parallel w^{[l]} \parallel^2_F\]</span></p>
+<p>where</p>
+<p><span class="math display">\[\parallel w^{[l]} \parallel^2_F = \Sigma_{i=1}^{l}\Sigma_{j=1}^{l-1} (w^{[l]}_{ij})^2\]</span></p>
+<p>Many people call it “Frobenius Norm” instead of L2-norm.</p>
+</div>
+<div id="dropout" class="section level4">
+<h4><span class="header-section-number">12.3.5.2</span> Dropout</h4>
+</div>
+</div>
+<div id="optimization" class="section level3">
+<h3><span class="header-section-number">12.3.6</span> Optimization</h3>
+<div id="batch-mini-batch-stochastic-gradient-descent" class="section level4">
+<h4><span class="header-section-number">12.3.6.1</span> Batch, Mini-batch, Stochastic Gradient Descent</h4>
+<p><span class="math display">\[\begin{array}{ccc} x= &amp; [\underbrace{x^{(1)},x^{(2)},\cdots,x^{(1000)}}/ &amp; \cdots/\cdots x^{(m)}]\\ (n_{x},m) &amp; mini-batch\ 1 \end{array}\]</span></p>
+<p><span class="math display">\[\begin{array}{ccc} y= &amp; [\underbrace{y^{(1)},y^{(2)},\cdots,y^{(1000)}}/ &amp; \cdots/\cdots y^{(m)}]\\ (1,m) &amp; mini-batch\ 1 \end{array}\]</span></p>
+<ul>
+<li>Mini-batch size = m: batch gradient descent, too long per iteration</li>
+<li>Mini-batch size = 1: stochastic gradient descent, lose speed from vectorization</li>
+<li>Mini-batch size in between: mini-batch gradient descent, make progress without processing all training set, typical batch sizes are <span class="math inline">\(2^6=64\)</span>, <span class="math inline">\(2^7=128\)</span>, <span class="math inline">\(2^7=256\)</span>, <span class="math inline">\(2^8=512\)</span></li>
+</ul>
+</div>
+<div id="optimization-algorithms" class="section level4">
+<h4><span class="header-section-number">12.3.6.2</span> Optimization Algorithms</h4>
+<p>In the history of deep learning, researchers proposed different optimization algorithms and showed that they worked well in a specific scenario. But the optimization algorithms didn’t generalize well to a wide range of neural networks. So you will need to try different optimizers in your application. We will introduce three commonly used optimizers here.</p>
+<p><strong>Exponentially Weighted Averages</strong></p>
+</div>
 </div>
 </div>
             </section>
@@ -356,8 +414,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           </div>
         </div>
       </div>
-<a href="penalized-generalized-linear-model.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="splitting-criteria.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="projection-pursuit-regression.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="convolutional-neural-network.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
@@ -388,7 +446,7 @@ gitbook.start({
 "size": 2
 },
 "edit": {
-"link": "https://github.com/happyrabbit/IntroDataScience/11-tree.Rmd",
+"link": "https://github.com/happyrabbit/IntroDataScience/12-DeepLearning.Rmd",
 "text": "Edit"
 },
 "history": {
