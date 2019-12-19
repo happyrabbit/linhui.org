@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2019-12-13" />
+<meta name="date" content="2019-12-18" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -419,6 +419,9 @@ z^{[l](1)} &amp; z^{[l](1)} &amp; \cdots &amp; z^{[l](m)}\\
 </div>
 <div id="activation-function" class="section level3">
 <h3><span class="header-section-number">12.3.4</span> Activation Function</h3>
+<ul>
+<li>Sigmoid and Softmax Function</li>
+</ul>
 <p>We have used the sigmoid (or logistic) activation function. The function is S-shape with an output value between 0 to 1. Therefore it is used as the output layer activation function to predict the probability <strong>when the response <span class="math inline">\(y\)</span> is binary</strong>. However, it is rarely used as an intermediate layer activation function. One of the main reasons is that when <span class="math inline">\(z\)</span> is away from 0, then the derivative of the function drops fast which slows down the optimization process through gradient descent. Even the fact that it is differentiable provides some convenience, the decreasing slope can cause a neural network to get stuck at the training time.</p>
 <div class="figure" style="text-align: center"><span id="fig:activationsigmoid"></span>
 <img src="IDS_files/figure-html/activationsigmoid-1.svg" alt="Sigmoid Function" width="80%" />
@@ -426,14 +429,63 @@ z^{[l](1)} &amp; z^{[l](1)} &amp; \cdots &amp; z^{[l](m)}\\
 FIGURE 11.3: Sigmoid Function
 </p>
 </div>
+<p>When the output has more than 2 categories, people use softmax function as the output layer activation function.</p>
+<p><span class="math display">\[f_i(\mathbf{z}) = \frac{e^{z_i}}{\Sigma_{j=1}^{J} e^{z_j} } \]</span>
+where <span class="math inline">\(\mathbf{z}\)</span> is a vector.</p>
 <ul>
-<li>Hyperbolic tangent activation function (tanh)</li>
+<li>Hyperbolic Tangent Function (tanh)</li>
 </ul>
-<p>Another activation function with a similar S-shape is the hyperbolic tangent function. It works better than the sigmoid function as the intermediate layer.</p>
+<p>Another activation function with a similar S-shape is the hyperbolic tangent function. It works better than the sigmoid function as the intermediate layer.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
 <p><span class="math display" id="eq:tanh">\[\begin{equation}
-tanh(z) = \frac{e^{z} -  e^{-z}}{e^{z} + e^{-z}}
+tanh(z) = \frac{e^{z} - e^{-z}}{e^{z} + e^{-z}}
 \tag{11.9}
 \end{equation}\]</span></p>
+<div class="figure" style="text-align: center"><span id="fig:activationtanh"></span>
+<img src="IDS_files/figure-html/activationtanh-1.svg" alt="Hyperbolic Tangent Function" width="80%" />
+<p class="caption">
+FIGURE 11.4: Hyperbolic Tangent Function
+</p>
+</div>
+<p>The tanh function crosses point (0, 0) and the value of the function is between 1 and -1 which makes the mean of the activated neurons closer to 0. The sigmoid function doesn’t have that property. When you preprocess the training input data, you sometimes center the data so that the mean is 0. The tanh function is kind of doing that data processing for you which makes learning for the next layer a little easier. This activation function is used a lot in the recurrent neural networks where you want to polarize the results.</p>
+<ul>
+<li>Rectified Linear Unit (ReLU) Function</li>
+</ul>
+<p>The most popular activation function is the Rectified Linear Unit (ReLU) function. It is a piecewise function, or a half rectified function:</p>
+<p><span class="math display">\[R(z) = max(0, z)\]</span></p>
+<p>The derivative is 1 when z is positive and 0 when z is negative. You can define the derivative as either 0 or 1 when z is 0. When you implement this, it is unlikely that z equals to exactly 0 even it can be very close to 0.</p>
+<div class="figure" style="text-align: center"><span id="fig:activationrelu"></span>
+<img src="IDS_files/figure-html/activationrelu-1.svg" alt="Rectified Linear Unit Function" width="80%" />
+<p class="caption">
+FIGURE 11.5: Rectified Linear Unit Function
+</p>
+</div>
+<p>The advantage of the ReLU is that when z is positive, the derivative doesn’t vanish as z getting larger. So it leads to faster computation than sigmoid or tanh. It is non-linear with an unconstrained response. However, the disadvantage is that when z is negative, the derivative is 0. It may not map the negative values appropriately. In practice, this doesn’t cause too much trouble but there is another version of ReLu called leaky ReLu that attempts to solve the dying ReLU problem. The leaky ReLu is</p>
+<p><span class="math display">\[R(z)_{Leaky}=\begin{cases}
+\begin{array}{c}
+z\\
+az
+\end{array} &amp; \begin{array}{c}
+z\geq0\\
+z&lt;0
+\end{array}\end{cases}\]</span></p>
+<p>Instead of being 0 when z is negative, it adds a slight slope such as <span class="math inline">\(a=0.01\)</span> as shown in figure <a href="feedforward-neural-network.html#fig:activationleakyrelu">11.6</a> (can you see the leaky part there? : ).</p>
+<div class="figure" style="text-align: center"><span id="fig:activationleakyrelu"></span>
+<img src="IDS_files/figure-html/activationleakyrelu-1.svg" alt="Rectified Linear Unit Function" width="80%" />
+<p class="caption">
+FIGURE 11.6: Rectified Linear Unit Function
+</p>
+</div>
+<p>You may notice that all activation functions are non-linear. Since the composition of two linear functions is still linear, using a linear activation function doesn’t help to capture more information. That is why you don’t see people use a linear activation function in the intermediate layer. One exception is when the output <span class="math inline">\(y\)</span> is continuous, you may use linear activation function at the output layer. To sum up, for intermediate layers:</p>
+<ul>
+<li>ReLU is usually a good choice. If you don’t know what to choose, then start with ReLU. Leaky ReLu usually works better than the ReLU but it is not used as much in practice. Either one works fine. Also, people usually use a=0.01 as the slope for leaky ReLU. You can try different parameters but most of the people a = 0.01.</li>
+<li>tanh is used sometimes especially in recurrent neural network. But you nearly never see people use sigmoid function as intermediate layer activation function.</li>
+</ul>
+<p>For the output layer:</p>
+<ul>
+<li>When it is binary classification, use sigmoid with binary cross-entropy as loss function</li>
+<li>When there are multiple classes, use softmax function with categorical cross-entropy as loss function</li>
+<li>When the response is continuous, use identity function (i.e. y = x)</li>
+</ul>
 </div>
 <div id="deal-with-overfitting" class="section level3">
 <h3><span class="header-section-number">12.3.5</span> Deal with Overfitting</h3>
@@ -473,6 +525,12 @@ tanh(z) = \frac{e^{z} -  e^{-z}}{e^{z} + e^{-z}}
 <p><strong>Exponentially Weighted Averages</strong></p>
 </div>
 </div>
+</div>
+<div class="footnotes">
+<hr />
+<ol start="2">
+<li id="fn2"><p>“The tanh function is almost always strictly superior.” —- by Andrew Ng from his coursera course “Neural Networks and Deep Learning”<a href="feedforward-neural-network.html#fnref2" class="footnote-back">↩</a></p></li>
+</ol>
 </div>
             </section>
 
