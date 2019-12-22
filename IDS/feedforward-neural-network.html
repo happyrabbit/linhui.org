@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2019-12-20" />
+<meta name="date" content="2019-12-21" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -284,6 +284,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="12.3.5" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#deal-with-overfitting"><i class="fa fa-check"></i><b>12.3.5</b> Deal with Overfitting</a></li>
 <li class="chapter" data-level="12.3.6" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#optimization"><i class="fa fa-check"></i><b>12.3.6</b> Optimization</a></li>
 <li class="chapter" data-level="12.3.7" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#image-recognition-using-ffnn"><i class="fa fa-check"></i><b>12.3.7</b> Image Recognition Using FFNN</a></li>
+<li class="chapter" data-level="12.3.8" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#image-data"><i class="fa fa-check"></i><b>12.3.8</b> Image Data</a></li>
 </ul></li>
 <li class="chapter" data-level="12.4" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html"><i class="fa fa-check"></i><b>12.4</b> Convolutional Neural Network</a></li>
 <li class="chapter" data-level="12.5" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html"><i class="fa fa-check"></i><b>12.5</b> Recurrent Neural Network</a></li>
@@ -431,15 +432,18 @@ FIGURE 11.3: Sigmoid Function
 </p>
 </div>
 <p>When the output has more than 2 categories, people use softmax function as the output layer activation function.</p>
-<p><span class="math display">\[f_i(\mathbf{z}) = \frac{e^{z_i}}{\Sigma_{j=1}^{J} e^{z_j} } \]</span>
-where <span class="math inline">\(\mathbf{z}\)</span> is a vector.</p>
+<p><span class="math display" id="eq:softmax">\[\begin{equation}
+f_i(\mathbf{z}) = \frac{e^{z_i}}{\Sigma_{j=1}^{J} e^{z_j} }
+\tag{11.9}
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(\mathbf{z}\)</span> is a vector.</p>
 <ul>
 <li>Hyperbolic Tangent Function (tanh)</li>
 </ul>
 <p>Another activation function with a similar S-shape is the hyperbolic tangent function. It works better than the sigmoid function as the intermediate layer.<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a></p>
 <p><span class="math display" id="eq:tanh">\[\begin{equation}
 tanh(z) = \frac{e^{z} - e^{-z}}{e^{z} + e^{-z}}
-\tag{11.9}
+\tag{11.10}
 \end{equation}\]</span></p>
 <div class="figure" style="text-align: center"><span id="fig:activationtanh"></span>
 <img src="IDS_files/figure-html/activationtanh-1.svg" alt="Hyperbolic Tangent Function" width="80%" />
@@ -452,7 +456,10 @@ FIGURE 11.4: Hyperbolic Tangent Function
 <li>Rectified Linear Unit (ReLU) Function</li>
 </ul>
 <p>The most popular activation function is the Rectified Linear Unit (ReLU) function. It is a piecewise function, or a half rectified function:</p>
-<p><span class="math display">\[R(z) = max(0, z)\]</span></p>
+<p><span class="math display" id="eq:relu">\[\begin{equation}
+R(z) = max(0, z)
+\tag{11.11}
+\end{equation}\]</span></p>
 <p>The derivative is 1 when z is positive and 0 when z is negative. You can define the derivative as either 0 or 1 when z is 0. When you implement this, it is unlikely that z equals to exactly 0 even it can be very close to 0.</p>
 <div class="figure" style="text-align: center"><span id="fig:activationrelu"></span>
 <img src="IDS_files/figure-html/activationrelu-1.svg" alt="Rectified Linear Unit Function" width="80%" />
@@ -536,6 +543,23 @@ FIGURE 11.6: Rectified Linear Unit Function
 </ul>
 <p>Refer to section <a href="CloudEnvironment.html#CloudEnvironment">4.3</a> for how to set up an account, create a notebook (R or Python) and start a cluster.</p>
 </div>
+<div id="image-data" class="section level3">
+<h3><span class="header-section-number">12.3.8</span> Image Data</h3>
+<p>What is an image as data? You can consider a digital image as a set of points on 2-d or 3-d space. Each each point has a value between 0 to 255 which is considered as a pixel. Figure <a href="feedforward-neural-network.html#fig:grayscaleimage">11.7</a> shows an example of grayscale image. It is a set of pixels on 2-d space and each pixel has a value between 0 to 255. You can process the image as a 2-d array input if you use a Convolutional Neural Network(CNN). Or, you can vectorize the array as the input for FFNN as shown in the figure.</p>
+<div class="figure" style="text-align: center"><span id="fig:grayscaleimage"></span>
+<img src="images/grayscaleimage.png" alt="Grayscale image is a set of pixels on 2-d space. Each pixel has a value range from 0 to 255." width="80%" />
+<p class="caption">
+FIGURE 11.7: Grayscale image is a set of pixels on 2-d space. Each pixel has a value range from 0 to 255.
+</p>
+</div>
+<p>A color image is a set of pixels on 3-d space and each pixel has a value between 0 to 255. There are three 2-d panels which represent the color red, blue and green accordingly. Similarly, You can process the image as a 3-d array. Or you can vectorize the array as shown in figure <a href="feedforward-neural-network.html#fig:colorimage">11.8</a>.</p>
+<div class="figure" style="text-align: center"><span id="fig:colorimage"></span>
+<img src="images/colorimage.png" alt="Color image is a set of pixels on 3-d space. Each pixel has a value range from 0 to 255." width="80%" />
+<p class="caption">
+FIGURE 11.8: Color image is a set of pixels on 3-d space. Each pixel has a value range from 0 to 255.
+</p>
+</div>
+</div>
 </div>
 <div class="footnotes">
 <hr />
@@ -575,7 +599,7 @@ gitbook.start({
 "github": true
 },
 "fontsettings": {
-"theme": "sepia",
+"theme": "white",
 "family": "sans",
 "size": 2
 },
