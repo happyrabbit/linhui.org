@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2019-12-21" />
+<meta name="date" content="2020-01-01" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -284,7 +284,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="12.3.5" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#deal-with-overfitting"><i class="fa fa-check"></i><b>12.3.5</b> Deal with Overfitting</a></li>
 <li class="chapter" data-level="12.3.6" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#optimization"><i class="fa fa-check"></i><b>12.3.6</b> Optimization</a></li>
 <li class="chapter" data-level="12.3.7" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#image-recognition-using-ffnn"><i class="fa fa-check"></i><b>12.3.7</b> Image Recognition Using FFNN</a></li>
-<li class="chapter" data-level="12.3.8" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#image-data"><i class="fa fa-check"></i><b>12.3.8</b> Image Data</a></li>
 </ul></li>
 <li class="chapter" data-level="12.4" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html"><i class="fa fa-check"></i><b>12.4</b> Convolutional Neural Network</a></li>
 <li class="chapter" data-level="12.5" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html"><i class="fa fa-check"></i><b>12.5</b> Recurrent Neural Network</a></li>
@@ -323,15 +322,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="reshape2-package" class="section level3">
 <h3><span class="header-section-number">6.3.1</span> <code>reshape2</code> package</h3>
 <p>It is a reboot of the previous package <code>reshape</code>. Take a baby subset of our exemplary clothes consumers data to illustrate:</p>
-<div class="sourceCode" id="cb200"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb200-1" data-line-number="1">sdat&lt;-sim.dat[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</a></code></pre></div>
+<div class="sourceCode" id="cb205"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb205-1" data-line-number="1">sdat&lt;-sim.dat[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">6</span>]</a></code></pre></div>
 <p>For the above data <code>sdat</code>, what if we want to have a variable indicating the purchasing channel (i.e. online or in-store) and another column with the corresponding expense amount? Assume we want to keep the rest of the columns the same. It is a task to change data from “wide” to “long”. There are two general ways to shape data:</p>
 <ul>
 <li>Use <code>melt()</code> to convert an object into a molten data frame, i.e., from wide to long</li>
 <li>Use <code>dcast()</code> to cast a molten data frame into the shape you want, i.e., from long to wide</li>
 </ul>
-<div class="sourceCode" id="cb201"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb201-1" data-line-number="1">(mdat &lt;-<span class="st"> </span><span class="kw">melt</span>(sdat, <span class="dt">measure.vars =</span> <span class="kw">c</span>(<span class="st">&quot;store_exp&quot;</span>, <span class="st">&quot;online_exp&quot;</span>),</a>
-<a class="sourceLine" id="cb201-2" data-line-number="2">              <span class="dt">variable.name =</span> <span class="st">&quot;Channel&quot;</span>, </a>
-<a class="sourceLine" id="cb201-3" data-line-number="3">              <span class="dt">value.name =</span> <span class="st">&quot;Expense&quot;</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb206"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb206-1" data-line-number="1">(mdat &lt;-<span class="st"> </span><span class="kw">melt</span>(sdat, <span class="dt">measure.vars =</span> <span class="kw">c</span>(<span class="st">&quot;store_exp&quot;</span>, <span class="st">&quot;online_exp&quot;</span>),</a>
+<a class="sourceLine" id="cb206-2" data-line-number="2">              <span class="dt">variable.name =</span> <span class="st">&quot;Channel&quot;</span>, </a>
+<a class="sourceLine" id="cb206-3" data-line-number="3">              <span class="dt">value.name =</span> <span class="st">&quot;Expense&quot;</span>))</a></code></pre></div>
 <pre><code>##    age gender income house    Channel Expense
 ## 1   57 Female 120963   Yes  store_exp   529.1
 ## 2   63 Female 122008   Yes  store_exp   478.0
@@ -345,14 +344,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 10  51   Male 124253   Yes online_exp   112.2</code></pre>
 <p>You melted the data frame <code>sdat</code> by two variables: <code>store_exp</code> and <code>online_exp</code> (<code>measure.vars=c(&quot;store_exp&quot;,&quot;online_exp&quot;)</code>). The new variable name is <code>Channel</code> set by command <code>variable.name = &quot;Channel&quot;</code>. The value name is <code>Expense</code> set by command <code>value.name = &quot;Expense&quot;</code>.</p>
 <p>You can run a regression to study the effect of purchasing channel as follows:</p>
-<div class="sourceCode" id="cb203"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb203-1" data-line-number="1"><span class="co"># Here we use all observations from sim.dat</span></a>
-<a class="sourceLine" id="cb203-2" data-line-number="2"><span class="co"># Don&#39;t show result here</span></a>
-<a class="sourceLine" id="cb203-3" data-line-number="3">mdat &lt;-<span class="st"> </span><span class="kw">melt</span>(sim.dat[, <span class="dv">1</span><span class="op">:</span><span class="dv">6</span>], <span class="dt">measure.vars =</span> <span class="kw">c</span>(<span class="st">&quot;store_exp&quot;</span>, <span class="st">&quot;online_exp&quot;</span>), </a>
-<a class="sourceLine" id="cb203-4" data-line-number="4">    <span class="dt">variable.name =</span> <span class="st">&quot;Channel&quot;</span>, <span class="dt">value.name =</span> <span class="st">&quot;Expense&quot;</span>)</a>
-<a class="sourceLine" id="cb203-5" data-line-number="5">fit &lt;-<span class="st"> </span><span class="kw">lm</span>(Expense <span class="op">~</span><span class="st"> </span>gender <span class="op">+</span><span class="st"> </span>house <span class="op">+</span><span class="st"> </span>income <span class="op">+</span><span class="st"> </span>Channel <span class="op">+</span><span class="st"> </span>age, <span class="dt">data =</span> mdat)</a>
-<a class="sourceLine" id="cb203-6" data-line-number="6"><span class="kw">summary</span>(fit)</a></code></pre></div>
+<div class="sourceCode" id="cb208"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb208-1" data-line-number="1"><span class="co"># Here we use all observations from sim.dat</span></a>
+<a class="sourceLine" id="cb208-2" data-line-number="2"><span class="co"># Don&#39;t show result here</span></a>
+<a class="sourceLine" id="cb208-3" data-line-number="3">mdat &lt;-<span class="st"> </span><span class="kw">melt</span>(sim.dat[, <span class="dv">1</span><span class="op">:</span><span class="dv">6</span>], <span class="dt">measure.vars =</span> <span class="kw">c</span>(<span class="st">&quot;store_exp&quot;</span>, <span class="st">&quot;online_exp&quot;</span>), </a>
+<a class="sourceLine" id="cb208-4" data-line-number="4">    <span class="dt">variable.name =</span> <span class="st">&quot;Channel&quot;</span>, <span class="dt">value.name =</span> <span class="st">&quot;Expense&quot;</span>)</a>
+<a class="sourceLine" id="cb208-5" data-line-number="5">fit &lt;-<span class="st"> </span><span class="kw">lm</span>(Expense <span class="op">~</span><span class="st"> </span>gender <span class="op">+</span><span class="st"> </span>house <span class="op">+</span><span class="st"> </span>income <span class="op">+</span><span class="st"> </span>Channel <span class="op">+</span><span class="st"> </span>age, <span class="dt">data =</span> mdat)</a>
+<a class="sourceLine" id="cb208-6" data-line-number="6"><span class="kw">summary</span>(fit)</a></code></pre></div>
 <p>You can <code>melt()</code> list, matrix, table too. The syntax is similar, and we won’t go through every situation. Sometimes we want to convert the data from “long” to “wide”. For example, <strong>you want to compare the online and in-store expense between male and female based on the house ownership. </strong></p>
-<div class="sourceCode" id="cb204"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb204-1" data-line-number="1"><span class="kw">dcast</span>(mdat, house <span class="op">+</span><span class="st"> </span>gender <span class="op">~</span><span class="st"> </span>Channel, sum)</a></code></pre></div>
+<div class="sourceCode" id="cb209"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb209-1" data-line-number="1"><span class="kw">dcast</span>(mdat, house <span class="op">+</span><span class="st"> </span>gender <span class="op">~</span><span class="st"> </span>Channel, sum)</a></code></pre></div>
 <pre><code>## Using Expense as value column: use value.var to override.</code></pre>
 <pre><code>##   house gender store_exp online_exp
 ## 1   Yes Female      1007      413.0
@@ -362,10 +361,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="tidyr-package" class="section level3">
 <h3><span class="header-section-number">6.3.2</span> <code>tidyr</code> package</h3>
 <p>The other package that will do similar manipulations is <code>tidyr</code>. Let’s get a subset to illustrate the usage.</p>
-<div class="sourceCode" id="cb207"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb207-1" data-line-number="1"><span class="co"># practice functions we learnt before</span></a>
-<a class="sourceLine" id="cb207-2" data-line-number="2">sdat &lt;-<span class="st"> </span>sim.dat[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, ] <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb207-3" data-line-number="3"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(age, gender, store_exp, store_trans)</a>
-<a class="sourceLine" id="cb207-4" data-line-number="4">sdat <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tbl_df</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb212"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb212-1" data-line-number="1"><span class="co"># practice functions we learnt before</span></a>
+<a class="sourceLine" id="cb212-2" data-line-number="2">sdat &lt;-<span class="st"> </span>sim.dat[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, ] <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb212-3" data-line-number="3"><span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(age, gender, store_exp, store_trans)</a>
+<a class="sourceLine" id="cb212-4" data-line-number="4">sdat <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tbl_df</span>()</a></code></pre></div>
 <pre><code>## # A tibble: 5 x 4
 ##     age gender store_exp store_trans
 ##   &lt;int&gt; &lt;fct&gt;      &lt;dbl&gt;       &lt;int&gt;
@@ -375,8 +374,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 4    60 Male        348.          10
 ## 5    51 Male        380.           4</code></pre>
 <p><code>gather()</code> function in <code>tidyr</code> is analogous to <code>melt()</code> in <code>reshape2</code>. The following code will do the same thing as we did before using <code>melt()</code>:</p>
-<div class="sourceCode" id="cb209"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb209-1" data-line-number="1">msdat &lt;-<span class="st"> </span>tidyr<span class="op">::</span><span class="kw">gather</span>(sdat, <span class="st">&quot;variable&quot;</span>,<span class="st">&quot;value&quot;</span>, store_exp, store_trans)</a>
-<a class="sourceLine" id="cb209-2" data-line-number="2">msdat <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tbl_df</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb214"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb214-1" data-line-number="1">msdat &lt;-<span class="st"> </span>tidyr<span class="op">::</span><span class="kw">gather</span>(sdat, <span class="st">&quot;variable&quot;</span>,<span class="st">&quot;value&quot;</span>, store_exp, store_trans)</a>
+<a class="sourceLine" id="cb214-2" data-line-number="2">msdat <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tbl_df</span>()</a></code></pre></div>
 <pre><code>## # A tibble: 10 x 4
 ##      age gender variable    value
 ##    &lt;int&gt; &lt;fct&gt;  &lt;chr&gt;       &lt;dbl&gt;
@@ -391,13 +390,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ##  9    60 Male   store_trans   10 
 ## 10    51 Male   store_trans    4</code></pre>
 <p>Or if we use the pipe operation, we can write the above code as:</p>
-<div class="sourceCode" id="cb211"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb211-1" data-line-number="1">sdat <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">gather</span>(<span class="st">&quot;variable&quot;</span>, <span class="st">&quot;value&quot;</span>, store_exp, store_trans)</a></code></pre></div>
+<div class="sourceCode" id="cb216"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb216-1" data-line-number="1">sdat <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">gather</span>(<span class="st">&quot;variable&quot;</span>, <span class="st">&quot;value&quot;</span>, store_exp, store_trans)</a></code></pre></div>
 <p>It is identical with the following code using <code>melt()</code>:</p>
-<div class="sourceCode" id="cb212"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb212-1" data-line-number="1"><span class="kw">melt</span>(sdat, <span class="dt">measure.vars =</span> <span class="kw">c</span>(<span class="st">&quot;store_exp&quot;</span>, <span class="st">&quot;store_trans&quot;</span>), </a>
-<a class="sourceLine" id="cb212-2" data-line-number="2">     <span class="dt">variable.name =</span> <span class="st">&quot;variable&quot;</span>, </a>
-<a class="sourceLine" id="cb212-3" data-line-number="3">     <span class="dt">value.name =</span> <span class="st">&quot;value&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb217"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb217-1" data-line-number="1"><span class="kw">melt</span>(sdat, <span class="dt">measure.vars =</span> <span class="kw">c</span>(<span class="st">&quot;store_exp&quot;</span>, <span class="st">&quot;store_trans&quot;</span>), </a>
+<a class="sourceLine" id="cb217-2" data-line-number="2">     <span class="dt">variable.name =</span> <span class="st">&quot;variable&quot;</span>, </a>
+<a class="sourceLine" id="cb217-3" data-line-number="3">     <span class="dt">value.name =</span> <span class="st">&quot;value&quot;</span>)</a></code></pre></div>
 <p>The opposite operation to <code>gather()</code> is <code>spread()</code>. The previous one stacks columns and the latter one spread the columns.</p>
-<div class="sourceCode" id="cb213"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb213-1" data-line-number="1">msdat <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">spread</span>(variable, value)</a></code></pre></div>
+<div class="sourceCode" id="cb218"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb218-1" data-line-number="1">msdat <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">spread</span>(variable, value)</a></code></pre></div>
 <pre><code>##   age gender store_exp store_trans
 ## 1  51   Male     379.6           4
 ## 2  57 Female     529.1           2
@@ -405,9 +404,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 4  60   Male     347.8          10
 ## 5  63 Female     478.0           4</code></pre>
 <p>Another pair of functions that do opposite manipulations are <code>separate()</code> and <code>unite()</code>.</p>
-<div class="sourceCode" id="cb215"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb215-1" data-line-number="1">sepdat&lt;-<span class="st"> </span>msdat <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb215-2" data-line-number="2"><span class="st">  </span><span class="kw">separate</span>(variable,<span class="kw">c</span>(<span class="st">&quot;Source&quot;</span>,<span class="st">&quot;Type&quot;</span>))</a>
-<a class="sourceLine" id="cb215-3" data-line-number="3">sepdat <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tbl_df</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb220"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb220-1" data-line-number="1">sepdat&lt;-<span class="st"> </span>msdat <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb220-2" data-line-number="2"><span class="st">  </span><span class="kw">separate</span>(variable,<span class="kw">c</span>(<span class="st">&quot;Source&quot;</span>,<span class="st">&quot;Type&quot;</span>))</a>
+<a class="sourceLine" id="cb220-3" data-line-number="3">sepdat <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">tbl_df</span>()</a></code></pre></div>
 <pre><code>## # A tibble: 10 x 5
 ##      age gender Source Type  value
 ##    &lt;int&gt; &lt;fct&gt;  &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt;
@@ -423,8 +422,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 10    51 Male   store  trans    4</code></pre>
 <p>You can see that the function separates the original column “<code>variable</code>” to two new columns “<code>Source</code>” and “<code>Type</code>”. You can use <code>sep=</code> to set the string or regular expression to separate the column. By default, it is “<code>_</code>”.</p>
 <p>The <code>unite()</code> function will do the opposite: combining two columns. It is the generalization of <code>paste()</code> to a data frame.</p>
-<div class="sourceCode" id="cb217"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb217-1" data-line-number="1">sepdat <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb217-2" data-line-number="2"><span class="st">  </span><span class="kw">unite</span>(<span class="st">&quot;variable&quot;</span>, Source, Type, <span class="dt">sep =</span> <span class="st">&quot;_&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb222"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb222-1" data-line-number="1">sepdat <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb222-2" data-line-number="2"><span class="st">  </span><span class="kw">unite</span>(<span class="st">&quot;variable&quot;</span>, Source, Type, <span class="dt">sep =</span> <span class="st">&quot;_&quot;</span>)</a></code></pre></div>
 <pre><code>##    age gender    variable value
 ## 1   57 Female   store_exp 529.1
 ## 2   63 Female   store_exp 478.0
