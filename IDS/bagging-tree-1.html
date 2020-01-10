@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2020-01-01" />
+<meta name="date" content="2020-01-09" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -339,26 +339,26 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><p>Since the bagging tree uses all of the original predictors as everey split of every tree, those trees are related with each other. The tree correlation prevents bagging from optimally reducing the variance of the predicted values. See <span class="citation">(Hastie T <a href="#ref-Hastie2008">2008</a>)</span> for a mathematical illustration of the tree correlation phenomenon.</p></li>
 </ul>
 <p>Let’s look at how to use R to build bagging tree. Get the predictors and response variable first:</p>
-<div class="sourceCode" id="cb391"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb391-1" data-line-number="1">dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)</a>
-<a class="sourceLine" id="cb391-2" data-line-number="2"><span class="co"># use the 10 survey questions as predictors</span></a>
-<a class="sourceLine" id="cb391-3" data-line-number="3">trainx &lt;-<span class="st"> </span>dat[, <span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>, <span class="kw">names</span>(dat))]</a>
-<a class="sourceLine" id="cb391-4" data-line-number="4"><span class="co"># add segment as a predictor </span></a>
-<a class="sourceLine" id="cb391-5" data-line-number="5"><span class="co"># don&#39;t need to encode it to dummy variables</span></a>
-<a class="sourceLine" id="cb391-6" data-line-number="6">trainx<span class="op">$</span>segment &lt;-<span class="st"> </span>dat<span class="op">$</span>segment</a>
-<a class="sourceLine" id="cb391-7" data-line-number="7"><span class="co"># use gender as the response variable</span></a>
-<a class="sourceLine" id="cb391-8" data-line-number="8">trainy &lt;-<span class="st"> </span><span class="kw">as.factor</span>(dat<span class="op">$</span>gender)</a></code></pre></div>
+<div class="sourceCode" id="cb363"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb363-1" data-line-number="1">dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)</a>
+<a class="sourceLine" id="cb363-2" data-line-number="2"><span class="co"># use the 10 survey questions as predictors</span></a>
+<a class="sourceLine" id="cb363-3" data-line-number="3">trainx &lt;-<span class="st"> </span>dat[, <span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>, <span class="kw">names</span>(dat))]</a>
+<a class="sourceLine" id="cb363-4" data-line-number="4"><span class="co"># add segment as a predictor </span></a>
+<a class="sourceLine" id="cb363-5" data-line-number="5"><span class="co"># don&#39;t need to encode it to dummy variables</span></a>
+<a class="sourceLine" id="cb363-6" data-line-number="6">trainx<span class="op">$</span>segment &lt;-<span class="st"> </span>dat<span class="op">$</span>segment</a>
+<a class="sourceLine" id="cb363-7" data-line-number="7"><span class="co"># use gender as the response variable</span></a>
+<a class="sourceLine" id="cb363-8" data-line-number="8">trainy &lt;-<span class="st"> </span><span class="kw">as.factor</span>(dat<span class="op">$</span>gender)</a></code></pre></div>
 <p>Then fit the model using train function in caret package. Here we just set the number of trees to be 1000. You can tune that parameter.</p>
-<div class="sourceCode" id="cb392"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb392-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb392-2" data-line-number="2">bagTune &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(trainx, trainy, </a>
-<a class="sourceLine" id="cb392-3" data-line-number="3">                           <span class="dt">method =</span> <span class="st">&quot;treebag&quot;</span>,</a>
-<a class="sourceLine" id="cb392-4" data-line-number="4">                           <span class="dt">nbagg =</span> <span class="dv">2000</span>,</a>
-<a class="sourceLine" id="cb392-5" data-line-number="5">                           <span class="dt">metric =</span> <span class="st">&quot;ROC&quot;</span>,</a>
-<a class="sourceLine" id="cb392-6" data-line-number="6">                           <span class="dt">trControl =</span> <span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>,</a>
-<a class="sourceLine" id="cb392-7" data-line-number="7">                           <span class="dt">summaryFunction =</span> twoClassSummary,</a>
-<a class="sourceLine" id="cb392-8" data-line-number="8">                           <span class="dt">classProbs =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb392-9" data-line-number="9">                           <span class="dt">savePredictions =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb364"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb364-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">100</span>)</a>
+<a class="sourceLine" id="cb364-2" data-line-number="2">bagTune &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(trainx, trainy, </a>
+<a class="sourceLine" id="cb364-3" data-line-number="3">                           <span class="dt">method =</span> <span class="st">&quot;treebag&quot;</span>,</a>
+<a class="sourceLine" id="cb364-4" data-line-number="4">                           <span class="dt">nbagg =</span> <span class="dv">2000</span>,</a>
+<a class="sourceLine" id="cb364-5" data-line-number="5">                           <span class="dt">metric =</span> <span class="st">&quot;ROC&quot;</span>,</a>
+<a class="sourceLine" id="cb364-6" data-line-number="6">                           <span class="dt">trControl =</span> <span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>,</a>
+<a class="sourceLine" id="cb364-7" data-line-number="7">                           <span class="dt">summaryFunction =</span> twoClassSummary,</a>
+<a class="sourceLine" id="cb364-8" data-line-number="8">                           <span class="dt">classProbs =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb364-9" data-line-number="9">                           <span class="dt">savePredictions =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
 <p>The model results are:</p>
-<div class="sourceCode" id="cb393"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb393-1" data-line-number="1">bagTune</a></code></pre></div>
+<div class="sourceCode" id="cb365"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb365-1" data-line-number="1">bagTune</a></code></pre></div>
 <pre><code>## Bagged CART 
 ## 
 ## 1000 samples
