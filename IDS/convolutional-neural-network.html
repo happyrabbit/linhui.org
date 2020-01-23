@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<html lang="" xml:lang="">
 <head>
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>12.4 Convolutional Neural Network | Introduction to Data Science</title>
   <meta name="description" content="12.4 Convolutional Neural Network | Introduction to Data Science" />
-  <meta name="generator" content="bookdown 0.15 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.17 and GitBook 2.6.7" />
 
   <meta property="og:title" content="12.4 Convolutional Neural Network | Introduction to Data Science" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2020-01-13" />
+<meta name="date" content="2020-01-23" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -289,6 +289,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="12.4.1" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#convolution-layer"><i class="fa fa-check"></i><b>12.4.1</b> Convolution Layer</a></li>
 <li class="chapter" data-level="12.4.2" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#padding-layer"><i class="fa fa-check"></i><b>12.4.2</b> Padding Layer</a></li>
 <li class="chapter" data-level="12.4.3" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#pooling-layer"><i class="fa fa-check"></i><b>12.4.3</b> Pooling Layer</a></li>
+<li class="chapter" data-level="12.4.4" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#convolutions-over-volume"><i class="fa fa-check"></i><b>12.4.4</b> Convolutions Over Volume</a></li>
 </ul></li>
 <li class="chapter" data-level="12.5" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html"><i class="fa fa-check"></i><b>12.5</b> Recurrent Neural Network</a></li>
 </ul></li>
@@ -347,40 +348,40 @@ FIGURE 11.10: Convolution step by step
 </p>
 </div>
 <p>Let’s use edge detection as an example to see how convolution operation works. Given a picture as the left of figure <a href="convolutional-neural-network.html#fig:edgedetection">11.11</a>, you want to detect the vertical lines. For example, there are vertical lines along with the hair and the edges of the bookcase. How do you do that? There are standard filters for operations like blurring, sharpening, and edge detection. To get the edge, you can use the following 3 x 3 filter to convolute over the image.</p>
-<div class="sourceCode" id="cb385"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb385-1" data-line-number="1">kernel_vertical =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">-1</span>, <span class="dv">-1</span>, <span class="dv">-1</span>),</a>
-<a class="sourceLine" id="cb385-2" data-line-number="2"><span class="dt">nrow =</span> <span class="dv">3</span>, <span class="dt">ncol =</span> <span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb385-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb385-4" data-line-number="4">kernel_vertical</a></code></pre></div>
+<div class="sourceCode" id="cb411"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb411-1" data-line-number="1">kernel_vertical =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">-1</span>, <span class="dv">-1</span>, <span class="dv">-1</span>),</a>
+<a class="sourceLine" id="cb411-2" data-line-number="2"><span class="dt">nrow =</span> <span class="dv">3</span>, <span class="dt">ncol =</span> <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb411-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb411-4" data-line-number="4">kernel_vertical</a></code></pre></div>
 <pre><code>##      [,1] [,2] [,3]
 ## [1,]    1    0   -1
 ## [2,]    1    0   -1
 ## [3,]    1    0   -1</code></pre>
 <p>The following code implements the convolution process. The result is shown as the middle of figure <a href="convolutional-neural-network.html#fig:edgedetection">11.11</a>.</p>
-<div class="sourceCode" id="cb387"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb387-1" data-line-number="1">image =<span class="st"> </span>magick<span class="op">::</span><span class="kw">image_read</span>(<span class="st">&quot;http://bit.ly/2Nh5ANX&quot;</span>)</a>
-<a class="sourceLine" id="cb387-2" data-line-number="2">kernel_vertical =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">-1</span>, <span class="dv">-1</span>, <span class="dv">-1</span>), </a>
-<a class="sourceLine" id="cb387-3" data-line-number="3">                       <span class="dt">nrow =</span> <span class="dv">3</span>, <span class="dt">ncol =</span> <span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb387-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb387-5" data-line-number="5">kernel_horizontal =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">-1</span>, <span class="dv">-1</span>, <span class="dv">-1</span>), </a>
-<a class="sourceLine" id="cb387-6" data-line-number="6">                       <span class="dt">nrow =</span> <span class="dv">3</span>, <span class="dt">ncol =</span> <span class="dv">3</span>, <span class="dt">byrow =</span> T)</a>
-<a class="sourceLine" id="cb387-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb387-8" data-line-number="8">image_edge_vertical =<span class="st"> </span>magick<span class="op">::</span><span class="kw">image_convolve</span>(image, kernel_vertical)</a>
-<a class="sourceLine" id="cb387-9" data-line-number="9">image_edge_horizontal =<span class="st"> </span>magick<span class="op">::</span><span class="kw">image_convolve</span>(image, kernel_horizontal)</a>
-<a class="sourceLine" id="cb387-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb387-11" data-line-number="11"><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">3</span>))</a>
-<a class="sourceLine" id="cb387-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb387-13" data-line-number="13"><span class="kw">plot</span>(image)</a>
-<a class="sourceLine" id="cb387-14" data-line-number="14"><span class="kw">plot</span>(image_edge_vertical)</a>
-<a class="sourceLine" id="cb387-15" data-line-number="15"><span class="kw">plot</span>(image_edge_horizontal)</a></code></pre></div>
+<div class="sourceCode" id="cb413"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb413-1" data-line-number="1">image =<span class="st"> </span>magick<span class="op">::</span><span class="kw">image_read</span>(<span class="st">&quot;http://bit.ly/2Nh5ANX&quot;</span>)</a>
+<a class="sourceLine" id="cb413-2" data-line-number="2">kernel_vertical =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">-1</span>, <span class="dv">-1</span>, <span class="dv">-1</span>), </a>
+<a class="sourceLine" id="cb413-3" data-line-number="3">                       <span class="dt">nrow =</span> <span class="dv">3</span>, <span class="dt">ncol =</span> <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb413-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb413-5" data-line-number="5">kernel_horizontal =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">-1</span>, <span class="dv">-1</span>, <span class="dv">-1</span>), </a>
+<a class="sourceLine" id="cb413-6" data-line-number="6">                       <span class="dt">nrow =</span> <span class="dv">3</span>, <span class="dt">ncol =</span> <span class="dv">3</span>, <span class="dt">byrow =</span> T)</a>
+<a class="sourceLine" id="cb413-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb413-8" data-line-number="8">image_edge_vertical =<span class="st"> </span>magick<span class="op">::</span><span class="kw">image_convolve</span>(image, kernel_vertical)</a>
+<a class="sourceLine" id="cb413-9" data-line-number="9">image_edge_horizontal =<span class="st"> </span>magick<span class="op">::</span><span class="kw">image_convolve</span>(image, kernel_horizontal)</a>
+<a class="sourceLine" id="cb413-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb413-11" data-line-number="11"><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">3</span>))</a>
+<a class="sourceLine" id="cb413-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb413-13" data-line-number="13"><span class="kw">plot</span>(image)</a>
+<a class="sourceLine" id="cb413-14" data-line-number="14"><span class="kw">plot</span>(image_edge_vertical)</a>
+<a class="sourceLine" id="cb413-15" data-line-number="15"><span class="kw">plot</span>(image_edge_horizontal)</a></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:edgedetection"></span>
 <img src="images/edgedet5.png" alt="Edge Detection Example" width="100%" />
 <p class="caption">
 FIGURE 11.11: Edge Detection Example
 </p>
 </div>
-<p>Why can <code>kernel_vertical</code> detect vertical edge? Let’s look at a simpler example. The following 8 x b matrix where half of the matrix is 10 and the other half is 0. The corresponding image is shown as the left of the figure <a href="convolutional-neural-network.html#fig:simpleedge">11.12</a>.</p>
-<div class="sourceCode" id="cb388"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb388-1" data-line-number="1">input_image =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">200</span>, <span class="dv">200</span>, <span class="dv">200</span>, <span class="dv">200</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="dv">8</span>), </a>
-<a class="sourceLine" id="cb388-2" data-line-number="2">                     <span class="dt">nrow =</span> <span class="dv">8</span>, <span class="dt">byrow =</span> T)</a>
-<a class="sourceLine" id="cb388-3" data-line-number="3">input_image</a></code></pre></div>
+<p>Why can <code>kernel_vertical</code> detect vertical edge? Let’s look at a simpler example. The following 8 x 8 matrix where half of the matrix is 10 and the other half is 0. The corresponding image is shown as the left of the figure <a href="convolutional-neural-network.html#fig:simpleedge">11.12</a>.</p>
+<div class="sourceCode" id="cb414"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb414-1" data-line-number="1">input_image =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">200</span>, <span class="dv">200</span>, <span class="dv">200</span>, <span class="dv">200</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="dv">8</span>), </a>
+<a class="sourceLine" id="cb414-2" data-line-number="2">                     <span class="dt">nrow =</span> <span class="dv">8</span>, <span class="dt">byrow =</span> T)</a>
+<a class="sourceLine" id="cb414-3" data-line-number="3">input_image</a></code></pre></div>
 <pre><code>##      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8]
 ## [1,]  200  200  200  200    0    0    0    0
 ## [2,]  200  200  200  200    0    0    0    0
@@ -391,9 +392,9 @@ FIGURE 11.11: Edge Detection Example
 ## [7,]  200  200  200  200    0    0    0    0
 ## [8,]  200  200  200  200    0    0    0    0</code></pre>
 <p>If we use the above filter kernel_vertical , the output matrix is shown below and the corresponding image is shown as the right of the figure <a href="convolutional-neural-network.html#fig:simpleedge">11.12</a>.</p>
-<div class="sourceCode" id="cb390"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb390-1" data-line-number="1">output_image =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">200</span>, <span class="dv">200</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="dv">6</span>), </a>
-<a class="sourceLine" id="cb390-2" data-line-number="2">                      <span class="dt">nrow =</span> <span class="dv">6</span>, <span class="dt">byrow =</span> T)</a>
-<a class="sourceLine" id="cb390-3" data-line-number="3">output_image</a></code></pre></div>
+<div class="sourceCode" id="cb416"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb416-1" data-line-number="1">output_image =<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rep</span>(<span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">200</span>, <span class="dv">200</span>, <span class="dv">0</span>, <span class="dv">0</span>), <span class="dv">6</span>), </a>
+<a class="sourceLine" id="cb416-2" data-line-number="2">                      <span class="dt">nrow =</span> <span class="dv">6</span>, <span class="dt">byrow =</span> T)</a>
+<a class="sourceLine" id="cb416-3" data-line-number="3">output_image</a></code></pre></div>
 <pre><code>##      [,1] [,2] [,3] [,4] [,5] [,6]
 ## [1,]    0    0  200  200    0    0
 ## [2,]    0    0  200  200    0    0
@@ -408,7 +409,7 @@ FIGURE 11.12: Simple Edge Detection Example
 </p>
 </div>
 <p>So the output image has a lighter region in the middle that corresponds to the vertical edge of the input image. When the input image is large, such as the image in figure <a href="convolutional-neural-network.html#fig:edgedetection">11.11</a> is 1020 x 711, the edge will not seem as thick as it is in this small example. To detect the horizontal edge, you only need to rotate the filter by 90 degrees. The right image in figure <a href="convolutional-neural-network.html#fig:edgedetection">11.11</a> shows the horizontal edge detection result. You can see how convolution operator detects a specific feature from the image.</p>
-<p>The parameters for the convolution operation are the elements in the filter. For a 3x3 filter shown below, the parameters to estimate are <span class="math inline">\(w_1\)</span> to <span class="math inline">\(w_9\)</span>. So far, we move the filter one step each time when we convolve. You can do more than 1 step as well. For example, you can hop 2 steps each time after the sum of the element-wise product. It is called strided-convolution.</p>
+<p>The parameters for the convolution operation are the elements in the filter. For a 3x3 filter shown below, the parameters to estimate are <span class="math inline">\(w_1\)</span> to <span class="math inline">\(w_9\)</span>. So far, we move the filter one step each time when we convolve. You can do more than 1 step as well. For example, you can hop 2 steps each time after the sum of the element-wise product. It is called strided-convolution. Use stride <span class="math inline">\(s\)</span> means the output is downsized by a factor of <span class="math inline">\(s\)</span>. It is rarely used in practice but it is good to be familiar with the concept.</p>
 <div class="figure" style="text-align: center"><span id="fig:convolutionlayer"></span>
 <img src="images/convlayer.png" alt="Convolution Layer Parameters" width="100%" />
 <p class="caption">
@@ -425,10 +426,122 @@ FIGURE 11.13: Convolution Layer Parameters
 FIGURE 11.14: Padding Layer
 </p>
 </div>
-<p>Still assume the stride is <span class="math inline">\(s\)</span> and we have a <span class="math inline">\(n \times n\)</span> input image to convolve with a <span class="math inline">\(f \times f\)</span> filter. This time we pad <span class="math inline">\(p\)</span> pixels in each side, then the output size becomes <span class="math inline">\((\frac{n + 2p -f}{s} + 1) \times (\frac{n + 2p -f}{s} + 1)\)</span>. You can specify the value for p and also the pixel value used. Or you can just use 0 to pad and make the output the same size with input.</p>
+<p>If the stride is <span class="math inline">\(s\)</span> and we have a <span class="math inline">\(n \times n\)</span> input image to convolve with a <span class="math inline">\(f \times f\)</span> filter. This time we pad <span class="math inline">\(p\)</span> pixels in each side, then the output size becomes <span class="math inline">\((\frac{n + 2p -f}{s} + 1) \times (\frac{n + 2p -f}{s} + 1)\)</span>. You can specify the value for p and also the pixel value used. Or you can just use 0 to pad and make the output the same size with input.</p>
 </div>
 <div id="pooling-layer" class="section level3">
 <h3><span class="header-section-number">12.4.3</span> Pooling Layer</h3>
+<p>People sometimes use the pooling layer to reduce the size of the representation and make some of the feature detection more robust. If you have a <span class="math inline">\(4 \times 4\)</span> input, the max and mean pooling operation are shown in the figure <a href="convolutional-neural-network.html#fig:poolinglayer">11.15</a>. The process is quite simple. In the example, the filter is <span class="math inline">\(2 \times 2\)</span> and stride is 2, so break the input into four <span class="math inline">\(2 \times 2\)</span> regions (shown in the figure with different shaded colors). For max pooling, each of the outputs is the maximum from the corresponding shaded sub-region. Mean pooling layer works in the same way except for getting the mean instead of maximum of the sub-region. The pooling layer has hyperparameters (<span class="math inline">\(f\)</span> and <span class="math inline">\(s\)</span>) but it has no parameter for gradient descent to learn.</p>
+<div class="figure" style="text-align: center"><span id="fig:poolinglayer"></span>
+<img src="images/poolinglayer.png" alt="Pooling Layer" width="100%" />
+<p class="caption">
+FIGURE 11.15: Pooling Layer
+</p>
+</div>
+<p>Let’s go through an example of pooling a 2D grayscale image. Hope it gives you some intuition behind what it does. Read the image and convert the original color image (a 3D array) to grayscale (a 2D matrix).</p>
+<div class="sourceCode" id="cb418"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb418-1" data-line-number="1"><span class="kw">library</span>(EBImage)</a>
+<a class="sourceLine" id="cb418-2" data-line-number="2"><span class="kw">library</span>(dplyr)</a>
+<a class="sourceLine" id="cb418-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb418-4" data-line-number="4">eggshell &lt;-<span class="st"> </span><span class="kw">readImage</span>(<span class="st">&quot;https://scientistcafe.com/images/eggshell.jpeg&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb418-5" data-line-number="5"><span class="st">  </span><span class="co"># make it smaller</span></a>
+<a class="sourceLine" id="cb418-6" data-line-number="6"><span class="st">  </span><span class="kw">resize</span>(<span class="dv">560</span>, <span class="dv">420</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb418-7" data-line-number="7"><span class="st">  </span><span class="co"># rotate image</span></a>
+<a class="sourceLine" id="cb418-8" data-line-number="8"><span class="st">  </span><span class="kw">rotate</span>(<span class="dv">90</span>)</a>
+<a class="sourceLine" id="cb418-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb418-10" data-line-number="10"><span class="co"># convert to 2D grayscale</span></a>
+<a class="sourceLine" id="cb418-11" data-line-number="11">gray_eggshell =<span class="st"> </span><span class="kw">apply</span>(eggshell, <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>), mean)</a></code></pre></div>
+<p>The following function takes an image matrix or array, and apply pooling operation.</p>
+<div class="sourceCode" id="cb419"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb419-1" data-line-number="1">pooling &lt;-<span class="st"> </span><span class="cf">function</span>(<span class="dt">type =</span> <span class="st">&quot;max&quot;</span>, image, filter, stride) {</a>
+<a class="sourceLine" id="cb419-2" data-line-number="2">    f &lt;-<span class="st"> </span>filter</a>
+<a class="sourceLine" id="cb419-3" data-line-number="3">    s &lt;-<span class="st"> </span>stride</a>
+<a class="sourceLine" id="cb419-4" data-line-number="4">    </a>
+<a class="sourceLine" id="cb419-5" data-line-number="5">    <span class="cf">if</span> (<span class="kw">length</span>(<span class="kw">dim</span>(image)) <span class="op">==</span><span class="st"> </span><span class="dv">3</span>) {</a>
+<a class="sourceLine" id="cb419-6" data-line-number="6">        <span class="co"># get image dimensions</span></a>
+<a class="sourceLine" id="cb419-7" data-line-number="7">        col &lt;-<span class="st"> </span><span class="kw">dim</span>(image[, , <span class="dv">1</span>])[<span class="dv">2</span>]</a>
+<a class="sourceLine" id="cb419-8" data-line-number="8">        row &lt;-<span class="st"> </span><span class="kw">dim</span>(image[, , <span class="dv">1</span>])[<span class="dv">1</span>]</a>
+<a class="sourceLine" id="cb419-9" data-line-number="9">        <span class="co"># calculate new dimension size</span></a>
+<a class="sourceLine" id="cb419-10" data-line-number="10">        c &lt;-<span class="st"> </span>(col <span class="op">-</span><span class="st"> </span>f)<span class="op">/</span>s <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb419-11" data-line-number="11">        r &lt;-<span class="st"> </span>(row <span class="op">-</span><span class="st"> </span>f)<span class="op">/</span>s <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb419-12" data-line-number="12">        <span class="co"># create new image object</span></a>
+<a class="sourceLine" id="cb419-13" data-line-number="13">        newImage &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="dv">0</span>, <span class="kw">c</span>(c, r, <span class="dv">3</span>))</a>
+<a class="sourceLine" id="cb419-14" data-line-number="14">        <span class="co"># loops in RGB layers</span></a>
+<a class="sourceLine" id="cb419-15" data-line-number="15">        <span class="cf">for</span> (rgb <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>) {</a>
+<a class="sourceLine" id="cb419-16" data-line-number="16">            m &lt;-<span class="st"> </span>image[, , rgb]</a>
+<a class="sourceLine" id="cb419-17" data-line-number="17">            m3 &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="dv">0</span>, <span class="dt">ncol =</span> c, <span class="dt">nrow =</span> r)</a>
+<a class="sourceLine" id="cb419-18" data-line-number="18">            i &lt;-<span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb419-19" data-line-number="19">            <span class="cf">if</span> (type <span class="op">==</span><span class="st"> &quot;mean&quot;</span>) </a>
+<a class="sourceLine" id="cb419-20" data-line-number="20">                <span class="cf">for</span> (ii <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>r) {</a>
+<a class="sourceLine" id="cb419-21" data-line-number="21">                  j &lt;-<span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb419-22" data-line-number="22">                  <span class="cf">for</span> (jj <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>c) {</a>
+<a class="sourceLine" id="cb419-23" data-line-number="23">                    m3[ii, jj] &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">as.numeric</span>(m[i<span class="op">:</span>(i <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb419-24" data-line-number="24"><span class="st">                      </span>(f <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)), j<span class="op">:</span>(j <span class="op">+</span><span class="st"> </span>(f <span class="op">-</span><span class="st"> </span><span class="dv">1</span>))]))</a>
+<a class="sourceLine" id="cb419-25" data-line-number="25">                    j &lt;-<span class="st"> </span>j <span class="op">+</span><span class="st"> </span>s</a>
+<a class="sourceLine" id="cb419-26" data-line-number="26">                  }</a>
+<a class="sourceLine" id="cb419-27" data-line-number="27">                  i &lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span>s</a>
+<a class="sourceLine" id="cb419-28" data-line-number="28">                } <span class="cf">else</span> <span class="cf">for</span> (ii <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>r) {</a>
+<a class="sourceLine" id="cb419-29" data-line-number="29">                j =<span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb419-30" data-line-number="30">                <span class="cf">for</span> (jj <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>c) {</a>
+<a class="sourceLine" id="cb419-31" data-line-number="31">                  m3[ii, jj] &lt;-<span class="st"> </span><span class="kw">max</span>(<span class="kw">as.numeric</span>(m[i<span class="op">:</span>(i <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb419-32" data-line-number="32"><span class="st">                    </span>(f <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)), j<span class="op">:</span>(j <span class="op">+</span><span class="st"> </span>(f <span class="op">-</span><span class="st"> </span><span class="dv">1</span>))]))</a>
+<a class="sourceLine" id="cb419-33" data-line-number="33">                  j &lt;-<span class="st"> </span>j <span class="op">+</span><span class="st"> </span>s</a>
+<a class="sourceLine" id="cb419-34" data-line-number="34">                }</a>
+<a class="sourceLine" id="cb419-35" data-line-number="35">                i &lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span>s</a>
+<a class="sourceLine" id="cb419-36" data-line-number="36">            }</a>
+<a class="sourceLine" id="cb419-37" data-line-number="37">            newImage[, , rgb] &lt;-<span class="st"> </span>m3</a>
+<a class="sourceLine" id="cb419-38" data-line-number="38">        }</a>
+<a class="sourceLine" id="cb419-39" data-line-number="39">    } <span class="cf">else</span> <span class="cf">if</span> (<span class="kw">length</span>(<span class="kw">dim</span>(image)) <span class="op">==</span><span class="st"> </span><span class="dv">2</span>) {</a>
+<a class="sourceLine" id="cb419-40" data-line-number="40">        <span class="co"># get image dimensions</span></a>
+<a class="sourceLine" id="cb419-41" data-line-number="41">        col &lt;-<span class="st"> </span><span class="kw">dim</span>(image)[<span class="dv">2</span>]</a>
+<a class="sourceLine" id="cb419-42" data-line-number="42">        row &lt;-<span class="st"> </span><span class="kw">dim</span>(image)[<span class="dv">1</span>]</a>
+<a class="sourceLine" id="cb419-43" data-line-number="43">        <span class="co"># calculate new dimension size</span></a>
+<a class="sourceLine" id="cb419-44" data-line-number="44">        c &lt;-<span class="st"> </span>(col <span class="op">-</span><span class="st"> </span>f)<span class="op">/</span>s <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb419-45" data-line-number="45">        r &lt;-<span class="st"> </span>(row <span class="op">-</span><span class="st"> </span>f)<span class="op">/</span>s <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb419-46" data-line-number="46">        m3 &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="dv">0</span>, <span class="dt">ncol =</span> c, <span class="dt">nrow =</span> r)</a>
+<a class="sourceLine" id="cb419-47" data-line-number="47">        i &lt;-<span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb419-48" data-line-number="48">        <span class="cf">if</span> (type <span class="op">==</span><span class="st"> &quot;mean&quot;</span>) </a>
+<a class="sourceLine" id="cb419-49" data-line-number="49">            <span class="cf">for</span> (ii <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>r) {</a>
+<a class="sourceLine" id="cb419-50" data-line-number="50">                j &lt;-<span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb419-51" data-line-number="51">                <span class="cf">for</span> (jj <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>c) {</a>
+<a class="sourceLine" id="cb419-52" data-line-number="52">                  m3[ii, jj] &lt;-<span class="st"> </span><span class="kw">mean</span>(<span class="kw">as.numeric</span>(image[i<span class="op">:</span>(i <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb419-53" data-line-number="53"><span class="st">                    </span>(f <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)), j<span class="op">:</span>(j <span class="op">+</span><span class="st"> </span>(f <span class="op">-</span><span class="st"> </span><span class="dv">1</span>))]))</a>
+<a class="sourceLine" id="cb419-54" data-line-number="54">                  j &lt;-<span class="st"> </span>j <span class="op">+</span><span class="st"> </span>s</a>
+<a class="sourceLine" id="cb419-55" data-line-number="55">                }</a>
+<a class="sourceLine" id="cb419-56" data-line-number="56">                i &lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span>s</a>
+<a class="sourceLine" id="cb419-57" data-line-number="57">            } <span class="cf">else</span> <span class="cf">for</span> (ii <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>r) {</a>
+<a class="sourceLine" id="cb419-58" data-line-number="58">            j =<span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb419-59" data-line-number="59">            <span class="cf">for</span> (jj <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>c) {</a>
+<a class="sourceLine" id="cb419-60" data-line-number="60">                m3[ii, jj] &lt;-<span class="st"> </span><span class="kw">max</span>(<span class="kw">as.numeric</span>(image[i<span class="op">:</span>(i <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb419-61" data-line-number="61"><span class="st">                  </span>(f <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)), j<span class="op">:</span>(j <span class="op">+</span><span class="st"> </span>(f <span class="op">-</span><span class="st"> </span><span class="dv">1</span>))]))</a>
+<a class="sourceLine" id="cb419-62" data-line-number="62">                j &lt;-<span class="st"> </span>j <span class="op">+</span><span class="st"> </span>s</a>
+<a class="sourceLine" id="cb419-63" data-line-number="63">            }</a>
+<a class="sourceLine" id="cb419-64" data-line-number="64">            i &lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span>s</a>
+<a class="sourceLine" id="cb419-65" data-line-number="65">        }</a>
+<a class="sourceLine" id="cb419-66" data-line-number="66">        newImage &lt;-<span class="st"> </span>m3</a>
+<a class="sourceLine" id="cb419-67" data-line-number="67">    }</a>
+<a class="sourceLine" id="cb419-68" data-line-number="68">    <span class="kw">return</span>(newImage)</a>
+<a class="sourceLine" id="cb419-69" data-line-number="69">}</a></code></pre></div>
+<p>Let’s apply both max and mean pooling with filter size 10 (<span class="math inline">\(f = 10\)</span>) and stride 10 (<span class="math inline">\(s = 10\)</span>).</p>
+<div class="sourceCode" id="cb420"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb420-1" data-line-number="1">gray_eggshell_max =<span class="st"> </span><span class="kw">pooling</span>(<span class="dt">type =</span> <span class="st">&quot;max&quot;</span>,</a>
+<a class="sourceLine" id="cb420-2" data-line-number="2">                            <span class="dt">image =</span> gray_eggshell,</a>
+<a class="sourceLine" id="cb420-3" data-line-number="3">                            <span class="dt">filter =</span> <span class="dv">10</span>, <span class="dt">stride =</span> <span class="dv">10</span>)</a>
+<a class="sourceLine" id="cb420-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb420-5" data-line-number="5">gray_eggshell_mean =<span class="st"> </span><span class="kw">pooling</span>(<span class="dt">type =</span> <span class="st">&quot;mean&quot;</span>,</a>
+<a class="sourceLine" id="cb420-6" data-line-number="6">                             <span class="dt">image =</span> gray_eggshell,</a>
+<a class="sourceLine" id="cb420-7" data-line-number="7">                             <span class="dt">filter =</span> <span class="dv">10</span>, <span class="dt">stride =</span> <span class="dv">10</span>)</a></code></pre></div>
+<p>You can see the result by plotting the output image.</p>
+<div class="sourceCode" id="cb421"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb421-1" data-line-number="1"><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>), <span class="dt">oma =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb421-2" data-line-number="2"><span class="kw">plot</span>(eggshell)</a>
+<a class="sourceLine" id="cb421-3" data-line-number="3"><span class="kw">plot</span>(<span class="kw">as.Image</span>(gray_eggshell))</a>
+<a class="sourceLine" id="cb421-4" data-line-number="4"><span class="kw">plot</span>(<span class="kw">as.Image</span>(gray_eggshell_max))</a>
+<a class="sourceLine" id="cb421-5" data-line-number="5"><span class="kw">plot</span>(<span class="kw">as.Image</span>(gray_eggshell_mean))</a></code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="images/eggshellconv.png" alt="Example of max and mean pooling" width="100%" />
+<p class="caption">
+(#fig:eggshell conv)Example of max and mean pooling
+</p>
+</div>
+</div>
+<div id="convolutions-over-volume" class="section level3">
+<h3><span class="header-section-number">12.4.4</span> Convolutions Over Volume</h3>
 </div>
 </div>
 <h3>References</h3>
@@ -459,14 +572,14 @@ FIGURE 11.14: Padding Layer
 gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
 "sharing": {
+"github": true,
 "facebook": true,
 "twitter": true,
 "linkedin": true,
 "weibo": false,
 "instapaper": false,
 "vk": false,
-"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"],
-"github": true
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": {
 "theme": "white",
@@ -478,6 +591,10 @@ gitbook.start({
 "text": "Edit"
 },
 "history": {
+"link": null,
+"text": null
+},
+"view": {
 "link": null,
 "text": null
 },
