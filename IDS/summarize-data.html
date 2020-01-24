@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2020-01-23" />
+<meta name="date" content="2020-01-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -524,15 +524,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb177-7" data-line-number="7">            <span class="dt">online_exp =</span> <span class="kw">round</span>(<span class="kw">mean</span>(online_exp), <span class="dv">0</span>), </a>
 <a class="sourceLine" id="cb177-8" data-line-number="8">            <span class="dt">store_trans =</span> <span class="kw">round</span>(<span class="kw">mean</span>(store_trans), <span class="dv">1</span>), </a>
 <a class="sourceLine" id="cb177-9" data-line-number="9">            <span class="dt">online_trans =</span> <span class="kw">round</span>(<span class="kw">mean</span>(online_trans), <span class="dv">1</span>))</a></code></pre></div>
-<pre><code>## # A tibble: 4 x 8
-##   segment   Age FemalePct HouseYes store_exp online_exp
-##   &lt;fct&gt;   &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
-## 1 Conspi…    42      0.32     0.86      4990       4898
-## 2 Price      60      0.45     0.94       501        205
-## 3 Quality    35      0.47     0.34       301       2013
-## 4 Style      24      0.81     0.27       200       1962
-## # … with 2 more variables: store_trans &lt;dbl&gt;,
-## #   online_trans &lt;dbl&gt;</code></pre>
+<pre><code>##   Age FemalePct HouseYes store_exp online_exp
+## 1  39      0.55     0.57       840       2120
+##   store_trans online_trans
+## 1         5.3         13.5</code></pre>
 <p>Now, let’s peel the onion.</p>
 <p>The first line <code>sim.dat</code> is easy. It is the data you want to work on. The second line <code>group_by(segment)</code> tells R that in the following steps you want to summarise by variable <code>segment</code>. Here we only summarize data by one categorical variable, but you can group by multiple variables, such as <code>group_by(segment, house)</code>. The third argument <code>summarise</code> tells R the manipulation(s) to do. Then list the exact actions inside <code>summarise()</code> . For example, <code>Age=round(mean(na.omit(age)),0)</code> tell R the following things:</p>
 <ol style="list-style-type: decimal">
@@ -563,21 +558,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb179-2" data-line-number="2"><span class="st">  </span><span class="kw">group_by</span>(segment) <span class="op">%&gt;%</span><span class="st"> </span></a>
 <a class="sourceLine" id="cb179-3" data-line-number="3"><span class="st">  </span><span class="kw">summarise</span>(<span class="dt">avg_online =</span> <span class="kw">round</span>(<span class="kw">sum</span>(online_exp)<span class="op">/</span><span class="kw">sum</span>(online_trans), <span class="dv">2</span>),</a>
 <a class="sourceLine" id="cb179-4" data-line-number="4">            <span class="dt">avg_store =</span> <span class="kw">round</span>(<span class="kw">sum</span>(store_exp)<span class="op">/</span><span class="kw">sum</span>(store_trans), <span class="dv">2</span>))</a></code></pre></div>
-<pre><code>## # A tibble: 4 x 3
-##   segment     avg_online avg_store
-##   &lt;fct&gt;            &lt;dbl&gt;     &lt;dbl&gt;
-## 1 Conspicuous      442.      479. 
-## 2 Price             69.3      81.3
-## 3 Quality          126.      105. 
-## 4 Style             92.8     121.</code></pre>
+<pre><code>##   avg_online avg_store
+## 1      156.5     253.6</code></pre>
 <p>Price group has the lowest averaged one-time purchase. The Conspicuous group will pay the highest price. When we build customer profile in real life, we will also need to look at the survey summarization. You may be surprised how much information simple data manipulations can provide.</p>
 <p>Another comman task is to check which column has missing values. It requires the program to look at each column in the data. In this case you can use <code>summarise_all</code>:</p>
 <div class="sourceCode" id="cb181"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb181-1" data-line-number="1"><span class="co"># apply function anyNA() to each column</span></a>
 <a class="sourceLine" id="cb181-2" data-line-number="2"><span class="co"># you can also assign a function vector such as: c(&quot;anyNA&quot;,&quot;is.factor&quot;)</span></a>
 <a class="sourceLine" id="cb181-3" data-line-number="3">dplyr<span class="op">::</span><span class="kw">summarise_all</span>(sim.dat, <span class="kw">funs_</span>(<span class="kw">c</span>(<span class="st">&quot;anyNA&quot;</span>)))</a></code></pre></div>
-<pre><code>## Warning: funs_() is deprecated. 
-## Please use list() instead
-## This warning is displayed once per session.</code></pre>
 <pre><code>##     age gender income house store_exp online_exp
 ## 1 FALSE  FALSE   TRUE FALSE     FALSE      FALSE
 ##   store_trans online_trans    Q1    Q2    Q3    Q4
@@ -587,39 +574,39 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>The above code returns a vector indicating if there is any value missing in each column.</p>
 <p><strong>Create new variable</strong></p>
 <p>There are often situations where you need to create new variables. For example, adding online and store expense to get total expense. In this case, you will apply <strong>window function</strong> to the columns and return a column with the same length. <code>mutate()</code> can do it for you and append one or more new columns:</p>
-<div class="sourceCode" id="cb184"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb184-1" data-line-number="1">dplyr<span class="op">::</span><span class="kw">mutate</span>(sim.dat, <span class="dt">total_exp =</span> store_exp <span class="op">+</span><span class="st"> </span>online_exp)</a></code></pre></div>
+<div class="sourceCode" id="cb183"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb183-1" data-line-number="1">dplyr<span class="op">::</span><span class="kw">mutate</span>(sim.dat, <span class="dt">total_exp =</span> store_exp <span class="op">+</span><span class="st"> </span>online_exp)</a></code></pre></div>
 <p>The above code sums up two columns and appends the result (<code>total_exp</code>) to <code>sim.dat</code>. Another similar function is <code>transmute()</code>. The difference is that <code>transmute()</code> will delete the original columns and only keep the new ones.</p>
-<div class="sourceCode" id="cb185"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb185-1" data-line-number="1">dplyr<span class="op">::</span><span class="kw">transmute</span>(sim.dat, <span class="dt">total_exp =</span> store_exp <span class="op">+</span><span class="st"> </span>online_exp)</a></code></pre></div>
+<div class="sourceCode" id="cb184"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb184-1" data-line-number="1">dplyr<span class="op">::</span><span class="kw">transmute</span>(sim.dat, <span class="dt">total_exp =</span> store_exp <span class="op">+</span><span class="st"> </span>online_exp)</a></code></pre></div>
 <p><strong>Merge</strong></p>
 <p>Similar to SQL, there are different joins in <code>dplyr</code>. We create two baby data sets to show how the functions work.</p>
-<div class="sourceCode" id="cb186"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb186-1" data-line-number="1">(x &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(<span class="dt">ID =</span> <span class="kw">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>), <span class="dt">x1 =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))))</a></code></pre></div>
+<div class="sourceCode" id="cb185"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb185-1" data-line-number="1">(x &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(<span class="dt">ID =</span> <span class="kw">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>), <span class="dt">x1 =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))))</a></code></pre></div>
 <pre><code>##   ID x1
 ## 1  A  1
 ## 2  B  2
 ## 3  C  3</code></pre>
-<div class="sourceCode" id="cb188"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb188-1" data-line-number="1">(y &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(<span class="dt">ID =</span> <span class="kw">c</span>(<span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;D&quot;</span>), <span class="dt">y1 =</span> <span class="kw">c</span>(T, T, F))))</a></code></pre></div>
+<div class="sourceCode" id="cb187"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb187-1" data-line-number="1">(y &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(<span class="dt">ID =</span> <span class="kw">c</span>(<span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;D&quot;</span>), <span class="dt">y1 =</span> <span class="kw">c</span>(T, T, F))))</a></code></pre></div>
 <pre><code>##   ID    y1
 ## 1  B  TRUE
 ## 2  C  TRUE
 ## 3  D FALSE</code></pre>
-<div class="sourceCode" id="cb190"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb190-1" data-line-number="1"><span class="co"># join to the left</span></a>
-<a class="sourceLine" id="cb190-2" data-line-number="2"><span class="co"># keep all rows in x</span></a>
-<a class="sourceLine" id="cb190-3" data-line-number="3"><span class="kw">left_join</span>(x, y, <span class="dt">by =</span> <span class="st">&quot;ID&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb189"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb189-1" data-line-number="1"><span class="co"># join to the left</span></a>
+<a class="sourceLine" id="cb189-2" data-line-number="2"><span class="co"># keep all rows in x</span></a>
+<a class="sourceLine" id="cb189-3" data-line-number="3"><span class="kw">left_join</span>(x, y, <span class="dt">by =</span> <span class="st">&quot;ID&quot;</span>)</a></code></pre></div>
 <pre><code>## Warning: Column `ID` joining factors with different
 ## levels, coercing to character vector</code></pre>
 <pre><code>##   ID x1   y1
 ## 1  A  1 &lt;NA&gt;
 ## 2  B  2 TRUE
 ## 3  C  3 TRUE</code></pre>
-<div class="sourceCode" id="cb193"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb193-1" data-line-number="1"><span class="co"># get rows matched in both data sets</span></a>
-<a class="sourceLine" id="cb193-2" data-line-number="2"><span class="kw">inner_join</span>(x, y, <span class="dt">by =</span> <span class="st">&quot;ID&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb192"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb192-1" data-line-number="1"><span class="co"># get rows matched in both data sets</span></a>
+<a class="sourceLine" id="cb192-2" data-line-number="2"><span class="kw">inner_join</span>(x, y, <span class="dt">by =</span> <span class="st">&quot;ID&quot;</span>)</a></code></pre></div>
 <pre><code>## Warning: Column `ID` joining factors with different
 ## levels, coercing to character vector</code></pre>
 <pre><code>##   ID x1   y1
 ## 1  B  2 TRUE
 ## 2  C  3 TRUE</code></pre>
-<div class="sourceCode" id="cb196"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb196-1" data-line-number="1"><span class="co"># get rows in either data set</span></a>
-<a class="sourceLine" id="cb196-2" data-line-number="2"><span class="kw">full_join</span>(x, y, <span class="dt">by =</span> <span class="st">&quot;ID&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb195"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb195-1" data-line-number="1"><span class="co"># get rows in either data set</span></a>
+<a class="sourceLine" id="cb195-2" data-line-number="2"><span class="kw">full_join</span>(x, y, <span class="dt">by =</span> <span class="st">&quot;ID&quot;</span>)</a></code></pre></div>
 <pre><code>## Warning: Column `ID` joining factors with different
 ## levels, coercing to character vector</code></pre>
 <pre><code>##   ID   x1    y1
@@ -627,13 +614,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 2  B    2  TRUE
 ## 3  C    3  TRUE
 ## 4  D &lt;NA&gt; FALSE</code></pre>
-<div class="sourceCode" id="cb199"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb199-1" data-line-number="1"><span class="co"># filter out rows in x that can be matched in y </span></a>
-<a class="sourceLine" id="cb199-2" data-line-number="2"><span class="co"># it doesn&#39;t bring in any values from y </span></a>
-<a class="sourceLine" id="cb199-3" data-line-number="3"><span class="kw">semi_join</span>(x, y, <span class="dt">by =</span> <span class="st">&quot;ID&quot;</span>)</a></code></pre></div>
-<div class="sourceCode" id="cb200"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb200-1" data-line-number="1"><span class="co"># the opposite of  semi_join()</span></a>
-<a class="sourceLine" id="cb200-2" data-line-number="2"><span class="co"># it gets rows in x that cannot be matched in y</span></a>
-<a class="sourceLine" id="cb200-3" data-line-number="3"><span class="co"># it doesn&#39;t bring in any values from y</span></a>
-<a class="sourceLine" id="cb200-4" data-line-number="4"><span class="kw">anti_join</span>(x, y, <span class="dt">by =</span> <span class="st">&quot;ID&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb198"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb198-1" data-line-number="1"><span class="co"># filter out rows in x that can be matched in y </span></a>
+<a class="sourceLine" id="cb198-2" data-line-number="2"><span class="co"># it doesn&#39;t bring in any values from y </span></a>
+<a class="sourceLine" id="cb198-3" data-line-number="3"><span class="kw">semi_join</span>(x, y, <span class="dt">by =</span> <span class="st">&quot;ID&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb199"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb199-1" data-line-number="1"><span class="co"># the opposite of  semi_join()</span></a>
+<a class="sourceLine" id="cb199-2" data-line-number="2"><span class="co"># it gets rows in x that cannot be matched in y</span></a>
+<a class="sourceLine" id="cb199-3" data-line-number="3"><span class="co"># it doesn&#39;t bring in any values from y</span></a>
+<a class="sourceLine" id="cb199-4" data-line-number="4"><span class="kw">anti_join</span>(x, y, <span class="dt">by =</span> <span class="st">&quot;ID&quot;</span>)</a></code></pre></div>
 <p>There are other functions(<code>intersect()</code>, <code>union()</code> and <code>setdiff()</code>). Also the data frame version of <code>rbind</code> and <code>cbind</code> which are <code>bind_rows()</code> and <code>bind_col()</code>. We are not going to go through them all. You can try them yourself. If you understand the functions we introduced so far. It should be easy for you to figure out the rest.</p>
 </div>
 </div>
