@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2020-01-24" />
+<meta name="date" content="2020-01-27" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -289,7 +289,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="12.4.1" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#convolution-layer"><i class="fa fa-check"></i><b>12.4.1</b> Convolution Layer</a></li>
 <li class="chapter" data-level="12.4.2" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#padding-layer"><i class="fa fa-check"></i><b>12.4.2</b> Padding Layer</a></li>
 <li class="chapter" data-level="12.4.3" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#pooling-layer"><i class="fa fa-check"></i><b>12.4.3</b> Pooling Layer</a></li>
-<li class="chapter" data-level="12.4.4" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#convolutions-over-volume"><i class="fa fa-check"></i><b>12.4.4</b> Convolutions Over Volume</a></li>
+<li class="chapter" data-level="12.4.4" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#convolution-over-volume"><i class="fa fa-check"></i><b>12.4.4</b> Convolution Over Volume</a></li>
 </ul></li>
 <li class="chapter" data-level="12.5" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html"><i class="fa fa-check"></i><b>12.5</b> Recurrent Neural Network</a></li>
 </ul></li>
@@ -329,9 +329,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><p>It is 10x faster. The trick is that <code>readr</code> uses C++ to process the data quickly.</p></li>
 <li><p>It doesn’t change the column names. The names can start with a number and “<code>.</code>” will not be substituted to “<code>_</code>”. For example:</p></li>
 </ol>
-<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb76-1" data-line-number="1"><span class="kw">read_csv</span>(<span class="st">&quot;2015,2016,2017</span></a>
-<a class="sourceLine" id="cb76-2" data-line-number="2"><span class="st">1,2,3</span></a>
-<a class="sourceLine" id="cb76-3" data-line-number="3"><span class="st">4,5,6&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb80-1" data-line-number="1"><span class="kw">read_csv</span>(<span class="st">&quot;2015,2016,2017</span></a>
+<a class="sourceLine" id="cb80-2" data-line-number="2"><span class="st">1,2,3</span></a>
+<a class="sourceLine" id="cb80-3" data-line-number="3"><span class="st">4,5,6&quot;</span>)</a></code></pre></div>
 <pre><code>## # A tibble: 2 x 3
 ##   `2015` `2016` `2017`
 ##    &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
@@ -355,8 +355,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul>
 <p>The good thing is that those functions have similar syntax. Once you learn one, the others become easy. Here we will focus on <code>read_csv()</code>.</p>
 <p>The most important information for <code>read_csv()</code> is the path to your data:</p>
-<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb78-1" data-line-number="1">sim.dat &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)</a>
-<a class="sourceLine" id="cb78-2" data-line-number="2"><span class="kw">head</span>(sim.dat)</a></code></pre></div>
+<div class="sourceCode" id="cb82"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb82-1" data-line-number="1">sim.dat &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)</a>
+<a class="sourceLine" id="cb82-2" data-line-number="2"><span class="kw">head</span>(sim.dat)</a></code></pre></div>
 <pre class="pre"><code># A tibble: 6 x 19
     age gender income house store_exp online_exp store_trans online_trans    Q1
   &lt;int&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt;     &lt;dbl&gt;      &lt;dbl&gt;       &lt;int&gt;        &lt;int&gt; &lt;int&gt;
@@ -376,28 +376,28 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul>
 <p>Refer to <a href="http://r4ds.had.co.nz/tibbles.html" class="uri">http://r4ds.had.co.nz/tibbles.html</a> for more information about ‘tibble’.</p>
 <p>When you run <code>read_csv()</code> it prints out a column specification that gives the name and type of each column. To better understanding how <code>readr</code> works, it is helpful to type in some baby data set and check the results:</p>
-<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb80-1" data-line-number="1">dat &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;2015,2016,2017</span></a>
-<a class="sourceLine" id="cb80-2" data-line-number="2"><span class="st">100,200,300</span></a>
-<a class="sourceLine" id="cb80-3" data-line-number="3"><span class="st">canola,soybean,corn&quot;</span>)</a>
-<a class="sourceLine" id="cb80-4" data-line-number="4"><span class="kw">print</span>(dat)</a></code></pre></div>
+<div class="sourceCode" id="cb84"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb84-1" data-line-number="1">dat &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;2015,2016,2017</span></a>
+<a class="sourceLine" id="cb84-2" data-line-number="2"><span class="st">100,200,300</span></a>
+<a class="sourceLine" id="cb84-3" data-line-number="3"><span class="st">canola,soybean,corn&quot;</span>)</a>
+<a class="sourceLine" id="cb84-4" data-line-number="4"><span class="kw">print</span>(dat)</a></code></pre></div>
 <pre><code>## # A tibble: 2 x 3
 ##   `2015` `2016`  `2017`
 ##   &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt; 
 ## 1 100    200     300   
 ## 2 canola soybean corn</code></pre>
 <p>You can also add comments on the top and tell R to skip those lines:</p>
-<div class="sourceCode" id="cb82"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb82-1" data-line-number="1">dat &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;# I will never let you know that</span></a>
-<a class="sourceLine" id="cb82-2" data-line-number="2"><span class="st">          # my favorite food is carrot</span></a>
-<a class="sourceLine" id="cb82-3" data-line-number="3"><span class="st">          Date,Food,Mood</span></a>
-<a class="sourceLine" id="cb82-4" data-line-number="4"><span class="st">          Monday,carrot,happy</span></a>
-<a class="sourceLine" id="cb82-5" data-line-number="5"><span class="st">          Tuesday,carrot,happy</span></a>
-<a class="sourceLine" id="cb82-6" data-line-number="6"><span class="st">          Wednesday,carrot,happy</span></a>
-<a class="sourceLine" id="cb82-7" data-line-number="7"><span class="st">          Thursday,carrot,happy</span></a>
-<a class="sourceLine" id="cb82-8" data-line-number="8"><span class="st">          Friday,carrot,happy</span></a>
-<a class="sourceLine" id="cb82-9" data-line-number="9"><span class="st">          Saturday,carrot,extremely happy</span></a>
-<a class="sourceLine" id="cb82-10" data-line-number="10"><span class="st">          Sunday,carrot,extremely happy&quot;</span>, </a>
-<a class="sourceLine" id="cb82-11" data-line-number="11">          <span class="dt">skip =</span> <span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb82-12" data-line-number="12"><span class="kw">print</span>(dat)</a></code></pre></div>
+<div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb86-1" data-line-number="1">dat &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;# I will never let you know that</span></a>
+<a class="sourceLine" id="cb86-2" data-line-number="2"><span class="st">          # my favorite food is carrot</span></a>
+<a class="sourceLine" id="cb86-3" data-line-number="3"><span class="st">          Date,Food,Mood</span></a>
+<a class="sourceLine" id="cb86-4" data-line-number="4"><span class="st">          Monday,carrot,happy</span></a>
+<a class="sourceLine" id="cb86-5" data-line-number="5"><span class="st">          Tuesday,carrot,happy</span></a>
+<a class="sourceLine" id="cb86-6" data-line-number="6"><span class="st">          Wednesday,carrot,happy</span></a>
+<a class="sourceLine" id="cb86-7" data-line-number="7"><span class="st">          Thursday,carrot,happy</span></a>
+<a class="sourceLine" id="cb86-8" data-line-number="8"><span class="st">          Friday,carrot,happy</span></a>
+<a class="sourceLine" id="cb86-9" data-line-number="9"><span class="st">          Saturday,carrot,extremely happy</span></a>
+<a class="sourceLine" id="cb86-10" data-line-number="10"><span class="st">          Sunday,carrot,extremely happy&quot;</span>, </a>
+<a class="sourceLine" id="cb86-11" data-line-number="11">          <span class="dt">skip =</span> <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb86-12" data-line-number="12"><span class="kw">print</span>(dat)</a></code></pre></div>
 <pre><code>## # A tibble: 7 x 3
 ##   Date      Food   Mood           
 ##   &lt;chr&gt;     &lt;chr&gt;  &lt;chr&gt;          
@@ -409,9 +409,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 6 Saturday  carrot extremely happy
 ## 7 Sunday    carrot extremely happy</code></pre>
 <p>If you don’t have column names, set <code>col_names = FALSE</code> then R will assign names “<code>X1</code>”,“<code>X2</code>”… to the columns:</p>
-<div class="sourceCode" id="cb84"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb84-1" data-line-number="1">dat &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;Saturday,carrot,extremely happy</span></a>
-<a class="sourceLine" id="cb84-2" data-line-number="2"><span class="st">          Sunday,carrot,extremely happy&quot;</span>, <span class="dt">col_names =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb84-3" data-line-number="3"><span class="kw">print</span>(dat)</a></code></pre></div>
+<div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb88-1" data-line-number="1">dat &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;Saturday,carrot,extremely happy</span></a>
+<a class="sourceLine" id="cb88-2" data-line-number="2"><span class="st">          Sunday,carrot,extremely happy&quot;</span>, <span class="dt">col_names =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb88-3" data-line-number="3"><span class="kw">print</span>(dat)</a></code></pre></div>
 <pre><code>## # A tibble: 2 x 3
 ##   X1       X2     X3             
 ##   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;          
@@ -419,9 +419,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 2 Sunday   carrot extremely happy</code></pre>
 <p>You can also pass <code>col_names</code> a character vector which will be used as the column names. Try to replace <code>col_names=FALSE</code> with <code>col_names=c(&quot;Date&quot;,&quot;Food&quot;,&quot;Mood&quot;)</code> and see what happen.</p>
 <p>As mentioned before, you can use <code>read_csv2()</code> to read semicolon separated files:</p>
-<div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb86-1" data-line-number="1">dat &lt;-<span class="st"> </span><span class="kw">read_csv2</span>(<span class="st">&quot;Saturday; carrot; extremely happy </span><span class="ch">\n</span><span class="st"> Sunday; carrot; extremely happy&quot;</span>, <span class="dt">col_names =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb90-1" data-line-number="1">dat &lt;-<span class="st"> </span><span class="kw">read_csv2</span>(<span class="st">&quot;Saturday; carrot; extremely happy </span><span class="ch">\n</span><span class="st"> Sunday; carrot; extremely happy&quot;</span>, <span class="dt">col_names =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
 <pre><code>## Using &#39;,&#39; as decimal and &#39;.&#39; as grouping mark. Use read_delim() for more control.</code></pre>
-<div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb88-1" data-line-number="1"><span class="kw">print</span>(dat)</a></code></pre></div>
+<div class="sourceCode" id="cb92"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb92-1" data-line-number="1"><span class="kw">print</span>(dat)</a></code></pre></div>
 <pre><code>## # A tibble: 2 x 3
 ##   X1       X2     X3             
 ##   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;          
@@ -429,27 +429,27 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 2 Sunday   carrot extremely happy</code></pre>
 <p>Here “<code>\n</code>” is a convenient shortcut for adding a new line.</p>
 <p>You can use <code>read_tsv()</code> to read tab delimited files：</p>
-<div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb90-1" data-line-number="1">dat &lt;-<span class="st"> </span><span class="kw">read_tsv</span>(<span class="st">&quot;every</span><span class="ch">\t</span><span class="st">man</span><span class="ch">\t</span><span class="st">is</span><span class="ch">\t</span><span class="st">a</span><span class="ch">\t</span><span class="st">poet</span><span class="ch">\t</span><span class="st">when</span><span class="ch">\t</span><span class="st">he</span><span class="ch">\t</span><span class="st">is</span><span class="ch">\t</span><span class="st">in</span><span class="ch">\t</span><span class="st">love</span><span class="ch">\n</span><span class="st">&quot;</span>, </a>
-<a class="sourceLine" id="cb90-2" data-line-number="2">    <span class="dt">col_names =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb90-3" data-line-number="3"><span class="kw">print</span>(dat)</a></code></pre></div>
+<div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb94-1" data-line-number="1">dat &lt;-<span class="st"> </span><span class="kw">read_tsv</span>(<span class="st">&quot;every</span><span class="ch">\t</span><span class="st">man</span><span class="ch">\t</span><span class="st">is</span><span class="ch">\t</span><span class="st">a</span><span class="ch">\t</span><span class="st">poet</span><span class="ch">\t</span><span class="st">when</span><span class="ch">\t</span><span class="st">he</span><span class="ch">\t</span><span class="st">is</span><span class="ch">\t</span><span class="st">in</span><span class="ch">\t</span><span class="st">love</span><span class="ch">\n</span><span class="st">&quot;</span>, </a>
+<a class="sourceLine" id="cb94-2" data-line-number="2">    <span class="dt">col_names =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb94-3" data-line-number="3"><span class="kw">print</span>(dat)</a></code></pre></div>
 <pre><code>## # A tibble: 1 x 10
 ##   X1    X2    X3    X4    X5    X6    X7    X8    X9   
 ##   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
 ## 1 every man   is    a     poet  when  he    is    in   
 ## # … with 1 more variable: X10 &lt;chr&gt;</code></pre>
 <p>Or more generally, you can use <code>read_delim()</code> and assign separating character：</p>
-<div class="sourceCode" id="cb92"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb92-1" data-line-number="1">dat &lt;-<span class="st"> </span><span class="kw">read_delim</span>(<span class="st">&quot;THE|UNBEARABLE|RANDOMNESS|OF|LIFE</span><span class="ch">\n</span><span class="st">&quot;</span>, </a>
-<a class="sourceLine" id="cb92-2" data-line-number="2">    <span class="dt">delim =</span> <span class="st">&quot;|&quot;</span>, <span class="dt">col_names =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb92-3" data-line-number="3"><span class="kw">print</span>(dat)</a></code></pre></div>
+<div class="sourceCode" id="cb96"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb96-1" data-line-number="1">dat &lt;-<span class="st"> </span><span class="kw">read_delim</span>(<span class="st">&quot;THE|UNBEARABLE|RANDOMNESS|OF|LIFE</span><span class="ch">\n</span><span class="st">&quot;</span>, </a>
+<a class="sourceLine" id="cb96-2" data-line-number="2">    <span class="dt">delim =</span> <span class="st">&quot;|&quot;</span>, <span class="dt">col_names =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb96-3" data-line-number="3"><span class="kw">print</span>(dat)</a></code></pre></div>
 <pre><code>## # A tibble: 1 x 5
 ##   X1    X2         X3         X4    X5   
 ##   &lt;chr&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt; &lt;chr&gt;
 ## 1 THE   UNBEARABLE RANDOMNESS OF    LIFE</code></pre>
 <p>Another situation you will often run into is the missing value. In marketing survey, people like to use “99” to represent missing. You can tell R to set all observation with value “99” as missing when you read the data:</p>
-<div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb94-1" data-line-number="1">dat &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;Q1,Q2,Q3</span></a>
-<a class="sourceLine" id="cb94-2" data-line-number="2"><span class="st">               5, 4,99&quot;</span>, </a>
-<a class="sourceLine" id="cb94-3" data-line-number="3">               <span class="dt">na =</span> <span class="st">&quot;99&quot;</span>)</a>
-<a class="sourceLine" id="cb94-4" data-line-number="4"><span class="kw">print</span>(dat)</a></code></pre></div>
+<div class="sourceCode" id="cb98"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb98-1" data-line-number="1">dat &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;Q1,Q2,Q3</span></a>
+<a class="sourceLine" id="cb98-2" data-line-number="2"><span class="st">               5, 4,99&quot;</span>, </a>
+<a class="sourceLine" id="cb98-3" data-line-number="3">               <span class="dt">na =</span> <span class="st">&quot;99&quot;</span>)</a>
+<a class="sourceLine" id="cb98-4" data-line-number="4"><span class="kw">print</span>(dat)</a></code></pre></div>
 <pre><code>## # A tibble: 1 x 3
 ##      Q1    Q2 Q3   
 ##   &lt;dbl&gt; &lt;dbl&gt; &lt;lgl&gt;
@@ -460,7 +460,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>Save dates and date-times in ISO8601 format so they are easily parsed elsewhere</li>
 </ul>
 <p>For example:</p>
-<div class="sourceCode" id="cb96"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb96-1" data-line-number="1"><span class="kw">write_csv</span>(sim.dat, <span class="st">&quot;sim_dat.csv&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb100"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb100-1" data-line-number="1"><span class="kw">write_csv</span>(sim.dat, <span class="st">&quot;sim_dat.csv&quot;</span>)</a></code></pre></div>
 <p>For other data types, you can use the following packages:</p>
 <ul>
 <li><code>Haven</code>: SPSS, Stata and SAS data</li>
@@ -486,8 +486,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>It uses <code>[]</code> to subset data</li>
 </ul>
 <p>We will use the clothes customer data to illustrate. There are two dimensions in <code>[]</code>. The first one indicates the row and second one indicates column. It uses a comma to separate them.</p>
-<div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb97-1" data-line-number="1"><span class="co"># read data</span></a>
-<a class="sourceLine" id="cb97-2" data-line-number="2">sim.dat &lt;-<span class="st"> </span>readr<span class="op">::</span><span class="kw">read_csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb101-1" data-line-number="1"><span class="co"># read data</span></a>
+<a class="sourceLine" id="cb101-2" data-line-number="2">sim.dat &lt;-<span class="st"> </span>readr<span class="op">::</span><span class="kw">read_csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)</a></code></pre></div>
 <pre><code>## Parsed with column specification:
 ## cols(
 ##   age = col_double(),
@@ -510,22 +510,22 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ##   Q10 = col_double(),
 ##   segment = col_character()
 ## )</code></pre>
-<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb99-1" data-line-number="1"><span class="co"># subset the first two rows</span></a>
-<a class="sourceLine" id="cb99-2" data-line-number="2">sim.dat[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, ]</a>
-<a class="sourceLine" id="cb99-3" data-line-number="3"><span class="co"># subset the first two rows and column 3 and 5</span></a>
-<a class="sourceLine" id="cb99-4" data-line-number="4">sim.dat[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">5</span>)]</a>
-<a class="sourceLine" id="cb99-5" data-line-number="5"><span class="co"># get all rows with age&gt;70</span></a>
-<a class="sourceLine" id="cb99-6" data-line-number="6">sim.dat[sim.dat<span class="op">$</span>age <span class="op">&gt;</span><span class="st"> </span><span class="dv">70</span>, ]</a>
-<a class="sourceLine" id="cb99-7" data-line-number="7"><span class="co"># get rows with age&gt; 60 and gender is Male select column 3 and 4</span></a>
-<a class="sourceLine" id="cb99-8" data-line-number="8">sim.dat[sim.dat<span class="op">$</span>age <span class="op">&gt;</span><span class="st"> </span><span class="dv">68</span> <span class="op">&amp;</span><span class="st"> </span>sim.dat<span class="op">$</span>gender <span class="op">==</span><span class="st"> &quot;Male&quot;</span>, <span class="dv">3</span><span class="op">:</span><span class="dv">4</span>]</a></code></pre></div>
+<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb103-1" data-line-number="1"><span class="co"># subset the first two rows</span></a>
+<a class="sourceLine" id="cb103-2" data-line-number="2">sim.dat[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, ]</a>
+<a class="sourceLine" id="cb103-3" data-line-number="3"><span class="co"># subset the first two rows and column 3 and 5</span></a>
+<a class="sourceLine" id="cb103-4" data-line-number="4">sim.dat[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">5</span>)]</a>
+<a class="sourceLine" id="cb103-5" data-line-number="5"><span class="co"># get all rows with age&gt;70</span></a>
+<a class="sourceLine" id="cb103-6" data-line-number="6">sim.dat[sim.dat<span class="op">$</span>age <span class="op">&gt;</span><span class="st"> </span><span class="dv">70</span>, ]</a>
+<a class="sourceLine" id="cb103-7" data-line-number="7"><span class="co"># get rows with age&gt; 60 and gender is Male select column 3 and 4</span></a>
+<a class="sourceLine" id="cb103-8" data-line-number="8">sim.dat[sim.dat<span class="op">$</span>age <span class="op">&gt;</span><span class="st"> </span><span class="dv">68</span> <span class="op">&amp;</span><span class="st"> </span>sim.dat<span class="op">$</span>gender <span class="op">==</span><span class="st"> &quot;Male&quot;</span>, <span class="dv">3</span><span class="op">:</span><span class="dv">4</span>]</a></code></pre></div>
 <p>Remember that there are usually different ways to conduct the same manipulation. For example, the following code presents three ways to calculate an average number of online transactions for male and female:</p>
-<div class="sourceCode" id="cb100"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb100-1" data-line-number="1"><span class="kw">tapply</span>(sim.dat<span class="op">$</span>online_trans, sim.dat<span class="op">$</span>gender, mean)</a>
-<a class="sourceLine" id="cb100-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb100-3" data-line-number="3"><span class="kw">aggregate</span>(online_trans <span class="op">~</span><span class="st"> </span>gender, <span class="dt">data =</span> sim.dat, mean)</a>
-<a class="sourceLine" id="cb100-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb100-5" data-line-number="5">sim.dat <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb100-6" data-line-number="6"><span class="st">  </span><span class="kw">group_by</span>(gender) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb100-7" data-line-number="7"><span class="st">  </span><span class="kw">summarise</span>(<span class="dt">Avg_online_trans =</span> <span class="kw">mean</span>(online_trans))</a></code></pre></div>
+<div class="sourceCode" id="cb104"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb104-1" data-line-number="1"><span class="kw">tapply</span>(sim.dat<span class="op">$</span>online_trans, sim.dat<span class="op">$</span>gender, mean)</a>
+<a class="sourceLine" id="cb104-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb104-3" data-line-number="3"><span class="kw">aggregate</span>(online_trans <span class="op">~</span><span class="st"> </span>gender, <span class="dt">data =</span> sim.dat, mean)</a>
+<a class="sourceLine" id="cb104-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb104-5" data-line-number="5">sim.dat <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb104-6" data-line-number="6"><span class="st">  </span><span class="kw">group_by</span>(gender) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb104-7" data-line-number="7"><span class="st">  </span><span class="kw">summarise</span>(<span class="dt">Avg_online_trans =</span> <span class="kw">mean</span>(online_trans))</a></code></pre></div>
 <p>There is no gold standard to choose a specific function to manipulate data. The goal is to solve the real problem, not the tool itself. So just use whatever tool that is convenient for you.</p>
 <p>The way to use <code>[]</code> is straightforward. But the manipulations are limited. If you need more complicated data reshaping or aggregation, there are other packages to use such as <code>dplyr</code>, <code>reshape2</code>, <code>tidyr</code> etc. But the usage of those packages are not as straightforward as <code>[]</code>. You often need to change functions. Keeping related operations together, such as subset, group, update, join etc, will allow for:</p>
 <ul>
@@ -542,29 +542,29 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul>
 <p>You need to install and load the package:</p>
 <p>Use <code>data.table()</code> to convert the existing data frame <code>sim.dat</code> to data table:</p>
-<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb101-1" data-line-number="1">dt &lt;-<span class="st"> </span><span class="kw">data.table</span>(sim.dat)</a>
-<a class="sourceLine" id="cb101-2" data-line-number="2"><span class="kw">class</span>(dt)</a></code></pre></div>
+<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb105-1" data-line-number="1">dt &lt;-<span class="st"> </span><span class="kw">data.table</span>(sim.dat)</a>
+<a class="sourceLine" id="cb105-2" data-line-number="2"><span class="kw">class</span>(dt)</a></code></pre></div>
 <pre><code>## [1] &quot;data.table&quot; &quot;data.frame&quot;</code></pre>
 <p>Calculate mean for counts of online transactions:</p>
-<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb103-1" data-line-number="1">dt[, <span class="kw">mean</span>(online_trans)]</a></code></pre></div>
+<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb107-1" data-line-number="1">dt[, <span class="kw">mean</span>(online_trans)]</a></code></pre></div>
 <pre><code>## [1] 13.55</code></pre>
 <p>You can’t do the same thing using data frame:</p>
-<div class="sourceCode" id="cb105"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb105-1" data-line-number="1">sim.dat[,<span class="kw">mean</span>(online_trans)]</a></code></pre></div>
-<div class="sourceCode" id="cb106"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb106-1" data-line-number="1">Error in mean(online_trans) : object &#39;online_trans&#39; not found</a></code></pre></div>
+<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb109-1" data-line-number="1">sim.dat[,<span class="kw">mean</span>(online_trans)]</a></code></pre></div>
+<div class="sourceCode" id="cb110"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb110-1" data-line-number="1">Error in mean(online_trans) : object &#39;online_trans&#39; not found</a></code></pre></div>
 <p>If you want to calculate mean by group as before, set “<code>by =</code>” argument:</p>
-<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb107-1" data-line-number="1">dt[ , <span class="kw">mean</span>(online_trans), by =<span class="st"> </span>gender]</a></code></pre></div>
+<div class="sourceCode" id="cb111"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb111-1" data-line-number="1">dt[ , <span class="kw">mean</span>(online_trans), by =<span class="st"> </span>gender]</a></code></pre></div>
 <pre><code>##    gender    V1
 ## 1: Female 15.38
 ## 2:   Male 11.26</code></pre>
 <p>You can group by more than one variables. For example, group by “<code>gender</code>” and “<code>house</code>”:</p>
-<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb109-1" data-line-number="1">dt[ , <span class="kw">mean</span>(online_trans), by =<span class="st"> </span>.(gender, house)]</a></code></pre></div>
+<div class="sourceCode" id="cb113"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb113-1" data-line-number="1">dt[ , <span class="kw">mean</span>(online_trans), by =<span class="st"> </span>.(gender, house)]</a></code></pre></div>
 <pre><code>##    gender house     V1
 ## 1: Female   Yes 11.312
 ## 2:   Male   Yes  8.772
 ## 3: Female    No 19.146
 ## 4:   Male    No 16.486</code></pre>
 <p>Assign column names for aggregated variables:</p>
-<div class="sourceCode" id="cb111"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb111-1" data-line-number="1">dt[ , .(<span class="dt">avg =</span> <span class="kw">mean</span>(online_trans)), by =<span class="st"> </span>.(gender, house)]</a></code></pre></div>
+<div class="sourceCode" id="cb115"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb115-1" data-line-number="1">dt[ , .(<span class="dt">avg =</span> <span class="kw">mean</span>(online_trans)), by =<span class="st"> </span>.(gender, house)]</a></code></pre></div>
 <pre><code>##    gender house    avg
 ## 1: Female   Yes 11.312
 ## 2:   Male   Yes  8.772
@@ -583,23 +583,23 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <img src="images/rSQL.png" />
 </center>
 <p>Let’s review our previous code:</p>
-<div class="sourceCode" id="cb113"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb113-1" data-line-number="1">dt[ , <span class="kw">mean</span>(online_trans), by =<span class="st"> </span>gender]</a></code></pre></div>
+<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb117-1" data-line-number="1">dt[ , <span class="kw">mean</span>(online_trans), by =<span class="st"> </span>gender]</a></code></pre></div>
 <p>The code above is equal to the following SQL：</p>
-<div class="sourceCode" id="cb114"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb114-1" data-line-number="1"><span class="kw">SELECT</span>  gender, <span class="fu">avg</span>(online_trans) <span class="kw">FROM</span> sim.dat <span class="kw">GROUP</span> <span class="kw">BY</span> gender</a></code></pre></div>
+<div class="sourceCode" id="cb118"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb118-1" data-line-number="1"><span class="kw">SELECT</span>  gender, <span class="fu">avg</span>(online_trans) <span class="kw">FROM</span> sim.dat <span class="kw">GROUP</span> <span class="kw">BY</span> gender</a></code></pre></div>
 <p>R code:</p>
-<div class="sourceCode" id="cb115"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb115-1" data-line-number="1">dt[ , .(<span class="dt">avg =</span> <span class="kw">mean</span>(online_trans)), by =<span class="st"> </span>.(gender, house)]</a></code></pre></div>
+<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb119-1" data-line-number="1">dt[ , .(<span class="dt">avg =</span> <span class="kw">mean</span>(online_trans)), by =<span class="st"> </span>.(gender, house)]</a></code></pre></div>
 <p>is equal to SQL：</p>
-<div class="sourceCode" id="cb116"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb116-1" data-line-number="1"><span class="kw">SELECT</span> gender, house, <span class="fu">avg</span>(online_trans) <span class="kw">AS</span> <span class="fu">avg</span> <span class="kw">FROM</span> sim.dat <span class="kw">GROUP</span> <span class="kw">BY</span> gender, house</a></code></pre></div>
+<div class="sourceCode" id="cb120"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb120-1" data-line-number="1"><span class="kw">SELECT</span> gender, house, <span class="fu">avg</span>(online_trans) <span class="kw">AS</span> <span class="fu">avg</span> <span class="kw">FROM</span> sim.dat <span class="kw">GROUP</span> <span class="kw">BY</span> gender, house</a></code></pre></div>
 <p>R code：</p>
-<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb117-1" data-line-number="1">dt[ age <span class="op">&lt;</span><span class="st"> </span><span class="dv">40</span>, .(<span class="dt">avg =</span> <span class="kw">mean</span>(online_trans)), by =<span class="st"> </span>.(gender, house)]</a></code></pre></div>
+<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb121-1" data-line-number="1">dt[ age <span class="op">&lt;</span><span class="st"> </span><span class="dv">40</span>, .(<span class="dt">avg =</span> <span class="kw">mean</span>(online_trans)), by =<span class="st"> </span>.(gender, house)]</a></code></pre></div>
 <p>is equal to SQL：</p>
-<div class="sourceCode" id="cb118"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb118-1" data-line-number="1"><span class="kw">SELECT</span> gender, house, <span class="fu">avg</span>(online_trans) <span class="kw">AS</span> <span class="fu">avg</span> <span class="kw">FROM</span> sim.dat <span class="kw">WHERE</span> age &lt; <span class="dv">40</span> <span class="kw">GROUP</span> <span class="kw">BY</span> gender, house</a></code></pre></div>
+<div class="sourceCode" id="cb122"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb122-1" data-line-number="1"><span class="kw">SELECT</span> gender, house, <span class="fu">avg</span>(online_trans) <span class="kw">AS</span> <span class="fu">avg</span> <span class="kw">FROM</span> sim.dat <span class="kw">WHERE</span> age &lt; <span class="dv">40</span> <span class="kw">GROUP</span> <span class="kw">BY</span> gender, house</a></code></pre></div>
 <p>You can see the analogy between <code>data.table</code> and <code>SQL</code>. Now let’s focus on operations in data table.</p>
 <ul>
 <li>select row</li>
 </ul>
-<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb119-1" data-line-number="1"><span class="co"># select rows with age&lt;20 and income &gt; 80000</span></a>
-<a class="sourceLine" id="cb119-2" data-line-number="2">dt[age <span class="op">&lt;</span><span class="st"> </span><span class="dv">20</span> <span class="op">&amp;</span><span class="st"> </span>income <span class="op">&gt;</span><span class="st"> </span><span class="dv">80000</span>]</a></code></pre></div>
+<div class="sourceCode" id="cb123"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb123-1" data-line-number="1"><span class="co"># select rows with age&lt;20 and income &gt; 80000</span></a>
+<a class="sourceLine" id="cb123-2" data-line-number="2">dt[age <span class="op">&lt;</span><span class="st"> </span><span class="dv">20</span> <span class="op">&amp;</span><span class="st"> </span>income <span class="op">&gt;</span><span class="st"> </span><span class="dv">80000</span>]</a></code></pre></div>
 <pre><code>##    age gender income house store_exp online_exp
 ## 1:  19 Female  83535    No     227.7       1491
 ## 2:  18 Female  89416   Yes     209.5       1926
@@ -612,8 +612,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 1:   1   Style
 ## 2:   1   Style
 ## 3:   1   Style</code></pre>
-<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb121-1" data-line-number="1"><span class="co"># select the first two rows</span></a>
-<a class="sourceLine" id="cb121-2" data-line-number="2">dt[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]</a></code></pre></div>
+<div class="sourceCode" id="cb125"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb125-1" data-line-number="1"><span class="co"># select the first two rows</span></a>
+<a class="sourceLine" id="cb125-2" data-line-number="2">dt[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>]</a></code></pre></div>
 <pre><code>##    age gender income house store_exp online_exp
 ## 1:  57 Female 120963   Yes     529.1      303.5
 ## 2:  63 Female 122008   Yes     478.0      109.5
@@ -627,49 +627,49 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>select column</li>
 </ul>
 <p>Selecting columns in <code>data.table</code> don’t need <code>$</code>:</p>
-<div class="sourceCode" id="cb123"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb123-1" data-line-number="1"><span class="co"># select column “age” but return it as a vector</span></a>
-<a class="sourceLine" id="cb123-2" data-line-number="2"><span class="co"># the argument for row is empty so the result will return all observations</span></a>
-<a class="sourceLine" id="cb123-3" data-line-number="3">ans &lt;-<span class="st"> </span>dt[, age]</a>
-<a class="sourceLine" id="cb123-4" data-line-number="4"><span class="kw">head</span>(ans)</a></code></pre></div>
+<div class="sourceCode" id="cb127"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb127-1" data-line-number="1"><span class="co"># select column “age” but return it as a vector</span></a>
+<a class="sourceLine" id="cb127-2" data-line-number="2"><span class="co"># the argument for row is empty so the result will return all observations</span></a>
+<a class="sourceLine" id="cb127-3" data-line-number="3">ans &lt;-<span class="st"> </span>dt[, age]</a>
+<a class="sourceLine" id="cb127-4" data-line-number="4"><span class="kw">head</span>(ans)</a></code></pre></div>
 <pre><code>## [1] 57 63 59 60 51 59</code></pre>
 <p>To return <code>data.table</code> object, put column names in <code>list()</code>:</p>
-<div class="sourceCode" id="cb125"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb125-1" data-line-number="1"><span class="co"># Select age and online_exp columns and return as a data.table instead</span></a>
-<a class="sourceLine" id="cb125-2" data-line-number="2">ans &lt;-<span class="st"> </span>dt[, <span class="kw">list</span>(age, online_exp)]</a>
-<a class="sourceLine" id="cb125-3" data-line-number="3"><span class="kw">head</span>(ans)</a></code></pre></div>
+<div class="sourceCode" id="cb129"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb129-1" data-line-number="1"><span class="co"># Select age and online_exp columns and return as a data.table instead</span></a>
+<a class="sourceLine" id="cb129-2" data-line-number="2">ans &lt;-<span class="st"> </span>dt[, <span class="kw">list</span>(age, online_exp)]</a>
+<a class="sourceLine" id="cb129-3" data-line-number="3"><span class="kw">head</span>(ans)</a></code></pre></div>
 <p>Or you can also put column names in <code>.()</code>:</p>
-<div class="sourceCode" id="cb126"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb126-1" data-line-number="1">ans &lt;-<span class="st"> </span>dt[, .(age, online_exp)]</a>
-<a class="sourceLine" id="cb126-2" data-line-number="2"><span class="co"># head(ans)</span></a></code></pre></div>
+<div class="sourceCode" id="cb130"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb130-1" data-line-number="1">ans &lt;-<span class="st"> </span>dt[, .(age, online_exp)]</a>
+<a class="sourceLine" id="cb130-2" data-line-number="2"><span class="co"># head(ans)</span></a></code></pre></div>
 <p>To select all columns from “<code>age</code>” to “<code>income</code>”:</p>
-<div class="sourceCode" id="cb127"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb127-1" data-line-number="1">ans &lt;-<span class="st"> </span>dt[, age<span class="op">:</span>income, with =<span class="st"> </span><span class="ot">FALSE</span>]</a>
-<a class="sourceLine" id="cb127-2" data-line-number="2"><span class="kw">head</span>(ans,<span class="dv">2</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb131"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb131-1" data-line-number="1">ans &lt;-<span class="st"> </span>dt[, age<span class="op">:</span>income, with =<span class="st"> </span><span class="ot">FALSE</span>]</a>
+<a class="sourceLine" id="cb131-2" data-line-number="2"><span class="kw">head</span>(ans,<span class="dv">2</span>)</a></code></pre></div>
 <pre><code>##    age gender income
 ## 1:  57 Female 120963
 ## 2:  63 Female 122008</code></pre>
 <p>Delete columns using <code>-</code> or <code>!</code>:</p>
-<div class="sourceCode" id="cb129"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb129-1" data-line-number="1"><span class="co"># delete columns from  age to online_exp</span></a>
-<a class="sourceLine" id="cb129-2" data-line-number="2">ans &lt;-<span class="st"> </span>dt[, <span class="op">-</span>(age<span class="op">:</span>online_exp), with =<span class="st"> </span><span class="ot">FALSE</span>]</a>
-<a class="sourceLine" id="cb129-3" data-line-number="3">ans &lt;-<span class="st"> </span>dt[, <span class="op">!</span>(age<span class="op">:</span>online_exp), with =<span class="st"> </span><span class="ot">FALSE</span>]</a></code></pre></div>
+<div class="sourceCode" id="cb133"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb133-1" data-line-number="1"><span class="co"># delete columns from  age to online_exp</span></a>
+<a class="sourceLine" id="cb133-2" data-line-number="2">ans &lt;-<span class="st"> </span>dt[, <span class="op">-</span>(age<span class="op">:</span>online_exp), with =<span class="st"> </span><span class="ot">FALSE</span>]</a>
+<a class="sourceLine" id="cb133-3" data-line-number="3">ans &lt;-<span class="st"> </span>dt[, <span class="op">!</span>(age<span class="op">:</span>online_exp), with =<span class="st"> </span><span class="ot">FALSE</span>]</a></code></pre></div>
 <ul>
 <li>tabulation</li>
 </ul>
 <p>In data table. <code>.N</code> means to count。</p>
-<div class="sourceCode" id="cb130"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb130-1" data-line-number="1"><span class="co"># row count</span></a>
-<a class="sourceLine" id="cb130-2" data-line-number="2">dt[, .N] </a></code></pre></div>
+<div class="sourceCode" id="cb134"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb134-1" data-line-number="1"><span class="co"># row count</span></a>
+<a class="sourceLine" id="cb134-2" data-line-number="2">dt[, .N] </a></code></pre></div>
 <pre><code>## [1] 1000</code></pre>
 <p>If you assign the group variable, then it will count by groups:</p>
-<div class="sourceCode" id="cb132"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb132-1" data-line-number="1"><span class="co"># counts by gender</span></a>
-<a class="sourceLine" id="cb132-2" data-line-number="2">dt[, .N, by=<span class="st"> </span>gender]  </a></code></pre></div>
+<div class="sourceCode" id="cb136"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb136-1" data-line-number="1"><span class="co"># counts by gender</span></a>
+<a class="sourceLine" id="cb136-2" data-line-number="2">dt[, .N, by=<span class="st"> </span>gender]  </a></code></pre></div>
 <pre><code>##    gender   N
 ## 1: Female 554
 ## 2:   Male 446</code></pre>
-<div class="sourceCode" id="cb134"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb134-1" data-line-number="1"><span class="co"># for those younger than 30, count by gender</span></a>
-<a class="sourceLine" id="cb134-2" data-line-number="2"> dt[age <span class="op">&lt;</span><span class="st"> </span><span class="dv">30</span>, .(<span class="dt">count=</span>.N), by=<span class="st"> </span>gender] </a></code></pre></div>
+<div class="sourceCode" id="cb138"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb138-1" data-line-number="1"><span class="co"># for those younger than 30, count by gender</span></a>
+<a class="sourceLine" id="cb138-2" data-line-number="2"> dt[age <span class="op">&lt;</span><span class="st"> </span><span class="dv">30</span>, .(<span class="dt">count=</span>.N), by=<span class="st"> </span>gender] </a></code></pre></div>
 <pre><code>##    gender count
 ## 1: Female   292
 ## 2:   Male    86</code></pre>
 <p>Order table:</p>
-<div class="sourceCode" id="cb136"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb136-1" data-line-number="1"><span class="co"># get records with the highest 5 online expense:</span></a>
-<a class="sourceLine" id="cb136-2" data-line-number="2"><span class="kw">head</span>(dt[<span class="kw">order</span>(<span class="op">-</span>online_exp)],<span class="dv">5</span>) </a></code></pre></div>
+<div class="sourceCode" id="cb140"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb140-1" data-line-number="1"><span class="co"># get records with the highest 5 online expense:</span></a>
+<a class="sourceLine" id="cb140-2" data-line-number="2"><span class="kw">head</span>(dt[<span class="kw">order</span>(<span class="op">-</span>online_exp)],<span class="dv">5</span>) </a></code></pre></div>
 <pre class="pre"><code>   age gender   income house store_exp online_exp store_trans ...
 1:  40 Female 217599.7    No  7023.684   9479.442          10
 2:  41 Female       NA   Yes  3786.740   8638.239          14
@@ -678,22 +678,22 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 5:  43 Female 190407.4   Yes  4694.922   7875.562           6
 ...</code></pre>
 <p>Since data table keep some characters of data frame, they share some operations:</p>
-<div class="sourceCode" id="cb138"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb138-1" data-line-number="1">dt[<span class="kw">order</span>(<span class="op">-</span>online_exp)][<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>]</a></code></pre></div>
+<div class="sourceCode" id="cb142"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb142-1" data-line-number="1">dt[<span class="kw">order</span>(<span class="op">-</span>online_exp)][<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>]</a></code></pre></div>
 <p>You can also order the table by more than one variable. The following code will order the table by <code>gender</code>, then order within <code>gender</code> by <code>online_exp</code>:</p>
-<div class="sourceCode" id="cb139"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb139-1" data-line-number="1">dt[<span class="kw">order</span>(gender, <span class="op">-</span>online_exp)][<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>]</a></code></pre></div>
+<div class="sourceCode" id="cb143"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb143-1" data-line-number="1">dt[<span class="kw">order</span>(gender, <span class="op">-</span>online_exp)][<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>]</a></code></pre></div>
 <ul>
 <li>Use <code>fread()</code> to import dat</li>
 </ul>
 <p>Other than <code>read.csv</code> in base R, we have introduced ‘read_csv’ in ‘readr’. <code>read_csv</code> is much faster and will provide progress bar which makes user feel much better (at least make me feel better). <code>fread()</code> in <code>data.table</code> further increase the efficiency of reading data. The following are three examples of reading the same data file <code>topic.csv</code>. The file includes text data scraped from an agriculture forum with 209670 rows and 6 columns:</p>
-<div class="sourceCode" id="cb140"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb140-1" data-line-number="1"><span class="kw">system.time</span>(topic&lt;-<span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2zam5ny&quot;</span>))</a></code></pre></div>
-<div class="sourceCode" id="cb141"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb141-1" data-line-number="1">   user  system elapsed </a>
-<a class="sourceLine" id="cb141-2" data-line-number="2">  3.561   0.051   4.888 </a></code></pre></div>
-<div class="sourceCode" id="cb142"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb142-1" data-line-number="1"><span class="kw">system.time</span>(topic&lt;-readr<span class="op">::</span><span class="kw">read_csv</span>(<span class="st">&quot;http://bit.ly/2zam5ny&quot;</span>))</a></code></pre></div>
-<div class="sourceCode" id="cb143"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb143-1" data-line-number="1">   user  system elapsed </a>
-<a class="sourceLine" id="cb143-2" data-line-number="2">  0.409   0.032   2.233 </a></code></pre></div>
-<div class="sourceCode" id="cb144"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb144-1" data-line-number="1"><span class="kw">system.time</span>(topic&lt;-data.table<span class="op">::</span><span class="kw">fread</span>(<span class="st">&quot;http://bit.ly/2zam5ny&quot;</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb144"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb144-1" data-line-number="1"><span class="kw">system.time</span>(topic&lt;-<span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2zam5ny&quot;</span>))</a></code></pre></div>
 <div class="sourceCode" id="cb145"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb145-1" data-line-number="1">   user  system elapsed </a>
-<a class="sourceLine" id="cb145-2" data-line-number="2">  0.276   0.096   1.117 </a></code></pre></div>
+<a class="sourceLine" id="cb145-2" data-line-number="2">  3.561   0.051   4.888 </a></code></pre></div>
+<div class="sourceCode" id="cb146"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb146-1" data-line-number="1"><span class="kw">system.time</span>(topic&lt;-readr<span class="op">::</span><span class="kw">read_csv</span>(<span class="st">&quot;http://bit.ly/2zam5ny&quot;</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb147"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb147-1" data-line-number="1">   user  system elapsed </a>
+<a class="sourceLine" id="cb147-2" data-line-number="2">  0.409   0.032   2.233 </a></code></pre></div>
+<div class="sourceCode" id="cb148"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb148-1" data-line-number="1"><span class="kw">system.time</span>(topic&lt;-data.table<span class="op">::</span><span class="kw">fread</span>(<span class="st">&quot;http://bit.ly/2zam5ny&quot;</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb149"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb149-1" data-line-number="1">   user  system elapsed </a>
+<a class="sourceLine" id="cb149-2" data-line-number="2">  0.276   0.096   1.117 </a></code></pre></div>
 <p>It is clear that <code>read_csv()</code> is much faster than <code>read.csv()</code>. <code>fread()</code> is a little faster than <code>read_csv()</code>. As the size increasing, the difference will become for significant. Note that <code>fread()</code> will read file as <code>data.table</code> by default.</p>
 </div>
 </div>

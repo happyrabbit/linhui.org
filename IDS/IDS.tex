@@ -169,7 +169,7 @@
 
 \title{Introduction to Data Science}
 \author{Hui Lin and Ming Li}
-\date{2019-12-20}
+\date{2020-01-27}
 
 \begin{document}
 \maketitle
@@ -1639,7 +1639,6 @@ Through the \texttt{sparklyr} package, we can use an R notebook to access many S
 \end{Highlighting}
 \end{Shaded}
 
-\textless{}\textless{}\textless{}\textless{}\textless{}\textless{}\textless{} HEAD
 After fitting the k-means model, we can apply the model to predict other datasets through \texttt{sdf\_predict()} function. Following code applies the model to \texttt{iris\_tbl} again to predict the cluster and collect the results as a local R object (i.e. \texttt{prediction}) using \texttt{collect()} function:
 
 \begin{Shaded}
@@ -5500,6 +5499,8 @@ Similar to the ROC curve, we can choose the model by comparing their lift charts
 \hypertarget{regression-models}{%
 \chapter{Regression Models}\label{regression-models}}
 
+In this chapter, we will cover ordinary linear regression and a few more advanced regression methods. First, we will introduce multivariate linear regression (i.e.~the typical least square regression) which is one of the simplest supervised learning methods. Even though it is simple, the general ideas and procedures of fitting a regression model are applied to a boarder scope. Having a solid understanding of the basic linear regression model enables us to learn more advanced models easily. For example, we will introduce two ``shrinkage'' versions of linear regression: ridge regression and LASSO regression. While the parameters are fitted by the least square method, the extra penalty can effectively shrink model parameters towards zero. It mediates overfitting and maintains the robustness of the model when data size is small compared to the number of explanatory variables. We first introduce basic knowledge of each model and then provide R codes to show how to fit the model. We only cover the major properties of these models and the listed reference will provide more in-depth discussion.
+
 \hypertarget{ordinary-least-squares}{%
 \section{Ordinary Least Squares}\label{ordinary-least-squares}}
 
@@ -6974,7 +6975,7 @@ Compare the results of the two approaches.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{rpartRoc <-}\StringTok{ }\KeywordTok{roc}\NormalTok{(}\DataTypeTok{response =}\NormalTok{ rpartTune1}\OperatorTok{$}\NormalTok{pred}\OperatorTok{$}\NormalTok{obs,}
+\NormalTok{rpartRoc <-}\StringTok{ }\NormalTok{pROC}\OperatorTok{::}\KeywordTok{roc}\NormalTok{(}\DataTypeTok{response =}\NormalTok{ rpartTune1}\OperatorTok{$}\NormalTok{pred}\OperatorTok{$}\NormalTok{obs,}
                 \DataTypeTok{predictor =}\NormalTok{ rpartTune1}\OperatorTok{$}\NormalTok{pred}\OperatorTok{$}\NormalTok{Female,}
                 \DataTypeTok{levels =} \KeywordTok{rev}\NormalTok{(}\KeywordTok{levels}\NormalTok{(rpartTune1}\OperatorTok{$}\NormalTok{pred}\OperatorTok{$}\NormalTok{obs)))}
 \end{Highlighting}
@@ -6998,20 +6999,23 @@ Compare the results of the two approaches.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{plot}\NormalTok{(rpartRoc, }\DataTypeTok{type =} \StringTok{"s"}\NormalTok{, }\DataTypeTok{print.thres =} \KeywordTok{c}\NormalTok{(.}\DecValTok{5}\NormalTok{),}
+\KeywordTok{plot.roc}\NormalTok{(rpartRoc, }
+     \DataTypeTok{type =} \StringTok{"s"}\NormalTok{, }
+     \DataTypeTok{print.thres =} \KeywordTok{c}\NormalTok{(.}\DecValTok{5}\NormalTok{),}
      \DataTypeTok{print.thres.pch =} \DecValTok{3}\NormalTok{,}
      \DataTypeTok{print.thres.pattern =} \StringTok{""}\NormalTok{,}
      \DataTypeTok{print.thres.cex =} \FloatTok{1.2}\NormalTok{,}
      \DataTypeTok{col =} \StringTok{"red"}\NormalTok{, }\DataTypeTok{legacy.axes =} \OtherTok{TRUE}\NormalTok{,}
      \DataTypeTok{print.thres.col =} \StringTok{"red"}\NormalTok{)}
 
-\KeywordTok{plot}\NormalTok{(rpartFactorRoc,}
+\KeywordTok{plot.roc}\NormalTok{(rpartFactorRoc,}
      \DataTypeTok{type =} \StringTok{"s"}\NormalTok{,}
      \DataTypeTok{add =} \OtherTok{TRUE}\NormalTok{,}
      \DataTypeTok{print.thres =} \KeywordTok{c}\NormalTok{(.}\DecValTok{5}\NormalTok{),}
      \DataTypeTok{print.thres.pch =} \DecValTok{16}\NormalTok{, }\DataTypeTok{legacy.axes =} \OtherTok{TRUE}\NormalTok{,}
      \DataTypeTok{print.thres.pattern =} \StringTok{""}\NormalTok{,}
      \DataTypeTok{print.thres.cex =} \FloatTok{1.2}\NormalTok{)}
+
 \KeywordTok{legend}\NormalTok{(.}\DecValTok{75}\NormalTok{, }\FloatTok{.2}\NormalTok{,}
        \KeywordTok{c}\NormalTok{(}\StringTok{"Grouped Categories"}\NormalTok{, }\StringTok{"Independent Categories"}\NormalTok{),}
        \DataTypeTok{lwd =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{),}
@@ -7476,24 +7480,32 @@ Now, let's compare the results from the three tree models.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{plot}\NormalTok{(rpartRoc, }\DataTypeTok{type =} \StringTok{"s"}\NormalTok{, }\DataTypeTok{print.thres =} \KeywordTok{c}\NormalTok{(.}\DecValTok{5}\NormalTok{),}
+\KeywordTok{plot.roc}\NormalTok{(rpartRoc, }
+     \DataTypeTok{type =} \StringTok{"s"}\NormalTok{, }
+     \DataTypeTok{print.thres =} \KeywordTok{c}\NormalTok{(.}\DecValTok{5}\NormalTok{),}
      \DataTypeTok{print.thres.pch =} \DecValTok{16}\NormalTok{,}
      \DataTypeTok{print.thres.pattern =} \StringTok{""}\NormalTok{,}
      \DataTypeTok{print.thres.cex =} \FloatTok{1.2}\NormalTok{,}
      \DataTypeTok{col =} \StringTok{"black"}\NormalTok{, }\DataTypeTok{legacy.axes =} \OtherTok{TRUE}\NormalTok{,}
      \DataTypeTok{print.thres.col =} \StringTok{"black"}\NormalTok{)}
 
-\KeywordTok{plot}\NormalTok{(treebagRoc, }\DataTypeTok{type =} \StringTok{"s"}\NormalTok{, }\DataTypeTok{add =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{print.thres =} \KeywordTok{c}\NormalTok{(.}\DecValTok{5}\NormalTok{), }
+\KeywordTok{plot.roc}\NormalTok{(treebagRoc, }
+     \DataTypeTok{type =} \StringTok{"s"}\NormalTok{, }
+     \DataTypeTok{add =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{print.thres =} \KeywordTok{c}\NormalTok{(.}\DecValTok{5}\NormalTok{), }
      \DataTypeTok{print.thres.pch =} \DecValTok{3}\NormalTok{, }\DataTypeTok{legacy.axes =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{print.thres.pattern =} \StringTok{""}\NormalTok{, }
      \DataTypeTok{print.thres.cex =} \FloatTok{1.2}\NormalTok{,}
      \DataTypeTok{col =} \StringTok{"red"}\NormalTok{, }\DataTypeTok{print.thres.col =} \StringTok{"red"}\NormalTok{)}
 
-\KeywordTok{plot}\NormalTok{(rfRoc, }\DataTypeTok{type =} \StringTok{"s"}\NormalTok{, }\DataTypeTok{add =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{print.thres =} \KeywordTok{c}\NormalTok{(.}\DecValTok{5}\NormalTok{), }
+\KeywordTok{plot.roc}\NormalTok{(rfRoc, }
+     \DataTypeTok{type =} \StringTok{"s"}\NormalTok{, }
+     \DataTypeTok{add =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{print.thres =} \KeywordTok{c}\NormalTok{(.}\DecValTok{5}\NormalTok{), }
      \DataTypeTok{print.thres.pch =} \DecValTok{1}\NormalTok{, }\DataTypeTok{legacy.axes =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{print.thres.pattern =} \StringTok{""}\NormalTok{, }
      \DataTypeTok{print.thres.cex =} \FloatTok{1.2}\NormalTok{,}
      \DataTypeTok{col =} \StringTok{"green"}\NormalTok{, }\DataTypeTok{print.thres.col =} \StringTok{"green"}\NormalTok{)}
 
-\KeywordTok{plot}\NormalTok{(gbmRoc, }\DataTypeTok{type =} \StringTok{"s"}\NormalTok{, }\DataTypeTok{add =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{print.thres =} \KeywordTok{c}\NormalTok{(.}\DecValTok{5}\NormalTok{), }
+\KeywordTok{plot.roc}\NormalTok{(gbmRoc, }
+     \DataTypeTok{type =} \StringTok{"s"}\NormalTok{, }
+     \DataTypeTok{add =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{print.thres =} \KeywordTok{c}\NormalTok{(.}\DecValTok{5}\NormalTok{), }
      \DataTypeTok{print.thres.pch =} \DecValTok{10}\NormalTok{, }\DataTypeTok{legacy.axes =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{print.thres.pattern =} \StringTok{""}\NormalTok{, }
      \DataTypeTok{print.thres.cex =} \FloatTok{1.2}\NormalTok{,}
      \DataTypeTok{col =} \StringTok{"blue"}\NormalTok{, }\DataTypeTok{print.thres.col =} \StringTok{"blue"}\NormalTok{)}
@@ -7898,7 +7910,11 @@ We have used the sigmoid (or logistic) activation function. The function is S-sh
 
 When the output has more than 2 categories, people use softmax function as the output layer activation function.
 
-\[f_i(\mathbf{z}) = \frac{e^{z_i}}{\Sigma_{j=1}^{J} e^{z_j} } \]
+\begin{equation}
+f_i(\mathbf{z}) = \frac{e^{z_i}}{\Sigma_{j=1}^{J} e^{z_j} }
+\label{eq:softmax}
+\end{equation}
+
 where \(\mathbf{z}\) is a vector.
 
 \begin{itemize}
@@ -7933,7 +7949,10 @@ The tanh function crosses point (0, 0) and the value of the function is between 
 
 The most popular activation function is the Rectified Linear Unit (ReLU) function. It is a piecewise function, or a half rectified function:
 
-\[R(z) = max(0, z)\]
+\begin{equation}
+R(z) = max(0, z)
+\label{eq:relu}
+\end{equation}
 
 The derivative is 1 when z is positive and 0 when z is negative. You can define the derivative as either 0 or 1 when z is 0. When you implement this, it is unlikely that z equals to exactly 0 even it can be very close to 0.
 
@@ -8065,8 +8084,32 @@ In this section, we will walk through a toy example of image classification prob
 
 Refer to section \ref{CloudEnvironment} for how to set up an account, create a notebook (R or Python) and start a cluster.
 
+What is an image as data? You can consider a digital image as a set of points on 2-d or 3-d space. Each each point has a value between 0 to 255 which is considered as a pixel. Figure \ref{fig:grayscaleimage} shows an example of grayscale image. It is a set of pixels on 2-d space and each pixel has a value between 0 to 255. You can process the image as a 2-d array input if you use a Convolutional Neural Network(CNN). Or, you can vectorize the array as the input for FFNN as shown in the figure.
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.8\linewidth]{images/grayscaleimage} 
+
+}
+
+\caption{Grayscale image is a set of pixels on 2-d space. Each pixel has a value range from 0 to 255.}\label{fig:grayscaleimage}
+\end{figure}
+
+A color image is a set of pixels on 3-d space and each pixel has a value between 0 to 255. There are three 2-d panels which represent the color red, blue and green accordingly. Similarly, You can process the image as a 3-d array. Or you can vectorize the array as shown in figure \ref{fig:colorimage}.
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.8\linewidth]{images/colorimage} 
+
+}
+
+\caption{Color image is a set of pixels on 3-d space. Each pixel has a value range from 0 to 255.}\label{fig:colorimage}
+\end{figure}
+
 \hypertarget{convolutional-neural-network}{%
 \section{Convolutional Neural Network}\label{convolutional-neural-network}}
+
+There are some challenges using a feedforward neural network to solve computer vision problems. One of the challenges is that the inputs can get really big after you vectorize the image array. A 64 x 64 x 3 image gives you an input vector of 12288! And that is a very small image. So you can expect the number of parameters grows fast and it is difficult to get enough data to fit the model. Also as the input image size grows, the computational requirements to train a feedforward neural network will soon become infeasible. Also, after vectorization, you lose most of the spacial information of the image. To overcome these, people instead use the convolutional neural network for computer vision problems.
 
 This section introduces the Convolutional Neural Network (CNN), the deep learning model that is almost universally used in computer vision applications. Computer vision has been advancing rapidly which enables many new applications such as self-driving cars and unlocking a phone using face. The application is not limited to the tech industry but some traditional industries such as agriculture and healthcare. Precision agriculture utilizes advanced hardware and computer vision algorithms to increase efficiency and reduce costs for farmers. For example, analyze images from cameras in the greenhouse to track plant growth state. Use sensory data from drones, satellites, and tractors to track soil conditions, detect herbs and pests, automate irrigation, etc. In health care, computer vision helps clinicians to diagnose disease, identify cancer sites with high accuracy \citep{gloria2019}. Even if you don't work on computer vision, you may find some of the ideas inspiring and borrow them into your area.
 
@@ -8082,7 +8125,318 @@ Some popular computer vision problems are:
   Neural Style Transfer (NST): Given a ``content'' image and a ``style'' image, generate an image that merges the two.
 \end{itemize}
 
-In this chapter, we illustrate the fundamentals of CNN using the example of image classification.
+\hypertarget{convolution-layer}{%
+\subsection{Convolution Layer}\label{convolution-layer}}
+
+A fundamental building block of the convolution neural network is, as the name indicates, the convolution operation. In this chapter, we illustrate the fundamentals of CNN using the example of image classification.
+
+How do you do convolution? For example, you have a 5 x 5 2-d image (figure \ref{fig:convolution1}. You apply a 3 x 3 filter and convolute over the image. The output of this convolution operator will be a 3 x 3 matrix, which you can consider as a 3 x 3 image and visualize it (top right of figure \ref{fig:convolution1}).
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.8\linewidth]{images/convolution1} 
+
+}
+
+\caption{There are an input image (left), a filter (middel), and an output image (right).}\label{fig:convolution1}
+\end{figure}
+
+You start from the top left corner of the image and put the filter on the top left 3 x3 sub-matrix of the input image and take the element-wise product. Then you add up the 9 numbers. Move forward one step each time until it gets to the bottom right. The detailed process is shown in figure \ref{fig:convolutionsbs}.
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.8\linewidth]{images/convolutionsbs} 
+
+}
+
+\caption{Convolution step by step}\label{fig:convolutionsbs}
+\end{figure}
+
+Let's use edge detection as an example to see how convolution operation works. Given a picture as the left of figure \ref{fig:edgedetection}, you want to detect the vertical lines. For example, there are vertical lines along with the hair and the edges of the bookcase. How do you do that? There are standard filters for operations like blurring, sharpening, and edge detection. To get the edge, you can use the following 3 x 3 filter to convolute over the image.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{kernel_vertical =}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{-1}\NormalTok{, }\DecValTok{-1}\NormalTok{, }\DecValTok{-1}\NormalTok{),}
+\DataTypeTok{nrow =} \DecValTok{3}\NormalTok{, }\DataTypeTok{ncol =} \DecValTok{3}\NormalTok{)}
+
+\NormalTok{kernel_vertical}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      [,1] [,2] [,3]
+## [1,]    1    0   -1
+## [2,]    1    0   -1
+## [3,]    1    0   -1
+\end{verbatim}
+
+The following code implements the convolution process. The result is shown as the middle of figure \ref{fig:edgedetection}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{image =}\StringTok{ }\NormalTok{magick}\OperatorTok{::}\KeywordTok{image_read}\NormalTok{(}\StringTok{"http://bit.ly/2Nh5ANX"}\NormalTok{)}
+\NormalTok{kernel_vertical =}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{-1}\NormalTok{, }\DecValTok{-1}\NormalTok{, }\DecValTok{-1}\NormalTok{), }
+                       \DataTypeTok{nrow =} \DecValTok{3}\NormalTok{, }\DataTypeTok{ncol =} \DecValTok{3}\NormalTok{)}
+
+\NormalTok{kernel_horizontal =}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{-1}\NormalTok{, }\DecValTok{-1}\NormalTok{, }\DecValTok{-1}\NormalTok{), }
+                       \DataTypeTok{nrow =} \DecValTok{3}\NormalTok{, }\DataTypeTok{ncol =} \DecValTok{3}\NormalTok{, }\DataTypeTok{byrow =}\NormalTok{ T)}
+
+\NormalTok{image_edge_vertical =}\StringTok{ }\NormalTok{magick}\OperatorTok{::}\KeywordTok{image_convolve}\NormalTok{(image, kernel_vertical)}
+\NormalTok{image_edge_horizontal =}\StringTok{ }\NormalTok{magick}\OperatorTok{::}\KeywordTok{image_convolve}\NormalTok{(image, kernel_horizontal)}
+
+\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{3}\NormalTok{))}
+
+\KeywordTok{plot}\NormalTok{(image)}
+\KeywordTok{plot}\NormalTok{(image_edge_vertical)}
+\KeywordTok{plot}\NormalTok{(image_edge_horizontal)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+
+{\centering \includegraphics[width=1\linewidth]{images/edgedet5} 
+
+}
+
+\caption{Edge Detection Example}\label{fig:edgedetection}
+\end{figure}
+
+Why can \texttt{kernel\_vertical} detect vertical edge? Let's look at a simpler example. The following 8 x 8 matrix where half of the matrix is 10 and the other half is 0. The corresponding image is shown as the left of the figure \ref{fig:simpleedge}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{input_image =}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{200}\NormalTok{, }\DecValTok{200}\NormalTok{, }\DecValTok{200}\NormalTok{, }\DecValTok{200}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{), }\DecValTok{8}\NormalTok{), }
+                     \DataTypeTok{nrow =} \DecValTok{8}\NormalTok{, }\DataTypeTok{byrow =}\NormalTok{ T)}
+\NormalTok{input_image}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8]
+## [1,]  200  200  200  200    0    0    0    0
+## [2,]  200  200  200  200    0    0    0    0
+## [3,]  200  200  200  200    0    0    0    0
+## [4,]  200  200  200  200    0    0    0    0
+## [5,]  200  200  200  200    0    0    0    0
+## [6,]  200  200  200  200    0    0    0    0
+## [7,]  200  200  200  200    0    0    0    0
+## [8,]  200  200  200  200    0    0    0    0
+\end{verbatim}
+
+If we use the above filter kernel\_vertical , the output matrix is shown below and the corresponding image is shown as the right of the figure \ref{fig:simpleedge}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{output_image =}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{200}\NormalTok{, }\DecValTok{200}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{), }\DecValTok{6}\NormalTok{), }
+                      \DataTypeTok{nrow =} \DecValTok{6}\NormalTok{, }\DataTypeTok{byrow =}\NormalTok{ T)}
+\NormalTok{output_image}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      [,1] [,2] [,3] [,4] [,5] [,6]
+## [1,]    0    0  200  200    0    0
+## [2,]    0    0  200  200    0    0
+## [3,]    0    0  200  200    0    0
+## [4,]    0    0  200  200    0    0
+## [5,]    0    0  200  200    0    0
+## [6,]    0    0  200  200    0    0
+\end{verbatim}
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.8\linewidth]{IDS_files/figure-latex/simpleedge-1} 
+
+}
+
+\caption{Simple Edge Detection Example}\label{fig:simpleedge}
+\end{figure}
+
+So the output image has a lighter region in the middle that corresponds to the vertical edge of the input image. When the input image is large, such as the image in figure \ref{fig:edgedetection} is 1020 x 711, the edge will not seem as thick as it is in this small example. To detect the horizontal edge, you only need to rotate the filter by 90 degrees. The right image in figure \ref{fig:edgedetection} shows the horizontal edge detection result. You can see how convolution operator detects a specific feature from the image.
+
+The parameters for the convolution operation are the elements in the filter. For a 3x3 filter shown below, the parameters to estimate are \(w_1\) to \(w_9\). So far, we move the filter one step each time when we convolve. You can do more than 1 step as well. For example, you can hop 2 steps each time after the sum of the element-wise product. It is called strided-convolution. Use stride \(s\) means the output is downsized by a factor of \(s\). It is rarely used in practice but it is good to be familiar with the concept.
+
+\begin{figure}
+
+{\centering \includegraphics[width=1\linewidth]{images/convlayer} 
+
+}
+
+\caption{Convolution Layer Parameters}\label{fig:convolutionlayer}
+\end{figure}
+
+\hypertarget{padding-layer}{%
+\subsection{Padding Layer}\label{padding-layer}}
+
+Assume the stride is \(s\) and we have a \(n \times n\) input image to convolve with a \(f \times f\) filter, the output image is \((\frac{n-f}{s} + 1) \times (\frac{n-f}{s} + 1)\). After each convolution, the dimension of the output shrinks. Depending on the size of the input image, the output size may get too small after a few rounds. Also, the pixel at the corner is used less than the pixel in the middle. So it overlooks some information in the image. To overcome these problems, you can add a padding layer during the process. To keep the output the same size as the input image in figure \ref{fig:convolutionlayer}, you can pad two pixels on each side of the image with 0 (figure \ref{fig:padding} ).
+
+\begin{figure}
+
+{\centering \includegraphics[width=1\linewidth]{images/padding} 
+
+}
+
+\caption{Padding Layer}\label{fig:padding}
+\end{figure}
+
+If the stride is \(s\) and we have a \(n \times n\) input image to convolve with a \(f \times f\) filter. This time we pad \(p\) pixels in each side, then the output size becomes \((\frac{n + 2p -f}{s} + 1) \times (\frac{n + 2p -f}{s} + 1)\). You can specify the value for p and also the pixel value used. Or you can just use 0 to pad and make the output the same size with input.
+
+\hypertarget{pooling-layer}{%
+\subsection{Pooling Layer}\label{pooling-layer}}
+
+People sometimes use the pooling layer to reduce the size of the representation and make some of the feature detection more robust. If you have a \(4 \times 4\) input, the max and mean pooling operation are shown in the figure \ref{fig:poolinglayer}. The process is quite simple. In the example, the filter is \(2 \times 2\) and stride is 2, so break the input into four \(2 \times 2\) regions (shown in the figure with different shaded colors). For max pooling, each of the outputs is the maximum from the corresponding shaded sub-region. Mean pooling layer works in the same way except for getting the mean instead of maximum of the sub-region. The pooling layer has hyperparameters (\(f\) and \(s\)) but it has no parameter for gradient descent to learn.
+
+\begin{figure}
+
+{\centering \includegraphics[width=1\linewidth]{images/poolinglayer} 
+
+}
+
+\caption{Pooling Layer}\label{fig:poolinglayer}
+\end{figure}
+
+Let's go through an example of pooling a 2D grayscale image. Hope it gives you some intuition behind what it does. Read the image and convert the original color image (a 3D array) to grayscale (a 2D matrix).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(EBImage)}
+\KeywordTok{library}\NormalTok{(dplyr)}
+
+\NormalTok{eggshell <-}\StringTok{ }\KeywordTok{readImage}\NormalTok{(}\StringTok{"https://scientistcafe.com/images/eggshell.jpeg"}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\CommentTok{# make it smaller}
+\StringTok{  }\KeywordTok{resize}\NormalTok{(}\DecValTok{560}\NormalTok{, }\DecValTok{420}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\CommentTok{# rotate image}
+\StringTok{  }\KeywordTok{rotate}\NormalTok{(}\DecValTok{90}\NormalTok{)}
+
+\CommentTok{# convert to 2D grayscale}
+\NormalTok{gray_eggshell =}\StringTok{ }\KeywordTok{apply}\NormalTok{(eggshell, }\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{), mean)}
+\end{Highlighting}
+\end{Shaded}
+
+The following function takes an image matrix or array, and apply pooling operation.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{pooling <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(}\DataTypeTok{type =} \StringTok{"max"}\NormalTok{, image, filter, stride) \{}
+\NormalTok{    f <-}\StringTok{ }\NormalTok{filter}
+\NormalTok{    s <-}\StringTok{ }\NormalTok{stride}
+    
+    \ControlFlowTok{if}\NormalTok{ (}\KeywordTok{length}\NormalTok{(}\KeywordTok{dim}\NormalTok{(image)) }\OperatorTok{==}\StringTok{ }\DecValTok{3}\NormalTok{) \{}
+        \CommentTok{# get image dimensions}
+\NormalTok{        col <-}\StringTok{ }\KeywordTok{dim}\NormalTok{(image[, , }\DecValTok{1}\NormalTok{])[}\DecValTok{2}\NormalTok{]}
+\NormalTok{        row <-}\StringTok{ }\KeywordTok{dim}\NormalTok{(image[, , }\DecValTok{1}\NormalTok{])[}\DecValTok{1}\NormalTok{]}
+        \CommentTok{# calculate new dimension size}
+\NormalTok{        c <-}\StringTok{ }\NormalTok{(col }\OperatorTok{-}\StringTok{ }\NormalTok{f)}\OperatorTok{/}\NormalTok{s }\OperatorTok{+}\StringTok{ }\DecValTok{1}
+\NormalTok{        r <-}\StringTok{ }\NormalTok{(row }\OperatorTok{-}\StringTok{ }\NormalTok{f)}\OperatorTok{/}\NormalTok{s }\OperatorTok{+}\StringTok{ }\DecValTok{1}
+        \CommentTok{# create new image object}
+\NormalTok{        newImage <-}\StringTok{ }\KeywordTok{array}\NormalTok{(}\DecValTok{0}\NormalTok{, }\KeywordTok{c}\NormalTok{(c, r, }\DecValTok{3}\NormalTok{))}
+        \CommentTok{# loops in RGB layers}
+        \ControlFlowTok{for}\NormalTok{ (rgb }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{3}\NormalTok{) \{}
+\NormalTok{            m <-}\StringTok{ }\NormalTok{image[, , rgb]}
+\NormalTok{            m3 <-}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DataTypeTok{ncol =}\NormalTok{ c, }\DataTypeTok{nrow =}\NormalTok{ r)}
+\NormalTok{            i <-}\StringTok{ }\DecValTok{1}
+            \ControlFlowTok{if}\NormalTok{ (type }\OperatorTok{==}\StringTok{ "mean"}\NormalTok{) }
+                \ControlFlowTok{for}\NormalTok{ (ii }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{r) \{}
+\NormalTok{                  j <-}\StringTok{ }\DecValTok{1}
+                  \ControlFlowTok{for}\NormalTok{ (jj }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{c) \{}
+\NormalTok{                    m3[ii, jj] <-}\StringTok{ }\KeywordTok{mean}\NormalTok{(}\KeywordTok{as.numeric}\NormalTok{(m[i}\OperatorTok{:}\NormalTok{(i }\OperatorTok{+}\StringTok{ }
+\StringTok{                      }\NormalTok{(f }\OperatorTok{-}\StringTok{ }\DecValTok{1}\NormalTok{)), j}\OperatorTok{:}\NormalTok{(j }\OperatorTok{+}\StringTok{ }\NormalTok{(f }\OperatorTok{-}\StringTok{ }\DecValTok{1}\NormalTok{))]))}
+\NormalTok{                    j <-}\StringTok{ }\NormalTok{j }\OperatorTok{+}\StringTok{ }\NormalTok{s}
+\NormalTok{                  \}}
+\NormalTok{                  i <-}\StringTok{ }\NormalTok{i }\OperatorTok{+}\StringTok{ }\NormalTok{s}
+\NormalTok{                \} }\ControlFlowTok{else} \ControlFlowTok{for}\NormalTok{ (ii }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{r) \{}
+\NormalTok{                j =}\StringTok{ }\DecValTok{1}
+                \ControlFlowTok{for}\NormalTok{ (jj }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{c) \{}
+\NormalTok{                  m3[ii, jj] <-}\StringTok{ }\KeywordTok{max}\NormalTok{(}\KeywordTok{as.numeric}\NormalTok{(m[i}\OperatorTok{:}\NormalTok{(i }\OperatorTok{+}\StringTok{ }
+\StringTok{                    }\NormalTok{(f }\OperatorTok{-}\StringTok{ }\DecValTok{1}\NormalTok{)), j}\OperatorTok{:}\NormalTok{(j }\OperatorTok{+}\StringTok{ }\NormalTok{(f }\OperatorTok{-}\StringTok{ }\DecValTok{1}\NormalTok{))]))}
+\NormalTok{                  j <-}\StringTok{ }\NormalTok{j }\OperatorTok{+}\StringTok{ }\NormalTok{s}
+\NormalTok{                \}}
+\NormalTok{                i <-}\StringTok{ }\NormalTok{i }\OperatorTok{+}\StringTok{ }\NormalTok{s}
+\NormalTok{            \}}
+\NormalTok{            newImage[, , rgb] <-}\StringTok{ }\NormalTok{m3}
+\NormalTok{        \}}
+\NormalTok{    \} }\ControlFlowTok{else} \ControlFlowTok{if}\NormalTok{ (}\KeywordTok{length}\NormalTok{(}\KeywordTok{dim}\NormalTok{(image)) }\OperatorTok{==}\StringTok{ }\DecValTok{2}\NormalTok{) \{}
+        \CommentTok{# get image dimensions}
+\NormalTok{        col <-}\StringTok{ }\KeywordTok{dim}\NormalTok{(image)[}\DecValTok{2}\NormalTok{]}
+\NormalTok{        row <-}\StringTok{ }\KeywordTok{dim}\NormalTok{(image)[}\DecValTok{1}\NormalTok{]}
+        \CommentTok{# calculate new dimension size}
+\NormalTok{        c <-}\StringTok{ }\NormalTok{(col }\OperatorTok{-}\StringTok{ }\NormalTok{f)}\OperatorTok{/}\NormalTok{s }\OperatorTok{+}\StringTok{ }\DecValTok{1}
+\NormalTok{        r <-}\StringTok{ }\NormalTok{(row }\OperatorTok{-}\StringTok{ }\NormalTok{f)}\OperatorTok{/}\NormalTok{s }\OperatorTok{+}\StringTok{ }\DecValTok{1}
+\NormalTok{        m3 <-}\StringTok{ }\KeywordTok{matrix}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DataTypeTok{ncol =}\NormalTok{ c, }\DataTypeTok{nrow =}\NormalTok{ r)}
+\NormalTok{        i <-}\StringTok{ }\DecValTok{1}
+        \ControlFlowTok{if}\NormalTok{ (type }\OperatorTok{==}\StringTok{ "mean"}\NormalTok{) }
+            \ControlFlowTok{for}\NormalTok{ (ii }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{r) \{}
+\NormalTok{                j <-}\StringTok{ }\DecValTok{1}
+                \ControlFlowTok{for}\NormalTok{ (jj }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{c) \{}
+\NormalTok{                  m3[ii, jj] <-}\StringTok{ }\KeywordTok{mean}\NormalTok{(}\KeywordTok{as.numeric}\NormalTok{(image[i}\OperatorTok{:}\NormalTok{(i }\OperatorTok{+}\StringTok{ }
+\StringTok{                    }\NormalTok{(f }\OperatorTok{-}\StringTok{ }\DecValTok{1}\NormalTok{)), j}\OperatorTok{:}\NormalTok{(j }\OperatorTok{+}\StringTok{ }\NormalTok{(f }\OperatorTok{-}\StringTok{ }\DecValTok{1}\NormalTok{))]))}
+\NormalTok{                  j <-}\StringTok{ }\NormalTok{j }\OperatorTok{+}\StringTok{ }\NormalTok{s}
+\NormalTok{                \}}
+\NormalTok{                i <-}\StringTok{ }\NormalTok{i }\OperatorTok{+}\StringTok{ }\NormalTok{s}
+\NormalTok{            \} }\ControlFlowTok{else} \ControlFlowTok{for}\NormalTok{ (ii }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{r) \{}
+\NormalTok{            j =}\StringTok{ }\DecValTok{1}
+            \ControlFlowTok{for}\NormalTok{ (jj }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{c) \{}
+\NormalTok{                m3[ii, jj] <-}\StringTok{ }\KeywordTok{max}\NormalTok{(}\KeywordTok{as.numeric}\NormalTok{(image[i}\OperatorTok{:}\NormalTok{(i }\OperatorTok{+}\StringTok{ }
+\StringTok{                  }\NormalTok{(f }\OperatorTok{-}\StringTok{ }\DecValTok{1}\NormalTok{)), j}\OperatorTok{:}\NormalTok{(j }\OperatorTok{+}\StringTok{ }\NormalTok{(f }\OperatorTok{-}\StringTok{ }\DecValTok{1}\NormalTok{))]))}
+\NormalTok{                j <-}\StringTok{ }\NormalTok{j }\OperatorTok{+}\StringTok{ }\NormalTok{s}
+\NormalTok{            \}}
+\NormalTok{            i <-}\StringTok{ }\NormalTok{i }\OperatorTok{+}\StringTok{ }\NormalTok{s}
+\NormalTok{        \}}
+\NormalTok{        newImage <-}\StringTok{ }\NormalTok{m3}
+\NormalTok{    \}}
+    \KeywordTok{return}\NormalTok{(newImage)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Let's apply both max and mean pooling with filter size 10 (\(f = 10\)) and stride 10 (\(s = 10\)).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{gray_eggshell_max =}\StringTok{ }\KeywordTok{pooling}\NormalTok{(}\DataTypeTok{type =} \StringTok{"max"}\NormalTok{,}
+                            \DataTypeTok{image =}\NormalTok{ gray_eggshell,}
+                            \DataTypeTok{filter =} \DecValTok{10}\NormalTok{, }\DataTypeTok{stride =} \DecValTok{10}\NormalTok{)}
+
+\NormalTok{gray_eggshell_mean =}\StringTok{ }\KeywordTok{pooling}\NormalTok{(}\DataTypeTok{type =} \StringTok{"mean"}\NormalTok{,}
+                             \DataTypeTok{image =}\NormalTok{ gray_eggshell,}
+                             \DataTypeTok{filter =} \DecValTok{10}\NormalTok{, }\DataTypeTok{stride =} \DecValTok{10}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+You can see the result by plotting the output image (figure \ref{fig:eggshellconv}). The top left is the original color picture. The top right is the 2D grayscale picture. The bottom left is the result of max pooling. The bottom right is the result of mean pooling. The max-pooling gives you the value of the largest pixel and the mean-pooling gives the average of the patch. You can consider it as a representation of features, looking at the maximal or average presence of different features. In general, max-pooling works better. You can gain some intuition from the example (figure \ref{fig:eggshellconv}). The max-pooling ``picks'' more distinct features and average-pooling blurs out features evenly.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow =} \KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{), }\DataTypeTok{oma =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{))}
+\KeywordTok{plot}\NormalTok{(eggshell)}
+\KeywordTok{plot}\NormalTok{(}\KeywordTok{as.Image}\NormalTok{(gray_eggshell))}
+\KeywordTok{plot}\NormalTok{(}\KeywordTok{as.Image}\NormalTok{(gray_eggshell_max))}
+\KeywordTok{plot}\NormalTok{(}\KeywordTok{as.Image}\NormalTok{(gray_eggshell_mean))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.7\linewidth]{images/eggshellconv} 
+
+}
+
+\caption{Example of max and mean pooling}\label{fig:eggshellconv}
+\end{figure}
+
+\hypertarget{convolution-over-volume}{%
+\subsection{Convolution Over Volume}\label{convolution-over-volume}}
+
+So far, we have shown different types of layers on 2D inputs. If you have a 3D input (such as a color image), then the filters will have 3 channels too. For example, if you have a \(6 \times 6\) color image, the input dimension is \(6 \times 6 \times 3\). We call them the height, width, and the number of channels. The filter itself has 3 channels corresponding to the red, green, and blue channels of the input. You can consider it as a 3D cube with 27 parameters. Apply each channel of the filter to the corresponding channel of the input. Multiply each of the 27 numbers with the corresponding numbers from the top left region of the color input image and add them up. Add a bias parameter and apply an activation function which gives you the first number of the output image. Then slide it over to calculate the next one. The final output is 2D \(4 \times 4\). If you want to detect features in the red channel only, you can use a filter with the second and third channels to be all 0s. With different choices of the parameters, you can get different feature detectors. You can use more than one filter and each filter has multiple channels. For example, you can use one \(3 \times 3 \times 3\) filter to detect the horizontal edge and another to detect the vertical edge. Figure \ref{fig:eggshellconv} shows an example of one layer with two filters. Each filter has a dimension of \(3 \times 3 \times 3\). The output dimension is \(4 \times 4 \times 2\). The output has two channels because we have two filters on the layer. The total number of parameters is 58 (each filter has one bias parameter \(b\)).
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.7\linewidth]{images/ConvOverVolume} 
+
+}
+
+\caption{Example of convolution over volume}\label{fig:ConvOverVolume}
+\end{figure}
 
 \hypertarget{recurrent-neural-network}{%
 \section{Recurrent Neural Network}\label{recurrent-neural-network}}
