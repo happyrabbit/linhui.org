@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2020-02-05" />
+<meta name="date" content="2020-02-08" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -282,13 +282,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="12.3.4" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#activation-function"><i class="fa fa-check"></i><b>12.3.4</b> Activation Function</a></li>
 <li class="chapter" data-level="12.3.5" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#deal-with-overfitting"><i class="fa fa-check"></i><b>12.3.5</b> Deal with Overfitting</a></li>
 <li class="chapter" data-level="12.3.6" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#optimization"><i class="fa fa-check"></i><b>12.3.6</b> Optimization</a></li>
-<li class="chapter" data-level="12.3.7" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#image-recognition-using-ffnn"><i class="fa fa-check"></i><b>12.3.7</b> Image Recognition Using FFNN</a></li>
+<li class="chapter" data-level="12.3.7" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#ffnnexample"><i class="fa fa-check"></i><b>12.3.7</b> Image Recognition Using FFNN</a></li>
 </ul></li>
 <li class="chapter" data-level="12.4" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html"><i class="fa fa-check"></i><b>12.4</b> Convolutional Neural Network</a><ul>
 <li class="chapter" data-level="12.4.1" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#convolution-layer"><i class="fa fa-check"></i><b>12.4.1</b> Convolution Layer</a></li>
 <li class="chapter" data-level="12.4.2" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#padding-layer"><i class="fa fa-check"></i><b>12.4.2</b> Padding Layer</a></li>
 <li class="chapter" data-level="12.4.3" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#pooling-layer"><i class="fa fa-check"></i><b>12.4.3</b> Pooling Layer</a></li>
 <li class="chapter" data-level="12.4.4" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#convolution-over-volume"><i class="fa fa-check"></i><b>12.4.4</b> Convolution Over Volume</a></li>
+<li class="chapter" data-level="12.4.5" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#cnnexample"><i class="fa fa-check"></i><b>12.4.5</b> Image Recognition Using CNN</a></li>
 </ul></li>
 <li class="chapter" data-level="12.5" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html"><i class="fa fa-check"></i><b>12.5</b> Recurrent Neural Network</a></li>
 </ul></li>
@@ -328,15 +329,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 \end{equation}\]</span></p>
 <p>Ridge penalty shrinks the coefficients of correlated predictors towards each other while the lasso tends to pick one and discard the others. So lasso estimates have a higher variance. However, ridge regression doesn’t have a variable selection property. The advantage of the elastic net is that it keeps the feature selection quality from the lasso penalty as well as the effectiveness of the ridge penalty. <span class="citation">(Zou and Hastie <a href="#ref-zou2005">2005</a>)</span> suggest that it deals with highly correlated variables more effectively.</p>
 <p>We can still use train() function to tune the parameters in the elastic net. As before, set the cross-validation and parameter range. Standardize the predictors:</p>
-<div class="sourceCode" id="cb310"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb310-1" data-line-number="1">enetGrid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">.lambda =</span> <span class="kw">seq</span>(<span class="dv">0</span>,<span class="fl">0.2</span>,<span class="dt">length=</span><span class="dv">20</span>), </a>
-<a class="sourceLine" id="cb310-2" data-line-number="2">                        <span class="dt">.fraction =</span> <span class="kw">seq</span>(.<span class="dv">8</span>, <span class="dv">1</span>, <span class="dt">length =</span> <span class="dv">20</span>))</a>
-<a class="sourceLine" id="cb310-3" data-line-number="3"><span class="kw">set.seed</span>(<span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb310-4" data-line-number="4">enetTune &lt;-<span class="st"> </span><span class="kw">train</span>(trainx, trainy,</a>
-<a class="sourceLine" id="cb310-5" data-line-number="5">                  <span class="dt">method =</span> <span class="st">&quot;enet&quot;</span>,</a>
-<a class="sourceLine" id="cb310-6" data-line-number="6">                  <span class="dt">tuneGrid =</span> enetGrid,</a>
-<a class="sourceLine" id="cb310-7" data-line-number="7">                  <span class="dt">trControl =</span> ctrl,</a>
-<a class="sourceLine" id="cb310-8" data-line-number="8">                  <span class="dt">preProc =</span> <span class="kw">c</span>(<span class="st">&quot;center&quot;</span>, <span class="st">&quot;scale&quot;</span>))</a>
-<a class="sourceLine" id="cb310-9" data-line-number="9">enetTune</a></code></pre></div>
+<div class="sourceCode" id="cb334"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb334-1" data-line-number="1">enetGrid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">.lambda =</span> <span class="kw">seq</span>(<span class="dv">0</span>,<span class="fl">0.2</span>,<span class="dt">length=</span><span class="dv">20</span>), </a>
+<a class="sourceLine" id="cb334-2" data-line-number="2">                        <span class="dt">.fraction =</span> <span class="kw">seq</span>(.<span class="dv">8</span>, <span class="dv">1</span>, <span class="dt">length =</span> <span class="dv">20</span>))</a>
+<a class="sourceLine" id="cb334-3" data-line-number="3"><span class="kw">set.seed</span>(<span class="dv">100</span>)</a>
+<a class="sourceLine" id="cb334-4" data-line-number="4">enetTune &lt;-<span class="st"> </span><span class="kw">train</span>(trainx, trainy,</a>
+<a class="sourceLine" id="cb334-5" data-line-number="5">                  <span class="dt">method =</span> <span class="st">&quot;enet&quot;</span>,</a>
+<a class="sourceLine" id="cb334-6" data-line-number="6">                  <span class="dt">tuneGrid =</span> enetGrid,</a>
+<a class="sourceLine" id="cb334-7" data-line-number="7">                  <span class="dt">trControl =</span> ctrl,</a>
+<a class="sourceLine" id="cb334-8" data-line-number="8">                  <span class="dt">preProc =</span> <span class="kw">c</span>(<span class="st">&quot;center&quot;</span>, <span class="st">&quot;scale&quot;</span>))</a>
+<a class="sourceLine" id="cb334-9" data-line-number="9">enetTune</a></code></pre></div>
 <pre class="pre"><code>Elasticnet 
 
 999 samples
