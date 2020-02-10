@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2020-02-08" />
+<meta name="date" content="2020-02-09" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -671,37 +671,38 @@ FIGURE 11.17: Example of convolution over volume
 <img src="images/cnn_history.png" style="width:70.0%" />
 </center>
 <p>The trained model accuracy can be evaluated on the testing dataset which is pretty good.</p>
-<div class="sourceCode" id="cb472"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb472-1" data-line-number="1">...</a>
-<a class="sourceLine" id="cb472-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb472-3" data-line-number="3"> 9248/10000 [==========================&gt;...] - ETA: 0s</a>
-<a class="sourceLine" id="cb472-4" data-line-number="4"> 9568/10000 [===========================&gt;..] - ETA: 0s</a>
-<a class="sourceLine" id="cb472-5" data-line-number="5"> 9888/10000 [============================&gt;.] - ETA: 0s</a>
-<a class="sourceLine" id="cb472-6" data-line-number="6">10000/10000 [==============================] - 2s 189us/sample - loss: 0.0120 - accuracy: 0.9928</a>
-<a class="sourceLine" id="cb472-7" data-line-number="7">$loss</a>
-<a class="sourceLine" id="cb472-8" data-line-number="8">[1] 0.02399249</a>
-<a class="sourceLine" id="cb472-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb472-10" data-line-number="10">$accuracy</a>
-<a class="sourceLine" id="cb472-11" data-line-number="11">[1] 0.9928</a></code></pre></div>
+<div class="sourceCode" id="cb472"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb472-1" data-line-number="1">cnn_model <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">evaluate</span>(x_test, y_test)</a></code></pre></div>
+<div class="sourceCode" id="cb473"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb473-1" data-line-number="1">...</a>
+<a class="sourceLine" id="cb473-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb473-3" data-line-number="3"> 9248/10000 [==========================&gt;...] - ETA: 0s</a>
+<a class="sourceLine" id="cb473-4" data-line-number="4"> 9568/10000 [===========================&gt;..] - ETA: 0s</a>
+<a class="sourceLine" id="cb473-5" data-line-number="5"> 9888/10000 [============================&gt;.] - ETA: 0s</a>
+<a class="sourceLine" id="cb473-6" data-line-number="6">10000/10000 [==============================] - 2s 189us/sample - loss: 0.0120 - accuracy: 0.9928</a>
+<a class="sourceLine" id="cb473-7" data-line-number="7">$loss</a>
+<a class="sourceLine" id="cb473-8" data-line-number="8">[1] 0.02399249</a>
+<a class="sourceLine" id="cb473-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb473-10" data-line-number="10">$accuracy</a>
+<a class="sourceLine" id="cb473-11" data-line-number="11">[1] 0.9928</a></code></pre></div>
 </div>
 <div id="prediction-1" class="section level4">
 <h4><span class="header-section-number">12.4.5.3</span> Prediction</h4>
 <p>We can apply the trained model to predict new image.</p>
-<div class="sourceCode" id="cb473"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb473-1" data-line-number="1"><span class="co"># model prediction</span></a>
-<a class="sourceLine" id="cb473-2" data-line-number="2">cnn_pred &lt;-<span class="st"> </span>cnn_model <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb473-3" data-line-number="3"><span class="st">              </span><span class="kw">predict_classes</span>(x_test)</a>
-<a class="sourceLine" id="cb473-4" data-line-number="4"><span class="kw">head</span>(cnn_pred)</a></code></pre></div>
-<div class="sourceCode" id="cb474"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb474-1" data-line-number="1">[1] 7 2 1 0 4 1</a></code></pre></div>
+<div class="sourceCode" id="cb474"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb474-1" data-line-number="1"><span class="co"># model prediction</span></a>
+<a class="sourceLine" id="cb474-2" data-line-number="2">cnn_pred &lt;-<span class="st"> </span>cnn_model <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb474-3" data-line-number="3"><span class="st">              </span><span class="kw">predict_classes</span>(x_test)</a>
+<a class="sourceLine" id="cb474-4" data-line-number="4"><span class="kw">head</span>(cnn_pred)</a></code></pre></div>
+<div class="sourceCode" id="cb475"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb475-1" data-line-number="1">[1] 7 2 1 0 4 1</a></code></pre></div>
 <p>Now let’s check a few misclassified images to see whether a human can do a better job than this simple CNN model.</p>
-<div class="sourceCode" id="cb475"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb475-1" data-line-number="1"><span class="co">## number of mis-classcified images</span></a>
-<a class="sourceLine" id="cb475-2" data-line-number="2"><span class="kw">sum</span>(cnn_pred <span class="op">!=</span><span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>y)</a></code></pre></div>
-<div class="sourceCode" id="cb476"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb476-1" data-line-number="1">[1] 72</a></code></pre></div>
-<div class="sourceCode" id="cb477"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb477-1" data-line-number="1">index_image =<span class="st"> </span><span class="dv">10</span> <span class="co">## change this index to see different image.</span></a>
-<a class="sourceLine" id="cb477-2" data-line-number="2">input_matrix &lt;-<span class="st"> </span>missed_image[index_image,<span class="dv">1</span><span class="op">:</span><span class="dv">28</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">28</span>]</a>
-<a class="sourceLine" id="cb477-3" data-line-number="3">output_matrix &lt;-<span class="st"> </span><span class="kw">apply</span>(input_matrix, <span class="dv">2</span>, rev)</a>
-<a class="sourceLine" id="cb477-4" data-line-number="4">output_matrix &lt;-<span class="st"> </span><span class="kw">t</span>(output_matrix)</a>
-<a class="sourceLine" id="cb477-5" data-line-number="5"><span class="kw">image</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">28</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">28</span>, output_matrix, <span class="dt">col=</span><span class="kw">gray.colors</span>(<span class="dv">256</span>), </a>
-<a class="sourceLine" id="cb477-6" data-line-number="6"><span class="dt">xlab=</span><span class="kw">paste</span>(<span class="st">&#39;Image for digit &#39;</span>, missed_digit[index_image], <span class="st">&#39;, </span></a>
-<a class="sourceLine" id="cb477-7" data-line-number="7"><span class="st">wrongly predicted as &#39;</span>, missed_pred[index_image]), <span class="dt">ylab=</span><span class="st">&quot;&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb476"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb476-1" data-line-number="1"><span class="co">## number of mis-classcified images</span></a>
+<a class="sourceLine" id="cb476-2" data-line-number="2"><span class="kw">sum</span>(cnn_pred <span class="op">!=</span><span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>y)</a></code></pre></div>
+<div class="sourceCode" id="cb477"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb477-1" data-line-number="1">[1] 72</a></code></pre></div>
+<div class="sourceCode" id="cb478"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb478-1" data-line-number="1">index_image =<span class="st"> </span><span class="dv">10</span> <span class="co">## change this index to see different image.</span></a>
+<a class="sourceLine" id="cb478-2" data-line-number="2">input_matrix &lt;-<span class="st"> </span>missed_image[index_image,<span class="dv">1</span><span class="op">:</span><span class="dv">28</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">28</span>]</a>
+<a class="sourceLine" id="cb478-3" data-line-number="3">output_matrix &lt;-<span class="st"> </span><span class="kw">apply</span>(input_matrix, <span class="dv">2</span>, rev)</a>
+<a class="sourceLine" id="cb478-4" data-line-number="4">output_matrix &lt;-<span class="st"> </span><span class="kw">t</span>(output_matrix)</a>
+<a class="sourceLine" id="cb478-5" data-line-number="5"><span class="kw">image</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">28</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">28</span>, output_matrix, <span class="dt">col=</span><span class="kw">gray.colors</span>(<span class="dv">256</span>), </a>
+<a class="sourceLine" id="cb478-6" data-line-number="6"><span class="dt">xlab=</span><span class="kw">paste</span>(<span class="st">&#39;Image for digit &#39;</span>, missed_digit[index_image], <span class="st">&#39;, </span></a>
+<a class="sourceLine" id="cb478-7" data-line-number="7"><span class="st">wrongly predicted as &#39;</span>, missed_pred[index_image]), <span class="dt">ylab=</span><span class="st">&quot;&quot;</span>)</a></code></pre></div>
 <center>
 <img src="images/misclassified_img_cnn.png" style="width:70.0%" />
 </center>
