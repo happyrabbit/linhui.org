@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2020-02-09" />
+<meta name="date" content="2020-02-10" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -291,7 +291,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="12.4.4" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#convolution-over-volume"><i class="fa fa-check"></i><b>12.4.4</b> Convolution Over Volume</a></li>
 <li class="chapter" data-level="12.4.5" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#cnnexample"><i class="fa fa-check"></i><b>12.4.5</b> Image Recognition Using CNN</a></li>
 </ul></li>
-<li class="chapter" data-level="12.5" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html"><i class="fa fa-check"></i><b>12.5</b> Recurrent Neural Network</a></li>
+<li class="chapter" data-level="12.5" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html"><i class="fa fa-check"></i><b>12.5</b> Recurrent Neural Network</a><ul>
+<li class="chapter" data-level="12.5.1" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#word-embedding"><i class="fa fa-check"></i><b>12.5.1</b> Word Embedding</a></li>
+<li class="chapter" data-level="12.5.2" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#long-short-term-memory"><i class="fa fa-check"></i><b>12.5.2</b> Long Short Term Memory</a></li>
+</ul></li>
 </ul></li>
 <li class="appendix"><span><b>Appendix</b></span></li>
 <li class="chapter" data-level="A" data-path="r-code-for-data-simulation.html"><a href="r-code-for-data-simulation.html"><i class="fa fa-check"></i><b>A</b> R code for data simulation</a><ul>
@@ -328,10 +331,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="impute-missing-values-with-medianmode" class="section level3">
 <h3><span class="header-section-number">5.2.1</span> Impute missing values with median/mode</h3>
 <p>In the case of missing at random, a common method is to impute with the mean (continuous variable) or median (categorical variables). You can use <code>impute()</code> function in <code>imputeMissings</code> package.</p>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" data-line-number="1"><span class="co"># save the result as another object</span></a>
-<a class="sourceLine" id="cb39-2" data-line-number="2">demo_imp &lt;-<span class="st"> </span><span class="kw">impute</span>(sim.dat, <span class="dt">method =</span> <span class="st">&quot;median/mode&quot;</span>)</a>
-<a class="sourceLine" id="cb39-3" data-line-number="3"><span class="co"># check the first 5 columns, there is no missing values in other columns</span></a>
-<a class="sourceLine" id="cb39-4" data-line-number="4"><span class="kw">summary</span>(demo_imp[, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>])</a></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" data-line-number="1"><span class="co"># save the result as another object</span></a>
+<a class="sourceLine" id="cb35-2" data-line-number="2">demo_imp &lt;-<span class="st"> </span><span class="kw">impute</span>(sim.dat, <span class="dt">method =</span> <span class="st">&quot;median/mode&quot;</span>)</a>
+<a class="sourceLine" id="cb35-3" data-line-number="3"><span class="co"># check the first 5 columns, there is no missing values in other columns</span></a>
+<a class="sourceLine" id="cb35-4" data-line-number="4"><span class="kw">summary</span>(demo_imp[, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>])</a></code></pre></div>
 <pre class="pre"><code>      age           gender        income       house       store_exp      
  Min.   :16.00   Female:554   Min.   : 41776   No :432   Min.   :  155.8  
  1st Qu.:25.00   Male  :446   1st Qu.: 87896   Yes:568   1st Qu.:  205.1  
@@ -341,9 +344,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
  Max.   :69.00                Max.   :319704             Max.   :50000.0</code></pre>
 <p>After imputation, <code>demo_imp</code> has no missing value. This method is straightforward and widely used. The disadvantage is that it does not take into account the relationship between the variables. When there is a significant proportion of missing, it will distort the data. In this case, it is better to consider the relationship between variables and study the missing mechanism. In the example here, the missing variables are numeric. If the missing variable is a categorical/factor variable, the <code>impute()</code> function will impute with the mode.</p>
 <p>You can also use <code>preProcess()</code> in package <code>caret</code>, but it is only for numeric variables, and can not impute categorical variables. Since missing values here are numeric, we can use the <code>preProcess()</code> function. The result is the same as the <code>impute()</code> function. <code>PreProcess()</code> is a powerful function that can link to a variety of data preprocessing methods. We will use the function later for other data preprocessing.</p>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" data-line-number="1">imp &lt;-<span class="st"> </span><span class="kw">preProcess</span>(sim.dat, <span class="dt">method =</span> <span class="st">&quot;medianImpute&quot;</span>)</a>
-<a class="sourceLine" id="cb41-2" data-line-number="2">demo_imp2 &lt;-<span class="st"> </span><span class="kw">predict</span>(imp, sim.dat)</a>
-<a class="sourceLine" id="cb41-3" data-line-number="3"><span class="kw">summary</span>(demo_imp2[, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>])</a></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" data-line-number="1">imp &lt;-<span class="st"> </span><span class="kw">preProcess</span>(sim.dat, <span class="dt">method =</span> <span class="st">&quot;medianImpute&quot;</span>)</a>
+<a class="sourceLine" id="cb37-2" data-line-number="2">demo_imp2 &lt;-<span class="st"> </span><span class="kw">predict</span>(imp, sim.dat)</a>
+<a class="sourceLine" id="cb37-3" data-line-number="3"><span class="kw">summary</span>(demo_imp2[, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>])</a></code></pre></div>
 <pre class="pre"><code>      age           gender        income       house       store_exp      
  Min.   :16.00   Female:554   Min.   : 41776   No :432   Min.   :  155.8  
  1st Qu.:25.00   Male  :446   1st Qu.: 87896   Yes:568   1st Qu.:  205.1  
@@ -356,11 +359,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h3><span class="header-section-number">5.2.2</span> K-nearest neighbors</h3>
 <p>K-nearest neighbor (KNN) will find the k closest samples (Euclidian distance) in the training set and impute the mean of those “neighbors.”</p>
 <p>Use <code>preProcess()</code> to conduct KNN:</p>
-<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" data-line-number="1">imp &lt;-<span class="st"> </span><span class="kw">preProcess</span>(sim.dat, <span class="dt">method =</span> <span class="st">&quot;knnImpute&quot;</span>, <span class="dt">k =</span> <span class="dv">5</span>)</a>
-<a class="sourceLine" id="cb43-2" data-line-number="2"><span class="co"># need to use predict() to get KNN result</span></a>
-<a class="sourceLine" id="cb43-3" data-line-number="3">demo_imp &lt;-<span class="st"> </span><span class="kw">predict</span>(imp, sim.dat)</a>
-<a class="sourceLine" id="cb43-4" data-line-number="4"><span class="co"># only show the first three elements</span></a>
-<a class="sourceLine" id="cb43-5" data-line-number="5"><span class="kw">lapply</span>(sim.dat, class)[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>]</a></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" data-line-number="1">imp &lt;-<span class="st"> </span><span class="kw">preProcess</span>(sim.dat, <span class="dt">method =</span> <span class="st">&quot;knnImpute&quot;</span>, <span class="dt">k =</span> <span class="dv">5</span>)</a>
+<a class="sourceLine" id="cb39-2" data-line-number="2"><span class="co"># need to use predict() to get KNN result</span></a>
+<a class="sourceLine" id="cb39-3" data-line-number="3">demo_imp &lt;-<span class="st"> </span><span class="kw">predict</span>(imp, sim.dat)</a>
+<a class="sourceLine" id="cb39-4" data-line-number="4"><span class="co"># only show the first three elements</span></a>
+<a class="sourceLine" id="cb39-5" data-line-number="5"><span class="kw">lapply</span>(sim.dat, class)[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>]</a></code></pre></div>
 <pre class="pre"><code>      age                gender        income        
  Min.   :-1.5910972   Female:554   Min.   :-1.43989  
  1st Qu.:-0.9568733   Male  :446   1st Qu.:-0.53732  
@@ -372,22 +375,22 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Comparing the KNN result with the previous median imputation, the two are very different. This is because when you tell the <code>preProcess()</code> function to use KNN (the option <code>method =&quot; knnImpute&quot;</code>), it will automatically standardize the data.
 Another way is to use Bagging tree (in the next section). Note that KNN can not impute samples with the entire row missing. The reason is straightforward. Since the algorithm uses the average of its neighbors if none of them has a value, what does it apply to calculate the mean?</p>
 <p>Let’s append a new row with all values missing to the original data frame to get a new object called <code>temp</code>. Then apply KNN to <code>temp</code> and see what happens:</p>
-<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb45-1" data-line-number="1">temp &lt;-<span class="st"> </span><span class="kw">rbind</span>(sim.dat, <span class="kw">rep</span>(<span class="ot">NA</span>, <span class="kw">ncol</span>(sim.dat)))</a>
-<a class="sourceLine" id="cb45-2" data-line-number="2">imp &lt;-<span class="st"> </span><span class="kw">preProcess</span>(sim.dat, <span class="dt">method =</span> <span class="st">&quot;knnImpute&quot;</span>, <span class="dt">k =</span> <span class="dv">5</span>)</a>
-<a class="sourceLine" id="cb45-3" data-line-number="3">demo_imp &lt;-<span class="st"> </span><span class="kw">predict</span>(imp, temp)</a></code></pre></div>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" data-line-number="1">temp &lt;-<span class="st"> </span><span class="kw">rbind</span>(sim.dat, <span class="kw">rep</span>(<span class="ot">NA</span>, <span class="kw">ncol</span>(sim.dat)))</a>
+<a class="sourceLine" id="cb41-2" data-line-number="2">imp &lt;-<span class="st"> </span><span class="kw">preProcess</span>(sim.dat, <span class="dt">method =</span> <span class="st">&quot;knnImpute&quot;</span>, <span class="dt">k =</span> <span class="dv">5</span>)</a>
+<a class="sourceLine" id="cb41-3" data-line-number="3">demo_imp &lt;-<span class="st"> </span><span class="kw">predict</span>(imp, temp)</a></code></pre></div>
 <pre class="pre"><code>Error in FUN(newX[, i], ...) : 
   cannot impute when all predictors are missing in the new data point</code></pre>
 <p>There is an error saying “<code>cannot impute when all predictors are missing in the new data point</code>”. It is easy to fix by finding and removing the problematic row(s):</p>
-<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb47-1" data-line-number="1">idx &lt;-<span class="st"> </span><span class="kw">apply</span>(temp, <span class="dv">1</span>, <span class="cf">function</span>(x) <span class="kw">sum</span>(<span class="kw">is.na</span>(x)))</a>
-<a class="sourceLine" id="cb47-2" data-line-number="2"><span class="kw">as.vector</span>(<span class="kw">which</span>(idx <span class="op">==</span><span class="st"> </span><span class="kw">ncol</span>(temp)))</a></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" data-line-number="1">idx &lt;-<span class="st"> </span><span class="kw">apply</span>(temp, <span class="dv">1</span>, <span class="cf">function</span>(x) <span class="kw">sum</span>(<span class="kw">is.na</span>(x)))</a>
+<a class="sourceLine" id="cb43-2" data-line-number="2"><span class="kw">as.vector</span>(<span class="kw">which</span>(idx <span class="op">==</span><span class="st"> </span><span class="kw">ncol</span>(temp)))</a></code></pre></div>
 <p>It shows that row 1001 is problematic. You can go ahead to delete it.</p>
 </div>
 <div id="bagging-tree" class="section level3">
 <h3><span class="header-section-number">5.2.3</span> Bagging Tree</h3>
 <p>Bagging (Bootstrap aggregating) was originally proposed by Leo Breiman. It is one of the earliest ensemble methods <span class="citation">(L, <a href="#ref-bag1">n.d.</a>)</span>. When used in missing value imputation, it will use the remaining variables as predictors to train a bagging tree and then use the tree to predict the missing values. Although theoretically, the method is powerful, the computation is much more intense than KNN. In practice, there is a trade-off between computation time and the effect. If a median or mean meet the modeling needs, even bagging tree may improve the accuracy a little, but the upgrade is so marginal that it does not deserve the extra time. The bagging tree itself is a model for regression and classification. Here we use <code>preProcess()</code> to impute <code>sim.dat</code>:</p>
-<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" data-line-number="1">imp &lt;-<span class="st"> </span><span class="kw">preProcess</span>(sim.dat, <span class="dt">method =</span> <span class="st">&quot;bagImpute&quot;</span>)</a>
-<a class="sourceLine" id="cb48-2" data-line-number="2">demo_imp &lt;-<span class="st"> </span><span class="kw">predict</span>(imp, sim.dat)</a>
-<a class="sourceLine" id="cb48-3" data-line-number="3"><span class="kw">summary</span>(demo_imp[, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>])</a></code></pre></div>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" data-line-number="1">imp &lt;-<span class="st"> </span><span class="kw">preProcess</span>(sim.dat, <span class="dt">method =</span> <span class="st">&quot;bagImpute&quot;</span>)</a>
+<a class="sourceLine" id="cb44-2" data-line-number="2">demo_imp &lt;-<span class="st"> </span><span class="kw">predict</span>(imp, sim.dat)</a>
+<a class="sourceLine" id="cb44-3" data-line-number="3"><span class="kw">summary</span>(demo_imp[, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>])</a></code></pre></div>
 <pre class="pre"><code>      age           gender        income       house       store_exp      
  Min.   :16.00   Female:554   Min.   : 41776   No :432   Min.   :  155.8  
  1st Qu.:25.00   Male  :446   1st Qu.: 86762   Yes:568   1st Qu.:  205.1  
