@@ -1,0 +1,91 @@
+---
+title: "Netlify Twitter Analysis"
+output: html_document
+---
+
+```{r setup, include=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+p_needed <- c("plyr", "dplyr", "stringr", "lubridate", "jsonlite", "httr", 
+              "xml2", "rvest", "devtools", "ggmap",  "networkD3", "RSelenium", 
+              "pageviews", "aRxiv", "twitteR", "streamR","igraph","rbokeh",
+              "shiny","animation","caTools","wordcloud","coreNLP","plotly","DT")
+lapply(p_needed, require, character.only = TRUE)
+library(pageviews)
+library(lubridate)
+library(dygraphs)
+library(xts)
+library(leaflet)
+library(maps)
+```
+
+## Tweet-Retweet Network
+
+
+```{r, warning=FALSE}
+dat <- read.csv("Data/tweets_netlify2018-03-02.csv")
+tweet_txt <- dat$text
+rt_patterns = grep("(RT|via)((?:\\b\\W*@\\w+)+)",tweet_txt, ignore.case=TRUE)
+# we create a list to store user names
+who_retweet = as.list(1:length(rt_patterns))
+who_post = as.list(1:length(rt_patterns))
+
+# for loop
+for (i in 1:length(rt_patterns))
+{
+  # get tweet with retweet entity
+  twit = dat[rt_patterns[i],]
+  # get retweet source
+  poster = str_extract_all(twit$text,"(RT|via)((?:\\b\\W*@\\w+)+)")
+  #remove ':'
+  poster = gsub(":", "", unlist(poster))
+  # name of retweeted user
+  who_post[[i]] = gsub("(RT @|via @)", "", poster, ignore.case=TRUE)
+  # name of retweeting user
+  who_retweet[[i]] = rep(as.character(twit$screenName), length(poster))
+}
+
+# and we put it off the list
+who_post = sub("@.*","",unlist(who_post))
+who_retweet = sub("@.*","",unlist(who_retweet))
+who_retweet = sub(" ","",who_retweet)
+retweeter_poster = cbind(who_retweet, who_post)
+
+name <- unique(c(who_retweet,who_post))
+who_retweet <- match(who_retweet, name)-1
+who_post <- match(who_post, name)-1
+## checking
+#checkid<-which(retweeter_poster[,2]=="Deere_Andrea")
+#retweeter_poster[checkid,]
+links <- data.frame(who_retweet, who_post)
+size <- rep(0.1,length(name))
+tb <- table(who_post+1)
+size[as.numeric(names(tb))]<-tb
+
+group <- rep("Retweet",length(name))
+group[which(name%in%retweeter_poster[,2])] <- "Tweet"
+group[which(name%in%retweeter_poster[,1]&
+              name%in%retweeter_poster[,2])] <- "Both"
+# table(group)
+group <- factor(group, levels = c("Both", "Retweet", "Tweet"))
+notes <- data.frame(name, group, size)
+# summary(notes)
+# Plot
+forceNetwork(Links = links, Nodes = notes,
+             Source = "who_retweet", Target = "who_post",
+             # Value = "value", 
+             Nodesize = "size",
+             NodeID = "name",
+             Group = "group", 
+             fontSize = 16,
+             # colourScale = JS("d3.scaleSequential(d3.interpolateRainbow)"),
+             legend=T,
+             opacity = 1)
+```
+
+## Who to target?
+
+```{r}
+datatable(notes, options = list (order = list(3, 'desc')))
+```
+
+
