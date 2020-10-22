@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2020-10-19" />
+<meta name="date" content="2020-10-21" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -139,8 +139,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="" data-path="about-the-authors.html"><a href="about-the-authors.html"><i class="fa fa-check"></i>About the Authors</a></li>
 <li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a><ul>
-<li class="chapter" data-level="1.1" data-path="blind-men-and-an-elephant.html"><a href="blind-men-and-an-elephant.html"><i class="fa fa-check"></i><b>1.1</b> Blind men and an elephant</a><ul>
-<li class="chapter" data-level="1.1.1" data-path="blind-men-and-an-elephant.html"><a href="blind-men-and-an-elephant.html#data-science-roleskill-tracks"><i class="fa fa-check"></i><b>1.1.1</b> Data science role/skill tracks</a></li>
+<li class="chapter" data-level="1.1" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html"><i class="fa fa-check"></i><b>1.1</b> Data science role and skill tracks</a><ul>
+<li class="chapter" data-level="1.1.1" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#engineering"><i class="fa fa-check"></i><b>1.1.1</b> Engineering</a></li>
+<li class="chapter" data-level="1.1.2" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#analysis"><i class="fa fa-check"></i><b>1.1.2</b> Analysis</a></li>
+<li class="chapter" data-level="1.1.3" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#modeling"><i class="fa fa-check"></i><b>1.1.3</b> Modeling</a></li>
 </ul></li>
 <li class="chapter" data-level="1.2" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html"><i class="fa fa-check"></i><b>1.2</b> What kind of questions can data science solve?</a><ul>
 <li class="chapter" data-level="1.2.1" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html#prerequisites"><i class="fa fa-check"></i><b>1.2.1</b> Prerequisites</a></li>
@@ -328,8 +330,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2><span class="header-section-number">5.8</span> Re-encode Dummy Variables</h2>
 <p>A dummy variable is a binary variable (0/1) to represent subgroups of the sample. Sometimes we need to recode categories to smaller bits of information named “dummy variables.” For example, some questionnaires have five options for each question, A, B, C, D, and E. After you get the data, you will usually convert the corresponding categorical variables for each question into five nominal variables, and then use one of the options as the baseline.</p>
 <p>Let’s encode <code>gender</code> and <code>house</code> from <code>sim.dat</code> to dummy variables. There are two ways to implement this. The first is to use <code>class.ind()</code> from <code>nnet</code> package. However, it only works on one variable at a time.</p>
-<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb73-1" data-line-number="1">dumVar &lt;-<span class="st"> </span>nnet<span class="op">::</span><span class="kw">class.ind</span>(sim.dat<span class="op">$</span>gender)</a>
-<a class="sourceLine" id="cb73-2" data-line-number="2"><span class="kw">head</span>(dumVar)</a></code></pre></div>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb69-1" data-line-number="1">dumVar &lt;-<span class="st"> </span>nnet<span class="op">::</span><span class="kw">class.ind</span>(sim.dat<span class="op">$</span>gender)</a>
+<a class="sourceLine" id="cb69-2" data-line-number="2"><span class="kw">head</span>(dumVar)</a></code></pre></div>
 <pre><code>##      Female Male
 ## [1,]      1    0
 ## [2,]      1    0
@@ -338,11 +340,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## [5,]      0    1
 ## [6,]      0    1</code></pre>
 <p>Since it is redundant to keep both, we need to remove one of them when modeling. Another more powerful function is <code>dummyVars()</code> from <code>caret</code>:</p>
-<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb75-1" data-line-number="1"><span class="co"># use &quot;origional variable name + level&quot; as new name</span></a>
-<a class="sourceLine" id="cb75-2" data-line-number="2">dumMod &lt;-<span class="st"> </span><span class="kw">dummyVars</span>(<span class="op">~</span>gender <span class="op">+</span><span class="st"> </span>house <span class="op">+</span><span class="st"> </span>income, </a>
-<a class="sourceLine" id="cb75-3" data-line-number="3">                    <span class="dt">data =</span> sim.dat, </a>
-<a class="sourceLine" id="cb75-4" data-line-number="4">                    <span class="dt">levelsOnly =</span> F)</a>
-<a class="sourceLine" id="cb75-5" data-line-number="5"><span class="kw">head</span>(<span class="kw">predict</span>(dumMod, sim.dat))</a></code></pre></div>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb71-1" data-line-number="1"><span class="co"># use &quot;origional variable name + level&quot; as new name</span></a>
+<a class="sourceLine" id="cb71-2" data-line-number="2">dumMod &lt;-<span class="st"> </span><span class="kw">dummyVars</span>(<span class="op">~</span>gender <span class="op">+</span><span class="st"> </span>house <span class="op">+</span><span class="st"> </span>income, </a>
+<a class="sourceLine" id="cb71-3" data-line-number="3">                    <span class="dt">data =</span> sim.dat, </a>
+<a class="sourceLine" id="cb71-4" data-line-number="4">                    <span class="dt">levelsOnly =</span> F)</a>
+<a class="sourceLine" id="cb71-5" data-line-number="5"><span class="kw">head</span>(<span class="kw">predict</span>(dumMod, sim.dat))</a></code></pre></div>
 <pre><code>##   genderFemale genderMale houseNo houseYes income
 ## 1            1          0       0        1 120963
 ## 2            1          0       0        1 122008
@@ -351,10 +353,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## 5            0          1       0        1 124253
 ## 6            0          1       0        1 107661</code></pre>
 <p><code>dummyVars()</code> can also use formula format. The variable on the right-hand side can be both categorical and numeric. For a numerical variable, the function will keep the variable unchanged. The advantage is that you can apply the function to a data frame without removing numerical variables. Other than that, the function can create interaction term:</p>
-<div class="sourceCode" id="cb77"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb77-1" data-line-number="1">dumMod &lt;-<span class="st"> </span><span class="kw">dummyVars</span>(<span class="op">~</span>gender <span class="op">+</span><span class="st"> </span>house <span class="op">+</span><span class="st"> </span>income <span class="op">+</span><span class="st"> </span>income<span class="op">:</span>gender, </a>
-<a class="sourceLine" id="cb77-2" data-line-number="2">                    <span class="dt">data =</span> sim.dat, </a>
-<a class="sourceLine" id="cb77-3" data-line-number="3">                    <span class="dt">levelsOnly =</span> F)</a>
-<a class="sourceLine" id="cb77-4" data-line-number="4"><span class="kw">head</span>(<span class="kw">predict</span>(dumMod, sim.dat))</a></code></pre></div>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb73-1" data-line-number="1">dumMod &lt;-<span class="st"> </span><span class="kw">dummyVars</span>(<span class="op">~</span>gender <span class="op">+</span><span class="st"> </span>house <span class="op">+</span><span class="st"> </span>income <span class="op">+</span><span class="st"> </span>income<span class="op">:</span>gender, </a>
+<a class="sourceLine" id="cb73-2" data-line-number="2">                    <span class="dt">data =</span> sim.dat, </a>
+<a class="sourceLine" id="cb73-3" data-line-number="3">                    <span class="dt">levelsOnly =</span> F)</a>
+<a class="sourceLine" id="cb73-4" data-line-number="4"><span class="kw">head</span>(<span class="kw">predict</span>(dumMod, sim.dat))</a></code></pre></div>
 <pre><code>##   genderFemale genderMale houseNo houseYes income
 ## 1            1          0       0        1 120963
 ## 2            1          0       0        1 122008
