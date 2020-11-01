@@ -389,112 +389,41 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb156"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb156-1" data-line-number="1"><span class="co"># Read data</span></a>
 <a class="sourceLine" id="cb156-2" data-line-number="2">sim.dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)</a>
 <a class="sourceLine" id="cb156-3" data-line-number="3"><span class="co"># Get numerical variables</span></a>
-<a class="sourceLine" id="cb156-4" data-line-number="4">sdat &lt;-<span class="st"> </span>sim.dat[, <span class="op">!</span><span class="kw">lapply</span>(sim.dat, class) <span class="op">==</span><span class="st"> &quot;factor&quot;</span>]</a>
+<a class="sourceLine" id="cb156-4" data-line-number="4">sdat &lt;-<span class="st"> </span>sim.dat[, <span class="kw">lapply</span>(sim.dat, class) <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;integer&quot;</span>, <span class="st">&quot;numeric&quot;</span>)]</a>
 <a class="sourceLine" id="cb156-5" data-line-number="5"><span class="co">## Try the following code with apply() function apply(sim.dat,2,class)</span></a>
 <a class="sourceLine" id="cb156-6" data-line-number="6"><span class="co">## What is the problem?</span></a></code></pre></div>
 <p>The data frame <code>sdat</code> only includes numeric columns. Now we can go head and use <code>apply()</code> to get mean and standard deviation for each column:</p>
 <div class="sourceCode" id="cb157"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb157-1" data-line-number="1"><span class="kw">apply</span>(sdat, <span class="dt">MARGIN=</span><span class="dv">2</span>,<span class="cf">function</span>(x) <span class="kw">mean</span>(<span class="kw">na.omit</span>(x)))</a></code></pre></div>
-<pre><code>## Warning in mean.default(na.omit(x)): argument is not
-## numeric or logical: returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not
-## numeric or logical: returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not
-## numeric or logical: returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not
-## numeric or logical: returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not
-## numeric or logical: returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not
-## numeric or logical: returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not
-## numeric or logical: returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not
-## numeric or logical: returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not
-## numeric or logical: returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not
-## numeric or logical: returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not
-## numeric or logical: returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not
-## numeric or logical: returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not
-## numeric or logical: returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not
-## numeric or logical: returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not
-## numeric or logical: returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not
-## numeric or logical: returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not
-## numeric or logical: returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not
-## numeric or logical: returning NA
-
-## Warning in mean.default(na.omit(x)): argument is not
-## numeric or logical: returning NA</code></pre>
-<pre><code>##          age       gender       income        house 
-##           NA           NA           NA           NA 
-##    store_exp   online_exp  store_trans online_trans 
-##           NA           NA           NA           NA 
-##           Q1           Q2           Q3           Q4 
-##           NA           NA           NA           NA 
-##           Q5           Q6           Q7           Q8 
-##           NA           NA           NA           NA 
-##           Q9          Q10      segment 
-##           NA           NA           NA</code></pre>
+<pre><code>##          age       income    store_exp   online_exp 
+##    3.884e+01    1.135e+05    1.357e+03    2.120e+03 
+##  store_trans online_trans           Q1           Q2 
+##    5.350e+00    1.355e+01    3.101e+00    1.823e+00 
+##           Q3           Q4           Q5           Q6 
+##    1.992e+00    2.763e+00    2.945e+00    2.448e+00 
+##           Q7           Q8           Q9          Q10 
+##    3.434e+00    2.396e+00    3.085e+00    2.320e+00</code></pre>
 <p>Here we defined a function using <code>function(x) mean(na.omit(x))</code>. It is a very simple function. It tells R to ignore the missing value when calculating the mean. <code>MARGIN=2</code> tells R to apply the function to each column. It is not hard to guess what <code>MARGIN=1</code> mean. The result show that the average online expense is much higher than store expense. You can also compare the average scores across different questions. The command to calculate standard deviation is very similar. The only difference is to change <code>mean()</code> to <code>sd()</code>:</p>
-<div class="sourceCode" id="cb160"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb160-1" data-line-number="1"><span class="kw">apply</span>(sdat, <span class="dt">MARGIN=</span><span class="dv">2</span>,<span class="cf">function</span>(x) <span class="kw">sd</span>(<span class="kw">na.omit</span>(x)))</a></code></pre></div>
-<pre><code>## Warning in var(if (is.vector(x) || is.factor(x)) x
-## else as.double(x), na.rm = na.rm): NAs introduced by
-## coercion
-
-## Warning in var(if (is.vector(x) || is.factor(x)) x
-## else as.double(x), na.rm = na.rm): NAs introduced by
-## coercion
-
-## Warning in var(if (is.vector(x) || is.factor(x)) x
-## else as.double(x), na.rm = na.rm): NAs introduced by
-## coercion</code></pre>
-<pre><code>##          age       gender       income        house 
-##       16.417           NA    49842.292           NA 
-##    store_exp   online_exp  store_trans online_trans 
-##     2774.400     1731.224        3.696        7.957 
-##           Q1           Q2           Q3           Q4 
-##        1.450        1.168        1.402        1.155 
-##           Q5           Q6           Q7           Q8 
-##        1.284        1.439        1.456        1.154 
-##           Q9          Q10      segment 
-##        1.118        1.136           NA</code></pre>
+<div class="sourceCode" id="cb159"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb159-1" data-line-number="1"><span class="kw">apply</span>(sdat, <span class="dt">MARGIN=</span><span class="dv">2</span>,<span class="cf">function</span>(x) <span class="kw">sd</span>(<span class="kw">na.omit</span>(x)))</a></code></pre></div>
+<pre><code>##          age       income    store_exp   online_exp 
+##       16.417    49842.287     2774.400     1731.224 
+##  store_trans online_trans           Q1           Q2 
+##        3.696        7.957        1.450        1.168 
+##           Q3           Q4           Q5           Q6 
+##        1.402        1.155        1.284        1.439 
+##           Q7           Q8           Q9          Q10 
+##        1.456        1.154        1.118        1.136</code></pre>
 <p>Even the average online expense is higher than store expense, the standard deviation for store expense is much higher than online expense which indicates there is very likely some big/small purchase in store. We can check it quickly:</p>
-<div class="sourceCode" id="cb163"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb163-1" data-line-number="1"><span class="kw">summary</span>(sdat<span class="op">$</span>store_exp)</a></code></pre></div>
+<div class="sourceCode" id="cb161"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb161-1" data-line-number="1"><span class="kw">summary</span>(sdat<span class="op">$</span>store_exp)</a></code></pre></div>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##    -500     205     329    1357     597   50000</code></pre>
-<div class="sourceCode" id="cb165"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb165-1" data-line-number="1"><span class="kw">summary</span>(sdat<span class="op">$</span>online_exp)</a></code></pre></div>
+<div class="sourceCode" id="cb163"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb163-1" data-line-number="1"><span class="kw">summary</span>(sdat<span class="op">$</span>online_exp)</a></code></pre></div>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##      69     420    1942    2120    2441    9479</code></pre>
 <p>There are some odd values in store expense. The minimum value is -500 which indicates that you should preprocess data before analyzing it. Checking those simple statistics will help you better understand your data. It then gives you some idea how to preprocess and analyze them. How about using <code>lapply()</code> and <code>sapply()</code>?</p>
 <p>Run the following code and compare the results:</p>
-<div class="sourceCode" id="cb167"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb167-1" data-line-number="1"><span class="kw">lapply</span>(sdat, <span class="cf">function</span>(x) <span class="kw">sd</span>(<span class="kw">na.omit</span>(x)))</a>
-<a class="sourceLine" id="cb167-2" data-line-number="2"><span class="kw">sapply</span>(sdat, <span class="cf">function</span>(x) <span class="kw">sd</span>(<span class="kw">na.omit</span>(x)))</a>
-<a class="sourceLine" id="cb167-3" data-line-number="3"><span class="kw">sapply</span>(sdat, <span class="cf">function</span>(x) <span class="kw">sd</span>(<span class="kw">na.omit</span>(x)), <span class="dt">simplify =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb165"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb165-1" data-line-number="1"><span class="kw">lapply</span>(sdat, <span class="cf">function</span>(x) <span class="kw">sd</span>(<span class="kw">na.omit</span>(x)))</a>
+<a class="sourceLine" id="cb165-2" data-line-number="2"><span class="kw">sapply</span>(sdat, <span class="cf">function</span>(x) <span class="kw">sd</span>(<span class="kw">na.omit</span>(x)))</a>
+<a class="sourceLine" id="cb165-3" data-line-number="3"><span class="kw">sapply</span>(sdat, <span class="cf">function</span>(x) <span class="kw">sd</span>(<span class="kw">na.omit</span>(x)), <span class="dt">simplify =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
 </div>
 <div id="dplyr-package" class="section level3">
 <h3><span class="header-section-number">6.2.2</span> <code>dplyr</code> package</h3>
@@ -516,41 +445,41 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <ul>
 <li><code>tbl_df()</code>: Convert the data to <code>tibble</code> which offers better checking and printing capabilities than traditional data frames. It will adjust output width according to fit the current window.</li>
 </ul>
-<div class="sourceCode" id="cb168"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb168-1" data-line-number="1"><span class="kw">tbl_df</span>(sim.dat)</a></code></pre></div>
+<div class="sourceCode" id="cb166"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb166-1" data-line-number="1"><span class="kw">tbl_df</span>(sim.dat)</a></code></pre></div>
 <ul>
 <li><code>glimpse()</code>: This is like a transposed version of <code>tbl_df()</code></li>
 </ul>
-<div class="sourceCode" id="cb169"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb169-1" data-line-number="1"><span class="kw">glimpse</span>(sim.dat)</a></code></pre></div>
+<div class="sourceCode" id="cb167"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb167-1" data-line-number="1"><span class="kw">glimpse</span>(sim.dat)</a></code></pre></div>
 <p><strong>Subset</strong></p>
 <p>Get rows with <code>income</code> more than 300000:</p>
-<div class="sourceCode" id="cb170"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb170-1" data-line-number="1"><span class="kw">filter</span>(sim.dat, income <span class="op">&gt;</span><span class="dv">300000</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb170-2" data-line-number="2"><span class="st">  </span><span class="kw">tbl_df</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb168"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb168-1" data-line-number="1"><span class="kw">filter</span>(sim.dat, income <span class="op">&gt;</span><span class="dv">300000</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb168-2" data-line-number="2"><span class="st">  </span><span class="kw">tbl_df</span>()</a></code></pre></div>
 <p>Here we meet a new operator <code>%&gt;%</code>. It is called “Pipe operator” which pipes a value forward into an expression or function call. What you get in the left operation will be the first argument or the only argument in the right operation.</p>
-<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb171-1" data-line-number="1">x <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">f</span>(y) =<span class="st"> </span><span class="kw">f</span>(x, y)</a>
-<a class="sourceLine" id="cb171-2" data-line-number="2">y <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">f</span>(x, ., z) =<span class="st"> </span><span class="kw">f</span>(x, y, z )</a></code></pre></div>
+<div class="sourceCode" id="cb169"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb169-1" data-line-number="1">x <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">f</span>(y) =<span class="st"> </span><span class="kw">f</span>(x, y)</a>
+<a class="sourceLine" id="cb169-2" data-line-number="2">y <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">f</span>(x, ., z) =<span class="st"> </span><span class="kw">f</span>(x, y, z )</a></code></pre></div>
 <p>It is an operator from <code>magrittr</code> which can be really beneficial. Look at the following code. Can you tell me what it does?</p>
-<div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb172-1" data-line-number="1">ave_exp &lt;-<span class="st"> </span><span class="kw">filter</span>( </a>
-<a class="sourceLine" id="cb172-2" data-line-number="2">  <span class="kw">summarise</span>(</a>
-<a class="sourceLine" id="cb172-3" data-line-number="3">    <span class="kw">group_by</span>( </a>
-<a class="sourceLine" id="cb172-4" data-line-number="4">      <span class="kw">filter</span>(</a>
-<a class="sourceLine" id="cb172-5" data-line-number="5">        sim.dat, </a>
-<a class="sourceLine" id="cb172-6" data-line-number="6">        <span class="op">!</span><span class="kw">is.na</span>(income)</a>
-<a class="sourceLine" id="cb172-7" data-line-number="7">      ), </a>
-<a class="sourceLine" id="cb172-8" data-line-number="8">      segment</a>
-<a class="sourceLine" id="cb172-9" data-line-number="9">    ), </a>
-<a class="sourceLine" id="cb172-10" data-line-number="10">    <span class="dt">ave_online_exp =</span> <span class="kw">mean</span>(online_exp), </a>
-<a class="sourceLine" id="cb172-11" data-line-number="11">    <span class="dt">n =</span> <span class="kw">n</span>()</a>
-<a class="sourceLine" id="cb172-12" data-line-number="12">  ), </a>
-<a class="sourceLine" id="cb172-13" data-line-number="13">  n <span class="op">&gt;</span><span class="st"> </span><span class="dv">200</span></a>
-<a class="sourceLine" id="cb172-14" data-line-number="14">) </a></code></pre></div>
+<div class="sourceCode" id="cb170"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb170-1" data-line-number="1">ave_exp &lt;-<span class="st"> </span><span class="kw">filter</span>( </a>
+<a class="sourceLine" id="cb170-2" data-line-number="2">  <span class="kw">summarise</span>(</a>
+<a class="sourceLine" id="cb170-3" data-line-number="3">    <span class="kw">group_by</span>( </a>
+<a class="sourceLine" id="cb170-4" data-line-number="4">      <span class="kw">filter</span>(</a>
+<a class="sourceLine" id="cb170-5" data-line-number="5">        sim.dat, </a>
+<a class="sourceLine" id="cb170-6" data-line-number="6">        <span class="op">!</span><span class="kw">is.na</span>(income)</a>
+<a class="sourceLine" id="cb170-7" data-line-number="7">      ), </a>
+<a class="sourceLine" id="cb170-8" data-line-number="8">      segment</a>
+<a class="sourceLine" id="cb170-9" data-line-number="9">    ), </a>
+<a class="sourceLine" id="cb170-10" data-line-number="10">    <span class="dt">ave_online_exp =</span> <span class="kw">mean</span>(online_exp), </a>
+<a class="sourceLine" id="cb170-11" data-line-number="11">    <span class="dt">n =</span> <span class="kw">n</span>()</a>
+<a class="sourceLine" id="cb170-12" data-line-number="12">  ), </a>
+<a class="sourceLine" id="cb170-13" data-line-number="13">  n <span class="op">&gt;</span><span class="st"> </span><span class="dv">200</span></a>
+<a class="sourceLine" id="cb170-14" data-line-number="14">) </a></code></pre></div>
 <p>Now look at the identical code using “<code>%&gt;%</code>”:</p>
-<div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb173-1" data-line-number="1">ave_exp &lt;-<span class="st"> </span>sim.dat <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb173-2" data-line-number="2"><span class="st"> </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(income)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb173-3" data-line-number="3"><span class="st"> </span><span class="kw">group_by</span>(segment) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb173-4" data-line-number="4"><span class="st"> </span><span class="kw">summarise</span>( </a>
-<a class="sourceLine" id="cb173-5" data-line-number="5">   <span class="dt">ave_online_exp =</span> <span class="kw">mean</span>(online_exp), </a>
-<a class="sourceLine" id="cb173-6" data-line-number="6">   <span class="dt">n =</span> <span class="kw">n</span>() ) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb173-7" data-line-number="7"><span class="st">  </span><span class="kw">filter</span>(n <span class="op">&gt;</span><span class="st"> </span><span class="dv">200</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb171"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb171-1" data-line-number="1">ave_exp &lt;-<span class="st"> </span>sim.dat <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb171-2" data-line-number="2"><span class="st"> </span><span class="kw">filter</span>(<span class="op">!</span><span class="kw">is.na</span>(income)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb171-3" data-line-number="3"><span class="st"> </span><span class="kw">group_by</span>(segment) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb171-4" data-line-number="4"><span class="st"> </span><span class="kw">summarise</span>( </a>
+<a class="sourceLine" id="cb171-5" data-line-number="5">   <span class="dt">ave_online_exp =</span> <span class="kw">mean</span>(online_exp), </a>
+<a class="sourceLine" id="cb171-6" data-line-number="6">   <span class="dt">n =</span> <span class="kw">n</span>() ) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb171-7" data-line-number="7"><span class="st">  </span><span class="kw">filter</span>(n <span class="op">&gt;</span><span class="st"> </span><span class="dv">200</span>)</a></code></pre></div>
 <p>Isn’t it much more straightforward now? Let’s read it:</p>
 <ol style="list-style-type: decimal">
 <li>Delete observations from <code>sim.dat</code> with missing income values</li>
@@ -560,48 +489,48 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>Get segments with size larger than 200</li>
 </ol>
 <p>You can use <code>distinct()</code> to delete duplicated rows.</p>
-<div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb174-1" data-line-number="1">dplyr<span class="op">::</span><span class="kw">distinct</span>(sim.dat)</a></code></pre></div>
+<div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb172-1" data-line-number="1">dplyr<span class="op">::</span><span class="kw">distinct</span>(sim.dat)</a></code></pre></div>
 <p><code>sample_frac()</code> will randomly select some rows with a specified percentage. <code>sample_n()</code> can randomly select rows with a specified number.</p>
-<div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb175-1" data-line-number="1">dplyr<span class="op">::</span><span class="kw">sample_frac</span>(sim.dat, <span class="fl">0.5</span>, <span class="dt">replace =</span> <span class="ot">TRUE</span>) </a>
-<a class="sourceLine" id="cb175-2" data-line-number="2">dplyr<span class="op">::</span><span class="kw">sample_n</span>(sim.dat, <span class="dv">10</span>, <span class="dt">replace =</span> <span class="ot">TRUE</span>) </a></code></pre></div>
+<div class="sourceCode" id="cb173"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb173-1" data-line-number="1">dplyr<span class="op">::</span><span class="kw">sample_frac</span>(sim.dat, <span class="fl">0.5</span>, <span class="dt">replace =</span> <span class="ot">TRUE</span>) </a>
+<a class="sourceLine" id="cb173-2" data-line-number="2">dplyr<span class="op">::</span><span class="kw">sample_n</span>(sim.dat, <span class="dv">10</span>, <span class="dt">replace =</span> <span class="ot">TRUE</span>) </a></code></pre></div>
 <p><code>slice()</code> will select rows by position:</p>
-<div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb176-1" data-line-number="1">dplyr<span class="op">::</span><span class="kw">slice</span>(sim.dat, <span class="dv">10</span><span class="op">:</span><span class="dv">15</span>) </a></code></pre></div>
+<div class="sourceCode" id="cb174"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb174-1" data-line-number="1">dplyr<span class="op">::</span><span class="kw">slice</span>(sim.dat, <span class="dv">10</span><span class="op">:</span><span class="dv">15</span>) </a></code></pre></div>
 <p>It is equivalent to <code>sim.dat[10:15,]</code>.</p>
 <p><code>top_n()</code> will select the order top n entries:</p>
-<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb177-1" data-line-number="1">dplyr<span class="op">::</span><span class="kw">top_n</span>(sim.dat,<span class="dv">2</span>,income)</a></code></pre></div>
+<div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb175-1" data-line-number="1">dplyr<span class="op">::</span><span class="kw">top_n</span>(sim.dat,<span class="dv">2</span>,income)</a></code></pre></div>
 <p>If you want to select columns instead of rows, you can use <code>select()</code>. The following are some sample codes:</p>
-<div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb178-1" data-line-number="1"><span class="co"># select by column name</span></a>
-<a class="sourceLine" id="cb178-2" data-line-number="2">dplyr<span class="op">::</span><span class="kw">select</span>(sim.dat,income,age,store_exp)</a>
-<a class="sourceLine" id="cb178-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb178-4" data-line-number="4"><span class="co"># select columns whose name contains a character string</span></a>
-<a class="sourceLine" id="cb178-5" data-line-number="5">dplyr<span class="op">::</span><span class="kw">select</span>(sim.dat, <span class="kw">contains</span>(<span class="st">&quot;_&quot;</span>))</a>
-<a class="sourceLine" id="cb178-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb178-7" data-line-number="7"><span class="co"># select columns whose name ends with a character string</span></a>
-<a class="sourceLine" id="cb178-8" data-line-number="8"><span class="co"># similar there is &quot;starts_with&quot;</span></a>
-<a class="sourceLine" id="cb178-9" data-line-number="9">dplyr<span class="op">::</span><span class="kw">select</span>(sim.dat, <span class="kw">ends_with</span>(<span class="st">&quot;e&quot;</span>))</a>
-<a class="sourceLine" id="cb178-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb178-11" data-line-number="11"><span class="co"># select columns Q1,Q2,Q3,Q4 and Q5</span></a>
-<a class="sourceLine" id="cb178-12" data-line-number="12"><span class="kw">select</span>(sim.dat, <span class="kw">num_range</span>(<span class="st">&quot;Q&quot;</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>)) </a>
-<a class="sourceLine" id="cb178-13" data-line-number="13"></a>
-<a class="sourceLine" id="cb178-14" data-line-number="14"><span class="co"># select columns whose names are in a group of names</span></a>
-<a class="sourceLine" id="cb178-15" data-line-number="15">dplyr<span class="op">::</span><span class="kw">select</span>(sim.dat, <span class="kw">one_of</span>(<span class="kw">c</span>(<span class="st">&quot;age&quot;</span>, <span class="st">&quot;income&quot;</span>)))</a>
-<a class="sourceLine" id="cb178-16" data-line-number="16"></a>
-<a class="sourceLine" id="cb178-17" data-line-number="17"><span class="co"># select columns between age and online_exp</span></a>
-<a class="sourceLine" id="cb178-18" data-line-number="18">dplyr<span class="op">::</span><span class="kw">select</span>(sim.dat, age<span class="op">:</span>online_exp)</a>
-<a class="sourceLine" id="cb178-19" data-line-number="19"></a>
-<a class="sourceLine" id="cb178-20" data-line-number="20"><span class="co"># select all columns except for age</span></a>
-<a class="sourceLine" id="cb178-21" data-line-number="21">dplyr<span class="op">::</span><span class="kw">select</span>(sim.dat, <span class="op">-</span>age)</a></code></pre></div>
+<div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb176-1" data-line-number="1"><span class="co"># select by column name</span></a>
+<a class="sourceLine" id="cb176-2" data-line-number="2">dplyr<span class="op">::</span><span class="kw">select</span>(sim.dat,income,age,store_exp)</a>
+<a class="sourceLine" id="cb176-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb176-4" data-line-number="4"><span class="co"># select columns whose name contains a character string</span></a>
+<a class="sourceLine" id="cb176-5" data-line-number="5">dplyr<span class="op">::</span><span class="kw">select</span>(sim.dat, <span class="kw">contains</span>(<span class="st">&quot;_&quot;</span>))</a>
+<a class="sourceLine" id="cb176-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb176-7" data-line-number="7"><span class="co"># select columns whose name ends with a character string</span></a>
+<a class="sourceLine" id="cb176-8" data-line-number="8"><span class="co"># similar there is &quot;starts_with&quot;</span></a>
+<a class="sourceLine" id="cb176-9" data-line-number="9">dplyr<span class="op">::</span><span class="kw">select</span>(sim.dat, <span class="kw">ends_with</span>(<span class="st">&quot;e&quot;</span>))</a>
+<a class="sourceLine" id="cb176-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb176-11" data-line-number="11"><span class="co"># select columns Q1,Q2,Q3,Q4 and Q5</span></a>
+<a class="sourceLine" id="cb176-12" data-line-number="12"><span class="kw">select</span>(sim.dat, <span class="kw">num_range</span>(<span class="st">&quot;Q&quot;</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>)) </a>
+<a class="sourceLine" id="cb176-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb176-14" data-line-number="14"><span class="co"># select columns whose names are in a group of names</span></a>
+<a class="sourceLine" id="cb176-15" data-line-number="15">dplyr<span class="op">::</span><span class="kw">select</span>(sim.dat, <span class="kw">one_of</span>(<span class="kw">c</span>(<span class="st">&quot;age&quot;</span>, <span class="st">&quot;income&quot;</span>)))</a>
+<a class="sourceLine" id="cb176-16" data-line-number="16"></a>
+<a class="sourceLine" id="cb176-17" data-line-number="17"><span class="co"># select columns between age and online_exp</span></a>
+<a class="sourceLine" id="cb176-18" data-line-number="18">dplyr<span class="op">::</span><span class="kw">select</span>(sim.dat, age<span class="op">:</span>online_exp)</a>
+<a class="sourceLine" id="cb176-19" data-line-number="19"></a>
+<a class="sourceLine" id="cb176-20" data-line-number="20"><span class="co"># select all columns except for age</span></a>
+<a class="sourceLine" id="cb176-21" data-line-number="21">dplyr<span class="op">::</span><span class="kw">select</span>(sim.dat, <span class="op">-</span>age)</a></code></pre></div>
 <p><strong>Summarize</strong></p>
 <p>A standard marketing problem is customer segmentation. It usually starts with designing survey and collecting data. Then run a cluster analysis on the data to get customer segments. Once we have different segments, the next is to understand how each group of customer look like by summarizing some key metrics. For example, we can do the following data aggregation for different segments of clothes customers.</p>
-<div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb179-1" data-line-number="1">sim.dat <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb179-2" data-line-number="2"><span class="st">  </span><span class="kw">group_by</span>(segment) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb179-3" data-line-number="3"><span class="st">  </span><span class="kw">summarise</span>(<span class="dt">Age =</span> <span class="kw">round</span>(<span class="kw">mean</span>(<span class="kw">na.omit</span>(age)), <span class="dv">0</span>), </a>
-<a class="sourceLine" id="cb179-4" data-line-number="4">            <span class="dt">FemalePct =</span> <span class="kw">round</span>(<span class="kw">mean</span>(gender <span class="op">==</span><span class="st"> &quot;Female&quot;</span>), <span class="dv">2</span>), </a>
-<a class="sourceLine" id="cb179-5" data-line-number="5">            <span class="dt">HouseYes =</span> <span class="kw">round</span>(<span class="kw">mean</span>(house <span class="op">==</span><span class="st"> &quot;Yes&quot;</span>), <span class="dv">2</span>), </a>
-<a class="sourceLine" id="cb179-6" data-line-number="6">            <span class="dt">store_exp =</span> <span class="kw">round</span>(<span class="kw">mean</span>(<span class="kw">na.omit</span>(store_exp), <span class="dt">trim =</span> <span class="fl">0.1</span>), <span class="dv">0</span>),</a>
-<a class="sourceLine" id="cb179-7" data-line-number="7">            <span class="dt">online_exp =</span> <span class="kw">round</span>(<span class="kw">mean</span>(online_exp), <span class="dv">0</span>), </a>
-<a class="sourceLine" id="cb179-8" data-line-number="8">            <span class="dt">store_trans =</span> <span class="kw">round</span>(<span class="kw">mean</span>(store_trans), <span class="dv">1</span>), </a>
-<a class="sourceLine" id="cb179-9" data-line-number="9">            <span class="dt">online_trans =</span> <span class="kw">round</span>(<span class="kw">mean</span>(online_trans), <span class="dv">1</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb177-1" data-line-number="1">sim.dat <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb177-2" data-line-number="2"><span class="st">  </span><span class="kw">group_by</span>(segment) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb177-3" data-line-number="3"><span class="st">  </span><span class="kw">summarise</span>(<span class="dt">Age =</span> <span class="kw">round</span>(<span class="kw">mean</span>(<span class="kw">na.omit</span>(age)), <span class="dv">0</span>), </a>
+<a class="sourceLine" id="cb177-4" data-line-number="4">            <span class="dt">FemalePct =</span> <span class="kw">round</span>(<span class="kw">mean</span>(gender <span class="op">==</span><span class="st"> &quot;Female&quot;</span>), <span class="dv">2</span>), </a>
+<a class="sourceLine" id="cb177-5" data-line-number="5">            <span class="dt">HouseYes =</span> <span class="kw">round</span>(<span class="kw">mean</span>(house <span class="op">==</span><span class="st"> &quot;Yes&quot;</span>), <span class="dv">2</span>), </a>
+<a class="sourceLine" id="cb177-6" data-line-number="6">            <span class="dt">store_exp =</span> <span class="kw">round</span>(<span class="kw">mean</span>(<span class="kw">na.omit</span>(store_exp), <span class="dt">trim =</span> <span class="fl">0.1</span>), <span class="dv">0</span>),</a>
+<a class="sourceLine" id="cb177-7" data-line-number="7">            <span class="dt">online_exp =</span> <span class="kw">round</span>(<span class="kw">mean</span>(online_exp), <span class="dv">0</span>), </a>
+<a class="sourceLine" id="cb177-8" data-line-number="8">            <span class="dt">store_trans =</span> <span class="kw">round</span>(<span class="kw">mean</span>(store_trans), <span class="dv">1</span>), </a>
+<a class="sourceLine" id="cb177-9" data-line-number="9">            <span class="dt">online_trans =</span> <span class="kw">round</span>(<span class="kw">mean</span>(online_trans), <span class="dv">1</span>))</a></code></pre></div>
 <pre><code>##   Age FemalePct HouseYes store_exp online_exp
 ## 1  39      0.55     0.57       840       2120
 ##   store_trans online_trans
@@ -632,17 +561,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul>
 <p>You may notice that Style group purchase more frequently online (<code>online_trans</code>) but the expense (<code>online_exp</code>) is not higher. It makes us wonder what is the average expense each time, so you have a better idea about the price range of the group.</p>
 <p>The analytical process is aggregated instead of independent steps. The current step will shed new light on what to do next. Sometimes you need to go back to fix something in the previous steps. Let’s check average one-time online and instore purchase amounts:</p>
-<div class="sourceCode" id="cb181"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb181-1" data-line-number="1">sim.dat <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb181-2" data-line-number="2"><span class="st">  </span><span class="kw">group_by</span>(segment) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb181-3" data-line-number="3"><span class="st">  </span><span class="kw">summarise</span>(<span class="dt">avg_online =</span> <span class="kw">round</span>(<span class="kw">sum</span>(online_exp)<span class="op">/</span><span class="kw">sum</span>(online_trans), <span class="dv">2</span>),</a>
-<a class="sourceLine" id="cb181-4" data-line-number="4">            <span class="dt">avg_store =</span> <span class="kw">round</span>(<span class="kw">sum</span>(store_exp)<span class="op">/</span><span class="kw">sum</span>(store_trans), <span class="dv">2</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb179-1" data-line-number="1">sim.dat <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb179-2" data-line-number="2"><span class="st">  </span><span class="kw">group_by</span>(segment) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb179-3" data-line-number="3"><span class="st">  </span><span class="kw">summarise</span>(<span class="dt">avg_online =</span> <span class="kw">round</span>(<span class="kw">sum</span>(online_exp)<span class="op">/</span><span class="kw">sum</span>(online_trans), <span class="dv">2</span>),</a>
+<a class="sourceLine" id="cb179-4" data-line-number="4">            <span class="dt">avg_store =</span> <span class="kw">round</span>(<span class="kw">sum</span>(store_exp)<span class="op">/</span><span class="kw">sum</span>(store_trans), <span class="dv">2</span>))</a></code></pre></div>
 <pre><code>##   avg_online avg_store
 ## 1      156.5     253.6</code></pre>
 <p>Price group has the lowest averaged one-time purchase. The Conspicuous group will pay the highest price. When we build customer profile in real life, we will also need to look at the survey summarization. You may be surprised how much information simple data manipulations can provide.</p>
 <p>Another comman task is to check which column has missing values. It requires the program to look at each column in the data. In this case you can use <code>summarise_all</code>:</p>
-<div class="sourceCode" id="cb183"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb183-1" data-line-number="1"><span class="co"># apply function anyNA() to each column</span></a>
-<a class="sourceLine" id="cb183-2" data-line-number="2"><span class="co"># you can also assign a function vector such as: c(&quot;anyNA&quot;,&quot;is.factor&quot;)</span></a>
-<a class="sourceLine" id="cb183-3" data-line-number="3">dplyr<span class="op">::</span><span class="kw">summarise_all</span>(sim.dat, <span class="kw">funs_</span>(<span class="kw">c</span>(<span class="st">&quot;anyNA&quot;</span>)))</a></code></pre></div>
+<div class="sourceCode" id="cb181"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb181-1" data-line-number="1"><span class="co"># apply function anyNA() to each column</span></a>
+<a class="sourceLine" id="cb181-2" data-line-number="2"><span class="co"># you can also assign a function vector such as: c(&quot;anyNA&quot;,&quot;is.factor&quot;)</span></a>
+<a class="sourceLine" id="cb181-3" data-line-number="3">dplyr<span class="op">::</span><span class="kw">summarise_all</span>(sim.dat, <span class="kw">funs_</span>(<span class="kw">c</span>(<span class="st">&quot;anyNA&quot;</span>)))</a></code></pre></div>
 <pre><code>##     age gender income house store_exp online_exp
 ## 1 FALSE  FALSE   TRUE FALSE     FALSE      FALSE
 ##   store_trans online_trans    Q1    Q2    Q3    Q4
@@ -652,47 +581,47 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>The above code returns a vector indicating if there is any value missing in each column.</p>
 <p><strong>Create new variable</strong></p>
 <p>There are often situations where you need to create new variables. For example, adding online and store expense to get total expense. In this case, you will apply <strong>window function</strong> to the columns and return a column with the same length. <code>mutate()</code> can do it for you and append one or more new columns:</p>
-<div class="sourceCode" id="cb185"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb185-1" data-line-number="1">dplyr<span class="op">::</span><span class="kw">mutate</span>(sim.dat, <span class="dt">total_exp =</span> store_exp <span class="op">+</span><span class="st"> </span>online_exp)</a></code></pre></div>
+<div class="sourceCode" id="cb183"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb183-1" data-line-number="1">dplyr<span class="op">::</span><span class="kw">mutate</span>(sim.dat, <span class="dt">total_exp =</span> store_exp <span class="op">+</span><span class="st"> </span>online_exp)</a></code></pre></div>
 <p>The above code sums up two columns and appends the result (<code>total_exp</code>) to <code>sim.dat</code>. Another similar function is <code>transmute()</code>. The difference is that <code>transmute()</code> will delete the original columns and only keep the new ones.</p>
-<div class="sourceCode" id="cb186"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb186-1" data-line-number="1">dplyr<span class="op">::</span><span class="kw">transmute</span>(sim.dat, <span class="dt">total_exp =</span> store_exp <span class="op">+</span><span class="st"> </span>online_exp)</a></code></pre></div>
+<div class="sourceCode" id="cb184"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb184-1" data-line-number="1">dplyr<span class="op">::</span><span class="kw">transmute</span>(sim.dat, <span class="dt">total_exp =</span> store_exp <span class="op">+</span><span class="st"> </span>online_exp)</a></code></pre></div>
 <p><strong>Merge</strong></p>
 <p>Similar to SQL, there are different joins in <code>dplyr</code>. We create two baby data sets to show how the functions work.</p>
-<div class="sourceCode" id="cb187"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb187-1" data-line-number="1">(x &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(<span class="dt">ID =</span> <span class="kw">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>), <span class="dt">x1 =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))))</a></code></pre></div>
+<div class="sourceCode" id="cb185"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb185-1" data-line-number="1">(x &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(<span class="dt">ID =</span> <span class="kw">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>), <span class="dt">x1 =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>))))</a></code></pre></div>
 <pre><code>##   ID x1
 ## 1  A  1
 ## 2  B  2
 ## 3  C  3</code></pre>
-<div class="sourceCode" id="cb189"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb189-1" data-line-number="1">(y &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(<span class="dt">ID =</span> <span class="kw">c</span>(<span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;D&quot;</span>), <span class="dt">y1 =</span> <span class="kw">c</span>(T, T, F))))</a></code></pre></div>
+<div class="sourceCode" id="cb187"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb187-1" data-line-number="1">(y &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">cbind</span>(<span class="dt">ID =</span> <span class="kw">c</span>(<span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>, <span class="st">&quot;D&quot;</span>), <span class="dt">y1 =</span> <span class="kw">c</span>(T, T, F))))</a></code></pre></div>
 <pre><code>##   ID    y1
 ## 1  B  TRUE
 ## 2  C  TRUE
 ## 3  D FALSE</code></pre>
-<div class="sourceCode" id="cb191"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb191-1" data-line-number="1"><span class="co"># join to the left</span></a>
-<a class="sourceLine" id="cb191-2" data-line-number="2"><span class="co"># keep all rows in x</span></a>
-<a class="sourceLine" id="cb191-3" data-line-number="3"><span class="kw">left_join</span>(x, y, <span class="dt">by =</span> <span class="st">&quot;ID&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb189"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb189-1" data-line-number="1"><span class="co"># join to the left</span></a>
+<a class="sourceLine" id="cb189-2" data-line-number="2"><span class="co"># keep all rows in x</span></a>
+<a class="sourceLine" id="cb189-3" data-line-number="3"><span class="kw">left_join</span>(x, y, <span class="dt">by =</span> <span class="st">&quot;ID&quot;</span>)</a></code></pre></div>
 <pre><code>##   ID x1   y1
 ## 1  A  1 &lt;NA&gt;
 ## 2  B  2 TRUE
 ## 3  C  3 TRUE</code></pre>
-<div class="sourceCode" id="cb193"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb193-1" data-line-number="1"><span class="co"># get rows matched in both data sets</span></a>
-<a class="sourceLine" id="cb193-2" data-line-number="2"><span class="kw">inner_join</span>(x, y, <span class="dt">by =</span> <span class="st">&quot;ID&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb191"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb191-1" data-line-number="1"><span class="co"># get rows matched in both data sets</span></a>
+<a class="sourceLine" id="cb191-2" data-line-number="2"><span class="kw">inner_join</span>(x, y, <span class="dt">by =</span> <span class="st">&quot;ID&quot;</span>)</a></code></pre></div>
 <pre><code>##   ID x1   y1
 ## 1  B  2 TRUE
 ## 2  C  3 TRUE</code></pre>
-<div class="sourceCode" id="cb195"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb195-1" data-line-number="1"><span class="co"># get rows in either data set</span></a>
-<a class="sourceLine" id="cb195-2" data-line-number="2"><span class="kw">full_join</span>(x, y, <span class="dt">by =</span> <span class="st">&quot;ID&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb193"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb193-1" data-line-number="1"><span class="co"># get rows in either data set</span></a>
+<a class="sourceLine" id="cb193-2" data-line-number="2"><span class="kw">full_join</span>(x, y, <span class="dt">by =</span> <span class="st">&quot;ID&quot;</span>)</a></code></pre></div>
 <pre><code>##   ID   x1    y1
 ## 1  A    1  &lt;NA&gt;
 ## 2  B    2  TRUE
 ## 3  C    3  TRUE
 ## 4  D &lt;NA&gt; FALSE</code></pre>
-<div class="sourceCode" id="cb197"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb197-1" data-line-number="1"><span class="co"># filter out rows in x that can be matched in y </span></a>
-<a class="sourceLine" id="cb197-2" data-line-number="2"><span class="co"># it doesn&#39;t bring in any values from y </span></a>
-<a class="sourceLine" id="cb197-3" data-line-number="3"><span class="kw">semi_join</span>(x, y, <span class="dt">by =</span> <span class="st">&quot;ID&quot;</span>)</a></code></pre></div>
-<div class="sourceCode" id="cb198"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb198-1" data-line-number="1"><span class="co"># the opposite of  semi_join()</span></a>
-<a class="sourceLine" id="cb198-2" data-line-number="2"><span class="co"># it gets rows in x that cannot be matched in y</span></a>
-<a class="sourceLine" id="cb198-3" data-line-number="3"><span class="co"># it doesn&#39;t bring in any values from y</span></a>
-<a class="sourceLine" id="cb198-4" data-line-number="4"><span class="kw">anti_join</span>(x, y, <span class="dt">by =</span> <span class="st">&quot;ID&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb195"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb195-1" data-line-number="1"><span class="co"># filter out rows in x that can be matched in y </span></a>
+<a class="sourceLine" id="cb195-2" data-line-number="2"><span class="co"># it doesn&#39;t bring in any values from y </span></a>
+<a class="sourceLine" id="cb195-3" data-line-number="3"><span class="kw">semi_join</span>(x, y, <span class="dt">by =</span> <span class="st">&quot;ID&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb196"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb196-1" data-line-number="1"><span class="co"># the opposite of  semi_join()</span></a>
+<a class="sourceLine" id="cb196-2" data-line-number="2"><span class="co"># it gets rows in x that cannot be matched in y</span></a>
+<a class="sourceLine" id="cb196-3" data-line-number="3"><span class="co"># it doesn&#39;t bring in any values from y</span></a>
+<a class="sourceLine" id="cb196-4" data-line-number="4"><span class="kw">anti_join</span>(x, y, <span class="dt">by =</span> <span class="st">&quot;ID&quot;</span>)</a></code></pre></div>
 <p>There are other functions(<code>intersect()</code>, <code>union()</code> and <code>setdiff()</code>). Also the data frame version of <code>rbind</code> and <code>cbind</code> which are <code>bind_rows()</code> and <code>bind_col()</code>. We are not going to go through them all. You can try them yourself. If you understand the functions we introduced so far. It should be easy for you to figure out the rest.</p>
 </div>
 </div>
