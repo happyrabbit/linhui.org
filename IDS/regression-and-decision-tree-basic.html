@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2020-10-31" />
+<meta name="date" content="2020-11-01" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -245,7 +245,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="9.1.1" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html#the-magic-p-value"><i class="fa fa-check"></i><b>9.1.1</b> The Magic P-value</a></li>
 <li class="chapter" data-level="9.1.2" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html#diagnostics-for-linear-regression"><i class="fa fa-check"></i><b>9.1.2</b> Diagnostics for Linear Regression</a></li>
 </ul></li>
-<li class="chapter" data-level="9.2" data-path="pcr-and-pls.html"><a href="pcr-and-pls.html"><i class="fa fa-check"></i><b>9.2</b> PCR and PLS</a></li>
+<li class="chapter" data-level="9.2" data-path="principal-components-regression-and-partial-least-square.html"><a href="principal-components-regression-and-partial-least-square.html"><i class="fa fa-check"></i><b>9.2</b> Principal Components Regression and Partial Least Square</a></li>
 <li class="chapter" data-level="9.3" data-path="measurement-error.html"><a href="measurement-error.html"><i class="fa fa-check"></i><b>9.3</b> Measurement Error</a><ul>
 <li class="chapter" data-level="9.3.1" data-path="measurement-error.html"><a href="measurement-error.html#measurement-error-in-the-response"><i class="fa fa-check"></i><b>9.3.1</b> Measurement Error in the Response</a></li>
 <li class="chapter" data-level="9.3.2" data-path="measurement-error.html"><a href="measurement-error.html#measurement-error-in-the-independent-variables"><i class="fa fa-check"></i><b>9.3.2</b> Measurement Error in the Independent Variables</a></li>
@@ -340,8 +340,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <center>
 <img src="images/varEN.png" />
 </center>
-<div class="sourceCode" id="cb367"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb367-1" data-line-number="1">y1=<span class="kw">c</span>(<span class="dv">156</span>,<span class="dv">167</span>,<span class="dv">165</span>,<span class="dv">163</span>,<span class="dv">160</span>,<span class="dv">170</span>,<span class="dv">160</span>)</a>
-<a class="sourceLine" id="cb367-2" data-line-number="2">y2=<span class="kw">c</span>(<span class="dv">172</span>,<span class="dv">180</span>,<span class="dv">176</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb376"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb376-1" data-line-number="1">y1=<span class="kw">c</span>(<span class="dv">156</span>,<span class="dv">167</span>,<span class="dv">165</span>,<span class="dv">163</span>,<span class="dv">160</span>,<span class="dv">170</span>,<span class="dv">160</span>)</a>
+<a class="sourceLine" id="cb376-2" data-line-number="2">y2=<span class="kw">c</span>(<span class="dv">172</span>,<span class="dv">180</span>,<span class="dv">176</span>)</a></code></pre></div>
 <p>The sample average for region <span class="math inline">\(R_1\)</span> is 163, for region <span class="math inline">\(R_2\)</span> is 176. For a new observation, if it is female, the model predicts the height to be 163, if it is male, the predicted height is 176. Calculating the mean is easy. Let’s look at the first step in more detail which is to divide the space into <span class="math inline">\(R_1, R_2, \dots, R_J\)</span>.</p>
 <p>In theory, the region can be any shape. However, to simplify the problem, we divide the predictor space into high-dimensional rectangles. The goal is to divide the space in a way that minimize RSS. Practically, it is nearly impossible to consider all possible partitions of the feature space. So we use an approach named recursive binary splitting, a top-down , greedy algorithm. The process starts from the top of the tree (root node) and then successively splits the predictor space. Each split produces two branches (hence binary). At each step of the process, it chooses the best split at that particular step, rather than looking ahead and picking a split that leads to a better tree in general (hence greedy).</p>
 <p><span class="math display">\[R_{1}(j, s)=\{X|X_j&lt;s\}\ and\ R_{2}(j, s)=\{X|X_j\geq s\}\]</span></p>
@@ -354,24 +354,24 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </center>
 <p>There are multiple R packages for building regression tree, such as <code>ctree</code>, <code>rpart</code> and <code>tree</code>. <code>rpart</code> is widely used for building single tree. The split is based on CART algorithm, using <code>rpart()</code> function from the package. There are some parameters that controls the model fitting, such as the minimum number of observations that must exist in a node in order for a split to be attempted, the minimum number of observations in any leaf node etc. You can can set those parameter using <code>rpart.control</code>.</p>
 <p>A more convenient way is to use <code>train()</code> function in <code>caret</code> package. The package can call <code>rpart()</code> function and train the model through cross-validation. In this case, the most common parameters are <code>cp</code> (complexity parameter) and <code>maxdepth</code> (the maximum depth of any node of the final tree). To tune the complexity parameter, set <code>method = &quot;rpart&quot;</code>. To tune the maximum tree depth, set <code>method = &quot;rpart2&quot;</code> :</p>
-<div class="sourceCode" id="cb368"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb368-1" data-line-number="1"><span class="kw">library</span>(rpart)</a>
-<a class="sourceLine" id="cb368-2" data-line-number="2">dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)</a>
-<a class="sourceLine" id="cb368-3" data-line-number="3"><span class="co"># data cleaning: delete wrong observations</span></a>
-<a class="sourceLine" id="cb368-4" data-line-number="4">dat &lt;-<span class="st"> </span><span class="kw">subset</span>(dat, store_exp <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span> <span class="op">&amp;</span><span class="st"> </span>online_exp <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</a>
-<a class="sourceLine" id="cb368-5" data-line-number="5"><span class="co"># use the 10 survey questions as predictors</span></a>
-<a class="sourceLine" id="cb368-6" data-line-number="6">trainx &lt;-<span class="st"> </span>dat[, <span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>, <span class="kw">names</span>(dat))]</a>
-<a class="sourceLine" id="cb368-7" data-line-number="7"><span class="co"># use the sum of store and online expenditure as response variable</span></a>
-<a class="sourceLine" id="cb368-8" data-line-number="8"><span class="co"># total expenditure = store expenditure + online expenditure</span></a>
-<a class="sourceLine" id="cb368-9" data-line-number="9">trainy &lt;-<span class="st"> </span>dat<span class="op">$</span>store_exp <span class="op">+</span><span class="st"> </span>dat<span class="op">$</span>online_exp</a>
-<a class="sourceLine" id="cb368-10" data-line-number="10"><span class="kw">set.seed</span>(<span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb368-11" data-line-number="11">rpartTune &lt;-<span class="st"> </span><span class="kw">train</span>(trainx, trainy, <span class="dt">method =</span> <span class="st">&quot;rpart2&quot;</span>, <span class="dt">tuneLength =</span> <span class="dv">10</span>, </a>
-<a class="sourceLine" id="cb368-12" data-line-number="12">    <span class="dt">trControl =</span> <span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>))</a>
-<a class="sourceLine" id="cb368-13" data-line-number="13"><span class="kw">plot</span>(rpartTune)</a></code></pre></div>
-<p><img src="IDS_files/figure-html/unnamed-chunk-147-1.svg" width="672" /></p>
+<div class="sourceCode" id="cb377"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb377-1" data-line-number="1"><span class="kw">library</span>(rpart)</a>
+<a class="sourceLine" id="cb377-2" data-line-number="2">dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)</a>
+<a class="sourceLine" id="cb377-3" data-line-number="3"><span class="co"># data cleaning: delete wrong observations</span></a>
+<a class="sourceLine" id="cb377-4" data-line-number="4">dat &lt;-<span class="st"> </span><span class="kw">subset</span>(dat, store_exp <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span> <span class="op">&amp;</span><span class="st"> </span>online_exp <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb377-5" data-line-number="5"><span class="co"># use the 10 survey questions as predictors</span></a>
+<a class="sourceLine" id="cb377-6" data-line-number="6">trainx &lt;-<span class="st"> </span>dat[, <span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>, <span class="kw">names</span>(dat))]</a>
+<a class="sourceLine" id="cb377-7" data-line-number="7"><span class="co"># use the sum of store and online expenditure as response variable</span></a>
+<a class="sourceLine" id="cb377-8" data-line-number="8"><span class="co"># total expenditure = store expenditure + online expenditure</span></a>
+<a class="sourceLine" id="cb377-9" data-line-number="9">trainy &lt;-<span class="st"> </span>dat<span class="op">$</span>store_exp <span class="op">+</span><span class="st"> </span>dat<span class="op">$</span>online_exp</a>
+<a class="sourceLine" id="cb377-10" data-line-number="10"><span class="kw">set.seed</span>(<span class="dv">100</span>)</a>
+<a class="sourceLine" id="cb377-11" data-line-number="11">rpartTune &lt;-<span class="st"> </span><span class="kw">train</span>(trainx, trainy, <span class="dt">method =</span> <span class="st">&quot;rpart2&quot;</span>, <span class="dt">tuneLength =</span> <span class="dv">10</span>, </a>
+<a class="sourceLine" id="cb377-12" data-line-number="12">    <span class="dt">trControl =</span> <span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>))</a>
+<a class="sourceLine" id="cb377-13" data-line-number="13"><span class="kw">plot</span>(rpartTune)</a></code></pre></div>
+<p><img src="IDS_files/figure-html/unnamed-chunk-154-1.svg" width="672" /></p>
 <p>RMSE doesn’t change much when the maximum is larger than 2. So we set the maximum depth to be 2 and refit the model:</p>
-<div class="sourceCode" id="cb369"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb369-1" data-line-number="1">rpartTree &lt;-<span class="st"> </span><span class="kw">rpart</span>(trainy <span class="op">~</span><span class="st"> </span>., <span class="dt">data =</span> trainx, <span class="dt">maxdepth =</span> <span class="dv">2</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb378"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb378-1" data-line-number="1">rpartTree &lt;-<span class="st"> </span><span class="kw">rpart</span>(trainy <span class="op">~</span><span class="st"> </span>., <span class="dt">data =</span> trainx, <span class="dt">maxdepth =</span> <span class="dv">2</span>)</a></code></pre></div>
 <p>You can check the result using <code>print()</code>:</p>
-<div class="sourceCode" id="cb370"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb370-1" data-line-number="1"><span class="kw">print</span>(rpartTree)</a></code></pre></div>
+<div class="sourceCode" id="cb379"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb379-1" data-line-number="1"><span class="kw">print</span>(rpartTree)</a></code></pre></div>
 <pre><code>## n= 999 
 ## 
 ## node), split, n, deviance, yval
@@ -383,10 +383,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ##     5) Q5&gt;=1.5 549 1.919e+09  2326.0 *
 ##   3) Q3&gt;=3.5 200 2.436e+09 10110.0 *</code></pre>
 <p>You can see that the final model picks <code>Q3</code> and <code>Q5</code> to predict total expenditure. To visualize the tree, you can convert <code>rpart</code> object to <code>party</code> object using <code>partykit</code> then use <code>plot()</code> function:</p>
-<div class="sourceCode" id="cb372"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb372-1" data-line-number="1"><span class="kw">library</span>(partykit)</a>
-<a class="sourceLine" id="cb372-2" data-line-number="2">rpartTree2 &lt;-<span class="st"> </span><span class="kw">as.party</span>(rpartTree)</a>
-<a class="sourceLine" id="cb372-3" data-line-number="3"><span class="kw">plot</span>(rpartTree2)</a></code></pre></div>
-<p><img src="IDS_files/figure-html/unnamed-chunk-150-1.svg" width="672" /></p>
+<div class="sourceCode" id="cb381"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb381-1" data-line-number="1"><span class="kw">library</span>(partykit)</a>
+<a class="sourceLine" id="cb381-2" data-line-number="2">rpartTree2 &lt;-<span class="st"> </span><span class="kw">as.party</span>(rpartTree)</a>
+<a class="sourceLine" id="cb381-3" data-line-number="3"><span class="kw">plot</span>(rpartTree2)</a></code></pre></div>
+<p><img src="IDS_files/figure-html/unnamed-chunk-157-1.svg" width="672" /></p>
 </div>
 <div id="decision-tree" class="section level3">
 <h3><span class="header-section-number">11.3.2</span> Decision Tree</h3>
@@ -398,25 +398,25 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ol>
 <p>When fitting tree models, people need to choose the way to treat categorical predictors. If you know some of the categories have higher predictability, then the first approach may be better. In the rest of this section, we will build tree models using the above two approaches and compare them.</p>
 <p>Let’s build a classification model to identify the gender of the customer:</p>
-<div class="sourceCode" id="cb373"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb373-1" data-line-number="1"><span class="kw">library</span>(caret)</a>
-<a class="sourceLine" id="cb373-2" data-line-number="2"><span class="kw">library</span>(pROC)</a>
-<a class="sourceLine" id="cb373-3" data-line-number="3">dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)</a>
-<a class="sourceLine" id="cb373-4" data-line-number="4"><span class="co"># use the 10 survey questions as predictors</span></a>
-<a class="sourceLine" id="cb373-5" data-line-number="5">trainx1 &lt;-<span class="st"> </span>dat[, <span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>, <span class="kw">names</span>(dat))]</a>
-<a class="sourceLine" id="cb373-6" data-line-number="6"><span class="co"># add a categorical predictor</span></a>
-<a class="sourceLine" id="cb373-7" data-line-number="7"><span class="co"># use two ways to treat categorical predictor</span></a>
-<a class="sourceLine" id="cb373-8" data-line-number="8"><span class="co"># trainx1: use approach 1, without encoding</span></a>
-<a class="sourceLine" id="cb373-9" data-line-number="9">trainx1<span class="op">$</span>segment &lt;-<span class="st"> </span>dat<span class="op">$</span>segment</a>
-<a class="sourceLine" id="cb373-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb373-11" data-line-number="11"><span class="co"># trainx2: use approach 2, encode it to a set of dummy variables</span></a>
-<a class="sourceLine" id="cb373-12" data-line-number="12">dumMod&lt;-<span class="kw">dummyVars</span>(<span class="op">~</span>.,</a>
-<a class="sourceLine" id="cb373-13" data-line-number="13">                  <span class="dt">data=</span>trainx1,</a>
-<a class="sourceLine" id="cb373-14" data-line-number="14">                  <span class="co"># Combine the previous variable name and the level name</span></a>
-<a class="sourceLine" id="cb373-15" data-line-number="15">                  <span class="co"># as the new dummy variable name</span></a>
-<a class="sourceLine" id="cb373-16" data-line-number="16">                  <span class="dt">levelsOnly=</span>F)</a>
-<a class="sourceLine" id="cb373-17" data-line-number="17">trainx2 &lt;-<span class="st"> </span><span class="kw">predict</span>(dumMod,trainx1)</a>
-<a class="sourceLine" id="cb373-18" data-line-number="18"><span class="co"># the response variable is gender</span></a>
-<a class="sourceLine" id="cb373-19" data-line-number="19">trainy &lt;-<span class="st"> </span>dat<span class="op">$</span>gender</a></code></pre></div>
+<div class="sourceCode" id="cb382"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb382-1" data-line-number="1"><span class="kw">library</span>(caret)</a>
+<a class="sourceLine" id="cb382-2" data-line-number="2"><span class="kw">library</span>(pROC)</a>
+<a class="sourceLine" id="cb382-3" data-line-number="3">dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)</a>
+<a class="sourceLine" id="cb382-4" data-line-number="4"><span class="co"># use the 10 survey questions as predictors</span></a>
+<a class="sourceLine" id="cb382-5" data-line-number="5">trainx1 &lt;-<span class="st"> </span>dat[, <span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>, <span class="kw">names</span>(dat))]</a>
+<a class="sourceLine" id="cb382-6" data-line-number="6"><span class="co"># add a categorical predictor</span></a>
+<a class="sourceLine" id="cb382-7" data-line-number="7"><span class="co"># use two ways to treat categorical predictor</span></a>
+<a class="sourceLine" id="cb382-8" data-line-number="8"><span class="co"># trainx1: use approach 1, without encoding</span></a>
+<a class="sourceLine" id="cb382-9" data-line-number="9">trainx1<span class="op">$</span>segment &lt;-<span class="st"> </span>dat<span class="op">$</span>segment</a>
+<a class="sourceLine" id="cb382-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb382-11" data-line-number="11"><span class="co"># trainx2: use approach 2, encode it to a set of dummy variables</span></a>
+<a class="sourceLine" id="cb382-12" data-line-number="12">dumMod&lt;-<span class="kw">dummyVars</span>(<span class="op">~</span>.,</a>
+<a class="sourceLine" id="cb382-13" data-line-number="13">                  <span class="dt">data=</span>trainx1,</a>
+<a class="sourceLine" id="cb382-14" data-line-number="14">                  <span class="co"># Combine the previous variable name and the level name</span></a>
+<a class="sourceLine" id="cb382-15" data-line-number="15">                  <span class="co"># as the new dummy variable name</span></a>
+<a class="sourceLine" id="cb382-16" data-line-number="16">                  <span class="dt">levelsOnly=</span>F)</a>
+<a class="sourceLine" id="cb382-17" data-line-number="17">trainx2 &lt;-<span class="st"> </span><span class="kw">predict</span>(dumMod,trainx1)</a>
+<a class="sourceLine" id="cb382-18" data-line-number="18"><span class="co"># the response variable is gender</span></a>
+<a class="sourceLine" id="cb382-19" data-line-number="19">trainy &lt;-<span class="st"> </span>dat<span class="op">$</span>gender</a></code></pre></div>
 <p>Here we use <code>train()</code> function in <code>caret</code> package to call <code>rpart</code> to build the model. We can compare the model results from the two approaches:</p>
 <pre class="pre"><code>CART 
 
@@ -444,45 +444,45 @@ Resampling results across tuning parameters:
 ROC was used to select the optimal model using the largest value.
 The final value used for the model was cp = 0.00835.</code></pre>
 <p>The above keeps the variable as categorical without encoding. Here <code>cp</code> is the complexity parameter. It is used to decide when to stop growing the tree. <code>cp = 0.01</code> means the algorithm only keeps the split that improves the corresponding metric by more than 0.01. Next, let’s encode the categorical variable to be a set of dummy variables and fit the model again:</p>
-<div class="sourceCode" id="cb375"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb375-1" data-line-number="1">rpartTune2 &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(trainx2, trainy, <span class="dt">method =</span> <span class="st">&quot;rpart&quot;</span>,</a>
-<a class="sourceLine" id="cb375-2" data-line-number="2">                       <span class="dt">tuneLength =</span> <span class="dv">30</span>,</a>
-<a class="sourceLine" id="cb375-3" data-line-number="3">                       <span class="dt">metric =</span> <span class="st">&quot;ROC&quot;</span>, </a>
-<a class="sourceLine" id="cb375-4" data-line-number="4">                       <span class="dt">trControl =</span> <span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>,</a>
-<a class="sourceLine" id="cb375-5" data-line-number="5">                                                <span class="dt">summaryFunction =</span> twoClassSummary,</a>
-<a class="sourceLine" id="cb375-6" data-line-number="6">                                                <span class="dt">classProbs =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb375-7" data-line-number="7">                                                <span class="dt">savePredictions =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb384"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb384-1" data-line-number="1">rpartTune2 &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(trainx2, trainy, <span class="dt">method =</span> <span class="st">&quot;rpart&quot;</span>,</a>
+<a class="sourceLine" id="cb384-2" data-line-number="2">                       <span class="dt">tuneLength =</span> <span class="dv">30</span>,</a>
+<a class="sourceLine" id="cb384-3" data-line-number="3">                       <span class="dt">metric =</span> <span class="st">&quot;ROC&quot;</span>, </a>
+<a class="sourceLine" id="cb384-4" data-line-number="4">                       <span class="dt">trControl =</span> <span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>,</a>
+<a class="sourceLine" id="cb384-5" data-line-number="5">                                                <span class="dt">summaryFunction =</span> twoClassSummary,</a>
+<a class="sourceLine" id="cb384-6" data-line-number="6">                                                <span class="dt">classProbs =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb384-7" data-line-number="7">                                                <span class="dt">savePredictions =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
 <p>Compare the results of the two approaches.</p>
-<div class="sourceCode" id="cb376"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb376-1" data-line-number="1">rpartRoc &lt;-<span class="st"> </span>pROC<span class="op">::</span><span class="kw">roc</span>(<span class="dt">response =</span> rpartTune1<span class="op">$</span>pred<span class="op">$</span>obs,</a>
-<a class="sourceLine" id="cb376-2" data-line-number="2">                <span class="dt">predictor =</span> rpartTune1<span class="op">$</span>pred<span class="op">$</span>Female,</a>
-<a class="sourceLine" id="cb376-3" data-line-number="3">                <span class="dt">levels =</span> <span class="kw">rev</span>(<span class="kw">levels</span>(rpartTune1<span class="op">$</span>pred<span class="op">$</span>obs)))</a></code></pre></div>
+<div class="sourceCode" id="cb385"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb385-1" data-line-number="1">rpartRoc &lt;-<span class="st"> </span>pROC<span class="op">::</span><span class="kw">roc</span>(<span class="dt">response =</span> rpartTune1<span class="op">$</span>pred<span class="op">$</span>obs,</a>
+<a class="sourceLine" id="cb385-2" data-line-number="2">                <span class="dt">predictor =</span> rpartTune1<span class="op">$</span>pred<span class="op">$</span>Female,</a>
+<a class="sourceLine" id="cb385-3" data-line-number="3">                <span class="dt">levels =</span> <span class="kw">rev</span>(<span class="kw">levels</span>(rpartTune1<span class="op">$</span>pred<span class="op">$</span>obs)))</a></code></pre></div>
 <pre><code>## Setting direction: controls &lt; cases</code></pre>
-<div class="sourceCode" id="cb378"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb378-1" data-line-number="1">rpartFactorRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span class="dt">response =</span> rpartTune2<span class="op">$</span>pred<span class="op">$</span>obs,</a>
-<a class="sourceLine" id="cb378-2" data-line-number="2">                      <span class="dt">predictor =</span> rpartTune2<span class="op">$</span>pred<span class="op">$</span>Female,</a>
-<a class="sourceLine" id="cb378-3" data-line-number="3">                      <span class="dt">levels =</span> <span class="kw">rev</span>(<span class="kw">levels</span>(rpartTune1<span class="op">$</span>pred<span class="op">$</span>obs)))</a></code></pre></div>
+<div class="sourceCode" id="cb387"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb387-1" data-line-number="1">rpartFactorRoc &lt;-<span class="st"> </span><span class="kw">roc</span>(<span class="dt">response =</span> rpartTune2<span class="op">$</span>pred<span class="op">$</span>obs,</a>
+<a class="sourceLine" id="cb387-2" data-line-number="2">                      <span class="dt">predictor =</span> rpartTune2<span class="op">$</span>pred<span class="op">$</span>Female,</a>
+<a class="sourceLine" id="cb387-3" data-line-number="3">                      <span class="dt">levels =</span> <span class="kw">rev</span>(<span class="kw">levels</span>(rpartTune1<span class="op">$</span>pred<span class="op">$</span>obs)))</a></code></pre></div>
 <pre><code>## Setting direction: controls &lt; cases</code></pre>
-<div class="sourceCode" id="cb380"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb380-1" data-line-number="1"><span class="kw">plot.roc</span>(rpartRoc, </a>
-<a class="sourceLine" id="cb380-2" data-line-number="2">     <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>, </a>
-<a class="sourceLine" id="cb380-3" data-line-number="3">     <span class="dt">print.thres =</span> <span class="kw">c</span>(.<span class="dv">5</span>),</a>
-<a class="sourceLine" id="cb380-4" data-line-number="4">     <span class="dt">print.thres.pch =</span> <span class="dv">3</span>,</a>
-<a class="sourceLine" id="cb380-5" data-line-number="5">     <span class="dt">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>,</a>
-<a class="sourceLine" id="cb380-6" data-line-number="6">     <span class="dt">print.thres.cex =</span> <span class="fl">1.2</span>,</a>
-<a class="sourceLine" id="cb380-7" data-line-number="7">     <span class="dt">col =</span> <span class="st">&quot;red&quot;</span>, <span class="dt">legacy.axes =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb380-8" data-line-number="8">     <span class="dt">print.thres.col =</span> <span class="st">&quot;red&quot;</span>)</a>
-<a class="sourceLine" id="cb380-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb380-10" data-line-number="10"><span class="kw">plot.roc</span>(rpartFactorRoc,</a>
-<a class="sourceLine" id="cb380-11" data-line-number="11">     <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>,</a>
-<a class="sourceLine" id="cb380-12" data-line-number="12">     <span class="dt">add =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb380-13" data-line-number="13">     <span class="dt">print.thres =</span> <span class="kw">c</span>(.<span class="dv">5</span>),</a>
-<a class="sourceLine" id="cb380-14" data-line-number="14">     <span class="dt">print.thres.pch =</span> <span class="dv">16</span>, <span class="dt">legacy.axes =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb380-15" data-line-number="15">     <span class="dt">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>,</a>
-<a class="sourceLine" id="cb380-16" data-line-number="16">     <span class="dt">print.thres.cex =</span> <span class="fl">1.2</span>)</a>
-<a class="sourceLine" id="cb380-17" data-line-number="17"></a>
-<a class="sourceLine" id="cb380-18" data-line-number="18"><span class="kw">legend</span>(.<span class="dv">75</span>, <span class="fl">.2</span>,</a>
-<a class="sourceLine" id="cb380-19" data-line-number="19">       <span class="kw">c</span>(<span class="st">&quot;Grouped Categories&quot;</span>, <span class="st">&quot;Independent Categories&quot;</span>),</a>
-<a class="sourceLine" id="cb380-20" data-line-number="20">       <span class="dt">lwd =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb380-21" data-line-number="21">       <span class="dt">col =</span> <span class="kw">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;red&quot;</span>),</a>
-<a class="sourceLine" id="cb380-22" data-line-number="22">       <span class="dt">pch =</span> <span class="kw">c</span>(<span class="dv">16</span>, <span class="dv">3</span>))</a></code></pre></div>
-<p><img src="IDS_files/figure-html/unnamed-chunk-154-1.svg" width="672" /></p>
+<div class="sourceCode" id="cb389"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb389-1" data-line-number="1"><span class="kw">plot.roc</span>(rpartRoc, </a>
+<a class="sourceLine" id="cb389-2" data-line-number="2">     <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>, </a>
+<a class="sourceLine" id="cb389-3" data-line-number="3">     <span class="dt">print.thres =</span> <span class="kw">c</span>(.<span class="dv">5</span>),</a>
+<a class="sourceLine" id="cb389-4" data-line-number="4">     <span class="dt">print.thres.pch =</span> <span class="dv">3</span>,</a>
+<a class="sourceLine" id="cb389-5" data-line-number="5">     <span class="dt">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>,</a>
+<a class="sourceLine" id="cb389-6" data-line-number="6">     <span class="dt">print.thres.cex =</span> <span class="fl">1.2</span>,</a>
+<a class="sourceLine" id="cb389-7" data-line-number="7">     <span class="dt">col =</span> <span class="st">&quot;red&quot;</span>, <span class="dt">legacy.axes =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb389-8" data-line-number="8">     <span class="dt">print.thres.col =</span> <span class="st">&quot;red&quot;</span>)</a>
+<a class="sourceLine" id="cb389-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb389-10" data-line-number="10"><span class="kw">plot.roc</span>(rpartFactorRoc,</a>
+<a class="sourceLine" id="cb389-11" data-line-number="11">     <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>,</a>
+<a class="sourceLine" id="cb389-12" data-line-number="12">     <span class="dt">add =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb389-13" data-line-number="13">     <span class="dt">print.thres =</span> <span class="kw">c</span>(.<span class="dv">5</span>),</a>
+<a class="sourceLine" id="cb389-14" data-line-number="14">     <span class="dt">print.thres.pch =</span> <span class="dv">16</span>, <span class="dt">legacy.axes =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb389-15" data-line-number="15">     <span class="dt">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>,</a>
+<a class="sourceLine" id="cb389-16" data-line-number="16">     <span class="dt">print.thres.cex =</span> <span class="fl">1.2</span>)</a>
+<a class="sourceLine" id="cb389-17" data-line-number="17"></a>
+<a class="sourceLine" id="cb389-18" data-line-number="18"><span class="kw">legend</span>(.<span class="dv">75</span>, <span class="fl">.2</span>,</a>
+<a class="sourceLine" id="cb389-19" data-line-number="19">       <span class="kw">c</span>(<span class="st">&quot;Grouped Categories&quot;</span>, <span class="st">&quot;Independent Categories&quot;</span>),</a>
+<a class="sourceLine" id="cb389-20" data-line-number="20">       <span class="dt">lwd =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>),</a>
+<a class="sourceLine" id="cb389-21" data-line-number="21">       <span class="dt">col =</span> <span class="kw">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;red&quot;</span>),</a>
+<a class="sourceLine" id="cb389-22" data-line-number="22">       <span class="dt">pch =</span> <span class="kw">c</span>(<span class="dv">16</span>, <span class="dv">3</span>))</a></code></pre></div>
+<p><img src="IDS_files/figure-html/unnamed-chunk-161-1.svg" width="672" /></p>
 <p>You can see that in this case, the two approaches lead to similar model performance.</p>
 <p>Single tree is straightforward and easy to interpret but it has problems:</p>
 <ol style="list-style-type: decimal">

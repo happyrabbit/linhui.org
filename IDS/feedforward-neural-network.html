@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2020-10-31" />
+<meta name="date" content="2020-11-01" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -245,7 +245,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="9.1.1" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html#the-magic-p-value"><i class="fa fa-check"></i><b>9.1.1</b> The Magic P-value</a></li>
 <li class="chapter" data-level="9.1.2" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html#diagnostics-for-linear-regression"><i class="fa fa-check"></i><b>9.1.2</b> Diagnostics for Linear Regression</a></li>
 </ul></li>
-<li class="chapter" data-level="9.2" data-path="pcr-and-pls.html"><a href="pcr-and-pls.html"><i class="fa fa-check"></i><b>9.2</b> PCR and PLS</a></li>
+<li class="chapter" data-level="9.2" data-path="principal-components-regression-and-partial-least-square.html"><a href="principal-components-regression-and-partial-least-square.html"><i class="fa fa-check"></i><b>9.2</b> Principal Components Regression and Partial Least Square</a></li>
 <li class="chapter" data-level="9.3" data-path="measurement-error.html"><a href="measurement-error.html"><i class="fa fa-check"></i><b>9.3</b> Measurement Error</a><ul>
 <li class="chapter" data-level="9.3.1" data-path="measurement-error.html"><a href="measurement-error.html#measurement-error-in-the-response"><i class="fa fa-check"></i><b>9.3.1</b> Measurement Error in the Response</a></li>
 <li class="chapter" data-level="9.3.2" data-path="measurement-error.html"><a href="measurement-error.html#measurement-error-in-the-independent-variables"><i class="fa fa-check"></i><b>9.3.2</b> Measurement Error in the Independent Variables</a></li>
@@ -568,68 +568,68 @@ FIGURE 12.8: Color image is a set of pixels on 3-d space. Each pixel has a value
 </p>
 </div>
 <p>Let’s look at how to use the <code>keras</code> R package for a toy example in deep learning with the handwritten digits image dataset (i.e. MNIST). <code>keras</code> has many dependent packages, so it takes a few minutes to install. Be patient! In a production cloud environment such as the paid version of Databricks, you can save what you have and resume from where you left.</p>
-<div class="sourceCode" id="cb403"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb403-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="st">&quot;keras&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb412"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb412-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="st">&quot;keras&quot;</span>)</a></code></pre></div>
 <p>As <code>keras</code> is just an interface to popular deep learning frameworks, we have to install the deep learning backend. The default and recommended backend is TensorFlow. By calling <code>install_keras()</code>, it will install all the needed dependencies for TensorFlow.</p>
-<div class="sourceCode" id="cb404"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb404-1" data-line-number="1"><span class="kw">library</span>(keras)</a>
-<a class="sourceLine" id="cb404-2" data-line-number="2"><span class="kw">install_keras</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb413"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb413-1" data-line-number="1"><span class="kw">library</span>(keras)</a>
+<a class="sourceLine" id="cb413-2" data-line-number="2"><span class="kw">install_keras</span>()</a></code></pre></div>
 <p>Now we are all set to explore deep learning! As simple as three lines of R code, but there are quite a lot going on behind the scene. If you are using a cloud environment, you do not need to worry about these behind scene setup and maintenance.</p>
 <p>We will use the widely used MNIST handwritten digit image dataset. More information about the dataset and benchmark results from various machine learning methods can be found at <a href="http://yann.lecun.com/exdb/mnist/" class="uri">http://yann.lecun.com/exdb/mnist/</a> and <a href="https://en.wikipedia.org/wiki/MNIST_database" class="uri">https://en.wikipedia.org/wiki/MNIST_database</a>.</p>
 <p>This dataset is already included in the keras/TensorFlow installation and we can simply load the dataset as described in the following cell. It takes less than a minute to load the dataset.</p>
-<div class="sourceCode" id="cb405"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb405-1" data-line-number="1">mnist &lt;-<span class="st"> </span><span class="kw">dataset_mnist</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb414"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb414-1" data-line-number="1">mnist &lt;-<span class="st"> </span><span class="kw">dataset_mnist</span>()</a></code></pre></div>
 <p>The data structure of the MNIST dataset is straight forward and well prepared for R, which has two pieces:</p>
 <ol style="list-style-type: decimal">
 <li><p>training set: x (i.e. features): 60000x28x28 tensor which corresponds to 60000 28x28 pixel greyscale images (i.e. all the values are integers between 0 and 255 in each 28x28 matrix), and y (i.e. responses): a length 60000 vector which contains the corresponding digits with integer values between 0 and 9.</p></li>
 <li><p>testing set: same as the training set, but with only 10000 images and responses. The detailed structure for the dataset can be seen with <code>str(mnist)</code> below.</p></li>
 </ol>
-<div class="sourceCode" id="cb406"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb406-1" data-line-number="1"><span class="kw">str</span>(mnist)</a></code></pre></div>
-<div class="sourceCode" id="cb407"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb407-1" data-line-number="1">List of 2</a>
-<a class="sourceLine" id="cb407-2" data-line-number="2"> $ train:List of 2</a>
-<a class="sourceLine" id="cb407-3" data-line-number="3">  ..$ x: int [1:60000, 1:28, 1:28] 0 0 0 0 0 0 0 0 0 0 ...</a>
-<a class="sourceLine" id="cb407-4" data-line-number="4">  ..$ y: int [1:60000(1d)] 5 0 4 1 9 2 1 3 1 4 ...</a>
-<a class="sourceLine" id="cb407-5" data-line-number="5"> $ test :List of 2</a>
-<a class="sourceLine" id="cb407-6" data-line-number="6">  ..$ x: int [1:10000, 1:28, 1:28] 0 0 0 0 0 0 0 0 0 0 ...</a>
-<a class="sourceLine" id="cb407-7" data-line-number="7">  ..$ y: int [1:10000(1d)] 7 2 1 0 4 1 4 9 5 9 ...</a></code></pre></div>
+<div class="sourceCode" id="cb415"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb415-1" data-line-number="1"><span class="kw">str</span>(mnist)</a></code></pre></div>
+<div class="sourceCode" id="cb416"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb416-1" data-line-number="1">List of 2</a>
+<a class="sourceLine" id="cb416-2" data-line-number="2"> $ train:List of 2</a>
+<a class="sourceLine" id="cb416-3" data-line-number="3">  ..$ x: int [1:60000, 1:28, 1:28] 0 0 0 0 0 0 0 0 0 0 ...</a>
+<a class="sourceLine" id="cb416-4" data-line-number="4">  ..$ y: int [1:60000(1d)] 5 0 4 1 9 2 1 3 1 4 ...</a>
+<a class="sourceLine" id="cb416-5" data-line-number="5"> $ test :List of 2</a>
+<a class="sourceLine" id="cb416-6" data-line-number="6">  ..$ x: int [1:10000, 1:28, 1:28] 0 0 0 0 0 0 0 0 0 0 ...</a>
+<a class="sourceLine" id="cb416-7" data-line-number="7">  ..$ y: int [1:10000(1d)] 7 2 1 0 4 1 4 9 5 9 ...</a></code></pre></div>
 <p>Now we prepare the features (x) and the response variable (y) for both the training and testing dataset, and we can check the structure of the <code>x_train</code> and <code>y_train</code> using <code>str()</code> function.</p>
-<div class="sourceCode" id="cb408"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb408-1" data-line-number="1">x_train &lt;-<span class="st"> </span>mnist<span class="op">$</span>train<span class="op">$</span>x</a>
-<a class="sourceLine" id="cb408-2" data-line-number="2">y_train &lt;-<span class="st"> </span>mnist<span class="op">$</span>train<span class="op">$</span>y</a>
-<a class="sourceLine" id="cb408-3" data-line-number="3">x_test &lt;-<span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>x</a>
-<a class="sourceLine" id="cb408-4" data-line-number="4">y_test &lt;-<span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>y</a>
-<a class="sourceLine" id="cb408-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb408-6" data-line-number="6"><span class="kw">str</span>(x_train)</a>
-<a class="sourceLine" id="cb408-7" data-line-number="7"><span class="kw">str</span>(y_train)</a></code></pre></div>
-<div class="sourceCode" id="cb409"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb409-1" data-line-number="1">int [1:60000, 1:28, 1:28] 0 0 0 0 0 0 0 0 0 0 ...</a>
-<a class="sourceLine" id="cb409-2" data-line-number="2">int [1:60000(1d)] 5 0 4 1 9 2 1 3 1 4 ...</a></code></pre></div>
+<div class="sourceCode" id="cb417"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb417-1" data-line-number="1">x_train &lt;-<span class="st"> </span>mnist<span class="op">$</span>train<span class="op">$</span>x</a>
+<a class="sourceLine" id="cb417-2" data-line-number="2">y_train &lt;-<span class="st"> </span>mnist<span class="op">$</span>train<span class="op">$</span>y</a>
+<a class="sourceLine" id="cb417-3" data-line-number="3">x_test &lt;-<span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>x</a>
+<a class="sourceLine" id="cb417-4" data-line-number="4">y_test &lt;-<span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>y</a>
+<a class="sourceLine" id="cb417-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb417-6" data-line-number="6"><span class="kw">str</span>(x_train)</a>
+<a class="sourceLine" id="cb417-7" data-line-number="7"><span class="kw">str</span>(y_train)</a></code></pre></div>
+<div class="sourceCode" id="cb418"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb418-1" data-line-number="1">int [1:60000, 1:28, 1:28] 0 0 0 0 0 0 0 0 0 0 ...</a>
+<a class="sourceLine" id="cb418-2" data-line-number="2">int [1:60000(1d)] 5 0 4 1 9 2 1 3 1 4 ...</a></code></pre></div>
 <p>Now let’s plot a chosen 28x28 matrix as an image using R’s <code>image()</code> function. In R’s <code>image()</code> function, the way of showing an image is rotated 90 degree from the matrix representation. So there is additional steps to rearrange the matrix such that we can use <code>image()</code> function to show it in the actual orientation.</p>
-<div class="sourceCode" id="cb410"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb410-1" data-line-number="1">index_image =<span class="st"> </span><span class="dv">28</span>  <span class="co">## change this index to see different image.</span></a>
-<a class="sourceLine" id="cb410-2" data-line-number="2">input_matrix &lt;-<span class="st"> </span>x_train[index_image, <span class="dv">1</span><span class="op">:</span><span class="dv">28</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">28</span>]</a>
-<a class="sourceLine" id="cb410-3" data-line-number="3">output_matrix &lt;-<span class="st"> </span><span class="kw">apply</span>(input_matrix, <span class="dv">2</span>, rev)</a>
-<a class="sourceLine" id="cb410-4" data-line-number="4">output_matrix &lt;-<span class="st"> </span><span class="kw">t</span>(output_matrix)</a>
-<a class="sourceLine" id="cb410-5" data-line-number="5"><span class="kw">image</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">28</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">28</span>, output_matrix, <span class="dt">col =</span> <span class="kw">gray.colors</span>(<span class="dv">256</span>), </a>
-<a class="sourceLine" id="cb410-6" data-line-number="6">    <span class="dt">xlab =</span> <span class="kw">paste</span>(<span class="st">&quot;Image for digit of: &quot;</span>, y_train[index_image]), </a>
-<a class="sourceLine" id="cb410-7" data-line-number="7">    <span class="dt">ylab =</span> <span class="st">&quot;&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb419"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb419-1" data-line-number="1">index_image =<span class="st"> </span><span class="dv">28</span>  <span class="co">## change this index to see different image.</span></a>
+<a class="sourceLine" id="cb419-2" data-line-number="2">input_matrix &lt;-<span class="st"> </span>x_train[index_image, <span class="dv">1</span><span class="op">:</span><span class="dv">28</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">28</span>]</a>
+<a class="sourceLine" id="cb419-3" data-line-number="3">output_matrix &lt;-<span class="st"> </span><span class="kw">apply</span>(input_matrix, <span class="dv">2</span>, rev)</a>
+<a class="sourceLine" id="cb419-4" data-line-number="4">output_matrix &lt;-<span class="st"> </span><span class="kw">t</span>(output_matrix)</a>
+<a class="sourceLine" id="cb419-5" data-line-number="5"><span class="kw">image</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">28</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">28</span>, output_matrix, <span class="dt">col =</span> <span class="kw">gray.colors</span>(<span class="dv">256</span>), </a>
+<a class="sourceLine" id="cb419-6" data-line-number="6">    <span class="dt">xlab =</span> <span class="kw">paste</span>(<span class="st">&quot;Image for digit of: &quot;</span>, y_train[index_image]), </a>
+<a class="sourceLine" id="cb419-7" data-line-number="7">    <span class="dt">ylab =</span> <span class="st">&quot;&quot;</span>)</a></code></pre></div>
 <center>
 <img src="images/mnist_image3.png" style="width:70.0%" />
 </center>
 <p>Here is the original 28x28 matrix for the above image:</p>
-<div class="sourceCode" id="cb411"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb411-1" data-line-number="1">input_matrix</a></code></pre></div>
-<div class="sourceCode" id="cb412"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb412-1" data-line-number="1">     [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10] [,11] [,12] [,13]</a>
-<a class="sourceLine" id="cb412-2" data-line-number="2"> [1,]    0    0    0    0    0    0    0    0    0     0     0     0     0</a>
-<a class="sourceLine" id="cb412-3" data-line-number="3"> [2,]    0    0    0    0    0    0    0    0    0     0     0     0     0</a>
-<a class="sourceLine" id="cb412-4" data-line-number="4"> [3,]    0    0    0    0    0    0    0    0    0     0     0     0     0</a>
-<a class="sourceLine" id="cb412-5" data-line-number="5"> [4,]    0    0    0    0    0    0    0    0    0     0     0     0     0</a>
-<a class="sourceLine" id="cb412-6" data-line-number="6"> [5,]    0    0    0    0    0    0    0    0    0     0     0     0     0</a>
-<a class="sourceLine" id="cb412-7" data-line-number="7"> [6,]    0    0    0    0    0    0    0    0    0     0     9    80   207</a>
-<a class="sourceLine" id="cb412-8" data-line-number="8"> [7,]    0    0    0    0    0    0   39  158  158   158   168   253   253</a>
-<a class="sourceLine" id="cb412-9" data-line-number="9"> [8,]    0    0    0    0    0    0  226  253  253   253   253   253   253</a>
-<a class="sourceLine" id="cb412-10" data-line-number="10"> [9,]    0    0    0    0    0    0  139  253  253   253   238   113   215</a>
-<a class="sourceLine" id="cb412-11" data-line-number="11">[10,]    0    0    0    0    0    0   39   34   34    34    30     0    31</a>
-<a class="sourceLine" id="cb412-12" data-line-number="12">[11,]    0    0    0    0    0    0   91    0    0     0     0     0     0</a>
-<a class="sourceLine" id="cb412-13" data-line-number="13">[12,]    0    0    0    0    0    0    0    0    0     0     0    11    33</a>
-<a class="sourceLine" id="cb412-14" data-line-number="14">[13,]    0    0    0    0    0    0    0    0    0     0    11   167   253</a>
-<a class="sourceLine" id="cb412-15" data-line-number="15">[14,]    0    0    0    0    0    0    0    0    0     0    27   253   253</a>
-<a class="sourceLine" id="cb412-16" data-line-number="16">[15,]    0    0    0    0    0    0    0    0    0     0    18   201   253</a>
-<a class="sourceLine" id="cb412-17" data-line-number="17">[16,]    0    0    0    0    0    0    0    0    0     0     0    36    87</a>
-<a class="sourceLine" id="cb412-18" data-line-number="18">...</a></code></pre></div>
+<div class="sourceCode" id="cb420"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb420-1" data-line-number="1">input_matrix</a></code></pre></div>
+<div class="sourceCode" id="cb421"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb421-1" data-line-number="1">     [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10] [,11] [,12] [,13]</a>
+<a class="sourceLine" id="cb421-2" data-line-number="2"> [1,]    0    0    0    0    0    0    0    0    0     0     0     0     0</a>
+<a class="sourceLine" id="cb421-3" data-line-number="3"> [2,]    0    0    0    0    0    0    0    0    0     0     0     0     0</a>
+<a class="sourceLine" id="cb421-4" data-line-number="4"> [3,]    0    0    0    0    0    0    0    0    0     0     0     0     0</a>
+<a class="sourceLine" id="cb421-5" data-line-number="5"> [4,]    0    0    0    0    0    0    0    0    0     0     0     0     0</a>
+<a class="sourceLine" id="cb421-6" data-line-number="6"> [5,]    0    0    0    0    0    0    0    0    0     0     0     0     0</a>
+<a class="sourceLine" id="cb421-7" data-line-number="7"> [6,]    0    0    0    0    0    0    0    0    0     0     9    80   207</a>
+<a class="sourceLine" id="cb421-8" data-line-number="8"> [7,]    0    0    0    0    0    0   39  158  158   158   168   253   253</a>
+<a class="sourceLine" id="cb421-9" data-line-number="9"> [8,]    0    0    0    0    0    0  226  253  253   253   253   253   253</a>
+<a class="sourceLine" id="cb421-10" data-line-number="10"> [9,]    0    0    0    0    0    0  139  253  253   253   238   113   215</a>
+<a class="sourceLine" id="cb421-11" data-line-number="11">[10,]    0    0    0    0    0    0   39   34   34    34    30     0    31</a>
+<a class="sourceLine" id="cb421-12" data-line-number="12">[11,]    0    0    0    0    0    0   91    0    0     0     0     0     0</a>
+<a class="sourceLine" id="cb421-13" data-line-number="13">[12,]    0    0    0    0    0    0    0    0    0     0     0    11    33</a>
+<a class="sourceLine" id="cb421-14" data-line-number="14">[13,]    0    0    0    0    0    0    0    0    0     0    11   167   253</a>
+<a class="sourceLine" id="cb421-15" data-line-number="15">[14,]    0    0    0    0    0    0    0    0    0     0    27   253   253</a>
+<a class="sourceLine" id="cb421-16" data-line-number="16">[15,]    0    0    0    0    0    0    0    0    0     0    18   201   253</a>
+<a class="sourceLine" id="cb421-17" data-line-number="17">[16,]    0    0    0    0    0    0    0    0    0     0     0    36    87</a>
+<a class="sourceLine" id="cb421-18" data-line-number="18">...</a></code></pre></div>
 <p>There are multiple deep learning methods to solve the handwritten digits problem and we will start from the simple and generic one, feedforward neural network (FFNN). FFNN contains a few fully connected layers and information is flowing from a front layer to a back layer without any feedback loop from the back layer to the front layer. It is the most common deep learning models to start with.</p>
 <div id="data-preprocessing" class="section level4">
 <h4><span class="header-section-number">12.2.7.1</span> Data preprocessing</h4>
@@ -637,151 +637,151 @@ FIGURE 12.8: Color image is a set of pixels on 3-d space. Each pixel has a value
 <p>First, for each digits, we have a scalar response and a 28x28 integer matrix with value between 0 and 255. To use the out of box DNN functions, for each response, all the features are one row of all features. For an image in MNIST dataet, the input for one response y is a 28x28 matrix, not a single row of many columns and we need to convet the 28x28 matrix into a single row by appending every row of the matrix to the first row using <code>reshape()</code> function.</p>
 <p>In addition, we also need to scale all features to be between (0, 1) or (-1, 1) or close to (-1, 1) range. Scale or normalize every feature will improve numerical stability in the optimization procedure as there are a lot of parameters to be optimized.</p>
 <p>We first reshape the 28x28 image for each digit (i.e each row) into 784 columns (i.e. features), and then rescale the value to be between 0 and 1 by dividing the original pixel value by 255, as described in the cell below.</p>
-<div class="sourceCode" id="cb413"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb413-1" data-line-number="1"><span class="co"># step 1: reshape</span></a>
-<a class="sourceLine" id="cb413-2" data-line-number="2">x_train &lt;-<span class="st"> </span><span class="kw">array_reshape</span>(x_train, <span class="kw">c</span>(<span class="kw">nrow</span>(x_train), <span class="dv">784</span>))</a>
-<a class="sourceLine" id="cb413-3" data-line-number="3">x_test &lt;-<span class="st"> </span><span class="kw">array_reshape</span>(x_test, <span class="kw">c</span>(<span class="kw">nrow</span>(x_test), <span class="dv">784</span>))</a>
-<a class="sourceLine" id="cb413-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb413-5" data-line-number="5"><span class="co"># step 2: rescale</span></a>
-<a class="sourceLine" id="cb413-6" data-line-number="6">x_train &lt;-<span class="st"> </span>x_train <span class="op">/</span><span class="st"> </span><span class="dv">255</span></a>
-<a class="sourceLine" id="cb413-7" data-line-number="7">x_test &lt;-<span class="st"> </span>x_test <span class="op">/</span><span class="st"> </span><span class="dv">255</span></a></code></pre></div>
+<div class="sourceCode" id="cb422"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb422-1" data-line-number="1"><span class="co"># step 1: reshape</span></a>
+<a class="sourceLine" id="cb422-2" data-line-number="2">x_train &lt;-<span class="st"> </span><span class="kw">array_reshape</span>(x_train, <span class="kw">c</span>(<span class="kw">nrow</span>(x_train), <span class="dv">784</span>))</a>
+<a class="sourceLine" id="cb422-3" data-line-number="3">x_test &lt;-<span class="st"> </span><span class="kw">array_reshape</span>(x_test, <span class="kw">c</span>(<span class="kw">nrow</span>(x_test), <span class="dv">784</span>))</a>
+<a class="sourceLine" id="cb422-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb422-5" data-line-number="5"><span class="co"># step 2: rescale</span></a>
+<a class="sourceLine" id="cb422-6" data-line-number="6">x_train &lt;-<span class="st"> </span>x_train <span class="op">/</span><span class="st"> </span><span class="dv">255</span></a>
+<a class="sourceLine" id="cb422-7" data-line-number="7">x_test &lt;-<span class="st"> </span>x_test <span class="op">/</span><span class="st"> </span><span class="dv">255</span></a></code></pre></div>
 <p>And here is the structure of the reshaped and rescaled features for training and testing dataset. Now for each digit, there are 784 columns of features.</p>
-<div class="sourceCode" id="cb414"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb414-1" data-line-number="1"><span class="kw">str</span>(x_train)</a>
-<a class="sourceLine" id="cb414-2" data-line-number="2"><span class="kw">str</span>(x_test)</a></code></pre></div>
-<div class="sourceCode" id="cb415"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb415-1" data-line-number="1">num [1:60000, 1:784] 0 0 0 0 0 0 0 0 0 0 ...</a>
-<a class="sourceLine" id="cb415-2" data-line-number="2">num [1:10000, 1:784] 0 0 0 0 0 0 0 0 0 0 ...</a></code></pre></div>
+<div class="sourceCode" id="cb423"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb423-1" data-line-number="1"><span class="kw">str</span>(x_train)</a>
+<a class="sourceLine" id="cb423-2" data-line-number="2"><span class="kw">str</span>(x_test)</a></code></pre></div>
+<div class="sourceCode" id="cb424"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb424-1" data-line-number="1">num [1:60000, 1:784] 0 0 0 0 0 0 0 0 0 0 ...</a>
+<a class="sourceLine" id="cb424-2" data-line-number="2">num [1:10000, 1:784] 0 0 0 0 0 0 0 0 0 0 ...</a></code></pre></div>
 <p>In this example, though the response variable is an integer (i.e. the corresponding digits for an image), there is no order or rank for these integers and they are just an indication of one of the 10 categories. So we also convert the response variable y to be categorical.</p>
-<div class="sourceCode" id="cb416"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb416-1" data-line-number="1">y_train &lt;-<span class="st"> </span><span class="kw">to_categorical</span>(y_train, <span class="dv">10</span>)</a>
-<a class="sourceLine" id="cb416-2" data-line-number="2">y_test &lt;-<span class="st"> </span><span class="kw">to_categorical</span>(y_test, <span class="dv">10</span>)</a>
-<a class="sourceLine" id="cb416-3" data-line-number="3"><span class="kw">str</span>(y_train)</a></code></pre></div>
-<div class="sourceCode" id="cb417"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb417-1" data-line-number="1">num [1:60000, 1:10] 0 1 0 0 0 0 0 0 0 0 ...</a></code></pre></div>
+<div class="sourceCode" id="cb425"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb425-1" data-line-number="1">y_train &lt;-<span class="st"> </span><span class="kw">to_categorical</span>(y_train, <span class="dv">10</span>)</a>
+<a class="sourceLine" id="cb425-2" data-line-number="2">y_test &lt;-<span class="st"> </span><span class="kw">to_categorical</span>(y_test, <span class="dv">10</span>)</a>
+<a class="sourceLine" id="cb425-3" data-line-number="3"><span class="kw">str</span>(y_train)</a></code></pre></div>
+<div class="sourceCode" id="cb426"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb426-1" data-line-number="1">num [1:60000, 1:10] 0 1 0 0 0 0 0 0 0 0 ...</a></code></pre></div>
 </div>
 <div id="fit-model" class="section level4">
 <h4><span class="header-section-number">12.2.7.2</span> Fit model</h4>
 <p>Now we are ready to fit the model. It is straight forward to build a deep neural network using keras. For this example, the number of input features is 784 (i.e. scaled value of each pixel in the 28x28 image) and the number of class for the output is 10 (i.e. one of the ten categories). So the input size for the first layer is 784 and the output size for the last layer is 10. And we can add any number of compatible layers in between.</p>
 <p>In keras, it is easy to define a DNN model: (1) use <code>keras_model_sequential()</code> to initiate a model placeholder and all model structures are attached to this model object, (2) layers are added in sequence by calling the <code>layer_dense()</code> function, (3) add arbitrary layers to the model based on the sequence of calling <code>layer_dense()</code>. For a dense layer, all the nodes from the previous layer are connected with each and every node to the next layer. In <code>layer_dense()</code> function, we can define how many nodes in that layer through the <code>units</code> parameter. The activation function can be defined through the <code>activation</code> parameter. For the first layer, we also need to define the input features’ dimension through <code>input_shape</code> parameter. For our preprocessed MNIST dataset, there are 784 columns in the input data. A common way to reduce overfitting is to use the dropout method, which randomly drops a proportion of the nodes in a layer. We can define the dropout proportion through <code>layer_dropout()</code> function immediately after the <code>layer_dense()</code> function.</p>
-<div class="sourceCode" id="cb418"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb418-1" data-line-number="1">dnn_model &lt;-<span class="st"> </span><span class="kw">keras_model_sequential</span>() </a>
-<a class="sourceLine" id="cb418-2" data-line-number="2">dnn_model <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb418-3" data-line-number="3"><span class="st">  </span><span class="kw">layer_dense</span>(<span class="dt">units =</span> <span class="dv">256</span>, <span class="dt">activation =</span> <span class="st">&#39;relu&#39;</span>, <span class="dt">input_shape =</span> <span class="kw">c</span>(<span class="dv">784</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb418-4" data-line-number="4"><span class="st">  </span><span class="kw">layer_dropout</span>(<span class="dt">rate =</span> <span class="fl">0.4</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb418-5" data-line-number="5"><span class="st">  </span><span class="kw">layer_dense</span>(<span class="dt">units =</span> <span class="dv">128</span>, <span class="dt">activation =</span> <span class="st">&#39;relu&#39;</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb418-6" data-line-number="6"><span class="st">  </span><span class="kw">layer_dropout</span>(<span class="dt">rate =</span> <span class="fl">0.3</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb418-7" data-line-number="7"><span class="st">  </span><span class="kw">layer_dense</span>(<span class="dt">units =</span> <span class="dv">64</span>, <span class="dt">activation =</span> <span class="st">&#39;relu&#39;</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb418-8" data-line-number="8"><span class="st">  </span><span class="kw">layer_dropout</span>(<span class="dt">rate =</span> <span class="fl">0.3</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb418-9" data-line-number="9"><span class="st">  </span><span class="kw">layer_dense</span>(<span class="dt">units =</span> <span class="dv">10</span>, <span class="dt">activation =</span> <span class="st">&#39;softmax&#39;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb427"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb427-1" data-line-number="1">dnn_model &lt;-<span class="st"> </span><span class="kw">keras_model_sequential</span>() </a>
+<a class="sourceLine" id="cb427-2" data-line-number="2">dnn_model <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb427-3" data-line-number="3"><span class="st">  </span><span class="kw">layer_dense</span>(<span class="dt">units =</span> <span class="dv">256</span>, <span class="dt">activation =</span> <span class="st">&#39;relu&#39;</span>, <span class="dt">input_shape =</span> <span class="kw">c</span>(<span class="dv">784</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb427-4" data-line-number="4"><span class="st">  </span><span class="kw">layer_dropout</span>(<span class="dt">rate =</span> <span class="fl">0.4</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb427-5" data-line-number="5"><span class="st">  </span><span class="kw">layer_dense</span>(<span class="dt">units =</span> <span class="dv">128</span>, <span class="dt">activation =</span> <span class="st">&#39;relu&#39;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb427-6" data-line-number="6"><span class="st">  </span><span class="kw">layer_dropout</span>(<span class="dt">rate =</span> <span class="fl">0.3</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb427-7" data-line-number="7"><span class="st">  </span><span class="kw">layer_dense</span>(<span class="dt">units =</span> <span class="dv">64</span>, <span class="dt">activation =</span> <span class="st">&#39;relu&#39;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb427-8" data-line-number="8"><span class="st">  </span><span class="kw">layer_dropout</span>(<span class="dt">rate =</span> <span class="fl">0.3</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb427-9" data-line-number="9"><span class="st">  </span><span class="kw">layer_dense</span>(<span class="dt">units =</span> <span class="dv">10</span>, <span class="dt">activation =</span> <span class="st">&#39;softmax&#39;</span>)</a></code></pre></div>
 <p>The above <code>dnn_model</code> has 4 layers with first layer 256 nodes, 2nd layer 128 nodes, 3rd layer 64 nodes, and last layer 10 nodes. The activation function for the first 3 layers is <code>relu</code> and the activation function for the last layer is <code>softmax</code> which is typical for classification problems. The model detail can be obtained through summary() function. The number of parameter of each layer can be calculated as: (number of input features +1) times (numbe of nodes in the layer). For example, the first layer has (784+1)x256=200960 parameters; the 2nd layer has (256+1)x128=32896 parameters. Please note, dropout only randomly drop certain proportion of parameters for each batch, it will not reduce the number of parameters in the model. The total number of parameters for the <code>dnn_model</code> we just defined has 242762 parameters to be estimated.</p>
-<div class="sourceCode" id="cb419"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb419-1" data-line-number="1"><span class="kw">summary</span>(dnn_model)</a></code></pre></div>
-<div class="sourceCode" id="cb420"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb420-1" data-line-number="1">________________________________________________________________________________</a>
-<a class="sourceLine" id="cb420-2" data-line-number="2">Layer (type)                        Output Shape                    Param #     </a>
-<a class="sourceLine" id="cb420-3" data-line-number="3">================================================================================</a>
-<a class="sourceLine" id="cb420-4" data-line-number="4">dense_1 (Dense)                     (None, 256)                     200960      </a>
-<a class="sourceLine" id="cb420-5" data-line-number="5">________________________________________________________________________________</a>
-<a class="sourceLine" id="cb420-6" data-line-number="6">dropout_1 (Dropout)                 (None, 256)                     0           </a>
-<a class="sourceLine" id="cb420-7" data-line-number="7">________________________________________________________________________________</a>
-<a class="sourceLine" id="cb420-8" data-line-number="8">dense_2 (Dense)                     (None, 128)                     32896       </a>
-<a class="sourceLine" id="cb420-9" data-line-number="9">________________________________________________________________________________</a>
-<a class="sourceLine" id="cb420-10" data-line-number="10">dropout_2 (Dropout)                 (None, 128)                     0           </a>
-<a class="sourceLine" id="cb420-11" data-line-number="11">________________________________________________________________________________</a>
-<a class="sourceLine" id="cb420-12" data-line-number="12">dense_3 (Dense)                     (None, 64)                      8256        </a>
-<a class="sourceLine" id="cb420-13" data-line-number="13">________________________________________________________________________________</a>
-<a class="sourceLine" id="cb420-14" data-line-number="14">dropout_3 (Dropout)                 (None, 64)                      0           </a>
-<a class="sourceLine" id="cb420-15" data-line-number="15">________________________________________________________________________________</a>
-<a class="sourceLine" id="cb420-16" data-line-number="16">dense_4 (Dense)                     (None, 10)                      650         </a>
-<a class="sourceLine" id="cb420-17" data-line-number="17">================================================================================</a>
-<a class="sourceLine" id="cb420-18" data-line-number="18">Total params: 242,762</a>
-<a class="sourceLine" id="cb420-19" data-line-number="19">Trainable params: 242,762</a>
-<a class="sourceLine" id="cb420-20" data-line-number="20">Non-trainable params: 0</a>
-<a class="sourceLine" id="cb420-21" data-line-number="21">________________________________________________________________________________</a></code></pre></div>
+<div class="sourceCode" id="cb428"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb428-1" data-line-number="1"><span class="kw">summary</span>(dnn_model)</a></code></pre></div>
+<div class="sourceCode" id="cb429"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb429-1" data-line-number="1">________________________________________________________________________________</a>
+<a class="sourceLine" id="cb429-2" data-line-number="2">Layer (type)                        Output Shape                    Param #     </a>
+<a class="sourceLine" id="cb429-3" data-line-number="3">================================================================================</a>
+<a class="sourceLine" id="cb429-4" data-line-number="4">dense_1 (Dense)                     (None, 256)                     200960      </a>
+<a class="sourceLine" id="cb429-5" data-line-number="5">________________________________________________________________________________</a>
+<a class="sourceLine" id="cb429-6" data-line-number="6">dropout_1 (Dropout)                 (None, 256)                     0           </a>
+<a class="sourceLine" id="cb429-7" data-line-number="7">________________________________________________________________________________</a>
+<a class="sourceLine" id="cb429-8" data-line-number="8">dense_2 (Dense)                     (None, 128)                     32896       </a>
+<a class="sourceLine" id="cb429-9" data-line-number="9">________________________________________________________________________________</a>
+<a class="sourceLine" id="cb429-10" data-line-number="10">dropout_2 (Dropout)                 (None, 128)                     0           </a>
+<a class="sourceLine" id="cb429-11" data-line-number="11">________________________________________________________________________________</a>
+<a class="sourceLine" id="cb429-12" data-line-number="12">dense_3 (Dense)                     (None, 64)                      8256        </a>
+<a class="sourceLine" id="cb429-13" data-line-number="13">________________________________________________________________________________</a>
+<a class="sourceLine" id="cb429-14" data-line-number="14">dropout_3 (Dropout)                 (None, 64)                      0           </a>
+<a class="sourceLine" id="cb429-15" data-line-number="15">________________________________________________________________________________</a>
+<a class="sourceLine" id="cb429-16" data-line-number="16">dense_4 (Dense)                     (None, 10)                      650         </a>
+<a class="sourceLine" id="cb429-17" data-line-number="17">================================================================================</a>
+<a class="sourceLine" id="cb429-18" data-line-number="18">Total params: 242,762</a>
+<a class="sourceLine" id="cb429-19" data-line-number="19">Trainable params: 242,762</a>
+<a class="sourceLine" id="cb429-20" data-line-number="20">Non-trainable params: 0</a>
+<a class="sourceLine" id="cb429-21" data-line-number="21">________________________________________________________________________________</a></code></pre></div>
 <p>Once a model is defined, we need to compile the model with a few other hyper-parameters including (1) loss function, (2) optimizer, and (3) performance metrics. For multi-class classification problems, people usually use the <code>categorical_crossentropy</code> loss function and <code>optimizer_rmsprop()</code> as the optimizer which performs batch gradient descent.</p>
-<div class="sourceCode" id="cb421"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb421-1" data-line-number="1">dnn_model <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">compile</span>(</a>
-<a class="sourceLine" id="cb421-2" data-line-number="2">  <span class="dt">loss =</span> <span class="st">&#39;categorical_crossentropy&#39;</span>,</a>
-<a class="sourceLine" id="cb421-3" data-line-number="3">  <span class="dt">optimizer =</span> <span class="kw">optimizer_rmsprop</span>(),</a>
-<a class="sourceLine" id="cb421-4" data-line-number="4">  <span class="dt">metrics =</span> <span class="kw">c</span>(<span class="st">&#39;accuracy&#39;</span>)</a>
-<a class="sourceLine" id="cb421-5" data-line-number="5">)</a></code></pre></div>
+<div class="sourceCode" id="cb430"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb430-1" data-line-number="1">dnn_model <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">compile</span>(</a>
+<a class="sourceLine" id="cb430-2" data-line-number="2">  <span class="dt">loss =</span> <span class="st">&#39;categorical_crossentropy&#39;</span>,</a>
+<a class="sourceLine" id="cb430-3" data-line-number="3">  <span class="dt">optimizer =</span> <span class="kw">optimizer_rmsprop</span>(),</a>
+<a class="sourceLine" id="cb430-4" data-line-number="4">  <span class="dt">metrics =</span> <span class="kw">c</span>(<span class="st">&#39;accuracy&#39;</span>)</a>
+<a class="sourceLine" id="cb430-5" data-line-number="5">)</a></code></pre></div>
 <p>Now we can feed data (x and y) into the neural network that we just built to estimate all the parameters in the model. Here we define three hyperparameters: <code>epochs</code>, <code>batch_size</code>, and <code>validation_split</code>, for this model. It just takes a couple of minutes to finish.</p>
-<div class="sourceCode" id="cb422"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb422-1" data-line-number="1">dnn_history &lt;-<span class="st"> </span>dnn_model <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">fit</span>(</a>
-<a class="sourceLine" id="cb422-2" data-line-number="2">  x_train, y_train, </a>
-<a class="sourceLine" id="cb422-3" data-line-number="3">  <span class="dt">epochs =</span> <span class="dv">15</span>, <span class="dt">batch_size =</span> <span class="dv">128</span>, </a>
-<a class="sourceLine" id="cb422-4" data-line-number="4">  <span class="dt">validation_split =</span> <span class="fl">0.2</span></a>
-<a class="sourceLine" id="cb422-5" data-line-number="5">)</a></code></pre></div>
+<div class="sourceCode" id="cb431"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb431-1" data-line-number="1">dnn_history &lt;-<span class="st"> </span>dnn_model <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">fit</span>(</a>
+<a class="sourceLine" id="cb431-2" data-line-number="2">  x_train, y_train, </a>
+<a class="sourceLine" id="cb431-3" data-line-number="3">  <span class="dt">epochs =</span> <span class="dv">15</span>, <span class="dt">batch_size =</span> <span class="dv">128</span>, </a>
+<a class="sourceLine" id="cb431-4" data-line-number="4">  <span class="dt">validation_split =</span> <span class="fl">0.2</span></a>
+<a class="sourceLine" id="cb431-5" data-line-number="5">)</a></code></pre></div>
 <p>There is some useful information stored in the output object <code>dnn_history</code> and the details can be shown by using <code>str()</code>. We can plot the training and validation accuracy and loss as function of epoch by simply calling <code>plot(dnn_history)</code>.</p>
-<div class="sourceCode" id="cb423"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb423-1" data-line-number="1"><span class="kw">str</span>(dnn_history)</a></code></pre></div>
-<div class="sourceCode" id="cb424"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb424-1" data-line-number="1">List of 2</a>
-<a class="sourceLine" id="cb424-2" data-line-number="2"> $ params :List of 8</a>
-<a class="sourceLine" id="cb424-3" data-line-number="3">  ..$ metrics           : chr [1:4] &quot;loss&quot; &quot;acc&quot; &quot;val_loss&quot; &quot;val_acc&quot;</a>
-<a class="sourceLine" id="cb424-4" data-line-number="4">  ..$ epochs            : int 15</a>
-<a class="sourceLine" id="cb424-5" data-line-number="5">  ..$ steps             : NULL</a>
-<a class="sourceLine" id="cb424-6" data-line-number="6">  ..$ do_validation     : logi TRUE</a>
-<a class="sourceLine" id="cb424-7" data-line-number="7">  ..$ samples           : int 48000</a>
-<a class="sourceLine" id="cb424-8" data-line-number="8">  ..$ batch_size        : int 128</a>
-<a class="sourceLine" id="cb424-9" data-line-number="9">  ..$ verbose           : int 1</a>
-<a class="sourceLine" id="cb424-10" data-line-number="10">  ..$ validation_samples: int 12000</a>
-<a class="sourceLine" id="cb424-11" data-line-number="11"> $ metrics:List of 4</a>
-<a class="sourceLine" id="cb424-12" data-line-number="12">  ..$ acc     : num [1:15] 0.83 0.929 0.945 0.954 0.959 ...</a>
-<a class="sourceLine" id="cb424-13" data-line-number="13">  ..$ loss    : num [1:15] 0.559 0.254 0.195 0.165 0.148 ...</a>
-<a class="sourceLine" id="cb424-14" data-line-number="14">  ..$ val_acc : num [1:15] 0.946 0.961 0.967 0.969 0.973 ...</a>
-<a class="sourceLine" id="cb424-15" data-line-number="15">  ..$ val_loss: num [1:15] 0.182 0.137 0.122 0.113 0.104 ...</a>
-<a class="sourceLine" id="cb424-16" data-line-number="16"> - attr(*, &quot;class&quot;)= chr &quot;keras_training_history&quot;</a></code></pre></div>
-<div class="sourceCode" id="cb425"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb425-1" data-line-number="1"><span class="kw">plot</span>(dnn_history)</a></code></pre></div>
+<div class="sourceCode" id="cb432"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb432-1" data-line-number="1"><span class="kw">str</span>(dnn_history)</a></code></pre></div>
+<div class="sourceCode" id="cb433"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb433-1" data-line-number="1">List of 2</a>
+<a class="sourceLine" id="cb433-2" data-line-number="2"> $ params :List of 8</a>
+<a class="sourceLine" id="cb433-3" data-line-number="3">  ..$ metrics           : chr [1:4] &quot;loss&quot; &quot;acc&quot; &quot;val_loss&quot; &quot;val_acc&quot;</a>
+<a class="sourceLine" id="cb433-4" data-line-number="4">  ..$ epochs            : int 15</a>
+<a class="sourceLine" id="cb433-5" data-line-number="5">  ..$ steps             : NULL</a>
+<a class="sourceLine" id="cb433-6" data-line-number="6">  ..$ do_validation     : logi TRUE</a>
+<a class="sourceLine" id="cb433-7" data-line-number="7">  ..$ samples           : int 48000</a>
+<a class="sourceLine" id="cb433-8" data-line-number="8">  ..$ batch_size        : int 128</a>
+<a class="sourceLine" id="cb433-9" data-line-number="9">  ..$ verbose           : int 1</a>
+<a class="sourceLine" id="cb433-10" data-line-number="10">  ..$ validation_samples: int 12000</a>
+<a class="sourceLine" id="cb433-11" data-line-number="11"> $ metrics:List of 4</a>
+<a class="sourceLine" id="cb433-12" data-line-number="12">  ..$ acc     : num [1:15] 0.83 0.929 0.945 0.954 0.959 ...</a>
+<a class="sourceLine" id="cb433-13" data-line-number="13">  ..$ loss    : num [1:15] 0.559 0.254 0.195 0.165 0.148 ...</a>
+<a class="sourceLine" id="cb433-14" data-line-number="14">  ..$ val_acc : num [1:15] 0.946 0.961 0.967 0.969 0.973 ...</a>
+<a class="sourceLine" id="cb433-15" data-line-number="15">  ..$ val_loss: num [1:15] 0.182 0.137 0.122 0.113 0.104 ...</a>
+<a class="sourceLine" id="cb433-16" data-line-number="16"> - attr(*, &quot;class&quot;)= chr &quot;keras_training_history&quot;</a></code></pre></div>
+<div class="sourceCode" id="cb434"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb434-1" data-line-number="1"><span class="kw">plot</span>(dnn_history)</a></code></pre></div>
 <center>
 <img src="images/dnn_history.png" style="width:70.0%" />
 </center>
 </div>
 <div id="prediction" class="section level4">
 <h4><span class="header-section-number">12.2.7.3</span> Prediction</h4>
-<div class="sourceCode" id="cb426"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb426-1" data-line-number="1">dnn_model <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">evaluate</span>(x_test, y_test)</a></code></pre></div>
-<div class="sourceCode" id="cb427"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb427-1" data-line-number="1">   32/10000 [..............................] - ETA: 3s</a>
-<a class="sourceLine" id="cb427-2" data-line-number="2">  416/10000 [&gt;.............................] - ETA: 1s</a>
-<a class="sourceLine" id="cb427-3" data-line-number="3">  800/10000 [=&gt;............................] - ETA: 1s</a>
-<a class="sourceLine" id="cb427-4" data-line-number="4"> 1184/10000 [==&gt;...........................] - ETA: 1s</a>
-<a class="sourceLine" id="cb427-5" data-line-number="5"> 1472/10000 [===&gt;..........................] - ETA: 1s</a>
-<a class="sourceLine" id="cb427-6" data-line-number="6"> 1728/10000 [====&gt;.........................] - ETA: 1s</a>
-<a class="sourceLine" id="cb427-7" data-line-number="7"> 2016/10000 [=====&gt;........................] - ETA: 1s</a>
-<a class="sourceLine" id="cb427-8" data-line-number="8"> 2464/10000 [======&gt;.......................] - ETA: 1s</a>
-<a class="sourceLine" id="cb427-9" data-line-number="9"> 2912/10000 [=======&gt;......................] - ETA: 1s</a>
-<a class="sourceLine" id="cb427-10" data-line-number="10"> 3360/10000 [=========&gt;....................] - ETA: 0s</a>
-<a class="sourceLine" id="cb427-11" data-line-number="11"> 3744/10000 [==========&gt;...................] - ETA: 0s</a>
-<a class="sourceLine" id="cb427-12" data-line-number="12"> 4192/10000 [===========&gt;..................] - ETA: 0s</a>
-<a class="sourceLine" id="cb427-13" data-line-number="13"> 4704/10000 [=============&gt;................] - ETA: 0s</a>
-<a class="sourceLine" id="cb427-14" data-line-number="14"> 5088/10000 [==============&gt;...............] - ETA: 0s</a>
-<a class="sourceLine" id="cb427-15" data-line-number="15"> 5568/10000 [===============&gt;..............] - ETA: 0s</a>
-<a class="sourceLine" id="cb427-16" data-line-number="16"> 6080/10000 [=================&gt;............] - ETA: 0s</a>
-<a class="sourceLine" id="cb427-17" data-line-number="17"> 6592/10000 [==================&gt;...........] - ETA: 0s</a>
-<a class="sourceLine" id="cb427-18" data-line-number="18"> 7008/10000 [====================&gt;.........] - ETA: 0s</a>
-<a class="sourceLine" id="cb427-19" data-line-number="19"> 7488/10000 [=====================&gt;........] - ETA: 0s</a>
-<a class="sourceLine" id="cb427-20" data-line-number="20"> 7968/10000 [======================&gt;.......] - ETA: 0s</a>
-<a class="sourceLine" id="cb427-21" data-line-number="21"> 8288/10000 [=======================&gt;......] - ETA: 0s</a>
-<a class="sourceLine" id="cb427-22" data-line-number="22"> 8704/10000 [=========================&gt;....] - ETA: 0s</a>
-<a class="sourceLine" id="cb427-23" data-line-number="23"> 9120/10000 [==========================&gt;...] - ETA: 0s</a>
-<a class="sourceLine" id="cb427-24" data-line-number="24"> 9600/10000 [===========================&gt;..] - ETA: 0s</a>
-<a class="sourceLine" id="cb427-25" data-line-number="25">10000/10000 [==============================] - 1s 128us/step</a>
-<a class="sourceLine" id="cb427-26" data-line-number="26">$loss</a>
-<a class="sourceLine" id="cb427-27" data-line-number="27">[1] 0.093325</a>
-<a class="sourceLine" id="cb427-28" data-line-number="28"></a>
-<a class="sourceLine" id="cb427-29" data-line-number="29">$acc</a>
-<a class="sourceLine" id="cb427-30" data-line-number="30">[1] 0.981</a></code></pre></div>
-<div class="sourceCode" id="cb428"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb428-1" data-line-number="1">dnn_pred &lt;-<span class="st"> </span>dnn_model <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb428-2" data-line-number="2"><span class="st">              </span><span class="kw">predict_classes</span>(x_test)</a>
-<a class="sourceLine" id="cb428-3" data-line-number="3"><span class="kw">head</span>(dnn_pred)</a></code></pre></div>
-<div class="sourceCode" id="cb429"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb429-1" data-line-number="1"> [1] 7 2 1 0 4 1</a></code></pre></div>
+<div class="sourceCode" id="cb435"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb435-1" data-line-number="1">dnn_model <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">evaluate</span>(x_test, y_test)</a></code></pre></div>
+<div class="sourceCode" id="cb436"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb436-1" data-line-number="1">   32/10000 [..............................] - ETA: 3s</a>
+<a class="sourceLine" id="cb436-2" data-line-number="2">  416/10000 [&gt;.............................] - ETA: 1s</a>
+<a class="sourceLine" id="cb436-3" data-line-number="3">  800/10000 [=&gt;............................] - ETA: 1s</a>
+<a class="sourceLine" id="cb436-4" data-line-number="4"> 1184/10000 [==&gt;...........................] - ETA: 1s</a>
+<a class="sourceLine" id="cb436-5" data-line-number="5"> 1472/10000 [===&gt;..........................] - ETA: 1s</a>
+<a class="sourceLine" id="cb436-6" data-line-number="6"> 1728/10000 [====&gt;.........................] - ETA: 1s</a>
+<a class="sourceLine" id="cb436-7" data-line-number="7"> 2016/10000 [=====&gt;........................] - ETA: 1s</a>
+<a class="sourceLine" id="cb436-8" data-line-number="8"> 2464/10000 [======&gt;.......................] - ETA: 1s</a>
+<a class="sourceLine" id="cb436-9" data-line-number="9"> 2912/10000 [=======&gt;......................] - ETA: 1s</a>
+<a class="sourceLine" id="cb436-10" data-line-number="10"> 3360/10000 [=========&gt;....................] - ETA: 0s</a>
+<a class="sourceLine" id="cb436-11" data-line-number="11"> 3744/10000 [==========&gt;...................] - ETA: 0s</a>
+<a class="sourceLine" id="cb436-12" data-line-number="12"> 4192/10000 [===========&gt;..................] - ETA: 0s</a>
+<a class="sourceLine" id="cb436-13" data-line-number="13"> 4704/10000 [=============&gt;................] - ETA: 0s</a>
+<a class="sourceLine" id="cb436-14" data-line-number="14"> 5088/10000 [==============&gt;...............] - ETA: 0s</a>
+<a class="sourceLine" id="cb436-15" data-line-number="15"> 5568/10000 [===============&gt;..............] - ETA: 0s</a>
+<a class="sourceLine" id="cb436-16" data-line-number="16"> 6080/10000 [=================&gt;............] - ETA: 0s</a>
+<a class="sourceLine" id="cb436-17" data-line-number="17"> 6592/10000 [==================&gt;...........] - ETA: 0s</a>
+<a class="sourceLine" id="cb436-18" data-line-number="18"> 7008/10000 [====================&gt;.........] - ETA: 0s</a>
+<a class="sourceLine" id="cb436-19" data-line-number="19"> 7488/10000 [=====================&gt;........] - ETA: 0s</a>
+<a class="sourceLine" id="cb436-20" data-line-number="20"> 7968/10000 [======================&gt;.......] - ETA: 0s</a>
+<a class="sourceLine" id="cb436-21" data-line-number="21"> 8288/10000 [=======================&gt;......] - ETA: 0s</a>
+<a class="sourceLine" id="cb436-22" data-line-number="22"> 8704/10000 [=========================&gt;....] - ETA: 0s</a>
+<a class="sourceLine" id="cb436-23" data-line-number="23"> 9120/10000 [==========================&gt;...] - ETA: 0s</a>
+<a class="sourceLine" id="cb436-24" data-line-number="24"> 9600/10000 [===========================&gt;..] - ETA: 0s</a>
+<a class="sourceLine" id="cb436-25" data-line-number="25">10000/10000 [==============================] - 1s 128us/step</a>
+<a class="sourceLine" id="cb436-26" data-line-number="26">$loss</a>
+<a class="sourceLine" id="cb436-27" data-line-number="27">[1] 0.093325</a>
+<a class="sourceLine" id="cb436-28" data-line-number="28"></a>
+<a class="sourceLine" id="cb436-29" data-line-number="29">$acc</a>
+<a class="sourceLine" id="cb436-30" data-line-number="30">[1] 0.981</a></code></pre></div>
+<div class="sourceCode" id="cb437"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb437-1" data-line-number="1">dnn_pred &lt;-<span class="st"> </span>dnn_model <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb437-2" data-line-number="2"><span class="st">              </span><span class="kw">predict_classes</span>(x_test)</a>
+<a class="sourceLine" id="cb437-3" data-line-number="3"><span class="kw">head</span>(dnn_pred)</a></code></pre></div>
+<div class="sourceCode" id="cb438"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb438-1" data-line-number="1"> [1] 7 2 1 0 4 1</a></code></pre></div>
 <p>Let’s check a few misclassified images. A number of misclassified images can be found using the following code. And we can plot these misclassified images to see whether a human can correctly read it out.</p>
-<div class="sourceCode" id="cb430"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb430-1" data-line-number="1"><span class="co">## total number of mis-classcified images</span></a>
-<a class="sourceLine" id="cb430-2" data-line-number="2"><span class="kw">sum</span>(dnn_pred <span class="op">!=</span><span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>y)</a></code></pre></div>
-<div class="sourceCode" id="cb431"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb431-1" data-line-number="1">[1] 190</a></code></pre></div>
-<div class="sourceCode" id="cb432"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb432-1" data-line-number="1">missed_image =<span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>x[dnn_pred <span class="op">!=</span><span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>y,,]</a>
-<a class="sourceLine" id="cb432-2" data-line-number="2">missed_digit =<span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>y[dnn_pred <span class="op">!=</span><span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>y]</a>
-<a class="sourceLine" id="cb432-3" data-line-number="3">missed_pred =<span class="st"> </span>dnn_pred[dnn_pred <span class="op">!=</span><span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>y]</a>
-<a class="sourceLine" id="cb432-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb432-5" data-line-number="5">index_image =<span class="st"> </span><span class="dv">34</span> </a>
-<a class="sourceLine" id="cb432-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb432-7" data-line-number="7"><span class="co">## change this index to see different image.</span></a>
-<a class="sourceLine" id="cb432-8" data-line-number="8">input_matrix &lt;-<span class="st"> </span>missed_image[index_image,<span class="dv">1</span><span class="op">:</span><span class="dv">28</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">28</span>]</a>
-<a class="sourceLine" id="cb432-9" data-line-number="9">output_matrix &lt;-<span class="st"> </span><span class="kw">apply</span>(input_matrix, <span class="dv">2</span>, rev)</a>
-<a class="sourceLine" id="cb432-10" data-line-number="10">output_matrix &lt;-<span class="st"> </span><span class="kw">t</span>(output_matrix)</a>
-<a class="sourceLine" id="cb432-11" data-line-number="11"></a>
-<a class="sourceLine" id="cb432-12" data-line-number="12"><span class="kw">image</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">28</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">28</span>, output_matrix, <span class="dt">col =</span> <span class="kw">gray.colors</span>(<span class="dv">256</span>), </a>
-<a class="sourceLine" id="cb432-13" data-line-number="13">    <span class="dt">xlab =</span> <span class="kw">paste</span>(<span class="st">&quot;Image for digit &quot;</span>, missed_digit[index_image], </a>
-<a class="sourceLine" id="cb432-14" data-line-number="14">        <span class="st">&quot;, wrongly predicted as &quot;</span>, missed_pred[index_image]), </a>
-<a class="sourceLine" id="cb432-15" data-line-number="15">    <span class="dt">ylab =</span> <span class="st">&quot;&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb439"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb439-1" data-line-number="1"><span class="co">## total number of mis-classcified images</span></a>
+<a class="sourceLine" id="cb439-2" data-line-number="2"><span class="kw">sum</span>(dnn_pred <span class="op">!=</span><span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>y)</a></code></pre></div>
+<div class="sourceCode" id="cb440"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb440-1" data-line-number="1">[1] 190</a></code></pre></div>
+<div class="sourceCode" id="cb441"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb441-1" data-line-number="1">missed_image =<span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>x[dnn_pred <span class="op">!=</span><span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>y,,]</a>
+<a class="sourceLine" id="cb441-2" data-line-number="2">missed_digit =<span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>y[dnn_pred <span class="op">!=</span><span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>y]</a>
+<a class="sourceLine" id="cb441-3" data-line-number="3">missed_pred =<span class="st"> </span>dnn_pred[dnn_pred <span class="op">!=</span><span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>y]</a>
+<a class="sourceLine" id="cb441-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb441-5" data-line-number="5">index_image =<span class="st"> </span><span class="dv">34</span> </a>
+<a class="sourceLine" id="cb441-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb441-7" data-line-number="7"><span class="co">## change this index to see different image.</span></a>
+<a class="sourceLine" id="cb441-8" data-line-number="8">input_matrix &lt;-<span class="st"> </span>missed_image[index_image,<span class="dv">1</span><span class="op">:</span><span class="dv">28</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">28</span>]</a>
+<a class="sourceLine" id="cb441-9" data-line-number="9">output_matrix &lt;-<span class="st"> </span><span class="kw">apply</span>(input_matrix, <span class="dv">2</span>, rev)</a>
+<a class="sourceLine" id="cb441-10" data-line-number="10">output_matrix &lt;-<span class="st"> </span><span class="kw">t</span>(output_matrix)</a>
+<a class="sourceLine" id="cb441-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb441-12" data-line-number="12"><span class="kw">image</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">28</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">28</span>, output_matrix, <span class="dt">col =</span> <span class="kw">gray.colors</span>(<span class="dv">256</span>), </a>
+<a class="sourceLine" id="cb441-13" data-line-number="13">    <span class="dt">xlab =</span> <span class="kw">paste</span>(<span class="st">&quot;Image for digit &quot;</span>, missed_digit[index_image], </a>
+<a class="sourceLine" id="cb441-14" data-line-number="14">        <span class="st">&quot;, wrongly predicted as &quot;</span>, missed_pred[index_image]), </a>
+<a class="sourceLine" id="cb441-15" data-line-number="15">    <span class="dt">ylab =</span> <span class="st">&quot;&quot;</span>)</a></code></pre></div>
 <center>
 <img src="images/misclassified_img.png" style="width:70.0%" />
 </center>
