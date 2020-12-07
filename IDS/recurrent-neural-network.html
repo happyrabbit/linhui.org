@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2020-12-02" />
+<meta name="date" content="2020-12-06" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -293,7 +293,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="12.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html"><i class="fa fa-check"></i><b>12.4</b> Recurrent Neural Network</a><ul>
 <li class="chapter" data-level="12.4.1" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#rnn-model"><i class="fa fa-check"></i><b>12.4.1</b> RNN Model</a></li>
 <li class="chapter" data-level="12.4.2" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#word-embedding"><i class="fa fa-check"></i><b>12.4.2</b> Word Embedding</a></li>
-<li class="chapter" data-level="12.4.3" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#long-short-term-memory"><i class="fa fa-check"></i><b>12.4.3</b> Long Short Term Memory</a></li>
+<li class="chapter" data-level="12.4.3" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#lstm"><i class="fa fa-check"></i><b>12.4.3</b> Long Short Term Memory</a></li>
 </ul></li>
 </ul></li>
 <li class="appendix"><span><b>Appendix</b></span></li>
@@ -363,7 +363,7 @@ FIGURE 12.19: An Unrolled Recurrent Neural Network
 </ul>
 <div id="rnn-model" class="section level3">
 <h3><span class="header-section-number">12.4.1</span> RNN Model</h3>
-<p>To further understand the RNN model, let’s look at an entity recognition example. Assume you want to build a sequence model to recognize the company or computer language names in a sentence like this: “Use Netlify and Hugo”. It is a name recognition problem which is used by the research company to index different company names in the articles. It is also used in material science to tag chemicals mentioned in the most recent journals to find any indication of the next research topic.</p>
+<p>To further understand the RNN model, let’s look at an entity recognition example. Assume you want to build a sequence model to recognize the company or computer language names in a sentence like this: “Use Netlify and Hugo”. It is a name recognition problem which is used by the research company to index different company names in the articles. For tasks like this, we need a model that can learn and share the learning across different texts. The position of the word has important information about the word. For example, the word before “to” is more likely to be a verb than a noun. It is also used in material science to tag chemicals mentioned in the most recent journals to find any indication of the next research topic.</p>
 <p>Given input sentence x, you want a model to produce one output for each word in x that tells you if that word is the name for something. So in this example, the input is a sequence of 5 words including the period in the end. The output is a sequence of 0/1 with the same length that indicates whether the input word is a name (1) or not (0). We use superscript <span class="math inline">\(&lt;t&gt;\)</span> to denote the element position of input and output; use superscript <span class="math inline">\((i)\)</span> to denote the <span class="math inline">\(i^{th}\)</span> sample (you will have different sentences in the training data); Use <span class="math inline">\(T_x^{(i)}\)</span> to denote the length of <span class="math inline">\(i^{th}\)</span> input, <span class="math inline">\(T_y^{(i)}\)</span> for output. In this case, <span class="math inline">\(T_x^{(i)}\)</span> is equal to <span class="math inline">\(T_y^{(i)}\)</span>.</p>
 <center>
 <img src="images/rnn_notation.png" style="width:50.0%" />
@@ -372,11 +372,28 @@ FIGURE 12.19: An Unrolled Recurrent Neural Network
 <center>
 <img src="images/nn_ohe.png" style="width:50.0%" />
 </center>
+<p>Given this representation of input words, the goal is to learn a sequence model that maps the input words to output y, indicating if the word is an entity (1) or not (0). Let us build a one-layer recurrent neural network. The model starts from the first word “use” (<span class="math inline">\(x^{&lt;1&gt;}\)</span>) and build a neural network to predict the output. To start the process, we also need to initialize the activation at time 0, <span class="math inline">\(a_0\)</span>. The most common choice is to use a vector of zeros. The common activation function for the intermediate layer is the Hyperbolic Tangent Function (tanh). RNN uses other methods to prevent the vanishing gradient problem discussed in section <a href="recurrent-neural-network.html#lstm">12.4.3</a>. Similar to FFNN, The output layer activation function depends on the output type. The current example is a binary classification, so we use the sigmoid function (<span class="math inline">\(\sigma\)</span>).</p>
+<p><span class="math display">\[a^{&lt;0&gt;} = \mathbf{0};\ a^{&lt;1&gt;} = tanh(W_{aa}a^{&lt;0&gt;} + W_{ax}x^{&lt;1&gt;}+b_a)\]</span>
+<span class="math display">\[\hat{y}^{&lt;1&gt;} = \sigma(W_{ya}a^{&lt;1&gt;}+b_y)\]</span>
+And when it takes the second word <span class="math inline">\(x^{&lt;2&gt;}\)</span>, it also gets information from the previous step using the non-activated neurons.</p>
+<p><span class="math display">\[a^{&lt;2&gt;} = tanh(W_{aa}a^{&lt;1&gt;}+W_{ax}x^{&lt;2&gt;}+b_a)\]</span>
+<span class="math display">\[\hat{y}^{&lt;2&gt;} = \sigma(W_{ya}a^{&lt;2&gt;}+b_y)\]</span></p>
+<p>For the <span class="math inline">\(t^{th}\)</span> word:</p>
+<p><span class="math display">\[a^{&lt;t&gt;} = tanh(W_{aa}a^{&lt;t-1&gt;}+W_{ax}x^{&lt;t&gt;}+b_a)\]</span>
+<span class="math display">\[\hat{y}^{&lt;t&gt;} = \sigma(W_{ya}a^{&lt;t&gt;}+b_y)\]</span></p>
+<p>The information flows from one step to the next with a repetitive structure until the last time step input <span class="math inline">\(x^{&lt;T_x&gt;}\)</span> and then it outputs <span class="math inline">\(\hat{y}^{&lt;T_y&gt;}\)</span>. In this example, <span class="math inline">\(T_x = T_y\)</span>. The architecture changes when <span class="math inline">\(T_x\)</span> and <span class="math inline">\(T_y\)</span> are not the same. The model shares parameters, <span class="math inline">\(W_{ya}, W_{aa}, W_{ax},b_a, b_y\)</span>, for all time steps of the input.</p>
+<center>
+<img src="images/RNN_pro.png" style="width:80.0%" />
+</center>
+<p>Calculate the loss function:</p>
+<p><span class="math display">\[L^{&lt;t&gt;}(\hat{y}^{&lt;t&gt;}) = -y^{&lt;t&gt;}log(\hat{y}^{&lt;t&gt;})-(1-y^{&lt;t&gt;})log(1-\hat{y}^{&lt;t&gt;})\]</span>
+<span class="math display">\[L(\hat{y},y)=\Sigma_{t=1}^{T_y}L^{&lt;t&gt;}(\hat{y},y)\]</span>
+The above defines the forward process. Same as before, the backward propagation computes the gradient descent for the parameters by the chain rule for differentiation.</p>
 </div>
 <div id="word-embedding" class="section level3">
 <h3><span class="header-section-number">12.4.2</span> Word Embedding</h3>
 </div>
-<div id="long-short-term-memory" class="section level3">
+<div id="lstm" class="section level3">
 <h3><span class="header-section-number">12.4.3</span> Long Short Term Memory</h3>
 <p>We are going to walk through LSTM step by step. The first step of LSTM is to decide what information to <strong>forget</strong>. This decision is made by “forget gate”, a sigmoid function (<span class="math inline">\(\Gamma_{f}\)</span>). It looks at <span class="math inline">\(a^{&lt;t-1&gt;}\)</span> and <span class="math inline">\(x^{t}\)</span> and outputs a number between 0 and 1 for each number in the cell state <span class="math inline">\(c^{t-1}\)</span>. A value 1 means “completely remember the state”, while 0 means “completely forget the state”.</p>
 <center>
