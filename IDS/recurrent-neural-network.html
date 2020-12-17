@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2020-12-14" />
+<meta name="date" content="2020-12-17" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -401,7 +401,13 @@ The above defines the forward process. Same as before, the backward propagation 
 </div>
 <div id="lstm" class="section level3">
 <h3><span class="header-section-number">12.4.3</span> Long Short Term Memory</h3>
-<p>We are going to walk through LSTM step by step. The first step of LSTM is to decide what information to <strong>forget</strong>. This decision is made by “forget gate”, a sigmoid function (<span class="math inline">\(\Gamma_{f}\)</span>). It looks at <span class="math inline">\(a^{&lt;t-1&gt;}\)</span> and <span class="math inline">\(x^{t}\)</span> and outputs a number between 0 and 1 for each number in the cell state <span class="math inline">\(c^{t-1}\)</span>. A value 1 means “completely remember the state”, while 0 means “completely forget the state”.</p>
+<p>The sequence in RNN can be very long which leads to vanishing gradient problem even when the RNN network is not deep. Think about the following examples:</p>
+<ol style="list-style-type: decimal">
+<li>The <strong>girl</strong> walked away, sat down in the shade of a tree, and began to read a new book which <strong>she</strong> bought the day before.</li>
+<li>The <strong>boy</strong> walked away, sat down in the shade of a tree, and began to read a new book which <strong>he</strong> bought the day before.</li>
+</ol>
+<p>For sentence 1, you need to use “she” in the adjective clause after “which” because it is a girl. For sentence 2, you need to use “he” because it is a boy. This is an example where there is a long-term dependency in the sentence where the information at the beginning can affect what needs to come much later in the sentence. RNN needs to forward propagate information from left to right and then backpropagate from right to left. It can be difficult for the error associated with the later sequence to affect the optimization earlier. So in practice, it means the model might fail to do the task mentioned above. People came up with different methods to mitigate this issue, such as the Greater Recurrent Units (GRU) <span class="citation">(Chung et al. <a href="#ref-chung2014empirical">2014</a>)</span> and Long Short Term Memory units (LSTM) <span class="citation">(Hochreiter and Schmidhuber <a href="#ref-lstm1997">1997</a>)</span>. The goal is to help the model memorize information in the earlier sequence. We are going to walk through LSTM step by step.</p>
+<p>The first step of LSTM is to decide what information to <strong>forget</strong>. This decision is made by “forget gate”, a sigmoid function (<span class="math inline">\(\Gamma_{f}\)</span>). It looks at <span class="math inline">\(a^{&lt;t-1&gt;}\)</span> and <span class="math inline">\(x^{t}\)</span> and outputs a number between 0 and 1 for each number in the cell state <span class="math inline">\(c^{t-1}\)</span>. A value 1 means “completely remember the state”, while 0 means “completely forget the state”.</p>
 <center>
 <img src="images/lstm1.png" style="width:50.0%" />
 </center>
@@ -436,8 +442,14 @@ The above defines the forward process. Same as before, the backward propagation 
 <div id="ref-deeplearningr18">
 <p>Chollet, François, and J. J. Allaire. 2018. <em>Deep Learning with R</em>. Manning.</p>
 </div>
+<div id="ref-chung2014empirical">
+<p>Chung, Junyoung, Caglar Gulcehre, KyungHyun Cho, and Yoshua Bengio. 2014. “Empirical Evaluation of Gated Recurrent Neural Networks on Sequence Modeling.”</p>
+</div>
 <div id="ref-Goodfellow-et-al-2016">
 <p>Goodfellow, Ian, Yoshua Bengio, and Aaron Courville. 2016. <em>Deep Learning</em>. MIT Press.</p>
+</div>
+<div id="ref-lstm1997">
+<p>Hochreiter, Sepp, and JÃŒrgen Schmidhuber. 1997. “Long Short-Term Memory.” <em>Neural Computation</em> 9 (8): 1735–80.</p>
 </div>
 </div>
             </section>
