@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2020-12-17" />
+<meta name="date" content="2020-12-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -292,8 +292,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="12.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html"><i class="fa fa-check"></i><b>12.4</b> Recurrent Neural Network</a><ul>
 <li class="chapter" data-level="12.4.1" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#rnn-model"><i class="fa fa-check"></i><b>12.4.1</b> RNN Model</a></li>
-<li class="chapter" data-level="12.4.2" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#word-embedding"><i class="fa fa-check"></i><b>12.4.2</b> Word Embedding</a></li>
+<li class="chapter" data-level="12.4.2" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#embedding"><i class="fa fa-check"></i><b>12.4.2</b> Word Embedding</a></li>
 <li class="chapter" data-level="12.4.3" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#lstm"><i class="fa fa-check"></i><b>12.4.3</b> Long Short Term Memory</a></li>
+<li class="chapter" data-level="12.4.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#rnnexample"><i class="fa fa-check"></i><b>12.4.4</b> Sentiment Analysis Using RNN</a></li>
 </ul></li>
 </ul></li>
 <li class="appendix"><span><b>Appendix</b></span></li>
@@ -396,20 +397,20 @@ The above defines the forward process. Same as before, the backward propagation 
 </ol>
 <p>Given just the first three words is not enough to know if the word “April” is part of a person’s name. It is a person’s name in 1 but not 2. The two sentences have the same first three words. In this case, we need a model that allows the information to flow in both directions. A bidirectional RNN takes data from both earlier and later in the sequence. The disadvantage is that it needs the entire word sequence to predict at any position. For a speech recognition application that requires capturing the speech in real-time, we need a more complex method called the attention model. We will not get into those models here. Deep Learning with R <span class="citation">(Chollet and Allaire <a href="#ref-deeplearningr18">2018</a>)</span> provides a high-level introduction of bidirectional RNN with applicable codes. It teaches both intuition and practical, computational usage of deep learning models. For python users, refer to Deep Learning with Python <span class="citation">(Chollet <a href="#ref-deeplearningpy17">2017</a>)</span>. A standard text with heavy mathematics is Deep Learning <span class="citation">(Goodfellow, Bengio, and Courville <a href="#ref-Goodfellow-et-al-2016">2016</a>)</span>.</p>
 </div>
-<div id="word-embedding" class="section level3">
+<div id="embedding" class="section level3">
 <h3><span class="header-section-number">12.4.2</span> Word Embedding</h3>
 </div>
 <div id="lstm" class="section level3">
 <h3><span class="header-section-number">12.4.3</span> Long Short Term Memory</h3>
-<p>The sequence in RNN can be very long which leads to vanishing gradient problem even when the RNN network is not deep. Think about the following examples:</p>
+<p>The sequence in RNN can be very long, which leads to the vanishing gradient problem even when the RNN network is not deep. Think about the following examples:</p>
 <ol style="list-style-type: decimal">
 <li>The <strong>girl</strong> walked away, sat down in the shade of a tree, and began to read a new book which <strong>she</strong> bought the day before.</li>
 <li>The <strong>boy</strong> walked away, sat down in the shade of a tree, and began to read a new book which <strong>he</strong> bought the day before.</li>
 </ol>
-<p>For sentence 1, you need to use “she” in the adjective clause after “which” because it is a girl. For sentence 2, you need to use “he” because it is a boy. This is an example where there is a long-term dependency in the sentence where the information at the beginning can affect what needs to come much later in the sentence. RNN needs to forward propagate information from left to right and then backpropagate from right to left. It can be difficult for the error associated with the later sequence to affect the optimization earlier. So in practice, it means the model might fail to do the task mentioned above. People came up with different methods to mitigate this issue, such as the Greater Recurrent Units (GRU) <span class="citation">(Chung et al. <a href="#ref-chung2014empirical">2014</a>)</span> and Long Short Term Memory units (LSTM) <span class="citation">(Hochreiter and Schmidhuber <a href="#ref-lstm1997">1997</a>)</span>. The goal is to help the model memorize information in the earlier sequence. We are going to walk through LSTM step by step.</p>
+<p>For sentence 1, you need to use “she” in the adjective clause after “which” because it is a girl. For sentence 2, you need to use “he” because it is a boy. This is a long-term dependency example where the information at the beginning can affect what needs to come much later in the sentence. RNN needs to forward propagate information from left to right and then backpropagate from right to left. It can be difficult for the error associated with the later sequence to affect the optimization earlier. So in practice, it means the model might fail to do the task mentioned above. People came up with different methods to mitigate this issue, such as the Greater Recurrent Units (GRU) <span class="citation">(Chung et al. <a href="#ref-chung2014empirical">2014</a>)</span> and Long Short Term Memory Units (LSTM) <span class="citation">(Hochreiter and Schmidhuber <a href="#ref-lstm1997">1997</a>)</span>. The goal is to help the model memorize information in the earlier sequence. We are going to walk through LSTM step by step.</p>
 <p>The first step of LSTM is to decide what information to <strong>forget</strong>. This decision is made by “forget gate”, a sigmoid function (<span class="math inline">\(\Gamma_{f}\)</span>). It looks at <span class="math inline">\(a^{&lt;t-1&gt;}\)</span> and <span class="math inline">\(x^{t}\)</span> and outputs a number between 0 and 1 for each number in the cell state <span class="math inline">\(c^{t-1}\)</span>. A value 1 means “completely remember the state”, while 0 means “completely forget the state”.</p>
 <center>
-<img src="images/lstm1.png" style="width:50.0%" />
+<img src="images/lstm1.png" style="width:80.0%" />
 </center>
 <p>The next step is to decide what new information we’re going to add to the cell state. This step includes two parts:</p>
 <ol style="list-style-type: decimal">
@@ -417,17 +418,180 @@ The above defines the forward process. Same as before, the backward propagation 
 <li>a vector of new candidate value (<span class="math inline">\(\tilde{c}^{&lt;t&gt;}\)</span>)</li>
 </ol>
 <center>
-<img src="images/lstm2.png" style="width:50.0%" />
+<img src="images/lstm2.png" style="width:80.0%" />
 </center>
 <p>The multiplication of the above two parts <span class="math inline">\(\Gamma_{u}*\tilde{c}^{&lt;t&gt;}\)</span> is the new candidate scaled by the input gate. We then combine the results we get so far to get new cell state <span class="math inline">\(c^{&lt;t&gt;}\)</span>.</p>
 <center>
-<img src="images/lstm3.png" style="width:50.0%" />
+<img src="images/lstm3.png" style="width:80.0%" />
 </center>
 <p>Finally, we need to decide what we are going to output. The output is a filtered version of the new cell state <span class="math inline">\(c^{&lt;t&gt;}\)</span>.</p>
 <center>
-<img src="images/lstm4.png" style="width:50.0%" />
+<img src="images/lstm4.png" style="width:80.0%" />
 </center>
+</div>
+<div id="rnnexample" class="section level3">
+<h3><span class="header-section-number">12.4.4</span> Sentiment Analysis Using RNN</h3>
+<p>In this section, we will walk through an example of text sentiment analysis using RNN. Refer to section <a href="CloudEnvironment.html#CloudEnvironment">4.3</a> to set up an account, create a notebook (R or Python) and start a cluster. Refer to section <a href="feedforward-neural-network.html#ffnnexample">12.2.7</a> for package installation.</p>
+<p>We will use the IMDB movie review data. It is one of the most used datasets for text-related machine learning methods. The datasets’ inputs are movie reviews published at IMDB in its raw text format, and the output is a binary sentiment indicator( “1” for positive and “0” for negative) created through human evaluation. The training and testing data have 25,000 records each. Each review varies in length.</p>
+<div id="data-preprocessing-2" class="section level4">
+<h4><span class="header-section-number">12.4.4.1</span> Data preprocessing</h4>
+<p>Machine learning algorithms can not deal with raw text, and we have to convert text into numbers before feeding it into an algorithm. Tokenization is one way to convert text data into a numerical representation. For example, suppose we have 500 unique words for all reviews in the training dataset. We can label each word by the rank (i.e., from 1 to 500) of their frequency in the training data. Then each word is replaced by an integer between 1 to 500. This way, we can map each movie review from its raw text format to a sequence of integers.</p>
+<p>As reviews can have different lengths, sequences of integers will have different sizes too. So another important step is to make sure each input has the same length by padding or truncating. For example, we can set a length of 50 words, and for any reviews less than 50 words, we can pad 0 to make it 50 in length; and for reviews with more than 50 words, we can truncate the sequence to 50 by keeping only the first 50 words. After padding and truncating, we have a typical data frame, each row is an observation, and each column is a feature. The number of features is the number of words designed for each review (i.e., 50 in this example).</p>
+<p>After tokenization, the numerical input is just a naive mapping to the original words, and the integers do not have their usual numerical meanings. We need to use embedding to convert these categorical integers to more meaningful representations. The word embedding captures the inherited relationship of words and dramatically reduces the input dimension (see section <a href="recurrent-neural-network.html#embedding">12.4.2</a>). The dimension is a vector space representing the entire vocabulary. It can be 128 or 256, and the vector space dimension is the same when the vocabulary changes. It has a lower dimension, and each vector is filled with real numbers. The embedding vectors can be learned from the training data, or we can use pre-trained embedding models. There are many pre-trained embeddings for us to use, such as Word2Vec, BIRD.</p>
+<img src="../course2020/slides/02DeepLearning/RNN/images/TokenizingPadding.png" style="width:80.0%" />
+<center>
+</div>
+<div id="r-code-for-imdb-dataset" class="section level4">
+<h4><span class="header-section-number">12.4.4.2</span> R code for IMDB dataset</h4>
+<p>The IMDB dataset is preloaded for <code>keras</code> and we can call <code>dataset_imdb()</code> to load a partially pre-processed dataset into a data frame. We can define a few parameters in that function. <code>num_words</code> is the number of words in each review to be used. All the unique words are ranked by their frequency counts in the training dataset. The <code>dataset_imdb()</code> function keeps the top <code>num_words</code> words and replaces other words with a default value of 2, and using integers to represent text (i.e., top frequency word will be replaced by 3 and 0, 1, 2 are reserved for “padding,” “start of the sequence,” and “unknown.” ).</p>
+<div class="sourceCode" id="cb507"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb507-1" data-line-number="1"><span class="co"># Load `keras` package</span></a>
+<a class="sourceLine" id="cb507-2" data-line-number="2"><span class="kw">library</span>(keras)</a>
+<a class="sourceLine" id="cb507-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb507-4" data-line-number="4"><span class="co"># consider only the top 10,000 words in the dataset</span></a>
+<a class="sourceLine" id="cb507-5" data-line-number="5">max_unique_word &lt;-<span class="st"> </span><span class="dv">2500</span></a>
+<a class="sourceLine" id="cb507-6" data-line-number="6"><span class="co"># cut off reviews after 100 words</span></a>
+<a class="sourceLine" id="cb507-7" data-line-number="7">max_review_len &lt;-<span class="st"> </span><span class="dv">100</span></a></code></pre></div>
+<p>Now we load the IMDB dataset, and we can check the structure of the loaded object by using <code>str()</code> command.</p>
+<div class="sourceCode" id="cb508"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb508-1" data-line-number="1">my_imdb &lt;-<span class="st"> </span><span class="kw">dataset_imdb</span>(<span class="dt">num_words =</span> max_unique_word)</a>
+<a class="sourceLine" id="cb508-2" data-line-number="2"><span class="kw">str</span>(my_imdb)</a></code></pre></div>
+<div class="sourceCode" id="cb509"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb509-1" data-line-number="1">Downloading data from https://storage.googleapis.com/tensorflow/tf-keras-datasets/imdb.npz</a>
+<a class="sourceLine" id="cb509-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb509-3" data-line-number="3">    8192/17464789 [..............................] - ETA: 0s</a>
+<a class="sourceLine" id="cb509-4" data-line-number="4">  811008/17464789 [&gt;.............................] - ETA: 1s</a>
+<a class="sourceLine" id="cb509-5" data-line-number="5"> 4202496/17464789 [======&gt;.......................] - ETA: 0s</a>
+<a class="sourceLine" id="cb509-6" data-line-number="6">11476992/17464789 [==================&gt;...........] - ETA: 0s</a>
+<a class="sourceLine" id="cb509-7" data-line-number="7">17465344/17464789 [==============================] - 0s 0us/step</a>
+<a class="sourceLine" id="cb509-8" data-line-number="8">List of 2</a>
+<a class="sourceLine" id="cb509-9" data-line-number="9"> $ train:List of 2</a>
+<a class="sourceLine" id="cb509-10" data-line-number="10">  ..$ x:List of 25000</a>
+<a class="sourceLine" id="cb509-11" data-line-number="11">  .. ..$ : int [1:218] 1 14 22 16 43 530 973 1622 1385 65 ...</a>
+<a class="sourceLine" id="cb509-12" data-line-number="12">  .. ..$ : int [1:189] 1 194 1153 194 2 78 228 5 6 1463 ...</a>
+<a class="sourceLine" id="cb509-13" data-line-number="13">  </a>
+<a class="sourceLine" id="cb509-14" data-line-number="14">*** skipped some output ***</a></code></pre></div>
+<div class="sourceCode" id="cb510"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb510-1" data-line-number="1">x_train &lt;-<span class="st"> </span>my_imdb<span class="op">$</span>train<span class="op">$</span>x</a>
+<a class="sourceLine" id="cb510-2" data-line-number="2">y_train &lt;-<span class="st"> </span>my_imdb<span class="op">$</span>train<span class="op">$</span>y</a>
+<a class="sourceLine" id="cb510-3" data-line-number="3">x_test  &lt;-<span class="st"> </span>my_imdb<span class="op">$</span>test<span class="op">$</span>x</a>
+<a class="sourceLine" id="cb510-4" data-line-number="4">y_test  &lt;-<span class="st"> </span>my_imdb<span class="op">$</span>test<span class="op">$</span>y</a></code></pre></div>
+<p>Next, we do the padding and truncating process.</p>
+<div class="sourceCode" id="cb511"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb511-1" data-line-number="1">x_train &lt;-<span class="st"> </span><span class="kw">pad_sequences</span>(x_train, <span class="dt">maxlen =</span> max_review_len)</a>
+<a class="sourceLine" id="cb511-2" data-line-number="2">x_test &lt;-<span class="st"> </span><span class="kw">pad_sequences</span>(x_test, <span class="dt">maxlen =</span> max_review_len)</a></code></pre></div>
+<p>The <code>x_train</code> and <code>x_test</code> are numerical data frames ready to be used for recurrent neural network models.</p>
+<p><strong>Simple Recurrent Neurel Network</strong></p>
+<p>Like DNN and CNN models we trained in the past, RNN models are relatively easy to train using <code>keras</code> after the pre-processing stage. In the following example, we use <code>layer_embedding()</code> to fit an embedding layer based on the training dataset, which has two parameters: <code>input_dim</code> (the number of unique words) and <code>output_dim</code> (the length of dense vectors). Then, we add a simple RNN layer by calling <code>layer_simple_rnn()</code> and followed by a dense layer <code>layer_dense()</code> to connect to the response binary variable.</p>
+<div class="sourceCode" id="cb512"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb512-1" data-line-number="1">rnn_model &lt;-<span class="st"> </span><span class="kw">keras_model_sequential</span>()</a>
+<a class="sourceLine" id="cb512-2" data-line-number="2">rnn_model <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb512-3" data-line-number="3"><span class="st">  </span><span class="kw">layer_embedding</span>(<span class="dt">input_dim =</span> max_unique_word, <span class="dt">output_dim =</span> <span class="dv">128</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb512-4" data-line-number="4"><span class="st">  </span><span class="kw">layer_simple_rnn</span>(<span class="dt">units =</span> <span class="dv">64</span>, <span class="dt">dropout =</span> <span class="fl">0.2</span>, <span class="dt">recurrent_dropout =</span> <span class="fl">0.2</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb512-5" data-line-number="5"><span class="st">  </span><span class="kw">layer_dense</span>(<span class="dt">units =</span> <span class="dv">1</span>, <span class="dt">activation =</span> <span class="st">&#39;sigmoid&#39;</span>)</a></code></pre></div>
+<p>We compile the RNN model by defining the loss function, optimizer to use, and metrics to track the same way as DNN and CNN models.</p>
+<div class="sourceCode" id="cb513"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb513-1" data-line-number="1">rnn_model <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">compile</span>(</a>
+<a class="sourceLine" id="cb513-2" data-line-number="2">  <span class="dt">loss =</span> <span class="st">&#39;binary_crossentropy&#39;</span>,</a>
+<a class="sourceLine" id="cb513-3" data-line-number="3">  <span class="dt">optimizer =</span> <span class="st">&#39;adam&#39;</span>,</a>
+<a class="sourceLine" id="cb513-4" data-line-number="4">  <span class="dt">metrics =</span> <span class="kw">c</span>(<span class="st">&#39;accuracy&#39;</span>)</a>
+<a class="sourceLine" id="cb513-5" data-line-number="5">)</a></code></pre></div>
+<p>Let us define a few more variables before fitting the model: <code>batch_size</code>, <code>epochs</code>, and <code>validation_split</code>. These variables have the same meaning as DNN and CNN models we see in the past.</p>
+<div class="sourceCode" id="cb514"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb514-1" data-line-number="1">batch_size =<span class="st"> </span><span class="dv">128</span></a>
+<a class="sourceLine" id="cb514-2" data-line-number="2">epochs =<span class="st"> </span><span class="dv">5</span></a>
+<a class="sourceLine" id="cb514-3" data-line-number="3">validation_split =<span class="st"> </span><span class="fl">0.2</span></a>
+<a class="sourceLine" id="cb514-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb514-5" data-line-number="5">rnn_history &lt;-<span class="st"> </span>rnn_model <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">fit</span>(</a>
+<a class="sourceLine" id="cb514-6" data-line-number="6">  x_train, y_train,</a>
+<a class="sourceLine" id="cb514-7" data-line-number="7">  <span class="dt">batch_size =</span> batch_size,</a>
+<a class="sourceLine" id="cb514-8" data-line-number="8">  <span class="dt">epochs =</span> epochs,</a>
+<a class="sourceLine" id="cb514-9" data-line-number="9">  <span class="dt">validation_split =</span> validation_split</a>
+<a class="sourceLine" id="cb514-10" data-line-number="10">)</a></code></pre></div>
+<div class="sourceCode" id="cb515"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb515-1" data-line-number="1">Epoch 1/5</a>
+<a class="sourceLine" id="cb515-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb515-3" data-line-number="3">  1/157 [...............] - ETA: 0s - loss: 0.7348 - accuracy: 0.4766</a>
+<a class="sourceLine" id="cb515-4" data-line-number="4">  2/157 [...............] - ETA: 7s - loss: 0.7279 - accuracy: 0.4961</a>
+<a class="sourceLine" id="cb515-5" data-line-number="5">  3/157 [...............] - ETA: 10s - loss: 0.7290 - accuracy: 0.4896</a>
+<a class="sourceLine" id="cb515-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb515-7" data-line-number="7">*** skipped some output ***</a>
+<a class="sourceLine" id="cb515-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb515-9" data-line-number="9">154/157 [=============&gt;.] - ETA: 0s - loss: 0.4456 - accuracy: 0.7991</a>
+<a class="sourceLine" id="cb515-10" data-line-number="10">155/157 [=============&gt;.] - ETA: 0s - loss: 0.4460 - accuracy: 0.7991</a>
+<a class="sourceLine" id="cb515-11" data-line-number="11">156/157 [=============&gt;.] - ETA: 0s - loss: 0.4457 - accuracy: 0.7995</a>
+<a class="sourceLine" id="cb515-12" data-line-number="12">157/157 [===============] - 17s 109ms/step </a>
+<a class="sourceLine" id="cb515-13" data-line-number="13">loss: 0.4457 - accuracy: 0.7995 - val_loss: 0.4444 - val_accuracy: 0.7908</a></code></pre></div>
+<div class="sourceCode" id="cb516"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb516-1" data-line-number="1"><span class="kw">plot</span>(rnn_history)</a></code></pre></div>
+<center>
+<img src="images/rnnhandson1.png" style="width:60.0%" />
+</center>
+<div class="sourceCode" id="cb517"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb517-1" data-line-number="1">rnn_model <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb517-2" data-line-number="2"><span class="st">   </span><span class="kw">evaluate</span>(x_test, y_test)</a></code></pre></div>
+<div class="sourceCode" id="cb518"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb518-1" data-line-number="1">  1/782 [...............] - ETA: 0s - loss: 0.3019 - accuracy: 0.8438</a>
+<a class="sourceLine" id="cb518-2" data-line-number="2">  8/782 [...............] - ETA: 5s - loss: 0.4328 - accuracy: 0.8008</a>
+<a class="sourceLine" id="cb518-3" data-line-number="3"> 15/782 [...............] - ETA: 5s - loss: 0.4415 - accuracy: 0.7937</a>
+<a class="sourceLine" id="cb518-4" data-line-number="4"> 23/782 [...............] - ETA: 5s - loss: 0.4247 - accuracy: 0.8043</a>
+<a class="sourceLine" id="cb518-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb518-6" data-line-number="6">*** skipped some output ***</a>
+<a class="sourceLine" id="cb518-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb518-8" data-line-number="8">775/782 [=============&gt;.] - ETA: 0s - loss: 0.4371 - accuracy: 0.8007</a>
+<a class="sourceLine" id="cb518-9" data-line-number="9">782/782 [===============] - ETA: 0s - loss: 0.4365 - accuracy: 0.8010</a>
+<a class="sourceLine" id="cb518-10" data-line-number="10">782/782 [===============] - 6s 8ms/step - loss: 0.4365 - accuracy: 0.8010</a>
+<a class="sourceLine" id="cb518-11" data-line-number="11">     loss  accuracy </a>
+<a class="sourceLine" id="cb518-12" data-line-number="12">0.4365373 0.8010000 </a></code></pre></div>
+<p><strong>LSTM RNN Model</strong></p>
+<p>A simple RNN layer is a good starting point for learning RNN, but the performance is usually not that good because these long-term dependencies are impossible to learn due to vanishing gradient. Long Short Term Memory RNN model (LSTM) can carry useful information from the earlier words to later words. In <code>keras</code>, it is easy to replace a simple RNN layer with an LSTM layer by using <code>layer_lstm()</code>.</p>
+<div class="sourceCode" id="cb519"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb519-1" data-line-number="1">lstm_model &lt;-<span class="st"> </span><span class="kw">keras_model_sequential</span>()</a>
+<a class="sourceLine" id="cb519-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb519-3" data-line-number="3">lstm_model <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb519-4" data-line-number="4"><span class="st">  </span><span class="kw">layer_embedding</span>(<span class="dt">input_dim =</span> max_unique_word, <span class="dt">output_dim =</span> <span class="dv">128</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb519-5" data-line-number="5"><span class="st">  </span><span class="kw">layer_lstm</span>(<span class="dt">units =</span> <span class="dv">64</span>, <span class="dt">dropout =</span> <span class="fl">0.2</span>, <span class="dt">recurrent_dropout =</span> <span class="fl">0.2</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb519-6" data-line-number="6"><span class="st">  </span><span class="kw">layer_dense</span>(<span class="dt">units =</span> <span class="dv">1</span>, <span class="dt">activation =</span> <span class="st">&#39;sigmoid&#39;</span>)</a>
+<a class="sourceLine" id="cb519-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb519-8" data-line-number="8">lstm_model <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">compile</span>(</a>
+<a class="sourceLine" id="cb519-9" data-line-number="9">  <span class="dt">loss =</span> <span class="st">&#39;binary_crossentropy&#39;</span>,</a>
+<a class="sourceLine" id="cb519-10" data-line-number="10">  <span class="dt">optimizer =</span> <span class="st">&#39;adam&#39;</span>,</a>
+<a class="sourceLine" id="cb519-11" data-line-number="11">  <span class="dt">metrics =</span> <span class="kw">c</span>(<span class="st">&#39;accuracy&#39;</span>)</a>
+<a class="sourceLine" id="cb519-12" data-line-number="12">)</a>
+<a class="sourceLine" id="cb519-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb519-14" data-line-number="14">batch_size =<span class="st"> </span><span class="dv">128</span></a>
+<a class="sourceLine" id="cb519-15" data-line-number="15">epochs =<span class="st"> </span><span class="dv">5</span></a>
+<a class="sourceLine" id="cb519-16" data-line-number="16">validation_split =<span class="st"> </span><span class="fl">0.2</span></a>
+<a class="sourceLine" id="cb519-17" data-line-number="17"></a>
+<a class="sourceLine" id="cb519-18" data-line-number="18">lstm_history &lt;-<span class="st"> </span>lstm_model <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">fit</span>(</a>
+<a class="sourceLine" id="cb519-19" data-line-number="19">  x_train, y_train,</a>
+<a class="sourceLine" id="cb519-20" data-line-number="20">  <span class="dt">batch_size =</span> batch_size,</a>
+<a class="sourceLine" id="cb519-21" data-line-number="21">  <span class="dt">epochs =</span> epochs,</a>
+<a class="sourceLine" id="cb519-22" data-line-number="22">  <span class="dt">validation_split =</span> validation_split</a>
+<a class="sourceLine" id="cb519-23" data-line-number="23">)</a></code></pre></div>
+<div class="sourceCode" id="cb520"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb520-1" data-line-number="1">Epoch 1/5</a>
+<a class="sourceLine" id="cb520-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb520-3" data-line-number="3">  1/157 [................] - ETA: 0s - loss: 0.6939 - accuracy: 0.4766</a>
+<a class="sourceLine" id="cb520-4" data-line-number="4">  2/157 [................] - ETA: 31s - loss: 0.6940 - accuracy: 0.4766</a>
+<a class="sourceLine" id="cb520-5" data-line-number="5">  3/157 [................] - ETA: 43s - loss: 0.6937 - accuracy: 0.4896</a>
+<a class="sourceLine" id="cb520-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb520-7" data-line-number="7">*** skipped some output ***</a>
+<a class="sourceLine" id="cb520-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb520-9" data-line-number="9">155/157 [===============&gt;.] - ETA: 0s - loss: 0.2610 - accuracy: 0.8918</a>
+<a class="sourceLine" id="cb520-10" data-line-number="10">156/157 [===============&gt;.] - ETA: 0s - loss: 0.2607 - accuracy: 0.8920</a>
+<a class="sourceLine" id="cb520-11" data-line-number="11">157/157 [=================] - ETA: 0s - loss: 0.2609 - accuracy: 0.8917</a>
+<a class="sourceLine" id="cb520-12" data-line-number="12">157/157 [=================] - 67s 424ms/step </a>
+<a class="sourceLine" id="cb520-13" data-line-number="13">loss: 0.2609 - accuracy: 0.8917 - val_loss: 0.3754 - val_accuracy: 0.8328</a></code></pre></div>
+<div class="sourceCode" id="cb521"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb521-1" data-line-number="1"><span class="kw">plot</span>(lstm_history)</a></code></pre></div>
+<center>
+<img src="images/rnnhandson2.png" style="width:60.0%" />
+</center>
+<div class="sourceCode" id="cb522"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb522-1" data-line-number="1">lstm_model <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb522-2" data-line-number="2"><span class="st">   </span><span class="kw">evaluate</span>(x_test, y_test)</a></code></pre></div>
+<div class="sourceCode" id="cb523"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb523-1" data-line-number="1">  1/782 [................] - ETA: 0s - loss: 0.2332 - accuracy: 0.9062</a>
+<a class="sourceLine" id="cb523-2" data-line-number="2">  4/782 [................] - ETA: 12s - loss: 0.3536 - accuracy: 0.8750</a>
+<a class="sourceLine" id="cb523-3" data-line-number="3">  7/782 [................] - ETA: 14s - loss: 0.3409 - accuracy: 0.8705</a>
+<a class="sourceLine" id="cb523-4" data-line-number="4"> 10/782 [................] - ETA: 14s - loss: 0.3508 - accuracy: 0.8625</a>
+<a class="sourceLine" id="cb523-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb523-6" data-line-number="6">*** skipped some output ***</a>
+<a class="sourceLine" id="cb523-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb523-8" data-line-number="8">775/782 [=============&gt;.] - ETA: 0s - loss: 0.3640 - accuracy: 0.8415</a>
+<a class="sourceLine" id="cb523-9" data-line-number="9">778/782 [==============&gt;.] - ETA: 0s - loss: 0.3637 - accuracy: 0.8417</a>
+<a class="sourceLine" id="cb523-10" data-line-number="10">780/782 [==============&gt;.] - ETA: 0s - loss: 0.3632 - accuracy: 0.8419</a>
+<a class="sourceLine" id="cb523-11" data-line-number="11">782/782 [================] - ETA: 0s - loss: 0.3631 - accuracy: 0.8420</a>
+<a class="sourceLine" id="cb523-12" data-line-number="12">782/782 [================] - 18s 22ms/step - loss: 0.3631 - accuracy: 0.8420</a>
+<a class="sourceLine" id="cb523-13" data-line-number="13">     loss  accuracy </a>
+<a class="sourceLine" id="cb523-14" data-line-number="14">0.3631141 0.8420000 </a></code></pre></div>
+<p>This simple example shows that LSTM’s performance has improved dramatically from the simple RNN model. The computation time for LSTM is roughly doubled when compared with the simple RNN model for this small dataset.</p>
 
+</div>
 </div>
 </div>
 <!-- </div> -->

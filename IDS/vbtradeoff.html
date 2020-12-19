@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2020-12-17" />
+<meta name="date" content="2020-12-19" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -292,8 +292,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul></li>
 <li class="chapter" data-level="12.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html"><i class="fa fa-check"></i><b>12.4</b> Recurrent Neural Network</a><ul>
 <li class="chapter" data-level="12.4.1" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#rnn-model"><i class="fa fa-check"></i><b>12.4.1</b> RNN Model</a></li>
-<li class="chapter" data-level="12.4.2" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#word-embedding"><i class="fa fa-check"></i><b>12.4.2</b> Word Embedding</a></li>
+<li class="chapter" data-level="12.4.2" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#embedding"><i class="fa fa-check"></i><b>12.4.2</b> Word Embedding</a></li>
 <li class="chapter" data-level="12.4.3" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#lstm"><i class="fa fa-check"></i><b>12.4.3</b> Long Short Term Memory</a></li>
+<li class="chapter" data-level="12.4.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#rnnexample"><i class="fa fa-check"></i><b>12.4.4</b> Sentiment Analysis Using RNN</a></li>
 </ul></li>
 </ul></li>
 <li class="appendix"><span><b>Appendix</b></span></li>
@@ -361,16 +362,16 @@ E[f(\mathbf{X})-\hat{f}(\mathbf{X})]^{2} &amp; = &amp; E\left(f(\mathbf{X})-E[\h
 <p>The systematic error consists of two parts, <span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span> and <span class="math inline">\(Var (\hat{f}(\mathbf{X}))\)</span>. To minimize the systematic error, we need to minimize both. The bias represents the error caused by the model’s approximation of the reality, i.e., systematic relation, which may be very complex. For example, linear regression assumes a linear relationship between the predictors and the response, but rarely is there a perfect linear relationship in real life. So linear regression is more likely to have a high bias. In general, the more flexible the model is, the higher the variance. However, this does not guarantee complex models will outperform a much simpler one, such as linear regression. If the real relationship <span class="math inline">\(f\)</span> is linear, then linear regression is unbiased. It is difficult for a more flexible model to compete. Good learning method requires low variance and bias. However, it is easy to find a model with extremely low bias but high variance (by fitting a tree) or a method with low variance but high variance (by fitting a straight line). That why we call it trade-off.</p>
 <p>To explore bias and variance, let’s begin with a simple simulation. We will simulate a data with a non-linear relationship and fit different models on it. An intuitive way to show these is to compare the plots of various models.</p>
 <p>The code below simulates one predictor (<code>x</code>) and one response variable (<code>fx</code>). The relationship between <code>x</code> and <code>fx</code> is non-linear.</p>
-<div class="sourceCode" id="cb216"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb216-1" data-line-number="1"><span class="kw">source</span>(<span class="kw">ids_url</span>(<span class="st">&#39;R/multiplot.r&#39;</span>))</a>
-<a class="sourceLine" id="cb216-2" data-line-number="2"><span class="co"># randomly simulate some non-linear samples</span></a>
-<a class="sourceLine" id="cb216-3" data-line-number="3">x =<span class="st"> </span><span class="kw">seq</span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="fl">0.01</span>) <span class="op">*</span><span class="st"> </span>pi</a>
-<a class="sourceLine" id="cb216-4" data-line-number="4">e =<span class="st"> </span><span class="kw">rnorm</span>(<span class="kw">length</span>(x), <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="fl">0.2</span>)</a>
-<a class="sourceLine" id="cb216-5" data-line-number="5">fx &lt;-<span class="st"> </span><span class="kw">sin</span>(x) <span class="op">+</span><span class="st"> </span>e <span class="op">+</span><span class="st"> </span><span class="kw">sqrt</span>(x)</a>
-<a class="sourceLine" id="cb216-6" data-line-number="6">dat =<span class="st"> </span><span class="kw">data.frame</span>(x, fx)</a></code></pre></div>
+<div class="sourceCode" id="cb225"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb225-1" data-line-number="1"><span class="kw">source</span>(<span class="kw">ids_url</span>(<span class="st">&#39;R/multiplot.r&#39;</span>))</a>
+<a class="sourceLine" id="cb225-2" data-line-number="2"><span class="co"># randomly simulate some non-linear samples</span></a>
+<a class="sourceLine" id="cb225-3" data-line-number="3">x =<span class="st"> </span><span class="kw">seq</span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="fl">0.01</span>) <span class="op">*</span><span class="st"> </span>pi</a>
+<a class="sourceLine" id="cb225-4" data-line-number="4">e =<span class="st"> </span><span class="kw">rnorm</span>(<span class="kw">length</span>(x), <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="fl">0.2</span>)</a>
+<a class="sourceLine" id="cb225-5" data-line-number="5">fx &lt;-<span class="st"> </span><span class="kw">sin</span>(x) <span class="op">+</span><span class="st"> </span>e <span class="op">+</span><span class="st"> </span><span class="kw">sqrt</span>(x)</a>
+<a class="sourceLine" id="cb225-6" data-line-number="6">dat =<span class="st"> </span><span class="kw">data.frame</span>(x, fx)</a></code></pre></div>
 <p>Then fit a simple linear regression on these data:</p>
-<div class="sourceCode" id="cb217"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb217-1" data-line-number="1"><span class="co"># plot fitting result</span></a>
-<a class="sourceLine" id="cb217-2" data-line-number="2"><span class="kw">library</span>(ggplot2)</a>
-<a class="sourceLine" id="cb217-3" data-line-number="3"><span class="kw">ggplot</span>(dat, <span class="kw">aes</span>(x, fx)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb226"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb226-1" data-line-number="1"><span class="co"># plot fitting result</span></a>
+<a class="sourceLine" id="cb226-2" data-line-number="2"><span class="kw">library</span>(ggplot2)</a>
+<a class="sourceLine" id="cb226-3" data-line-number="3"><span class="kw">ggplot</span>(dat, <span class="kw">aes</span>(x, fx)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
 <pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
 <div class="figure" style="text-align: center"><span id="fig:linearbias"></span>
 <img src="IDS_files/figure-html/linearbias-1.svg" alt="High bias model" width="80%" />
@@ -381,7 +382,7 @@ FIGURE 7.1: High bias model
 <p>Despite a large sample size, trained linear regression cannot describe the relationship very well. In other words, in this case, the model has a high bias (Fig. <a href="vbtradeoff.html#fig:linearbias">7.1</a>). People also call it underfitting.</p>
 <p>Since the estimated parameters will be somewhat different for different samples, there is the variance of estimates. Intuitively, it gives you some sense that if we fit the same model with different samples (presumably, they are from the same population), how much will the estimates change. Ideally, the change is trivial. For high variance models, small changes in the training data result in very different estimates. In general, a model with high flexibility also has high variance., such as the CART tree, and the initial boosting method. To overcome that problem, the Random Forest and Gradient Boosting Model aim to reduce the variance by summarizing the results obtained from different samples.</p>
 <p>Let’s fit the above data using a smoothing method which is highly flexible and can fit the current data tightly:</p>
-<div class="sourceCode" id="cb219"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb219-1" data-line-number="1"><span class="kw">ggplot</span>(dat, <span class="kw">aes</span>(x, fx)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb228"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb228-1" data-line-number="1"><span class="kw">ggplot</span>(dat, <span class="kw">aes</span>(x, fx)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)</a></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:linearvar"></span>
 <img src="IDS_files/figure-html/linearvar-1.svg" alt="High variance model" width="80%" />
 <p class="caption">
@@ -389,36 +390,36 @@ FIGURE 7.2: High variance model
 </p>
 </div>
 <p>The resulting plot (Fig. <a href="vbtradeoff.html#fig:linearvar">7.2</a>) indicates the smoothing method fit the data much better and it has a much smaller bias. However, this method has a high variance. If we simulate different subsets of the sample, the result curve will change significantly:</p>
-<div class="sourceCode" id="cb220"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb220-1" data-line-number="1"><span class="co"># set random seed</span></a>
-<a class="sourceLine" id="cb220-2" data-line-number="2"><span class="kw">set.seed</span>(<span class="dv">2016</span>)</a>
-<a class="sourceLine" id="cb220-3" data-line-number="3"><span class="co"># sample part of the data to fit model sample 1</span></a>
-<a class="sourceLine" id="cb220-4" data-line-number="4">idx1 =<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(x), <span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb220-5" data-line-number="5">dat1 =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x1 =</span> x[idx1], <span class="dt">fx1 =</span> fx[idx1])</a>
-<a class="sourceLine" id="cb220-6" data-line-number="6">p1 =<span class="st"> </span><span class="kw">ggplot</span>(dat1, <span class="kw">aes</span>(x1, fx1)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)</a>
-<a class="sourceLine" id="cb220-7" data-line-number="7"><span class="co"># sample 2</span></a>
-<a class="sourceLine" id="cb220-8" data-line-number="8">idx2 =<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(x), <span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb220-9" data-line-number="9">dat2 =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x2 =</span> x[idx2], <span class="dt">fx2 =</span> fx[idx2])</a>
-<a class="sourceLine" id="cb220-10" data-line-number="10">p2 =<span class="st"> </span><span class="kw">ggplot</span>(dat2, <span class="kw">aes</span>(x2, fx2)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)</a>
-<a class="sourceLine" id="cb220-11" data-line-number="11"><span class="co"># sample 3</span></a>
-<a class="sourceLine" id="cb220-12" data-line-number="12">idx3 =<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(x), <span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb220-13" data-line-number="13">dat3 =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x3 =</span> x[idx3], <span class="dt">fx3 =</span> fx[idx3])</a>
-<a class="sourceLine" id="cb220-14" data-line-number="14">p3 =<span class="st"> </span><span class="kw">ggplot</span>(dat3, <span class="kw">aes</span>(x3, fx3)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)</a>
-<a class="sourceLine" id="cb220-15" data-line-number="15"><span class="co"># sample 4</span></a>
-<a class="sourceLine" id="cb220-16" data-line-number="16">idx4 =<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(x), <span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb220-17" data-line-number="17">dat4 =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x4 =</span> x[idx4], <span class="dt">fx4 =</span> fx[idx4])</a>
-<a class="sourceLine" id="cb220-18" data-line-number="18">p4 =<span class="st"> </span><span class="kw">ggplot</span>(dat4, <span class="kw">aes</span>(x4, fx4)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)</a>
-<a class="sourceLine" id="cb220-19" data-line-number="19"><span class="kw">multiplot</span>(p1, p2, p3, p4, <span class="dt">cols =</span> <span class="dv">2</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb229"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb229-1" data-line-number="1"><span class="co"># set random seed</span></a>
+<a class="sourceLine" id="cb229-2" data-line-number="2"><span class="kw">set.seed</span>(<span class="dv">2016</span>)</a>
+<a class="sourceLine" id="cb229-3" data-line-number="3"><span class="co"># sample part of the data to fit model sample 1</span></a>
+<a class="sourceLine" id="cb229-4" data-line-number="4">idx1 =<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(x), <span class="dv">100</span>)</a>
+<a class="sourceLine" id="cb229-5" data-line-number="5">dat1 =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x1 =</span> x[idx1], <span class="dt">fx1 =</span> fx[idx1])</a>
+<a class="sourceLine" id="cb229-6" data-line-number="6">p1 =<span class="st"> </span><span class="kw">ggplot</span>(dat1, <span class="kw">aes</span>(x1, fx1)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)</a>
+<a class="sourceLine" id="cb229-7" data-line-number="7"><span class="co"># sample 2</span></a>
+<a class="sourceLine" id="cb229-8" data-line-number="8">idx2 =<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(x), <span class="dv">100</span>)</a>
+<a class="sourceLine" id="cb229-9" data-line-number="9">dat2 =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x2 =</span> x[idx2], <span class="dt">fx2 =</span> fx[idx2])</a>
+<a class="sourceLine" id="cb229-10" data-line-number="10">p2 =<span class="st"> </span><span class="kw">ggplot</span>(dat2, <span class="kw">aes</span>(x2, fx2)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)</a>
+<a class="sourceLine" id="cb229-11" data-line-number="11"><span class="co"># sample 3</span></a>
+<a class="sourceLine" id="cb229-12" data-line-number="12">idx3 =<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(x), <span class="dv">100</span>)</a>
+<a class="sourceLine" id="cb229-13" data-line-number="13">dat3 =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x3 =</span> x[idx3], <span class="dt">fx3 =</span> fx[idx3])</a>
+<a class="sourceLine" id="cb229-14" data-line-number="14">p3 =<span class="st"> </span><span class="kw">ggplot</span>(dat3, <span class="kw">aes</span>(x3, fx3)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)</a>
+<a class="sourceLine" id="cb229-15" data-line-number="15"><span class="co"># sample 4</span></a>
+<a class="sourceLine" id="cb229-16" data-line-number="16">idx4 =<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(x), <span class="dv">100</span>)</a>
+<a class="sourceLine" id="cb229-17" data-line-number="17">dat4 =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x4 =</span> x[idx4], <span class="dt">fx4 =</span> fx[idx4])</a>
+<a class="sourceLine" id="cb229-18" data-line-number="18">p4 =<span class="st"> </span><span class="kw">ggplot</span>(dat4, <span class="kw">aes</span>(x4, fx4)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)</a>
+<a class="sourceLine" id="cb229-19" data-line-number="19"><span class="kw">multiplot</span>(p1, p2, p3, p4, <span class="dt">cols =</span> <span class="dv">2</span>)</a></code></pre></div>
 <p><img src="IDS_files/figure-html/unnamed-chunk-67-1.svg" width="672" /></p>
 <p>The fitted lines (blue) change over different samples which means it has high variance. People also call it overfitting. Fitting the linear model using the same four subsets, the result barely changes:</p>
-<div class="sourceCode" id="cb221"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb221-1" data-line-number="1">p1 =<span class="st"> </span><span class="kw">ggplot</span>(dat1, <span class="kw">aes</span>(x1, fx1)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, </a>
-<a class="sourceLine" id="cb221-2" data-line-number="2">    <span class="dt">se =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb221-3" data-line-number="3">p2 =<span class="st"> </span><span class="kw">ggplot</span>(dat2, <span class="kw">aes</span>(x2, fx2)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, </a>
-<a class="sourceLine" id="cb221-4" data-line-number="4">    <span class="dt">se =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb221-5" data-line-number="5">p3 =<span class="st"> </span><span class="kw">ggplot</span>(dat3, <span class="kw">aes</span>(x3, fx3)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, </a>
-<a class="sourceLine" id="cb221-6" data-line-number="6">    <span class="dt">se =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb221-7" data-line-number="7">p4 =<span class="st"> </span><span class="kw">ggplot</span>(dat4, <span class="kw">aes</span>(x4, fx4)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, </a>
-<a class="sourceLine" id="cb221-8" data-line-number="8">    <span class="dt">se =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb221-9" data-line-number="9"><span class="kw">multiplot</span>(p1, p2, p3, p4, <span class="dt">cols =</span> <span class="dv">2</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb230"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb230-1" data-line-number="1">p1 =<span class="st"> </span><span class="kw">ggplot</span>(dat1, <span class="kw">aes</span>(x1, fx1)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, </a>
+<a class="sourceLine" id="cb230-2" data-line-number="2">    <span class="dt">se =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb230-3" data-line-number="3">p2 =<span class="st"> </span><span class="kw">ggplot</span>(dat2, <span class="kw">aes</span>(x2, fx2)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, </a>
+<a class="sourceLine" id="cb230-4" data-line-number="4">    <span class="dt">se =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb230-5" data-line-number="5">p3 =<span class="st"> </span><span class="kw">ggplot</span>(dat3, <span class="kw">aes</span>(x3, fx3)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, </a>
+<a class="sourceLine" id="cb230-6" data-line-number="6">    <span class="dt">se =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb230-7" data-line-number="7">p4 =<span class="st"> </span><span class="kw">ggplot</span>(dat4, <span class="kw">aes</span>(x4, fx4)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, </a>
+<a class="sourceLine" id="cb230-8" data-line-number="8">    <span class="dt">se =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb230-9" data-line-number="9"><span class="kw">multiplot</span>(p1, p2, p3, p4, <span class="dt">cols =</span> <span class="dv">2</span>)</a></code></pre></div>
 <pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;
 ## `geom_smooth()` using formula &#39;y ~ x&#39;
 ## `geom_smooth()` using formula &#39;y ~ x&#39;
