@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2021-01-05" />
+<meta name="date" content="2021-01-23" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -423,52 +423,52 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="select-statement" class="section level4">
 <h4><span class="header-section-number">4.5.3.1</span> <code>SELECT</code> Statement</h4>
 <p><code>SELECT</code> is the most used statement in SQL, especially for database users and business analysts. It is used to extract specific information (i.e. column or columns) <code>FROM</code> one or multiple tables. It can be used to combine multiple tables. <code>WHERE</code> can be used in the <code>SELECT</code> statement to selected rows with specific conditions (i.e. filters). <code>ORDER BY</code> can be used in the <code>SELECT</code> statement to order the results in descending or ascending order of one or multiple columns. We can use <code>*</code> after <code>SELECT</code> to represent all columns in the table, or specifically write the column names separated by a comma. Below is the basic structure of a <code>SELECT</code> statement:</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb27-1" data-line-number="1"><span class="kw">SELECT</span> Col_Name1, Col_Name2</a>
-<a class="sourceLine" id="cb27-2" data-line-number="2"><span class="kw">FROM</span> Table_Name</a>
-<a class="sourceLine" id="cb27-3" data-line-number="3"><span class="kw">WHERE</span> Specific_Condition</a>
-<a class="sourceLine" id="cb27-4" data-line-number="4"><span class="kw">ORDER</span> <span class="kw">BY</span> Col_Name1, Col_Name2;</a></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb23-1" data-line-number="1"><span class="kw">SELECT</span> Col_Name1, Col_Name2</a>
+<a class="sourceLine" id="cb23-2" data-line-number="2"><span class="kw">FROM</span> Table_Name</a>
+<a class="sourceLine" id="cb23-3" data-line-number="3"><span class="kw">WHERE</span> Specific_Condition</a>
+<a class="sourceLine" id="cb23-4" data-line-number="4"><span class="kw">ORDER</span> <span class="kw">BY</span> Col_Name1, Col_Name2;</a></code></pre></div>
 <p>Here <code>Specific_Condition</code> is the typical logical conditions and only columns with <code>TRUE</code> for this condition will be chosen. For example, if we want to choose states and its total income where the population larger than 10000 and individual income less than 5000 with the result order by state name, we can use the following query:</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb28-1" data-line-number="1"><span class="kw">select</span> state, income*population <span class="kw">as</span> total_income</a>
-<a class="sourceLine" id="cb28-2" data-line-number="2"><span class="kw">from</span> metrics</a>
-<a class="sourceLine" id="cb28-3" data-line-number="3"><span class="kw">where</span> population &gt; <span class="dv">10000</span> <span class="kw">and</span> income &lt; <span class="dv">5000</span></a>
-<a class="sourceLine" id="cb28-4" data-line-number="4"><span class="kw">order</span> <span class="kw">by</span> state</a></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb24-1" data-line-number="1"><span class="kw">select</span> state, income*population <span class="kw">as</span> total_income</a>
+<a class="sourceLine" id="cb24-2" data-line-number="2"><span class="kw">from</span> metrics</a>
+<a class="sourceLine" id="cb24-3" data-line-number="3"><span class="kw">where</span> population &gt; <span class="dv">10000</span> <span class="kw">and</span> income &lt; <span class="dv">5000</span></a>
+<a class="sourceLine" id="cb24-4" data-line-number="4"><span class="kw">order</span> <span class="kw">by</span> state</a></code></pre></div>
 <p>The <code>SELECT</code> statement is used to slicing and dicing the dataset as well as create new columns of interest (such as <code>total_income</code>) using basic computation functions.</p>
 </div>
 <div id="aggregation-functions-and-group-by" class="section level4">
 <h4><span class="header-section-number">4.5.3.2</span> Aggregation Functions and <code>GROUP BY</code></h4>
 <p>We can also use aggregation functions in the <code>SELECT</code> statement to summarize the data. For example, <code>count(col_name)</code> function will return the total number of not <code>NULL</code> rows for a specific column. Other aggregation function on numerical values include <code>min(col_name)</code>, <code>max(col_name)</code>, <code>avg(col_name)</code>. Let’s use the <code>metrics</code> table again to illustrate aggregation functions. For aggregation function, it takes all the rows that match WHERE condition (if any) and return one number. The following statement will calculate the maximum, minimum, and average population for all states starts with letter A to E.</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb29-1" data-line-number="1"><span class="kw">select</span> <span class="fu">sum</span>(population) <span class="kw">as</span> sum_pop, <span class="fu">max</span>(population) <span class="kw">as</span></a>
-<a class="sourceLine" id="cb29-2" data-line-number="2">max_pop, <span class="fu">min</span>(population) <span class="kw">as</span> min_pop, <span class="fu">avg</span>(population)</a>
-<a class="sourceLine" id="cb29-3" data-line-number="3"><span class="kw">as</span> avg_pop, <span class="fu">count</span>(population) <span class="kw">as</span> count_pop</a>
-<a class="sourceLine" id="cb29-4" data-line-number="4"><span class="kw">from</span> metrics</a>
-<a class="sourceLine" id="cb29-5" data-line-number="5"><span class="kw">where</span> substring(state, <span class="dv">1</span>, <span class="dv">1</span>) <span class="kw">in</span> (<span class="st">&#39;A&#39;</span>, <span class="st">&#39;B&#39;</span>, <span class="st">&#39;C&#39;</span>, <span class="st">&#39;D&#39;</span>, <span class="st">&#39;E&#39;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb25-1" data-line-number="1"><span class="kw">select</span> <span class="fu">sum</span>(population) <span class="kw">as</span> sum_pop, <span class="fu">max</span>(population) <span class="kw">as</span></a>
+<a class="sourceLine" id="cb25-2" data-line-number="2">max_pop, <span class="fu">min</span>(population) <span class="kw">as</span> min_pop, <span class="fu">avg</span>(population)</a>
+<a class="sourceLine" id="cb25-3" data-line-number="3"><span class="kw">as</span> avg_pop, <span class="fu">count</span>(population) <span class="kw">as</span> count_pop</a>
+<a class="sourceLine" id="cb25-4" data-line-number="4"><span class="kw">from</span> metrics</a>
+<a class="sourceLine" id="cb25-5" data-line-number="5"><span class="kw">where</span> substring(state, <span class="dv">1</span>, <span class="dv">1</span>) <span class="kw">in</span> (<span class="st">&#39;A&#39;</span>, <span class="st">&#39;B&#39;</span>, <span class="st">&#39;C&#39;</span>, <span class="st">&#39;D&#39;</span>, <span class="st">&#39;E&#39;</span>)</a></code></pre></div>
 <p>The results from the above query only return one row as expected. Sometimes we want to find the aggregated value based on groups that can be defined by one or more columns. Instead of writing multiple SQL to calculate the aggregated value for each group, we can easily use the GROUP BY to calculate the aggregated value for each group in the <code>SELECT</code> statement. For example, if we want to find how many states in each division, we can use the following:</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb30-1" data-line-number="1"><span class="kw">select</span> division, <span class="fu">count</span>(state) <span class="kw">as</span> number_of_states</a>
-<a class="sourceLine" id="cb30-2" data-line-number="2"><span class="kw">from</span> divisions</a>
-<a class="sourceLine" id="cb30-3" data-line-number="3"><span class="kw">group</span> <span class="kw">by</span> division</a></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb26-1" data-line-number="1"><span class="kw">select</span> division, <span class="fu">count</span>(state) <span class="kw">as</span> number_of_states</a>
+<a class="sourceLine" id="cb26-2" data-line-number="2"><span class="kw">from</span> divisions</a>
+<a class="sourceLine" id="cb26-3" data-line-number="3"><span class="kw">group</span> <span class="kw">by</span> division</a></code></pre></div>
 <p>Another special aggregation function is to return distinct values for one column or a combination of multiple columns. Simple use <code>SELECT DISTINCT col_name1, col_name2</code> in the first line of the <code>SELECT</code> statement.</p>
 </div>
 <div id="join-multiple-tables" class="section level4">
 <h4><span class="header-section-number">4.5.3.3</span> Join Multiple Tables</h4>
 <p>The database system is usually designed such that each table contains a piece of specific information and oftentimes we need to JOIN multiple tables to achieve a specific task. There are few types typically JOINs: inner join (keep only rows that match the join condition from both tables), left outer join (rows from inner join + unmatched rows from the first table), right outer join (rows from inner join + unmatched rows from the second table) and full outer join (rows from inner join + unmatched rows from both tables). The typical <code>JOIN</code> statement is illustrated below:</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb31-1" data-line-number="1"><span class="kw">SELECT</span> a.col_name1 <span class="kw">as</span> var1, b.col_name2 <span class="kw">as</span> var2</a>
-<a class="sourceLine" id="cb31-2" data-line-number="2"><span class="kw">FROM</span> tbl_one <span class="kw">as</span> a</a>
-<a class="sourceLine" id="cb31-3" data-line-number="3"><span class="kw">LEFT</span> <span class="kw">JOIN</span> tabl_two <span class="kw">as</span> b</a>
-<a class="sourceLine" id="cb31-4" data-line-number="4"><span class="kw">ON</span> a.col_to_match = b.col_to_match</a></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb27-1" data-line-number="1"><span class="kw">SELECT</span> a.col_name1 <span class="kw">as</span> var1, b.col_name2 <span class="kw">as</span> var2</a>
+<a class="sourceLine" id="cb27-2" data-line-number="2"><span class="kw">FROM</span> tbl_one <span class="kw">as</span> a</a>
+<a class="sourceLine" id="cb27-3" data-line-number="3"><span class="kw">LEFT</span> <span class="kw">JOIN</span> tabl_two <span class="kw">as</span> b</a>
+<a class="sourceLine" id="cb27-4" data-line-number="4"><span class="kw">ON</span> a.col_to_match = b.col_to_match</a></code></pre></div>
 <p>For example, let us join the division table and metrics table to find what is the average population and income for each division, and the results order by division names:</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb32-1" data-line-number="1"><span class="kw">select</span> a.division, <span class="fu">avg</span>(b.population) <span class="kw">as</span> avg_pop,</a>
-<a class="sourceLine" id="cb32-2" data-line-number="2"><span class="fu">avg</span>(b.income) <span class="kw">as</span> avg_inc</a>
-<a class="sourceLine" id="cb32-3" data-line-number="3"><span class="kw">from</span> divisions <span class="kw">as</span> a</a>
-<a class="sourceLine" id="cb32-4" data-line-number="4"><span class="kw">inner</span> <span class="kw">join</span> metrics <span class="kw">as</span> b</a>
-<a class="sourceLine" id="cb32-5" data-line-number="5"><span class="kw">on</span> a.state = b.state</a>
-<a class="sourceLine" id="cb32-6" data-line-number="6"><span class="kw">group</span> <span class="kw">by</span> division</a>
-<a class="sourceLine" id="cb32-7" data-line-number="7"><span class="kw">order</span> <span class="kw">by</span> division</a></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb28-1" data-line-number="1"><span class="kw">select</span> a.division, <span class="fu">avg</span>(b.population) <span class="kw">as</span> avg_pop,</a>
+<a class="sourceLine" id="cb28-2" data-line-number="2"><span class="fu">avg</span>(b.income) <span class="kw">as</span> avg_inc</a>
+<a class="sourceLine" id="cb28-3" data-line-number="3"><span class="kw">from</span> divisions <span class="kw">as</span> a</a>
+<a class="sourceLine" id="cb28-4" data-line-number="4"><span class="kw">inner</span> <span class="kw">join</span> metrics <span class="kw">as</span> b</a>
+<a class="sourceLine" id="cb28-5" data-line-number="5"><span class="kw">on</span> a.state = b.state</a>
+<a class="sourceLine" id="cb28-6" data-line-number="6"><span class="kw">group</span> <span class="kw">by</span> division</a>
+<a class="sourceLine" id="cb28-7" data-line-number="7"><span class="kw">order</span> <span class="kw">by</span> division</a></code></pre></div>
 </div>
 <div id="add-more-content-into-a-table" class="section level4">
 <h4><span class="header-section-number">4.5.3.4</span> Add More Content into a Table</h4>
 <p>We can use the <code>INSERT</code> statement to add additional rows into a particular table, for example, we can add one more row to the metrics table by using the following query:</p>
-<div class="sourceCode" id="cb33"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb33-1" data-line-number="1"><span class="kw">insert</span> <span class="kw">into</span> metrics</a>
-<a class="sourceLine" id="cb33-2" data-line-number="2"><span class="kw">values</span> (<span class="st">&#39;Alberta&#39;</span>, <span class="dv">4146</span>, <span class="dv">7370</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb29-1" data-line-number="1"><span class="kw">insert</span> <span class="kw">into</span> metrics</a>
+<a class="sourceLine" id="cb29-2" data-line-number="2"><span class="kw">values</span> (<span class="st">&#39;Alberta&#39;</span>, <span class="dv">4146</span>, <span class="dv">7370</span>)</a></code></pre></div>
 </div>
 </div>
 <div id="advanced-topics-in-database" class="section level3">
