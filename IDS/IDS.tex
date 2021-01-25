@@ -169,7 +169,7 @@
 
 \title{Introduction to Data Science}
 \author{Hui Lin and Ming Li}
-\date{2021-01-23}
+\date{2021-01-25}
 
 \begin{document}
 \maketitle
@@ -4588,8 +4588,8 @@ In general, the variance (\(Var(\hat{f}(\mathbf{X}))\)) \textbf{increases} and t
 
 Those highly adaptable models can model complex relationships. However, they tend to overfit which leads to the poor prediction by learning too much from the data. It means that the model is susceptible to the specific sample used to fit it. When future data is not exactly like the past data, the model prediction may have big mistakes. A simple model like ordinary linear regression tends instead to underfit which leads to a bad prediction by learning too little from the data. It systematically over-predicts or under-predicts the data regardless of how well future data resemble past data. Without evaluating models, the modeler will not know about the problem before the future samples. Data splitting and resampling are fundamental techniques to build sound models for prediction.
 
-\hypertarget{data-splitting}{%
-\subsection{Data Splitting}\label{data-splitting}}
+\hypertarget{datasplitting}{%
+\subsection{Data Splitting}\label{datasplitting}}
 
 \emph{Data splitting} is to put part of the data aside as testing set (or Hold-outs, out of bag samples) and use the rest for model training. Training samples are also called in-sample. Model performance metrics evaluated using in-sample are retrodictive, not predictive.
 
@@ -8272,8 +8272,8 @@ First initialize \(w_1\), \(w_2\), \ldots{} , \(w_{n_x}\), and \(b\). Then plug 
 
 Repeat the forward and backward process using the updated parameter until the cost \(J\) stabilizes.
 
-\hypertarget{deep-neural-network}{%
-\subsection{Deep Neural Network}\label{deep-neural-network}}
+\hypertarget{deepneuralnetwork}{%
+\subsection{Deep Neural Network}\label{deepneuralnetwork}}
 
 Before people coined the term \emph{deep learning}, a neural network refers to \emph{single hidden layer network}. Neural networks with more than one layers are called \emph{deep learning}. Network with the structure in figure \ref{fig:ffnn} is the \textbf{multiple layer perceptron (MLP)} or \textbf{feedforward neural network (FFNN)}.
 
@@ -8479,6 +8479,122 @@ For the output layer:
   When the response is continuous, use identity function (i.e.~y = x)
 \end{itemize}
 
+\hypertarget{optimization}{%
+\subsection{Optimization}\label{optimization}}
+
+So far, we have introduced the core components of deep learning architecture, layer, weight, activation function, and loss function. With the architecture in place, we need to determine how to update the network based on a loss function (a.k.a. objective function). In this section, we will look at variants of optimization algorithms that will improve the training speed.
+
+\hypertarget{batch-mini-batch-stochastic-gradient-descent}{%
+\subsubsection{Batch, Mini-batch, Stochastic Gradient Descent}\label{batch-mini-batch-stochastic-gradient-descent}}
+
+\textbf{Stochastic Gradient Descent (SGD)} updates one sample each time. We showed the SGD for logistic regression across \(m\) samples in section @ref(logistic\_reg\_as\_neural\_network). If you process the entire training set each time to calculate the gradient, it is \textbf{Batch Gradient Descent (BGD)}. The vector representation section \ref{deepneuralnetwork} using all \(m\) is an example of BGD.
+
+In deep learning applications, the training set is often huge, with hundreds of thousands or millions of samples. If processing all the samples can only lead to one step of gradient descent, it could be slow. An intuitive way to improve the algorithm is to make some progress before finishing the entire data set. In particular, split up the training set into smaller subsets and fit the model using one subset each time. The subsets are mini-batches. \textbf{Mini-batch Gradient Descent (MGD)} is to split the training set to be smaller mini-batches. For example, if the mini-batch size is 1000, the algorithm will process 1000 samples each time, calculate the gradient and update the parameters. Then it moves on to the next mini-batch set until it goes through the whole training set. We call it one pass through training set using mini-batch gradient descent or one epoch. \textbf{Epoch} is a common keyword in deep learning, which means a single pass through the training set. If the training set has 60,000 samples, one epoch leads to 60 gradient descent steps. Then it will start over and take another pass through the training set. It means one more decision to make, the optimal number of epochs. It is decided by looking at the trends of performance metrics on a holdout set of training data. We discussed the data splitting and sampling in section \ref{datasplittingresampling}. People often use a single holdout set to tune the model in deep learning. But it is important to use a big enough holdout set to give high confidence in your model's overall performance. Then you can evaluate the chosen model on your test set that is not used in the training process. MGD is what everyone in deep learning uses when training on a large data set.
+
+\[\begin{array}{ccc} x= & [\underbrace{x^{(1)},x^{(2)},\cdots,x^{(1000)}}/ & \cdots/\cdots x^{(m)}]\\ (n_{x},m) & mini-batch\ 1 \end{array}\]
+
+\[\begin{array}{ccc} y= & [\underbrace{y^{(1)},y^{(2)},\cdots,y^{(1000)}}/ & \cdots/\cdots y^{(m)}]\\ (1,m) & mini-batch\ 1 \end{array}\]
+
+\begin{itemize}
+\tightlist
+\item
+  Mini-batch size = m: batch gradient descent, too long per iteration
+\item
+  Mini-batch size = 1: stochastic gradient descent, lose speed from vectorization
+\item
+  Mini-batch size in between: mini-batch gradient descent, make progress without processing all training set, typical batch sizes are \(2^6=64\), \(2^7=128\), \(2^7=256\), \(2^8=512\)
+\end{itemize}
+
+\hypertarget{optimization-algorithms}{%
+\subsubsection{Optimization Algorithms}\label{optimization-algorithms}}
+
+In the history of deep learning, researchers proposed different optimization algorithms and showed that they worked well in a specific scenario. But the optimization algorithms didn't generalize well to a wide range of neural networks. So you will need to try different optimizers in your application. We will introduce three commonly used optimizers here, and they are all based on something called exponentially weighted averages. To understand the intuition behind it, let's look at a hypothetical example shown in figure \ref{fig:weightedagv}.
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.6\linewidth]{images/weighted_agv} 
+
+}
+
+\caption{The intuition behind the weighted average gradient}\label{fig:weightedagv}
+\end{figure}
+
+We have two parameters, b and w. The blue dot represents the current parameter value, and the red point is the optimum value we want to reach. The current value is close to the target vertically but far away horizontally. In this situation, we hope to have slower learning on b and faster learning on w. A way to adjust is to use the average of the gradients from different iterations instead of the current iteration to update the parameter. Vertically, since the current value is close to the target value of parameter b, the gradient of b is likely to jump between positive and negative values. The average tends to cancel out the positive and negative derivatives along the vertical direction and slow down the oscillations. Horizontally, since it is still further away from the target value of parameter w, all the gradients are likely pointing in the same direction. Using an average won't have too much impact there. That is the fundamental idea behind many different optimizers: adjust the learning rate using a weighted average of various iterations' gradients.
+
+\textbf{Exponentially Weighted Averages}
+
+Before we get to more sophisticated optimization algorithms that implement this idea, let's first introduce the basic weighted moving average framework.
+
+Suppose we have the following 100 days' temperature data:
+
+\[ \theta_{1}=49F, \theta_{2}=53F, \dots, \theta_{99}=70F, \theta_{100}=69F\]
+The weighted average is defined as:
+
+\[V_t = \beta V_{t-1}+(1-\beta)\theta_t\]
+And we have:
+
+\[
+\begin{array}{c} V_{0}=0\\ V_{1}=\beta V_1 + (1-\beta)\theta_1\\ V_2=\beta V_1 + (1-\beta)\theta_2\\ \vdots \\ V_{100}= \beta V_{99} + (1-\beta)\theta_{100} \end{array}\]
+
+For example, for \(\beta=0.95\):
+
+\[\begin{array}{c} V_{0}=0 \\ V_{1}=0.05\theta_{1}  \\ V_{2}=0.0475\theta_{1}+0.05\theta_{2}   \end{array} \\ ......\]
+
+The black line in the right plot of figure \ref{fig:weightedavgplot} is the exponentially weighted averages of simulated temperature data with \(\beta = 0.95\). \(V_t\) is approximately average over the previous \(\frac{1}{1-\beta}\) \(\theta\). So \(\beta = 0.95\) approximates a 20 days' average. The red line corresponds to \(\beta = 0.8\), which approximates 5 days' average. As \(\beta\) increases, it averages over a larger window of the previous values, and hence the curve gets smoother. A larger \(\beta\) also means that it gives V\_\{0\}=0 \textbackslash{} V\_\{1\}=0.05\theta\_\{1\}the current value \(\theta_t\) less weight (\(1-\beta\)), and the average adapts more slowly. It is easy to see from the plot that the averages at the beginning are more biased. The bias correction can help to achieve a better estimate:
+
+\[V_t^{corrected} = \frac{V_t}{1-\beta^t}\]
+
+\[V_{1}^{corrected}=\frac{V_{1}}{1-0.95}=\theta_{1}\]
+
+\[V_{2}^{corrected}=\frac{V_{2}}{1-0.95^{2}}=0.4872\theta_{1}+0.5128\theta_{2}\]
+
+For \(\beta = 0.95\), the origional \(V_2 = 0.0475\theta_{1}+0.05\theta_{2}\) which is a small fraction of both \(theta_1\) and \(theta_2\). That is why it starts so much lower with big bias. After correction, \(V_{2}^{corrected} = 0.4872\theta_{1}+0.5128\theta_{2}\) is a weighted average with two weights added up to 1 which revmoves the bias. Notice that as \(t\) increases, \(\beta^t\) converges to 0 and \(V^{corrected}\) converges to \(V^t\).
+
+The following code simulates a set of temperature data and applies exponentially weighted average with and without correction using various \(\beta\) values (0.5, 0.8, 0.95).
+
+\begin{figure}
+
+{\centering \includegraphics[width=1\linewidth]{IDS_files/figure-latex/weightedavgplot-1} 
+
+}
+
+\caption{Exponentially weighted averages with and without corrrection}\label{fig:weightedavgplot}
+\end{figure}
+
+How do we apply the exponentially weighted average to optimization? Instead of using the gradients (\(dw\) and \(db\)) to update the parameter, we use the gradients' exponentially weighted average. There are various optimizers built on top of this idea. We will look at three optimizers, Momentum, Root Mean Square Propagation (RMSprop), and Adaptive Moment Estimation (Adam).
+
+\textbf{Momentum}
+
+On iteration t, compute dw, db using samples in one mini-batch and update the parameters as follows:
+
+\[V_{dw} = \beta V_{dw}+(1-\beta)dw\]
+
+\[V_{db} = \beta V_{db}+(1-\beta)db\]
+
+\[w=w-\alpha V_{dw};\ \ b=b-\alpha V_{db}\]
+
+\textbf{Root Mean Square Propagation (RMSprop)}
+
+On iteration t, compute dw, db using the current mini-batch.
+
+\[S_{dw}=\beta S_{dw} + (1-\beta)dw^2\]
+
+\[S_{db}=\beta S_{db} + (1-\beta)db^2\]
+
+\[w = w - \alpha \frac{dw}{\sqrt{S_{dw}}};\ b=b-\alpha \frac{db}{\sqrt{S_{db}}}\]
+
+\textbf{Adaptive Moment Estimation (Adam)}
+
+On iteration t, compute dw, db using the current mini-batch.
+
+\[\begin{cases} \begin{array}{c} V_{dw}=\beta_{1}V_{dw}+(1-\beta_{1})dw\\ V_{db}=\beta_{1}V_{db}+(1-\beta_{1})db \end{array} & momantum\ update\ \beta_{1}\end{cases}\]
+
+\[\begin{cases} \begin{array}{c} S_{dw}=\beta_{2}S_{dw}+(1-\beta_{2})dw^{2}\\ S_{db}=\beta_{2}S_{db}+(1-\beta_{2})db^{2} \end{array} & RMSprop\ update\ \beta_{2}\end{cases}\]
+
+\[\begin{cases} \begin{array}{c} V_{dw}^{corrected}=\frac{V_{dw}}{1-\beta_{1}^{t}}\\ V_{db}^{corrected}=\frac{V_{db}}{1-\beta_{1}^{t}} \end{array}\end{cases};\ \ \begin{cases} \begin{array}{c} S_{dw}^{corrected}=\frac{S_{dw}}{1-\beta_{2}^{t}}\\ S_{db}^{corrected}=\frac{S_{db}}{1-\beta_{2}^{t}} \end{array}\end{cases}\]
+
+\[w=w-\alpha \frac{V_{dw}^{corrected}}{\sqrt{S_{dw}^{corrected}} +\epsilon};\ b=b-\alpha\frac{V_{db}^{corrected}}{\sqrt{S_{db}^{corrected}}+\epsilon}\]
+
 \hypertarget{deal-with-overfitting}{%
 \subsection{Deal with Overfitting}\label{deal-with-overfitting}}
 
@@ -8515,33 +8631,6 @@ Another powerful regularization technique is ``dropout.'' In chapter @ref(tree m
 It temporally freezes a randomly selected subset of nodes at a specific layer in the neural network during the optimization process to reduce overfitting. When applying dropout to a particular layer and mini-batch, we pre-set a percentage, for example, 30\%, and randomly remove 30\% of the layer's nodes. The output from the 30\% removed nodes will be zero. During backpropagation, we update the remaining parameters for a much-diminished network. We need to do the random drop out again for the next mini-batch.
 
 To normalize the output with all nodes in this layer, we need to scale up the output accordingly to the same percentage to make sure the dropped-out nodes do not impact the overall signal. Please note, the dropout process will randomly turn-off different nodes for each mini-batch. Dropout is more efficient in reducing overfitting in deep learning than L1 or L2 regularizations.
-
-\hypertarget{optimization}{%
-\subsection{Optimization}\label{optimization}}
-
-\hypertarget{batch-mini-batch-stochastic-gradient-descent}{%
-\subsubsection{Batch, Mini-batch, Stochastic Gradient Descent}\label{batch-mini-batch-stochastic-gradient-descent}}
-
-\[\begin{array}{ccc} x= & [\underbrace{x^{(1)},x^{(2)},\cdots,x^{(1000)}}/ & \cdots/\cdots x^{(m)}]\\ (n_{x},m) & mini-batch\ 1 \end{array}\]
-
-\[\begin{array}{ccc} y= & [\underbrace{y^{(1)},y^{(2)},\cdots,y^{(1000)}}/ & \cdots/\cdots y^{(m)}]\\ (1,m) & mini-batch\ 1 \end{array}\]
-
-\begin{itemize}
-\tightlist
-\item
-  Mini-batch size = m: batch gradient descent, too long per iteration
-\item
-  Mini-batch size = 1: stochastic gradient descent, lose speed from vectorization
-\item
-  Mini-batch size in between: mini-batch gradient descent, make progress without processing all training set, typical batch sizes are \(2^6=64\), \(2^7=128\), \(2^7=256\), \(2^8=512\)
-\end{itemize}
-
-\hypertarget{optimization-algorithms}{%
-\subsubsection{Optimization Algorithms}\label{optimization-algorithms}}
-
-In the history of deep learning, researchers proposed different optimization algorithms and showed that they worked well in a specific scenario. But the optimization algorithms didn't generalize well to a wide range of neural networks. So you will need to try different optimizers in your application. We will introduce three commonly used optimizers here.
-
-\textbf{Exponentially Weighted Averages}
 
 \hypertarget{ffnnexample}{%
 \subsection{Image Recognition Using FFNN}\label{ffnnexample}}
