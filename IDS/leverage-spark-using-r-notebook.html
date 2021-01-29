@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2021-01-25" />
+<meta name="date" content="2021-01-28" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -387,12 +387,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb17-7" data-line-number="7"><span class="st">  </span><span class="kw">collect</span>()</a></code></pre></div>
 <p>Now, <code>iris_summary</code> is a local R object to the R notebook and we can use any R packages and functions to it. In the following code, we will apply <code>ggplot()</code> to it, exactly the same as a stand along R console:</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1"><span class="kw">library</span>(ggplot2)</a>
-<a class="sourceLine" id="cb18-2" data-line-number="2"><span class="kw">ggplot</span>(iris_summary, <span class="kw">aes</span>(Sepal_Width, Sepal_Length, <span class="dt">color =</span> Species)) <span class="op">+</span></a>
-<a class="sourceLine" id="cb18-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_line</span>(<span class="dt">size =</span> <span class="fl">1.2</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb18-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_errorbar</span>(<span class="kw">aes</span>(<span class="dt">ymin =</span> Sepal_Length <span class="op">-</span><span class="st"> </span>stdev, </a>
-<a class="sourceLine" id="cb18-5" data-line-number="5">                    <span class="dt">ymax =</span> Sepal_Length <span class="op">+</span><span class="st"> </span>stdev), <span class="dt">width =</span> <span class="fl">0.05</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb18-6" data-line-number="6"><span class="st">  </span><span class="kw">geom_text</span>(<span class="kw">aes</span>(<span class="dt">label =</span> count), <span class="dt">vjust =</span> <span class="fl">-0.2</span>, <span class="dt">hjust =</span> <span class="fl">1.2</span>, <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>) <span class="op">+</span></a>
-<a class="sourceLine" id="cb18-7" data-line-number="7"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position=</span><span class="st">&quot;top&quot;</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb18-2" data-line-number="2"><span class="kw">ggplot</span>(iris_summary, <span class="kw">aes</span>(Sepal_Width, Sepal_Length, </a>
+<a class="sourceLine" id="cb18-3" data-line-number="3">                         <span class="dt">color =</span> Species)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb18-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_line</span>(<span class="dt">size =</span> <span class="fl">1.2</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb18-5" data-line-number="5"><span class="st">  </span><span class="kw">geom_errorbar</span>(<span class="kw">aes</span>(<span class="dt">ymin =</span> Sepal_Length <span class="op">-</span><span class="st"> </span>stdev, </a>
+<a class="sourceLine" id="cb18-6" data-line-number="6">                    <span class="dt">ymax =</span> Sepal_Length <span class="op">+</span><span class="st"> </span>stdev), </a>
+<a class="sourceLine" id="cb18-7" data-line-number="7">                    <span class="dt">width =</span> <span class="fl">0.05</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb18-8" data-line-number="8"><span class="st">  </span><span class="kw">geom_text</span>(<span class="kw">aes</span>(<span class="dt">label =</span> count), <span class="dt">vjust =</span> <span class="fl">-0.2</span>, <span class="dt">hjust =</span> <span class="fl">1.2</span>, </a>
+<a class="sourceLine" id="cb18-9" data-line-number="9">            <span class="dt">color =</span> <span class="st">&quot;black&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb18-10" data-line-number="10"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position=</span><span class="st">&quot;top&quot;</span>)</a></code></pre></div>
 <p>In most cases, the heavy-duty data preprocessing and aggregation is done in Spark using functions in ·dplyr·. Once the data is aggregated, the size is usually dramatically reduced and such reduced data can be collected to an R local object for downstream analysis.</p>
 <p><strong>Fit Regression to SDF</strong></p>
 <p>One of the advantages of the Spark system is the parallel machine learning algorithm. There are many statistical and machine learning algorithms developed to run in parallel across many CPUs with data across many memory units for SDF. In this example, we have already uploaded the <code>iris</code> data to the Spark system, and the data in the SDF can be referred through <code>iris_tbl</code> as in the last section. The linear regression algorithm implemented in the Spark system can be called through <code>ml_linear_regression()</code> function. The syntax to call the function is to define the local R object that representing the SDF (i.e. <code>iris_tbl</code> (local R object) for <code>iris</code> (SDF)), response variable (i.e. the y variable in linear regression in the SDF) and features (i.e. the x variables in linear regression in the SDF). Now, we can easily fit a linear regression for large dataset far beyond the memory limit of one single computer, and it is truly scalable and only constrained by the resource of the Spark cluster. Below is an illustration of how to fit a linear regression to SDF using R notebook:</p>

@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2021-01-25" />
+<meta name="date" content="2021-01-28" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -331,36 +331,36 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Partial least square regression (PLS)  is the supervised version of PCR. Similar to PCR, PLS can also reduce the number of variables in the regression model.   As PLS is also related to the variables’ variance, we usually standardize or normalize variables before PLS. Suppose we have a list of explanatory variables <span class="math inline">\(\mathbf{X}=[X_{1},X_{2},...,X_{p}]^{T}\)</span>, and their variance-covariance matrix is <span class="math inline">\(\Sigma\)</span>. PLS also transforms the original variables using linear combination to new uncorrelated variables <span class="math inline">\((Z_{1} , Z_{2} , \ldots , Z_{m})\)</span>. When <span class="math inline">\(m=p\)</span>, the result of PLS is the same as OLS. The main difference between PCR and PLS is the process of creating new variables. PLS considers the response variable.</p>
 <p>PLS is from Herman Wold’s Nonlinear Iterative Partial Least Squares (NIPALS) algorithm <span class="citation">(Wold <a href="#ref-wold1973">1973</a>; Wold and Jöreskog <a href="#ref-wold1982">1982</a>)</span> . Later NIPALS was applied to regression problems, which was then called PLS . PLS is a method of linearizing nonlinear relationships through hidden layers. It is similar to the PCR, except that PCR does not take into account the information of the dependent variable when selecting the components, and its purpose is to find the linear combinations (i.e., unsupervised) that capture the most variance of the independent variables. And PLS maximizes the linear combination of dependencies with the response variable. In the current case, the more complicated PLS does not perform better than simple linear regression. We will not discuss the PLS algorithm’s detail, and the reference mentioned above provides a more detailed description of the algorithm.</p>
 <p>We focus on using R library <code>caret</code> to fit PCR and PLS models. Let us use the 10 survey questions (<code>Q1</code>-<code>Q10</code>) as the explanatory variables and income as the response variable. First load the data and preprocessing the data:</p>
-<div class="sourceCode" id="cb291"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb291-1" data-line-number="1"><span class="kw">library</span>(lattice)</a>
-<a class="sourceLine" id="cb291-2" data-line-number="2"><span class="kw">library</span>(caret)</a>
-<a class="sourceLine" id="cb291-3" data-line-number="3"><span class="kw">library</span>(dplyr)</a>
-<a class="sourceLine" id="cb291-4" data-line-number="4"><span class="kw">library</span>(elasticnet)</a>
-<a class="sourceLine" id="cb291-5" data-line-number="5"><span class="kw">library</span>(lars)</a>
-<a class="sourceLine" id="cb291-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb291-7" data-line-number="7"><span class="co"># Load Data</span></a>
-<a class="sourceLine" id="cb291-8" data-line-number="8">sim.dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)</a>
-<a class="sourceLine" id="cb291-9" data-line-number="9">ymad &lt;-<span class="st"> </span><span class="kw">mad</span>(<span class="kw">na.omit</span>(sim.dat<span class="op">$</span>income))</a>
-<a class="sourceLine" id="cb291-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb291-11" data-line-number="11"><span class="co"># Calculate Z values</span></a>
-<a class="sourceLine" id="cb291-12" data-line-number="12">zs &lt;-<span class="st"> </span>(sim.dat<span class="op">$</span>income <span class="op">-</span><span class="st"> </span><span class="kw">mean</span>(<span class="kw">na.omit</span>(sim.dat<span class="op">$</span>income)))<span class="op">/</span>ymad</a>
-<a class="sourceLine" id="cb291-13" data-line-number="13"><span class="co"># which(na.omit(zs&gt;3.5)) find outlier </span></a>
-<a class="sourceLine" id="cb291-14" data-line-number="14"><span class="co"># which(is.na(zs)) find missing values</span></a>
-<a class="sourceLine" id="cb291-15" data-line-number="15">idex &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">which</span>(<span class="kw">na.omit</span>(zs <span class="op">&gt;</span><span class="st"> </span><span class="fl">3.5</span>)), <span class="kw">which</span>(<span class="kw">is.na</span>(zs)))</a>
-<a class="sourceLine" id="cb291-16" data-line-number="16"><span class="co"># Remove rows with outlier and missing values</span></a>
-<a class="sourceLine" id="cb291-17" data-line-number="17">sim.dat &lt;-<span class="st"> </span>sim.dat[<span class="op">-</span>idex, ]</a></code></pre></div>
+<div class="sourceCode" id="cb288"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb288-1" data-line-number="1"><span class="kw">library</span>(lattice)</a>
+<a class="sourceLine" id="cb288-2" data-line-number="2"><span class="kw">library</span>(caret)</a>
+<a class="sourceLine" id="cb288-3" data-line-number="3"><span class="kw">library</span>(dplyr)</a>
+<a class="sourceLine" id="cb288-4" data-line-number="4"><span class="kw">library</span>(elasticnet)</a>
+<a class="sourceLine" id="cb288-5" data-line-number="5"><span class="kw">library</span>(lars)</a>
+<a class="sourceLine" id="cb288-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb288-7" data-line-number="7"><span class="co"># Load Data</span></a>
+<a class="sourceLine" id="cb288-8" data-line-number="8">sim.dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)</a>
+<a class="sourceLine" id="cb288-9" data-line-number="9">ymad &lt;-<span class="st"> </span><span class="kw">mad</span>(<span class="kw">na.omit</span>(sim.dat<span class="op">$</span>income))</a>
+<a class="sourceLine" id="cb288-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb288-11" data-line-number="11"><span class="co"># Calculate Z values</span></a>
+<a class="sourceLine" id="cb288-12" data-line-number="12">zs &lt;-<span class="st"> </span>(sim.dat<span class="op">$</span>income <span class="op">-</span><span class="st"> </span><span class="kw">mean</span>(<span class="kw">na.omit</span>(sim.dat<span class="op">$</span>income)))<span class="op">/</span>ymad</a>
+<a class="sourceLine" id="cb288-13" data-line-number="13"><span class="co"># which(na.omit(zs&gt;3.5)) find outlier </span></a>
+<a class="sourceLine" id="cb288-14" data-line-number="14"><span class="co"># which(is.na(zs)) find missing values</span></a>
+<a class="sourceLine" id="cb288-15" data-line-number="15">idex &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">which</span>(<span class="kw">na.omit</span>(zs <span class="op">&gt;</span><span class="st"> </span><span class="fl">3.5</span>)), <span class="kw">which</span>(<span class="kw">is.na</span>(zs)))</a>
+<a class="sourceLine" id="cb288-16" data-line-number="16"><span class="co"># Remove rows with outlier and missing values</span></a>
+<a class="sourceLine" id="cb288-17" data-line-number="17">sim.dat &lt;-<span class="st"> </span>sim.dat[<span class="op">-</span>idex, ]</a></code></pre></div>
 <p>Now let’s define explanatory variable matrix (<code>xtrain</code>) by selecting these 10 survey questions columns, and define response variable (<code>ytrain</code>):</p>
-<div class="sourceCode" id="cb292"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb292-1" data-line-number="1">xtrain =<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(sim.dat, Q1<span class="op">:</span>Q10)</a>
-<a class="sourceLine" id="cb292-2" data-line-number="2">ytrain =<span class="st"> </span>sim.dat<span class="op">$</span>income</a></code></pre></div>
+<div class="sourceCode" id="cb289"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb289-1" data-line-number="1">xtrain =<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(sim.dat, Q1<span class="op">:</span>Q10)</a>
+<a class="sourceLine" id="cb289-2" data-line-number="2">ytrain =<span class="st"> </span>sim.dat<span class="op">$</span>income</a></code></pre></div>
 <p>We also set up random seed and 10-folder cross-validation:</p>
-<div class="sourceCode" id="cb293"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb293-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb293-2" data-line-number="2">ctrl &lt;-<span class="st"> </span><span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>, <span class="dt">number =</span> <span class="dv">10</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb290"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb290-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">100</span>)</a>
+<a class="sourceLine" id="cb290-2" data-line-number="2">ctrl &lt;-<span class="st"> </span><span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>, <span class="dt">number =</span> <span class="dv">10</span>)</a></code></pre></div>
 <p>Fit PLS model using number of explanatory variables as the hyper-parameter to tune. As there are at most 10 explanatory variables in the model, we set up the hyper-parameter tuning range to be 1 to 10:</p>
-<div class="sourceCode" id="cb294"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb294-1" data-line-number="1">plsTune &lt;-<span class="st"> </span><span class="kw">train</span>(xtrain, ytrain, </a>
-<a class="sourceLine" id="cb294-2" data-line-number="2">                 <span class="dt">method =</span> <span class="st">&quot;pls&quot;</span>, </a>
-<a class="sourceLine" id="cb294-3" data-line-number="3">                 <span class="co"># set hyper-parameter tuning range</span></a>
-<a class="sourceLine" id="cb294-4" data-line-number="4">                 <span class="dt">tuneGrid =</span> <span class="kw">expand.grid</span>(<span class="dt">.ncomp =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">10</span>),</a>
-<a class="sourceLine" id="cb294-5" data-line-number="5">                 <span class="dt">trControl =</span> ctrl)</a>
-<a class="sourceLine" id="cb294-6" data-line-number="6">plsTune</a></code></pre></div>
+<div class="sourceCode" id="cb291"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb291-1" data-line-number="1">plsTune &lt;-<span class="st"> </span><span class="kw">train</span>(xtrain, ytrain, </a>
+<a class="sourceLine" id="cb291-2" data-line-number="2">                 <span class="dt">method =</span> <span class="st">&quot;pls&quot;</span>, </a>
+<a class="sourceLine" id="cb291-3" data-line-number="3">                 <span class="co"># set hyper-parameter tuning range</span></a>
+<a class="sourceLine" id="cb291-4" data-line-number="4">                 <span class="dt">tuneGrid =</span> <span class="kw">expand.grid</span>(<span class="dt">.ncomp =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">10</span>),</a>
+<a class="sourceLine" id="cb291-5" data-line-number="5">                 <span class="dt">trControl =</span> ctrl)</a>
+<a class="sourceLine" id="cb291-6" data-line-number="6">plsTune</a></code></pre></div>
 <pre><code>## Partial Least Squares 
 ## 
 ## 772 samples
@@ -388,18 +388,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## The final value used for the model was ncomp = 7.</code></pre>
 <p>From the result, we can see that the optimal number of variables is 7. However, if we pay attention to the RMSE improvement, we will find only minimum improvement in RMSE after three variables. In practice, we could choose to use the model with three variables if the improvement does not make a practical difference, and we would rather have a simpler model. </p>
 <p>We can also find the relative importance of each variable during PLS model tuning process, as described using the following code: </p>
-<div class="sourceCode" id="cb296"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb296-1" data-line-number="1">plsImp &lt;-<span class="st"> </span><span class="kw">varImp</span>(plsTune, <span class="dt">scale =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb296-2" data-line-number="2"><span class="kw">plot</span>(plsImp, <span class="dt">top =</span> <span class="dv">10</span>, <span class="dt">scales =</span> <span class="kw">list</span>(<span class="dt">y =</span> <span class="kw">list</span>(<span class="dt">cex =</span> <span class="fl">0.95</span>)))</a></code></pre></div>
-<p><img src="IDS_files/figure-html/unnamed-chunk-109-1.svg" width="672" /></p>
+<div class="sourceCode" id="cb293"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb293-1" data-line-number="1">plsImp &lt;-<span class="st"> </span><span class="kw">varImp</span>(plsTune, <span class="dt">scale =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb293-2" data-line-number="2"><span class="kw">plot</span>(plsImp, <span class="dt">top =</span> <span class="dv">10</span>, <span class="dt">scales =</span> <span class="kw">list</span>(<span class="dt">y =</span> <span class="kw">list</span>(<span class="dt">cex =</span> <span class="fl">0.95</span>)))</a></code></pre></div>
+<p><img src="IDS_files/figure-html/unnamed-chunk-108-1.svg" width="672" /></p>
 <p>The above plot shows that Q1, Q2, Q3, and Q6, are more important than other variables.Now let’s fit a PCR model with number of principal components as the hyper-parameter: </p>
-<div class="sourceCode" id="cb297"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb297-1" data-line-number="1"><span class="co"># Set random seed</span></a>
-<a class="sourceLine" id="cb297-2" data-line-number="2"> <span class="kw">set.seed</span>(<span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb297-3" data-line-number="3"> pcrTune &lt;-<span class="st"> </span><span class="kw">train</span>(<span class="dt">x =</span> xtrain, <span class="dt">y =</span> ytrain,</a>
-<a class="sourceLine" id="cb297-4" data-line-number="4">          <span class="dt">method =</span> <span class="st">&quot;pcr&quot;</span>,</a>
-<a class="sourceLine" id="cb297-5" data-line-number="5">          <span class="co"># set hyper-parameter tuning range</span></a>
-<a class="sourceLine" id="cb297-6" data-line-number="6">          <span class="dt">tuneGrid =</span> <span class="kw">expand.grid</span>(<span class="dt">.ncomp =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">10</span>),</a>
-<a class="sourceLine" id="cb297-7" data-line-number="7">          <span class="dt">trControl =</span> ctrl)</a>
-<a class="sourceLine" id="cb297-8" data-line-number="8"> pcrTune</a></code></pre></div>
+<div class="sourceCode" id="cb294"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb294-1" data-line-number="1"><span class="co"># Set random seed</span></a>
+<a class="sourceLine" id="cb294-2" data-line-number="2"> <span class="kw">set.seed</span>(<span class="dv">100</span>)</a>
+<a class="sourceLine" id="cb294-3" data-line-number="3"> pcrTune &lt;-<span class="st"> </span><span class="kw">train</span>(<span class="dt">x =</span> xtrain, <span class="dt">y =</span> ytrain,</a>
+<a class="sourceLine" id="cb294-4" data-line-number="4">          <span class="dt">method =</span> <span class="st">&quot;pcr&quot;</span>,</a>
+<a class="sourceLine" id="cb294-5" data-line-number="5">          <span class="co"># set hyper-parameter tuning range</span></a>
+<a class="sourceLine" id="cb294-6" data-line-number="6">          <span class="dt">tuneGrid =</span> <span class="kw">expand.grid</span>(<span class="dt">.ncomp =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">10</span>),</a>
+<a class="sourceLine" id="cb294-7" data-line-number="7">          <span class="dt">trControl =</span> ctrl)</a>
+<a class="sourceLine" id="cb294-8" data-line-number="8"> pcrTune</a></code></pre></div>
 <pre><code>## Principal Component Analysis 
 ## 
 ## 772 samples
@@ -427,19 +427,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## The final value used for the model was ncomp = 10.</code></pre>
 <p>From the output, the default recommendation is ten components. However, if we pay attention to RMSE improvement with more components, we will find little difference after the model with three components. Again, in practice, we can keep models with three components.</p>
 <p>Now let’s compare the hyper-parameter tuning process for PLS and PCR:</p>
-<div class="sourceCode" id="cb299"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb299-1" data-line-number="1"><span class="co"># Save PLS model tuning information to plsResamples</span></a>
-<a class="sourceLine" id="cb299-2" data-line-number="2">plsResamples &lt;-<span class="st"> </span>plsTune<span class="op">$</span>results</a>
-<a class="sourceLine" id="cb299-3" data-line-number="3">plsResamples<span class="op">$</span>Model &lt;-<span class="st"> &quot;PLS&quot;</span></a>
-<a class="sourceLine" id="cb299-4" data-line-number="4"><span class="co"># Save PCR model tuning information to plsResamples</span></a>
-<a class="sourceLine" id="cb299-5" data-line-number="5">pcrResamples &lt;-<span class="st"> </span>pcrTune<span class="op">$</span>results</a>
-<a class="sourceLine" id="cb299-6" data-line-number="6">pcrResamples<span class="op">$</span>Model &lt;-<span class="st"> &quot;PCR&quot;</span></a>
-<a class="sourceLine" id="cb299-7" data-line-number="7"><span class="co"># Combine both output for plotting</span></a>
-<a class="sourceLine" id="cb299-8" data-line-number="8">plsPlotData &lt;-<span class="st"> </span><span class="kw">rbind</span>(plsResamples, pcrResamples)</a>
-<a class="sourceLine" id="cb299-9" data-line-number="9"><span class="co"># Leverage xyplot() function from lattice library</span></a>
-<a class="sourceLine" id="cb299-10" data-line-number="10"><span class="kw">xyplot</span>(RMSE <span class="op">~</span><span class="st"> </span>ncomp, <span class="dt">data =</span> plsPlotData, <span class="dt">xlab =</span> <span class="st">&quot;# Components&quot;</span>, </a>
-<a class="sourceLine" id="cb299-11" data-line-number="11">    <span class="dt">ylab =</span> <span class="st">&quot;RMSE (Cross-Validation)&quot;</span>, <span class="dt">auto.key =</span> <span class="kw">list</span>(<span class="dt">columns =</span> <span class="dv">2</span>), </a>
-<a class="sourceLine" id="cb299-12" data-line-number="12">    <span class="dt">groups =</span> Model, <span class="dt">type =</span> <span class="kw">c</span>(<span class="st">&quot;o&quot;</span>, <span class="st">&quot;g&quot;</span>))</a></code></pre></div>
-<p><img src="IDS_files/figure-html/unnamed-chunk-111-1.svg" width="672" /></p>
+<div class="sourceCode" id="cb296"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb296-1" data-line-number="1"><span class="co"># Save PLS model tuning information to plsResamples</span></a>
+<a class="sourceLine" id="cb296-2" data-line-number="2">plsResamples &lt;-<span class="st"> </span>plsTune<span class="op">$</span>results</a>
+<a class="sourceLine" id="cb296-3" data-line-number="3">plsResamples<span class="op">$</span>Model &lt;-<span class="st"> &quot;PLS&quot;</span></a>
+<a class="sourceLine" id="cb296-4" data-line-number="4"><span class="co"># Save PCR model tuning information to plsResamples</span></a>
+<a class="sourceLine" id="cb296-5" data-line-number="5">pcrResamples &lt;-<span class="st"> </span>pcrTune<span class="op">$</span>results</a>
+<a class="sourceLine" id="cb296-6" data-line-number="6">pcrResamples<span class="op">$</span>Model &lt;-<span class="st"> &quot;PCR&quot;</span></a>
+<a class="sourceLine" id="cb296-7" data-line-number="7"><span class="co"># Combine both output for plotting</span></a>
+<a class="sourceLine" id="cb296-8" data-line-number="8">plsPlotData &lt;-<span class="st"> </span><span class="kw">rbind</span>(plsResamples, pcrResamples)</a>
+<a class="sourceLine" id="cb296-9" data-line-number="9"><span class="co"># Leverage xyplot() function from lattice library</span></a>
+<a class="sourceLine" id="cb296-10" data-line-number="10"><span class="kw">xyplot</span>(RMSE <span class="op">~</span><span class="st"> </span>ncomp, <span class="dt">data =</span> plsPlotData, <span class="dt">xlab =</span> <span class="st">&quot;# Components&quot;</span>, </a>
+<a class="sourceLine" id="cb296-11" data-line-number="11">    <span class="dt">ylab =</span> <span class="st">&quot;RMSE (Cross-Validation)&quot;</span>, <span class="dt">auto.key =</span> <span class="kw">list</span>(<span class="dt">columns =</span> <span class="dv">2</span>), </a>
+<a class="sourceLine" id="cb296-12" data-line-number="12">    <span class="dt">groups =</span> Model, <span class="dt">type =</span> <span class="kw">c</span>(<span class="st">&quot;o&quot;</span>, <span class="st">&quot;g&quot;</span>))</a></code></pre></div>
+<p><img src="IDS_files/figure-html/unnamed-chunk-110-1.svg" width="672" /></p>
 <p>The plot confirms our choice of using a model with three components for both PLS and PCR.</p>
 
 </div>
