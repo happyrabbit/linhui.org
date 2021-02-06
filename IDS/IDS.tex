@@ -169,7 +169,7 @@
 
 \title{Introduction to Data Science}
 \author{Hui Lin and Ming Li}
-\date{2021-01-29}
+\date{2021-02-06}
 
 \begin{document}
 \maketitle
@@ -196,13 +196,13 @@
 \chapter*{Preface}\label{preface}}
 
 
-During the early years in our career as data scientists, we were bewildered by all kinds of data science hype. There was a lack of definition of many basic terminologies such as ``Big Data'' and ``Data Science.'' How many GBs of data were big data? What was data science? What was the difference between the sexy title ``Data Scientist'' and the traditional ``Data Analyst?'' How suddenly came all kinds of machine learning and deep learning algorithms? All those struck us as confusing and vague as real-world data scientists! However, we always felt something real in data science applications, and it develops very fast. After applying data science for many years, we now have a much better idea about data science in general. This book is our endeavor to make data science a more concrete and legitimate field. In addition to ``hard'' technical aspects, the book also covers soft skills and career development in data science.
+During the early years of our career as data scientists, we were bewildered by all kinds of data science hype. There is a lack of definition of many basic terminologies such as ``big data,'' ``artificial intelligence,'' and ``data science.'' How big is big data? What is data science? What is the difference between the sexy title ``Data Scientist'' and the traditional ``Data Analyst?'' The term data science stirs so many associations such as machine learning, deep learning, data mining, pattern recognition. All those struck us as confusing and vague as real-world data scientists! However, we always feel something tangible in data science applications, and it has been developing very fast. After applying data science for many years, we now have a much better idea about data science in general. This book is our endeavor to make data science a more concrete and legitimate field. In addition to ``hard'' technical aspects, the book also covers soft skills and career development in data science.
 
 \hypertarget{goal-of-the-book}{%
 \section*{Goal of the Book}\label{goal-of-the-book}}
 
 
-This is an introductory book to data science with a specific focus on real-world applications. Data Science is a cross-disciplinary subject involving hands-on experience and business problem-solving exposures. The majority of existing introduction books on data science are about the modeling techniques and the implementation of models using R or Python. However, many of these books lack the context of the industrial environment. Moreover, a crucial part, the art of data science in practice is often missing. This book intends to fill the gap.
+This is a book on data science with a specific focus on industrial experience. Data Science is a cross-disciplinary subject involving hands-on experience and business problem-solving exposures. The majority of existing introduction books on data science are about the modeling techniques and the implementation of models using R or Python. However, many of these books lack the context of the industrial environment. Moreover, a crucial part, the art of data science in practice, is often missing. This book intends to fill the gap.
 
 Some key features of this book are as follows:
 
@@ -1537,6 +1537,28 @@ To simplify the learning process, let us use a very familiar small dataset: the 
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{library}\NormalTok{(dplyr)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Attaching package: 'dplyr'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \KeywordTok{head}\NormalTok{(iris)}
 \end{Highlighting}
 \end{Shaded}
@@ -3896,10 +3918,19 @@ A standard marketing problem is customer segmentation. It usually starts with de
 \end{Shaded}
 
 \begin{verbatim}
-##   Age FemalePct HouseYes store_exp online_exp
-## 1  39      0.55     0.57       840       2120
-##   store_trans online_trans
-## 1         5.3         13.5
+## `summarise()` ungrouping output (override with `.groups` argument)
+\end{verbatim}
+
+\begin{verbatim}
+## # A tibble: 4 x 8
+##   segment   Age FemalePct HouseYes store_exp online_exp
+##   <chr>   <dbl>     <dbl>    <dbl>     <dbl>      <dbl>
+## 1 Conspi~    42      0.32     0.86      4990       4898
+## 2 Price      60      0.45     0.94       501        205
+## 3 Quality    35      0.47     0.34       301       2013
+## 4 Style      24      0.81     0.27       200       1962
+## # ... with 2 more variables: store_trans <dbl>,
+## #   online_trans <dbl>
 \end{verbatim}
 
 Now, let's peel the onion.
@@ -3965,8 +3996,17 @@ The analytical process is aggregated instead of independent steps. The current s
 \end{Shaded}
 
 \begin{verbatim}
-##   avg_online avg_store
-## 1      156.5     253.6
+## `summarise()` ungrouping output (override with `.groups` argument)
+\end{verbatim}
+
+\begin{verbatim}
+## # A tibble: 4 x 3
+##   segment     avg_online avg_store
+##   <chr>            <dbl>     <dbl>
+## 1 Conspicuous      442.      479. 
+## 2 Price             69.3      81.3
+## 3 Quality          126.      105. 
+## 4 Style             92.8     121.
 \end{verbatim}
 
 Price group has the lowest averaged one-time purchase. The Conspicuous group will pay the highest price. When we build customer profile in real life, we will also need to look at the survey summarization. You may be surprised how much information simple data manipulations can provide.
@@ -3981,6 +4021,30 @@ Another comman task is to check which column has missing values. It requires the
 \NormalTok{dplyr}\OperatorTok{::}\KeywordTok{summarise_all}\NormalTok{(sim.dat, }\KeywordTok{funs_}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{"anyNA"}\NormalTok{)))}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+## Warning: `funs_()` is deprecated as of dplyr 0.7.0.
+## Please use `funs()` instead.
+## See vignette('programming') for more help
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_warnings()` to see where this warning was generated.
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: `funs()` is deprecated as of dplyr 0.8.0.
+## Please use a list of either functions or lambdas: 
+## 
+##   # Simple named list: 
+##   list(mean = mean, median = median)
+## 
+##   # Auto named with `tibble::lst()`: 
+##   tibble::lst(mean, median)
+## 
+##   # Using lambdas
+##   list(~ mean(., trim = .2), ~ median(., na.rm = TRUE))
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_warnings()` to see where this warning was generated.
+\end{verbatim}
 
 \begin{verbatim}
 ##     age gender income house store_exp online_exp
@@ -4204,6 +4268,13 @@ The other package that will do similar manipulations is \texttt{tidyr}. Let's ge
 \NormalTok{sdat }\OperatorTok{%>%}\StringTok{ }\KeywordTok{tbl_df}\NormalTok{()}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+## Warning: `tbl_df()` is deprecated as of dplyr 1.0.0.
+## Please use `tibble::as_tibble()` instead.
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_warnings()` to see where this warning was generated.
+\end{verbatim}
 
 \begin{verbatim}
 ## # A tibble: 5 x 4
@@ -4632,6 +4703,37 @@ According to the setting, there are 800 samples in the training set and 200 in t
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{library}\NormalTok{(plyr)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## -----------------------------------------------------
+\end{verbatim}
+
+\begin{verbatim}
+## You have loaded plyr after dplyr - this is likely to cause problems.
+## If you need functions from both plyr and dplyr, please load plyr first, then dplyr:
+## library(plyr); library(dplyr)
+\end{verbatim}
+
+\begin{verbatim}
+## -----------------------------------------------------
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attaching package: 'plyr'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:dplyr':
+## 
+##     arrange, count, desc, failwith, id, mutate,
+##     rename, summarise, summarize
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \KeywordTok{ddply}\NormalTok{(datTrain, }\StringTok{"segment"}\NormalTok{, summarise, }\DataTypeTok{count =} \KeywordTok{length}\NormalTok{(segment), }
     \DataTypeTok{percentage =} \KeywordTok{round}\NormalTok{(}\KeywordTok{length}\NormalTok{(segment)}\OperatorTok{/}\KeywordTok{nrow}\NormalTok{(datTrain), }\DecValTok{2}\NormalTok{))}
 \end{Highlighting}
@@ -4784,7 +4886,9 @@ Fig. \ref{fig:times} shows 100 simulated time series observation. The goal is to
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{timeSlices <-}\StringTok{ }\KeywordTok{createTimeSlices}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\KeywordTok{length}\NormalTok{(timedata), }
-                   \DataTypeTok{initialWindow =} \DecValTok{36}\NormalTok{, }\DataTypeTok{horizon =} \DecValTok{12}\NormalTok{, }\DataTypeTok{fixedWindow =}\NormalTok{ T)}
+                   \DataTypeTok{initialWindow =} \DecValTok{36}\NormalTok{, }
+                   \DataTypeTok{horizon =} \DecValTok{12}\NormalTok{, }
+                   \DataTypeTok{fixedWindow =}\NormalTok{ T)}
 \KeywordTok{str}\NormalTok{(timeSlices,}\DataTypeTok{max.level =} \DecValTok{1}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -4951,7 +5055,10 @@ We can use the same function (\texttt{createDataPartition\ ()}) as before. If yo
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{trainIndex <-}\StringTok{ }\KeywordTok{createDataPartition}\NormalTok{(sim.dat}\OperatorTok{$}\NormalTok{segment, }\DataTypeTok{p =} \FloatTok{.8}\NormalTok{, }\DataTypeTok{list =} \OtherTok{FALSE}\NormalTok{, }\DataTypeTok{times =} \DecValTok{5}\NormalTok{)}
+\NormalTok{trainIndex <-}\StringTok{ }\KeywordTok{createDataPartition}\NormalTok{(sim.dat}\OperatorTok{$}\NormalTok{segment, }
+                                  \DataTypeTok{p =} \FloatTok{.8}\NormalTok{, }
+                                  \DataTypeTok{list =} \OtherTok{FALSE}\NormalTok{, }
+                                  \DataTypeTok{times =} \DecValTok{5}\NormalTok{)}
 \NormalTok{dplyr}\OperatorTok{::}\KeywordTok{glimpse}\NormalTok{(trainIndex)}
 \end{Highlighting}
 \end{Shaded}
@@ -5072,6 +5179,42 @@ This section focuses on performance measurement for models with a categorical re
 \begin{Highlighting}[]
 \KeywordTok{library}\NormalTok{(dplyr)}
 \KeywordTok{library}\NormalTok{(randomForest)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## randomForest 4.6-14
+\end{verbatim}
+
+\begin{verbatim}
+## Type rfNews() to see new features/changes/bug fixes.
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attaching package: 'randomForest'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:psych':
+## 
+##     outlier
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:ggplot2':
+## 
+##     margin
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:dplyr':
+## 
+##     combine
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \KeywordTok{library}\NormalTok{(caret)}
 \KeywordTok{library}\NormalTok{(readr)}
 \NormalTok{disease_dat <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"http://bit.ly/2KXb1Qi"}\NormalTok{)}
@@ -5100,8 +5243,11 @@ Train a random forest model:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{train_rf <-}\StringTok{ }\KeywordTok{randomForest}\NormalTok{(yTrain }\OperatorTok{~}\StringTok{ }\NormalTok{., }\DataTypeTok{data =}\NormalTok{ xTrain, }\DataTypeTok{mtry =} \KeywordTok{trunc}\NormalTok{(}\KeywordTok{sqrt}\NormalTok{(}\KeywordTok{ncol}\NormalTok{(xTrain) }\OperatorTok{-}\StringTok{ }
-\StringTok{    }\DecValTok{1}\NormalTok{)), }\DataTypeTok{ntree =} \DecValTok{1000}\NormalTok{, }\DataTypeTok{importance =}\NormalTok{ T)}
+\NormalTok{train_rf <-}\StringTok{ }\KeywordTok{randomForest}\NormalTok{(yTrain }\OperatorTok{~}\StringTok{ }\NormalTok{., }
+                         \DataTypeTok{data =}\NormalTok{ xTrain, }
+                         \DataTypeTok{mtry =} \KeywordTok{trunc}\NormalTok{(}\KeywordTok{sqrt}\NormalTok{(}\KeywordTok{ncol}\NormalTok{(xTrain) }\OperatorTok{-}\StringTok{ }\DecValTok{1}\NormalTok{)),}
+                         \DataTypeTok{ntree =} \DecValTok{1000}\NormalTok{, }
+                         \DataTypeTok{importance =}\NormalTok{ T)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -5239,6 +5385,18 @@ In general, a value between 0.3 to 0.5 indicates a reasonable agreement. If a mo
 \begin{Highlighting}[]
 \CommentTok{# install.packages("fmsb")}
 \NormalTok{kt<-fmsb}\OperatorTok{::}\KeywordTok{Kappa.test}\NormalTok{(}\KeywordTok{table}\NormalTok{(yhat,yTest))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Registered S3 methods overwritten by 'fmsb':
+##   method    from
+##   print.roc pROC
+##   plot.roc  pROC
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \NormalTok{kt}\OperatorTok{$}\NormalTok{Result}
 \end{Highlighting}
 \end{Shaded}
@@ -5277,6 +5435,26 @@ Receiver Operating Characteristic (ROC) curve uses the predicted class probabili
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{library}\NormalTok{(pROC)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Type 'citation("pROC")' for a citation.
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attaching package: 'pROC'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:stats':
+## 
+##     cov, smooth, var
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \NormalTok{rocCurve<-}\KeywordTok{roc}\NormalTok{(}\DataTypeTok{response=}\NormalTok{yTest,}
               \DataTypeTok{predictor=}\NormalTok{yhatprob[,}\DecValTok{2}\NormalTok{])}
 \end{Highlighting}
@@ -5743,8 +5921,8 @@ Now it is easy to see why row 960 with \texttt{total\_exp\ =\ 658.3} is an outli
 
 The graphs suggest some outliers, but it is our decision what to do. We can either remove it or investigate it further. If the values are not due to any data error, we should consider them in our analysis.
 
-\hypertarget{principal-components-regression-and-partial-least-square}{%
-\section{Principal Components Regression and Partial Least Square}\label{principal-components-regression-and-partial-least-square}}
+\hypertarget{principal-component-regression-and-partial-least-square}{%
+\section{Principal Component Regression and Partial Least Square}\label{principal-component-regression-and-partial-least-square}}
 
 In real-life applications, explanatory variables are usually related to each other, containing similar information. For example, in the previous chapter, we used expenditure variables to predict consumer income. In that model, store expenditure (\texttt{store\_exp}), online expenditure (\texttt{online\_exp}), number of store transactions (\texttt{store\_trans}), and number of online transactions (\texttt{online\_trans}) are correlated to a certain extent, especially the number of transactions and expenditure. If there is a strong correlation among explanatory variables, then the least square-based linear regression model may not be robust. If the number of observations is less than the number of explanatory variables, the standard least square method cannot provide a unique set of coefficient estimates. We can perform data preprocessing, such as remove highly correlated variables with a preset threshold for such cases. However, this approach cannot guarantee a low correlation of the linear combination of the variables with other variables. In that case, the standard least square method will still not be robust. We need to be aware that removing highly correlated variables is not always guarantee a robust solution. We can also apply feature engineering procedures to explanatory variables such as principal component analysis (PCA). \index{principal component analysis (PCA)} By using principal components, we can ensure they are uncorrelated with each other. However, the drawback of using PCA is that these components are linear combinations of original variables, and it is difficult to explain the fitted model. Principal component regression (PCR) \index{Principal component regression (PCR)} is described in more detail in \citep{Massy1965}. It can be used when there are strong correlations among variables or when the number of observations is less than the number of variables.
 
@@ -5762,6 +5940,30 @@ We focus on using R library \texttt{caret} to fit PCR and PLS models. Let us use
 \KeywordTok{library}\NormalTok{(caret)}
 \KeywordTok{library}\NormalTok{(dplyr)}
 \KeywordTok{library}\NormalTok{(elasticnet)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: lars
+\end{verbatim}
+
+\begin{verbatim}
+## Loaded lars 1.2
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attaching package: 'lars'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:psych':
+## 
+##     error.bars
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \KeywordTok{library}\NormalTok{(lars)}
 
 \CommentTok{# Load Data}
@@ -5844,6 +6046,34 @@ We can also find the relative importance of each variable during PLS model tunin
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{plsImp <-}\StringTok{ }\KeywordTok{varImp}\NormalTok{(plsTune, }\DataTypeTok{scale =} \OtherTok{FALSE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Attaching package: 'pls'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:corrplot':
+## 
+##     corrplot
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:caret':
+## 
+##     R2
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:stats':
+## 
+##     loadings
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \KeywordTok{plot}\NormalTok{(plsImp, }\DataTypeTok{top =} \DecValTok{10}\NormalTok{, }\DataTypeTok{scales =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{y =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{cex =} \FloatTok{0.95}\NormalTok{)))}
 \end{Highlighting}
 \end{Shaded}
@@ -6559,6 +6789,22 @@ the maximum likelihood estimation unstable \citep{Wed1976}, \citep{albert1984}. 
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{library}\NormalTok{(MASS)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Attaching package: 'MASS'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:dplyr':
+## 
+##     select
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \NormalTok{dat <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"http://bit.ly/2KXb1Qi"}\NormalTok{)}
 \NormalTok{fit <-}\StringTok{ }\KeywordTok{glm}\NormalTok{(y}\OperatorTok{~}\NormalTok{., dat, }\DataTypeTok{family =} \StringTok{"binomial"}\NormalTok{)}
 \end{Highlighting}
@@ -6727,6 +6973,17 @@ Load the package:
 \KeywordTok{library}\NormalTok{(}\StringTok{"NetlifyDS"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+## 
+## Attaching package: 'NetlifyDS'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked _by_ '.GlobalEnv':
+## 
+##     multiplot
+\end{verbatim}
 
 The package includes the swine disease breakout data and you can load the data by:
 
