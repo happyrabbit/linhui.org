@@ -119,3 +119,201 @@ summary(demo_imp[, 1:5])
 ```
 
 # Centering and Scaling
+
+Centering and scaling are the most common data transformation, and they are easy to apply. For example, one way to do centering and scaling is to use the mean and standard deviation of the data, as described below.
+
+```{r}
+income <- sim.dat$income
+# calculate the mean of income
+mux <- mean(income, na.rm = T)
+# calculate the standard deviation of income
+sdx <- sd(income, na.rm = T)
+# centering
+tr1 <- income - mux
+# scaling
+tr2 <- tr1/sdx
+```
+
+But we can use the `preProcess()` function in `caret` directly, as illustrated below for the `age` and `income`:
+
+```{r}
+sdat <- subset(sim.dat, select = c("age", "income"))
+# set the 'method' option
+trans <- preProcess(sdat, method = c("center", "scale"))
+# use predict() function to get the final result
+transformed <- predict(trans, sdat)
+```
+
+# Resolve Skewness
+
+We first show how the left and right skewness looks and then describe how to use a box-cox procedure to identify a transformation to reduce skewness in the data.
+
+```{r}
+# need skewness() function from e1071 package
+set.seed(1000)
+par(mfrow = c(1, 2), oma = c(2, 2, 2, 2))
+# random sample 1000 chi-square distribution with df=2
+# right skew
+x1 <- rchisq(1000, 2, ncp = 0)
+# get left skew variable x2 from x1
+x2 <- max(x1) - x1
+plot(density(x2), main = paste("left skew, skewnwss =",
+round(skewness(x2), 2)), xlab = "X2")
+plot(density(x1), main = paste("right skew, skewness =",
+round(skewness(x1), 2)), xlab = "X1")
+```
+
+In the cell below, we use the `preProcess()` function in `caret` package to find the best Box-Cox transformation for `store_trans` and `online_trans`  in our simulated dataset.
+
+```{r}
+describe(sim.dat)
+# select the two columns and save them as dat_bc
+dat_bc <- subset(sim.dat, select = c("store_trans", "online_trans"))
+trans <- preProcess(dat_bc, method = c("BoxCox"))
+```
+
+Compare the histogram of the `store_trans` variable before and after the Box-Cox transformation.
+
+```{r}
+transformed <- predict(trans, dat_bc)
+par(mfrow = c(1, 2), oma = c(2, 2, 2, 2))
+hist(dat_bc$store_trans, main = "Before Transformation",
+xlab = "store_trans")
+hist(transformed$store_trans, main = "After Transformation",
+xlab = "store_trans")
+```
+
+```{r}
+skewness(transformed$store_trans)
+```
+
+We can also use the `BoxCoxTrans()` function directly to perform the Box-Cox transformation.
+
+```{r}
+trans <- BoxCoxTrans(dat_bc$store_trans)
+transformed <- predict(trans, dat_bc$store_trans)
+skewness(transformed)
+```
+
+# Resolve Outliers
+
+There are formal definitions of outliers, but it is essential to visualize the data to gain some intuition. 
+
+```{r, message=FALSE}
+# select numerical non-survey data
+sdat <- subset(sim.dat, select = c("age", "income", "store_exp",
+"online_exp", "store_trans", "online_trans"))
+# use scatterplotMatrix() function from car package
+par(oma = c(2, 2, 1, 2))
+car::scatterplotMatrix(sdat, diagonal = TRUE)
+```
+
+In addition to visualization, we can also calculate the modified Z-score using mean and MAD (i.e., median of the absolute dispersion) for each data point. We can then define outliers as modified Z-score greater than 3.5.
+
+```{r}
+# calculate median of the absolute dispersion for income
+ymad <- mad(na.omit(sdat$income))
+# calculate z-score
+zs <- (sdat$income - mean(na.omit(sdat$income)))/ymad
+# count the number of outliers
+sum(na.omit(zs > 3.5))
+```
+
+For models sensitive to outliers, we can use spatial sign transformation to minimize outliers' impact, as described below.
+
+
+```{r}
+# KNN imputation
+sdat <- sim.dat[, c("income", "age")]
+imp <- preProcess(sdat, method = c("knnImpute"), k = 5)
+sdat <- predict(imp, sdat)
+transformed <- spatialSign(sdat)
+transformed <- as.data.frame(transformed)
+par(mfrow = c(1, 2), oma = c(2, 2, 2, 2))
+plot(income ~ age, data = sdat, col = "blue", main = "Before")
+plot(income ~ age, data = transformed, col = "blue", main = "After")
+```
+
+# Deal with Collinearity
+
+When two variables are highly correlated, collinearity exists. We can visualize the correlation between variables.
+
+
+```{r}
+# select non-survey numerical variables
+sdat <- subset(sim.dat, select = c("age", "income", "store_exp",
+"online_exp", "store_trans", "online_trans"))
+
+# use bagging imputation here
+imp <- preProcess(sdat, method = "bagImpute")
+sdat <- predict(imp, sdat)
+
+# get the correlation matrix
+correlation <- cor(sdat)
+
+# plot
+par(oma = c(2, 2, 2, 2))
+corrplot.mixed(correlation, order = "hclust", tl.pos = "lt",
+upper = "ellipse")
+```
+
+Once we have the correlation between variables, we can define high correlation variables using certain cutoff threshold, and remove them to reduce potential collinearity.
+
+```{r}
+highCorr <- findCorrelation(cor(sdat), cutoff = 0.7)
+
+# delete highly correlated columns
+sdat <- sdat[-highCorr]
+
+# check the new correlation matrix
+cor(sdat)
+```
+
+
+# Deal with Sparse Variables
+
+Other than the highly related predictors, predictors with degenerate distributions can cause problems. Removing those variables can significantly improve some models' performance and stability. One extreme example is a variable with a single value, which is called
+a zero-variance variable. Variables with a very low frequency of unique values are near-zero variance predictors.
+
+```{r}
+# make a copy
+zero_demo <- sim.dat
+# add two sparse variable zero1 only has one unique value zero2 is a
+# vector with the first element 1 and the rest are 0s
+zero_demo$zero1 <- rep(1, nrow(zero_demo))
+zero_demo$zero2 <- c(1, rep(0, nrow(zero_demo) - 1))
+```
+
+We can use `nearZeroVar()` function in `caret` package to identify these sparse variables.
+
+```{r}
+nearZeroVar(zero_demo,freqCut = 95/5, uniqueCut = 10)
+```
+
+# Encode Dummy Variables
+
+For categorical variables, dummy encoding is a needed step before fitting many models. It converted one column of a categorical variable to multiple columns containing 0 and 1. For one categorical variable, we can use the `class.ind()` function in `nnet` package. But it is more convenient to use the `dummyVars()` function in `caret` package, which can be applied to a data frame.
+
+```{r}
+dumVar <- nnet::class.ind(sim.dat$gender)
+head(dumVar)
+```
+
+```{r}
+# use "origional variable name + level" as new name
+dumMod <- dummyVars(~gender + house + income,
+data = sim.dat,
+levelsOnly = F)
+head(predict(dumMod, sim.dat))
+```
+
+The function can also create interaction term:
+
+```{r}
+dumMod <- dummyVars(~gender + house + income + income:gender,
+data = sim.dat,
+levelsOnly = F)
+head(predict(dumMod, sim.dat))
+```
+
+
