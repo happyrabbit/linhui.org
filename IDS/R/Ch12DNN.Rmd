@@ -1,0 +1,251 @@
+---
+title: "Chapter 12 Data Pre-processing"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float:
+      collapsed: true
+      smooth_scroll: true
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE)
+
+options(dplyr.print_min = 6, dplyr.print_max = 6)
+
+hook_output <- knitr::knit_hooks$get("output")
+knit_hooks$set(output = function(x, options) {
+  lines <- options$output.lines
+  if (is.null(lines)) {
+    return(hook_output(x, options))  # pass to default hook
+  }
+  x <- unlist(strsplit(x, "\n"))
+  more <- "etc ..."
+  if (length(lines)==1) {      # first n lines
+    if (length(x) > lines) {   # truncate the output, but add ....
+      x <- c(head(x, lines), more)
+    }
+  } else {
+    x <- c(more, x[lines], more)
+  }
+  # paste these lines together
+  x <- paste(c(x, ""), collapse = "\n")
+  hook_output(x, options)
+})
+```
+
+This notebook will walk through a toy example of an image classification problem using **`keras`** package. We use R in the section to illustrate the process and also provide the python notebook on the book website. Please check the [`keras` R package website](https://keras.rstudio.com/) for the most recent development. We are using the Databrick community edition with the following consideration:
+
+- Minimum language barrier in coding for most users
+- Zero setup to save time using cloud environment
+- Help you get familiar with current trend of cloud computing in corporate setup
+
+# Packages Download and Installation
+
+We can install `keras` through CRAN by calling `install.packages("keras")`. As it is still at a fast development stage, we can also get it directly from github for the most recent version that might not be in CRAN yet using `devtools::install_github('rstudio/keras')`. Again, The following cell may take a few minutes to finish installing all dependencies.
+
+```r
+devtools::install_github("rstudio/keras")
+```
+
+As keras is just an interface to popular deep learning frameworks, we have to install the deep learning backend. The default and recommended backend is TensorFlow. By calling `install_keras()`, it will install all the needed dependencies for TensorFlow.
+
+```{r}
+library(keras)
+# install_keras()
+```
+
+Now we are all set to explore deep learning! As simple as three lines of R code, but there are quite a lot going on behind the scene. If you are using a cloud environment, you do not need to worry about these behind scene setup and maintenance.
+
+# Overview for MNIST Dataset
+
+We will use the widely used MNIST handwritten digit image dataset. More information about the dataset and benchmark results from various machine learning methods can be found at http://yann.lecun.com/exdb/mnist/ and https://en.wikipedia.org/wiki/MNIST_database.
+
+## Load MNIST dataset
+
+This dataset is already included in the keras/TensorFlow installation and we can simply load the dataset as described in the following cell. It takes less than a minute to load the dataset.
+ 
+```{r}
+mnist <- dataset_mnist()
+```
+
+The data structure of the MNIST dataset is straight forward and well prepared for R, which has two pieces:
+
+1. training set: x (i.e. features): 60000x28x28 tensor which corresponds to 60000 28x28 pixel greyscale images (i.e. all the values are integers between 0 and 255 in each 28x28 matrix), and y (i.e. responses): a length 60000 vector which contains the corresponding digits with integer values between 0 and 9.
+
+2. testing set: same as the training set, but with only 10000 images and responses. The detailed structure for the dataset can be seen with `str(mnist)` below.
+
+```{r}
+str(mnist)
+```
+
+
+## Training and testing datasets
+
+Now we prepare the features (x) and the response variable (y) for both the training and testing dataset, and we can check the structure of the `x_train` and `y_train` using `str()` function.
+
+```{r}
+x_train <- mnist$train$x
+y_train <- mnist$train$y
+x_test <- mnist$test$x
+y_test <- mnist$test$y
+
+str(x_train)
+str(y_train)
+```
+
+## Plot an image
+
+Now let’s plot a chosen 28x28 matrix as an image using R’s `image()` function. In R’s `image()` function, the way of showing an image is rotated 90 degree from the matrix representation. So there is additional steps to rearrange the matrix such that we can use `image()` function to show it in the actual orientation.
+
+```{r}
+index_image = 28  ## change this index to see different image.
+input_matrix <- x_train[index_image, 1:28, 1:28]
+output_matrix <- apply(input_matrix, 2, rev)
+output_matrix <- t(output_matrix)
+image(1:28, 1:28, output_matrix, col = gray.colors(256), 
+    xlab = paste("Image for digit of: ", y_train[index_image]), 
+    ylab = "")
+```
+
+Here is the original 28x28 matrix for the above image:
+
+```{r}
+dplyr::tibble(input_matrix)
+```
+
+# Feedforward Deep Neural Networking Model
+
+There are multiple deep learning methods to solve the handwritten digits problem and we will start from the simple and generic one, feedforward neural network (FFNN). FFNN contains a few fully connected layers and information is flowing from a front layer to a back layer without any feedback loop from the back layer to the front layer. It is the most common deep learning models to start with.
+
+##  Data preprocessing
+
+In this section, we will walk through the needed steps of data preprocessing. For the MNIST dataset that we just loaded, some preprocessing is already done. So we have a relatively “clean” data, but before we feed the data into FFNN, we still need to do some additional preparations.
+
+First, for each digits, we have a scalar response and a 28x28 integer matrix with value between 0 and 255. To use the out of box DNN functions, for each response, all the features are one row of all features. For an image in MNIST dataet, the input for one response y is a 28x28 matrix, not a single row of many columns and we need to convet the 28x28 matrix into a single row by appending every row of the matrix to the first row using `reshape()` function.
+
+In addition, we also need to scale all features to be between (0, 1) or (-1, 1) or close to (-1, 1) range. Scale or normalize every feature will improve numerical stability in the optimization procedure as there are a lot of parameters to be optimized.
+
+We first reshape the 28x28 image for each digit (i.e each row) into 784 columns (i.e. features), and then rescale the value to be between 0 and 1 by dividing the original pixel value by 255, as described in the cell below.
+
+```{r}
+# step 1: reshape
+x_train <- array_reshape(x_train, c(nrow(x_train), 784))
+x_test <- array_reshape(x_test, c(nrow(x_test), 784))
+
+# step 2: rescale
+x_train <- x_train / 255
+x_test <- x_test / 255
+```
+
+And here is the structure of the reshaped and rescaled features for training and testing dataset. Now for each digit, there are 784 columns of features.
+
+```{r}
+str(x_train)
+str(x_test)
+```
+
+In this example, though the response variable is an integer (i.e. the corresponding digits for an image), there is no order or rank for these integers and they are just an indication of one of the 10 categories. So we also convert the response variable y to be categorical.
+
+```{r}
+y_train <- to_categorical(y_train, 10)
+y_test <- to_categorical(y_test, 10)
+str(y_train)
+```
+
+## Fit model
+
+Now we are ready to fit the model. It is straight forward to build a deep neural network using keras. For this example, the number of input features is 784 (i.e. scaled value of each pixel in the 28x28 image) and the number of class for the output is 10 (i.e. one of the ten categories). So the input size for the first layer is 784 and the output size for the last layer is 10. And we can add any number of compatible layers in between.
+
+In keras, it is easy to define a DNN model: (1) use `keras_model_sequential()` to initiate a model placeholder and all model structures are attached to this model object, (2) layers are added in sequence by calling the `layer_dense()` function, (3) add arbitrary layers to the model based on the sequence of calling `layer_dense()`. For a dense layer, all the nodes from the previous layer are connected with each and every node to the next layer. In `layer_dense()` function, we can define how many nodes in that layer through the units parameter. The activation function can be defined through the activation parameter. For the first layer, we also need to define the input features’ dimension through input_shape parameter. For our preprocessed MNIST dataset, there are 784 columns in the input data. A common way to reduce overfitting is to use the dropout method, which randomly drops a proportion of the nodes in a layer. We can define the dropout proportion through `layer_dropout()` function immediately after the `layer_dense()` function.
+
+```{r}
+dnn_model <- keras_model_sequential() 
+dnn_model %>% 
+  layer_dense(units = 256, activation = 'relu', input_shape = c(784)) %>% 
+  layer_dropout(rate = 0.4) %>% 
+  layer_dense(units = 128, activation = 'relu') %>%
+  layer_dropout(rate = 0.3) %>%
+  layer_dense(units = 64, activation = 'relu') %>%
+  layer_dropout(rate = 0.3) %>%
+  layer_dense(units = 10, activation = 'softmax')
+```
+
+The above `dnn_model` has 4 layers with first layer 256 nodes, 2nd layer 128 nodes, 3rd layer 64 nodes, and last layer 10 nodes. The activation function for the first 3 layers is relu and the activation function for the last layer is `softmax` which is typical for classification problems. The model detail can be obtained through `summary()` function. The number of parameter of each layer can be calculated as: (number of input features +1) times (numbe of nodes in the layer). For example, the first layer has (784+1)x256=200960 parameters; the 2nd layer has (256+1)x128=32896 parameters. Please note, dropout only randomly drop certain proportion of parameters for each batch, it will not reduce the number of parameters in the model. The total number of parameters for the `dnn_model` we just defined has 242762 parameters to be estimated.
+
+```{r}
+summary(dnn_model)
+```
+
+Once a model is defined, we need to compile the model with a few other hyper-parameters including (1) loss function, (2) optimizer, and (3) performance metrics. For multi-class classification problems, people usually use the `categorical_crossentropy` loss function and `optimizer_rmsprop()` as the optimizer which performs batch gradient descent.
+
+```{r}
+dnn_model %>% compile(
+  loss = 'categorical_crossentropy',
+  optimizer = optimizer_rmsprop(),
+  metrics = c('accuracy')
+)
+```
+
+Now we can feed data (x and y) into the neural network that we just built to estimate all the parameters in the model. Here we define three hyperparameters: `epochs`, `batch_size`, and `validation_split`, for this model. It just takes a couple of minutes to finish.
+
+```{r}
+dnn_history <- dnn_model %>% fit(
+  x_train, y_train, 
+  epochs = 15, batch_size = 128, 
+  validation_split = 0.2
+)
+```
+
+There is some useful information stored in the output object `dnn_history` and the details can be shown by using `str()`. We can plot the training and validation accuracy and loss as function of epoch by simply calling `plot(dnn_history)`.
+
+```{r}
+str(dnn_history)
+```
+
+```{r}
+plot(dnn_history)
+```
+
+## Prediction
+
+```{r}
+dnn_model %>% evaluate(x_test, y_test)
+```
+
+```{r}
+dnn_pred <- dnn_model %>% 
+              predict_classes(x_test)
+head(dnn_pred)
+```
+
+Let’s check a few misclassified images. A number of misclassified images can be found using the following code. And we can plot these misclassified images to see whether a human can correctly read it out.
+
+```{r}
+## total number of mis-classcified images
+sum(dnn_pred != mnist$test$y)
+```
+
+```{r}
+missed_image = mnist$test$x[dnn_pred != mnist$test$y,,]
+missed_digit = mnist$test$y[dnn_pred != mnist$test$y]
+missed_pred = dnn_pred[dnn_pred != mnist$test$y]
+
+index_image = 34 
+
+## change this index to see different image.
+input_matrix <- missed_image[index_image,1:28,1:28]
+output_matrix <- apply(input_matrix, 2, rev)
+output_matrix <- t(output_matrix)
+
+image(1:28, 1:28, output_matrix, col = gray.colors(256), 
+    xlab = paste("Image for digit ", missed_digit[index_image], 
+        ", wrongly predicted as ", missed_pred[index_image]), 
+    ylab = "")
+```
+
+Now we finish this simple tutorial of using deep neural networks for handwritten digit recognition using the MNIST dataset. We illustrate how to reshape the original data into the right format and scaling; how to define a deep neural network with arbitrary number of layers; how to choose activation function, optimizer, and loss function; how to use dropout to limit overfitting; how to setup hyperparameters; and how to fit the model and using a fitted model to predict. Finally, we illustrate how to plot the accuracy/loss as functions of the epoch. It shows the end-to-end cycle of how to fit a deep neural network model.
+
