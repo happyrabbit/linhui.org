@@ -1,0 +1,235 @@
+---
+title: "Chapter 12  Feedforward Neural Network"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float:
+      collapsed: true
+      smooth_scroll: true
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE)
+
+options(dplyr.print_min = 6, dplyr.print_max = 6)
+
+hook_output <- knitr::knit_hooks$get("output")
+knit_hooks$set(output = function(x, options) {
+  lines <- options$output.lines
+  if (is.null(lines)) {
+    return(hook_output(x, options))  # pass to default hook
+  }
+  x <- unlist(strsplit(x, "\n"))
+  more <- "etc ..."
+  if (length(lines)==1) {      # first n lines
+    if (length(x) > lines) {   # truncate the output, but add ....
+      x <- c(head(x, lines), more)
+    }
+  } else {
+    x <- c(more, x[lines], more)
+  }
+  # paste these lines together
+  x <- paste(c(x, ""), collapse = "\n")
+  hook_output(x, options)
+})
+```
+
+In this notebook, we will walk through how to use the `keras` R package for a toy example in deep learning with the handwritten digits image dataset (MNIST). The notebook's purpose is to illustrate how to build Convolutional Neural Network using R. Please check the `keras` R package website for the most recent development: https://keras.rstudio.com/.
+
+# Packages Download and Installation
+
+We can install `keras` through CRAN by calling `install.packages("keras")`. As it is still at a fast development stage, we can also get it directly from github for the most recent version that might not be in CRAN yet using `devtools::install_github('rstudio/keras')`. The following cell may take a few minutes to finish installing all dependencies.
+
+```r
+devtools::install_github("rstudio/keras")
+```
+
+As keras is just an interface to popular deep learning frameworks, we have to install the deep learning backend. The default and recommended backend is TensorFlow. By calling `install_keras()`, it will install all the needed dependencies for TensorFlow.
+
+```{r}
+library(keras)
+# install_keras()
+```
+
+You can run this notebook in the Databrick community edition with R as the interface. For an audience with a statistical background, using a well-managed cloud environment has the following benefit:
+
+- Minimum language barrier in coding for most statisticians
+- Zero setups to save time using the cloud environment
+- Get familiar with the current trend of cloud computing in the industrial context
+
+You can also run this notebook on your local machine with R and the required Python packages (`keras`  uses the Python TensorFlow backend engine). Different versions of Python may cause some errors when running `install_keras()`.  Here are the things you could do when you encounter the Python backend issue in your local machine:
+
+- Run `reticulate::py_config()` to check the current Python configuration to see if anything needs to be changed. 
+- By default, `install_keras()` uses virtual environment `~/.virtualenvs/r-reticulate`. If you don't know how to set the right environment, try to set the installation method as conda (`install_keras(method = "conda")`)
+- Refer to this document for more details on how to [install `keras` and the TensorFlow backend](https://tensorflow.rstudio.com/reference/keras/install_keras/). 
+
+
+# Overview for MNIST Dataset
+
+We will use the widely used MNIST handwritten digit image dataset. More information about the dataset and benchmark results from various machine learning methods can be found at http://yann.lecun.com/exdb/mnist/ and https://en.wikipedia.org/wiki/MNIST_database.
+
+## Load MNIST dataset
+
+This dataset is already included in the keras/TensorFlow installation and we can simply load the dataset as described in the following cell. It takes less than a minute to load the dataset.
+ 
+```{r}
+mnist <- dataset_mnist()
+```
+
+The data structure of the MNIST dataset is straight forward and well prepared for R, which has two pieces:
+
+1. training set: x (i.e. features): 60000x28x28 tensor which corresponds to 60000 28x28 pixel greyscale images (i.e. all the values are integers between 0 and 255 in each 28x28 matrix), and y (i.e. responses): a length 60000 vector which contains the corresponding digits with integer values between 0 and 9.
+
+2. testing set: same as the training set, but with only 10000 images and responses. The detailed structure for the dataset can be seen with `str(mnist)` below.
+
+```{r}
+str(mnist)
+```
+
+## Training and testing datasets
+
+CNN leverages the relationship among neighbor pixels in the 2D image for better performance. It also avoids generating thousands or millions of features for high resolution images with full color. CNN requires different preprocessing steps. Let’s start with a few parameters to be used later.
+
+```{r}
+x_train <- mnist$train$x
+y_train <- mnist$train$y
+x_test <- mnist$test$x
+y_test <- mnist$test$y
+
+# Define a few parameters to be used in the CNN model
+batch_size <- 128
+num_classes <- 10
+epochs <- 10
+
+# Input image dimensions
+img_rows <- 28
+img_cols <- 28
+```
+
+#  Data preprocessing
+
+For CNN, the input is a $n_H \times n_W \times n_C$ 3D array with $n_C$ channels. For example, a greyscale $n_H \times n_W$ image has only one channel, and the input is $n_H \times n_W \times 1$   tensor. A $n_H \times n_W$ 8-bit per channel RGB image has three channels with 3 $n_H \times n_W$ array with values between 0 and 255, so the input is $n_H \times n_W \times 3$ tensor. For the problem that we have now, the image is greyscaled, but we need to specifically define there is one channel by reshaping the 2D array into 3D tensor using `array_reshape()`. The `input_shape` variable will be used in the CNN model later. For an RGB color image, the number of channels is 3 and we need to replace "1" with "3" for the code cell below if the input image is RGB format.
+
+```{r}
+x_train <- array_reshape(x_train, c(nrow(x_train), img_rows, img_cols, 1))
+x_test <- array_reshape(x_test, c(nrow(x_test), img_rows, img_cols, 1))
+input_shape <- c(img_rows, img_cols, 1)
+```
+
+Here is the structure of the reshaped image, the first dimension is the image index, the 2-4 dimension is a 3D tensor even though there is only one channel.
+
+```{r}
+str(x_train)
+```
+
+Scale the input values to be between 0 and 1 for the same numerical stability consideration in the optimization process.
+
+```{r}
+x_train <- x_train / 255
+x_test <- x_test / 255
+```
+
+Encode the response variable to binary vectors.
+
+```{r}
+# Convert class vectors to binary class matrices
+y_train <- to_categorical(y_train, num_classes)
+y_test <- to_categorical(y_test, num_classes)
+```
+
+# Fit model
+
+CNN model contains a series of 3D convolutional layers which contains a few parameters:   
+
+(1) the kernal_size which is typically 3x3 or 5x5;   
+
+(2) the number of filters, which is equal to the number of channels of the output;   
+
+(3) activation function.   
+
+For the first layer, there is also an input_shape parameter which is the input image size and channel. To prevent overfitting and speed up computation, a pooling layer is usually applied after one or a few convolutional layers. A maximum pooling layer with pool_size = 2x2 reduces the size to half. Dropout can be used as well in addition to pooling neighbor values. After a few 3D convolutional layers, we also need to 'flatten' the 3D tensor output into 1D tensor, and then add one or a couple of dense layers to connect the output to the target response classes.
+
+Let's define the CNN model structure. Now we define a CNN model with two convolutional layers, two max-pooling layers, and two dropout layers to mediate overfitting. There are three dense layers after flattening the 3D tensor. The last layer is a dense layer that connects to the response. 
+
+```{r}
+# define model structure 
+cnn_model <- keras_model_sequential() %>%
+  layer_conv_2d(filters = 32, kernel_size = c(5,5), activation = 'relu', input_shape = input_shape) %>% 
+  layer_max_pooling_2d(pool_size = c(2, 2)) %>% 
+  layer_conv_2d(filters = 64, kernel_size = c(5,5), activation = 'relu') %>% 
+  layer_max_pooling_2d(pool_size = c(2, 2)) %>% 
+  layer_dropout(rate = 0.2) %>% 
+  layer_flatten() %>% 
+  layer_dense(units = 120, activation = 'relu') %>% 
+  layer_dropout(rate = 0.5) %>% 
+  layer_dense(units = 84, activation = 'relu') %>% 
+  layer_dense(units = num_classes, activation = 'softmax')
+```
+
+```{r}
+summary(cnn_model)
+```
+
+We need to compile the defined CNN model.
+
+```{r}
+cnn_model %>% compile(
+  loss = loss_categorical_crossentropy,
+  optimizer = optimizer_adadelta(),
+  metrics = c('accuracy')
+)
+```
+
+Train the model and save each epochs's history. Please note, as we are not using GPU, it takes a few minutes to finish. Please be patient while waiting for the results. The training time can be significantly reduced if running on GPU.
+
+```{r}
+cnn_history <- cnn_model %>% fit(
+  x_train, y_train,
+  batch_size = batch_size,
+  epochs = epochs,
+  validation_split = 0.2
+)
+```
+
+The trained model accuracy can be evaluated on the testing dataset which is pretty good.
+
+```{r}
+cnn_model %>% evaluate(x_test, y_test)
+```
+
+# Prediction
+
+We can apply the trained model to predict new image.
+
+```{r}
+# model prediction
+cnn_pred <- cnn_model %>% 
+              predict_classes(x_test)
+head(cnn_pred)
+```
+
+Now let's check a few misclassified images to see whether a human can do a better job than this simple CNN model.
+
+```{r}
+## number of mis-classcified images
+sum(cnn_pred != mnist$test$y)
+```
+
+```{r}
+missed_image = mnist$test$x[cnn_pred != mnist$test$y,,]
+missed_digit = mnist$test$y[cnn_pred != mnist$test$y]
+missed_pred = cnn_pred[cnn_pred != mnist$test$y]
+```
+
+```{r}
+index_image = 10 ## change this index to see different image.
+input_matrix <- missed_image[index_image,1:28,1:28]
+output_matrix <- apply(input_matrix, 2, rev)
+output_matrix <- t(output_matrix)
+image(1:28, 1:28, output_matrix, col=gray.colors(256), 
+xlab=paste('Image for digit ', missed_digit[index_image], ', 
+wrongly predicted as ', missed_pred[index_image]), ylab="")
+```
