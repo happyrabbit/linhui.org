@@ -1,0 +1,71 @@
+---
+title: "Chapter 12  Recurrent Neural Network"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float:
+      collapsed: true
+      smooth_scroll: true
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+knitr::opts_chunk$set(echo = TRUE)
+
+options(dplyr.print_min = 6, dplyr.print_max = 6)
+
+hook_output <- knitr::knit_hooks$get("output")
+knit_hooks$set(output = function(x, options) {
+  lines <- options$output.lines
+  if (is.null(lines)) {
+    return(hook_output(x, options))  # pass to default hook
+  }
+  x <- unlist(strsplit(x, "\n"))
+  more <- "etc ..."
+  if (length(lines)==1) {      # first n lines
+    if (length(x) > lines) {   # truncate the output, but add ....
+      x <- c(head(x, lines), more)
+    }
+  } else {
+    x <- c(more, x[lines], more)
+  }
+  # paste these lines together
+  x <- paste(c(x, ""), collapse = "\n")
+  hook_output(x, options)
+})
+```
+
+In this section, we will walk through an example of text sentiment analysis using RNN. The notebook's purpose is to illustrate how to build Convolutional Neural Network using R. Please check the `keras` R package website for the most recent development: https://keras.rstudio.com/.
+
+
+#  Packages Download and Installation
+
+We can install `keras` through CRAN by calling `install.packages("keras")`. As it is still at a fast development stage, we can also get it directly from github for the most recent version that might not be in CRAN yet using `devtools::install_github('rstudio/keras')`. The following cell may take a few minutes to finish installing all dependencies.
+
+```r
+devtools::install_github("rstudio/keras")
+```
+
+As keras is just an interface to popular deep learning frameworks, we have to install the deep learning backend. The default and recommended backend is TensorFlow. By calling `install_keras()`, it will install all the needed dependencies for TensorFlow.
+
+```{r}
+library(keras)
+# install_keras()
+```
+
+You can run this notebook in the Databrick community edition with R as the interface. For an audience with a statistical background, using a well-managed cloud environment has the following benefit:
+
+- Minimum language barrier in coding for most statisticians
+- Zero setups to save time using the cloud environment
+- Get familiar with the current trend of cloud computing in the industrial context
+
+You can also run this notebook on your local machine with R and the required Python packages (`keras`  uses the Python TensorFlow backend engine). Different versions of Python may cause some errors when running `install_keras()`.  Here are the things you could do when you encounter the Python backend issue in your local machine:
+
+- Run `reticulate::py_config()` to check the current Python configuration to see if anything needs to be changed. 
+- By default, `install_keras()` uses virtual environment `~/.virtualenvs/r-reticulate`. If you don't know how to set the right environment, try to set the installation method as conda (`install_keras(method = "conda")`)
+- Refer to this document for more details on how to [install `keras` and the TensorFlow backend](https://tensorflow.rstudio.com/reference/keras/install_keras/). 
+We will use the IMDB movie review data. It is one of the most used datasets for text-related machine learning methods. The datasets’ inputs are movie reviews published at IMDB in its raw text format, and the output is a binary sentiment indicator( “1” for positive and “0” for negative) created through human evaluation. The training and testing data have 25,000 records each. Each review varies in length.
+
+# Data preprocessing

@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2021-02-06" />
+<meta name="date" content="2021-02-09" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -699,13 +699,16 @@ FIGURE 12.19: Example of convolution over volume
 <div class="sourceCode" id="cb454"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb454-1" data-line-number="1"><span class="co">## number of mis-classcified images</span></a>
 <a class="sourceLine" id="cb454-2" data-line-number="2"><span class="kw">sum</span>(cnn_pred <span class="op">!=</span><span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>y)</a></code></pre></div>
 <div class="sourceCode" id="cb455"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb455-1" data-line-number="1">[1] 72</a></code></pre></div>
-<div class="sourceCode" id="cb456"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb456-1" data-line-number="1">index_image =<span class="st"> </span><span class="dv">10</span> <span class="co">## change this index to see different image.</span></a>
-<a class="sourceLine" id="cb456-2" data-line-number="2">input_matrix &lt;-<span class="st"> </span>missed_image[index_image,<span class="dv">1</span><span class="op">:</span><span class="dv">28</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">28</span>]</a>
-<a class="sourceLine" id="cb456-3" data-line-number="3">output_matrix &lt;-<span class="st"> </span><span class="kw">apply</span>(input_matrix, <span class="dv">2</span>, rev)</a>
-<a class="sourceLine" id="cb456-4" data-line-number="4">output_matrix &lt;-<span class="st"> </span><span class="kw">t</span>(output_matrix)</a>
-<a class="sourceLine" id="cb456-5" data-line-number="5"><span class="kw">image</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">28</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">28</span>, output_matrix, <span class="dt">col=</span><span class="kw">gray.colors</span>(<span class="dv">256</span>), </a>
-<a class="sourceLine" id="cb456-6" data-line-number="6"><span class="dt">xlab=</span><span class="kw">paste</span>(<span class="st">&#39;Image for digit &#39;</span>, missed_digit[index_image], <span class="st">&#39;, </span></a>
-<a class="sourceLine" id="cb456-7" data-line-number="7"><span class="st">wrongly predicted as &#39;</span>, missed_pred[index_image]), <span class="dt">ylab=</span><span class="st">&quot;&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb456"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb456-1" data-line-number="1">missed_image =<span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>x[cnn_pred <span class="op">!=</span><span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>y,,]</a>
+<a class="sourceLine" id="cb456-2" data-line-number="2">missed_digit =<span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>y[cnn_pred <span class="op">!=</span><span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>y]</a>
+<a class="sourceLine" id="cb456-3" data-line-number="3">missed_pred =<span class="st"> </span>cnn_pred[cnn_pred <span class="op">!=</span><span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>y]</a></code></pre></div>
+<div class="sourceCode" id="cb457"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb457-1" data-line-number="1">index_image =<span class="st"> </span><span class="dv">10</span> <span class="co">## change this index to see different image.</span></a>
+<a class="sourceLine" id="cb457-2" data-line-number="2">input_matrix &lt;-<span class="st"> </span>missed_image[index_image,<span class="dv">1</span><span class="op">:</span><span class="dv">28</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">28</span>]</a>
+<a class="sourceLine" id="cb457-3" data-line-number="3">output_matrix &lt;-<span class="st"> </span><span class="kw">apply</span>(input_matrix, <span class="dv">2</span>, rev)</a>
+<a class="sourceLine" id="cb457-4" data-line-number="4">output_matrix &lt;-<span class="st"> </span><span class="kw">t</span>(output_matrix)</a>
+<a class="sourceLine" id="cb457-5" data-line-number="5"><span class="kw">image</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">28</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">28</span>, output_matrix, <span class="dt">col=</span><span class="kw">gray.colors</span>(<span class="dv">256</span>), </a>
+<a class="sourceLine" id="cb457-6" data-line-number="6"><span class="dt">xlab=</span><span class="kw">paste</span>(<span class="st">&#39;Image for digit &#39;</span>, missed_digit[index_image], <span class="st">&#39;, </span></a>
+<a class="sourceLine" id="cb457-7" data-line-number="7"><span class="st">wrongly predicted as &#39;</span>, missed_pred[index_image]), <span class="dt">ylab=</span><span class="st">&quot;&quot;</span>)</a></code></pre></div>
 <center>
 <img src="images/misclassified_img_cnn.png" style="width:70.0%" />
 </center>

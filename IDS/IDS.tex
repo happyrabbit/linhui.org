@@ -114,6 +114,7 @@
 
 \usepackage{booktabs}
 \usepackage{longtable}
+\usepackage{listings}
 \usepackage[bf,singlelinecheck=off]{caption}
 
 \usepackage{framed,color}
@@ -164,12 +165,13 @@
 \makeatother
 
 \frontmatter
+\usepackage{algpseudocode}
 \usepackage[]{natbib}
 \bibliographystyle{apalike}
 
 \title{Introduction to Data Science}
 \author{Hui Lin and Ming Li}
-\date{2021-02-06}
+\date{2021-02-14}
 
 \begin{document}
 \maketitle
@@ -1537,28 +1539,6 @@ To simplify the learning process, let us use a very familiar small dataset: the 
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{library}\NormalTok{(dplyr)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## 
-## Attaching package: 'dplyr'
-\end{verbatim}
-
-\begin{verbatim}
-## The following objects are masked from 'package:stats':
-## 
-##     filter, lag
-\end{verbatim}
-
-\begin{verbatim}
-## The following objects are masked from 'package:base':
-## 
-##     intersect, setdiff, setequal, union
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \KeywordTok{head}\NormalTok{(iris)}
 \end{Highlighting}
 \end{Shaded}
@@ -2058,7 +2038,7 @@ Are there any problems? Questionnaire response Q1-Q10 seem reasonable, the minim
   Someone is 300 years old.
 \end{itemize}
 
-How to deal with that? Depending on the real situation, if the sample size is large enough, it does not hurt to delete those problematic samples. Here we have 1000 observations. Since marketing survey is usually expensive, it is better to set these values as missing and impute them instead of deleting the rows.
+How to deal with that? Depending on the situation, if the sample size is large enough and the missing happens randomly, it does not hurt to delete those problematic samples. Or we can set these values as missing and impute them instead of deleting the rows.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2394,7 +2374,7 @@ Even under certain assumptions we can statistically define outliers, it can be h
     \StringTok{"online_exp"}\NormalTok{, }\StringTok{"store_trans"}\NormalTok{, }\StringTok{"online_trans"}\NormalTok{))}
 \CommentTok{# use scatterplotMatrix() function from car package}
 \KeywordTok{par}\NormalTok{(}\DataTypeTok{oma =} \KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{))}
-\KeywordTok{scatterplotMatrix}\NormalTok{(sdat, }\DataTypeTok{diagonal =} \StringTok{"boxplot"}\NormalTok{, }\DataTypeTok{smoother =} \OtherTok{FALSE}\NormalTok{)}
+\NormalTok{car}\OperatorTok{::}\KeywordTok{scatterplotMatrix}\NormalTok{(sdat, }\DataTypeTok{diagonal =} \OtherTok{TRUE}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -2875,7 +2855,7 @@ As mentioned before, you can use \texttt{read\_csv2()} to read semicolon separat
 
 Here ``\texttt{\textbackslash{}n}'' is a convenient shortcut for adding a new line.
 
-You can use \texttt{read\_tsv()} to read tab delimited files：
+You can use \texttt{read\_tsv()} to read tab delimited files:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2893,7 +2873,7 @@ You can use \texttt{read\_tsv()} to read tab delimited files：
 ## # ... with 1 more variable: X10 <chr>
 \end{verbatim}
 
-Or more generally, you can use \texttt{read\_delim()} and assign separating character：
+Or more generally, you can use \texttt{read\_delim()} and assign separating character:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -2967,7 +2947,7 @@ Some other useful materials:
 \item
   \href{https://cran.r-project.org/doc/manuals/r-release/R-data.html\#Acknowledgements}{R data import/export manual}
 \item
-  \texttt{rio} package：\url{https://github.com/leeper/rio}
+  \texttt{rio} package:\url{https://github.com/leeper/rio}
 \end{itemize}
 
 \hypertarget{data.table-enhanced-data.frame}{%
@@ -3189,7 +3169,7 @@ Let's review our previous code:
 \end{Highlighting}
 \end{Shaded}
 
-The code above is equal to the following SQL：
+The code above is equal to the following SQL:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3211,7 +3191,7 @@ R code:
 \end{Highlighting}
 \end{Shaded}
 
-is equal to SQL：
+is equal to SQL:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3227,7 +3207,7 @@ is equal to SQL：
 \end{Highlighting}
 \end{Shaded}
 
-R code：
+R code:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3235,7 +3215,7 @@ R code：
 \end{Highlighting}
 \end{Shaded}
 
-is equal to SQL：
+is equal to SQL:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3918,19 +3898,10 @@ A standard marketing problem is customer segmentation. It usually starts with de
 \end{Shaded}
 
 \begin{verbatim}
-## `summarise()` ungrouping output (override with `.groups` argument)
-\end{verbatim}
-
-\begin{verbatim}
-## # A tibble: 4 x 8
-##   segment   Age FemalePct HouseYes store_exp online_exp
-##   <chr>   <dbl>     <dbl>    <dbl>     <dbl>      <dbl>
-## 1 Conspi~    42      0.32     0.86      4990       4898
-## 2 Price      60      0.45     0.94       501        205
-## 3 Quality    35      0.47     0.34       301       2013
-## 4 Style      24      0.81     0.27       200       1962
-## # ... with 2 more variables: store_trans <dbl>,
-## #   online_trans <dbl>
+##   Age FemalePct HouseYes store_exp online_exp
+## 1  39      0.55     0.57       840       2120
+##   store_trans online_trans
+## 1         5.3         13.5
 \end{verbatim}
 
 Now, let's peel the onion.
@@ -3996,17 +3967,8 @@ The analytical process is aggregated instead of independent steps. The current s
 \end{Shaded}
 
 \begin{verbatim}
-## `summarise()` ungrouping output (override with `.groups` argument)
-\end{verbatim}
-
-\begin{verbatim}
-## # A tibble: 4 x 3
-##   segment     avg_online avg_store
-##   <chr>            <dbl>     <dbl>
-## 1 Conspicuous      442.      479. 
-## 2 Price             69.3      81.3
-## 3 Quality          126.      105. 
-## 4 Style             92.8     121.
+##   avg_online avg_store
+## 1      156.5     253.6
 \end{verbatim}
 
 Price group has the lowest averaged one-time purchase. The Conspicuous group will pay the highest price. When we build customer profile in real life, we will also need to look at the survey summarization. You may be surprised how much information simple data manipulations can provide.
@@ -4021,30 +3983,6 @@ Another comman task is to check which column has missing values. It requires the
 \NormalTok{dplyr}\OperatorTok{::}\KeywordTok{summarise_all}\NormalTok{(sim.dat, }\KeywordTok{funs_}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{"anyNA"}\NormalTok{)))}
 \end{Highlighting}
 \end{Shaded}
-
-\begin{verbatim}
-## Warning: `funs_()` is deprecated as of dplyr 0.7.0.
-## Please use `funs()` instead.
-## See vignette('programming') for more help
-## This warning is displayed once every 8 hours.
-## Call `lifecycle::last_warnings()` to see where this warning was generated.
-\end{verbatim}
-
-\begin{verbatim}
-## Warning: `funs()` is deprecated as of dplyr 0.8.0.
-## Please use a list of either functions or lambdas: 
-## 
-##   # Simple named list: 
-##   list(mean = mean, median = median)
-## 
-##   # Auto named with `tibble::lst()`: 
-##   tibble::lst(mean, median)
-## 
-##   # Using lambdas
-##   list(~ mean(., trim = .2), ~ median(., na.rm = TRUE))
-## This warning is displayed once every 8 hours.
-## Call `lifecycle::last_warnings()` to see where this warning was generated.
-\end{verbatim}
 
 \begin{verbatim}
 ##     age gender income house store_exp online_exp
@@ -4270,13 +4208,6 @@ The other package that will do similar manipulations is \texttt{tidyr}. Let's ge
 \end{Shaded}
 
 \begin{verbatim}
-## Warning: `tbl_df()` is deprecated as of dplyr 1.0.0.
-## Please use `tibble::as_tibble()` instead.
-## This warning is displayed once every 8 hours.
-## Call `lifecycle::last_warnings()` to see where this warning was generated.
-\end{verbatim}
-
-\begin{verbatim}
 ## # A tibble: 5 x 4
 ##     age gender store_exp store_trans
 ##   <int> <chr>      <dbl>       <int>
@@ -4414,21 +4345,21 @@ This chapter will illustrate the practical aspects of model tuning. We will talk
 Assume \(\mathbf{X}\) is \(n \times p\) observation matrix and \(\mathbf{y}\) is response variable, we have:
 
 \begin{equation}
-\mathbf{y}=f(\mathbf{X})+\mathbf{\epsilon}
+\mathbf{y}=f(\mathbf{X})+\symbf{\epsilon}
 \label{eq:generalmodeleq}
 \end{equation}
 
-where \(\mathbf{\epsilon}\) is the random error with a mean of zero. The function \(f(\cdot)\) is our modeling target, which represents the information in the response variable that predictors can explain. The main goal of estimating \(f(\cdot)\) is inference or prediction, or sometimes both. In general, there is a trade-off between flexibility and interpretability of the model. So data scientists need to comprehend the delicate balance between these two.
+where \(\symbf{\epsilon}\) is the random error with a mean of zero. The function \(f(\cdot)\) is our modeling target, which represents the information in the response variable that predictors can explain. The main goal of estimating \(f(\cdot)\) is inference or prediction, or sometimes both. In general, there is a trade-off between flexibility and interpretability of the model. So data scientists need to comprehend the delicate balance between these two.
 
 Depending on the modeling purposes, the requirement for interpretability varies. If the prediction is the only goal, then as long as the prediction is accurate enough, the interpretability is not under consideration. In this case, people can use ``black box'' model, such as random forest, boosting tree, neural network and so on. These models are very flexible but nearly impossible to explain. Their accuracy is usually higher on the training set, but not necessary when it predicts. It is not surprising since those models have a huge number of parameters and high flexibility that they can ``memorize'' the entire training data. A paper by Chiyuan Zhang et al.~in 2017 pointed out that ``Deep neural networks (even just two-layer net) easily fit random labels'' \citep{rethinkDL}. The traditional forms of regularization, such as weight decay, dropout, and data augmentation, fail to control generalization error. It poses a conceptual challenge to statistical theory and also calls our attention when we use such black-box models.
 
 There are two kinds of application problems: complete information problem and incomplete information problem. The complete information problem has all the information you need to know the correct response. Take the famous cat recognition, for example, all the information you need to identify a cat is in the picture. In this situation, the algorithm that penetrates the data the most wins. There are some other similar problems such as the self-driving car, chess game, facial recognition and speech recognition. But in most of the data science applications, the information is incomplete. If you want to know whether a customer is going to purchase again or not, it is unlikely to have 360-degree of the customer's information. You may have their historical purchasing record, discounts and service received. But you don't know if the customer sees your advertisement, or has a friend recommends competitor's product, or encounters some unhappy purchasing experience somewhere. There could be a myriad of factors that will influence the customer's purchase decision while what you have as data is only a small part. To make things worse, in many cases, you don't even know what you don't know. Deep learning doesn't have any advantage in solving those problems. Instead, some parametric models often work better in this situation. You will comprehend this more after learning the different types of model error.
-Assume we have \(\hat{f}\) which is an estimator of \(f\). Then we can further get \(\mathbf{\hat{y}}=\hat{f}(\mathbf{X})\). The predicted error is divided into two parts, systematic error, and random error:
+Assume we have \(\hat{f}\) which is an estimator of \(f\). Then we can further get \(\symbf{\hat{y}}=\hat{f}(\mathbf{X})\). The predicted error is divided into two parts, systematic error, and random error:
 
 \begin{equation}
 \begin{array}{ccc}
-E(\mathbf{y}-\hat{\mathbf{y}})^{2} & = & E[f(\mathbf{X})+ \mathbf{\epsilon} - \hat{f}(\mathbf{X})]^{2}\\
- & = & \underset{\text{(1)}}{\underbrace{E[f(\mathbf{X})-\hat{f}(\mathbf{X})]^{2}}}+\underset{\text{(2)}}{\underbrace{Var(\mathbf{\epsilon})}}
+E(\mathbf{y}-\hat{\mathbf{y}})^{2} & = & E[f(\mathbf{X})+ \symbf{\epsilon} - \hat{f}(\mathbf{X})]^{2}\\
+ & = & \underset{\text{(1)}}{\underbrace{E[f(\mathbf{X})-\hat{f}(\mathbf{X})]^{2}}}+\underset{\text{(2)}}{\underbrace{Var(\symbf{\epsilon})}}
 \end{array}
 \label{eq:error}
 \end{equation}
@@ -4454,18 +4385,18 @@ Deep learning has significant success solving problems with complete information
 \caption{Types of Model Error}
 \end{figure}
 
-The systematic error can be further decomposed as:
+The systematic error \(E[f(\mathbf{X})-\hat{f}(\mathbf{X})]^{2}\) can be further decomposed as:
 
 \begin{equation}
 \begin{array}{ccc}
-E[f(\mathbf{X})-\hat{f}(\mathbf{X})]^{2} & = & E\left(f(\mathbf{X})-E[\hat{f}(\mathbf{X})]+E[\hat{f}(\mathbf{X})]-\hat{f}(\mathbf{X})\right)^{2}\\
+ &  & \left(f(\mathbf{X})-E[\hat{f}(\mathbf{X})]+E[\hat{f}(\mathbf{X})]-\hat{f}(\mathbf{X})\right)\\
  & = & E\left(E[\hat{f}(\mathbf{X})]-f(\mathbf{X})\right)^{2}+E\left(\hat{f}(\mathbf{X})-E[\hat{f}(\mathbf{X})]\right)^{2}\\
  & = & [Bias(\hat{f}(\mathbf{X}))]^{2}+Var(\hat{f}(\mathbf{X}))
 \end{array}
 \label{eq:biasvariance}
 \end{equation}
 
-The systematic error consists of two parts, \(Bias(\hat{f}(\mathbf{X}))\) and \(Var (\hat{f}(\mathbf{X}))\). To minimize the systematic error, we need to minimize both. The bias represents the error caused by the model's approximation of the reality, i.e., systematic relation, which may be very complex. For example, linear regression assumes a linear relationship between the predictors and the response, but rarely is there a perfect linear relationship in real life. So linear regression is more likely to have a high bias. In general, the more flexible the model is, the higher the variance. However, this does not guarantee complex models will outperform a much simpler one, such as linear regression. If the real relationship \(f\) is linear, then linear regression is unbiased. It is difficult for a more flexible model to compete. Good learning method requires low variance and bias. However, it is easy to find a model with extremely low bias but high variance (by fitting a tree) or a method with low variance but high variance (by fitting a straight line). That why we call it trade-off.
+The systematic error consists of two parts, \(Bias(\hat{f}(\mathbf{X}))\) and \(Var (\hat{f}(\mathbf{X}))\). To minimize the systematic error, we need to minimize both. The bias represents the error caused by the model's approximation of the reality, i.e., systematic relation, which may be very complex. For example, linear regression assumes a linear relationship between the predictors and the response, but rarely is there a perfect linear relationship in real life. So linear regression is more likely to have a high bias. In general, the more flexible the model is, the higher the variance. However, this does not guarantee complex models will outperform a much simpler one, such as linear regression. If the real relationship \(f\) is linear, then linear regression is unbiased. It is difficult for a more flexible model to compete. Good learning method requires low variance and bias. However, it is easy to find a model with extremely low bias but high variance (by fitting a tree) or a method with low variance but high bias (by fitting a straight line). That why we call it trade-off.
 
 To explore bias and variance, let's begin with a simple simulation. We will simulate a data with a non-linear relationship and fit different models on it. An intuitive way to show these is to compare the plots of various models.
 
@@ -4572,13 +4503,6 @@ The fitted lines (blue) change over different samples which means it has high va
 \end{Highlighting}
 \end{Shaded}
 
-\begin{verbatim}
-## `geom_smooth()` using formula 'y ~ x'
-## `geom_smooth()` using formula 'y ~ x'
-## `geom_smooth()` using formula 'y ~ x'
-## `geom_smooth()` using formula 'y ~ x'
-\end{verbatim}
-
 \includegraphics{IDS_files/figure-latex/unnamed-chunk-67-1.pdf}
 
 In general, the variance (\(Var(\hat{f}(\mathbf{X}))\)) \textbf{increases} and the bias (\(Bias(\hat{f}(\mathbf{X}))\)) \textbf{decreases} as the model flexibility increases. Variance and bias together determine the systematic error. As we increase the flexibility of the model, at first the rate at which \(Bias(\hat{f}(\mathbf{X}))\) decreases is faster than \(Var (\hat{f} (\mathbf{X}))\), so the MSE decreases. However, to some degree, higher flexibility has little effect on \(Bias(\hat{f}(\mathbf{X}))\) but \(Var(\hat{f} (\mathbf{X}))\) increases significantly, so the MSE increases.
@@ -4600,7 +4524,7 @@ The traditional business intelligence usually handles data description. Answer s
 \item
   What is the monthly sales of a product in 2015?
 \item
-  What is the number of visits to our site in the past month?\\
+  What is the number of visits to our site in the past month?
 \item
   What is the sales difference in 2015 for two different product designs?
 \end{itemize}
@@ -4703,37 +4627,6 @@ According to the setting, there are 800 samples in the training set and 200 in t
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{library}\NormalTok{(plyr)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## -----------------------------------------------------
-\end{verbatim}
-
-\begin{verbatim}
-## You have loaded plyr after dplyr - this is likely to cause problems.
-## If you need functions from both plyr and dplyr, please load plyr first, then dplyr:
-## library(plyr); library(dplyr)
-\end{verbatim}
-
-\begin{verbatim}
-## -----------------------------------------------------
-\end{verbatim}
-
-\begin{verbatim}
-## 
-## Attaching package: 'plyr'
-\end{verbatim}
-
-\begin{verbatim}
-## The following objects are masked from 'package:dplyr':
-## 
-##     arrange, count, desc, failwith, id, mutate,
-##     rename, summarise, summarize
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \KeywordTok{ddply}\NormalTok{(datTrain, }\StringTok{"segment"}\NormalTok{, summarise, }\DataTypeTok{count =} \KeywordTok{length}\NormalTok{(segment), }
     \DataTypeTok{percentage =} \KeywordTok{round}\NormalTok{(}\KeywordTok{length}\NormalTok{(segment)}\OperatorTok{/}\KeywordTok{nrow}\NormalTok{(datTrain), }\DecValTok{2}\NormalTok{))}
 \end{Highlighting}
@@ -4975,7 +4868,8 @@ k-fold cross-validation is to partition the original sample into \(k\) equal siz
 
 Denote by \(\hat{f}^{-\kappa}(X)\) the fitted function, computed with the \(\kappa^{th}\) fold removed and \(x_i^\kappa\) the predictors for samples in left-out fold. The process of k-fold cross-validation is as follows:
 
-\begin{quote}
+\textbf{k-fold cross-validation}
+
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
@@ -4983,25 +4877,18 @@ Denote by \(\hat{f}^{-\kappa}(X)\) the fitted function, computed with the \(\kap
   Partition the original sample into \(k\) equal size folds
 \item
   for \(\kappa=1…k\)
-\end{enumerate}
 
-\begin{itemize}
-\tightlist
-\item
-  Use data other than fold \(\kappa\) to train the model \(\hat{f}^{-\kappa}(X)\)
-\item
-  Apply \(\hat{f}^{-\kappa}(X)\) to predict fold \(\kappa\) to get \(\hat{f}^{-\kappa}(x_i^\kappa)\)
-\end{itemize}
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{2}
-\tightlist
+  \begin{itemize}
+  \tightlist
+  \item
+    Use data other than fold \(\kappa\) to train the model \(\hat{f}^{-\kappa}(X)\)
+  \item
+    Apply \(\hat{f}^{-\kappa}(X)\) to predict fold \(\kappa\) to get \(\hat{f}^{-\kappa}(x_i^\kappa)\)
+  \end{itemize}
 \item
   Aggregate the results
   \[\hat{Error} = \frac{1}{N}\Sigma_{\kappa=1}^k\Sigma_{x_i^{\kappa}}L(y_i^{\kappa},\hat{f}^{-\kappa}(x_i^\kappa))\]
 \end{enumerate}
-\end{quote}
 
 It is a standard way to find the value of tuning parameter that gives you the best performance. It is also a way to study the variability of model performance.
 
@@ -5179,42 +5066,6 @@ This section focuses on performance measurement for models with a categorical re
 \begin{Highlighting}[]
 \KeywordTok{library}\NormalTok{(dplyr)}
 \KeywordTok{library}\NormalTok{(randomForest)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## randomForest 4.6-14
-\end{verbatim}
-
-\begin{verbatim}
-## Type rfNews() to see new features/changes/bug fixes.
-\end{verbatim}
-
-\begin{verbatim}
-## 
-## Attaching package: 'randomForest'
-\end{verbatim}
-
-\begin{verbatim}
-## The following object is masked from 'package:psych':
-## 
-##     outlier
-\end{verbatim}
-
-\begin{verbatim}
-## The following object is masked from 'package:ggplot2':
-## 
-##     margin
-\end{verbatim}
-
-\begin{verbatim}
-## The following object is masked from 'package:dplyr':
-## 
-##     combine
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \KeywordTok{library}\NormalTok{(caret)}
 \KeywordTok{library}\NormalTok{(readr)}
 \NormalTok{disease_dat <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"http://bit.ly/2KXb1Qi"}\NormalTok{)}
@@ -5385,18 +5236,6 @@ In general, a value between 0.3 to 0.5 indicates a reasonable agreement. If a mo
 \begin{Highlighting}[]
 \CommentTok{# install.packages("fmsb")}
 \NormalTok{kt<-fmsb}\OperatorTok{::}\KeywordTok{Kappa.test}\NormalTok{(}\KeywordTok{table}\NormalTok{(yhat,yTest))}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## Registered S3 methods overwritten by 'fmsb':
-##   method    from
-##   print.roc pROC
-##   plot.roc  pROC
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \NormalTok{kt}\OperatorTok{$}\NormalTok{Result}
 \end{Highlighting}
 \end{Shaded}
@@ -5435,26 +5274,6 @@ Receiver Operating Characteristic (ROC) curve uses the predicted class probabili
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{library}\NormalTok{(pROC)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## Type 'citation("pROC")' for a citation.
-\end{verbatim}
-
-\begin{verbatim}
-## 
-## Attaching package: 'pROC'
-\end{verbatim}
-
-\begin{verbatim}
-## The following objects are masked from 'package:stats':
-## 
-##     cov, smooth, var
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \NormalTok{rocCurve<-}\KeywordTok{roc}\NormalTok{(}\DataTypeTok{response=}\NormalTok{yTest,}
               \DataTypeTok{predictor=}\NormalTok{yhatprob[,}\DecValTok{2}\NormalTok{])}
 \end{Highlighting}
@@ -5940,30 +5759,6 @@ We focus on using R library \texttt{caret} to fit PCR and PLS models. Let us use
 \KeywordTok{library}\NormalTok{(caret)}
 \KeywordTok{library}\NormalTok{(dplyr)}
 \KeywordTok{library}\NormalTok{(elasticnet)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## Loading required package: lars
-\end{verbatim}
-
-\begin{verbatim}
-## Loaded lars 1.2
-\end{verbatim}
-
-\begin{verbatim}
-## 
-## Attaching package: 'lars'
-\end{verbatim}
-
-\begin{verbatim}
-## The following object is masked from 'package:psych':
-## 
-##     error.bars
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \KeywordTok{library}\NormalTok{(lars)}
 
 \CommentTok{# Load Data}
@@ -6046,34 +5841,6 @@ We can also find the relative importance of each variable during PLS model tunin
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{plsImp <-}\StringTok{ }\KeywordTok{varImp}\NormalTok{(plsTune, }\DataTypeTok{scale =} \OtherTok{FALSE}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## 
-## Attaching package: 'pls'
-\end{verbatim}
-
-\begin{verbatim}
-## The following object is masked from 'package:corrplot':
-## 
-##     corrplot
-\end{verbatim}
-
-\begin{verbatim}
-## The following object is masked from 'package:caret':
-## 
-##     R2
-\end{verbatim}
-
-\begin{verbatim}
-## The following object is masked from 'package:stats':
-## 
-##     loadings
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \KeywordTok{plot}\NormalTok{(plsImp, }\DataTypeTok{top =} \DecValTok{10}\NormalTok{, }\DataTypeTok{scales =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{y =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{cex =} \FloatTok{0.95}\NormalTok{)))}
 \end{Highlighting}
 \end{Shaded}
@@ -6171,7 +5938,7 @@ Ridge regression \citep{Hoerl1970} is similar but it finds \(\hat{\beta}^{R}\) t
 
 where \(\lambda >0\) is a tuning parameter. As with the least squares, ridge regression considers minimizing RSS. However, it adds a shrinkage penalty \(\lambda\Sigma_{j=1}^{p}\beta_{j}^{2}\) that takes account of the number of parameters in the model. When \(\lambda = 0\), it is identical to least squares. As \(\lambda\) gets larger, the coefficients start shrinking towards 0. When \(\lambda\rightarrow\infty\), the rest of the coefficients \(\beta_{1},...,\beta_{p}\) are close to 0. Here, the penalty is not applied to \(\beta_{0}\). The tuning parameter \(\lambda\) is used to adjust the impact of the two parts in equation \eqref{eq:ridge}. Every value of \(\lambda\) corresponds to a set of parameter estimates.
 
-There are many R packages for ridge regression, such as lm.ridge() function from MASS, function enet() from, elasticnet. If you know the value of \(\lambda\), you can use either of the function to fit ridge regression. A more convenient way is to use train() function from caret. Let's use the 10 survey questions to predict the total purchase amount (sum of online and store purchase).
+There are many R packages for ridge regression, such as \texttt{lm.ridge()} function from \texttt{MASS}, function \texttt{enet()} from \texttt{elasticnet}. If you know the value of \(\lambda\), you can use either of the function to fit ridge regression. A more convenient way is to use \texttt{train()} function from caret. Let's use the 10 survey questions to predict the total purchase amount (sum of online and store purchase).
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -6190,7 +5957,8 @@ There are many R packages for ridge regression, such as lm.ridge() function from
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{dat <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"http://bit.ly/2P5gTw4"}\NormalTok{)}
-\CommentTok{# data cleaning: delete wrong observations since expense can't be negative}
+\CommentTok{# data cleaning: delete wrong observations}
+\CommentTok{# expense can't be negative}
 \NormalTok{dat <-}\StringTok{ }\KeywordTok{subset}\NormalTok{(dat, store_exp }\OperatorTok{>}\StringTok{ }\DecValTok{0} \OperatorTok{&}\StringTok{ }\NormalTok{online_exp }\OperatorTok{>}\StringTok{ }\DecValTok{0}\NormalTok{)}
 \CommentTok{# get predictors}
 \NormalTok{trainx <-}\StringTok{ }\NormalTok{dat[ , }\KeywordTok{grep}\NormalTok{(}\StringTok{"Q"}\NormalTok{, }\KeywordTok{names}\NormalTok{(dat))]}
@@ -6199,7 +5967,7 @@ There are many R packages for ridge regression, such as lm.ridge() function from
 \end{Highlighting}
 \end{Shaded}
 
-Use \texttt{train()} function to tune parameter. Since ridge regression adds the penalty parameter \(\lambda\) in front of the sum of squares of the parameters, the scale of the parameters matters. So here it is better to center and scale the predictors. This preprocessing is recommended for all techniques that put penalty to parameter estimates. In this example, the 10 survey questions are already with the same scale so data preprocessing doesn't make too much different. It is a good idea to set the preprocessing as a standard.
+Use \texttt{train()} function to tune parameter. Since ridge regression adds the penalty parameter \(\lambda\) in front of the sum of squares of the parameters, the scale of the parameters matters. So here it is better to center and scale the predictors. This preprocessing is generally recommended for all techniques that puts penalty to parameter estimates. In this example, the 10 survey questions are already with the same scale so data preprocessing doesn't make too much different. It is a good idea to set the preprocessing as a standard.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -6430,7 +6198,8 @@ Here we continue using \texttt{enet()}. The syntax is similar to ridge regressio
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{lassoModel<-}\StringTok{ }\KeywordTok{enet}\NormalTok{(}\DataTypeTok{x =} \KeywordTok{as.matrix}\NormalTok{(trainx), }\DataTypeTok{y =}\NormalTok{ trainy, }\DataTypeTok{lambda =} \DecValTok{0}\NormalTok{, }\DataTypeTok{normalize =} \OtherTok{TRUE}\NormalTok{)}
+\NormalTok{lassoModel <-}\StringTok{ }\KeywordTok{enet}\NormalTok{(}\DataTypeTok{x =} \KeywordTok{as.matrix}\NormalTok{(trainx), }\DataTypeTok{y =}\NormalTok{ trainy, }
+                   \DataTypeTok{lambda =} \DecValTok{0}\NormalTok{, }\DataTypeTok{normalize =} \OtherTok{TRUE}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -6438,7 +6207,8 @@ Set the fraction value to be 0.957 (the value we got above):
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{lassoFit <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(lassoModel, }\DataTypeTok{newx =} \KeywordTok{as.matrix}\NormalTok{(trainx), }\DataTypeTok{s =} \FloatTok{0.957}\NormalTok{, }\DataTypeTok{mode =} \StringTok{"fraction"}\NormalTok{, }\DataTypeTok{type =} \StringTok{"fit"}\NormalTok{)}
+\NormalTok{lassoFit <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(lassoModel, }\DataTypeTok{newx =} \KeywordTok{as.matrix}\NormalTok{(trainx), }
+                    \DataTypeTok{s =} \FloatTok{0.957}\NormalTok{, }\DataTypeTok{mode =} \StringTok{"fraction"}\NormalTok{, }\DataTypeTok{type =} \StringTok{"fit"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -6459,7 +6229,8 @@ You need to set \texttt{type\ =\ "coefficients"} to get parameter estimates:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{lassoCoef <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(lassoModel, }\DataTypeTok{newx =} \KeywordTok{as.matrix}\NormalTok{(trainx), }\DataTypeTok{s =} \FloatTok{0.95}\NormalTok{, }\DataTypeTok{mode =} \StringTok{"fraction"}\NormalTok{, }\DataTypeTok{type =} \StringTok{"coefficients"}\NormalTok{)}
+\NormalTok{lassoCoef <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(lassoModel, }\DataTypeTok{newx =} \KeywordTok{as.matrix}\NormalTok{(trainx), }
+                     \DataTypeTok{s =} \FloatTok{0.95}\NormalTok{, }\DataTypeTok{mode =} \StringTok{"fraction"}\NormalTok{, }\DataTypeTok{type =} \StringTok{"coefficients"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -6472,7 +6243,7 @@ It also returns a list and the estimates are in the \texttt{coefficients} item:
 \end{Highlighting}
 \end{Shaded}
 
-Many researchers applied lasso to other learning methods, such as linear discriminant analysis \citep{Clem2011}, partial least squares regression\citep{chun2010}. However, since the \(L_1\) norm is not differentiable, optimization for lasso regression is more complicated. People come up with different algorithms to solve the computation problem. The biggest breakthrough is Least Angle Regression {[}LARS{]} from Bradley Efron etc. This algorithm works well for lasso regression especially when the dimension is high.
+Many researchers applied lasso to other learning methods, such as linear discriminant analysis \citep{Clem2011}, partial least squares regression\citep{chun2010}. However, since the \(L_1\) norm is not differentiable, optimization for lasso regression is more complicated. People come up with different algorithms to solve the computation problem. The biggest breakthrough is Least Angle Regression (LARS) from Bradley Efron etc. This algorithm works well for lasso regression especially when the dimension is high.
 
 \hypertarget{variable-selection-property-of-the-lasso}{%
 \section{Variable selection property of the lasso}\label{variable-selection-property-of-the-lasso}}
@@ -6581,13 +6352,13 @@ The results show that the best values of the tuning parameters are fraction = 0.
 
 Adding penalties is a general technique that can be applied to many methods other than linear regression. In this section, we will introduce the penalized generalized linear model. It is to fit the generalized linear model by minimizing a penalized maximum likelihood. The penalty can be \(L_1\), \(L_2\) or a combination of the two. The estimates of coefficients minimize the following:
 
-\[\underset{\beta_{0},\mathbf{\beta}}{min}\frac{1}{N}\Sigma_{i=1}^{N}w_{i}l(y_{i},\beta_{0}+\mathbf{\beta^{T}x_{i}})+\lambda[(1-\alpha)\parallel\mathbf{\beta}\parallel_{2}^{2}/2+\alpha\parallel\mathbf{\beta}\parallel_{1}]\]
+\[\underset{\beta_{0},\symbf{\beta}}{min}\frac{1}{N}\Sigma_{i=1}^{N}w_{i}l(y_{i},\beta_{0}+\symbf{\beta^{T}x_{i}})+\lambda[(1-\alpha)\parallel\symbf{\beta}\parallel_{2}^{2}/2+\alpha\parallel\symbf{\beta}\parallel_{1}]\]
 
 where
 
-\[l(y_{i},\beta_{0}+\mathbf{\beta^{T}x_{i}})=-log[\mathcal{L}(y_{i},\beta_{0}+\mathbf{\beta^{T}x_{i}})]\]
+\[l(y_{i},\beta_{0}+\symbf{\beta^{T}x_{i}})=-log[\mathcal{L}(y_{i},\beta_{0}+\symbf{\beta^{T}x_{i}})]\]
 
-It is the negative logarithm of the likelihood, \(\mathcal{L}(y_{i},\beta_{0}+\mathbf{\beta^{T}x_{i}})\). Maximize likelihood is to minimize \(l(y_{i},\beta_{0}+\mathbf{\beta^{T}x_{i}})\).
+It is the negative logarithm of the likelihood, \(\mathcal{L}(y_{i},\beta_{0}+\symbf{\beta^{T}x_{i}})\). Maximize likelihood is to minimize \(l(y_{i},\beta_{0}+\symbf{\beta^{T}x_{i}})\).
 
 Parameter \(\alpha\) decides the penalty, i.e, between \(L_2\) (\(\alpha=0\)) and \(L_1\) (\(\alpha=1\)). \(\lambda\) controls the weight of the whole penalty item. The higher \(\lambda\) is, the more weight the penalty carries comparing to likelihood. As discussed above, the ridge penalty shrinks the coefficients towards 0 but can't be exactly 0. The lasso penalty can set 0 estimates so it has the property of feature selection. The elastic net combines both. Here we have two tuning parameters, \(\alpha\) and \(\lambda\).
 
@@ -6602,7 +6373,7 @@ The default family option in the function \texttt{glmnet()} is \texttt{gaussian}
 \begin{Highlighting}[]
 \KeywordTok{library}\NormalTok{(glmnet)}
 \NormalTok{dat <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"http://bit.ly/2P5gTw4"}\NormalTok{)}
-\CommentTok{# data cleaning: delete wrong observations since expense can't be negative}
+\CommentTok{# data cleaning: delete wrong observations with expense < 0}
 \NormalTok{dat <-}\StringTok{ }\KeywordTok{subset}\NormalTok{(dat, store_exp }\OperatorTok{>}\StringTok{ }\DecValTok{0} \OperatorTok{&}\StringTok{ }\NormalTok{online_exp }\OperatorTok{>}\StringTok{ }\DecValTok{0}\NormalTok{)}
 \CommentTok{# get predictors}
 \NormalTok{trainx <-}\StringTok{ }\NormalTok{dat[, }\KeywordTok{grep}\NormalTok{(}\StringTok{"Q"}\NormalTok{, }\KeywordTok{names}\NormalTok{(dat))]}
@@ -6622,7 +6393,7 @@ The object \texttt{glmfit} returned by \texttt{glmnet()} has the information of 
 
 \includegraphics{IDS_files/figure-latex/unnamed-chunk-128-1.pdf}
 
-Each curve in the plot represents one predictor. The default setting is \(\alpha=1\) which means there is only lasso penalty. From left to right, \(L_I\) norm is increasing which means \(\lambda\) is decreasing. The bottom x-axis is \(L_1\) norm (i.e. \(\parallel\mathbf{\beta}\parallel_{1}\)). The upper x-axis is the effective degrees of freedom (df) for the lasso. You can check the detail for every step by:
+Each curve in the plot represents one predictor. The default setting is \(\alpha=1\) which means there is only lasso penalty. From left to right, \(L_I\) norm is increasing which means \(\lambda\) is decreasing. The bottom x-axis is \(L_1\) norm (i.e. \(\parallel\symbf{\beta}\parallel_{1}\)). The upper x-axis is the effective degrees of freedom (df) for the lasso. You can check the detail for every step by:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -6686,7 +6457,7 @@ When \(\lambda=1200\), there are three coefficients with non-zero estimates(\tex
 ## [3,] 9158 8411
 \end{verbatim}
 
-Each column corresponds to a value of \(\lambda\). To tune the value of \(\lambda\), we can easily use \texttt{cv.glmnet()} function to do cross-validation.\texttt{cv.glmnet()} returns the cross-validation results as a list object. We store the object in \texttt{cvfit} and use it for further operations.
+Each column corresponds to a value of \(\lambda\). To tune the value of \(\lambda\), we can easily use \texttt{cv.glmnet()} function to do cross-validation. \texttt{cv.glmnet()} returns the cross-validation results as a list object. We store the object in \texttt{cvfit} and use it for further operations.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -6769,17 +6540,17 @@ of disease for \(i\)th subject by \(\theta_i\), the model can be formulated as:
 
 \[y_{i}\sim Bounoulli(\theta_{i})\]
 
-\[log\left(\frac{\theta_{i}}{1-\theta_{i}}\right)=\eta_{\mathbf{\beta}}(x_{i})=\beta_{0}+\sum_{g=1}^{G}\mathbf{x_{i,g}}^{T}\mathbf{\mathbf{\beta_{g}}}\]
+\[log\left(\frac{\theta_{i}}{1-\theta_{i}}\right)=\eta_{\symbf{\beta}}(x_{i})=\beta_{0}+\sum_{g=1}^{G}\mathbf{x_{i,g}}^{T}\symbf{\beta_{g}}\]
 
-where \(\beta_{0}\) is the intercept and \(\mathbf{\beta_{g}}\) is the parameter vector corresponding to the \(g^{th}\) predictor. As we mentioned, here \(\mathbf{\beta_{g}}\) has length 2.
+where \(\beta_{0}\) is the intercept and \(\symbf{\beta_{g}}\) is the parameter vector corresponding to the \(g^{th}\) predictor. As we mentioned, here \(\symbf{\beta_{g}}\) has length 2.
 
 Traditional estimation of logistic
-parameters \(\mathbf{\beta}=(\beta_{0}^{T},\mathbf{\beta_{1}}^{T},\mathbf{\beta_{2}}^{T},...,\mathbf{\beta_{G}}^{T})^{T}\) is done through maximizing the log-likelihood
+parameters \(\symbf{\beta}=(\beta_{0}^{T},\symbf{\beta_{1}}^{T},\symbf{\beta_{2}}^{T},...,\symbf{\beta_{G}}^{T})^{T}\) is done through maximizing the log-likelihood
 
 \begin{eqnarray*}
-l(\mathbf{\beta})&=&log[\prod_{i=1}^{n}\theta_{i}^{y_{i}}(1-\theta_{i})^{1-y_{i}}]\\
+l(\symbf{\beta})&=&log[\prod_{i=1}^{n}\theta_{i}^{y_{i}}(1-\theta_{i})^{1-y_{i}}]\\
 &=&\sum_{i=1}^{n}\{y_{i}log(\theta_{i})+(1-y_{i})log(1-\theta_{i})\}\\
-&=&\sum_{i=1}^{n}\{\ y_{i}\eta_{\mathbf{\beta}}(\mathbf{x_{i}})-log[1+exp(\eta_{\mathbf{\beta}}(\mathbf{x_{i}}))]\ \}
+&=&\sum_{i=1}^{n}\{\ y_{i}\eta_{\symbf{\beta}}(\mathbf{x_{i}})-log[1+exp(\eta_{\symbf{\beta}}(\mathbf{x_{i}}))]\ \}
 \label{eq:logisticlikelihood}
 \end{eqnarray*}
 
@@ -6789,22 +6560,6 @@ the maximum likelihood estimation unstable \citep{Wed1976}, \citep{albert1984}. 
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{library}\NormalTok{(MASS)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## 
-## Attaching package: 'MASS'
-\end{verbatim}
-
-\begin{verbatim}
-## The following object is masked from 'package:dplyr':
-## 
-##     select
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \NormalTok{dat <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"http://bit.ly/2KXb1Qi"}\NormalTok{)}
 \NormalTok{fit <-}\StringTok{ }\KeywordTok{glm}\NormalTok{(y}\OperatorTok{~}\NormalTok{., dat, }\DataTypeTok{family =} \StringTok{"binomial"}\NormalTok{)}
 \end{Highlighting}
@@ -6827,7 +6582,7 @@ There is an error saying ``\texttt{algorithm\ did\ not\ converge}''. It is becau
 Penalized logistic regression adds penalty to the likelihood function:
 
 \[
-\underset{\mathbf{\beta}\in \mathbb{R}^{p+1}}{min} -\sum_{i=1}^{n}\{\ y_{i}\eta_{\mathbf{\beta}}(\mathbf{x_{i}})-log[1+exp(\eta_{\mathbf{\beta}}(\mathbf{x_{i}}))]\ \}+\lambda [(1-\alpha) \parallel \mathbf{\beta}\parallel _{2}^{2}/2] + \alpha \parallel \mathbf{\beta}\parallel _{1} ]
+\sum_{i=1}^{n}\{\ y_{i}\eta_{\symbf{\beta}}(\mathbf{x_{i}})-log[1+exp(\eta_{\symbf{\beta}}(\mathbf{x_{i}}))]\ \}+\lambda [(1-\alpha) \frac{\parallel \symbf{\beta}\parallel_{2}^{2}}{2}] + \alpha \parallel \symbf{\beta}\parallel _{1} ]
 \]
 
 \begin{Shaded}
@@ -6896,7 +6651,8 @@ For example:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{cvfit =}\StringTok{ }\KeywordTok{cv.glmnet}\NormalTok{(}\KeywordTok{as.matrix}\NormalTok{(trainx), trainy, }\DataTypeTok{family =} \StringTok{"binomial"}\NormalTok{, }\DataTypeTok{type.measure =} \StringTok{"class"}\NormalTok{)}
+\NormalTok{cvfit =}\StringTok{ }\KeywordTok{cv.glmnet}\NormalTok{(}\KeywordTok{as.matrix}\NormalTok{(trainx), trainy, }
+                  \DataTypeTok{family =} \StringTok{"binomial"}\NormalTok{, }\DataTypeTok{type.measure =} \StringTok{"class"}\NormalTok{)}
 \KeywordTok{plot}\NormalTok{(cvfit)}
 \end{Highlighting}
 \end{Shaded}
@@ -6935,7 +6691,7 @@ For models with categorical survey questions (explanatory variables), however, t
 In this section, we illustrate how to use the logistic group lasso algorithm to construct risk scoring systems for predicting disease. Instead of maximizing the log-likelihood in the maximum likelihood method, the logistic group lasso estimates are calculated by minimizing the convex function:
 
 \[
-S_{\lambda}(\mathbf{\beta})=-l(\mathbf{\beta})+\lambda\sum_{g=1}^{G}s(df_{g})\parallel\mathbf{\beta_{g}}\parallel_{2}
+S_{\lambda}(\symbf{\beta})=-l(\symbf{\beta})+\lambda\sum_{g=1}^{G}s(df_{g})\parallel\symbf{\beta_{g}}\parallel_{2}
 \]
 
 where \(\lambda\) is a tuning parameter for the penalty and \(s(\cdot)\) is a function to rescale the penalty. In lasso algorithms, the selection of \(\lambda\) is usually determined by cross-validation using data. For \(s(\cdot)\), we use the square root function \(s(df_g)=df_g^{0.5}\) as suggested in Meier et al.\citep{Meier2008}. It ensures the penalty is of the order of the number of parameters \(df_g\) as used in \citep{Yuan2007}.
@@ -6973,17 +6729,6 @@ Load the package:
 \KeywordTok{library}\NormalTok{(}\StringTok{"NetlifyDS"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
-
-\begin{verbatim}
-## 
-## Attaching package: 'NetlifyDS'
-\end{verbatim}
-
-\begin{verbatim}
-## The following object is masked _by_ '.GlobalEnv':
-## 
-##     multiplot
-\end{verbatim}
 
 The package includes the swine disease breakout data and you can load the data by:
 
@@ -7025,7 +6770,7 @@ Dummy variables from the same question are in the same group:
 ## [49] "Q25" "Q25"
 \end{verbatim}
 
-Set a series of tuning parameter values. nlam is the number of values we want to tune. It is the parameter \(m\) in \{0.96\lambda\emph{\{max\},0.96\textsuperscript{\{2\}\lambda\emph{\{max\},0.96\^{}\{3\}\lambda}\{max\},\ldots{},0.96}\{m\}\lambda}\{max\}\}\$. The tuning process returns a long output and we will not report all:
+Set a series of tuning parameter values. \texttt{nlam} is the number of values we want to tune. It is the parameter \(m\) in \(\{0.96\lambda_{max},0.96^{2}\lambda_{max},0.96^{3}\lambda_{max},...,0.96^{m}\lambda_{max}\}\). The tuning process returns a long output and we will not report all:
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -7036,7 +6781,8 @@ Set a series of tuning parameter values. nlam is the number of values we want to
 \CommentTok{# - `response`: return the predicted probability}
 \CommentTok{# number of cross-validation folds}
 \NormalTok{kfold <-}\StringTok{ }\DecValTok{10}
-\NormalTok{cv_fit <-}\StringTok{ }\KeywordTok{cv_glasso}\NormalTok{(trainx, trainy, }\DataTypeTok{nlam =}\NormalTok{ nlam, }\DataTypeTok{kfold =}\NormalTok{ kfold, }\DataTypeTok{type =} \StringTok{"link"}\NormalTok{)}
+\NormalTok{cv_fit <-}\StringTok{ }\KeywordTok{cv_glasso}\NormalTok{(trainx, trainy, }
+                    \DataTypeTok{nlam =}\NormalTok{ nlam, }\DataTypeTok{kfold =}\NormalTok{ kfold, }\DataTypeTok{type =} \StringTok{"link"}\NormalTok{)}
 \CommentTok{# only show part of the results}
 \KeywordTok{str}\NormalTok{(cv_fit)}
 \end{Highlighting}
@@ -7047,9 +6793,9 @@ Here we only show part of the output:
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{...}
-\NormalTok{ $ auc               : num [1:100] 0.573 0.567 0.535 0.484 0.514 ...}
-\NormalTok{ $ log_likelihood    : num [1:100] -554 -554 -553 -553 -552 ...}
-\NormalTok{ $ maxrho            : num [1:100] -0.0519 0.00666 0.04631 0.0486 0.06269 ...}
+\NormalTok{ $ auc               : num [1:100] 0.573 0.567 0.535 ...}
+\NormalTok{ $ log_likelihood    : num [1:100] -554 -554 -553 ...}
+\NormalTok{ $ maxrho            : num [1:100] -0.0519 0.00666  ...}
 \NormalTok{ $ lambda.max.auc    : Named num [1:2] 0.922 0.94}
 \NormalTok{  ..- attr(*, "names")= chr [1:2] "lambda" "auc"}
 \NormalTok{ $ lambda.1se.auc    : Named num [1:2] 16.74 0.81}
@@ -7103,7 +6849,8 @@ The x-axis is the value of the tuning parameter, the y-axis is AUC. The two dash
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{fitgl <-}\StringTok{ }\KeywordTok{fitglasso}\NormalTok{(trainx, trainy, }\DataTypeTok{lambda =} \FloatTok{0.922}\NormalTok{, }\DataTypeTok{na_action =}\NormalTok{ na.pass)}
+\NormalTok{fitgl <-}\StringTok{ }\KeywordTok{fitglasso}\NormalTok{(trainx, trainy, }
+                   \DataTypeTok{lambda =} \FloatTok{0.922}\NormalTok{, }\DataTypeTok{na_action =}\NormalTok{ na.pass)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -7578,11 +7325,13 @@ Let's build a classification model to identify the gender of the customer:
 \NormalTok{trainx1}\OperatorTok{$}\NormalTok{segment <-}\StringTok{ }\NormalTok{dat}\OperatorTok{$}\NormalTok{segment}
 
 \CommentTok{# trainx2: use approach 2, encode it to a set of dummy variables}
-\NormalTok{dumMod<-}\KeywordTok{dummyVars}\NormalTok{(}\OperatorTok{~}\NormalTok{.,}
-                  \DataTypeTok{data=}\NormalTok{trainx1,}
-                  \CommentTok{# Combine the previous variable name and the level name}
-                  \CommentTok{# as the new dummy variable name}
-                  \DataTypeTok{levelsOnly=}\NormalTok{F)}
+\NormalTok{dumMod<-}\KeywordTok{dummyVars}\NormalTok{(}
+  \OperatorTok{~}\NormalTok{.,}
+  \DataTypeTok{data=}\NormalTok{trainx1,}
+  \CommentTok{# Combine the previous variable and the level name}
+  \CommentTok{# as the new dummy variable name}
+  \DataTypeTok{levelsOnly=}\NormalTok{F}
+\NormalTok{  )}
 \NormalTok{trainx2 <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(dumMod,trainx1)}
 \CommentTok{# the response variable is gender}
 \NormalTok{trainy <-}\StringTok{ }\NormalTok{dat}\OperatorTok{$}\NormalTok{gender}
@@ -7623,13 +7372,15 @@ The above keeps the variable as categorical without encoding. Here \texttt{cp} i
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{rpartTune2 <-}\StringTok{ }\NormalTok{caret}\OperatorTok{::}\KeywordTok{train}\NormalTok{(trainx2, trainy, }\DataTypeTok{method =} \StringTok{"rpart"}\NormalTok{,}
-                       \DataTypeTok{tuneLength =} \DecValTok{30}\NormalTok{,}
-                       \DataTypeTok{metric =} \StringTok{"ROC"}\NormalTok{, }
-                       \DataTypeTok{trControl =} \KeywordTok{trainControl}\NormalTok{(}\DataTypeTok{method =} \StringTok{"cv"}\NormalTok{,}
-                                                \DataTypeTok{summaryFunction =}\NormalTok{ twoClassSummary,}
-                                                \DataTypeTok{classProbs =} \OtherTok{TRUE}\NormalTok{,}
-                                                \DataTypeTok{savePredictions =} \OtherTok{TRUE}\NormalTok{))}
+\NormalTok{rpartTune2 <-}\StringTok{ }\NormalTok{caret}\OperatorTok{::}\KeywordTok{train}\NormalTok{(}
+\NormalTok{  trainx2, trainy, }\DataTypeTok{method =} \StringTok{"rpart"}\NormalTok{,}
+  \DataTypeTok{tuneLength =} \DecValTok{30}\NormalTok{,}
+  \DataTypeTok{metric =} \StringTok{"ROC"}\NormalTok{, }
+  \DataTypeTok{trControl =} \KeywordTok{trainControl}\NormalTok{(}\DataTypeTok{method =} \StringTok{"cv"}\NormalTok{,}
+                           \DataTypeTok{summaryFunction =}\NormalTok{ twoClassSummary,}
+                           \DataTypeTok{classProbs =} \OtherTok{TRUE}\NormalTok{,}
+                           \DataTypeTok{savePredictions =} \OtherTok{TRUE}\NormalTok{)}
+\NormalTok{  )}
 \end{Highlighting}
 \end{Shaded}
 
@@ -8109,71 +7860,49 @@ Now, let's compare the results from the three tree models.
 \NormalTok{treebagRoc <-}\StringTok{ }\KeywordTok{roc}\NormalTok{(}\DataTypeTok{response =}\NormalTok{ bagTune}\OperatorTok{$}\NormalTok{pred}\OperatorTok{$}\NormalTok{obs,}
                         \DataTypeTok{predictor =}\NormalTok{ bagTune}\OperatorTok{$}\NormalTok{pred}\OperatorTok{$}\NormalTok{Female,}
                         \DataTypeTok{levels =} \KeywordTok{rev}\NormalTok{(}\KeywordTok{levels}\NormalTok{(bagTune}\OperatorTok{$}\NormalTok{pred}\OperatorTok{$}\NormalTok{obs)))}
-\end{Highlighting}
-\end{Shaded}
 
-\begin{verbatim}
-## Setting direction: controls < cases
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \NormalTok{rfRoc <-}\StringTok{ }\KeywordTok{roc}\NormalTok{(}\DataTypeTok{response =}\NormalTok{ rfTune}\OperatorTok{$}\NormalTok{pred}\OperatorTok{$}\NormalTok{obs,}
              \DataTypeTok{predictor =}\NormalTok{ rfTune}\OperatorTok{$}\NormalTok{pred}\OperatorTok{$}\NormalTok{Female,}
              \DataTypeTok{levels =} \KeywordTok{rev}\NormalTok{(}\KeywordTok{levels}\NormalTok{(rfTune}\OperatorTok{$}\NormalTok{pred}\OperatorTok{$}\NormalTok{obs)))}
-\end{Highlighting}
-\end{Shaded}
 
-\begin{verbatim}
-## Setting direction: controls < cases
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \NormalTok{gbmRoc <-}\StringTok{ }\KeywordTok{roc}\NormalTok{(}\DataTypeTok{response =}\NormalTok{ gbmTune}\OperatorTok{$}\NormalTok{pred}\OperatorTok{$}\NormalTok{obs,}
               \DataTypeTok{predictor =}\NormalTok{ gbmTune}\OperatorTok{$}\NormalTok{pred}\OperatorTok{$}\NormalTok{Female,}
               \DataTypeTok{levels =} \KeywordTok{rev}\NormalTok{(}\KeywordTok{levels}\NormalTok{(gbmTune}\OperatorTok{$}\NormalTok{pred}\OperatorTok{$}\NormalTok{obs)))}
-\end{Highlighting}
-\end{Shaded}
 
-\begin{verbatim}
-## Setting direction: controls < cases
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \KeywordTok{plot.roc}\NormalTok{(rpartRoc, }
      \DataTypeTok{type =} \StringTok{"s"}\NormalTok{, }
-     \DataTypeTok{print.thres =} \KeywordTok{c}\NormalTok{(.}\DecValTok{5}\NormalTok{),}
-     \DataTypeTok{print.thres.pch =} \DecValTok{16}\NormalTok{,}
-     \DataTypeTok{print.thres.pattern =} \StringTok{""}\NormalTok{,}
-     \DataTypeTok{print.thres.cex =} \FloatTok{1.2}\NormalTok{,}
+     \DataTypeTok{print.thres =} \KeywordTok{c}\NormalTok{(.}\DecValTok{5}\NormalTok{), }\DataTypeTok{print.thres.pch =} \DecValTok{16}\NormalTok{,}
+     \DataTypeTok{print.thres.pattern =} \StringTok{""}\NormalTok{, }\DataTypeTok{print.thres.cex =} \FloatTok{1.2}\NormalTok{,}
      \DataTypeTok{col =} \StringTok{"black"}\NormalTok{, }\DataTypeTok{legacy.axes =} \OtherTok{TRUE}\NormalTok{,}
      \DataTypeTok{print.thres.col =} \StringTok{"black"}\NormalTok{)}
 
 \KeywordTok{plot.roc}\NormalTok{(treebagRoc, }
      \DataTypeTok{type =} \StringTok{"s"}\NormalTok{, }
-     \DataTypeTok{add =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{print.thres =} \KeywordTok{c}\NormalTok{(.}\DecValTok{5}\NormalTok{), }
-     \DataTypeTok{print.thres.pch =} \DecValTok{3}\NormalTok{, }\DataTypeTok{legacy.axes =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{print.thres.pattern =} \StringTok{""}\NormalTok{, }
+     \DataTypeTok{add =} \OtherTok{TRUE}\NormalTok{, }
+     \DataTypeTok{print.thres =} \KeywordTok{c}\NormalTok{(.}\DecValTok{5}\NormalTok{), }\DataTypeTok{print.thres.pch =} \DecValTok{3}\NormalTok{, }
+     \DataTypeTok{legacy.axes =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{print.thres.pattern =} \StringTok{""}\NormalTok{, }
      \DataTypeTok{print.thres.cex =} \FloatTok{1.2}\NormalTok{,}
      \DataTypeTok{col =} \StringTok{"red"}\NormalTok{, }\DataTypeTok{print.thres.col =} \StringTok{"red"}\NormalTok{)}
 
 \KeywordTok{plot.roc}\NormalTok{(rfRoc, }
      \DataTypeTok{type =} \StringTok{"s"}\NormalTok{, }
-     \DataTypeTok{add =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{print.thres =} \KeywordTok{c}\NormalTok{(.}\DecValTok{5}\NormalTok{), }
-     \DataTypeTok{print.thres.pch =} \DecValTok{1}\NormalTok{, }\DataTypeTok{legacy.axes =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{print.thres.pattern =} \StringTok{""}\NormalTok{, }
+     \DataTypeTok{add =} \OtherTok{TRUE}\NormalTok{, }
+     \DataTypeTok{print.thres =} \KeywordTok{c}\NormalTok{(.}\DecValTok{5}\NormalTok{), }\DataTypeTok{print.thres.pch =} \DecValTok{1}\NormalTok{, }
+     \DataTypeTok{legacy.axes =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{print.thres.pattern =} \StringTok{""}\NormalTok{, }
      \DataTypeTok{print.thres.cex =} \FloatTok{1.2}\NormalTok{,}
      \DataTypeTok{col =} \StringTok{"green"}\NormalTok{, }\DataTypeTok{print.thres.col =} \StringTok{"green"}\NormalTok{)}
 
 \KeywordTok{plot.roc}\NormalTok{(gbmRoc, }
      \DataTypeTok{type =} \StringTok{"s"}\NormalTok{, }
-     \DataTypeTok{add =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{print.thres =} \KeywordTok{c}\NormalTok{(.}\DecValTok{5}\NormalTok{), }
-     \DataTypeTok{print.thres.pch =} \DecValTok{10}\NormalTok{, }\DataTypeTok{legacy.axes =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{print.thres.pattern =} \StringTok{""}\NormalTok{, }
+     \DataTypeTok{add =} \OtherTok{TRUE}\NormalTok{, }
+     \DataTypeTok{print.thres =} \KeywordTok{c}\NormalTok{(.}\DecValTok{5}\NormalTok{), }\DataTypeTok{print.thres.pch =} \DecValTok{10}\NormalTok{, }
+     \DataTypeTok{legacy.axes =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{print.thres.pattern =} \StringTok{""}\NormalTok{, }
      \DataTypeTok{print.thres.cex =} \FloatTok{1.2}\NormalTok{,}
      \DataTypeTok{col =} \StringTok{"blue"}\NormalTok{, }\DataTypeTok{print.thres.col =} \StringTok{"blue"}\NormalTok{)}
 
 \KeywordTok{legend}\NormalTok{(}\FloatTok{0.2}\NormalTok{, }\FloatTok{0.5}\NormalTok{, }\DataTypeTok{cex =} \FloatTok{0.8}\NormalTok{,}
-       \KeywordTok{c}\NormalTok{(}\StringTok{"Single Tree"}\NormalTok{, }\StringTok{"Bagged Tree"}\NormalTok{, }\StringTok{"Random Forest"}\NormalTok{, }\StringTok{"Boosted Tree"}\NormalTok{),}
+       \KeywordTok{c}\NormalTok{(}\StringTok{"Single Tree"}\NormalTok{, }\StringTok{"Bagged Tree"}\NormalTok{, }
+         \StringTok{"Random Forest"}\NormalTok{, }\StringTok{"Boosted Tree"}\NormalTok{),}
        \DataTypeTok{lwd =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{1}\NormalTok{),}
        \DataTypeTok{col =} \KeywordTok{c}\NormalTok{(}\StringTok{"black"}\NormalTok{, }\StringTok{"red"}\NormalTok{, }\StringTok{"green"}\NormalTok{, }\StringTok{"blue"}\NormalTok{),}
        \DataTypeTok{pch =} \KeywordTok{c}\NormalTok{(}\DecValTok{16}\NormalTok{, }\DecValTok{3}\NormalTok{, }\DecValTok{1}\NormalTok{, }\DecValTok{10}\NormalTok{))}
@@ -8198,7 +7927,7 @@ f(x)=\Sigma_{m=1}^M \beta_m b(x,\gamma_m)
 \label{eq:basisexp}
 \end{equation}
 
-where \(\beta_m,\ m=1,\dots,M\) is expansion coefficient and \(b(x,\gamma)\in \mathbb{R}\) is basis function. Many of the learning methods fit into this additive framework. Hastie et al discuss basis expansion in detail in Chapter 5 of the book \citep{Hastie2008} and cover the additive expansion for different learning techniques \citep{Hastie2008}, such as single-hidden-layer neural networks (Chapter 11) and MARS (Section 9.4). These models are fit by minimizing a designated loss function averaged over the training data:
+where \(\beta_m,\ m=1,\dots,M\) is expansion coefficient and \(b(x,\gamma)\in \mathbb{R}\) is basis function. Many of the learning methods fit into this additive framework. Hastie et al discuss basis expansion in detail in Chapter 5 of \citet{Hastie2008} and cover the additive expansion for different learning techniques, such as single-hidden-layer neural networks (Chapter 11) and MARS (Section 9.4). These models are fit by minimizing a designated loss function averaged over the training data:
 
 \begin{equation}
 \underset{\{\beta_m,\gamma_m\}_i^M}{min}\Sigma_{i=1}^N L\left(y_i,\Sigma_{m=1}^M\beta_{m}b(x_i;\gamma_m)\right)
@@ -8209,24 +7938,18 @@ Different models have different basis function \(b(x_i;\gamma_m)\). You can also
 
 \[\underset{\beta,\gamma}{min}=\Sigma_{i=1}^N L(y_i,\beta b(x_i;\gamma))\]
 
-The forward stagewise algorithm approximates the optimal solution of equation \eqref{eq:additiveloss}. It adds new basis functions to the expansion without adjusting the previous ones. The forward stagewise additive algorithm is as following (section 10.2, \citep{Hastie2008}):
+The forward stagewise algorithm approximates the optimal solution of equation \eqref{eq:additiveloss}. It adds new basis functions to the expansion without adjusting the previous ones. The forward stagewise additive algorithm is as following (Section 10.2 of \citet{Hastie2008}):
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
-\tightlist
 \item
   Initialize \(f_0(x)=0\)
 \item
   \textbf{for} \(m=1,\dots,M\) \textbf{do}：
+  compute
+  \[(\beta_m,\gamma_m)=\underset{\beta,\gamma}{argmin}\Sigma_{i=1}^NL(y_i,f_{m-1}(x_i)+\beta b(x_i;\gamma))\]
 
-  \begin{itemize}
-  \tightlist
-  \item
-    compute
-    \[(\beta_m,\gamma_m)=\underset{\beta,\gamma}{argmin}\Sigma_{i=1}^NL(y_i,f_{m-1}(x_i)+\beta b(x_i;\gamma))\]
-  \item
-    set \(f_m(x)=f_{m-1}(x)+\beta_m b(x;\gamma_m)\)
-  \end{itemize}
+  set \(f_m(x)=f_{m-1}(x)+\beta_m b(x;\gamma_m)\)
 \end{enumerate}
 
 At iteration m, it will search for the optimal \(b(x;\gamma_m)\) and \(\beta_m\) based on the previous basis function \(f_{m-1}(x)\). And then add the new basis \(b(x;\gamma_m)\beta_m\) to the previous basis function to get a new basis function \(f_m(x)\) without changing any parameters from previous steps. Assume we use squared-error loss:
@@ -8260,10 +7983,10 @@ where \(w_i^m= exp[-y_if_{m-1}(x_i)]\). It does not depend on \(\beta\) and \(G(
 
 \begin{equation}
 \begin{array}{ccc}
-(\beta_{m},G_{m}) & = & \underset{\beta,G}{argmin}\Sigma_{i=1}^{N}w_{i}^{m}exp[-y_{i}\beta G(x_{i})]\\
-& = & \underset{\beta,G}{argmin}\Sigma_{i=1}^{N}\left\{ w_{i}^{m}e^{-\beta}I(y_{i}=G(x))+w_{i}^{m}e^{\beta}I(y_{i}\neq G(x))\right\} \\
-& = & \underset{\beta,G}{argmin}\Sigma_{i=1}^{N}\left\{ w_{i}^{m}e^{-\beta}[1-I(y_{i}\neq G(x))]+w_{i}^{m}e^{\beta}I(y_{i}\neq G(x))\right\} \\
-& = & \underset{\beta,G}{argmin}\left\{ (e^{\beta}-e^{-\beta})\cdot\Sigma_{i=1}^{N}w_{i}^{m}I(y_{i}\neq G(x_{i}))+e^{-\beta}\cdot\Sigma_{i=1}^{N}w_{i}^{m}\right\}
+ &  & \underset{\beta,G}{argmin}\Sigma_{i=1}^{N}w_{i}^{m}exp[-y_{i}\beta G(x_{i})]\\
+ & = & \underset{\beta,G}{argmin}\Sigma_{i=1}^{N}\left\{ w_{i}^{m}e^{-\beta}I(y_{i}=G(x))+w_{i}^{m}e^{\beta}I(y_{i}\neq G(x))\right\} \\
+ & = & \underset{\beta,G}{argmin}\Sigma_{i=1}^{N}\left\{ w_{i}^{m}e^{-\beta}[1-I(y_{i}\neq G(x))]+w_{i}^{m}e^{\beta}I(y_{i}\neq G(x))\right\} \\
+ & = & \underset{\beta,G}{argmin}\left\{ (e^{\beta}-e^{-\beta})\cdot\Sigma_{i=1}^{N}w_{i}^{m}I(y_{i}\neq G(x_{i}))+e^{-\beta}\cdot\Sigma_{i=1}^{N}w_{i}^{m}\right\} 
 \end{array}
 \label{eq:explossadaboost2}
 \end{equation}
@@ -8328,7 +8051,7 @@ In addition to data and neural network structure, there were a few key algorithm
 
 \textbf{Computation Power}
 
-With data, network structure and algorithms ready, it still requires certain computation power to train a deep learning model. The entire framework involves heavy linear algebra operations with large matrixes and tensors. The general CPU architecture is not the ideal platform and GPU is a much faster choice. With the vast potential application of deep learning, major tech companies contribute heavily to open-source deep learning frameworks. For example, Google has open-sourced its TensorFlow framework; Facebook has open-sourced its PyTorch framework, and Amazon has significantly contributed to the MXNet open-source framework. With thousands of well-trained software developers and scientists behind these deep learning frameworks, users can confidently pick one framework and start training their deep learning models right away in popular cloud environments. Much of the heavy lifting to train a deep learning model has been embedded in these open-source frameworks and there are also many pre-trained models available for users to adopt. Users can now enjoy the relatively easy access to software and hardware to develop their own deep learning applications. In this book, we will demo deep learning examples using Keras, a high-level abstraction of TensorFlow, using the Databricks Community Edition platform.
+With data, network structure and algorithms ready, it still requires certain computation power to train a deep learning model. The entire framework involves heavy linear algebra operations with large matrixes and tensors. The general CPU architecture is not the ideal platform and GPU is a much faster choice. With the vast potential application of deep learning, major tech companies contribute heavily to open-source deep learning frameworks. For example, Google has open-sourced its TensorFlow framework; Facebook has open-sourced its PyTorch framework, and Amazon has significantly contributed to the MXNet open-source framework. With thousands of well-trained software developers and scientists behind these deep learning frameworks, users can confidently pick one framework and start training their deep learning models right away in popular cloud environments. Much of the heavy lifting to train a deep learning model has been embedded in these open-source frameworks and there are also many pre-trained models available for users to adopt. Users can now enjoy the relatively easy access to software and hardware to develop their own deep learning applications. In this book, we will demonstrate deep learning examples using Keras, a high-level abstraction of TensorFlow, using the Databricks Community Edition platform.
 
 In summary, deep learning applications are not developed just in the past few years and it has been ongoing research in the past few decades. The accumulation of data, the advance of algorithm and the improvement of computation power finally enable every day deep learning applications. In the foreseeable future, deep learning will continue to revolutionize machine learning methods across more areas to provide significant improvement.
 
@@ -8838,19 +8561,7 @@ To normalize the output with all nodes in this layer, we need to scale up the ou
 \hypertarget{ffnnexample}{%
 \subsection{Image Recognition Using FFNN}\label{ffnnexample}}
 
-In this section, we will walk through a toy example of image classification problem using \textbf{\texttt{keras}} package. We use R in the section to illustrate the process and also provide the python notebook on the book website. Please check the \href{https://keras.rstudio.com/}{\texttt{keras} R package website} for the most recent development. We are using the Databrick community edition with the following consideration:
-
-\begin{itemize}
-\tightlist
-\item
-  Minimum language barrier in coding for most users
-\item
-  Zero setup to save time using cloud environment
-\item
-  Help you get familiar with current trend of cloud computing in corporate setup
-\end{itemize}
-
-Refer to section \ref{CloudEnvironment} for how to set up an account, create a notebook (R or Python) and start a cluster.
+In this section, we will walk through a toy example of image classification problem using \textbf{\texttt{keras}} package. We use R in the section to illustrate the process and also provide the python notebook on the book website. Please check the \href{https://keras.rstudio.com/}{\texttt{keras} R package website} for the most recent development.
 
 What is an image as data? You can consider a digital image as a set of points on 2-d or 3-d space. Each each point has a value between 0 to 255 which is considered as a pixel. Figure \ref{fig:grayscaleimage} shows an example of grayscale image. It is a set of pixels on 2-d space and each pixel has a value between 0 to 255. You can process the image as a 2-d array input if you use a Convolutional Neural Network(CNN). Or, you can vectorize the array as the input for FFNN as shown in the figure.
 
@@ -8890,6 +8601,30 @@ As \texttt{keras} is just an interface to popular deep learning frameworks, we h
 \KeywordTok{install_keras}\NormalTok{()}
 \end{Highlighting}
 \end{Shaded}
+
+You can run the code in this section in the Databrick community edition with R as the interface. Refer to section \ref{CloudEnvironment} for how to set up an account, create a notebook (R or Python) and start a cluster. For an audience with a statistical background, using a well-managed cloud environment has the following benefit:
+
+\begin{itemize}
+\tightlist
+\item
+  Minimum language barrier in coding for most statisticians
+\item
+  Zero setups to save time using the cloud environment
+\item
+  Get familiar with the current trend of cloud computing in the industrial context
+\end{itemize}
+
+You can also run the code on your local machine with R and the required Python packages (\texttt{keras} uses the Python TensorFlow backend engine). Different versions of Python may cause some errors when running \texttt{install\_keras()}. Here are the things you could do when you encounter the Python backend issue in your local machine:
+
+\begin{itemize}
+\tightlist
+\item
+  Run \texttt{reticulate::py\_config()} to check the current Python configuration to see if anything needs to be changed.
+\item
+  By default, \texttt{install\_keras()} uses virtual environment \texttt{\textasciitilde{}/.virtualenvs/r-reticulate}. If you don't know how to set the right environment, try to set the installation method as conda (\texttt{install\_keras(method\ =\ "conda")})
+\item
+  Refer to this document for more details on how to \href{https://tensorflow.rstudio.com/reference/keras/install_keras/}{install \texttt{keras} and the TensorFlow backend}.
+\end{itemize}
 
 Now we are all set to explore deep learning! As simple as three lines of R code, but there are quite a lot going on behind the scene. If you are using a cloud environment, you do not need to worry about these behind scene setup and maintenance.
 
@@ -9015,8 +8750,10 @@ We first reshape the 28x28 image for each digit (i.e each row) into 784 columns 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# step 1: reshape}
-\NormalTok{x_train <-}\StringTok{ }\KeywordTok{array_reshape}\NormalTok{(x_train, }\KeywordTok{c}\NormalTok{(}\KeywordTok{nrow}\NormalTok{(x_train), }\DecValTok{784}\NormalTok{))}
-\NormalTok{x_test <-}\StringTok{ }\KeywordTok{array_reshape}\NormalTok{(x_test, }\KeywordTok{c}\NormalTok{(}\KeywordTok{nrow}\NormalTok{(x_test), }\DecValTok{784}\NormalTok{))}
+\NormalTok{x_train <-}\StringTok{ }\KeywordTok{array_reshape}\NormalTok{(x_train, }
+                         \KeywordTok{c}\NormalTok{(}\KeywordTok{nrow}\NormalTok{(x_train), }\DecValTok{784}\NormalTok{))}
+\NormalTok{x_test <-}\StringTok{ }\KeywordTok{array_reshape}\NormalTok{(x_test, }
+                        \KeywordTok{c}\NormalTok{(}\KeywordTok{nrow}\NormalTok{(x_test), }\DecValTok{784}\NormalTok{))}
 
 \CommentTok{# step 2: rescale}
 \NormalTok{x_train <-}\StringTok{ }\NormalTok{x_train }\OperatorTok{/}\StringTok{ }\DecValTok{255}
@@ -9671,8 +9408,10 @@ For CNN, the input is a \(n_H \times n_W \times n_C\) 3D array with \(n_C\) chan
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{x_train <-}\StringTok{ }\KeywordTok{array_reshape}\NormalTok{(x_train, }\KeywordTok{c}\NormalTok{(}\KeywordTok{nrow}\NormalTok{(x_train), img_rows, img_cols, }\DecValTok{1}\NormalTok{))}
-\NormalTok{x_test <-}\StringTok{ }\KeywordTok{array_reshape}\NormalTok{(x_test, }\KeywordTok{c}\NormalTok{(}\KeywordTok{nrow}\NormalTok{(x_test), img_rows, img_cols, }\DecValTok{1}\NormalTok{))}
+\NormalTok{x_train <-}\StringTok{ }\KeywordTok{array_reshape}\NormalTok{(x_train,}
+                         \KeywordTok{c}\NormalTok{(}\KeywordTok{nrow}\NormalTok{(x_train), img_rows, img_cols, }\DecValTok{1}\NormalTok{))}
+\NormalTok{x_test <-}\StringTok{ }\KeywordTok{array_reshape}\NormalTok{(x_test,}
+                         \KeywordTok{c}\NormalTok{(}\KeywordTok{nrow}\NormalTok{(x_test), img_rows, img_cols, }\DecValTok{1}\NormalTok{))}
 \NormalTok{input_shape <-}\StringTok{ }\KeywordTok{c}\NormalTok{(img_rows, img_cols, }\DecValTok{1}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -9733,9 +9472,14 @@ Let's define the CNN model structure. Now we define a CNN model with two convolu
 \begin{Highlighting}[]
 \CommentTok{# define model structure }
 \NormalTok{cnn_model <-}\StringTok{ }\KeywordTok{keras_model_sequential}\NormalTok{() }\OperatorTok{%>%}
-\StringTok{  }\KeywordTok{layer_conv_2d}\NormalTok{(}\DataTypeTok{filters =} \DecValTok{32}\NormalTok{, }\DataTypeTok{kernel_size =} \KeywordTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{,}\DecValTok{5}\NormalTok{), }\DataTypeTok{activation =} \StringTok{'relu'}\NormalTok{, }\DataTypeTok{input_shape =}\NormalTok{ input_shape) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{layer_conv_2d}\NormalTok{(}\DataTypeTok{filters =} \DecValTok{32}\NormalTok{, }
+                \DataTypeTok{kernel_size =} \KeywordTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{,}\DecValTok{5}\NormalTok{), }
+                \DataTypeTok{activation =} \StringTok{'relu'}\NormalTok{, }
+                \DataTypeTok{input_shape =}\NormalTok{ input_shape) }\OperatorTok{%>%}\StringTok{ }
 \StringTok{  }\KeywordTok{layer_max_pooling_2d}\NormalTok{(}\DataTypeTok{pool_size =} \KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }
-\StringTok{  }\KeywordTok{layer_conv_2d}\NormalTok{(}\DataTypeTok{filters =} \DecValTok{64}\NormalTok{, }\DataTypeTok{kernel_size =} \KeywordTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{,}\DecValTok{5}\NormalTok{), }\DataTypeTok{activation =} \StringTok{'relu'}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{layer_conv_2d}\NormalTok{(}\DataTypeTok{filters =} \DecValTok{64}\NormalTok{, }
+                \DataTypeTok{kernel_size =} \KeywordTok{c}\NormalTok{(}\DecValTok{5}\NormalTok{,}\DecValTok{5}\NormalTok{), }
+                \DataTypeTok{activation =} \StringTok{'relu'}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }
 \StringTok{  }\KeywordTok{layer_max_pooling_2d}\NormalTok{(}\DataTypeTok{pool_size =} \KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{)) }\OperatorTok{%>%}\StringTok{ }
 \StringTok{  }\KeywordTok{layer_dropout}\NormalTok{(}\DataTypeTok{rate =} \FloatTok{0.2}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }
 \StringTok{  }\KeywordTok{layer_flatten}\NormalTok{() }\OperatorTok{%>%}\StringTok{ }
@@ -9752,38 +9496,7 @@ Let's define the CNN model structure. Now we define a CNN model with two convolu
 \end{Highlighting}
 \end{Shaded}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{Model: "sequential_5"}
-\NormalTok{____________________________________________________________________________________________}
-\NormalTok{Layer (type)                             Output Shape                         Param #       }
-\NormalTok{============================================================================================}
-\NormalTok{conv2d_11 (Conv2D)                       (None, 24, 24, 32)                   832           }
-\NormalTok{____________________________________________________________________________________________}
-\NormalTok{max_pooling2d_9 (MaxPooling2D)           (None, 12, 12, 32)                   0             }
-\NormalTok{____________________________________________________________________________________________}
-\NormalTok{conv2d_12 (Conv2D)                       (None, 8, 8, 64)                     51264         }
-\NormalTok{____________________________________________________________________________________________}
-\NormalTok{max_pooling2d_10 (MaxPooling2D)          (None, 4, 4, 64)                     0             }
-\NormalTok{____________________________________________________________________________________________}
-\NormalTok{dropout_6 (Dropout)                      (None, 4, 4, 64)                     0             }
-\NormalTok{____________________________________________________________________________________________}
-\NormalTok{flatten_5 (Flatten)                      (None, 1024)                         0             }
-\NormalTok{____________________________________________________________________________________________}
-\NormalTok{dense_15 (Dense)                         (None, 120)                          123000        }
-\NormalTok{____________________________________________________________________________________________}
-\NormalTok{dropout_7 (Dropout)                      (None, 120)                          0             }
-\NormalTok{____________________________________________________________________________________________}
-\NormalTok{dense_16 (Dense)                         (None, 84)                           10164         }
-\NormalTok{____________________________________________________________________________________________}
-\NormalTok{dense_17 (Dense)                         (None, 10)                           850           }
-\NormalTok{============================================================================================}
-\NormalTok{Total params: 186,110}
-\NormalTok{Trainable params: 186,110}
-\NormalTok{Non-trainable params: 0}
-\NormalTok{____________________________________________________________________________________________}
-\end{Highlighting}
-\end{Shaded}
+\includegraphics[width=1\textwidth,height=\textheight]{images/cnn_summary.png}
 
 Similar to before, we need to compile the defined CNN model.
 
@@ -9810,7 +9523,7 @@ Train the model and save each epochs's history. Please note, as we are not using
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics[width=0.7\textwidth,height=\textheight]{images/cnn_history.png}
+\includegraphics[width=0.9\textwidth,height=\textheight]{images/cnn_history.png}
 
 The trained model accuracy can be evaluated on the testing dataset which is pretty good.
 
@@ -9822,17 +9535,8 @@ The trained model accuracy can be evaluated on the testing dataset which is pret
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{...}
-
-\NormalTok{ 9248/10000 [==========================>...] - ETA: 0s}
-\NormalTok{ 9568/10000 [===========================>..] - ETA: 0s}
-\NormalTok{ 9888/10000 [============================>.] - ETA: 0s}
-\NormalTok{10000/10000 [==============================] - 2s 189us/sample - loss: 0.0120 - accuracy: 0.9928}
-\NormalTok{$loss}
-\NormalTok{[1] 0.02399249}
-
-\NormalTok{$accuracy}
-\NormalTok{[1] 0.9928}
+\NormalTok{##       loss   accuracy }
+\NormalTok{## 0.02153786 0.99290001}
 \end{Highlighting}
 \end{Shaded}
 
@@ -9873,6 +9577,14 @@ Now let's check a few misclassified images to see whether a human can do a bette
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\NormalTok{missed_image =}\StringTok{ }\NormalTok{mnist}\OperatorTok{$}\NormalTok{test}\OperatorTok{$}\NormalTok{x[cnn_pred }\OperatorTok{!=}\StringTok{ }\NormalTok{mnist}\OperatorTok{$}\NormalTok{test}\OperatorTok{$}\NormalTok{y,,]}
+\NormalTok{missed_digit =}\StringTok{ }\NormalTok{mnist}\OperatorTok{$}\NormalTok{test}\OperatorTok{$}\NormalTok{y[cnn_pred }\OperatorTok{!=}\StringTok{ }\NormalTok{mnist}\OperatorTok{$}\NormalTok{test}\OperatorTok{$}\NormalTok{y]}
+\NormalTok{missed_pred =}\StringTok{ }\NormalTok{cnn_pred[cnn_pred }\OperatorTok{!=}\StringTok{ }\NormalTok{mnist}\OperatorTok{$}\NormalTok{test}\OperatorTok{$}\NormalTok{y]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \NormalTok{index_image =}\StringTok{ }\DecValTok{10} \CommentTok{## change this index to see different image.}
 \NormalTok{input_matrix <-}\StringTok{ }\NormalTok{missed_image[index_image,}\DecValTok{1}\OperatorTok{:}\DecValTok{28}\NormalTok{,}\DecValTok{1}\OperatorTok{:}\DecValTok{28}\NormalTok{]}
 \NormalTok{output_matrix <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(input_matrix, }\DecValTok{2}\NormalTok{, rev)}
@@ -9894,7 +9606,7 @@ The recurrent neural network allows information to flow from one step to the nex
 
 \begin{figure}
 
-{\centering \includegraphics{images/rnnunit} 
+{\centering \includegraphics[width=0.4\linewidth]{images/rnnunit} 
 
 }
 
@@ -9905,7 +9617,7 @@ So the whole process repeats a similar pattern. If we unroll the loop:
 
 \begin{figure}
 
-{\centering \includegraphics[width=0.7\linewidth]{images/rnnrollout} 
+{\centering \includegraphics[width=0.9\linewidth]{images/rnnrollout} 
 
 }
 
@@ -9953,11 +9665,11 @@ To further understand the RNN model, let's look at an entity recognition example
 
 Given input sentence x, you want a model to produce one output for each word in x that tells you if that word is the name for something. So in this example, the input is a sequence of 5 words including the period in the end. The output is a sequence of 0/1 with the same length that indicates whether the input word is a name (1) or not (0). We use superscript \(<t>\) to denote the element position of input and output; use superscript \((i)\) to denote the \(i^{th}\) sample (you will have different sentences in the training data); Use \(T_x^{(i)}\) to denote the length of \(i^{th}\) input, \(T_y^{(i)}\) for output. In this case, \(T_x^{(i)}\) is equal to \(T_y^{(i)}\).
 
-\includegraphics[width=0.5\textwidth,height=\textheight]{images/rnn_notation.png}
+\includegraphics[width=0.7\textwidth,height=\textheight]{images/rnn_notation.png}
 
 Before we build a neural network, we need to decide a way to represent individual words in numbers. What should \(x^{<1>}\) be? In practice, people use word embedding which we will discuss in the later section. Here, for illustration, we use the one-hot encoding word representation. Assume we have a dictionary of 10,000 unique words. You can build the dictionary by finding the top 10,000 occurring words in your training set. Each word in your training set will have a position in the dictionary sequence. For example, ``use'' is the 8320th element of the dictionary sequence. So \(x^{<1>}\) is a vector with all zeros except for a one on position 8320. Using this one-hot representation, each input \(x^{<t>}\) is a vector with all zeros except for one element.
 
-\includegraphics[width=0.5\textwidth,height=\textheight]{images/nn_ohe.png}
+\includegraphics[width=0.7\textwidth,height=\textheight]{images/nn_ohe.png}
 
 Given this representation of input words, the goal is to learn a sequence model that maps the input words to output y, indicating if the word is an entity (1) or not (0). Let us build a one-layer recurrent neural network. The model starts from the first word ``use'' (\(x^{<1>}\)) and build a neural network to predict the output. To start the process, we also need to initialize the activation at time 0, \(a_0\). The most common choice is to use a vector of zeros. The common activation function for the intermediate layer is the Hyperbolic Tangent Function (tanh). RNN uses other methods to prevent the vanishing gradient problem discussed in section \ref{lstm}. Similar to FFNN, The output layer activation function depends on the output type. The current example is a binary classification, so we use the sigmoid function (\(\sigma\)).
 
@@ -10012,7 +9724,7 @@ So far, we have been using one-hot encoding to represent the words. This represe
 
 The algorithm can not learn the relationship between ``pumpkin'' and ``apple'' by the distance between the one-hot encoding for the two words. If we can find a way to create features to represent the words, we may teach the model to learn that pumpkin and apple is food. And the distance between the feature representations of these two words is closer than, for example, ``apple'' and ``nurse.'' So when the model sees ``apple'' in a new sentence and needs to predict the word after, it is more likely to choose ``pie'' since it sees ``pumpkin pie'' in the training data. The idea of word embedding is to learn a set of features to represent words. For example, you can score each word in the dictionary according to a group of features like this:
 
-\includegraphics[width=0.8\textwidth,height=\textheight]{images/rnn_embedding1.png}
+\includegraphics[width=0.9\textwidth,height=\textheight]{images/rnn_embedding1.png}
 
 The word ``male'' has a score of -1 for the ``gender'' feature, ``female'' has a score of 1. Both ``Apple'' and ``pumpkin'' have a high score for the ``food'' feature and much lower scores for the rest. You can set the number of features to learn, usually more than what we list in the above figure. If you use 200 features to represent the words, then the learned embedding for each word is a vector with a length of 200.
 
@@ -10159,7 +9871,8 @@ Like DNN and CNN models we trained in the past, RNN models are relatively easy t
 \NormalTok{rnn_model <-}\StringTok{ }\KeywordTok{keras_model_sequential}\NormalTok{()}
 \NormalTok{rnn_model }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{layer_embedding}\NormalTok{(}\DataTypeTok{input_dim =}\NormalTok{ max_unique_word, }\DataTypeTok{output_dim =} \DecValTok{128}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }
-\StringTok{  }\KeywordTok{layer_simple_rnn}\NormalTok{(}\DataTypeTok{units =} \DecValTok{64}\NormalTok{, }\DataTypeTok{dropout =} \FloatTok{0.2}\NormalTok{, }\DataTypeTok{recurrent_dropout =} \FloatTok{0.2}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{layer_simple_rnn}\NormalTok{(}\DataTypeTok{units =} \DecValTok{64}\NormalTok{, }\DataTypeTok{dropout =} \FloatTok{0.2}\NormalTok{, }
+                   \DataTypeTok{recurrent_dropout =} \FloatTok{0.2}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }
 \StringTok{  }\KeywordTok{layer_dense}\NormalTok{(}\DataTypeTok{units =} \DecValTok{1}\NormalTok{, }\DataTypeTok{activation =} \StringTok{'sigmoid'}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -10279,17 +9992,17 @@ A simple RNN layer is a good starting point for learning RNN, but the performanc
 \begin{Highlighting}[]
 \NormalTok{Epoch 1/5}
 
-\NormalTok{  1/157 [................] - ETA: 0s - loss: 0.6939 - accuracy: 0.4766}
-\NormalTok{  2/157 [................] - ETA: 31s - loss: 0.6940 - accuracy: 0.4766}
-\NormalTok{  3/157 [................] - ETA: 43s - loss: 0.6937 - accuracy: 0.4896}
+\NormalTok{  1/157 [.........] - ETA: 0s - loss: 0.6939 - accuracy: 0.4766}
+\NormalTok{  2/157 [.........] - ETA: 31s - loss: 0.6940 - accuracy: 0.4766}
+\NormalTok{  3/157 [.........] - ETA: 43s - loss: 0.6937 - accuracy: 0.4896}
 
 \NormalTok{*** skipped some output ***}
 
-\NormalTok{155/157 [===============>.] - ETA: 0s - loss: 0.2610 - accuracy: 0.8918}
-\NormalTok{156/157 [===============>.] - ETA: 0s - loss: 0.2607 - accuracy: 0.8920}
-\NormalTok{157/157 [=================] - ETA: 0s - loss: 0.2609 - accuracy: 0.8917}
-\NormalTok{157/157 [=================] - 67s 424ms/step }
-\NormalTok{loss: 0.2609 - accuracy: 0.8917 - val_loss: 0.3754 - val_accuracy: 0.8328}
+\NormalTok{155/157 [=======>.] - ETA: 0s - loss: 0.2610 - accuracy: 0.8918}
+\NormalTok{156/157 [=======>.] - ETA: 0s - loss: 0.2607 - accuracy: 0.8920}
+\NormalTok{157/157 [=========] - ETA: 0s - loss: 0.2609 - accuracy: 0.8917}
+\NormalTok{157/157 [=========] - 67s 424ms/step }
+\NormalTok{loss: 0.2609 accuracy: 0.8917 val_loss: 0.3754 val_accuracy: 0.8328}
 \end{Highlighting}
 \end{Shaded}
 
@@ -10310,18 +10023,18 @@ A simple RNN layer is a good starting point for learning RNN, but the performanc
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{  1/782 [................] - ETA: 0s - loss: 0.2332 - accuracy: 0.9062}
-\NormalTok{  4/782 [................] - ETA: 12s - loss: 0.3536 - accuracy: 0.8750}
-\NormalTok{  7/782 [................] - ETA: 14s - loss: 0.3409 - accuracy: 0.8705}
-\NormalTok{ 10/782 [................] - ETA: 14s - loss: 0.3508 - accuracy: 0.8625}
+\NormalTok{  1/782 [.........] - ETA: 0s  - loss: 0.2332 - accuracy: 0.9062}
+\NormalTok{  4/782 [.........] - ETA: 12s - loss: 0.3536 - accuracy: 0.8750}
+\NormalTok{  7/782 [.........] - ETA: 14s - loss: 0.3409 - accuracy: 0.8705}
+\NormalTok{ 10/782 [.........] - ETA: 14s - loss: 0.3508 - accuracy: 0.8625}
 
 \NormalTok{*** skipped some output ***}
 
-\NormalTok{775/782 [=============>.] - ETA: 0s - loss: 0.3640 - accuracy: 0.8415}
-\NormalTok{778/782 [==============>.] - ETA: 0s - loss: 0.3637 - accuracy: 0.8417}
-\NormalTok{780/782 [==============>.] - ETA: 0s - loss: 0.3632 - accuracy: 0.8419}
-\NormalTok{782/782 [================] - ETA: 0s - loss: 0.3631 - accuracy: 0.8420}
-\NormalTok{782/782 [================] - 18s 22ms/step - loss: 0.3631 - accuracy: 0.8420}
+\NormalTok{775/782 [=======>.] - ETA: 0s - loss: 0.3640 - accuracy: 0.8415}
+\NormalTok{778/782 [=======>.] - ETA: 0s - loss: 0.3637 - accuracy: 0.8417}
+\NormalTok{780/782 [=======>.] - ETA: 0s - loss: 0.3632 - accuracy: 0.8419}
+\NormalTok{782/782 [=========] - ETA: 0s - loss: 0.3631 - accuracy: 0.8420}
+\NormalTok{782/782 [=========] - 18s 22ms/step - loss: 0.3631 - accuracy: 0.8420}
 \NormalTok{     loss  accuracy }
 \NormalTok{0.3631141 0.8420000 }
 \end{Highlighting}
@@ -10340,9 +10053,17 @@ This simple example shows that LSTM's performance has improved dramatically from
 \section{Customer Data for Clothing Company}\label{appendixdata1}}
 
 The simulation is not very straightforward and we will break it into three parts:
-1. Define data structure: variable names, variable distribution, customer segment names, segment size
-1. Variable distribution parameters: mean and variance
-1. Iterate across segments and variables. Simulate data according to specific parameters assigned
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Define data structure: variable names, variable distribution, customer segment names, segment size
+\item
+  Variable distribution parameters: mean and variance
+\item
+  Iterate across segments and variables. Simulate data according to specific parameters assigned
+\end{enumerate}
 
 By organizing code this way, it makes easy for us to change specific parts of the simulation. For example, if we want to change the distribution of one variable, we can just change the corresponding part of the code.
 
@@ -10557,8 +10278,8 @@ So far we have created part of the data. You can check it using \texttt{summary(
     \KeywordTok{colnames}\NormalTok{(sim.da1) <-}\StringTok{ }\NormalTok{col}
     \KeywordTok{rownames}\NormalTok{(sim.da1) <-}\StringTok{ }\NormalTok{row}
     
-    \CommentTok{# use class.ind() function in nnet package to}
-    \CommentTok{# encode dummy variables}
+    \CommentTok{# use class.ind() function in nnet package to encode}
+    \CommentTok{# dummy variables}
     \KeywordTok{library}\NormalTok{(nnet)}
 \NormalTok{    dummy.sim1 <-}\StringTok{ }\OtherTok{NULL}
     \ControlFlowTok{for}\NormalTok{ (k }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{ncol}\NormalTok{(sim.da1)) \{}
@@ -10568,35 +10289,45 @@ So far we have created part of the data. You can check it using \texttt{summary(
 \NormalTok{    \}}
 \NormalTok{    dummy.sim1 <-}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(dummy.sim1)}
     
-    \CommentTok{# set 'C' as the baseline delete baseline dummy}
-    \CommentTok{# variable}
+    \CommentTok{# set 'C' as the baseline delete baseline dummy variable}
     
 \NormalTok{    base.idx <-}\StringTok{ }\DecValTok{3} \OperatorTok{*}\StringTok{ }\KeywordTok{c}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\DecValTok{120}\NormalTok{)}
 \NormalTok{    dummy1 <-}\StringTok{ }\NormalTok{dummy.sim1[, }\OperatorTok{-}\NormalTok{base.idx]}
     
-    \CommentTok{# simulate independent variable for different}
-    \CommentTok{# values of r simulate based on one value of r each}
-    \CommentTok{# time r=0.1, get the link function}
-\NormalTok{    s1 <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\OperatorTok{/}\DecValTok{10}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{-1}\OperatorTok{/}\DecValTok{10}\NormalTok{), }\DecValTok{40}\NormalTok{), }\KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\OperatorTok{/}\DecValTok{10}\NormalTok{, }
-        \DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{), }\DecValTok{40}\NormalTok{), }\KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{), }\DecValTok{40}\NormalTok{))}
+    \CommentTok{# simulate independent variable for different values of}
+    \CommentTok{# r simulate based on one value of r each time r=0.1,}
+    \CommentTok{# get the link function}
+    
+\NormalTok{    s1 <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\OperatorTok{/}\DecValTok{10}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{-1}\OperatorTok{/}\DecValTok{10}\NormalTok{), }\DecValTok{40}\NormalTok{), }
+            \KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\OperatorTok{/}\DecValTok{10}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{), }\DecValTok{40}\NormalTok{), }
+            \KeywordTok{rep}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{, }\DecValTok{0}\NormalTok{), }\DecValTok{40}\NormalTok{))}
 \NormalTok{    link1 <-}\StringTok{ }\KeywordTok{as.matrix}\NormalTok{(dummy.sim1) }\OperatorTok{%*%}\StringTok{ }\NormalTok{s1 }\OperatorTok{-}\StringTok{ }\DecValTok{40}\OperatorTok{/}\DecValTok{3}\OperatorTok{/}\DecValTok{10}
     
-    \CommentTok{# r=0.25}
-    \CommentTok{# c(rep(c(1/4,0,-1/4),40),rep(c(1/4,0,0),40),rep(c(0,0,0),40))->s1}
-    \CommentTok{# as.matrix(dummy.sim1)%*%s1-40/3/4->link1}
+    \CommentTok{# Other settings  ---------------------------}
+    \CommentTok{# r = 0.25}
+    \CommentTok{# s1 <- c(rep(c(1/4, 0, -1/4), 40), }
+    \CommentTok{#        rep(c(1/4, 0, 0), 40), }
+    \CommentTok{#        rep(c(0, 0, 0), 40))}
+    \CommentTok{# link1 <- as.matrix(dummy.sim1) %*% s1 - 40/3/4}
     
-    \CommentTok{# r=0.5}
-    \CommentTok{# c(rep(c(1/2,0,-1/2),40),rep(c(1/2,0,0),40),rep(c(0,0,0),40))->s1}
-    \CommentTok{# as.matrix(dummy.sim1)%*%s1-40/3/2->link1}
+    \CommentTok{# r = 0.5}
+    \CommentTok{# s1 <- c(rep(c(1/2, 0, -1/2), 40), }
+    \CommentTok{#        rep(c(1/2, 0, 0), 40), }
+    \CommentTok{#        rep(c(0, 0, 0), 40))}
+    \CommentTok{# link1 <- as.matrix(dummy.sim1) %*% s1 - 40/3/2}
     
-    \CommentTok{# r=1}
-    \CommentTok{# c(rep(c(1,0,-1),40),rep(c(1,0,0),40),rep(c(0,0,0),40))->s1}
-    \CommentTok{# as.matrix(dummy.sim1)%*%s1-40/3->link1}
+    \CommentTok{# r = 1}
+    \CommentTok{# s1 <- c(rep(c(1, 0, -1), 40), }
+    \CommentTok{#        rep(c(1, 0, 0), 40), }
+    \CommentTok{#        rep(c(0, 0, 0), 40))}
+    \CommentTok{# link1 <- as.matrix(dummy.sim1) %*% s1 - 40/3}
     
-    \CommentTok{# r=2}
-    \CommentTok{# c(rep(c(2,0,-2),40),rep(c(2,0,0),40),rep(c(0,0,0),40))->s1}
-    \CommentTok{# as.matrix(dummy.sim1)%*%s1-40/3/0.5->link1}
-    
+    \CommentTok{# r = 2}
+    \CommentTok{# s1 <- c(rep(c(2, 0, -2), 40), }
+    \CommentTok{#        rep(c(2, 0, 0), 40), }
+    \CommentTok{#        rep(c(0, 0, 0), 40))}
+    \CommentTok{# }
+    \CommentTok{# link1 <- as.matrix(dummy.sim1) %*% s1 - 40/3/0.5}
     
     \CommentTok{# calculate the outbreak probability}
 \NormalTok{    hp1 <-}\StringTok{ }\KeywordTok{exp}\NormalTok{(link1)}\OperatorTok{/}\NormalTok{(}\KeywordTok{exp}\NormalTok{(link1) }\OperatorTok{+}\StringTok{ }\DecValTok{1}\NormalTok{)}
@@ -10605,14 +10336,13 @@ So far we have created part of the data. You can check it using \texttt{summary(
     \CommentTok{# variable: res}
 \NormalTok{    res <-}\StringTok{ }\KeywordTok{rep}\NormalTok{(}\DecValTok{9}\NormalTok{, nf)}
     \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{nf) \{}
-\NormalTok{        res[i] <-}\StringTok{ }\KeywordTok{sample}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{), }\DecValTok{1}\NormalTok{, }\DataTypeTok{prob =} \KeywordTok{c}\NormalTok{(hp1[i], }
-            \DecValTok{1} \OperatorTok{-}\StringTok{ }\NormalTok{hp1[i]))}
+\NormalTok{        res[i] <-}\StringTok{ }\KeywordTok{sample}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{0}\NormalTok{), }\DecValTok{1}\NormalTok{, }\DataTypeTok{prob =} \KeywordTok{c}\NormalTok{(hp1[i], }\DecValTok{1} \OperatorTok{-}\StringTok{ }
+\StringTok{            }\NormalTok{hp1[i]))}
 \NormalTok{    \}}
     
-    \CommentTok{# da1 with response variable, without group}
-    \CommentTok{# indicator da2 without response variable, with}
-    \CommentTok{# group indicator da3 without response variable,}
-    \CommentTok{# without group indicator}
+    \CommentTok{# da1 with response variable, without group indicator}
+    \CommentTok{# da2 without response variable, with group indicator}
+    \CommentTok{# da3 without response variable, without group indicator}
     
 \NormalTok{    dummy1}\OperatorTok{$}\NormalTok{y <-}\StringTok{ }\NormalTok{res}
 \NormalTok{    da1 <-}\StringTok{ }\NormalTok{dummy1}
@@ -10626,12 +10356,12 @@ So far we have created part of the data. You can check it using \texttt{summary(
 \NormalTok{    da3 <-}\StringTok{ }\NormalTok{da1[, }\DecValTok{1}\OperatorTok{:}\DecValTok{240}\NormalTok{]}
     
     \CommentTok{# save simulated data}
-    \KeywordTok{write.csv}\NormalTok{(da1, }\KeywordTok{paste}\NormalTok{(}\StringTok{"sim"}\NormalTok{, j, }\StringTok{"_da"}\NormalTok{, }\DecValTok{1}\NormalTok{, }\StringTok{".csv"}\NormalTok{, }
-        \DataTypeTok{sep =} \StringTok{""}\NormalTok{), }\DataTypeTok{row.names =}\NormalTok{ F)}
-    \KeywordTok{write.csv}\NormalTok{(da2, }\KeywordTok{paste}\NormalTok{(}\StringTok{"sim"}\NormalTok{, j, }\StringTok{"_da"}\NormalTok{, }\DecValTok{2}\NormalTok{, }\StringTok{".csv"}\NormalTok{, }
-        \DataTypeTok{sep =} \StringTok{""}\NormalTok{), }\DataTypeTok{row.names =}\NormalTok{ F)}
-    \KeywordTok{write.csv}\NormalTok{(da3, }\KeywordTok{paste}\NormalTok{(}\StringTok{"sim"}\NormalTok{, j, }\StringTok{"_da"}\NormalTok{, }\DecValTok{3}\NormalTok{, }\StringTok{".csv"}\NormalTok{, }
-        \DataTypeTok{sep =} \StringTok{""}\NormalTok{), }\DataTypeTok{row.names =}\NormalTok{ F)}
+    \KeywordTok{write.csv}\NormalTok{(da1, }\KeywordTok{paste}\NormalTok{(}\StringTok{"sim"}\NormalTok{, j, }\StringTok{"_da"}\NormalTok{, }\DecValTok{1}\NormalTok{, }\StringTok{".csv"}\NormalTok{, }\DataTypeTok{sep =} \StringTok{""}\NormalTok{), }
+        \DataTypeTok{row.names =}\NormalTok{ F)}
+    \KeywordTok{write.csv}\NormalTok{(da2, }\KeywordTok{paste}\NormalTok{(}\StringTok{"sim"}\NormalTok{, j, }\StringTok{"_da"}\NormalTok{, }\DecValTok{2}\NormalTok{, }\StringTok{".csv"}\NormalTok{, }\DataTypeTok{sep =} \StringTok{""}\NormalTok{), }
+        \DataTypeTok{row.names =}\NormalTok{ F)}
+    \KeywordTok{write.csv}\NormalTok{(da3, }\KeywordTok{paste}\NormalTok{(}\StringTok{"sim"}\NormalTok{, j, }\StringTok{"_da"}\NormalTok{, }\DecValTok{3}\NormalTok{, }\StringTok{".csv"}\NormalTok{, }\DataTypeTok{sep =} \StringTok{""}\NormalTok{), }
+        \DataTypeTok{row.names =}\NormalTok{ F)}
     \KeywordTok{write.csv}\NormalTok{(sim.da1, }\KeywordTok{paste}\NormalTok{(}\StringTok{"sim"}\NormalTok{, j, }\StringTok{".csv"}\NormalTok{, }\DataTypeTok{sep =} \StringTok{""}\NormalTok{), }
         \DataTypeTok{row.names =}\NormalTok{ F)}
     \KeywordTok{write.csv}\NormalTok{(dummy.sim1, }\KeywordTok{paste}\NormalTok{(}\StringTok{"dummy.sim"}\NormalTok{, j, }\StringTok{".csv"}\NormalTok{, }
