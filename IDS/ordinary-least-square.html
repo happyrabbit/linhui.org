@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2021-02-09" />
+<meta name="date" content="2021-02-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -330,29 +330,29 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>where <span class="math inline">\(\mathbf{\beta}\)</span> is the parameter vector with length <span class="math inline">\(p+1\)</span>. Least square is the method to find a set of value for <span class="math inline">\(\mathbf{\beta^{T}}=(\beta_{0},\beta_{1},...,\beta_{p})\)</span> such that it minimizes the residual sum of square (RSS):</p>
 <p><span class="math display">\[RSS(\beta)=\sum_{i=1}^{N}(y_{i}-f(\mathbf{x_{i.}}))^{2}=\sum_{i=1}^{N}(y_{i}-\beta_{0}-\sum_{j=1}^{p}x_{ij}\beta_{j})^{2}\]</span></p>
 <p>The process of finding a set of values has been implemented in R. Now let’s load the data:</p>
-<div class="sourceCode" id="cb267"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb267-1" data-line-number="1">dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb266"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb266-1" data-line-number="1">dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)</a></code></pre></div>
 <p>Before fitting the model, we need to clean the data, such as removing bad data points that are not logical (negative expense).</p>
-<div class="sourceCode" id="cb268"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb268-1" data-line-number="1">dat &lt;-<span class="st"> </span><span class="kw">subset</span>(dat, store_exp <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span> <span class="op">&amp;</span><span class="st"> </span>online_exp <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb267"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb267-1" data-line-number="1">dat &lt;-<span class="st"> </span><span class="kw">subset</span>(dat, store_exp <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span> <span class="op">&amp;</span><span class="st"> </span>online_exp <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>)</a></code></pre></div>
 <p>Use 10 survey question variables as our explanatory variables.</p>
-<div class="sourceCode" id="cb269"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb269-1" data-line-number="1">modeldat &lt;-<span class="st"> </span>dat[, <span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>, <span class="kw">names</span>(dat))]</a></code></pre></div>
+<div class="sourceCode" id="cb268"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb268-1" data-line-number="1">modeldat &lt;-<span class="st"> </span>dat[, <span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>, <span class="kw">names</span>(dat))]</a></code></pre></div>
 <p>The response variable is the sum of in-store spending and online spending.</p>
-<div class="sourceCode" id="cb270"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb270-1" data-line-number="1"><span class="co"># total expense = in store expense + online expense</span></a>
-<a class="sourceLine" id="cb270-2" data-line-number="2">modeldat<span class="op">$</span>total_exp &lt;-<span class="st"> </span>dat<span class="op">$</span>store_exp <span class="op">+</span><span class="st"> </span>dat<span class="op">$</span>online_exp</a></code></pre></div>
+<div class="sourceCode" id="cb269"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb269-1" data-line-number="1"><span class="co"># total expense = in store expense + online expense</span></a>
+<a class="sourceLine" id="cb269-2" data-line-number="2">modeldat<span class="op">$</span>total_exp &lt;-<span class="st"> </span>dat<span class="op">$</span>store_exp <span class="op">+</span><span class="st"> </span>dat<span class="op">$</span>online_exp</a></code></pre></div>
 <p>To fit a linear regression model, let us first check if there are any missing values or outliers:</p>
-<div class="sourceCode" id="cb271"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb271-1" data-line-number="1"><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</a>
-<a class="sourceLine" id="cb271-2" data-line-number="2"><span class="kw">hist</span>(modeldat<span class="op">$</span>total_exp, <span class="dt">main =</span> <span class="st">&quot;&quot;</span>, <span class="dt">xlab =</span> <span class="st">&quot;total_exp&quot;</span>)</a>
-<a class="sourceLine" id="cb271-3" data-line-number="3"><span class="kw">boxplot</span>(modeldat<span class="op">$</span>total_exp)</a></code></pre></div>
-<p><img src="IDS_files/figure-html/unnamed-chunk-96-1.svg" width="672" /></p>
+<div class="sourceCode" id="cb270"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb270-1" data-line-number="1"><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb270-2" data-line-number="2"><span class="kw">hist</span>(modeldat<span class="op">$</span>total_exp, <span class="dt">main =</span> <span class="st">&quot;&quot;</span>, <span class="dt">xlab =</span> <span class="st">&quot;total_exp&quot;</span>)</a>
+<a class="sourceLine" id="cb270-3" data-line-number="3"><span class="kw">boxplot</span>(modeldat<span class="op">$</span>total_exp)</a></code></pre></div>
+<p><img src="IDS_files/figure-html/unnamed-chunk-98-1.svg" width="672" /></p>
 <p>There is no missing value in the response variable, but there are outliers. Outliers are usually best described by the problem to solve itself such that we know from domain knowledge that it is not possible to have such values. We can also use a statistical threshold to remove extremely large or small outlier values from the data. We use the Z-score to find and remove outliers described in section <a href="outliers.html#outliers">5.5</a>. Readers can refer to the section for more detail.</p>
-<div class="sourceCode" id="cb272"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb272-1" data-line-number="1">y &lt;-<span class="st"> </span>modeldat<span class="op">$</span>total_exp</a>
-<a class="sourceLine" id="cb272-2" data-line-number="2"><span class="co"># Find data points with Z-score larger than 3.5</span></a>
-<a class="sourceLine" id="cb272-3" data-line-number="3">zs &lt;-<span class="st"> </span>(y <span class="op">-</span><span class="st"> </span><span class="kw">mean</span>(y))<span class="op">/</span><span class="kw">mad</span>(y)</a>
-<a class="sourceLine" id="cb272-4" data-line-number="4">modeldat &lt;-<span class="st"> </span>modeldat[<span class="op">-</span><span class="kw">which</span>(zs <span class="op">&gt;</span><span class="st"> </span><span class="fl">3.5</span>), ]</a></code></pre></div>
+<div class="sourceCode" id="cb271"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb271-1" data-line-number="1">y &lt;-<span class="st"> </span>modeldat<span class="op">$</span>total_exp</a>
+<a class="sourceLine" id="cb271-2" data-line-number="2"><span class="co"># Find data points with Z-score larger than 3.5</span></a>
+<a class="sourceLine" id="cb271-3" data-line-number="3">zs &lt;-<span class="st"> </span>(y <span class="op">-</span><span class="st"> </span><span class="kw">mean</span>(y))<span class="op">/</span><span class="kw">mad</span>(y)</a>
+<a class="sourceLine" id="cb271-4" data-line-number="4">modeldat &lt;-<span class="st"> </span>modeldat[<span class="op">-</span><span class="kw">which</span>(zs <span class="op">&gt;</span><span class="st"> </span><span class="fl">3.5</span>), ]</a></code></pre></div>
 <p>We will not perform log-transformation for the response variable at this stage. Let us first check the correlation among explanatory variables:</p>
-<div class="sourceCode" id="cb273"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb273-1" data-line-number="1"><span class="kw">library</span>(corrplot)</a>
-<a class="sourceLine" id="cb273-2" data-line-number="2">correlation &lt;-<span class="st"> </span><span class="kw">cor</span>(modeldat[, <span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>, <span class="kw">names</span>(modeldat))])</a>
-<a class="sourceLine" id="cb273-3" data-line-number="3"><span class="kw">corrplot.mixed</span>(correlation, <span class="dt">order =</span> <span class="st">&quot;hclust&quot;</span>, <span class="dt">tl.pos =</span> <span class="st">&quot;lt&quot;</span>, </a>
-<a class="sourceLine" id="cb273-4" data-line-number="4">    <span class="dt">upper =</span> <span class="st">&quot;ellipse&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb272"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb272-1" data-line-number="1"><span class="kw">library</span>(corrplot)</a>
+<a class="sourceLine" id="cb272-2" data-line-number="2">correlation &lt;-<span class="st"> </span><span class="kw">cor</span>(modeldat[, <span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>, <span class="kw">names</span>(modeldat))])</a>
+<a class="sourceLine" id="cb272-3" data-line-number="3"><span class="kw">corrplot.mixed</span>(correlation, <span class="dt">order =</span> <span class="st">&quot;hclust&quot;</span>, <span class="dt">tl.pos =</span> <span class="st">&quot;lt&quot;</span>, </a>
+<a class="sourceLine" id="cb272-4" data-line-number="4">    <span class="dt">upper =</span> <span class="st">&quot;ellipse&quot;</span>)</a></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:corplotlm"></span>
 <img src="IDS_files/figure-html/corplotlm-1.svg" alt="Correlation Matrix Plot for Explanatory Variables" width="80%" />
 <p class="caption">
@@ -360,8 +360,8 @@ FIGURE 9.1: Correlation Matrix Plot for Explanatory Variables
 </p>
 </div>
 <p>As shown in figure <a href="ordinary-least-square.html#fig:corplotlm">9.1</a>, there are some highly correlated variables. Let us use the method described in section <a href="collinearity.html#collinearity">5.6</a> to remove highly correlated explanatory variables with a threshold of 0.75:</p>
-<div class="sourceCode" id="cb274"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb274-1" data-line-number="1">highcor &lt;-<span class="st"> </span><span class="kw">findCorrelation</span>(correlation, <span class="dt">cutoff =</span> <span class="fl">0.75</span>)</a>
-<a class="sourceLine" id="cb274-2" data-line-number="2">modeldat &lt;-<span class="st"> </span>modeldat[, <span class="op">-</span>highcor]</a></code></pre></div>
+<div class="sourceCode" id="cb273"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb273-1" data-line-number="1">highcor &lt;-<span class="st"> </span><span class="kw">findCorrelation</span>(correlation, <span class="dt">cutoff =</span> <span class="fl">0.75</span>)</a>
+<a class="sourceLine" id="cb273-2" data-line-number="2">modeldat &lt;-<span class="st"> </span>modeldat[, <span class="op">-</span>highcor]</a></code></pre></div>
 <p>The dataset is now ready to fit a linear regression model. The standard format to define a regression in R is:</p>
 <ol style="list-style-type: decimal">
 <li><p>response variable is at the left side of <code>~</code></p></li>
@@ -370,8 +370,8 @@ FIGURE 9.1: Correlation Matrix Plot for Explanatory Variables
 <li><p>if we want to consider the interaction between two variables such as Q1 and Q2, we can add an interaction term <code>Q1*Q2</code></p></li>
 <li><p>transformation of variables can be added directly to variable names such as <code>log(total_exp)</code>.</p></li>
 </ol>
-<div class="sourceCode" id="cb275"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb275-1" data-line-number="1">lmfit &lt;-<span class="st"> </span><span class="kw">lm</span>(<span class="kw">log</span>(total_exp) <span class="op">~</span><span class="st"> </span>., <span class="dt">data =</span> modeldat)</a>
-<a class="sourceLine" id="cb275-2" data-line-number="2"><span class="kw">summary</span>(lmfit)</a></code></pre></div>
+<div class="sourceCode" id="cb274"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb274-1" data-line-number="1">lmfit &lt;-<span class="st"> </span><span class="kw">lm</span>(<span class="kw">log</span>(total_exp) <span class="op">~</span><span class="st"> </span>., <span class="dt">data =</span> modeldat)</a>
+<a class="sourceLine" id="cb274-2" data-line-number="2"><span class="kw">summary</span>(lmfit)</a></code></pre></div>
 <pre><code>## 
 ## Call:
 ## lm(formula = log(total_exp) ~ ., data = modeldat)
@@ -423,7 +423,7 @@ FIGURE 9.1: Correlation Matrix Plot for Explanatory Variables
 <p>The Bayesian paradigm is an alternative to the classical paradigm. A Bayesian can state probabilities about the parameters, which are considered random variables. However, it is not possible in the classical paradigm. In our work, We use hierarchical (generalize) linear models in practice instead of classical linear regression. Hierarchical models pool information across clusters (for example, you can treat each customer segment as a cluster). This pooling tends to improve estimates of each cluster, especially when sampling is imbalanced. Because the models automatically cope with differing uncertainty introduced by sampling imbalance (bigger cluster has smaller variance), it prevents over-sampled clusters from unfairly dominating inference.</p>
 <p>This book does not cover the Bayesian framework. The best applied Bayesian book is <a href="https://xcelab.net/rm/statistical-rethinking/">Statistical Rethinking</a> by Richard McElreath <span class="citation">(McElreath <a href="#ref-rethinking2020">2020</a>)</span>. The book provides outstanding conceptual explanations and a wide range of models from simple to advanced with detailed, repeatable code. The text uses R, but there are code examples for Python and Julia on the book website.</p>
 <p>Now let us come back to our example. We will not spend too much time on p-values, while we will focus on the confidence interval for the parameter estimate for each explanatory variable. In R, the function <code>confint()</code> can produce the confidence interval for each parameter:</p>
-<div class="sourceCode" id="cb277"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb277-1" data-line-number="1"><span class="kw">confint</span>(lmfit,<span class="dt">level=</span><span class="fl">0.9</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb276"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb276-1" data-line-number="1"><span class="kw">confint</span>(lmfit,<span class="dt">level=</span><span class="fl">0.9</span>)</a></code></pre></div>
 <pre><code>##                  5 %     95 %
 ## (Intercept)  8.00892  8.18771
 ## Q1          -0.15987 -0.13081
@@ -466,11 +466,11 @@ FIGURE 9.1: Correlation Matrix Plot for Explanatory Variables
 </ol>
 <p>Cook’s distance can check influential points in OLS based linear regression models. In general, we need to pay attention to data points with Cook’s distance &gt; 0.5.</p>
 <p>In R, these diagnostic graphs are built in the<code>plot()</code> function.</p>
-<div class="sourceCode" id="cb279"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb279-1" data-line-number="1"><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">2</span>))</a>
-<a class="sourceLine" id="cb279-2" data-line-number="2"><span class="kw">plot</span>(lmfit, <span class="dt">which =</span> <span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb279-3" data-line-number="3"><span class="kw">plot</span>(lmfit, <span class="dt">which =</span> <span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb279-4" data-line-number="4"><span class="kw">plot</span>(lmfit, <span class="dt">which =</span> <span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb279-5" data-line-number="5"><span class="kw">plot</span>(lmfit, <span class="dt">which =</span> <span class="dv">4</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb278"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb278-1" data-line-number="1"><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">2</span>))</a>
+<a class="sourceLine" id="cb278-2" data-line-number="2"><span class="kw">plot</span>(lmfit, <span class="dt">which =</span> <span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb278-3" data-line-number="3"><span class="kw">plot</span>(lmfit, <span class="dt">which =</span> <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb278-4" data-line-number="4"><span class="kw">plot</span>(lmfit, <span class="dt">which =</span> <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb278-5" data-line-number="5"><span class="kw">plot</span>(lmfit, <span class="dt">which =</span> <span class="dv">4</span>)</a></code></pre></div>
 <div class="figure" style="text-align: center"><span id="fig:lmdiagnostic"></span>
 <img src="IDS_files/figure-html/lmdiagnostic-1.svg" alt="Linear Regression Diagnostic Plots: residual plot (top left), Q-Q plot (top right), standardized residuals plot (lower left), Cook's distance (lower right)" width="80%" />
 <p class="caption">
@@ -483,17 +483,17 @@ FIGURE 9.2: Linear Regression Diagnostic Plots: residual plot (top left), Q-Q pl
 <li><p>Q-Q plot: data points are pretty much along the diagonal line of Y=X, indicating no significant normality assumption departure for the residuals. Because we simulate the data, we know the response variable before log transformation follows a normal distribution. The shape of the distribution does not deviate from a normal distribution too much after log transformation.</p></li>
 <li><p>Standardized residual plot: if the constant variance assumption is valid, then the plot’s data points should be randomly distributed around the horizontal line. We can see there are three outliers on the plot. Let us check those points:</p></li>
 </ul>
-<div class="sourceCode" id="cb280"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb280-1" data-line-number="1">modeldat[<span class="kw">which</span>(<span class="kw">row.names</span>(modeldat) <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">960</span>, <span class="dv">678</span>, <span class="dv">155</span>)), ]</a></code></pre></div>
+<div class="sourceCode" id="cb279"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb279-1" data-line-number="1">modeldat[<span class="kw">which</span>(<span class="kw">row.names</span>(modeldat) <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">960</span>, <span class="dv">678</span>, <span class="dv">155</span>)), ]</a></code></pre></div>
 <pre><code>##     Q1 Q2 Q3 Q6 Q8 total_exp
 ## 155  4  2  1  4  4     351.9
 ## 678  2  1  1  1  2    1087.3
 ## 960  2  1  1  1  3     658.3</code></pre>
 <p>It is not easy to see why those records are outliers from the above output. It will be clear conditional on the independent variables (<code>Q1</code>, <code>Q2</code>, <code>Q3</code>, <code>Q6</code>, and <code>Q8</code>). Let us examine the value of <code>total_exp</code> for samples with the same Q1, Q2, Q3, Q6, and Q8 answers as the 3rd row above.</p>
-<div class="sourceCode" id="cb282"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb282-1" data-line-number="1">datcheck =<span class="st"> </span>modeldat <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(Q1 <span class="op">==</span><span class="dv">2</span> <span class="op">&amp;</span><span class="st"> </span>Q2 <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">&amp;</span><span class="st"> </span>Q3 <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">&amp;</span><span class="st"> </span>Q6 <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">&amp;</span><span class="st"> </span>Q8 <span class="op">==</span><span class="st"> </span><span class="dv">3</span>) </a>
-<a class="sourceLine" id="cb282-2" data-line-number="2"><span class="kw">nrow</span>(datcheck)</a></code></pre></div>
+<div class="sourceCode" id="cb281"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb281-1" data-line-number="1">datcheck =<span class="st"> </span>modeldat <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">filter</span>(Q1 <span class="op">==</span><span class="dv">2</span> <span class="op">&amp;</span><span class="st"> </span>Q2 <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">&amp;</span><span class="st"> </span>Q3 <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">&amp;</span><span class="st"> </span>Q6 <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">&amp;</span><span class="st"> </span>Q8 <span class="op">==</span><span class="st"> </span><span class="dv">3</span>) </a>
+<a class="sourceLine" id="cb281-2" data-line-number="2"><span class="kw">nrow</span>(datcheck)</a></code></pre></div>
 <pre><code>## [1] 87</code></pre>
 <p>There are 87 samples with the same values of independent variables. The response variable’s (<code>total_exp</code>) distribution is:</p>
-<div class="sourceCode" id="cb284"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb284-1" data-line-number="1"><span class="kw">summary</span>(datcheck<span class="op">$</span>total_exp)</a></code></pre></div>
+<div class="sourceCode" id="cb283"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb283-1" data-line-number="1"><span class="kw">summary</span>(datcheck<span class="op">$</span>total_exp)</a></code></pre></div>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##     658    1884    2215    2204    2554    3197</code></pre>
 <p>Now it is easy to see why row 960 with <code>total_exp = 658.3</code> is an outlier. All the other 86 records with the same survey responses have a much higher total expense!</p>

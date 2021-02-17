@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2021-02-09" />
+<meta name="date" content="2021-02-16" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -327,17 +327,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2><span class="header-section-number">7.1</span> Variance-Bias Trade-Off</h2>
 <p>Assume <span class="math inline">\(\mathbf{X}\)</span> is <span class="math inline">\(n \times p\)</span> observation matrix and <span class="math inline">\(\mathbf{y}\)</span> is response variable, we have:</p>
 <p><span class="math display" id="eq:generalmodeleq">\[\begin{equation}
-\mathbf{y}=f(\mathbf{X})+\mathbf{\epsilon}
+\mathbf{y}=f(\mathbf{X})+\symbf{\epsilon}
 \tag{7.1}
 \end{equation}\]</span></p>
-<p>where <span class="math inline">\(\mathbf{\epsilon}\)</span> is the random error with a mean of zero. The function <span class="math inline">\(f(\cdot)\)</span> is our modeling target, which represents the information in the response variable that predictors can explain. The main goal of estimating <span class="math inline">\(f(\cdot)\)</span> is inference or prediction, or sometimes both. In general, there is a trade-off between flexibility and interpretability of the model. So data scientists need to comprehend the delicate balance between these two.</p>
+<p>where <span class="math inline">\(\symbf{\epsilon}\)</span> is the random error with a mean of zero. The function <span class="math inline">\(f(\cdot)\)</span> is our modeling target, which represents the information in the response variable that predictors can explain. The main goal of estimating <span class="math inline">\(f(\cdot)\)</span> is inference or prediction, or sometimes both. In general, there is a trade-off between flexibility and interpretability of the model. So data scientists need to comprehend the delicate balance between these two.</p>
 <p>Depending on the modeling purposes, the requirement for interpretability varies. If the prediction is the only goal, then as long as the prediction is accurate enough, the interpretability is not under consideration. In this case, people can use “black box” model, such as random forest, boosting tree, neural network and so on. These models are very flexible but nearly impossible to explain. Their accuracy is usually higher on the training set, but not necessary when it predicts. It is not surprising since those models have a huge number of parameters and high flexibility that they can “memorize” the entire training data. A paper by Chiyuan Zhang et al. in 2017 pointed out that “Deep neural networks (even just two-layer net) easily fit random labels” <span class="citation">(Zhang et al. <a href="#ref-rethinkDL">2017</a>)</span>. The traditional forms of regularization, such as weight decay, dropout, and data augmentation, fail to control generalization error. It poses a conceptual challenge to statistical theory and also calls our attention when we use such black-box models.</p>
 <p>There are two kinds of application problems: complete information problem and incomplete information problem. The complete information problem has all the information you need to know the correct response. Take the famous cat recognition, for example, all the information you need to identify a cat is in the picture. In this situation, the algorithm that penetrates the data the most wins. There are some other similar problems such as the self-driving car, chess game, facial recognition and speech recognition. But in most of the data science applications, the information is incomplete. If you want to know whether a customer is going to purchase again or not, it is unlikely to have 360-degree of the customer’s information. You may have their historical purchasing record, discounts and service received. But you don’t know if the customer sees your advertisement, or has a friend recommends competitor’s product, or encounters some unhappy purchasing experience somewhere. There could be a myriad of factors that will influence the customer’s purchase decision while what you have as data is only a small part. To make things worse, in many cases, you don’t even know what you don’t know. Deep learning doesn’t have any advantage in solving those problems. Instead, some parametric models often work better in this situation. You will comprehend this more after learning the different types of model error.
-Assume we have <span class="math inline">\(\hat{f}\)</span> which is an estimator of <span class="math inline">\(f\)</span>. Then we can further get <span class="math inline">\(\mathbf{\hat{y}}=\hat{f}(\mathbf{X})\)</span>. The predicted error is divided into two parts, systematic error, and random error:</p>
+Assume we have <span class="math inline">\(\hat{f}\)</span> which is an estimator of <span class="math inline">\(f\)</span>. Then we can further get <span class="math inline">\(\symbf{\hat{y}}=\hat{f}(\mathbf{X})\)</span>. The predicted error is divided into two parts, systematic error, and random error:</p>
 <p><span class="math display" id="eq:error">\[\begin{equation}
 \begin{array}{ccc}
-E(\mathbf{y}-\hat{\mathbf{y}})^{2} &amp; = &amp; E[f(\mathbf{X})+ \mathbf{\epsilon} - \hat{f}(\mathbf{X})]^{2}\\
- &amp; = &amp; \underset{\text{(1)}}{\underbrace{E[f(\mathbf{X})-\hat{f}(\mathbf{X})]^{2}}}+\underset{\text{(2)}}{\underbrace{Var(\mathbf{\epsilon})}}
+E(\mathbf{y}-\hat{\mathbf{y}})^{2} &amp; = &amp; E[f(\mathbf{X})+ \symbf{\epsilon} - \hat{f}(\mathbf{X})]^{2}\\
+ &amp; = &amp; \underset{\text{(1)}}{\underbrace{E[f(\mathbf{X})-\hat{f}(\mathbf{X})]^{2}}}+\underset{\text{(2)}}{\underbrace{Var(\symbf{\epsilon})}}
 \end{array}
 \tag{7.2}
 \end{equation}\]</span></p>
@@ -352,19 +352,19 @@ E(\mathbf{y}-\hat{\mathbf{y}})^{2} &amp; = &amp; E[f(\mathbf{X})+ \mathbf{\epsil
 <img src="images/ModelError.png" alt="Types of Model Error" />
 <p class="caption">Types of Model Error</p>
 </div>
-<p>The systematic error can be further decomposed as:</p>
+<p>The systematic error <span class="math inline">\(E[f(\mathbf{X})-\hat{f}(\mathbf{X})]^{2}\)</span> can be further decomposed as:</p>
 <p><span class="math display" id="eq:biasvariance">\[\begin{equation}
 \begin{array}{ccc}
-E[f(\mathbf{X})-\hat{f}(\mathbf{X})]^{2} &amp; = &amp; E\left(f(\mathbf{X})-E[\hat{f}(\mathbf{X})]+E[\hat{f}(\mathbf{X})]-\hat{f}(\mathbf{X})\right)^{2}\\
+ &amp;  &amp; \left(f(\mathbf{X})-E[\hat{f}(\mathbf{X})]+E[\hat{f}(\mathbf{X})]-\hat{f}(\mathbf{X})\right)\\
  &amp; = &amp; E\left(E[\hat{f}(\mathbf{X})]-f(\mathbf{X})\right)^{2}+E\left(\hat{f}(\mathbf{X})-E[\hat{f}(\mathbf{X})]\right)^{2}\\
  &amp; = &amp; [Bias(\hat{f}(\mathbf{X}))]^{2}+Var(\hat{f}(\mathbf{X}))
 \end{array}
 \tag{7.3}
 \end{equation}\]</span></p>
-<p>The systematic error consists of two parts, <span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span> and <span class="math inline">\(Var (\hat{f}(\mathbf{X}))\)</span>. To minimize the systematic error, we need to minimize both. The bias represents the error caused by the model’s approximation of the reality, i.e., systematic relation, which may be very complex. For example, linear regression assumes a linear relationship between the predictors and the response, but rarely is there a perfect linear relationship in real life. So linear regression is more likely to have a high bias. In general, the more flexible the model is, the higher the variance. However, this does not guarantee complex models will outperform a much simpler one, such as linear regression. If the real relationship <span class="math inline">\(f\)</span> is linear, then linear regression is unbiased. It is difficult for a more flexible model to compete. Good learning method requires low variance and bias. However, it is easy to find a model with extremely low bias but high variance (by fitting a tree) or a method with low variance but high variance (by fitting a straight line). That why we call it trade-off.</p>
+<p>The systematic error consists of two parts, <span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span> and <span class="math inline">\(Var (\hat{f}(\mathbf{X}))\)</span>. To minimize the systematic error, we need to minimize both. The bias represents the error caused by the model’s approximation of the reality, i.e., systematic relation, which may be very complex. For example, linear regression assumes a linear relationship between the predictors and the response, but rarely is there a perfect linear relationship in real life. So linear regression is more likely to have a high bias. In general, the more flexible the model is, the higher the variance. However, this does not guarantee complex models will outperform a much simpler one, such as linear regression. If the real relationship <span class="math inline">\(f\)</span> is linear, then linear regression is unbiased. It is difficult for a more flexible model to compete. Good learning method requires low variance and bias. However, it is easy to find a model with extremely low bias but high variance (by fitting a tree) or a method with low variance but high bias (by fitting a straight line). That why we call it trade-off.</p>
 <p>To explore bias and variance, let’s begin with a simple simulation. We will simulate a data with a non-linear relationship and fit different models on it. An intuitive way to show these is to compare the plots of various models.</p>
-<p>The code below simulates one predictor (<code>x</code>) and one response variable (<code>fx</code>). The relationship between <code>x</code> and <code>fx</code> is non-linear.</p>
-<div class="sourceCode" id="cb211"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb211-1" data-line-number="1"><span class="kw">source</span>(<span class="kw">ids_url</span>(<span class="st">&#39;R/multiplot.r&#39;</span>))</a>
+<p>The code below simulates one predictor (<code>x</code>) and one response variable (<code>fx</code>). The relationship between <code>x</code> and <code>fx</code> is non-linear. You need to load the <code>multiplot</code> function by running <code>source('http://bit.ly/2KeEIg9')</code>. The function assembles multiple plots on a canvas.</p>
+<div class="sourceCode" id="cb211"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb211-1" data-line-number="1"><span class="kw">source</span>(<span class="st">&#39;http://bit.ly/2KeEIg9&#39;</span>)</a>
 <a class="sourceLine" id="cb211-2" data-line-number="2"><span class="co"># randomly simulate some non-linear samples</span></a>
 <a class="sourceLine" id="cb211-3" data-line-number="3">x =<span class="st"> </span><span class="kw">seq</span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="fl">0.01</span>) <span class="op">*</span><span class="st"> </span>pi</a>
 <a class="sourceLine" id="cb211-4" data-line-number="4">e =<span class="st"> </span><span class="kw">rnorm</span>(<span class="kw">length</span>(x), <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="fl">0.2</span>)</a>
@@ -413,7 +413,7 @@ FIGURE 7.2: High variance model
 <a class="sourceLine" id="cb215-17" data-line-number="17">dat4 =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x4 =</span> x[idx4], <span class="dt">fx4 =</span> fx[idx4])</a>
 <a class="sourceLine" id="cb215-18" data-line-number="18">p4 =<span class="st"> </span><span class="kw">ggplot</span>(dat4, <span class="kw">aes</span>(x4, fx4)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)</a>
 <a class="sourceLine" id="cb215-19" data-line-number="19"><span class="kw">multiplot</span>(p1, p2, p3, p4, <span class="dt">cols =</span> <span class="dv">2</span>)</a></code></pre></div>
-<p><img src="IDS_files/figure-html/unnamed-chunk-66-1.svg" width="672" /></p>
+<p><img src="IDS_files/figure-html/unnamed-chunk-68-1.svg" width="672" /></p>
 <p>The fitted lines (blue) change over different samples which means it has high variance. People also call it overfitting. Fitting the linear model using the same four subsets, the result barely changes:</p>
 <div class="sourceCode" id="cb216"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb216-1" data-line-number="1">p1 =<span class="st"> </span><span class="kw">ggplot</span>(dat1, <span class="kw">aes</span>(x1, fx1)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, </a>
 <a class="sourceLine" id="cb216-2" data-line-number="2">    <span class="dt">se =</span> <span class="ot">FALSE</span>)</a>
@@ -424,11 +424,7 @@ FIGURE 7.2: High variance model
 <a class="sourceLine" id="cb216-7" data-line-number="7">p4 =<span class="st"> </span><span class="kw">ggplot</span>(dat4, <span class="kw">aes</span>(x4, fx4)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, </a>
 <a class="sourceLine" id="cb216-8" data-line-number="8">    <span class="dt">se =</span> <span class="ot">FALSE</span>)</a>
 <a class="sourceLine" id="cb216-9" data-line-number="9"><span class="kw">multiplot</span>(p1, p2, p3, p4, <span class="dt">cols =</span> <span class="dv">2</span>)</a></code></pre></div>
-<pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;
-## `geom_smooth()` using formula &#39;y ~ x&#39;
-## `geom_smooth()` using formula &#39;y ~ x&#39;
-## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
-<p><img src="IDS_files/figure-html/unnamed-chunk-67-1.svg" width="672" /></p>
+<p><img src="IDS_files/figure-html/unnamed-chunk-69-1.svg" width="672" /></p>
 <p>In general, the variance (<span class="math inline">\(Var(\hat{f}(\mathbf{X}))\)</span>) <strong>increases</strong> and the bias (<span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span>) <strong>decreases</strong> as the model flexibility increases. Variance and bias together determine the systematic error. As we increase the flexibility of the model, at first the rate at which <span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span> decreases is faster than <span class="math inline">\(Var (\hat{f} (\mathbf{X}))\)</span>, so the MSE decreases. However, to some degree, higher flexibility has little effect on <span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span> but <span class="math inline">\(Var(\hat{f} (\mathbf{X}))\)</span> increases significantly, so the MSE increases.</p>
 </div>
 <h3>References</h3>
