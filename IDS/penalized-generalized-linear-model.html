@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2021-02-16" />
+<meta name="date" content="2021-02-17" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -346,7 +346,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb318-9" data-line-number="9">glmfit =<span class="st"> </span><span class="kw">glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy)</a></code></pre></div>
 <p>The object <code>glmfit</code> returned by <code>glmnet()</code> has the information of the fitted model for the later operations. An easy way to extract the components is through various functions on <code>glmfit</code>, such as <code>plot()</code>, <code>print()</code>, <code>coef()</code> and <code>predict()</code> . For example, the following code visualizes the path of coefficients as penalty increases:</p>
 <div class="sourceCode" id="cb319"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb319-1" data-line-number="1"><span class="kw">plot</span>(glmfit, <span class="dt">label =</span> T)</a></code></pre></div>
-<p><img src="IDS_files/figure-html/unnamed-chunk-130-1.svg" width="672" /></p>
+<p><img src="IDS_files/figure-html/unnamed-chunk-165-1.svg" width="672" /></p>
 <p>Each curve in the plot represents one predictor. The default setting is <span class="math inline">\(\alpha=1\)</span> which means there is only lasso penalty. From left to right, <span class="math inline">\(L_I\)</span> norm is increasing which means <span class="math inline">\(\lambda\)</span> is decreasing. The bottom x-axis is <span class="math inline">\(L_1\)</span> norm (i.e. <span class="math inline">\(\parallel\symbf{\beta}\parallel_{1}\)</span>). The upper x-axis is the effective degrees of freedom (df) for the lasso. You can check the detail for every step by:</p>
 <div class="sourceCode" id="cb320"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb320-1" data-line-number="1"><span class="kw">print</span>(glmfit)</a></code></pre></div>
 <pre class="pre"><code>Call:  glmnet(x = as.matrix(trainx), y = trainy) 
@@ -388,7 +388,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb326"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb326-1" data-line-number="1">cvfit =<span class="st"> </span><span class="kw">cv.glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy)</a></code></pre></div>
 <p>We can plot the object using <code>plot()</code>. The red dotted line is the cross-validation curve. Each red point is the cross-validation mean squared error for a value of <span class="math inline">\(\lambda\)</span>. The grey bars around the red points indicate the upper and lower standard deviation. The two gray dotted vertical lines represent the two selected values of <span class="math inline">\(\lambda\)</span>, one gives the minimum mean cross-validated error (<code>lambda.min</code>), the other gives the error that is within one standard error of the minimum (<code>lambda.1se</code>).</p>
 <div class="sourceCode" id="cb327"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb327-1" data-line-number="1"><span class="kw">plot</span>(cvfit)</a></code></pre></div>
-<p><img src="IDS_files/figure-html/unnamed-chunk-134-1.svg" width="672" /></p>
+<p><img src="IDS_files/figure-html/unnamed-chunk-169-1.svg" width="672" /></p>
 <p>You can check the two selected <span class="math inline">\(\lambda\)</span> values by:</p>
 <div class="sourceCode" id="cb328"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb328-1" data-line-number="1"><span class="co"># lambda with minimum mean cross-validated error</span></a>
 <a class="sourceLine" id="cb328-2" data-line-number="2">cvfit<span class="op">$</span>lambda.min</a></code></pre></div>
@@ -480,7 +480,7 @@ So the model is to predict the probability of outcome “1”. Take a baby examp
 <div class="sourceCode" id="cb342"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb342-1" data-line-number="1">cvfit =<span class="st"> </span><span class="kw">cv.glmnet</span>(<span class="kw">as.matrix</span>(trainx), trainy, </a>
 <a class="sourceLine" id="cb342-2" data-line-number="2">                  <span class="dt">family =</span> <span class="st">&quot;binomial&quot;</span>, <span class="dt">type.measure =</span> <span class="st">&quot;class&quot;</span>)</a>
 <a class="sourceLine" id="cb342-3" data-line-number="3"><span class="kw">plot</span>(cvfit)</a></code></pre></div>
-<p><img src="IDS_files/figure-html/unnamed-chunk-141-1.svg" width="672" /></p>
+<p><img src="IDS_files/figure-html/unnamed-chunk-176-1.svg" width="672" /></p>
 <p>The above uses error rate as performance criteria and use 10-fold cross-validation. Similarly, you can get the <span class="math inline">\(\lambda\)</span> value for the minimum error rate and the error rate that is 1 standard error from the minimum:</p>
 <div class="sourceCode" id="cb343"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb343-1" data-line-number="1">cvfit<span class="op">$</span>lambda.min</a></code></pre></div>
 <pre><code>## [1] 2.643e-05</code></pre>
@@ -574,7 +574,7 @@ logistic regression.</p>
 </ul>
 <p>The most common criterion is AUC. You can compare the selections from different criteria. If they all point to the same value of the tuning parameter, you can have more confidence about the choice. If they suggest very different values, then you need to concern if the tuning process is stable. You can visualize the cross validation result:</p>
 <div class="sourceCode" id="cb355"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb355-1" data-line-number="1"><span class="kw">plot</span>(cv_fit)</a></code></pre></div>
-<p><img src="IDS_files/figure-html/unnamed-chunk-148-1.svg" width="672" /></p>
+<p><img src="IDS_files/figure-html/unnamed-chunk-183-1.svg" width="672" /></p>
 <p>The x-axis is the value of the tuning parameter, the y-axis is AUC. The two dash lines are the value of <span class="math inline">\(\lambda\)</span> for max AUC and the value for the one standard deviation to the max AUC. Once you choose the value of the tuning parameter, you can use <code>fitglasso()</code> to fit the model. For example, we can fit the model using the parameter value that gives the max AUC, which is <span class="math inline">\(\lambda=0.922\)</span>:</p>
 <div class="sourceCode" id="cb356"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb356-1" data-line-number="1">fitgl &lt;-<span class="st"> </span><span class="kw">fitglasso</span>(trainx, trainy, </a>
 <a class="sourceLine" id="cb356-2" data-line-number="2">                   <span class="dt">lambda =</span> <span class="fl">0.922</span>, <span class="dt">na_action =</span> na.pass)</a></code></pre></div>
