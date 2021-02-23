@@ -177,7 +177,7 @@
 
 \title{Introduction to Data Science}
 \author{Hui Lin and Ming Li}
-\date{2021-02-21}
+\date{2021-02-22}
 
 \begin{document}
 \maketitle
@@ -231,13 +231,27 @@ Some key features of this book are as follows:
 
 This book is for readers who want to explore potential data science career paths and eventually want to become a data scientist. Traditional data-related practitioners such as statisticians, business analysts, and data analysts will find this book helpful in expanding their skills for future data science careers. Undergraduate and graduate students from analytics-related areas will find this book beneficial to learn real-world data science applications. Non-mathematical readers will appreciate the reproducibility of the companion R and python codes.
 
-We assume readers have experience with one of the programming languages, R or Python. If you are new to the two programming languages, you may find the code obscure. We will provide some references in the Complementary Reading section that can help you fill the gap. For some chapters (\ref{datapreprocessing}, \ref{modeltuningstrategy} - \ref{deeplearning}), readers need to know elementary linear algebra (such as matrix manipulations) and understand basic statistical concepts (such as correlation and simple linear regression). While the book is biased against complex equations, a mathematical background is good for the deep dive under the hood mechanism for advanced topics behind applications.
+We assume readers have experience with one of the programming languages, R or Python. If you are new to the two programming languages, you may find the code obscure. We will provide some references in the \textbf{Complementary Reading} section that can help you fill the gap. For some chapters (\ref{datapreprocessing}, \ref{modeltuningstrategy} - \ref{deeplearning}), readers need to know elementary linear algebra (such as matrix manipulations) and understand basic statistical concepts (such as correlation and simple linear regression). While the book is biased against complex equations, a mathematical background is good for the deep dive under the hood mechanism for advanced topics behind applications.
 
 \hypertarget{what-this-book-covers}{%
 \section*{What This Book Covers}\label{what-this-book-covers}}
 
 
-We first introduce the basic ideas of data science and then cover data science career paths, project cycles, soft skills, and common pitfalls based on industry and real-world scenarios. We then introduce typical big data cloud platforms and use R library \texttt{sparklyr} \index{sparklyr} to explore Spark's power for data preprocessing and traditional statistical and machine learning model development. The next few chapters cover common statistical and machine learning models and strategies such as data preprocessing, data wrangling, model tuning, performance measuring, regression methods, regularization, and tree-based methods. In the end, we introduce three types of deep learning models and their applications to image and text data. We use R as the text's programming language and provide most of the Python codes in GitHub. Refer to this page (\url{https://github.com/happyrabbit/IntroDataScience/}) for a table with the notebooks' links.
+The book is organized as the following.
+
+\begin{itemize}
+\tightlist
+\item
+  Chapters 1-3 discuss various aspects of data science: difference tracks, career paths, project cycles, soft skills, and common pitfalls. Chapter 3 is an overview of the data sets used in the book.
+\item
+  Chapter 4 introduces typical big data cloud platforms and uses R library \texttt{sparklyr} \index{sparklyr} as an interface to the big data analytics engine Spark.
+\item
+  Chapters 5-6 cover the essential skills to prepare the data for further analysis and modeling, i.e., data preprocessing and wrangling.
+\item
+  Chapter 7 illustrates the practical aspects of model tuning. It covers different types of model error, sources of model error, hyperparameter tuning, how to set up your data, and how to make sure your model implementation is correct. In practice, applying machine learning is a highly iterative process. We discuss this before introducing the machine learning algorithm because it applies to nearly all models. You will use cross-validation or training/developing/testing split to tune the models presented in later chapters'.
+\item
+  Chapters 8 - 14 introduce different types of models. There is a myriad of learning algorithms to learn the data patterns. This book doesn't cover all of them but presents the most common ones or the foundational methods.
+\end{itemize}
 
 \hypertarget{acknowledgements}{%
 \section*{Acknowledgements}\label{acknowledgements}}
@@ -263,7 +277,7 @@ MS and Ph.D.~in statistics from Iowa State University.
 \hypertarget{introduction}{%
 \chapter{Introduction}\label{introduction}}
 
-Data science is a fast-developing area. This chapter discusses varied aspects of data science. What are the different career tracks and skills required in data science? How is the data science team structured? We focus on the demand side of data science from business and industry requirements and application points of view. We hope this chapter will provide a complementary perspective to other data sciences books.
+Data science is a fast-developing area. This chapter discusses various aspects of data science. What are the different career tracks and skills required in data science? How is the data science team structured? We focus on the demand side of data science from business and industry requirements and application points of view. We hope this chapter will provide a complementary perspective to other data sciences books.
 
 \hypertarget{a-brief-history-of-data-science}{%
 \section{A brief history of data science}\label{a-brief-history-of-data-science}}
@@ -2659,12 +2673,26 @@ When the data is too large to fit in a computer's memory, we can use some big da
 
 Even when the data can fit in the memory, there may be a situation where it is slow to read and manipulate due to a relatively large size. Some R packages can make the process faster with the cost of familiarity, especially for data wrangling. But it avoids the hurdle of setting up Spark cluster and working in an unfamiliar environment. It is not a topic in this chapter but Appendix \ref{largelocaldata} briefly introduces some of the alternative R packages to read, write and wrangle a data set that is relatively large but not too big to fit in the memory.
 
+There are many fundamental data processing functions in R. They lack consistent coding and can't flow together easily. Learning all of them is a daunting task and unnecessary. R Studio developed a collection of packages and bundled them in \texttt{tidyverse} to systemize data wrangling and analysis tasks. You can see the package list in \texttt{tidyverse} on the \href{https://www.tidyverse.org/packages/}{website}. This chapter focuses on some of the \texttt{tidyverse} packages to do data wrangling for the following reasons:
+
+\begin{itemize}
+\tightlist
+\item
+  Those packages are widely used among R users in data science.
+\item
+  The code is more efficient.
+\item
+  The code syntax is consistent, which makes it easier to remember and read.
+\end{itemize}
+
+Section \ref{applyfamilyinbaser} introduces some base R functions outside the \texttt{tidyverse} universe, such as \texttt{apply()}, \texttt{lapply()} and \texttt{sapply()}. They are complementary functions when you are working with a data frame.
+
 Load the R packages first:
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# install packages from CRAN}
-\NormalTok{p_needed <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{'readr'}\NormalTok{,}\StringTok{'dplyr'}\NormalTok{,}\StringTok{'data.table'}\NormalTok{,}\StringTok{'reshape2'}\NormalTok{,}\StringTok{'tidyr'}\NormalTok{)}
+\NormalTok{p_needed <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{'dplyr'}\NormalTok{,}\StringTok{'tidyr'}\NormalTok{)}
 \NormalTok{packages <-}\StringTok{ }\KeywordTok{rownames}\NormalTok{(}\KeywordTok{installed.packages}\NormalTok{())}
 \NormalTok{p_to_install <-}\StringTok{ }\NormalTok{p_needed[}\OperatorTok{!}\NormalTok{(p_needed }\OperatorTok{%in%}\StringTok{ }\NormalTok{packages)]}
 \ControlFlowTok{if}\NormalTok{ (}\KeywordTok{length}\NormalTok{(p_to_install) }\OperatorTok{>}\StringTok{ }\DecValTok{0}\NormalTok{) \{}
@@ -2693,7 +2721,7 @@ Load the R packages first:
   The interface is the same for data frame, data table or database.
 \end{itemize}
 
-We will illustrate the following functions in order:
+We will illustrate the following functions in order using the clothing company data:
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -2709,6 +2737,13 @@ We will illustrate the following functions in order:
 \item
   Merge
 \end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Read data}
+\NormalTok{sim.dat <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"http://bit.ly/2P5gTw4"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
 
 \textbf{Display}
 
@@ -2877,9 +2912,9 @@ A standard marketing problem is customer segmentation. It usually starts with de
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{sim.dat }\OperatorTok{%>%}\StringTok{ }
-\StringTok{  }\KeywordTok{group_by}\NormalTok{(segment) }\OperatorTok{%>%}\StringTok{ }
-\StringTok{  }\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{Age =} \KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(}\KeywordTok{na.omit}\NormalTok{(age)), }\DecValTok{0}\NormalTok{), }
+\NormalTok{dat_summary <-}\StringTok{ }\NormalTok{sim.dat }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{group_by}\NormalTok{(segment) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{Age =} \KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(}\KeywordTok{na.omit}\NormalTok{(age)), }\DecValTok{0}\NormalTok{), }
             \DataTypeTok{FemalePct =} \KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(gender }\OperatorTok{==}\StringTok{ "Female"}\NormalTok{), }\DecValTok{2}\NormalTok{), }
             \DataTypeTok{HouseYes =} \KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(house }\OperatorTok{==}\StringTok{ "Yes"}\NormalTok{), }\DecValTok{2}\NormalTok{), }
             \DataTypeTok{store_exp =} \KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(}\KeywordTok{na.omit}\NormalTok{(store_exp), }
@@ -2887,14 +2922,26 @@ A standard marketing problem is customer segmentation. It usually starts with de
             \DataTypeTok{online_exp =} \KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(online_exp), }\DecValTok{0}\NormalTok{), }
             \DataTypeTok{store_trans =} \KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(store_trans), }\DecValTok{1}\NormalTok{), }
             \DataTypeTok{online_trans =} \KeywordTok{round}\NormalTok{(}\KeywordTok{mean}\NormalTok{(online_trans), }\DecValTok{1}\NormalTok{))}
+
+\CommentTok{# transpose the data frame for showing purpose}
+\CommentTok{# due to the limit of output width}
+\NormalTok{cnames <-}\StringTok{ }\NormalTok{dat_summary}\OperatorTok{$}\NormalTok{segment}
+\NormalTok{dat_summary <-}\StringTok{ }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{select}\NormalTok{(dat_summary, }\OperatorTok{-}\StringTok{ }\NormalTok{segment)}
+\NormalTok{tdat_summary <-}\StringTok{ }\KeywordTok{t}\NormalTok{(dat_summary) }\OperatorTok{%>%}\StringTok{ }\KeywordTok{data.frame}\NormalTok{()}
+\KeywordTok{names}\NormalTok{(tdat_summary) <-}\StringTok{ }\NormalTok{cnames}
+\NormalTok{tdat_summary}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-##   Age FemalePct HouseYes store_exp online_exp
-## 1  39      0.55     0.57       840       2120
-##   store_trans online_trans
-## 1         5.3         13.5
+##              Conspicuous  Price Quality   Style
+## Age                42.00  60.00   35.00   24.00
+## FemalePct           0.32   0.45    0.47    0.81
+## HouseYes            0.86   0.94    0.34    0.27
+## store_exp        4990.00 501.00  301.00  200.00
+## online_exp       4898.00 205.00 2013.00 1962.00
+## store_trans        10.90   6.10    2.90    3.00
+## online_trans       11.10   3.00   16.00   21.10
 \end{verbatim}
 
 Now, let's peel the onion.
@@ -2939,7 +2986,7 @@ There is a lot of information you can extract from those simple averages.
 \item
   Conspicuous: average age is about 40. It is a group of middle-age wealthy people. 1/3 of them are female, and 2/3 are male. They buy regardless the price. Almost all of them own house (0.86). It makes us wonder what is wrong with the rest 14\%?
 \item
-  Price: They are older people with average age 60. Nearly all of them own a house(0.94). They are less likely to purchase online (store\_trans=6 while online\_trans=3). It is the only group that is less likely to buy online.
+  Price: They are older people with average age 60. Nearly all of them own a house(0.94). They are less likely to purchase online (\texttt{store\_trans\ =\ 6} while \texttt{online\_trans\ =\ 3}). It is the only group that is less likely to buy online.
 \item
   Quality: The average age is 35. They are not way different with Conspicuous regarding age. But they spend much less. The percentages of male and female are similar. They prefer online shopping. More than half of them don't own a house (0.66).
 \item
@@ -3098,8 +3145,8 @@ Similar to SQL, there are different joins in \texttt{dplyr}. We create two baby 
 
 There are other functions(\texttt{intersect()}, \texttt{union()} and \texttt{setdiff()}). Also the data frame version of \texttt{rbind} and \texttt{cbind} which are \texttt{bind\_rows()} and \texttt{bind\_col()}. We are not going to go through them all. You can try them yourself. If you understand the functions we introduced so far. It should be easy for you to figure out the rest.
 
-\hypertarget{apply-lapply-and-sapply-in-base-r}{%
-\subsection{\texorpdfstring{\texttt{apply()}, \texttt{lapply()} and \texttt{sapply()} in base R}{apply(), lapply() and sapply() in base R}}\label{apply-lapply-and-sapply-in-base-r}}
+\hypertarget{applyfamilyinbaser}{%
+\subsection{\texorpdfstring{\texttt{apply()}, \texttt{lapply()} and \texttt{sapply()} in base R}{apply(), lapply() and sapply() in base R}}\label{applyfamilyinbaser}}
 
 There are some powerful functions to summarize data in base R, such as \texttt{apply()}, \texttt{lapply()} and \texttt{sapply()}. They do the same basic things and are all from ``apply'' family: apply functions over parts of data. They differ in two important respects:
 
@@ -3218,8 +3265,6 @@ Let's use some data with context to help you better understand the functions.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{# Read data}
-\NormalTok{sim.dat <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"http://bit.ly/2P5gTw4"}\NormalTok{)}
 \CommentTok{# Get numerical variables}
 \NormalTok{sdat <-}\StringTok{ }\NormalTok{sim.dat[, }\KeywordTok{lapply}\NormalTok{(sim.dat, class) }\OperatorTok{%in%}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"integer"}\NormalTok{, }\StringTok{"numeric"}\NormalTok{)]}
 \CommentTok{## Try the following code with apply() function apply(sim.dat,2,class)}
@@ -3231,7 +3276,7 @@ The data frame \texttt{sdat} only includes numeric columns. Now we can go head a
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{apply}\NormalTok{(sdat, }\DataTypeTok{MARGIN=}\DecValTok{2}\NormalTok{,}\ControlFlowTok{function}\NormalTok{(x) }\KeywordTok{mean}\NormalTok{(}\KeywordTok{na.omit}\NormalTok{(x)))}
+\KeywordTok{apply}\NormalTok{(sdat, }\DataTypeTok{MARGIN =} \DecValTok{2}\NormalTok{, }\ControlFlowTok{function}\NormalTok{(x) }\KeywordTok{mean}\NormalTok{(}\KeywordTok{na.omit}\NormalTok{(x)))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -3246,11 +3291,11 @@ The data frame \texttt{sdat} only includes numeric columns. Now we can go head a
 ##    3.434e+00    2.396e+00    3.085e+00    2.320e+00
 \end{verbatim}
 
-Here we defined a function using \texttt{function(x)\ mean(na.omit(x))}. It is a very simple function. It tells R to ignore the missing value when calculating the mean. \texttt{MARGIN=2} tells R to apply the function to each column. It is not hard to guess what \texttt{MARGIN=1} mean. The result show that the average online expense is much higher than store expense. You can also compare the average scores across different questions. The command to calculate standard deviation is very similar. The only difference is to change \texttt{mean()} to \texttt{sd()}:
+Here we defined a function using \texttt{function(x)\ mean(na.omit(x))}. It is a very simple function. It tells R to ignore the missing value when calculating the mean. \texttt{MARGIN\ =\ 2} tells R to apply the function to each column. It is not hard to guess what \texttt{MARGIN\ =\ 1} mean. The result show that the average online expense is much higher than store expense. You can also compare the average scores across different questions. The command to calculate standard deviation is very similar. The only difference is to change \texttt{mean()} to \texttt{sd()}:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{apply}\NormalTok{(sdat, }\DataTypeTok{MARGIN=}\DecValTok{2}\NormalTok{,}\ControlFlowTok{function}\NormalTok{(x) }\KeywordTok{sd}\NormalTok{(}\KeywordTok{na.omit}\NormalTok{(x)))}
+\KeywordTok{apply}\NormalTok{(sdat, }\DataTypeTok{MARGIN =} \DecValTok{2}\NormalTok{, }\ControlFlowTok{function}\NormalTok{(x) }\KeywordTok{sd}\NormalTok{(}\KeywordTok{na.omit}\NormalTok{(x)))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -3306,34 +3351,37 @@ Run the following code and compare the results:
 
 ``Tidy data'' represent the information from a dataset as data frames where each row is an observation, and each column contains the values of a variable (i.e., an attribute of what we are observing). Depending on the situation, the requirements on what to present as rows and columns may change. To make data easy to work with for the problem at hand, in practice, we often need to convert data between the ``wide'' and the ``long'' format. The process feels like kneading the dough.
 
-There are two commonly used packages for this kind of manipulations: \texttt{tidyr} and \texttt{reshape2}. We will show how to tidy and reshape data using the two packages. By comparing the functions to show how they overlap and where they differ.
+In this section, we will show how to tidy and reshape data using \texttt{tidyr} packages. It is built to simplify the process of creating tidy data. We will go through four fundamental functions:
+- \texttt{gather()}: reshape data from wide to long
+- \texttt{spread()}: reshape data from long to wide
+- \texttt{separate()}: split a column into multiple columns
+- \texttt{unite()}: combine multiple columns to one column
 
-\hypertarget{reshape2-package}{%
-\subsection{\texorpdfstring{\texttt{reshape2} package}{reshape2 package}}\label{reshape2-package}}
-
-It is a reboot of the previous package \texttt{reshape}. Take a baby subset of our exemplary clothes consumers data to illustrate:
+Take a baby subset of our exemplary clothes consumers data to illustrate:
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{sdat<-sim.dat[}\DecValTok{1}\OperatorTok{:}\DecValTok{5}\NormalTok{,}\DecValTok{1}\OperatorTok{:}\DecValTok{6}\NormalTok{]}
+\NormalTok{sdat}
 \end{Highlighting}
 \end{Shaded}
 
-For the above data \texttt{sdat}, what if we want to have a variable indicating the purchasing channel (i.e.~online or in-store) and another column with the corresponding expense amount? Assume we want to keep the rest of the columns the same. It is a task to change data from ``wide'' to ``long''. There are two general ways to shape data:
+\begin{verbatim}
+##   age gender income house store_exp online_exp
+## 1  57 Female 120963   Yes     529.1      303.5
+## 2  63 Female 122008   Yes     478.0      109.5
+## 3  59   Male 114202   Yes     490.8      279.2
+## 4  60   Male 113616   Yes     347.8      141.7
+## 5  51   Male 124253   Yes     379.6      112.2
+\end{verbatim}
 
-\begin{itemize}
-\tightlist
-\item
-  Use \texttt{melt()} to convert an object into a molten data frame, i.e., from wide to long
-\item
-  Use \texttt{dcast()} to cast a molten data frame into the shape you want, i.e., from long to wide
-\end{itemize}
+For the above data \texttt{sdat}, what if we want to reshape the data to have a column indicating the purchasing channel (i.e.~from \texttt{store\_exp} or \texttt{online\_exp}) and a second column with the corresponding expense amount? Assume we want to keep the rest of the columns the same. It is a task to change data from ``wide'' to ``long''.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{(mdat <-}\StringTok{ }\KeywordTok{melt}\NormalTok{(sdat, }\DataTypeTok{measure.vars =} \KeywordTok{c}\NormalTok{(}\StringTok{"store_exp"}\NormalTok{, }\StringTok{"online_exp"}\NormalTok{),}
-              \DataTypeTok{variable.name =} \StringTok{"Channel"}\NormalTok{, }
-              \DataTypeTok{value.name =} \StringTok{"Expense"}\NormalTok{))}
+\NormalTok{dat_wide <-}\StringTok{ }\NormalTok{tidyr}\OperatorTok{::}\KeywordTok{gather}\NormalTok{(sdat, }\StringTok{"Channel"}\NormalTok{,}\StringTok{"Expense"}\NormalTok{, }
+\NormalTok{                       store_exp, online_exp)}
+\NormalTok{dat_wide}
 \end{Highlighting}
 \end{Shaded}
 
@@ -3351,7 +3399,7 @@ For the above data \texttt{sdat}, what if we want to have a variable indicating 
 ## 10  51   Male 124253   Yes online_exp   112.2
 \end{verbatim}
 
-You melted the data frame \texttt{sdat} by two variables: \texttt{store\_exp} and \texttt{online\_exp} (\texttt{measure.vars=c("store\_exp","online\_exp")}). The new variable name is \texttt{Channel} set by command \texttt{variable.name\ =\ "Channel"}. The value name is \texttt{Expense} set by command \texttt{value.name\ =\ "Expense"}.
+The above code gathers two variables (\texttt{store\_exp} and \texttt{online\_exp}), and collapses them into key-value pairs (\texttt{Channel} and \texttt{Expense}), duplicating all other columns as needed.
 
 You can run a regression to study the effect of purchasing channel as follows:
 
@@ -3359,171 +3407,88 @@ You can run a regression to study the effect of purchasing channel as follows:
 \begin{Highlighting}[]
 \CommentTok{# Here we use all observations from sim.dat}
 \CommentTok{# Don't show result here}
-\NormalTok{mdat <-}\StringTok{ }\KeywordTok{melt}\NormalTok{(sim.dat[, }\DecValTok{1}\OperatorTok{:}\DecValTok{6}\NormalTok{], }
-             \DataTypeTok{measure.vars =} \KeywordTok{c}\NormalTok{(}\StringTok{"store_exp"}\NormalTok{, }\StringTok{"online_exp"}\NormalTok{), }
-             \DataTypeTok{variable.name =} \StringTok{"Channel"}\NormalTok{, }
-             \DataTypeTok{value.name =} \StringTok{"Expense"}\NormalTok{)}
+
+\NormalTok{msdat <-}\StringTok{ }\NormalTok{tidyr}\OperatorTok{::}\KeywordTok{gather}\NormalTok{(sim.dat[, }\DecValTok{1}\OperatorTok{:}\DecValTok{6}\NormalTok{], }\StringTok{"Channel"}\NormalTok{,}\StringTok{"Expense"}\NormalTok{, }
+\NormalTok{                       store_exp, online_exp)}
 \NormalTok{fit <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(Expense }\OperatorTok{~}\StringTok{ }\NormalTok{gender }\OperatorTok{+}\StringTok{ }\NormalTok{house }\OperatorTok{+}\StringTok{ }\NormalTok{income }\OperatorTok{+}\StringTok{ }\NormalTok{Channel }\OperatorTok{+}\StringTok{ }\NormalTok{age, }
-          \DataTypeTok{data =}\NormalTok{ mdat)}
+          \DataTypeTok{data =}\NormalTok{ msdat)}
 \KeywordTok{summary}\NormalTok{(fit)}
 \end{Highlighting}
 \end{Shaded}
 
-You can \texttt{melt()} list, matrix, table too. The syntax is similar, and we won't go through every situation. Sometimes we want to convert the data from ``long'' to ``wide''. For example, \textbf{you want to compare the online and in-store expense between male and female based on the house ownership. }
+Sometimes we want to reshape the data from ``long'' to ``wide''. For example, \textbf{you want to compare the online and in-store expense between male and female based on house ownership.}
+
+We need to reshape the wide data frame \texttt{dat\_wide} to a long format by spreading the key-value pairs across multiple columns. And then summarize the long data frame \texttt{dat\_long}, grouping by\texttt{house} and \texttt{gender}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{dcast}\NormalTok{(mdat, house }\OperatorTok{+}\StringTok{ }\NormalTok{gender }\OperatorTok{~}\StringTok{ }\NormalTok{Channel, sum)}
+\NormalTok{dat_long =}\StringTok{ }\NormalTok{tidyr}\OperatorTok{::}\KeywordTok{spread}\NormalTok{(dat_wide, Channel, Expense)}
+\CommentTok{# you can check what dat_long is like}
+\NormalTok{dat_long }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{group_by}\NormalTok{(house, gender) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{total_online_exp =} \KeywordTok{sum}\NormalTok{(online_exp),}
+                   \DataTypeTok{total_store_exp =} \KeywordTok{sum}\NormalTok{(store_exp))}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-## Using Expense as value column: use value.var to override.
+## # A tibble: 2 x 4
+## # Groups:   house [1]
+##   house gender total_online_exp total_store_exp
+##   <chr> <chr>             <dbl>           <dbl>
+## 1 Yes   Female             413.           1007.
+## 2 Yes   Male               533.           1218.
 \end{verbatim}
 
-\begin{verbatim}
-##   house gender store_exp online_exp
-## 1   Yes Female      1007      413.0
-## 2   Yes   Male      1218      533.2
-\end{verbatim}
-
-In the above code, what is the left side of \texttt{\textasciitilde{}} are variables that you want to group by. The right side is the variable you want to spread as columns. It will use the column indicating value from \texttt{melt()} before. Here is ``\texttt{Expense}'' .
-
-\hypertarget{tidyr-package}{%
-\subsection{\texorpdfstring{\texttt{tidyr} package}{tidyr package}}\label{tidyr-package}}
-
-The other package that will do similar manipulations is \texttt{tidyr}. Let's get a subset to illustrate the usage.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{# practice functions we learnt before}
-\NormalTok{sdat <-}\StringTok{ }\NormalTok{sim.dat[}\DecValTok{1}\OperatorTok{:}\DecValTok{5}\NormalTok{, ] }\OperatorTok{%>%}\StringTok{ }
-\StringTok{  }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{select}\NormalTok{(age, gender, store_exp, store_trans)}
-\NormalTok{sdat }\OperatorTok{%>%}\StringTok{ }\KeywordTok{tbl_df}\NormalTok{()}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## # A tibble: 5 x 4
-##     age gender store_exp store_trans
-##   <int> <chr>      <dbl>       <int>
-## 1    57 Female      529.           2
-## 2    63 Female      478.           4
-## 3    59 Male        491.           7
-## 4    60 Male        348.          10
-## 5    51 Male        380.           4
-\end{verbatim}
-
-\texttt{gather()} function in \texttt{tidyr} is analogous to \texttt{melt()} in \texttt{reshape2}. The following code will do the same thing as we did before using \texttt{melt()}:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{msdat <-}\StringTok{ }\NormalTok{tidyr}\OperatorTok{::}\KeywordTok{gather}\NormalTok{(sdat, }\StringTok{"variable"}\NormalTok{,}\StringTok{"value"}\NormalTok{, }
-\NormalTok{                       store_exp, store_trans)}
-\NormalTok{msdat }\OperatorTok{%>%}\StringTok{ }\KeywordTok{tbl_df}\NormalTok{()}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-## # A tibble: 10 x 4
-##      age gender variable    value
-##    <int> <chr>  <chr>       <dbl>
-##  1    57 Female store_exp    529.
-##  2    63 Female store_exp    478.
-##  3    59 Male   store_exp    491.
-##  4    60 Male   store_exp    348.
-##  5    51 Male   store_exp    380.
-##  6    57 Female store_trans    2 
-##  7    63 Female store_trans    4 
-##  8    59 Male   store_trans    7 
-##  9    60 Male   store_trans   10 
-## 10    51 Male   store_trans    4
-\end{verbatim}
-
-Or if we use the pipe operation, we can write the above code as:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{sdat }\OperatorTok{%>%}\StringTok{ }\KeywordTok{gather}\NormalTok{(}\StringTok{"variable"}\NormalTok{, }\StringTok{"value"}\NormalTok{, store_exp, store_trans)}
-\end{Highlighting}
-\end{Shaded}
-
-It is identical with the following code using \texttt{melt()}:
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\KeywordTok{melt}\NormalTok{(sdat, }\DataTypeTok{measure.vars =} \KeywordTok{c}\NormalTok{(}\StringTok{"store_exp"}\NormalTok{, }\StringTok{"store_trans"}\NormalTok{), }
-     \DataTypeTok{variable.name =} \StringTok{"variable"}\NormalTok{, }
-     \DataTypeTok{value.name =} \StringTok{"value"}\NormalTok{)}
-\end{Highlighting}
-\end{Shaded}
-
-The opposite operation to \texttt{gather()} is \texttt{spread()}. The previous one stacks columns and the latter one spread the columns.
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{msdat }\OperatorTok{%>%}\StringTok{ }\KeywordTok{spread}\NormalTok{(variable, value)}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-##   age gender store_exp store_trans
-## 1  51   Male     379.6           4
-## 2  57 Female     529.1           2
-## 3  59   Male     490.8           7
-## 4  60   Male     347.8          10
-## 5  63 Female     478.0           4
-\end{verbatim}
+The above code also uses the functions in the \texttt{dplyr} package introduced in the previous section. Here we use \texttt{package::function} to make clear the package name. It is not necessary if the package is already loaded.
 
 Another pair of functions that do opposite manipulations are \texttt{separate()} and \texttt{unite()}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{sepdat<-}\StringTok{ }\NormalTok{msdat }\OperatorTok{%>%}\StringTok{ }
-\StringTok{  }\KeywordTok{separate}\NormalTok{(variable,}\KeywordTok{c}\NormalTok{(}\StringTok{"Source"}\NormalTok{,}\StringTok{"Type"}\NormalTok{))}
-\NormalTok{sepdat }\OperatorTok{%>%}\StringTok{ }\KeywordTok{tbl_df}\NormalTok{()}
+\NormalTok{sepdat<-}\StringTok{ }\NormalTok{dat_wide }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{separate}\NormalTok{(Channel, }\KeywordTok{c}\NormalTok{(}\StringTok{"Source"}\NormalTok{, }\StringTok{"Type"}\NormalTok{))}
+\NormalTok{sepdat}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-## # A tibble: 10 x 5
-##      age gender Source Type  value
-##    <int> <chr>  <chr>  <chr> <dbl>
-##  1    57 Female store  exp    529.
-##  2    63 Female store  exp    478.
-##  3    59 Male   store  exp    491.
-##  4    60 Male   store  exp    348.
-##  5    51 Male   store  exp    380.
-##  6    57 Female store  trans    2 
-##  7    63 Female store  trans    4 
-##  8    59 Male   store  trans    7 
-##  9    60 Male   store  trans   10 
-## 10    51 Male   store  trans    4
+##    age gender income house Source Type Expense
+## 1   57 Female 120963   Yes  store  exp   529.1
+## 2   63 Female 122008   Yes  store  exp   478.0
+## 3   59   Male 114202   Yes  store  exp   490.8
+## 4   60   Male 113616   Yes  store  exp   347.8
+## 5   51   Male 124253   Yes  store  exp   379.6
+## 6   57 Female 120963   Yes online  exp   303.5
+## 7   63 Female 122008   Yes online  exp   109.5
+## 8   59   Male 114202   Yes online  exp   279.2
+## 9   60   Male 113616   Yes online  exp   141.7
+## 10  51   Male 124253   Yes online  exp   112.2
 \end{verbatim}
 
-You can see that the function separates the original column ``\texttt{variable}'' to two new columns ``\texttt{Source}'' and ``\texttt{Type}''. You can use \texttt{sep=} to set the string or regular expression to separate the column. By default, it is ``\texttt{\_}''.
+You can see that the function separates the original column ``\texttt{Channel}'' to two new columns ``\texttt{Source}'' and ``\texttt{Type}''. You can use \texttt{sep\ =} to set the string or regular expression to separate the column. By default, it is ``\texttt{\_}''.
 
 The \texttt{unite()} function will do the opposite: combining two columns. It is the generalization of \texttt{paste()} to a data frame.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{sepdat }\OperatorTok{%>%}\StringTok{ }
-\StringTok{  }\KeywordTok{unite}\NormalTok{(}\StringTok{"variable"}\NormalTok{, Source, Type, }\DataTypeTok{sep =} \StringTok{"_"}\NormalTok{)}
+\StringTok{  }\KeywordTok{unite}\NormalTok{(}\StringTok{"Channel"}\NormalTok{, Source, Type, }\DataTypeTok{sep =} \StringTok{"_"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-##    age gender    variable value
-## 1   57 Female   store_exp 529.1
-## 2   63 Female   store_exp 478.0
-## 3   59   Male   store_exp 490.8
-## 4   60   Male   store_exp 347.8
-## 5   51   Male   store_exp 379.6
-## 6   57 Female store_trans   2.0
-## 7   63 Female store_trans   4.0
-## 8   59   Male store_trans   7.0
-## 9   60   Male store_trans  10.0
-## 10  51   Male store_trans   4.0
+##    age gender income house    Channel Expense
+## 1   57 Female 120963   Yes  store_exp   529.1
+## 2   63 Female 122008   Yes  store_exp   478.0
+## 3   59   Male 114202   Yes  store_exp   490.8
+## 4   60   Male 113616   Yes  store_exp   347.8
+## 5   51   Male 124253   Yes  store_exp   379.6
+## 6   57 Female 120963   Yes online_exp   303.5
+## 7   63 Female 122008   Yes online_exp   109.5
+## 8   59   Male 114202   Yes online_exp   279.2
+## 9   60   Male 113616   Yes online_exp   141.7
+## 10  51   Male 124253   Yes online_exp   112.2
 \end{verbatim}
 
 The reshaping manipulations may be the trickiest part. You have to practice a lot to get familiar with those functions. Unfortunately, there is no shortcut.
@@ -3681,7 +3646,7 @@ The resulting plot (Fig. \ref{fig:linearvar}) indicates the smoothing method fit
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-47-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-45-1.pdf}
 
 The fitted lines (blue) change over different samples which means it has high variance. People also call it overfitting. Fitting the linear model using the same four subsets, the result barely changes:
 
@@ -3699,7 +3664,7 @@ The fitted lines (blue) change over different samples which means it has high va
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-48-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-46-1.pdf}
 
 In general, the variance (\(Var(\hat{f}(\mathbf{X}))\)) \textbf{increases} and the bias (\(Bias(\hat{f}(\mathbf{X}))\)) \textbf{decreases} as the model flexibility increases. Variance and bias together determine the systematic error. As we increase the flexibility of the model, at first the rate at which \(Bias(\hat{f}(\mathbf{X}))\) decreases is faster than \(Var (\hat{f} (\mathbf{X}))\), so the MSE decreases. However, to some degree, higher flexibility has little effect on \(Bias(\hat{f}(\mathbf{X}))\) but \(Var(\hat{f} (\mathbf{X}))\) increases significantly, so the MSE increases.
 
@@ -4471,7 +4436,7 @@ Receiver Operating Characteristic (ROC) curve uses the predicted class probabili
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-69-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-67-1.pdf}
 
 The first argument of the \texttt{roc()} is, \texttt{response}, the observation vector. The second argument is \texttt{predictor} is the continuous prediction (probability or link function value). The x-axis of ROC curve is ``1 - specificity'' and the y-axis is ``sensitivity''. ROC curve starts from (0, 0) and ends with (1, 1). A perfect model that correctly identifies all the samples will have 100\% sensitivity and specificity which corresponds to the curve that also goes through (0, 1). The area under the perfect curve is 1. A model that is totally useless corresponds to a curve that is close to the diagonal line and an area under the curve about 0.5.
 
@@ -4539,7 +4504,7 @@ Let's plot the lift charts to compare the predicted outbreak probability (\textt
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-72-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-70-1.pdf}
 
 The x-axis is the percentage of samples tested and the y-axis is the percentage of positive samples that are detected by the model. For example, the point on the curve of random forest prediction, （8.125,18.31）, indicates that if you order the testing samples by the predicted probability from high to low, the top 8.125\% of the samples contain 0.1831\% of the total positive outcomes.
 
@@ -4608,7 +4573,7 @@ To fit a linear regression model, let us first check if there are any missing va
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-77-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-75-1.pdf}
 
 There is no missing value in the response variable, but there are outliers. Outliers are usually best described by the problem to solve itself such that we know from domain knowledge that it is not possible to have such values. We can also use a statistical threshold to remove extremely large or small outlier values from the data. We use the Z-score to find and remove outliers described in section \ref{outliers}. Readers can refer to the section for more detail.
 
@@ -5023,7 +4988,7 @@ We can also find the relative importance of each variable during PLS model tunin
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-89-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-87-1.pdf}
 
 The above plot shows that Q1, Q2, Q3, and Q6, are more important than other variables.Now let's fit a PCR model with number of principal components as the hyper-parameter: \index{PCR}
 
@@ -5089,7 +5054,7 @@ Now let's compare the hyper-parameter tuning process for PLS and PCR:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-91-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-89-1.pdf}
 
 The plot confirms our choice of using a model with three components for both PLS and PCR.
 
@@ -5569,7 +5534,7 @@ The object \texttt{glmfit} returned by \texttt{glmnet()} has the information of 
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-109-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-107-1.pdf}
 
 Each curve in the plot represents one predictor. The default setting is \(\alpha=1\) which means there is only lasso penalty. From left to right, \(L_I\) norm is increasing which means \(\lambda\) is decreasing. The bottom x-axis is \(L_1\) norm (i.e. \(\parallel\symbf{\beta}\parallel_{1}\)). The upper x-axis is the effective degrees of freedom (df) for the lasso. You can check the detail for every step by:
 
@@ -5651,7 +5616,7 @@ We can plot the object using \texttt{plot()}. The red dotted line is the cross-v
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-113-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-111-1.pdf}
 
 You can check the two selected \(\lambda\) values by:
 
@@ -5835,7 +5800,7 @@ For example:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-120-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-118-1.pdf}
 
 The above uses error rate as performance criteria and use 10-fold cross-validation. Similarly, you can get the \(\lambda\) value for the minimum error rate and the error rate that is 1 standard error from the minimum:
 
@@ -6021,7 +5986,7 @@ The most common criterion is AUC. You can compare the selections from different 
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-127-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-125-1.pdf}
 
 The x-axis is the value of the tuning parameter, the y-axis is AUC. The two dash lines are the value of \(\lambda\) for max AUC and the value for the one standard deviation to the max AUC. Once you choose the value of the tuning parameter, you can use \texttt{fitglasso()} to fit the model. For example, we can fit the model using the parameter value that gives the max AUC, which is \(\lambda=0.922\):
 
@@ -6427,7 +6392,7 @@ A more convenient way is to use \texttt{train()} function in \texttt{caret} pack
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-131-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-129-1.pdf}
 
 RMSE doesn't change much when the maximum is larger than 2. So we set the maximum depth to be 2 and refit the model:
 
@@ -6468,7 +6433,7 @@ You can see that the final model picks \texttt{Q3} and \texttt{Q5} to predict to
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-134-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-132-1.pdf}
 
 \hypertarget{decision-tree}{%
 \subsection{Decision Tree}\label{decision-tree}}
@@ -6615,7 +6580,7 @@ Compare the results of the two approaches.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-138-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-136-1.pdf}
 
 You can see that in this case, the two approaches lead to similar model performance.
 
@@ -6848,7 +6813,7 @@ You can use varImpPlot() function to visualize the predictor importance:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-146-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-144-1.pdf}
 It is easy to see from the plot that \texttt{segment} and \texttt{Q4} are the top two variables to classify gender.
 
 \hypertarget{gradient-boosted-machine}{%
@@ -7035,7 +7000,7 @@ Now, let's compare the results from the three tree models.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-149-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-147-1.pdf}
 
 Since the data here doesn't have many variables, we don't see a significant difference among the models. But you can still see those ensemble methods are better than a single tree. In most of the real applications, ensemble methods perform much better. Random forest and boosting trees can be a baseline model. Before exploring different models, you can quickly run a random forest to see the performance and then try to improve that performance. If the performance you got from the random forest is not too much better than guessing, you should consider collecting more data or reviewing the problem to frame it a different way instead of trying other models. Because it usually means the current data is not enough to solve the problem.
 
@@ -9174,6 +9139,18 @@ This simple example shows that LSTM's performance has improved dramatically from
 
 \hypertarget{largelocaldata}{%
 \chapter{Handling Large Local Data}\label{largelocaldata}}
+
+When the data is too large to fit in a computer's memory, we can use some big data analytics engine like Spark on a cloud platform (see Chapter \ref{bigdatacloudplatform}). However, even when the data can fit in the memory, there may be a situation where it is slow to read and manipulate due to a relatively large size. Some R packages can make the process faster with the cost of familiarity, especially for data wrangling. But it avoids the hurdle of setting up Spark cluster and working in an unfamiliar environment. This section presents some of the alternative R packages to read, write and wrangle a data set that is relatively large but not too big to fit in the memory.
+
+Load the R packages first:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# install packages from CRAN if you haven't}
+\KeywordTok{library}\NormalTok{(readr)}
+\KeywordTok{library}\NormalTok{(data.table)}
+\end{Highlighting}
+\end{Shaded}
 
 \hypertarget{readr}{%
 \section{\texorpdfstring{\texttt{readr}}{readr}}\label{readr}}
