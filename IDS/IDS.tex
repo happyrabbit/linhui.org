@@ -177,7 +177,7 @@
 
 \title{Introduction to Data Science}
 \author{Hui Lin and Ming Li}
-\date{2021-02-22}
+\date{2021-02-23}
 
 \begin{document}
 \maketitle
@@ -2344,7 +2344,7 @@ The last line of the output shows the estimates of \(\lambda\) for each variable
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-11-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-17-1.pdf}
 
 Before the transformation, the \texttt{stroe\_trans} is skewed right.
 \texttt{BoxCoxTrans\ ()} can also conduct Box-Cox transform. But note that \texttt{BoxCoxTrans\ ()} can only be applied to a single variable, and it is not possible to transform difference columns in a data frame at the same time.
@@ -2400,7 +2400,7 @@ Even under certain assumptions we can statistically define outliers, it can be h
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-14-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-20-1.pdf}
 
 It is also easy to observe the pair relationship from the plot. \texttt{age} is negatively correlated with \texttt{online\_trans} but positively correlated with \texttt{store\_trans}. It seems that older people tend to purchase from the local store. The amount of expense is positively correlated with income. Scatterplot matrix like this can reveal lots of information before modeling.
 
@@ -2464,7 +2464,7 @@ Function \texttt{spatialSign()} \texttt{caret} package can conduct the transform
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-16-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-22-1.pdf}
 
 Some readers may have found that the above code does not seem to standardize the data before transformation. Recall the introduction of KNN, \texttt{preProcess()} with \texttt{method="knnImpute"} by default will standardize data.
 
@@ -2490,7 +2490,7 @@ It is probably the technical term known by the most un-technical people. When tw
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-17-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-23-1.pdf}
 
 The closer the correlation is to 0, the lighter the color is and the closer the shape is to a circle. The elliptical means the correlation is not equal to 0 (because we set the \texttt{upper\ =\ "ellipse"}), the greater the correlation, the narrower the ellipse. Blue represents a positive correlation; red represents a negative correlation. The direction of the ellipse also changes with the correlation. The correlation coefficient is shown in the lower triangle of the matrix.
 
@@ -2782,7 +2782,7 @@ Get rows with \texttt{income} more than 300000:
 \end{Highlighting}
 \end{Shaded}
 
-Here we meet a new operator \texttt{\%\textgreater{}\%}. It is called ``Pipe operator'' which pipes a value forward into an expression or function call. What you get in the left operation will be the first argument or the only argument in the right operation.
+Here we use the operator \texttt{\%\textgreater{}\%}. It is called a ``pipe operator'' which pipes a value forward into an expression or function call. What you get in the left operation will be the first argument or the only argument in the right operation.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -3379,9 +3379,9 @@ For the above data \texttt{sdat}, what if we want to reshape the data to have a 
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{dat_wide <-}\StringTok{ }\NormalTok{tidyr}\OperatorTok{::}\KeywordTok{gather}\NormalTok{(sdat, }\StringTok{"Channel"}\NormalTok{,}\StringTok{"Expense"}\NormalTok{, }
+\NormalTok{dat_long <-}\StringTok{ }\NormalTok{tidyr}\OperatorTok{::}\KeywordTok{gather}\NormalTok{(sdat, }\StringTok{"Channel"}\NormalTok{,}\StringTok{"Expense"}\NormalTok{, }
 \NormalTok{                       store_exp, online_exp)}
-\NormalTok{dat_wide}
+\NormalTok{dat_long}
 \end{Highlighting}
 \end{Shaded}
 
@@ -3422,9 +3422,9 @@ We need to reshape the wide data frame \texttt{dat\_wide} to a long format by sp
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{dat_long =}\StringTok{ }\NormalTok{tidyr}\OperatorTok{::}\KeywordTok{spread}\NormalTok{(dat_wide, Channel, Expense)}
+\NormalTok{dat_wide =}\StringTok{ }\NormalTok{tidyr}\OperatorTok{::}\KeywordTok{spread}\NormalTok{(dat_long, Channel, Expense)}
 \CommentTok{# you can check what dat_long is like}
-\NormalTok{dat_long }\OperatorTok{%>%}\StringTok{ }
+\NormalTok{dat_wide }\OperatorTok{%>%}\StringTok{ }
 \StringTok{  }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{group_by}\NormalTok{(house, gender) }\OperatorTok{%>%}\StringTok{ }
 \StringTok{  }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{total_online_exp =} \KeywordTok{sum}\NormalTok{(online_exp),}
                    \DataTypeTok{total_store_exp =} \KeywordTok{sum}\NormalTok{(store_exp))}
@@ -3446,7 +3446,7 @@ Another pair of functions that do opposite manipulations are \texttt{separate()}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{sepdat<-}\StringTok{ }\NormalTok{dat_wide }\OperatorTok{%>%}\StringTok{ }
+\NormalTok{sepdat<-}\StringTok{ }\NormalTok{dat_long }\OperatorTok{%>%}\StringTok{ }
 \StringTok{  }\KeywordTok{separate}\NormalTok{(Channel, }\KeywordTok{c}\NormalTok{(}\StringTok{"Source"}\NormalTok{, }\StringTok{"Type"}\NormalTok{))}
 \NormalTok{sepdat}
 \end{Highlighting}
@@ -3499,6 +3499,22 @@ The reshaping manipulations may be the trickiest part. You have to practice a lo
 When training a machine learning model, there are many decisions to make. For example, when training a random forest, you need to decide the number of trees and the number of variables at each node. For lasso method, you need to determine the penalty parameter. There may be standard settings for some of the parameters, but it's unlikely to guess the right values for all of these correctly. Other than that, making good choices on how you split the data into training and testing sets can make a huge difference in helping you find a high-performance model efficiently.
 
 This chapter will illustrate the practical aspects of model tuning. We will talk about different types of model error, sources of model error, hyperparameter tuning, how to set up your data and how to make sure your model implementation is correct. In practice applying machine learning is a highly iterative process.
+
+Load the R packages first:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# install packages from CRAN}
+\NormalTok{p_needed <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{'ggplot2'}\NormalTok{,}\StringTok{'tidyr'}\NormalTok{, }\StringTok{'caret'}\NormalTok{, }\StringTok{'dplyr'}\NormalTok{, }\StringTok{'lattice'}\NormalTok{, }\StringTok{'proxy'}\NormalTok{, }\StringTok{'caret'}\NormalTok{)}
+\NormalTok{packages <-}\StringTok{ }\KeywordTok{rownames}\NormalTok{(}\KeywordTok{installed.packages}\NormalTok{())}
+\NormalTok{p_to_install <-}\StringTok{ }\NormalTok{p_needed[}\OperatorTok{!}\NormalTok{(p_needed }\OperatorTok{%in%}\StringTok{ }\NormalTok{packages)]}
+\ControlFlowTok{if}\NormalTok{ (}\KeywordTok{length}\NormalTok{(p_to_install) }\OperatorTok{>}\StringTok{ }\DecValTok{0}\NormalTok{) \{}
+    \KeywordTok{install.packages}\NormalTok{(p_to_install)}
+\NormalTok{\}}
+
+\KeywordTok{lapply}\NormalTok{(p_needed, require, }\DataTypeTok{character.only =} \OtherTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
 
 \hypertarget{vbtradeoff}{%
 \section{Variance-Bias Trade-Off}\label{vbtradeoff}}
@@ -3629,42 +3645,62 @@ The resulting plot (Fig. \ref{fig:linearvar}) indicates the smoothing method fit
 \CommentTok{# sample part of the data to fit model sample 1}
 \NormalTok{idx1 =}\StringTok{ }\KeywordTok{sample}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\KeywordTok{length}\NormalTok{(x), }\DecValTok{100}\NormalTok{)}
 \NormalTok{dat1 =}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{x1 =}\NormalTok{ x[idx1], }\DataTypeTok{fx1 =}\NormalTok{ fx[idx1])}
-\NormalTok{p1 =}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(dat1, }\KeywordTok{aes}\NormalTok{(x1, fx1)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_smooth}\NormalTok{(}\DataTypeTok{span =} \FloatTok{0.03}\NormalTok{)}
+\NormalTok{p1 =}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(dat1, }\KeywordTok{aes}\NormalTok{(x1, fx1)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_smooth}\NormalTok{(}\DataTypeTok{span =} \FloatTok{0.03}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{()}
+
 \CommentTok{# sample 2}
 \NormalTok{idx2 =}\StringTok{ }\KeywordTok{sample}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\KeywordTok{length}\NormalTok{(x), }\DecValTok{100}\NormalTok{)}
 \NormalTok{dat2 =}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{x2 =}\NormalTok{ x[idx2], }\DataTypeTok{fx2 =}\NormalTok{ fx[idx2])}
-\NormalTok{p2 =}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(dat2, }\KeywordTok{aes}\NormalTok{(x2, fx2)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_smooth}\NormalTok{(}\DataTypeTok{span =} \FloatTok{0.03}\NormalTok{)}
+\NormalTok{p2 =}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(dat2, }\KeywordTok{aes}\NormalTok{(x2, fx2)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_smooth}\NormalTok{(}\DataTypeTok{span =} \FloatTok{0.03}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{()}
+
 \CommentTok{# sample 3}
 \NormalTok{idx3 =}\StringTok{ }\KeywordTok{sample}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\KeywordTok{length}\NormalTok{(x), }\DecValTok{100}\NormalTok{)}
 \NormalTok{dat3 =}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{x3 =}\NormalTok{ x[idx3], }\DataTypeTok{fx3 =}\NormalTok{ fx[idx3])}
-\NormalTok{p3 =}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(dat3, }\KeywordTok{aes}\NormalTok{(x3, fx3)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_smooth}\NormalTok{(}\DataTypeTok{span =} \FloatTok{0.03}\NormalTok{)}
+\NormalTok{p3 =}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(dat3, }\KeywordTok{aes}\NormalTok{(x3, fx3)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_smooth}\NormalTok{(}\DataTypeTok{span =} \FloatTok{0.03}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{()}
+
 \CommentTok{# sample 4}
 \NormalTok{idx4 =}\StringTok{ }\KeywordTok{sample}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\KeywordTok{length}\NormalTok{(x), }\DecValTok{100}\NormalTok{)}
 \NormalTok{dat4 =}\StringTok{ }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{x4 =}\NormalTok{ x[idx4], }\DataTypeTok{fx4 =}\NormalTok{ fx[idx4])}
-\NormalTok{p4 =}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(dat4, }\KeywordTok{aes}\NormalTok{(x4, fx4)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_smooth}\NormalTok{(}\DataTypeTok{span =} \FloatTok{0.03}\NormalTok{)}
+\NormalTok{p4 =}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(dat4, }\KeywordTok{aes}\NormalTok{(x4, fx4)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_smooth}\NormalTok{(}\DataTypeTok{span =} \FloatTok{0.03}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{()}
+
 \KeywordTok{multiplot}\NormalTok{(p1, p2, p3, p4, }\DataTypeTok{cols =} \DecValTok{2}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-45-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-52-1.pdf}
 
 The fitted lines (blue) change over different samples which means it has high variance. People also call it overfitting. Fitting the linear model using the same four subsets, the result barely changes:
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{p1 =}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(dat1, }\KeywordTok{aes}\NormalTok{(x1, fx1)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_smooth}\NormalTok{(}\DataTypeTok{method =} \StringTok{"lm"}\NormalTok{, }
-    \DataTypeTok{se =} \OtherTok{FALSE}\NormalTok{)}
-\NormalTok{p2 =}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(dat2, }\KeywordTok{aes}\NormalTok{(x2, fx2)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_smooth}\NormalTok{(}\DataTypeTok{method =} \StringTok{"lm"}\NormalTok{, }
-    \DataTypeTok{se =} \OtherTok{FALSE}\NormalTok{)}
-\NormalTok{p3 =}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(dat3, }\KeywordTok{aes}\NormalTok{(x3, fx3)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_smooth}\NormalTok{(}\DataTypeTok{method =} \StringTok{"lm"}\NormalTok{, }
-    \DataTypeTok{se =} \OtherTok{FALSE}\NormalTok{)}
-\NormalTok{p4 =}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(dat4, }\KeywordTok{aes}\NormalTok{(x4, fx4)) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_smooth}\NormalTok{(}\DataTypeTok{method =} \StringTok{"lm"}\NormalTok{, }
-    \DataTypeTok{se =} \OtherTok{FALSE}\NormalTok{)}
+\NormalTok{p1 =}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(dat1, }\KeywordTok{aes}\NormalTok{(x1, fx1)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_smooth}\NormalTok{(}\DataTypeTok{method =} \StringTok{"lm"}\NormalTok{, }\DataTypeTok{se =} \OtherTok{FALSE}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{()}
+
+\NormalTok{p2 =}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(dat2, }\KeywordTok{aes}\NormalTok{(x2, fx2)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_smooth}\NormalTok{(}\DataTypeTok{method =} \StringTok{"lm"}\NormalTok{, }\DataTypeTok{se =} \OtherTok{FALSE}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{()}
+
+\NormalTok{p3 =}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(dat3, }\KeywordTok{aes}\NormalTok{(x3, fx3)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_smooth}\NormalTok{(}\DataTypeTok{method =} \StringTok{"lm"}\NormalTok{, }\DataTypeTok{se =} \OtherTok{FALSE}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{()}
+
+\NormalTok{p4 =}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(dat4, }\KeywordTok{aes}\NormalTok{(x4, fx4)) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_smooth}\NormalTok{(}\DataTypeTok{method =} \StringTok{"lm"}\NormalTok{, }\DataTypeTok{se =} \OtherTok{FALSE}\NormalTok{) }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{()}
+
 \KeywordTok{multiplot}\NormalTok{(p1, p2, p3, p4, }\DataTypeTok{cols =} \DecValTok{2}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-46-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-53-1.pdf}
 
 In general, the variance (\(Var(\hat{f}(\mathbf{X}))\)) \textbf{increases} and the bias (\(Bias(\hat{f}(\mathbf{X}))\)) \textbf{decreases} as the model flexibility increases. Variance and bias together determine the systematic error. As we increase the flexibility of the model, at first the rate at which \(Bias(\hat{f}(\mathbf{X}))\) decreases is faster than \(Var (\hat{f} (\mathbf{X}))\), so the MSE decreases. However, to some degree, higher flexibility has little effect on \(Bias(\hat{f}(\mathbf{X}))\) but \(Var(\hat{f} (\mathbf{X}))\) increases significantly, so the MSE increases.
 
@@ -3773,33 +3809,40 @@ According to the setting, there are 800 samples in the training set and 200 in t
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{library}\NormalTok{(plyr)}
-\KeywordTok{ddply}\NormalTok{(datTrain, }\StringTok{"segment"}\NormalTok{, summarise, }\DataTypeTok{count =} \KeywordTok{length}\NormalTok{(segment), }
-    \DataTypeTok{percentage =} \KeywordTok{round}\NormalTok{(}\KeywordTok{length}\NormalTok{(segment)}\OperatorTok{/}\KeywordTok{nrow}\NormalTok{(datTrain), }\DecValTok{2}\NormalTok{))}
+\NormalTok{datTrain }\OperatorTok{%>%}
+\StringTok{  }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{group_by}\NormalTok{(segment) }\OperatorTok{%>%}
+\StringTok{  }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{count =} \KeywordTok{n}\NormalTok{(),}
+            \DataTypeTok{percentage =} \KeywordTok{round}\NormalTok{(}\KeywordTok{length}\NormalTok{(segment)}\OperatorTok{/}\KeywordTok{nrow}\NormalTok{(datTrain), }\DecValTok{2}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-##       segment count percentage
-## 1 Conspicuous   160       0.20
-## 2       Price   200       0.25
-## 3     Quality   160       0.20
-## 4       Style   280       0.35
+## # A tibble: 4 x 3
+##   segment     count percentage
+##   <chr>       <int>      <dbl>
+## 1 Conspicuous   160       0.2 
+## 2 Price         200       0.25
+## 3 Quality       160       0.2 
+## 4 Style         280       0.35
 \end{verbatim}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{ddply}\NormalTok{(datTest, }\StringTok{"segment"}\NormalTok{, summarise, }\DataTypeTok{count =} \KeywordTok{length}\NormalTok{(segment), }
-    \DataTypeTok{percentage =} \KeywordTok{round}\NormalTok{(}\KeywordTok{length}\NormalTok{(segment)}\OperatorTok{/}\KeywordTok{nrow}\NormalTok{(datTest), }\DecValTok{2}\NormalTok{))}
+\NormalTok{datTest }\OperatorTok{%>%}
+\StringTok{  }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{group_by}\NormalTok{(segment) }\OperatorTok{%>%}
+\StringTok{  }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{summarise}\NormalTok{(}\DataTypeTok{count =} \KeywordTok{n}\NormalTok{(),}
+            \DataTypeTok{percentage =} \KeywordTok{round}\NormalTok{(}\KeywordTok{length}\NormalTok{(segment)}\OperatorTok{/}\KeywordTok{nrow}\NormalTok{(datTrain), }\DecValTok{2}\NormalTok{))}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{verbatim}
-##       segment count percentage
-## 1 Conspicuous    40       0.20
-## 2       Price    50       0.25
-## 3     Quality    40       0.20
-## 4       Style    70       0.35
+## # A tibble: 4 x 3
+##   segment     count percentage
+##   <chr>       <int>      <dbl>
+## 1 Conspicuous    40       0.05
+## 2 Price          50       0.06
+## 3 Quality        40       0.05
+## 4 Style          70       0.09
 \end{verbatim}
 
 The percentages are the same for these two sets. In practice, it is possible that the distributions are not exactly identical but should be close.
@@ -4047,10 +4090,10 @@ You can implement k-fold cross-validation using \texttt{createFolds()} in \textt
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{library}\NormalTok{(caret)}
-\NormalTok{class<-sim.dat}\OperatorTok{$}\NormalTok{segment}
+\NormalTok{class <-}\StringTok{ }\NormalTok{sim.dat}\OperatorTok{$}\NormalTok{segment}
 \CommentTok{# creat k-folds}
 \KeywordTok{set.seed}\NormalTok{(}\DecValTok{1}\NormalTok{)}
-\NormalTok{cv<-}\KeywordTok{createFolds}\NormalTok{(class,}\DataTypeTok{k=}\DecValTok{10}\NormalTok{,}\DataTypeTok{returnTrain=}\NormalTok{T)}
+\NormalTok{cv <-}\StringTok{ }\KeywordTok{createFolds}\NormalTok{(class, }\DataTypeTok{k =} \DecValTok{10}\NormalTok{, }\DataTypeTok{returnTrain =}\NormalTok{ T)}
 \KeywordTok{str}\NormalTok{(cv)}
 \end{Highlighting}
 \end{Shaded}
@@ -4436,7 +4479,7 @@ Receiver Operating Characteristic (ROC) curve uses the predicted class probabili
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-67-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-75-1.pdf}
 
 The first argument of the \texttt{roc()} is, \texttt{response}, the observation vector. The second argument is \texttt{predictor} is the continuous prediction (probability or link function value). The x-axis of ROC curve is ``1 - specificity'' and the y-axis is ``sensitivity''. ROC curve starts from (0, 0) and ends with (1, 1). A perfect model that correctly identifies all the samples will have 100\% sensitivity and specificity which corresponds to the curve that also goes through (0, 1). The area under the perfect curve is 1. A model that is totally useless corresponds to a curve that is close to the diagonal line and an area under the curve about 0.5.
 
@@ -4504,7 +4547,7 @@ Let's plot the lift charts to compare the predicted outbreak probability (\textt
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-70-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-78-1.pdf}
 
 The x-axis is the percentage of samples tested and the y-axis is the percentage of positive samples that are detected by the model. For example, the point on the curve of random forest prediction, （8.125,18.31）, indicates that if you order the testing samples by the predicted probability from high to low, the top 8.125\% of the samples contain 0.1831\% of the total positive outcomes.
 
@@ -4573,7 +4616,7 @@ To fit a linear regression model, let us first check if there are any missing va
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-75-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-83-1.pdf}
 
 There is no missing value in the response variable, but there are outliers. Outliers are usually best described by the problem to solve itself such that we know from domain knowledge that it is not possible to have such values. We can also use a statistical threshold to remove extremely large or small outlier values from the data. We use the Z-score to find and remove outliers described in section \ref{outliers}. Readers can refer to the section for more detail.
 
@@ -4988,7 +5031,7 @@ We can also find the relative importance of each variable during PLS model tunin
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-87-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-95-1.pdf}
 
 The above plot shows that Q1, Q2, Q3, and Q6, are more important than other variables.Now let's fit a PCR model with number of principal components as the hyper-parameter: \index{PCR}
 
@@ -5054,7 +5097,7 @@ Now let's compare the hyper-parameter tuning process for PLS and PCR:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-89-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-97-1.pdf}
 
 The plot confirms our choice of using a model with three components for both PLS and PCR.
 
@@ -5534,7 +5577,7 @@ The object \texttt{glmfit} returned by \texttt{glmnet()} has the information of 
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-107-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-115-1.pdf}
 
 Each curve in the plot represents one predictor. The default setting is \(\alpha=1\) which means there is only lasso penalty. From left to right, \(L_I\) norm is increasing which means \(\lambda\) is decreasing. The bottom x-axis is \(L_1\) norm (i.e. \(\parallel\symbf{\beta}\parallel_{1}\)). The upper x-axis is the effective degrees of freedom (df) for the lasso. You can check the detail for every step by:
 
@@ -5616,7 +5659,7 @@ We can plot the object using \texttt{plot()}. The red dotted line is the cross-v
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-111-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-119-1.pdf}
 
 You can check the two selected \(\lambda\) values by:
 
@@ -5800,7 +5843,7 @@ For example:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-118-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-126-1.pdf}
 
 The above uses error rate as performance criteria and use 10-fold cross-validation. Similarly, you can get the \(\lambda\) value for the minimum error rate and the error rate that is 1 standard error from the minimum:
 
@@ -5986,7 +6029,7 @@ The most common criterion is AUC. You can compare the selections from different 
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-125-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-133-1.pdf}
 
 The x-axis is the value of the tuning parameter, the y-axis is AUC. The two dash lines are the value of \(\lambda\) for max AUC and the value for the one standard deviation to the max AUC. Once you choose the value of the tuning parameter, you can use \texttt{fitglasso()} to fit the model. For example, we can fit the model using the parameter value that gives the max AUC, which is \(\lambda=0.922\):
 
@@ -6392,7 +6435,7 @@ A more convenient way is to use \texttt{train()} function in \texttt{caret} pack
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-129-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-137-1.pdf}
 
 RMSE doesn't change much when the maximum is larger than 2. So we set the maximum depth to be 2 and refit the model:
 
@@ -6433,7 +6476,7 @@ You can see that the final model picks \texttt{Q3} and \texttt{Q5} to predict to
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-132-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-140-1.pdf}
 
 \hypertarget{decision-tree}{%
 \subsection{Decision Tree}\label{decision-tree}}
@@ -6580,7 +6623,7 @@ Compare the results of the two approaches.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-136-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-144-1.pdf}
 
 You can see that in this case, the two approaches lead to similar model performance.
 
@@ -6813,7 +6856,7 @@ You can use varImpPlot() function to visualize the predictor importance:
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-144-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-152-1.pdf}
 It is easy to see from the plot that \texttt{segment} and \texttt{Q4} are the top two variables to classify gender.
 
 \hypertarget{gradient-boosted-machine}{%
@@ -7000,7 +7043,7 @@ Now, let's compare the results from the three tree models.
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{IDS_files/figure-latex/unnamed-chunk-147-1.pdf}
+\includegraphics{IDS_files/figure-latex/unnamed-chunk-155-1.pdf}
 
 Since the data here doesn't have many variables, we don't see a significant difference among the models. But you can still see those ensemble methods are better than a single tree. In most of the real applications, ensemble methods perform much better. Random forest and boosting trees can be a baseline model. Before exploring different models, you can quickly run a random forest to see the performance and then try to improve that performance. If the performance you got from the random forest is not too much better than guessing, you should consider collecting more data or reviewing the problem to frame it a different way instead of trying other models. Because it usually means the current data is not enough to solve the problem.
 
