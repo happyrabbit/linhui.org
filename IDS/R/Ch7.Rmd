@@ -12,8 +12,252 @@ output:
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 ```
 
-This R notebook shows how to apply data splitting and resampling techniques to build sound models for prediction.
+In this notebook, we illustrate basic model tuning strategies.
 
+# Load R Packages and Data
+
+```{r, message = FALSE, warning=FALSE, results='hide'}
+# install packages from CRAN
+p_needed <- c('ggplot2','tidyr', 'caret', 'dplyr', 'lattice', 'proxy', 'caret')
+packages <- rownames(installed.packages())
+p_to_install <- p_needed[!(p_needed %in% packages)]
+if (length(p_to_install) > 0) {
+    install.packages(p_to_install)
+}
+
+lapply(p_needed, require, character.only = TRUE)
+```
+
+# Variance-Bias Trade-Off
+
+In this section, we will show the variance-bias trade-off through a simulated example. We first simulate a dataset and plot the data.
+
+```{r}
+# randomly simulate some non-linear samples
+x = seq(1, 10, 0.01) * pi
+e = rnorm(length(x), mean = 0, sd = 0.2)
+fx <- sin(x) + e + sqrt(x)
+dat = data.frame(x, fx)
+```
+
+If we fit a linear regression model to this dataset, it will be a high bias model.
+
+```{r}
+ggplot(dat, aes(x, fx)) +
+geom_point() +
+geom_smooth(method = "lm", se = FALSE)
+```
+
+If we use a smoothing method to fit the data, it will be a high variance model.
+
+```{r}
+ggplot(dat, aes(x, fx)) + geom_smooth(span = 0.03)
+```
+
+To better illustrate the variance-bias trade-off, we now simulate four subsets of the original dataset and try to fit a smoothing model and a linear model. As the plots show, the smoothing model is more flexible to the training data, while the linear model is more robust to different subsets.
+
+```{r}
+# set random seed
+set.seed(2016)
+# sample part of the data to fit model sample 1
+idx1 = sample(1:length(x), 100)
+dat1 = data.frame(x1 = x[idx1], fx1 = fx[idx1])
+p1 = ggplot(dat1, aes(x1, fx1)) + 
+  geom_smooth(span = 0.03) + 
+  geom_point()
+
+# sample 2
+idx2 = sample(1:length(x), 100)
+dat2 = data.frame(x2 = x[idx2], fx2 = fx[idx2])
+p2 = ggplot(dat2, aes(x2, fx2)) + 
+  geom_smooth(span = 0.03) + 
+  geom_point()
+
+# sample 3
+idx3 = sample(1:length(x), 100)
+dat3 = data.frame(x3 = x[idx3], fx3 = fx[idx3])
+p3 = ggplot(dat3, aes(x3, fx3)) + 
+  geom_smooth(span = 0.03) + 
+  geom_point()
+
+# sample 4
+idx4 = sample(1:length(x), 100)
+dat4 = data.frame(x4 = x[idx4], fx4 = fx[idx4])
+p4 = ggplot(dat4, aes(x4, fx4)) + 
+  geom_smooth(span = 0.03) + 
+  geom_point()
+
+# Load multiplot function
+source('http://bit.ly/2KeEIg9')
+
+multiplot(p1, p2, p3, p4, cols = 2)
+```
+
+
+```{r}
+p1 = ggplot(dat1, aes(x1, fx1)) + 
+  geom_smooth(method = "lm", se = FALSE) + 
+  geom_point()
+
+p2 = ggplot(dat2, aes(x2, fx2)) + 
+  geom_smooth(method = "lm", se = FALSE) + 
+  geom_point()
+
+p3 = ggplot(dat3, aes(x3, fx3)) + 
+  geom_smooth(method = "lm", se = FALSE) + 
+  geom_point()
+
+p4 = ggplot(dat4, aes(x4, fx4)) + 
+  geom_smooth(method = "lm", se = FALSE) + 
+  geom_point()
+
+multiplot(p1, p2, p3, p4, cols = 2)
+```
+
+# Data Splitting and Resampling
+
+Data splitting and resampling are fundamental techniques to build sound models for prediction.
+
+## Data Splitting
+
+The `createDataPartition()` function in `caret` package will return a balanced splitting based on assigned variable.
+
+
+```{r}
+# load data
+sim.dat <- read.csv("http://bit.ly/2P5gTw4")
+# set random seed to make sure reproducibility
+set.seed(3456)
+trainIndex <- createDataPartition(sim.dat$segment,
+                                  p = 0.8,
+                                  list = FALSE,
+                                  times = 1)
+head(trainIndex)
+```
+
+
+```{r}
+# get training set
+datTrain <- sim.dat[trainIndex, ]
+# get test set
+datTest <- sim.dat[-trainIndex, ]
+```
+
+Let's check the distribution of the two sets:
+
+```{r, message=FALSE}
+datTrain %>%
+  dplyr::group_by(segment) %>%
+  dplyr::summarise(count = n(),
+            percentage = round(length(segment)/nrow(datTrain), 2))
+```
+
+```{r, message=FALSE}
+datTest %>%
+  dplyr::group_by(segment) %>%
+  dplyr::summarise(count = n(),
+            percentage = round(length(segment)/nrow(datTrain), 2))
+```
+
+An alternative way is to split data based on the predictors. The goal is to get a diverse subset from a dataset so that the sample is representative.
+
+```{r}
+# select variables
+testing <- subset(sim.dat, select = c("age", "income"))
+```
+
+Random select 5 samples as initial subset (`start`) , the rest will be in `samplePool`: 
+
+```{r}
+set.seed(5)
+# select 5 random samples
+startSet <- sample(1:dim(testing)[1], 5)
+start <- testing[startSet, ]
+# save the rest in data frame 'samplePool'
+samplePool <- testing[-startSet, ]
+```
+
+Use `maxDissim()` to select another 5 samples from `samplePool` that are as different as possible with the initical set `start`:
+
+```{r}
+selectId <- maxDissim(start, samplePool, obj = minDiss, n = 5)
+minDissSet <- samplePool[selectId, ]
+```
+
+```{r}
+selectId <- sample(1:dim(samplePool)[1], 5)
+RandomSet <- samplePool[selectId, ]
+```
+
+
+```{r}
+start$group <- rep("Initial Set", nrow(start))
+minDissSet$group <- rep("Maximum Dissimilarity Sampling",
+                        nrow(minDissSet))
+
+RandomSet$group <- rep("Random Sampling",
+                        nrow(RandomSet))
+
+xyplot(age ~ income,
+       data = rbind(start, minDissSet, RandomSet),
+       grid = TRUE,
+       group = group,
+       auto.key = TRUE)
+```
+
+For time series data, random sampling is usually not the best way.
+
+```{r}
+# simulte AR(1) time series samples
+timedata = arima.sim(list(order=c(1,0,0), ar=-.9), n=100)
+# plot time series
+plot(timedata, main=(expression(AR(1)~~~phi==-.9)))
+```
+
+```{r}
+timeSlices <- createTimeSlices(1:length(timedata),
+                               initialWindow = 36,
+                               horizon = 12,
+                               fixedWindow = T)
+str(timeSlices,max.level = 1)
+```
+
+```{r}
+# get result for the 1st training set
+trainSlices <- timeSlices[[1]]
+# get result for the 1st test set
+testSlices <- timeSlices[[2]]
+# check the index for the 1st training and test set
+trainSlices[[1]]
+```
+
+
+```{r}
+testSlices[[1]]
+```
+
+## Resampling
+
+k-fold cross-validation is to partition the original sample into 𝑘 equal size subsamples (folds).
+
+```{r}
+class <- sim.dat$segment
+# creat k-folds
+set.seed(1)
+cv <- createFolds(class, k = 10, returnTrain = T)
+str(cv)
+```
+
+Repeated training/test splits method is repeating the training/test set division on the original data.
+
+
+```{r}
+trainIndex <- createDataPartition(sim.dat$segment,
+                                  p = .8,
+                                  list = FALSE,
+                                  times = 5)
+dplyr::glimpse(trainIndex)
+```
