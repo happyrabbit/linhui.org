@@ -1,0 +1,330 @@
+---
+title: "Chapter 6 Data Wrangling"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float:
+      collapsed: true
+      smooth_scroll: true
+---
+
+
+This notebook illustrates how to perform standard data pre-processing, an essential step for any data science project.
+
+# Load R Packages and Data
+
+```{r, message = FALSE, warning=FALSE, results='hide'}
+# install packages from CRAN
+p_needed <- c('dplyr','tidyr')
+packages <- rownames(installed.packages())
+p_to_install <- p_needed[!(p_needed %in% packages)]
+if (length(p_to_install) > 0) {
+    install.packages(p_to_install)
+}
+
+lapply(p_needed, require, character.only = TRUE)
+```
+
+# Summarize Data
+
+## `dplyr` Package
+
+```{r}
+ # Read data
+sim.dat <- read.csv("http://bit.ly/2P5gTw4")
+```
+
+### Display
+
+We first use `tibble::as_tibble()` function to convert data into a `tibble` object. It offers better checking and printing capabilities than the traditional data frame. For example, the `glimpse()` function provides a quick view of the data.
+
+```{r}
+tibble::as_tibble(sim.dat)
+glimpse(sim.dat)
+```
+
+### Subset
+
+```{r}
+filter(sim.dat, income >300000) %>% 
+  tibble::as_tibble()
+```
+
+The example below shows the difference between using and not using `%>%`.
+
+```{r}
+# don't use %>%
+ave_exp <- filter(
+  summarise(
+    group_by(
+      filter(
+        sim.dat,
+        !is.na(income)
+      ),
+    segment
+  ),
+  ave_online_exp = mean(online_exp),
+  n = n()
+  ),
+  n > 200
+)
+ 
+ave_exp
+```
+
+```{r}
+# use %>%
+ave_exp <- sim.dat %>%
+  filter(!is.na(income)) %>%
+  group_by(segment) %>%
+  summarise(
+    ave_online_exp = mean(online_exp),
+    n = n() ) %>%
+  filter(n > 200)
+ 
+ave_exp
+```
+
+Let us check a few more functions in `dplyr` pacakge.
+
+```{r, results='hide'}
+# remove duplicated rows
+dplyr::distinct(sim.dat)
+```
+
+```{r}
+# sample a fraction or certain number of rows of data
+print(dplyr::sample_frac(sim.dat, 0.01, replace = TRUE))
+print(dplyr::sample_n(sim.dat, 10, replace = TRUE))
+```
+
+
+```{r}
+# subset rows by position
+dplyr::slice(sim.dat, 10:15)
+```
+
+
+```{r}
+# select the order top n entries
+dplyr::top_n(sim.dat,2,income)
+```
+
+
+```{r}
+# select by column name
+print(head(dplyr::select(sim.dat,income,age,store_exp)))
+
+# select columns whose name contains a character string
+print(head(dplyr::select(sim.dat, contains("_"))))
+```
+
+
+```{r}
+# select columns whose name ends with a character string
+# similar there is "starts_with"
+print(head(dplyr::select(sim.dat, ends_with("e"))))
+
+# select columns Q1,Q2,Q3,Q4 and Q5
+print(head(select(sim.dat, num_range("Q", 1:5))))
+
+# select columns whose names are in a group of names
+print(head(dplyr::select(sim.dat, one_of(c("age", "income")))))
+
+# select columns between age and online_exp
+print(head(dplyr::select(sim.dat, age:online_exp)))
+
+# select all columns except for age
+print(head(dplyr::select(sim.dat, -age)))
+```
+
+### Summarize
+
+```{r, message = FALSE}
+dat_summary <- sim.dat %>% 
+  dplyr::group_by(segment) %>% 
+  dplyr::summarise(Age = round(mean(na.omit(age)), 0), 
+            FemalePct = round(mean(gender == "Female"), 2), 
+            HouseYes = round(mean(house == "Yes"), 2), 
+            store_exp = round(mean(na.omit(store_exp), 
+                                   trim = 0.1), 0),
+            online_exp = round(mean(online_exp), 0), 
+            store_trans = round(mean(store_trans), 1), 
+            online_trans = round(mean(online_trans), 1))
+
+# transpose the data frame for showing purpose
+# due to the limit of output width
+cnames <- dat_summary$segment
+dat_summary <- dplyr::select(dat_summary, - segment)
+tdat_summary <- t(dat_summary) %>% data.frame()
+names(tdat_summary) <- cnames
+tdat_summary
+```
+
+```{r}
+# Another example using group_by() and summarise()
+sim.dat %>%
+  group_by(segment) %>%
+  summarise(avg_online = round(sum(online_exp)/sum(online_trans), 2),
+            avg_store = round(sum(store_exp)/sum(store_trans), 2))
+```
+
+```{r}
+# apply function anyNA() to each column
+# you can also assign a function vector such as: c("anyNA","is.factor")
+dplyr::summarise_all(sim.dat, funs_(c("anyNA")))
+```
+
+### Create new variable
+
+```{r}
+# create a new variable
+head(dplyr::mutate(sim.dat, total_exp = store_exp + online_exp))
+```
+
+
+```{r}
+# create a new variable and only keep the new variable
+head(dplyr::transmute(sim.dat, total_exp = store_exp + online_exp))
+```
+
+### Merge
+
+```{r}
+(x <- data.frame(cbind(ID = c("A", "B", "C"), x1 = c(1, 2, 3))))
+(y <- data.frame(cbind(ID = c("B", "C", "D"), y1 = c(T, T, F))))
+```
+
+```{r}
+# join to the left
+# keep all rows in x
+left_join(x, y, by = "ID")
+```
+
+```{r}
+# get rows matched in both data sets
+inner_join(x, y, by = "ID")
+```
+
+```{r}
+# get rows in either data set
+full_join(x, y, by = "ID")
+```
+
+```r
+# filter out rows in x that can be matched in y 
+# it doesn't bring in any values from y 
+semi_join(x, y, by = "ID")
+```
+
+```r
+# the opposite of  semi_join()
+# it gets rows in x that cannot be matched in y
+# it doesn't bring in any values from y
+anti_join(x, y, by = "ID")
+```
+
+## `apply()`, `lapply()` and `sapply()` in base R
+
+Compute row and column sums for a matrix:
+
+```{r}
+## simulate a matrix
+x <- cbind(x1 =1:8, x2 = c(4:1, 2:5))
+dimnames(x)[[1]] <- letters[1:8]
+apply(x, 2, mean)
+col.sums <- apply(x, 2, sum)
+row.sums <- apply(x, 1, sum)
+```
+
+You can also apply other functions:
+
+```{r}
+ma <- matrix(c(1:4, 1, 6:8), nrow = 2)
+ma
+apply(ma, 1, table)  #--> a list of length 2
+apply(ma, 1, stats::quantile) # 5 x n matrix with rownames
+```
+
+Let's use some data with context to help you better understand the functions.
+
+- Get the mean and standard deviation of all numerical variables in the dataset.
+
+```{r}
+# Get numerical variables
+sdat <- sim.dat[, lapply(sim.dat, class) %in% c("integer", "numeric")]
+## Try the following code with apply() function apply(sim.dat,2,class)
+## What is the problem?
+```
+
+The data frame `sdat` only includes numeric columns. Now we can go head and use `apply()` to get mean and standard deviation for each column:
+
+```{r}
+apply(sdat, MARGIN = 2, function(x) mean(na.omit(x)))
+```
+
+Run the following code and compare the results:
+
+```r
+lapply(sdat, function(x) sd(na.omit(x)))
+sapply(sdat, function(x) sd(na.omit(x)))
+sapply(sdat, function(x) sd(na.omit(x)), simplify = FALSE)
+```
+
+# Tidy and Reshape Data
+
+Take a baby subset of our exemplary clothes consumers data to illustrate: 
+
+```{r}
+sdat<-sim.dat[1:5,1:6]
+sdat
+```
+
+Change data from "wide" to "long". 
+
+```{r}
+dat_long <- tidyr::gather(sdat, "Channel","Expense", 
+                       store_exp, online_exp)
+dat_long
+```
+
+You can run a regression to study the effect of purchasing channel as follows: 
+
+```{r}
+# Here we use all observations from sim.dat
+# Don't show result here
+
+msdat <- tidyr::gather(sim.dat[, 1:6], "Channel","Expense", 
+                       store_exp, online_exp)
+fit <- lm(Expense ~ gender + house + income + Channel + age, 
+          data = msdat)
+summary(fit)
+```
+
+Change data from "long" to "wide".
+
+```{r, message = FALSE}
+dat_wide = tidyr::spread(dat_long, Channel, Expense)
+# you can check what dat_long is like
+dat_wide %>% 
+  dplyr::group_by(house, gender) %>% 
+  dplyr::summarise(total_online_exp = sum(online_exp),
+                   total_store_exp = sum(store_exp))
+```
+
+Another pair of functions that do opposite manipulations are `separate()` and `unite()`. 
+
+```{r}
+sepdat<- dat_long %>% 
+  separate(Channel, c("Source", "Type"))
+sepdat
+```
+
+The `unite()` function will do the opposite: combining two columns. It is the generalization of `paste()` to a data frame.
+
+```{r}
+sepdat %>% 
+  unite("Channel", Source, Type, sep = "_")
+```
