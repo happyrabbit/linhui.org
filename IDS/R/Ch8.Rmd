@@ -1,0 +1,175 @@
+---
+title: "Chapter 8 Measuring Performance"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float:
+      collapsed: true
+      smooth_scroll: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+# Load R Packages
+
+```{r, message = FALSE, warning=FALSE, results='hide'}
+# install packages from CRAN
+p_needed <- c('caret', 'dplyr', 'randomForest',
+              'readr', 'car', 'pROC', 'fmsb', 'caret')
+
+packages <- rownames(installed.packages())
+p_to_install <- p_needed[!(p_needed %in% packages)]
+if (length(p_to_install) > 0) {
+    install.packages(p_to_install)
+}
+
+lapply(p_needed, require, character.only = TRUE)
+```
+
+In this notebook, we introduce basic model performance measurements for regression and classification problems.
+
+# Regression Model Performance
+
+We first fit a linear regression model on a simulated dataset, and then go through the details about metrics to check for model performance such as MSE, RMSE, and R-Square.
+
+```{r}
+sim.dat <- read.csv("http://bit.ly/2P5gTw4")
+fit<- lm(formula = income ~ store_exp + online_exp + store_trans + 
+    online_trans, data = sim.dat)
+summary(fit)
+```
+
+The fitted results `fit` shows the RMSE is `r as.integer(round(summary(fit)$sigma,0))` (at the bottom of the output after `Residual standard error:`).
+
+Another common performance measure for the regression model is R-Squared, often denoted as $R^2$. It is the square of the correlation between the fitted value and the observed value. It is often explained as the percentage of the information in the data that can be explained by the model. The above model returns a R-squared＝`r round(summary(fit)$adj.r.squared,2)`, which indicates the model can explain `r round((summary(fit)$adj.r.squared)*100,0)`% of the variance in variable `income`.  While $R^2$ is easy to explain, it is not a direct measure of model accuracy but correlation. Here the $R^2$ value is not low but the RMSE is  `r round(summary(fit)$adj.r.squared,2)`  which means the average difference between model fitting and the observation is  `r round(summary(fit)$sigma,0)`. It is a big discrepancy from an application point of view. When the response variable has a large scale and high variance, a high $R^2$ doesn't mean the model has enough accuracy. It is also important to remember that $R^2$ is dependent on the variation of the outcome variable. If the data has a response variable with a higher variance, the model based on it tends to have a higher $R^2$.
+
+# Classification Model Performance
+
+In this section, we will fit a random forest model for a classification problem, and then go through typical metrics and plots for model performance. 
+```{r}
+disease_dat <- read.csv("http://bit.ly/2KXb1Qi")
+```
+
+## Train a Random Forest Model
+
+We separate the data into training and testing dataset. We then use the training dataset to train a random forest model, and predict the probability and corresponding classes for the testing dataset using the model trained. 
+
+```{r}
+set.seed(100)
+# separate the data to be training and testing
+trainIndex <- createDataPartition(disease_dat$y, p = 0.8,
+                                  list = F, times = 1)
+
+xTrain <- disease_dat[trainIndex, ] %>% dplyr::select(-y)
+xTest <- disease_dat[-trainIndex, ] %>% dplyr::select(-y)
+
+# the response variable need to be factor
+yTrain <- disease_dat$y[trainIndex] %>% as.factor()
+yTest <- disease_dat$y[-trainIndex] %>% as.factor()
+```
+
+
+```{r}
+train_rf <- randomForest(yTrain ~ .,
+                         data = xTrain,
+                         mtry = trunc(sqrt(ncol(xTrain) - 1)),
+                         ntree = 1000,
+                         importance = T)
+```
+
+
+```{r}
+yhatprob <- predict(train_rf, xTest, "prob")
+set.seed(100)
+car::some(yhatprob)
+```
+
+
+```{r}
+yhat <- predict(train_rf, xTest)
+car::some(yhat)
+```
+
+## Confusion Matrix and Kappa Statistic
+
+Confusion matrix is a typical way to check the model performance for classification problems. Kappa statistics measures the agreement between the observed and predicted classes.
+
+```{r}
+yhat = as.factor(yhat) %>% relevel("1")
+yTest = as.factor(yTest) %>% relevel("1")
+table(yhat, yTest)
+```
+
+
+```{r}
+kt<-fmsb::Kappa.test(table(yhat,yTest))
+kt$Result
+```
+
+Kappa can take on a value from  -1 to 1. The higher the value,  the higher the agreement. A value of 0 means there is no agreement between the observed and predicted classes, while a value of 1 indicates perfect agreement. A negative value indicates that the prediction is in the opposite direction of the observed value. The following table may help you "visualize" the interpretation of kappa:
+
+| Kappa | Agreement |
+|:-----:|:-----:|
+| < 0 | Less than chance agreement |
+| 0.01–0.20 | Slight agreement |
+| 0.21– 0.40 | Fair agreement |
+| 0.41–0.60 | Moderate agreement |
+| 0.61–0.80 | Substantial agreement | 
+| 0.81–0.99 | Almost perfect agreement |
+
+```{r}
+kt$Judgement
+```
+
+## ROC
+
+ROC (i.e. receiver operating characteristic) curve and AUC (i.e. area under the curve) are two common ways to evaluate classification model performance. 
+
+```{r}
+rocCurve <- pROC::roc(response = yTest,
+              predictor = yhatprob[,2])
+
+plot(1-rocCurve$specificities, 
+     rocCurve$sensitivities, 
+     type = 'l',
+     xlab = '1 - Specificities',
+     ylab = 'Sensitivities')
+```
+
+
+```{r}
+# get the estimate of AUC
+auc(rocCurve)
+```
+
+
+```{r}
+# get a confidence interval based on DeLong et al.
+ci.auc(rocCurve)
+```
+
+## Gain and Lift Charts
+
+Gain and lift chart is another visual tool for evaluating the performance for a classification model. It ranks the samples by their scores and calculate the cumulative positive rate as more samples are evaluated.
+
+```{r}
+table(yTest)
+```
+
+```{r}
+# predicted outbreak probability
+modelscore <- yhatprob[ ,2]
+# randomly sample from a uniform distribution
+randomscore <- runif(length(yTest))
+labs<-c(modelscore = "Random Forest Prediction",
+        randomscore = "Random Number")
+        liftCurve = caret::lift(yTest ~ modelscore + randomscore,
+        class = "1",
+        labels = labs)
+xyplot(liftCurve, auto.key = list(columns = 2, lines = T, points = F))
+```
+
