@@ -1,0 +1,355 @@
+---
+title: "Chapter 11 Tree-Based Methods"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float:
+      collapsed: true
+      smooth_scroll: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+# Load R Packages
+
+```{r, message = FALSE, warning=FALSE, results='hide'}
+# install packages from CRAN
+p_needed <- c('rpart', 'caret', 'partykit',
+              'pROC', 'dplyr', 'ipred',
+              'e1071', 'randomForest', 'gbm')
+
+packages <- rownames(installed.packages())
+p_to_install <- p_needed[!(p_needed %in% packages)]
+if (length(p_to_install) > 0) {
+    install.packages(p_to_install)
+}
+
+lapply(p_needed, require, character.only = TRUE)
+```
+
+# Regression Tree
+
+```{r}
+# first load data
+dat <- read.csv("http://bit.ly/2P5gTw4")
+head(dat)
+```
+
+
+```{r}
+# data cleaning: delete wrong observations
+dat <- subset(dat, store_exp > 0 & online_exp > 0)
+
+# use the 10 survey questions as predictors
+trainx <- dat[, grep("Q", names(dat))]
+
+# use the sum of store and online expenditure as response variable
+# total expenditure = store expenditure + online expenditure
+trainy <- dat$store_exp + dat$online_exp
+```
+
+```{r}
+# set fixed random seed such that the results can be duplicated
+set.seed(100)
+
+# fit the model using caret library function train to find the best tree model 
+# based on RMSE on the cross-validation set
+
+rpartTune <- train(trainx, trainy, method = "rpart2", tuneLength = 10, 
+    trControl = trainControl(method = "cv"))
+plot(rpartTune)
+```
+
+```{r}
+# from the graph above, RMSE doesn’t change much when the maximum is larger than 2. 
+# So we set the maximum depth to be 2 and refit the model: 
+rpartTree <- rpart(trainy ~ ., data = trainx, maxdepth = 2)
+
+print(rpartTree)
+```
+
+To visualize the tree, you can convert rpart object to party object using `partykit` then use `plot()` function:
+
+```{r}
+rpartTree2 <- partykit::as.party(rpartTree)
+plot(rpartTree2)
+```
+
+# Decision Tree
+
+```{r}
+dat <- read.csv("http://bit.ly/2P5gTw4")
+head(dat)
+```
+
+In the code below, we showed two ways to deal with categorical data, use it as it is (approach 1) and covert it to dummy variables (approach 2)
+
+```{r}
+# use the 10 survey questions as predictors
+trainx1 <- dat[, grep("Q", names(dat))]
+
+# add a categorical predictor
+# use two ways to treat categorical predictor
+# trainx1: use approach 1, without encoding
+trainx1$segment <- dat$segment
+head(trainx1)
+```
+
+```{r}
+# trainx2: use approach 2, encode it to a set of dummy variables
+dumMod<-dummyVars(~.,
+                  data=trainx1,
+                  # Combine the previous variable name and the level name
+                  # as the new dummy variable name
+                  levelsOnly=F)
+trainx2 <- predict(dumMod,trainx1)
+head(trainx2)
+```
+
+```{r}
+# the response variable is gender
+trainy <- dat$gender
+head(trainy)
+```
+
+```{r}
+## model search using approach 1 for categorical variable
+rpartTune1 <- caret::train(trainx1, trainy, method = "rpart",
+                       tuneLength = 30,
+                       metric = "ROC", 
+                       trControl = trainControl(method = "cv",
+                                                summaryFunction = twoClassSummary,
+                                                classProbs = TRUE,
+                                                savePredictions = TRUE))
+```
+
+```{r}
+rpartTune1
+```
+
+```{r}
+rpartRoc <- pROC::roc(response = rpartTune1$pred$obs,
+                predictor = rpartTune1$pred$Female,
+                levels = rev(levels(rpartTune1$pred$obs)))
+rpartRoc
+```
+
+
+```{r}
+## model search using approach 2 for categorical variable
+rpartTune2 <- caret::train(trainx2, trainy, method = "rpart",
+                       tuneLength = 30,
+                       metric = "ROC", 
+                       trControl = trainControl(method = "cv",
+                                                summaryFunction = twoClassSummary,
+                                                classProbs = TRUE,
+                                                savePredictions = TRUE))
+rpartTune2
+```
+
+```{r}
+rpartFactorRoc <- pROC::roc(response = rpartTune2$pred$obs,
+                      predictor = rpartTune2$pred$Female,
+                      levels = rev(levels(rpartTune1$pred$obs))
+                      )
+rpartFactorRoc
+```
+
+```{r}
+# compare the ROC for two approaches
+plot.roc(rpartRoc, 
+     type = "s", 
+     print.thres = c(.5),
+     print.thres.pch = 3,
+     print.thres.pattern = "",
+     print.thres.cex = 1.2,
+     col = "red", legacy.axes = TRUE,
+     print.thres.col = "red")
+
+plot.roc(rpartFactorRoc,
+     type = "s",
+     add = TRUE,
+     print.thres = c(.5),
+     print.thres.pch = 16, legacy.axes = TRUE,
+     print.thres.pattern = "",
+     print.thres.cex = 1.2)
+
+legend(.75, .2,
+       c("Grouped Categories", "Independent Categories"),
+       lwd = c(1, 1),
+       col = c("black", "red"),
+       pch = c(16, 3))
+```
+
+# Bagging Tree Model
+
+```{r}
+# load and prepare data
+dat <- read.csv("http://bit.ly/2P5gTw4")
+
+# use the 10 survey questions as predictors
+trainx <- dat[, grep("Q", names(dat))]
+
+# add segment as a predictor 
+# don't need to encode it to dummy variables
+trainx$segment <- as.factor(dat$segment)
+
+# use gender as the response variable
+trainy <- as.factor(dat$gender)
+```
+
+```{r}
+# using 200 trees to do bagging, no tuning parameters for this method
+set.seed(100)
+bagTune <- caret::train(trainx, trainy, 
+                           method = "treebag",
+                           nbagg = 200,
+                           metric = "ROC",
+                           trControl = trainControl(method = "cv",
+                           summaryFunction = twoClassSummary,
+                           classProbs = TRUE,
+                           savePredictions = TRUE)
+                        )
+```
+
+```{r}
+bagTune
+```
+
+# Random Forest
+
+```{r}
+# tune across a list of numbers of predictors
+mtryValues <- c(1:5)
+
+# train and tune random forest models
+set.seed(100)
+rfTune <- train(x = trainx, 
+               y = trainy,
+               # set the model to be random forest
+               method = "rf",
+               ntree = 200,
+               tuneGrid = data.frame(.mtry = mtryValues),
+               importance = TRUE,
+               metric = "ROC",
+               trControl = trainControl(method = "cv",
+                           summaryFunction = twoClassSummary,
+                           classProbs = TRUE,
+                           savePredictions = TRUE))
+```
+
+```{r}
+rfTune
+```
+
+```{r}
+# fit model with best option
+rfit = randomForest(trainy ~ ., 
+                    trainx, 
+                    mtry = 5, 
+                    ntree = 2000)
+```
+
+```{r}
+# print relative importance of each variable
+importance(rfit)
+```
+
+```{r}
+# plot the relative importance of each variable
+varImpPlot(rfit)
+```
+
+# Gradient Boosted Tree
+
+```{r}
+# setup tuning grid
+gbmGrid <- expand.grid(interaction.depth = c(1, 5, 9),
+                       n.trees = c(6:10)*10,
+                       shrinkage = c(.01, .1),
+                       n.minobsinnode = 10)
+
+set.seed(100)
+gbmTune <- caret::train(x = trainx, 
+                y = trainy,
+                method = "gbm",
+                tuneGrid = gbmGrid,
+                metric = "accuracy",
+                verbose = FALSE,
+                trControl = trainControl(method = "cv",
+                           classProbs = TRUE,
+                           savePredictions = TRUE))
+```
+
+```{r}
+gbmTune
+```
+
+# Comparing ROC Curves
+
+Now, let us plot ROC curve for different methods in the same graph.
+
+```{r}
+treebagRoc <- pROC::roc(response = bagTune$pred$obs,
+                        predictor = bagTune$pred$Female,
+                        levels = rev(levels(bagTune$pred$obs)))
+treebagRoc
+```
+
+```{r}
+rfRoc <- pROC::roc(response = rfTune$pred$obs,
+             predictor = rfTune$pred$Female,
+             levels = rev(levels(rfTune$pred$obs)))
+rfRoc
+```
+
+```{r}
+gbmRoc <- pROC::roc(response = gbmTune$pred$obs,
+              predictor = gbmTune$pred$Female,
+              levels = rev(levels(gbmTune$pred$obs)))
+gbmRoc
+```
+
+```{r}
+plot.roc(rpartRoc, 
+     type = "s", 
+     print.thres = c(.5),
+     print.thres.pch = 16,
+     print.thres.pattern = "",
+     print.thres.cex = 1.2,
+     col = "black", legacy.axes = TRUE,
+     print.thres.col = "black")
+
+plot.roc(treebagRoc, 
+     type = "s", 
+     add = TRUE, print.thres = c(.5), 
+     print.thres.pch = 3, legacy.axes = TRUE, print.thres.pattern = "", 
+     print.thres.cex = 1.2,
+     col = "red", print.thres.col = "red")
+
+plot.roc(rfRoc, 
+     type = "s", 
+     add = TRUE, print.thres = c(.5), 
+     print.thres.pch = 1, legacy.axes = TRUE, print.thres.pattern = "", 
+     print.thres.cex = 1.2,
+     col = "green", print.thres.col = "green")
+
+plot.roc(gbmRoc, 
+     type = "s", 
+     add = TRUE, print.thres = c(.5), 
+     print.thres.pch = 10, legacy.axes = TRUE, print.thres.pattern = "", 
+     print.thres.cex = 1.2,
+     col = "blue", print.thres.col = "blue")
+
+legend("topleft", cex = 0.8,
+       c("Single Tree", "Bagged Tree", "Random Forest", "Boosted Tree"),
+       lwd = c(1, 1, 1, 1),
+       col = c("black", "red", "green", "blue"),
+       pch = c(16, 3, 1, 10))
+```
+
+Since the data here doesn’t have many variables, we don’t see a significant difference among the models. But you can still see those ensemble methods are better than a single tree. In most of the real applications, ensemble methods perform much better. Random forest and boosting trees can be a baseline model. Before exploring different models, you can quickly run a random forest to see the performance and then try to improve that performance. If the performance you got from the random forest is not too much better than guessing, you should consider collecting more data or reviewing the problem to frame it a different way instead of trying other models. Because it usually means the current data is not enough to solve the problem.
