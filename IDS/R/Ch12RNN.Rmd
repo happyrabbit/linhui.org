@@ -37,7 +37,7 @@ knit_hooks$set(output = function(x, options) {
 })
 ```
 
-In this section, we will walk through an example of text sentiment analysis using RNN. The notebook's purpose is to illustrate how to build Convolutional Neural Network using R. Please check the `keras` R package website for the most recent development: https://keras.rstudio.com/.
+In this section, we will walk through an example of text sentiment analysis using RNN. The notebook's purpose is to illustrate how to build a Recurrent Neural Network using R. Please check the `keras` R package website for the most recent development: https://keras.rstudio.com/.
 
 
 #  Packages Download and Installation
@@ -66,6 +66,141 @@ You can also run this notebook on your local machine with R and the required Pyt
 - Run `reticulate::py_config()` to check the current Python configuration to see if anything needs to be changed. 
 - By default, `install_keras()` uses virtual environment `~/.virtualenvs/r-reticulate`. If you don't know how to set the right environment, try to set the installation method as conda (`install_keras(method = "conda")`)
 - Refer to this document for more details on how to [install `keras` and the TensorFlow backend](https://tensorflow.rstudio.com/reference/keras/install_keras/). 
+
+
+# Overview for IMDB Dataset
+
 We will use the IMDB movie review data. It is one of the most used datasets for text-related machine learning methods. The datasets’ inputs are movie reviews published at IMDB in its raw text format, and the output is a binary sentiment indicator( “1” for positive and “0” for negative) created through human evaluation. The training and testing data have 25,000 records each. Each review varies in length.
 
-# Data preprocessing
+## Data preprocessing
+
+Machine learning algorithms can not deal with raw text, and we have to convert text into numbers before feeding it into an algorithm. Tokenization is one way to convert text data into a numerical representation. For example, suppose we have 500 unique words for all reviews in the training dataset. We can label each word by the rank (i.e., from 1 to 500) of their frequency in the training data. Then each word is replaced by an integer between 1 to 500. This way, we can map each movie review from its raw text format to a sequence of integers.
+
+As reviews can have different lengths, sequences of integers will have different sizes too. So another important step is to make sure each input has the same length by padding or truncating. For example, we can set a length of 50 words, and for any reviews less than 50 words, we can pad 0 to make it 50 in length; and for reviews with more than 50 words, we can truncate the sequence to 50 by keeping only the first 50 words. After padding and truncating, we have a typical data frame, each row is an observation, and each column is a feature. The number of features is the number of words designed for each review (i.e., 50 in this example).
+
+After tokenization, the numerical input is just a naive mapping to the original words, and the integers do not have their usual numerical meanings. We need to use embedding to convert these categorical integers to more meaningful representations. The word embedding captures the inherited relationship of words and dramatically reduces the input dimension. The dimension is a vector space representing the entire vocabulary. It can be 128 or 256, and the vector space dimension is the same when the vocabulary changes. It has a lower dimension, and each vector is filled with real numbers. The embedding vectors can be learned from the training data, or we can use pre-trained embedding models. There are many pre-trained embeddings for us to use, such as Word2Vec, BIRD.
+
+## Load IMDB Dataset
+
+The IMDB dataset is preloaded for `keras` and we can call `dataset_imdb()` to load a partially pre-processed dataset into a data frame. We can define a few parameters in that function. `num_words` is the number of words in each review to be used. All the unique words are ranked by their frequency counts in the training dataset. The `dataset_imdb()` function keeps the top `num_words` words and replaces other words with a default value of 2, and using integers to represent text (i.e., top frequency word will be replaced by 3 and 0, 1, 2 are reserved for "padding," "start of the sequence," and "unknown." ).
+
+```{r}
+# consider only the top 10,000 words in the dataset
+max_unique_word <- 2500
+# cut off reviews after 100 words
+max_review_len <- 100
+```
+
+
+Now we load the IMDB dataset, and we can check the structure of the loaded object by using `str()` command.
+
+```{r}
+my_imdb <- dataset_imdb(num_words = max_unique_word)
+str(my_imdb, list.len = 10)
+```
+
+## Training and testing datasets
+
+```{r}
+x_train <- my_imdb$train$x
+y_train <- my_imdb$train$y
+x_test  <- my_imdb$test$x
+y_test  <- my_imdb$test$y
+```
+
+Next, we do the padding and truncating process.
+
+```{r}
+x_train <- pad_sequences(x_train, maxlen = max_review_len)
+x_test <- pad_sequences(x_test, maxlen = max_review_len)
+```
+
+The `x_train` and `x_test` are numerical data frames ready to be used for recurrent neural network models.
+
+**Simple Recurrent Neurel Network**
+
+Like DNN and CNN models we trained in the past, RNN models are relatively easy to train using `keras` after the pre-processing stage. In the following example, we use `layer_embedding()` to fit an embedding layer based on the training dataset, which has two parameters: `input_dim` (the number of unique words) and `output_dim` (the length of dense vectors). Then, we add a simple RNN layer by calling `layer_simple_rnn()` and followed by a dense layer `layer_dense()` to connect to the response binary variable.
+
+```{r}
+rnn_model <- keras_model_sequential()
+rnn_model %>%
+  layer_embedding(input_dim = max_unique_word, output_dim = 128) %>% 
+  layer_simple_rnn(units = 64, dropout = 0.2, 
+                   recurrent_dropout = 0.2) %>% 
+  layer_dense(units = 1, activation = 'sigmoid')
+```
+
+We compile the RNN model by defining the loss function, optimizer to use, and metrics to track the same way as DNN and CNN models.
+
+```{r}
+rnn_model %>% compile(
+  loss = 'binary_crossentropy',
+  optimizer = 'adam',
+  metrics = c('accuracy')
+)
+```
+
+Let us define a few more variables before fitting the model: `batch_size`, `epochs`, and `validation_split`. These variables have the same meaning as DNN and CNN models we see in the past.
+
+```{r}
+batch_size = 128
+epochs = 5
+validation_split = 0.2
+
+rnn_history <- rnn_model %>% fit(
+  x_train, y_train,
+  batch_size = batch_size,
+  epochs = epochs,
+  validation_split = validation_split
+)
+```
+
+```{r}
+plot(rnn_history)
+```
+
+```{r}
+rnn_model %>% 
+   evaluate(x_test, y_test)
+```
+
+**LSTM RNN Model**
+
+A simple RNN layer is a good starting point for learning RNN, but the performance is usually not that good because these long-term dependencies are impossible to learn due to vanishing gradient. Long Short Term Memory RNN model (LSTM) can carry useful information from the earlier words to later words. In `keras`, it is easy to replace a simple RNN layer with an LSTM layer by using `layer_lstm()`.
+
+```{r}
+lstm_model <- keras_model_sequential()
+
+lstm_model %>%
+  layer_embedding(input_dim = max_unique_word, output_dim = 128) %>% 
+  layer_lstm(units = 64, dropout = 0.2, recurrent_dropout = 0.2) %>% 
+  layer_dense(units = 1, activation = 'sigmoid')
+
+lstm_model %>% compile(
+  loss = 'binary_crossentropy',
+  optimizer = 'adam',
+  metrics = c('accuracy')
+)
+
+batch_size = 128
+epochs = 5
+validation_split = 0.2
+
+lstm_history <- lstm_model %>% fit(
+  x_train, y_train,
+  batch_size = batch_size,
+  epochs = epochs,
+  validation_split = validation_split
+)
+```
+
+```{r}
+plot(lstm_history)
+```
+
+```{r}
+lstm_model %>% 
+   evaluate(x_test, y_test)
+```
+
+This simple example shows that LSTM's performance has improved dramatically from the simple RNN model. The computation time for LSTM is roughly doubled when compared with the simple RNN model for this small dataset.
