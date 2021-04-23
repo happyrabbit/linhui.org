@@ -177,7 +177,7 @@
 
 \title{Introduction to Data Science}
 \author{Hui Lin and Ming Li}
-\date{2021-02-28}
+\date{2021-03-29}
 
 \begin{document}
 \maketitle
@@ -467,15 +467,15 @@ If you are new to the programming languages, you may find the code obscure. We p
 
 For some chapters (\ref{datapreprocessing}, \ref{modeltuningstrategy} - \ref{deeplearning}), readers need to know elementary linear algebra (such as matrix manipulations) and understand basic statistical concepts (such as correlation and simple linear regression). While the book is biased against complex equations, a mathematical background is good for the deep dive under the hood mechanism for advanced topics behind applications.
 
-\hypertarget{how-to-use-r-and-python-code}{%
-\subsection*{How to use R and Python code}\label{how-to-use-r-and-python-code}}
+\hypertarget{how-to-run-r-and-python-code}{%
+\subsection*{How to run R and Python code}\label{how-to-run-r-and-python-code}}
 
 
 This book uses R in the main text and provides most of the Python codes on GitHub.
 
 \textbf{Use R code.} You should be able to repeat the R code in your local R console or RStudio in all the chapters except for Chapter \ref{bigdatacloudplatform}. The code in each chapter is self-sufficient, and you don't need to run the code in previous chapters first to run the code in the current chapter. For code within a chapter, you do need to run from the beginning. At the beginning of each chapter, there is a code block for installing and loading all required packages. We also provide the \texttt{.rmd} notebooks that include the code to make it easier for you to repeat the code. Refer to this page \url{http://bit.ly/3r7cV4s} for a table with the links to the notebooks.
 
-To repeat the code on big data and cloud platforms {[}chapter \ref{bigdatacloudplatform}{]}, you need to use Databricks, a cloud data platform. We use Databricks' because:
+To repeat the code on big data and cloud platforms {[}chapter \ref{bigdatacloudplatform}{]}, you need to use Databricks, a cloud data platform. We use Databricks because:
 
 \begin{itemize}
 \tightlist
@@ -1832,6 +1832,28 @@ To simplify the learning process, let us use a very familiar small dataset: the 
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{library}\NormalTok{(dplyr)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Attaching package: 'dplyr'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \KeywordTok{head}\NormalTok{(iris)}
 \end{Highlighting}
 \end{Shaded}
@@ -3303,6 +3325,30 @@ Another comman task is to check which column has missing values. It requires the
 \NormalTok{dplyr}\OperatorTok{::}\KeywordTok{summarise_all}\NormalTok{(sim.dat, }\KeywordTok{funs_}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{"anyNA"}\NormalTok{)))}
 \end{Highlighting}
 \end{Shaded}
+
+\begin{verbatim}
+## Warning: `funs_()` is deprecated as of dplyr 0.7.0.
+## Please use `funs()` instead.
+## See vignette('programming') for more help
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_warnings()` to see where this warning was generated.
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: `funs()` is deprecated as of dplyr 0.8.0.
+## Please use a list of either functions or lambdas: 
+## 
+##   # Simple named list: 
+##   list(mean = mean, median = median)
+## 
+##   # Auto named with `tibble::lst()`: 
+##   tibble::lst(mean, median)
+## 
+##   # Using lambdas
+##   list(~ mean(., trim = .2), ~ median(., na.rm = TRUE))
+## This warning is displayed once every 8 hours.
+## Call `lifecycle::last_warnings()` to see where this warning was generated.
+\end{verbatim}
 
 \begin{verbatim}
 ##     age gender income house store_exp online_exp
@@ -4854,16 +4900,16 @@ In this chapter, we will cover ordinary linear regression and a few more advance
 
 First, we will introduce multivariate linear regression (i.e.~the typical least square regression) which is one of the simplest supervised learning methods. Even though it is simple, the general ideas and procedures of fitting a regression model are applied to a boarder scope. Having a solid understanding of the basic linear regression model enables us to learn more advanced models easily. For example, we will introduce two ``shrinkage'' versions of linear regression: ridge regression and LASSO regression. While the parameters are fitted by the least square method, the extra penalty can effectively shrink model parameters towards zero. It mediates overfitting and maintains the robustness of the model when data size is small compared to the number of explanatory variables. We first introduce basic knowledge of each model and then provide R codes to show how to fit the model. We only cover the major properties of these models and the listed reference will provide more in-depth discussion.
 
-We will use the clothing company data as an example. We want to answer business questions such as ``which variables are the driving factor of total revenue (both online and in-store purchase)?'' The answer to this question can help the company to decide where to invest (such as design, quality, etc.). Note that the driving factor here does not guarantee a causal relationship. Linear regression models reveal correlation rather than causation. For example, if a survey on car purchase shows a positive correlation between price and customer satisfaction, does it suggest the car dealer should increase the price? Probably not! It is more likely that a more expensive car has better performance or quality. It is more likely that the customer satisfaction is impacted by quality. Causal inference is much more difficult to establish and we have to be very careful when interpreting regression model results.
+We will use the clothing company data as an example. We want to answer business questions such as ``which variables are the driving factor of total revenue (both online and in-store purchase)?'' The answer to this question can help the company to decide where to invest (such as design, quality, etc.). Note that the driving factor here does not guarantee a causal relationship. Linear regression models reveal correlation rather than causation. For example, if a survey on car purchase shows a positive correlation between price and customer satisfaction, does it suggest the car dealer should increase the price? Probably not! It is more likely that the customer satisfaction is impacted by quality. And a higher quality car tends to be more expensive. Causal inference is much more difficult to establish and we have to be very careful when interpreting regression model results.
 
 \hypertarget{ordinary-least-square}{%
 \section{Ordinary Least Square}\label{ordinary-least-square}}
 
 For a typical linear regression with \(p\) explanatory variables, we have a linear combinations of these variables:
 
-\[f(\mathbf{X})=\mathbf{X}\mathbf{\beta}=\beta_{0}+\sum_{j=1}^{p}\mathbf{x_{.j}}\beta_{j}\]
+\[f(\mathbf{X})=\mathbf{X}\symbf{\beta}=\beta_{0}+\sum_{j=1}^{p}\mathbf{x_{.j}}\beta_{j}\]
 
-where \(\mathbf{\beta}\) is the parameter vector with length \(p+1\). Least square is the method to find a set of value for \(\mathbf{\beta^{T}}=(\beta_{0},\beta_{1},...,\beta_{p})\) such that it minimizes the residual sum of square (RSS):
+where \(\symbf{\beta}\) is the parameter vector with length \(p+1\). Here we use \(\mathbf{x_{.j}}\) for column vector and \(\mathbf{x_{i.}}\) for row vector. Least square is the method to find a set of value for \(\symbf{\beta^{T}}=(\beta_{0},\beta_{1},...,\beta_{p})\) such that it minimizes the residual sum of square (RSS):
 
 \[RSS(\beta)=\sum_{i=1}^{N}(y_{i}-f(\mathbf{x_{i.}}))^{2}=\sum_{i=1}^{N}(y_{i}-\beta_{0}-\sum_{j=1}^{p}x_{ij}\beta_{j})^{2}\]
 
@@ -5238,6 +5284,30 @@ We focus on using R library \texttt{caret} to fit PCR and PLS models. Let us use
 \KeywordTok{library}\NormalTok{(caret)}
 \KeywordTok{library}\NormalTok{(dplyr)}
 \KeywordTok{library}\NormalTok{(elasticnet)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: lars
+\end{verbatim}
+
+\begin{verbatim}
+## Loaded lars 1.2
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attaching package: 'lars'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:psych':
+## 
+##     error.bars
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \KeywordTok{library}\NormalTok{(lars)}
 
 \CommentTok{# Load Data}
@@ -5320,6 +5390,34 @@ We can also find the relative importance of each variable during PLS model tunin
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{plsImp <-}\StringTok{ }\KeywordTok{varImp}\NormalTok{(plsTune, }\DataTypeTok{scale =} \OtherTok{FALSE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Attaching package: 'pls'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:corrplot':
+## 
+##     corrplot
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:caret':
+## 
+##     R2
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:stats':
+## 
+##     loadings
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
 \KeywordTok{plot}\NormalTok{(plsImp, }\DataTypeTok{top =} \DecValTok{10}\NormalTok{, }\DataTypeTok{scales =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{y =} \KeywordTok{list}\NormalTok{(}\DataTypeTok{cex =} \FloatTok{0.95}\NormalTok{)))}
 \end{Highlighting}
 \end{Shaded}
