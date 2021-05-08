@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2021-02-28" />
+<meta name="date" content="2021-04-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -137,7 +137,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="" data-path="who-this-book-is-for.html"><a href="who-this-book-is-for.html"><i class="fa fa-check"></i>Who This Book Is For</a></li>
 <li class="chapter" data-level="" data-path="how-to-use-this-book.html"><a href="how-to-use-this-book.html"><i class="fa fa-check"></i>How to Use This Book</a><ul>
 <li class="chapter" data-level="" data-path="how-to-use-this-book.html"><a href="how-to-use-this-book.html#what-the-book-assumes"><i class="fa fa-check"></i>What the book assumes</a></li>
-<li class="chapter" data-level="" data-path="how-to-use-this-book.html"><a href="how-to-use-this-book.html#how-to-use-r-and-python-code"><i class="fa fa-check"></i>How to use R and Python code</a></li>
+<li class="chapter" data-level="" data-path="how-to-use-this-book.html"><a href="how-to-use-this-book.html#how-to-run-r-and-python-code"><i class="fa fa-check"></i>How to run R and Python code</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="complementary-reading.html"><a href="complementary-reading.html"><i class="fa fa-check"></i>Complementary Reading</a></li>
 <li class="chapter" data-level="" data-path="acknowledgements.html"><a href="acknowledgements.html"><i class="fa fa-check"></i>Acknowledgements</a></li>
@@ -274,7 +274,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="12" data-path="deeplearning.html"><a href="deeplearning.html"><i class="fa fa-check"></i><b>12</b> Deep Learning</a><ul>
 <li class="chapter" data-level="12.1" data-path="projection-pursuit-regression.html"><a href="projection-pursuit-regression.html"><i class="fa fa-check"></i><b>12.1</b> Projection Pursuit Regression</a></li>
 <li class="chapter" data-level="12.2" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html"><i class="fa fa-check"></i><b>12.2</b> Feedforward Neural Network</a><ul>
-<li class="chapter" data-level="12.2.1" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#logistic_reg_as_neural_network"><i class="fa fa-check"></i><b>12.2.1</b> Logistic Regression as Neural Network</a></li>
+<li class="chapter" data-level="12.2.1" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#logisticregasneuralnetwork"><i class="fa fa-check"></i><b>12.2.1</b> Logistic Regression as Neural Network</a></li>
 <li class="chapter" data-level="12.2.2" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#stochastic-gradient-descent"><i class="fa fa-check"></i><b>12.2.2</b> Stochastic Gradient Descent</a></li>
 <li class="chapter" data-level="12.2.3" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#deepneuralnetwork"><i class="fa fa-check"></i><b>12.2.3</b> Deep Neural Network</a></li>
 <li class="chapter" data-level="12.2.4" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#activationfunction"><i class="fa fa-check"></i><b>12.2.4</b> Activation Function</a></li>
@@ -330,18 +330,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h1><span class="header-section-number">Chapter 11</span> Tree-Based Methods</h1>
 <p>Tree-based models such as random forest and gradient boosted trees are frequent winners in data challenges and competitions which use standard numerical and categorical datasets. These methods, in general, provide a good baseline for model performance. This chapter describes the fundamentals of tree-based models and provides a set of standard modeling procedures.</p>
 <p>Load R packages:</p>
-<div class="sourceCode" id="cb289"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb289-1" data-line-number="1"><span class="co"># install packages from CRAN</span></a>
-<a class="sourceLine" id="cb289-2" data-line-number="2">p_needed &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;rpart&#39;</span>, <span class="st">&#39;caret&#39;</span>, <span class="st">&#39;partykit&#39;</span>,</a>
-<a class="sourceLine" id="cb289-3" data-line-number="3">              <span class="st">&#39;pROC&#39;</span>, <span class="st">&#39;dplyr&#39;</span>, <span class="st">&#39;ipred&#39;</span>,</a>
-<a class="sourceLine" id="cb289-4" data-line-number="4">              <span class="st">&#39;e1071&#39;</span>, <span class="st">&#39;randomForest&#39;</span>, <span class="st">&#39;gbm&#39;</span>)</a>
-<a class="sourceLine" id="cb289-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb289-6" data-line-number="6">packages &lt;-<span class="st"> </span><span class="kw">rownames</span>(<span class="kw">installed.packages</span>())</a>
-<a class="sourceLine" id="cb289-7" data-line-number="7">p_to_install &lt;-<span class="st"> </span>p_needed[<span class="op">!</span>(p_needed <span class="op">%in%</span><span class="st"> </span>packages)]</a>
-<a class="sourceLine" id="cb289-8" data-line-number="8"><span class="cf">if</span> (<span class="kw">length</span>(p_to_install) <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>) {</a>
-<a class="sourceLine" id="cb289-9" data-line-number="9">    <span class="kw">install.packages</span>(p_to_install)</a>
-<a class="sourceLine" id="cb289-10" data-line-number="10">}</a>
-<a class="sourceLine" id="cb289-11" data-line-number="11"></a>
-<a class="sourceLine" id="cb289-12" data-line-number="12"><span class="kw">lapply</span>(p_needed, require, <span class="dt">character.only =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb291"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb291-1" data-line-number="1"><span class="co"># install packages from CRAN</span></a>
+<a class="sourceLine" id="cb291-2" data-line-number="2">p_needed &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;rpart&#39;</span>, <span class="st">&#39;caret&#39;</span>, <span class="st">&#39;partykit&#39;</span>,</a>
+<a class="sourceLine" id="cb291-3" data-line-number="3">              <span class="st">&#39;pROC&#39;</span>, <span class="st">&#39;dplyr&#39;</span>, <span class="st">&#39;ipred&#39;</span>,</a>
+<a class="sourceLine" id="cb291-4" data-line-number="4">              <span class="st">&#39;e1071&#39;</span>, <span class="st">&#39;randomForest&#39;</span>, <span class="st">&#39;gbm&#39;</span>)</a>
+<a class="sourceLine" id="cb291-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb291-6" data-line-number="6">packages &lt;-<span class="st"> </span><span class="kw">rownames</span>(<span class="kw">installed.packages</span>())</a>
+<a class="sourceLine" id="cb291-7" data-line-number="7">p_to_install &lt;-<span class="st"> </span>p_needed[<span class="op">!</span>(p_needed <span class="op">%in%</span><span class="st"> </span>packages)]</a>
+<a class="sourceLine" id="cb291-8" data-line-number="8"><span class="cf">if</span> (<span class="kw">length</span>(p_to_install) <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>) {</a>
+<a class="sourceLine" id="cb291-9" data-line-number="9">    <span class="kw">install.packages</span>(p_to_install)</a>
+<a class="sourceLine" id="cb291-10" data-line-number="10">}</a>
+<a class="sourceLine" id="cb291-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb291-12" data-line-number="12"><span class="kw">lapply</span>(p_needed, require, <span class="dt">character.only =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 </div>
             </section>
 

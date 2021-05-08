@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2021-02-28" />
+<meta name="date" content="2021-04-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -137,7 +137,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="" data-path="who-this-book-is-for.html"><a href="who-this-book-is-for.html"><i class="fa fa-check"></i>Who This Book Is For</a></li>
 <li class="chapter" data-level="" data-path="how-to-use-this-book.html"><a href="how-to-use-this-book.html"><i class="fa fa-check"></i>How to Use This Book</a><ul>
 <li class="chapter" data-level="" data-path="how-to-use-this-book.html"><a href="how-to-use-this-book.html#what-the-book-assumes"><i class="fa fa-check"></i>What the book assumes</a></li>
-<li class="chapter" data-level="" data-path="how-to-use-this-book.html"><a href="how-to-use-this-book.html#how-to-use-r-and-python-code"><i class="fa fa-check"></i>How to use R and Python code</a></li>
+<li class="chapter" data-level="" data-path="how-to-use-this-book.html"><a href="how-to-use-this-book.html#how-to-run-r-and-python-code"><i class="fa fa-check"></i>How to run R and Python code</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="complementary-reading.html"><a href="complementary-reading.html"><i class="fa fa-check"></i>Complementary Reading</a></li>
 <li class="chapter" data-level="" data-path="acknowledgements.html"><a href="acknowledgements.html"><i class="fa fa-check"></i>Acknowledgements</a></li>
@@ -274,7 +274,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="12" data-path="deeplearning.html"><a href="deeplearning.html"><i class="fa fa-check"></i><b>12</b> Deep Learning</a><ul>
 <li class="chapter" data-level="12.1" data-path="projection-pursuit-regression.html"><a href="projection-pursuit-regression.html"><i class="fa fa-check"></i><b>12.1</b> Projection Pursuit Regression</a></li>
 <li class="chapter" data-level="12.2" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html"><i class="fa fa-check"></i><b>12.2</b> Feedforward Neural Network</a><ul>
-<li class="chapter" data-level="12.2.1" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#logistic_reg_as_neural_network"><i class="fa fa-check"></i><b>12.2.1</b> Logistic Regression as Neural Network</a></li>
+<li class="chapter" data-level="12.2.1" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#logisticregasneuralnetwork"><i class="fa fa-check"></i><b>12.2.1</b> Logistic Regression as Neural Network</a></li>
 <li class="chapter" data-level="12.2.2" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#stochastic-gradient-descent"><i class="fa fa-check"></i><b>12.2.2</b> Stochastic Gradient Descent</a></li>
 <li class="chapter" data-level="12.2.3" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#deepneuralnetwork"><i class="fa fa-check"></i><b>12.2.3</b> Deep Neural Network</a></li>
 <li class="chapter" data-level="12.2.4" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#activationfunction"><i class="fa fa-check"></i><b>12.2.4</b> Activation Function</a></li>
@@ -330,7 +330,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h1><span class="header-section-number">Chapter 9</span> Regression Models</h1>
 <p>In this chapter, we will cover ordinary linear regression and a few more advanced regression methods. The linear combination of variables seems simple compared to many of today’s machine learning models. However, many advanced models use linear combinations of variables as one of its major components or steps. For example, for each neuron in the deep neural network, all the input signals are first linearly combined before feeding to a non-linear activation function. To understand many of today’s machine learning models, it is helpful to understand the key ideas across different modeling frameworks.</p>
 <p>First, we will introduce multivariate linear regression (i.e. the typical least square regression) which is one of the simplest supervised learning methods. Even though it is simple, the general ideas and procedures of fitting a regression model are applied to a boarder scope. Having a solid understanding of the basic linear regression model enables us to learn more advanced models easily. For example, we will introduce two “shrinkage” versions of linear regression: ridge regression and LASSO regression. While the parameters are fitted by the least square method, the extra penalty can effectively shrink model parameters towards zero. It mediates overfitting and maintains the robustness of the model when data size is small compared to the number of explanatory variables. We first introduce basic knowledge of each model and then provide R codes to show how to fit the model. We only cover the major properties of these models and the listed reference will provide more in-depth discussion.</p>
-<p>We will use the clothing company data as an example. We want to answer business questions such as “which variables are the driving factor of total revenue (both online and in-store purchase)?” The answer to this question can help the company to decide where to invest (such as design, quality, etc.). Note that the driving factor here does not guarantee a causal relationship. Linear regression models reveal correlation rather than causation. For example, if a survey on car purchase shows a positive correlation between price and customer satisfaction, does it suggest the car dealer should increase the price? Probably not! It is more likely that a more expensive car has better performance or quality. It is more likely that the customer satisfaction is impacted by quality. Causal inference is much more difficult to establish and we have to be very careful when interpreting regression model results.</p>
+<p>We will use the clothing company data as an example. We want to answer business questions such as “which variables are the driving factors of total revenue (both online and in-store purchase)?” The answer to this question can help the company to decide where to invest (such as design, quality, etc). Note that the driving factor here does not guarantee a causal relationship. Linear regression models reveal correlation rather than causation. For example, if a survey on car purchase shows a positive correlation between price and customer satisfaction, does it suggest the car dealer should increase the price? Probably not! It is more likely that the customer satisfaction is impacted by quality. And a higher quality car tends to be more expensive. Causal inference is much more difficult to establish and we have to be very careful when interpreting regression model results.</p>
+<p>Load the R packages first:</p>
+<div class="sourceCode" id="cb194"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb194-1" data-line-number="1"><span class="co"># install packages from CRAN</span></a>
+<a class="sourceLine" id="cb194-2" data-line-number="2">p_needed &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;caret&#39;</span>, <span class="st">&#39;dplyr&#39;</span>, <span class="st">&#39;lattice&#39;</span>,</a>
+<a class="sourceLine" id="cb194-3" data-line-number="3">              <span class="st">&#39;elasticnet&#39;</span>, <span class="st">&#39;lars&#39;</span>, <span class="st">&#39;corrplot&#39;</span>, </a>
+<a class="sourceLine" id="cb194-4" data-line-number="4">              <span class="st">&#39;pls&#39;</span>)</a>
+<a class="sourceLine" id="cb194-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb194-6" data-line-number="6">packages &lt;-<span class="st"> </span><span class="kw">rownames</span>(<span class="kw">installed.packages</span>())</a>
+<a class="sourceLine" id="cb194-7" data-line-number="7">p_to_install &lt;-<span class="st"> </span>p_needed[<span class="op">!</span>(p_needed <span class="op">%in%</span><span class="st"> </span>packages)]</a>
+<a class="sourceLine" id="cb194-8" data-line-number="8"><span class="cf">if</span> (<span class="kw">length</span>(p_to_install) <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>) {</a>
+<a class="sourceLine" id="cb194-9" data-line-number="9">    <span class="kw">install.packages</span>(p_to_install)</a>
+<a class="sourceLine" id="cb194-10" data-line-number="10">}</a>
+<a class="sourceLine" id="cb194-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb194-12" data-line-number="12"><span class="kw">lapply</span>(p_needed, require, <span class="dt">character.only =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 </div>
             </section>
 

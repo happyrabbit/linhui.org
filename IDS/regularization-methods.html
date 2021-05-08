@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2021-02-28" />
+<meta name="date" content="2021-04-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -137,7 +137,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="" data-path="who-this-book-is-for.html"><a href="who-this-book-is-for.html"><i class="fa fa-check"></i>Who This Book Is For</a></li>
 <li class="chapter" data-level="" data-path="how-to-use-this-book.html"><a href="how-to-use-this-book.html"><i class="fa fa-check"></i>How to Use This Book</a><ul>
 <li class="chapter" data-level="" data-path="how-to-use-this-book.html"><a href="how-to-use-this-book.html#what-the-book-assumes"><i class="fa fa-check"></i>What the book assumes</a></li>
-<li class="chapter" data-level="" data-path="how-to-use-this-book.html"><a href="how-to-use-this-book.html#how-to-use-r-and-python-code"><i class="fa fa-check"></i>How to use R and Python code</a></li>
+<li class="chapter" data-level="" data-path="how-to-use-this-book.html"><a href="how-to-use-this-book.html#how-to-run-r-and-python-code"><i class="fa fa-check"></i>How to run R and Python code</a></li>
 </ul></li>
 <li class="chapter" data-level="" data-path="complementary-reading.html"><a href="complementary-reading.html"><i class="fa fa-check"></i>Complementary Reading</a></li>
 <li class="chapter" data-level="" data-path="acknowledgements.html"><a href="acknowledgements.html"><i class="fa fa-check"></i>Acknowledgements</a></li>
@@ -274,7 +274,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li class="chapter" data-level="12" data-path="deeplearning.html"><a href="deeplearning.html"><i class="fa fa-check"></i><b>12</b> Deep Learning</a><ul>
 <li class="chapter" data-level="12.1" data-path="projection-pursuit-regression.html"><a href="projection-pursuit-regression.html"><i class="fa fa-check"></i><b>12.1</b> Projection Pursuit Regression</a></li>
 <li class="chapter" data-level="12.2" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html"><i class="fa fa-check"></i><b>12.2</b> Feedforward Neural Network</a><ul>
-<li class="chapter" data-level="12.2.1" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#logistic_reg_as_neural_network"><i class="fa fa-check"></i><b>12.2.1</b> Logistic Regression as Neural Network</a></li>
+<li class="chapter" data-level="12.2.1" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#logisticregasneuralnetwork"><i class="fa fa-check"></i><b>12.2.1</b> Logistic Regression as Neural Network</a></li>
 <li class="chapter" data-level="12.2.2" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#stochastic-gradient-descent"><i class="fa fa-check"></i><b>12.2.2</b> Stochastic Gradient Descent</a></li>
 <li class="chapter" data-level="12.2.3" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#deepneuralnetwork"><i class="fa fa-check"></i><b>12.2.3</b> Deep Neural Network</a></li>
 <li class="chapter" data-level="12.2.4" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#activationfunction"><i class="fa fa-check"></i><b>12.2.4</b> Activation Function</a></li>
@@ -331,26 +331,26 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>The regularization method is also known as the shrinkage method. It is a technique that constrains or regularizes the coefficient estimates. By imposing a penalty on the size of coefficients, it shrinks the coefficient estimates towards zero. It also intrinsically conduct feature selection and is naturally resistant to non-informative predictors. It may not be obvious why this technique improves model performance, but it turns out to be a very effective modeling technique. In this chapter, we will introduce two best-known regularization methods: ridge regression and lasso. The elastic net is a combination of ridge and lasso, or it is a general representation of the two.</p>
 <p>We talked about the variance bias trade-off in section <a href="vbtradeoff.html#vbtradeoff">7.1</a>. The variance of a learning model is the amount by which <span class="math inline">\(\hat{f}\)</span> would change if we estimated it using a different training data set. In general, model variance increases as flexibility increases. The regularization technique decreases the model flexibility by shrinking the coefficient and hence significantly reduce the model variance.</p>
 <p>Load the R packages:</p>
-<div class="sourceCode" id="cb222"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb222-1" data-line-number="1"><span class="co"># install packages from CRAN</span></a>
-<a class="sourceLine" id="cb222-2" data-line-number="2">p_needed &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;caret&#39;</span>, <span class="st">&#39;elasticnet&#39;</span>, <span class="st">&#39;glmnet&#39;</span>, <span class="st">&#39;devtools&#39;</span>,</a>
-<a class="sourceLine" id="cb222-3" data-line-number="3">              <span class="st">&#39;MASS&#39;</span>, <span class="st">&#39;grplasso&#39;</span>)</a>
-<a class="sourceLine" id="cb222-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb222-5" data-line-number="5">packages &lt;-<span class="st"> </span><span class="kw">rownames</span>(<span class="kw">installed.packages</span>())</a>
-<a class="sourceLine" id="cb222-6" data-line-number="6">p_to_install &lt;-<span class="st"> </span>p_needed[<span class="op">!</span>(p_needed <span class="op">%in%</span><span class="st"> </span>packages)]</a>
-<a class="sourceLine" id="cb222-7" data-line-number="7"><span class="cf">if</span> (<span class="kw">length</span>(p_to_install) <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>) {</a>
-<a class="sourceLine" id="cb222-8" data-line-number="8">    <span class="kw">install.packages</span>(p_to_install)</a>
-<a class="sourceLine" id="cb222-9" data-line-number="9">}</a>
-<a class="sourceLine" id="cb222-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb222-11" data-line-number="11"><span class="kw">lapply</span>(p_needed, require, <span class="dt">character.only =</span> <span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb222-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb222-13" data-line-number="13"><span class="co"># install packages from GitHub</span></a>
-<a class="sourceLine" id="cb222-14" data-line-number="14">p_needed_gh &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;NetlifyDS&#39;</span>)</a>
-<a class="sourceLine" id="cb222-15" data-line-number="15"></a>
-<a class="sourceLine" id="cb222-16" data-line-number="16"><span class="cf">if</span> (<span class="op">!</span><span class="st"> </span>p_needed_gh <span class="op">%in%</span><span class="st"> </span>packages) {</a>
-<a class="sourceLine" id="cb222-17" data-line-number="17">    devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;netlify/NetlifyDS&quot;</span>)</a>
-<a class="sourceLine" id="cb222-18" data-line-number="18">}</a>
-<a class="sourceLine" id="cb222-19" data-line-number="19"></a>
-<a class="sourceLine" id="cb222-20" data-line-number="20"><span class="kw">library</span>(NetlifyDS)</a></code></pre></div>
+<div class="sourceCode" id="cb224"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb224-1" data-line-number="1"><span class="co"># install packages from CRAN</span></a>
+<a class="sourceLine" id="cb224-2" data-line-number="2">p_needed &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;caret&#39;</span>, <span class="st">&#39;elasticnet&#39;</span>, <span class="st">&#39;glmnet&#39;</span>, <span class="st">&#39;devtools&#39;</span>,</a>
+<a class="sourceLine" id="cb224-3" data-line-number="3">              <span class="st">&#39;MASS&#39;</span>, <span class="st">&#39;grplasso&#39;</span>)</a>
+<a class="sourceLine" id="cb224-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb224-5" data-line-number="5">packages &lt;-<span class="st"> </span><span class="kw">rownames</span>(<span class="kw">installed.packages</span>())</a>
+<a class="sourceLine" id="cb224-6" data-line-number="6">p_to_install &lt;-<span class="st"> </span>p_needed[<span class="op">!</span>(p_needed <span class="op">%in%</span><span class="st"> </span>packages)]</a>
+<a class="sourceLine" id="cb224-7" data-line-number="7"><span class="cf">if</span> (<span class="kw">length</span>(p_to_install) <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>) {</a>
+<a class="sourceLine" id="cb224-8" data-line-number="8">    <span class="kw">install.packages</span>(p_to_install)</a>
+<a class="sourceLine" id="cb224-9" data-line-number="9">}</a>
+<a class="sourceLine" id="cb224-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb224-11" data-line-number="11"><span class="kw">lapply</span>(p_needed, require, <span class="dt">character.only =</span> <span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb224-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb224-13" data-line-number="13"><span class="co"># install packages from GitHub</span></a>
+<a class="sourceLine" id="cb224-14" data-line-number="14">p_needed_gh &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;NetlifyDS&#39;</span>)</a>
+<a class="sourceLine" id="cb224-15" data-line-number="15"></a>
+<a class="sourceLine" id="cb224-16" data-line-number="16"><span class="cf">if</span> (<span class="op">!</span><span class="st"> </span>p_needed_gh <span class="op">%in%</span><span class="st"> </span>packages) {</a>
+<a class="sourceLine" id="cb224-17" data-line-number="17">    devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;netlify/NetlifyDS&quot;</span>)</a>
+<a class="sourceLine" id="cb224-18" data-line-number="18">}</a>
+<a class="sourceLine" id="cb224-19" data-line-number="19"></a>
+<a class="sourceLine" id="cb224-20" data-line-number="20"><span class="kw">library</span>(NetlifyDS)</a></code></pre></div>
 </div>
             </section>
 
