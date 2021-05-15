@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2021-04-24" />
+<meta name="date" content="2021-05-10" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -336,16 +336,19 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>Can handle missing data</li>
 <li>Many pre-built packages make implementation as easy as a button push</li>
 </ol>
-<p>CART can refer to the tree model in general, but most of the time, it represents the algorithm initially proposed by Breiman <span class="citation">(al <a href="#ref-Breiman1984">1984</a>)</span>. After Breiman, there are many new algorithms, such as ID3, C4.5, and C5.0. C5.0 is an improved version of C4.5, but since C5.0 is not open source, the C4.5 algorithm is more popular. C4.5 was a major competitor of CART. But now, all those seem outdated. The most popular tree models are Random Forest (RF) and Gradient Boosting Machine (GBM). Despite being out of favor in application, it is important to understand the mechanism of the basic tree algorithm. Because the later models are based on the same foundation.</p>
+<p>CART can refer to the tree model in general, but most of the time, it represents the algorithm initially proposed by Breiman <span class="citation">(Breiman et al. <a href="#ref-Breiman1984">1984</a>)</span>. After Breiman, there are many new algorithms, such as ID3, C4.5, and C5.0. C5.0 is an improved version of C4.5, but since C5.0 is not open source, the C4.5 algorithm is more popular. C4.5 was a major competitor of CART. But now, all those seem outdated. The most popular tree models are Random Forest (RF) and Gradient Boosting Machine (GBM). Despite being out of favor in application, it is important to understand the mechanism of the basic tree algorithm. Because the later models are based on the same foundation.</p>
 <p>The original CART algorithm targets binary classification, and the later algorithms can handle multi-category classification. A single tree is easy to explain but has poor accuracy. More complicated tree models, such as RF and GBM, can provide much better prediction at the cost of explainability. As the model becoming more complicated, it is more like a black-box which makes it very difficult to explain the relationship among predictors. There is always a trade-off between explainability and predictability.</p>
-<center>
-<img src="images/treeEN.png" />
-</center>
-<p>The reason why it is called “tree” is of course because the structure has similarities. But the direction of the decision tree is opposite to the real tree, the root is on the top, and the leaf is on the bottom. From the root node, a decision tree divides to different branches and generates more nodes. The new nodes are child nodes, and the previous node is the parent node. At each child node, the algorithm will decide whether to continue dividing. If it stops, the node is called a leaf node. If it continues, then the node becomes the new parent node and splits to produce the next layer of child nodes. At each non-leaf node, the algorithm needs to decide split into branches. The leaf node contains the final “decision,” final class the sample belongs to or the sample’s value has. Here are the important definitions in the tree model:</p>
+<div class="figure" style="text-align: center"><span id="fig:treeexample"></span>
+<img src="images/treeEN.png" alt="This is a classification tree trained from passenger survival data from the Titanic.  Survival probability is predicted using sex and age." width="80%" />
+<p class="caption">
+FIGURE 11.1: This is a classification tree trained from passenger survival data from the Titanic. Survival probability is predicted using sex and age.
+</p>
+</div>
+<p>The reason why it is called “tree” is of course because the structure has similarities. But the direction of the decision tree is opposite of a real tree, the root is on the top, and the leaf is on the bottom (figure <a href="tree-basics.html#fig:treeexample">11.1</a>). From the root node, a decision tree divides to different branches and generates more nodes. The new nodes are child nodes, and the previous node is the parent node. At each child node, the algorithm will decide whether to continue dividing. If it stops, the node is called a leaf node. If it continues, then the node becomes the new parent node and splits to produce the next layer of child nodes. At each non-leaf node, the algorithm needs to decide if it will split into branches. The leaf node contains the final “decision”; the class the sample belongs to or the sample’s value. Here are the important definitions in the tree model:</p>
 <ul>
 <li><strong>Classification tree</strong>: the outcome is discrete</li>
 <li><strong>Regression tree</strong>: the outcome is continuous (e.g. the price of a house, or a patient’s length of stay in a hospital)</li>
-<li><strong>Non-leaf node (or split node)</strong>: the algorithm needs to decide a split at each non-leaf node (eg: <span class="math inline">\(age \leq 25\)</span>, <span class="math inline">\(25 &lt; age \leq 35\)</span>, <span class="math inline">\(age &gt; 35\)</span>)</li>
+<li><strong>Non-leaf node (or split node)</strong>: the algorithm needs to decide a split at each non-leaf node (eg: age &gt;= 9.5)</li>
 <li><strong>Root node</strong>：the beginning node where the tree starts</li>
 <li><strong>Leaf node (or Terminal node)</strong>: the node stops splitting. It has the final decision of the model</li>
 <li><strong>Degree of the node</strong>: the number of subtrees of a node</li>
@@ -355,12 +358,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><strong>Child</strong>: the node directly after and connected to another node</li>
 <li><strong>Parent</strong>: the converse notion of a child</li>
 </ul>
-<p>Single tree is easy to explain but has high variance and low accuracy, and hence is very limited. Minor changes in the training data can lead to large changes in the fitted tree. A series of rectangular decision regions defined by a single tree is often too naive to represent the relationship between the dependent variable and the predictors. To overcome these shortcomings, researchers have proposed ensemble methods which combine many trees. Ensemble tree models typically have much better predictive performance than a single tree. We will introduce those models in later sections.</p>
+<p>Single tree is easy to explain but has high variance and low accuracy, and hence is very limited. Minor changes in the training data can lead to large changes in the fitted tree. A series of rectangular decision regions (figure <a href="tree-basics.html#fig:decisionregion">11.2</a>) defined by a single tree is often too naive to represent the relationship between the dependent variable and the predictors. To overcome these shortcomings, researchers have proposed ensemble methods which combine many trees. Ensemble tree models typically have much better predictive performance than a single tree. We will introduce those models in later sections.</p>
+<div class="figure" style="text-align: center"><span id="fig:decisionregion"></span>
+<img src="images/decisionregion.png" alt="Example of decision regions for different types of flowers based on petal length and width. Three different types of flowers are classified using decisions about length and width." width="80%" />
+<p class="caption">
+FIGURE 11.2: Example of decision regions for different types of flowers based on petal length and width. Three different types of flowers are classified using decisions about length and width.
+</p>
+</div>
 </div>
 <h3>References</h3>
 <div id="refs" class="references">
 <div id="ref-Breiman1984">
-<p>al, Leo Breiman et. 1984. <em>Classification and Regression Trees</em>. ISBN 978-0412048418. Chapman; Hall/CRC.</p>
+<p>Breiman, L., J. H. Friedman, R. A. Olshen, and C. J. Stone. 1984. <em>Classification and Regression Trees</em>. ISBN 978-0412048418. CRC.</p>
 </div>
 </div>
             </section>
