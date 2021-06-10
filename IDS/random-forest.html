@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2021-05-10" />
+<meta name="date" content="2021-05-25" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -333,22 +333,22 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>When building a tree, the algorithm randomly chooses <span class="math inline">\(m\)</span> variables to use at each splitting node. Then choose the best one out of the <span class="math inline">\(m\)</span> to use at that node. In general, people use <span class="math inline">\(m=\sqrt{p}\)</span>. For example, if we use 10 questions from the questionnaire as predictors, then at each node, the algorithm will randomly choose 4 candidate variables. Since those trees in the forest don’t always use the same variables, tree correlation is less than that in bagging. It tends to work better when there are more predictors. Since we only have 10 predictors here, the improvement from the random forest is marginal. The number of randomly selected predictors is a tuning parameter in the random forest. Since random forest is computationally intensive, we suggest starting with 5 value around <span class="math inline">\(m=\sqrt{p}\)</span>. Another tuning parameter is the number of trees in the forest. You can start with 1000 trees and then increase the number until performance levels off. The basic random forest is shown in Algorithm <a href="#randomforestalgorithm"><strong>??</strong></a>.</p>
 
 <p>When <span class="math inline">\(m=p\)</span>, random forest is equal to the bagging tree. When the predictors are highly correlated, then smaller <span class="math inline">\(m\)</span> tends to work better. Let’s use the <code>caret</code> package to train a random forest:</p>
-<div class="sourceCode" id="cb310"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb310-1" data-line-number="1"><span class="co"># tune across a list of numbers of predictors</span></a>
-<a class="sourceLine" id="cb310-2" data-line-number="2">mtryValues &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>)</a>
-<a class="sourceLine" id="cb310-3" data-line-number="3"><span class="kw">set.seed</span>(<span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb310-4" data-line-number="4">rfTune &lt;-<span class="st"> </span><span class="kw">train</span>(<span class="dt">x =</span> trainx, </a>
-<a class="sourceLine" id="cb310-5" data-line-number="5">               <span class="dt">y =</span> trainy,</a>
-<a class="sourceLine" id="cb310-6" data-line-number="6">               <span class="co"># set the model to be random forest</span></a>
-<a class="sourceLine" id="cb310-7" data-line-number="7">               <span class="dt">method =</span> <span class="st">&quot;rf&quot;</span>,</a>
-<a class="sourceLine" id="cb310-8" data-line-number="8">               <span class="dt">ntree =</span> <span class="dv">1000</span>,</a>
-<a class="sourceLine" id="cb310-9" data-line-number="9">               <span class="dt">tuneGrid =</span> <span class="kw">data.frame</span>(<span class="dt">.mtry =</span> mtryValues),</a>
-<a class="sourceLine" id="cb310-10" data-line-number="10">               <span class="dt">importance =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb310-11" data-line-number="11">               <span class="dt">metric =</span> <span class="st">&quot;ROC&quot;</span>,</a>
-<a class="sourceLine" id="cb310-12" data-line-number="12">               <span class="dt">trControl =</span> <span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>,</a>
-<a class="sourceLine" id="cb310-13" data-line-number="13">                           <span class="dt">summaryFunction =</span> twoClassSummary,</a>
-<a class="sourceLine" id="cb310-14" data-line-number="14">                           <span class="dt">classProbs =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb310-15" data-line-number="15">                           <span class="dt">savePredictions =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
-<div class="sourceCode" id="cb311"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb311-1" data-line-number="1">rfTune</a></code></pre></div>
+<div class="sourceCode" id="cb312"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb312-1" data-line-number="1"><span class="co"># tune across a list of numbers of predictors</span></a>
+<a class="sourceLine" id="cb312-2" data-line-number="2">mtryValues &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>)</a>
+<a class="sourceLine" id="cb312-3" data-line-number="3"><span class="kw">set.seed</span>(<span class="dv">100</span>)</a>
+<a class="sourceLine" id="cb312-4" data-line-number="4">rfTune &lt;-<span class="st"> </span><span class="kw">train</span>(<span class="dt">x =</span> trainx, </a>
+<a class="sourceLine" id="cb312-5" data-line-number="5">               <span class="dt">y =</span> trainy,</a>
+<a class="sourceLine" id="cb312-6" data-line-number="6">               <span class="co"># set the model to be random forest</span></a>
+<a class="sourceLine" id="cb312-7" data-line-number="7">               <span class="dt">method =</span> <span class="st">&quot;rf&quot;</span>,</a>
+<a class="sourceLine" id="cb312-8" data-line-number="8">               <span class="dt">ntree =</span> <span class="dv">1000</span>,</a>
+<a class="sourceLine" id="cb312-9" data-line-number="9">               <span class="dt">tuneGrid =</span> <span class="kw">data.frame</span>(<span class="dt">.mtry =</span> mtryValues),</a>
+<a class="sourceLine" id="cb312-10" data-line-number="10">               <span class="dt">importance =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb312-11" data-line-number="11">               <span class="dt">metric =</span> <span class="st">&quot;ROC&quot;</span>,</a>
+<a class="sourceLine" id="cb312-12" data-line-number="12">               <span class="dt">trControl =</span> <span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>,</a>
+<a class="sourceLine" id="cb312-13" data-line-number="13">                           <span class="dt">summaryFunction =</span> twoClassSummary,</a>
+<a class="sourceLine" id="cb312-14" data-line-number="14">                           <span class="dt">classProbs =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb312-15" data-line-number="15">                           <span class="dt">savePredictions =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb313"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb313-1" data-line-number="1">rfTune</a></code></pre></div>
 <pre><code>## Random Forest 
 ## 
 ## 1000 samples
@@ -372,9 +372,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## The final value used for the model was mtry = 1.</code></pre>
 <p>In this example, since the number of predictors is small, the result of the model indicates that the optimal number of candidate variables at each node is 1. The optimal AUC is not too much higher than that from bagging tree:</p>
 <p>If you have selected the values of tuning parameters, you can also use the randomForest package to fit a random forest.</p>
-<div class="sourceCode" id="cb313"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb313-1" data-line-number="1">rfit =<span class="st"> </span><span class="kw">randomForest</span>(trainy <span class="op">~</span><span class="st"> </span>., trainx, <span class="dt">mtry =</span> <span class="dv">1</span>, <span class="dt">ntree =</span> <span class="dv">1000</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb315"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb315-1" data-line-number="1">rfit =<span class="st"> </span><span class="kw">randomForest</span>(trainy <span class="op">~</span><span class="st"> </span>., trainx, <span class="dt">mtry =</span> <span class="dv">1</span>, <span class="dt">ntree =</span> <span class="dv">1000</span>)</a></code></pre></div>
 <p>Since bagging tree is a special case of random forest, you can fit the bagging tree by setting <span class="math inline">\(mtry=p\)</span>. Function <code>importance()</code> can return the importance of each predictor:</p>
-<div class="sourceCode" id="cb314"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb314-1" data-line-number="1"><span class="kw">importance</span>(rfit)</a></code></pre></div>
+<div class="sourceCode" id="cb316"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb316-1" data-line-number="1"><span class="kw">importance</span>(rfit)</a></code></pre></div>
 <pre><code>##         MeanDecreaseGini
 ## Q1                 9.056
 ## Q2                 7.582
@@ -388,7 +388,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## Q10                4.781
 ## segment           11.185</code></pre>
 <p>You can use varImpPlot() function to visualize the predictor importance:</p>
-<div class="sourceCode" id="cb316"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb316-1" data-line-number="1"><span class="kw">varImpPlot</span>(rfit)</a></code></pre></div>
+<div class="sourceCode" id="cb318"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb318-1" data-line-number="1"><span class="kw">varImpPlot</span>(rfit)</a></code></pre></div>
 <p><img src="IDS_files/figure-html/unnamed-chunk-152-1.svg" width="672" />
 It is easy to see from the plot that <code>segment</code> and <code>Q4</code> are the top two variables to classify gender.</p>
 </div>

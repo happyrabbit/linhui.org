@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2021-05-10" />
+<meta name="date" content="2021-05-25" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -332,18 +332,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>First, we will introduce multivariate linear regression (i.e. the typical least square regression) which is one of the simplest supervised learning methods. Even though it is simple, the general ideas and procedures of fitting a regression model are applied to a boarder scope. Having a solid understanding of the basic linear regression model enables us to learn more advanced models easily. For example, we will introduce two “shrinkage” versions of linear regression: ridge regression and LASSO regression. While the parameters are fitted by the least square method, the extra penalty can effectively shrink model parameters towards zero. It mediates overfitting and maintains the robustness of the model when data size is small compared to the number of explanatory variables. We first introduce basic knowledge of each model and then provide R codes to show how to fit the model. We only cover the major properties of these models and the listed reference will provide more in-depth discussion.</p>
 <p>We will use the clothing company data as an example. We want to answer business questions such as “which variables are the driving factors of total revenue (both online and in-store purchase)?” The answer to this question can help the company to decide where to invest (such as design, quality, etc). Note that the driving factor here does not guarantee a causal relationship. Linear regression models reveal correlation rather than causation. For example, if a survey on car purchase shows a positive correlation between price and customer satisfaction, does it suggest the car dealer should increase the price? Probably not! It is more likely that the customer satisfaction is impacted by quality. And a higher quality car tends to be more expensive. Causal inference is much more difficult to establish and we have to be very careful when interpreting regression model results.</p>
 <p>Load the R packages first:</p>
-<div class="sourceCode" id="cb194"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb194-1" data-line-number="1"><span class="co"># install packages from CRAN</span></a>
-<a class="sourceLine" id="cb194-2" data-line-number="2">p_needed &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;caret&#39;</span>, <span class="st">&#39;dplyr&#39;</span>, <span class="st">&#39;lattice&#39;</span>,</a>
-<a class="sourceLine" id="cb194-3" data-line-number="3">              <span class="st">&#39;elasticnet&#39;</span>, <span class="st">&#39;lars&#39;</span>, <span class="st">&#39;corrplot&#39;</span>, </a>
-<a class="sourceLine" id="cb194-4" data-line-number="4">              <span class="st">&#39;pls&#39;</span>)</a>
-<a class="sourceLine" id="cb194-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb194-6" data-line-number="6">packages &lt;-<span class="st"> </span><span class="kw">rownames</span>(<span class="kw">installed.packages</span>())</a>
-<a class="sourceLine" id="cb194-7" data-line-number="7">p_to_install &lt;-<span class="st"> </span>p_needed[<span class="op">!</span>(p_needed <span class="op">%in%</span><span class="st"> </span>packages)]</a>
-<a class="sourceLine" id="cb194-8" data-line-number="8"><span class="cf">if</span> (<span class="kw">length</span>(p_to_install) <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>) {</a>
-<a class="sourceLine" id="cb194-9" data-line-number="9">    <span class="kw">install.packages</span>(p_to_install)</a>
-<a class="sourceLine" id="cb194-10" data-line-number="10">}</a>
-<a class="sourceLine" id="cb194-11" data-line-number="11"></a>
-<a class="sourceLine" id="cb194-12" data-line-number="12"><span class="kw">lapply</span>(p_needed, require, <span class="dt">character.only =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb200"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb200-1" data-line-number="1"><span class="co"># install packages from CRAN</span></a>
+<a class="sourceLine" id="cb200-2" data-line-number="2">p_needed &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;caret&#39;</span>, <span class="st">&#39;dplyr&#39;</span>, <span class="st">&#39;lattice&#39;</span>,</a>
+<a class="sourceLine" id="cb200-3" data-line-number="3">              <span class="st">&#39;elasticnet&#39;</span>, <span class="st">&#39;lars&#39;</span>, <span class="st">&#39;corrplot&#39;</span>, </a>
+<a class="sourceLine" id="cb200-4" data-line-number="4">              <span class="st">&#39;pls&#39;</span>)</a>
+<a class="sourceLine" id="cb200-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb200-6" data-line-number="6">packages &lt;-<span class="st"> </span><span class="kw">rownames</span>(<span class="kw">installed.packages</span>())</a>
+<a class="sourceLine" id="cb200-7" data-line-number="7">p_to_install &lt;-<span class="st"> </span>p_needed[<span class="op">!</span>(p_needed <span class="op">%in%</span><span class="st"> </span>packages)]</a>
+<a class="sourceLine" id="cb200-8" data-line-number="8"><span class="cf">if</span> (<span class="kw">length</span>(p_to_install) <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>) {</a>
+<a class="sourceLine" id="cb200-9" data-line-number="9">    <span class="kw">install.packages</span>(p_to_install)</a>
+<a class="sourceLine" id="cb200-10" data-line-number="10">}</a>
+<a class="sourceLine" id="cb200-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb200-12" data-line-number="12"><span class="kw">lapply</span>(p_needed, require, <span class="dt">character.only =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 </div>
             </section>
 

@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2021-05-10" />
+<meta name="date" content="2021-05-25" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -331,16 +331,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>When training a machine learning model, there are many decisions to make. For example, when training a random forest, you need to decide the number of trees and the number of variables at each node. For lasso method, you need to determine the penalty parameter. There may be standard settings for some of the parameters, but it’s unlikely to guess the right values for all of these correctly. Other than that, making good choices on how you split the data into training and testing sets can make a huge difference in helping you find a high-performance model efficiently.</p>
 <p>This chapter will illustrate the practical aspects of model tuning. We will talk about different types of model error, sources of model error, hyperparameter tuning, how to set up your data and how to make sure your model implementation is correct. In practice applying machine learning is a highly iterative process.</p>
 <p>Load the R packages first:</p>
-<div class="sourceCode" id="cb137"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb137-1" data-line-number="1"><span class="co"># install packages from CRAN</span></a>
-<a class="sourceLine" id="cb137-2" data-line-number="2">p_needed &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;ggplot2&#39;</span>,<span class="st">&#39;tidyr&#39;</span>, <span class="st">&#39;caret&#39;</span>, <span class="st">&#39;dplyr&#39;</span>, </a>
-<a class="sourceLine" id="cb137-3" data-line-number="3">              <span class="st">&#39;lattice&#39;</span>, <span class="st">&#39;proxy&#39;</span>, <span class="st">&#39;caret&#39;</span>)</a>
-<a class="sourceLine" id="cb137-4" data-line-number="4">packages &lt;-<span class="st"> </span><span class="kw">rownames</span>(<span class="kw">installed.packages</span>())</a>
-<a class="sourceLine" id="cb137-5" data-line-number="5">p_to_install &lt;-<span class="st"> </span>p_needed[<span class="op">!</span>(p_needed <span class="op">%in%</span><span class="st"> </span>packages)]</a>
-<a class="sourceLine" id="cb137-6" data-line-number="6"><span class="cf">if</span> (<span class="kw">length</span>(p_to_install) <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>) {</a>
-<a class="sourceLine" id="cb137-7" data-line-number="7">    <span class="kw">install.packages</span>(p_to_install)</a>
-<a class="sourceLine" id="cb137-8" data-line-number="8">}</a>
-<a class="sourceLine" id="cb137-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb137-10" data-line-number="10"><span class="kw">lapply</span>(p_needed, require, <span class="dt">character.only =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb143"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb143-1" data-line-number="1"><span class="co"># install packages from CRAN</span></a>
+<a class="sourceLine" id="cb143-2" data-line-number="2">p_needed &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;ggplot2&#39;</span>,<span class="st">&#39;tidyr&#39;</span>, <span class="st">&#39;caret&#39;</span>, <span class="st">&#39;dplyr&#39;</span>, </a>
+<a class="sourceLine" id="cb143-3" data-line-number="3">              <span class="st">&#39;lattice&#39;</span>, <span class="st">&#39;proxy&#39;</span>, <span class="st">&#39;caret&#39;</span>)</a>
+<a class="sourceLine" id="cb143-4" data-line-number="4">packages &lt;-<span class="st"> </span><span class="kw">rownames</span>(<span class="kw">installed.packages</span>())</a>
+<a class="sourceLine" id="cb143-5" data-line-number="5">p_to_install &lt;-<span class="st"> </span>p_needed[<span class="op">!</span>(p_needed <span class="op">%in%</span><span class="st"> </span>packages)]</a>
+<a class="sourceLine" id="cb143-6" data-line-number="6"><span class="cf">if</span> (<span class="kw">length</span>(p_to_install) <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>) {</a>
+<a class="sourceLine" id="cb143-7" data-line-number="7">    <span class="kw">install.packages</span>(p_to_install)</a>
+<a class="sourceLine" id="cb143-8" data-line-number="8">}</a>
+<a class="sourceLine" id="cb143-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb143-10" data-line-number="10"><span class="kw">lapply</span>(p_needed, require, <span class="dt">character.only =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 </div>
             </section>
 

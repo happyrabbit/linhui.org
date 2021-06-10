@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2021-05-10" />
+<meta name="date" content="2021-05-25" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -458,153 +458,153 @@ The above defines the forward process. Same as before, the backward propagation 
 <div id="r-code-for-imdb-dataset" class="section level4">
 <h4><span class="header-section-number">12.4.4.2</span> R code for IMDB dataset</h4>
 <p>The IMDB dataset is preloaded for <code>keras</code> and we can call <code>dataset_imdb()</code> to load a partially pre-processed dataset into a data frame. We can define a few parameters in that function. <code>num_words</code> is the number of words in each review to be used. All the unique words are ranked by their frequency counts in the training dataset. The <code>dataset_imdb()</code> function keeps the top <code>num_words</code> words and replaces other words with a default value of 2, and using integers to represent text (i.e., top frequency word will be replaced by 3 and 0, 1, 2 are reserved for “padding,” “start of the sequence,” and “unknown.” ).</p>
-<div class="sourceCode" id="cb381"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb381-1" data-line-number="1"><span class="co"># Load `keras` package</span></a>
-<a class="sourceLine" id="cb381-2" data-line-number="2"><span class="kw">library</span>(keras)</a>
-<a class="sourceLine" id="cb381-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb381-4" data-line-number="4"><span class="co"># consider only the top 10,000 words in the dataset</span></a>
-<a class="sourceLine" id="cb381-5" data-line-number="5">max_unique_word &lt;-<span class="st"> </span><span class="dv">2500</span></a>
-<a class="sourceLine" id="cb381-6" data-line-number="6"><span class="co"># cut off reviews after 100 words</span></a>
-<a class="sourceLine" id="cb381-7" data-line-number="7">max_review_len &lt;-<span class="st"> </span><span class="dv">100</span></a></code></pre></div>
+<div class="sourceCode" id="cb385"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb385-1" data-line-number="1"><span class="co"># Load `keras` package</span></a>
+<a class="sourceLine" id="cb385-2" data-line-number="2"><span class="kw">library</span>(keras)</a>
+<a class="sourceLine" id="cb385-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb385-4" data-line-number="4"><span class="co"># consider only the top 10,000 words in the dataset</span></a>
+<a class="sourceLine" id="cb385-5" data-line-number="5">max_unique_word &lt;-<span class="st"> </span><span class="dv">2500</span></a>
+<a class="sourceLine" id="cb385-6" data-line-number="6"><span class="co"># cut off reviews after 100 words</span></a>
+<a class="sourceLine" id="cb385-7" data-line-number="7">max_review_len &lt;-<span class="st"> </span><span class="dv">100</span></a></code></pre></div>
 <p>Now we load the IMDB dataset, and we can check the structure of the loaded object by using <code>str()</code> command.</p>
-<div class="sourceCode" id="cb382"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb382-1" data-line-number="1">my_imdb &lt;-<span class="st"> </span><span class="kw">dataset_imdb</span>(<span class="dt">num_words =</span> max_unique_word)</a>
-<a class="sourceLine" id="cb382-2" data-line-number="2"><span class="kw">str</span>(my_imdb)</a></code></pre></div>
-<div class="sourceCode" id="cb383"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb383-1" data-line-number="1">Downloading data from</a>
-<a class="sourceLine" id="cb383-2" data-line-number="2">https://storage.googleapis.com/tensorflow/tf-keras-datasets/imdb.npz</a>
-<a class="sourceLine" id="cb383-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb383-4" data-line-number="4">    8192/17464789 [..............................] - ETA: 0s</a>
-<a class="sourceLine" id="cb383-5" data-line-number="5">  811008/17464789 [&gt;.............................] - ETA: 1s</a>
-<a class="sourceLine" id="cb383-6" data-line-number="6"> 4202496/17464789 [======&gt;.......................] - ETA: 0s</a>
-<a class="sourceLine" id="cb383-7" data-line-number="7">11476992/17464789 [==================&gt;...........] - ETA: 0s</a>
-<a class="sourceLine" id="cb383-8" data-line-number="8">17465344/17464789 [==============================] - 0s 0us/step</a>
-<a class="sourceLine" id="cb383-9" data-line-number="9">List of 2</a>
-<a class="sourceLine" id="cb383-10" data-line-number="10"> $ train:List of 2</a>
-<a class="sourceLine" id="cb383-11" data-line-number="11">  ..$ x:List of 25000</a>
-<a class="sourceLine" id="cb383-12" data-line-number="12">  .. ..$ : int [1:218] 1 14 22 16 43 530 973 1622 1385 65 ...</a>
-<a class="sourceLine" id="cb383-13" data-line-number="13">  .. ..$ : int [1:189] 1 194 1153 194 2 78 228 5 6 1463 ...</a>
-<a class="sourceLine" id="cb383-14" data-line-number="14">  </a>
-<a class="sourceLine" id="cb383-15" data-line-number="15">*** skipped some output ***</a></code></pre></div>
-<div class="sourceCode" id="cb384"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb384-1" data-line-number="1">x_train &lt;-<span class="st"> </span>my_imdb<span class="op">$</span>train<span class="op">$</span>x</a>
-<a class="sourceLine" id="cb384-2" data-line-number="2">y_train &lt;-<span class="st"> </span>my_imdb<span class="op">$</span>train<span class="op">$</span>y</a>
-<a class="sourceLine" id="cb384-3" data-line-number="3">x_test  &lt;-<span class="st"> </span>my_imdb<span class="op">$</span>test<span class="op">$</span>x</a>
-<a class="sourceLine" id="cb384-4" data-line-number="4">y_test  &lt;-<span class="st"> </span>my_imdb<span class="op">$</span>test<span class="op">$</span>y</a></code></pre></div>
+<div class="sourceCode" id="cb386"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb386-1" data-line-number="1">my_imdb &lt;-<span class="st"> </span><span class="kw">dataset_imdb</span>(<span class="dt">num_words =</span> max_unique_word)</a>
+<a class="sourceLine" id="cb386-2" data-line-number="2"><span class="kw">str</span>(my_imdb)</a></code></pre></div>
+<div class="sourceCode" id="cb387"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb387-1" data-line-number="1">Downloading data from</a>
+<a class="sourceLine" id="cb387-2" data-line-number="2">https://storage.googleapis.com/tensorflow/tf-keras-datasets/imdb.npz</a>
+<a class="sourceLine" id="cb387-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb387-4" data-line-number="4">    8192/17464789 [..............................] - ETA: 0s</a>
+<a class="sourceLine" id="cb387-5" data-line-number="5">  811008/17464789 [&gt;.............................] - ETA: 1s</a>
+<a class="sourceLine" id="cb387-6" data-line-number="6"> 4202496/17464789 [======&gt;.......................] - ETA: 0s</a>
+<a class="sourceLine" id="cb387-7" data-line-number="7">11476992/17464789 [==================&gt;...........] - ETA: 0s</a>
+<a class="sourceLine" id="cb387-8" data-line-number="8">17465344/17464789 [==============================] - 0s 0us/step</a>
+<a class="sourceLine" id="cb387-9" data-line-number="9">List of 2</a>
+<a class="sourceLine" id="cb387-10" data-line-number="10"> $ train:List of 2</a>
+<a class="sourceLine" id="cb387-11" data-line-number="11">  ..$ x:List of 25000</a>
+<a class="sourceLine" id="cb387-12" data-line-number="12">  .. ..$ : int [1:218] 1 14 22 16 43 530 973 1622 1385 65 ...</a>
+<a class="sourceLine" id="cb387-13" data-line-number="13">  .. ..$ : int [1:189] 1 194 1153 194 2 78 228 5 6 1463 ...</a>
+<a class="sourceLine" id="cb387-14" data-line-number="14">  </a>
+<a class="sourceLine" id="cb387-15" data-line-number="15">*** skipped some output ***</a></code></pre></div>
+<div class="sourceCode" id="cb388"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb388-1" data-line-number="1">x_train &lt;-<span class="st"> </span>my_imdb<span class="op">$</span>train<span class="op">$</span>x</a>
+<a class="sourceLine" id="cb388-2" data-line-number="2">y_train &lt;-<span class="st"> </span>my_imdb<span class="op">$</span>train<span class="op">$</span>y</a>
+<a class="sourceLine" id="cb388-3" data-line-number="3">x_test  &lt;-<span class="st"> </span>my_imdb<span class="op">$</span>test<span class="op">$</span>x</a>
+<a class="sourceLine" id="cb388-4" data-line-number="4">y_test  &lt;-<span class="st"> </span>my_imdb<span class="op">$</span>test<span class="op">$</span>y</a></code></pre></div>
 <p>Next, we do the padding and truncating process.</p>
-<div class="sourceCode" id="cb385"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb385-1" data-line-number="1">x_train &lt;-<span class="st"> </span><span class="kw">pad_sequences</span>(x_train, <span class="dt">maxlen =</span> max_review_len)</a>
-<a class="sourceLine" id="cb385-2" data-line-number="2">x_test &lt;-<span class="st"> </span><span class="kw">pad_sequences</span>(x_test, <span class="dt">maxlen =</span> max_review_len)</a></code></pre></div>
+<div class="sourceCode" id="cb389"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb389-1" data-line-number="1">x_train &lt;-<span class="st"> </span><span class="kw">pad_sequences</span>(x_train, <span class="dt">maxlen =</span> max_review_len)</a>
+<a class="sourceLine" id="cb389-2" data-line-number="2">x_test &lt;-<span class="st"> </span><span class="kw">pad_sequences</span>(x_test, <span class="dt">maxlen =</span> max_review_len)</a></code></pre></div>
 <p>The <code>x_train</code> and <code>x_test</code> are numerical data frames ready to be used for recurrent neural network models.</p>
 <p><strong>Simple Recurrent Neurel Network</strong></p>
 <p>Like DNN and CNN models we trained in the past, RNN models are relatively easy to train using <code>keras</code> after the pre-processing stage. In the following example, we use <code>layer_embedding()</code> to fit an embedding layer based on the training dataset, which has two parameters: <code>input_dim</code> (the number of unique words) and <code>output_dim</code> (the length of dense vectors). Then, we add a simple RNN layer by calling <code>layer_simple_rnn()</code> and followed by a dense layer <code>layer_dense()</code> to connect to the response binary variable.</p>
-<div class="sourceCode" id="cb386"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb386-1" data-line-number="1">rnn_model &lt;-<span class="st"> </span><span class="kw">keras_model_sequential</span>()</a>
-<a class="sourceLine" id="cb386-2" data-line-number="2">rnn_model <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb386-3" data-line-number="3"><span class="st">  </span><span class="kw">layer_embedding</span>(<span class="dt">input_dim =</span> max_unique_word, <span class="dt">output_dim =</span> <span class="dv">128</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb386-4" data-line-number="4"><span class="st">  </span><span class="kw">layer_simple_rnn</span>(<span class="dt">units =</span> <span class="dv">64</span>, <span class="dt">dropout =</span> <span class="fl">0.2</span>, </a>
-<a class="sourceLine" id="cb386-5" data-line-number="5">                   <span class="dt">recurrent_dropout =</span> <span class="fl">0.2</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb386-6" data-line-number="6"><span class="st">  </span><span class="kw">layer_dense</span>(<span class="dt">units =</span> <span class="dv">1</span>, <span class="dt">activation =</span> <span class="st">&#39;sigmoid&#39;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb390"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb390-1" data-line-number="1">rnn_model &lt;-<span class="st"> </span><span class="kw">keras_model_sequential</span>()</a>
+<a class="sourceLine" id="cb390-2" data-line-number="2">rnn_model <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb390-3" data-line-number="3"><span class="st">  </span><span class="kw">layer_embedding</span>(<span class="dt">input_dim =</span> max_unique_word, <span class="dt">output_dim =</span> <span class="dv">128</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb390-4" data-line-number="4"><span class="st">  </span><span class="kw">layer_simple_rnn</span>(<span class="dt">units =</span> <span class="dv">64</span>, <span class="dt">dropout =</span> <span class="fl">0.2</span>, </a>
+<a class="sourceLine" id="cb390-5" data-line-number="5">                   <span class="dt">recurrent_dropout =</span> <span class="fl">0.2</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb390-6" data-line-number="6"><span class="st">  </span><span class="kw">layer_dense</span>(<span class="dt">units =</span> <span class="dv">1</span>, <span class="dt">activation =</span> <span class="st">&#39;sigmoid&#39;</span>)</a></code></pre></div>
 <p>We compile the RNN model by defining the loss function, optimizer to use, and metrics to track the same way as DNN and CNN models.</p>
-<div class="sourceCode" id="cb387"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb387-1" data-line-number="1">rnn_model <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">compile</span>(</a>
-<a class="sourceLine" id="cb387-2" data-line-number="2">  <span class="dt">loss =</span> <span class="st">&#39;binary_crossentropy&#39;</span>,</a>
-<a class="sourceLine" id="cb387-3" data-line-number="3">  <span class="dt">optimizer =</span> <span class="st">&#39;adam&#39;</span>,</a>
-<a class="sourceLine" id="cb387-4" data-line-number="4">  <span class="dt">metrics =</span> <span class="kw">c</span>(<span class="st">&#39;accuracy&#39;</span>)</a>
-<a class="sourceLine" id="cb387-5" data-line-number="5">)</a></code></pre></div>
+<div class="sourceCode" id="cb391"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb391-1" data-line-number="1">rnn_model <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">compile</span>(</a>
+<a class="sourceLine" id="cb391-2" data-line-number="2">  <span class="dt">loss =</span> <span class="st">&#39;binary_crossentropy&#39;</span>,</a>
+<a class="sourceLine" id="cb391-3" data-line-number="3">  <span class="dt">optimizer =</span> <span class="st">&#39;adam&#39;</span>,</a>
+<a class="sourceLine" id="cb391-4" data-line-number="4">  <span class="dt">metrics =</span> <span class="kw">c</span>(<span class="st">&#39;accuracy&#39;</span>)</a>
+<a class="sourceLine" id="cb391-5" data-line-number="5">)</a></code></pre></div>
 <p>Let us define a few more variables before fitting the model: <code>batch_size</code>, <code>epochs</code>, and <code>validation_split</code>. These variables have the same meaning as DNN and CNN models we see in the past.</p>
-<div class="sourceCode" id="cb388"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb388-1" data-line-number="1">batch_size =<span class="st"> </span><span class="dv">128</span></a>
-<a class="sourceLine" id="cb388-2" data-line-number="2">epochs =<span class="st"> </span><span class="dv">5</span></a>
-<a class="sourceLine" id="cb388-3" data-line-number="3">validation_split =<span class="st"> </span><span class="fl">0.2</span></a>
-<a class="sourceLine" id="cb388-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb388-5" data-line-number="5">rnn_history &lt;-<span class="st"> </span>rnn_model <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">fit</span>(</a>
-<a class="sourceLine" id="cb388-6" data-line-number="6">  x_train, y_train,</a>
-<a class="sourceLine" id="cb388-7" data-line-number="7">  <span class="dt">batch_size =</span> batch_size,</a>
-<a class="sourceLine" id="cb388-8" data-line-number="8">  <span class="dt">epochs =</span> epochs,</a>
-<a class="sourceLine" id="cb388-9" data-line-number="9">  <span class="dt">validation_split =</span> validation_split</a>
-<a class="sourceLine" id="cb388-10" data-line-number="10">)</a></code></pre></div>
-<div class="sourceCode" id="cb389"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb389-1" data-line-number="1">Epoch 1/5</a>
-<a class="sourceLine" id="cb389-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb389-3" data-line-number="3">  1/157 [...............] - ETA: 0s - loss: 0.7348 - accuracy: 0.4766</a>
-<a class="sourceLine" id="cb389-4" data-line-number="4">  2/157 [...............] - ETA: 7s - loss: 0.7279 - accuracy: 0.4961</a>
-<a class="sourceLine" id="cb389-5" data-line-number="5">  3/157 [...............] - ETA: 10s - loss: 0.7290 - accuracy: 0.4896</a>
-<a class="sourceLine" id="cb389-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb389-7" data-line-number="7">*** skipped some output ***</a>
-<a class="sourceLine" id="cb389-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb389-9" data-line-number="9">154/157 [=============&gt;.] - ETA: 0s - loss: 0.4456 - accuracy: 0.7991</a>
-<a class="sourceLine" id="cb389-10" data-line-number="10">155/157 [=============&gt;.] - ETA: 0s - loss: 0.4460 - accuracy: 0.7991</a>
-<a class="sourceLine" id="cb389-11" data-line-number="11">156/157 [=============&gt;.] - ETA: 0s - loss: 0.4457 - accuracy: 0.7995</a>
-<a class="sourceLine" id="cb389-12" data-line-number="12">157/157 [===============] - 17s 109ms/step </a>
-<a class="sourceLine" id="cb389-13" data-line-number="13">loss: 0.4457 - accuracy: 0.7995 - val_loss: 0.4444 - val_accuracy: 0.7908</a></code></pre></div>
-<div class="sourceCode" id="cb390"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb390-1" data-line-number="1"><span class="kw">plot</span>(rnn_history)</a></code></pre></div>
+<div class="sourceCode" id="cb392"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb392-1" data-line-number="1">batch_size =<span class="st"> </span><span class="dv">128</span></a>
+<a class="sourceLine" id="cb392-2" data-line-number="2">epochs =<span class="st"> </span><span class="dv">5</span></a>
+<a class="sourceLine" id="cb392-3" data-line-number="3">validation_split =<span class="st"> </span><span class="fl">0.2</span></a>
+<a class="sourceLine" id="cb392-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb392-5" data-line-number="5">rnn_history &lt;-<span class="st"> </span>rnn_model <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">fit</span>(</a>
+<a class="sourceLine" id="cb392-6" data-line-number="6">  x_train, y_train,</a>
+<a class="sourceLine" id="cb392-7" data-line-number="7">  <span class="dt">batch_size =</span> batch_size,</a>
+<a class="sourceLine" id="cb392-8" data-line-number="8">  <span class="dt">epochs =</span> epochs,</a>
+<a class="sourceLine" id="cb392-9" data-line-number="9">  <span class="dt">validation_split =</span> validation_split</a>
+<a class="sourceLine" id="cb392-10" data-line-number="10">)</a></code></pre></div>
+<div class="sourceCode" id="cb393"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb393-1" data-line-number="1">Epoch 1/5</a>
+<a class="sourceLine" id="cb393-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb393-3" data-line-number="3">  1/157 [...............] - ETA: 0s - loss: 0.7348 - accuracy: 0.4766</a>
+<a class="sourceLine" id="cb393-4" data-line-number="4">  2/157 [...............] - ETA: 7s - loss: 0.7279 - accuracy: 0.4961</a>
+<a class="sourceLine" id="cb393-5" data-line-number="5">  3/157 [...............] - ETA: 10s - loss: 0.7290 - accuracy: 0.4896</a>
+<a class="sourceLine" id="cb393-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb393-7" data-line-number="7">*** skipped some output ***</a>
+<a class="sourceLine" id="cb393-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb393-9" data-line-number="9">154/157 [=============&gt;.] - ETA: 0s - loss: 0.4456 - accuracy: 0.7991</a>
+<a class="sourceLine" id="cb393-10" data-line-number="10">155/157 [=============&gt;.] - ETA: 0s - loss: 0.4460 - accuracy: 0.7991</a>
+<a class="sourceLine" id="cb393-11" data-line-number="11">156/157 [=============&gt;.] - ETA: 0s - loss: 0.4457 - accuracy: 0.7995</a>
+<a class="sourceLine" id="cb393-12" data-line-number="12">157/157 [===============] - 17s 109ms/step </a>
+<a class="sourceLine" id="cb393-13" data-line-number="13">loss: 0.4457 - accuracy: 0.7995 - val_loss: 0.4444 - val_accuracy: 0.7908</a></code></pre></div>
+<div class="sourceCode" id="cb394"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb394-1" data-line-number="1"><span class="kw">plot</span>(rnn_history)</a></code></pre></div>
 <center>
 <img src="images/rnnhandson1.png" style="width:90.0%" />
 </center>
-<div class="sourceCode" id="cb391"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb391-1" data-line-number="1">rnn_model <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb391-2" data-line-number="2"><span class="st">   </span><span class="kw">evaluate</span>(x_test, y_test)</a></code></pre></div>
-<div class="sourceCode" id="cb392"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb392-1" data-line-number="1">  1/782 [...............] - ETA: 0s - loss: 0.3019 - accuracy: 0.8438</a>
-<a class="sourceLine" id="cb392-2" data-line-number="2">  8/782 [...............] - ETA: 5s - loss: 0.4328 - accuracy: 0.8008</a>
-<a class="sourceLine" id="cb392-3" data-line-number="3"> 15/782 [...............] - ETA: 5s - loss: 0.4415 - accuracy: 0.7937</a>
-<a class="sourceLine" id="cb392-4" data-line-number="4"> 23/782 [...............] - ETA: 5s - loss: 0.4247 - accuracy: 0.8043</a>
-<a class="sourceLine" id="cb392-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb392-6" data-line-number="6">*** skipped some output ***</a>
-<a class="sourceLine" id="cb392-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb392-8" data-line-number="8">775/782 [=============&gt;.] - ETA: 0s - loss: 0.4371 - accuracy: 0.8007</a>
-<a class="sourceLine" id="cb392-9" data-line-number="9">782/782 [===============] - ETA: 0s - loss: 0.4365 - accuracy: 0.8010</a>
-<a class="sourceLine" id="cb392-10" data-line-number="10">782/782 [===============] - 6s 8ms/step - loss: 0.4365 - accuracy: 0.8010</a>
-<a class="sourceLine" id="cb392-11" data-line-number="11">     loss  accuracy </a>
-<a class="sourceLine" id="cb392-12" data-line-number="12">0.4365373 0.8010000 </a></code></pre></div>
+<div class="sourceCode" id="cb395"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb395-1" data-line-number="1">rnn_model <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb395-2" data-line-number="2"><span class="st">   </span><span class="kw">evaluate</span>(x_test, y_test)</a></code></pre></div>
+<div class="sourceCode" id="cb396"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb396-1" data-line-number="1">  1/782 [...............] - ETA: 0s - loss: 0.3019 - accuracy: 0.8438</a>
+<a class="sourceLine" id="cb396-2" data-line-number="2">  8/782 [...............] - ETA: 5s - loss: 0.4328 - accuracy: 0.8008</a>
+<a class="sourceLine" id="cb396-3" data-line-number="3"> 15/782 [...............] - ETA: 5s - loss: 0.4415 - accuracy: 0.7937</a>
+<a class="sourceLine" id="cb396-4" data-line-number="4"> 23/782 [...............] - ETA: 5s - loss: 0.4247 - accuracy: 0.8043</a>
+<a class="sourceLine" id="cb396-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb396-6" data-line-number="6">*** skipped some output ***</a>
+<a class="sourceLine" id="cb396-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb396-8" data-line-number="8">775/782 [=============&gt;.] - ETA: 0s - loss: 0.4371 - accuracy: 0.8007</a>
+<a class="sourceLine" id="cb396-9" data-line-number="9">782/782 [===============] - ETA: 0s - loss: 0.4365 - accuracy: 0.8010</a>
+<a class="sourceLine" id="cb396-10" data-line-number="10">782/782 [===============] - 6s 8ms/step - loss: 0.4365 - accuracy: 0.8010</a>
+<a class="sourceLine" id="cb396-11" data-line-number="11">     loss  accuracy </a>
+<a class="sourceLine" id="cb396-12" data-line-number="12">0.4365373 0.8010000 </a></code></pre></div>
 <p><strong>LSTM RNN Model</strong></p>
 <p>A simple RNN layer is a good starting point for learning RNN, but the performance is usually not that good because these long-term dependencies are impossible to learn due to vanishing gradient. Long Short Term Memory RNN model (LSTM) can carry useful information from the earlier words to later words. In <code>keras</code>, it is easy to replace a simple RNN layer with an LSTM layer by using <code>layer_lstm()</code>.</p>
-<div class="sourceCode" id="cb393"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb393-1" data-line-number="1">lstm_model &lt;-<span class="st"> </span><span class="kw">keras_model_sequential</span>()</a>
-<a class="sourceLine" id="cb393-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb393-3" data-line-number="3">lstm_model <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb393-4" data-line-number="4"><span class="st">  </span><span class="kw">layer_embedding</span>(<span class="dt">input_dim =</span> max_unique_word, <span class="dt">output_dim =</span> <span class="dv">128</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb393-5" data-line-number="5"><span class="st">  </span><span class="kw">layer_lstm</span>(<span class="dt">units =</span> <span class="dv">64</span>, <span class="dt">dropout =</span> <span class="fl">0.2</span>, <span class="dt">recurrent_dropout =</span> <span class="fl">0.2</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb393-6" data-line-number="6"><span class="st">  </span><span class="kw">layer_dense</span>(<span class="dt">units =</span> <span class="dv">1</span>, <span class="dt">activation =</span> <span class="st">&#39;sigmoid&#39;</span>)</a>
-<a class="sourceLine" id="cb393-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb393-8" data-line-number="8">lstm_model <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">compile</span>(</a>
-<a class="sourceLine" id="cb393-9" data-line-number="9">  <span class="dt">loss =</span> <span class="st">&#39;binary_crossentropy&#39;</span>,</a>
-<a class="sourceLine" id="cb393-10" data-line-number="10">  <span class="dt">optimizer =</span> <span class="st">&#39;adam&#39;</span>,</a>
-<a class="sourceLine" id="cb393-11" data-line-number="11">  <span class="dt">metrics =</span> <span class="kw">c</span>(<span class="st">&#39;accuracy&#39;</span>)</a>
-<a class="sourceLine" id="cb393-12" data-line-number="12">)</a>
-<a class="sourceLine" id="cb393-13" data-line-number="13"></a>
-<a class="sourceLine" id="cb393-14" data-line-number="14">batch_size =<span class="st"> </span><span class="dv">128</span></a>
-<a class="sourceLine" id="cb393-15" data-line-number="15">epochs =<span class="st"> </span><span class="dv">5</span></a>
-<a class="sourceLine" id="cb393-16" data-line-number="16">validation_split =<span class="st"> </span><span class="fl">0.2</span></a>
-<a class="sourceLine" id="cb393-17" data-line-number="17"></a>
-<a class="sourceLine" id="cb393-18" data-line-number="18">lstm_history &lt;-<span class="st"> </span>lstm_model <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">fit</span>(</a>
-<a class="sourceLine" id="cb393-19" data-line-number="19">  x_train, y_train,</a>
-<a class="sourceLine" id="cb393-20" data-line-number="20">  <span class="dt">batch_size =</span> batch_size,</a>
-<a class="sourceLine" id="cb393-21" data-line-number="21">  <span class="dt">epochs =</span> epochs,</a>
-<a class="sourceLine" id="cb393-22" data-line-number="22">  <span class="dt">validation_split =</span> validation_split</a>
-<a class="sourceLine" id="cb393-23" data-line-number="23">)</a></code></pre></div>
-<div class="sourceCode" id="cb394"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb394-1" data-line-number="1">Epoch 1/5</a>
-<a class="sourceLine" id="cb394-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb394-3" data-line-number="3">  1/157 [.........] - ETA: 0s - loss: 0.6939 - accuracy: 0.4766</a>
-<a class="sourceLine" id="cb394-4" data-line-number="4">  2/157 [.........] - ETA: 31s - loss: 0.6940 - accuracy: 0.4766</a>
-<a class="sourceLine" id="cb394-5" data-line-number="5">  3/157 [.........] - ETA: 43s - loss: 0.6937 - accuracy: 0.4896</a>
-<a class="sourceLine" id="cb394-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb394-7" data-line-number="7">*** skipped some output ***</a>
-<a class="sourceLine" id="cb394-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb394-9" data-line-number="9">155/157 [=======&gt;.] - ETA: 0s - loss: 0.2610 - accuracy: 0.8918</a>
-<a class="sourceLine" id="cb394-10" data-line-number="10">156/157 [=======&gt;.] - ETA: 0s - loss: 0.2607 - accuracy: 0.8920</a>
-<a class="sourceLine" id="cb394-11" data-line-number="11">157/157 [=========] - ETA: 0s - loss: 0.2609 - accuracy: 0.8917</a>
-<a class="sourceLine" id="cb394-12" data-line-number="12">157/157 [=========] - 67s 424ms/step </a>
-<a class="sourceLine" id="cb394-13" data-line-number="13">loss: 0.2609 accuracy: 0.8917 val_loss: 0.3754 val_accuracy: 0.8328</a></code></pre></div>
-<div class="sourceCode" id="cb395"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb395-1" data-line-number="1"><span class="kw">plot</span>(lstm_history)</a></code></pre></div>
+<div class="sourceCode" id="cb397"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb397-1" data-line-number="1">lstm_model &lt;-<span class="st"> </span><span class="kw">keras_model_sequential</span>()</a>
+<a class="sourceLine" id="cb397-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb397-3" data-line-number="3">lstm_model <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb397-4" data-line-number="4"><span class="st">  </span><span class="kw">layer_embedding</span>(<span class="dt">input_dim =</span> max_unique_word, <span class="dt">output_dim =</span> <span class="dv">128</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb397-5" data-line-number="5"><span class="st">  </span><span class="kw">layer_lstm</span>(<span class="dt">units =</span> <span class="dv">64</span>, <span class="dt">dropout =</span> <span class="fl">0.2</span>, <span class="dt">recurrent_dropout =</span> <span class="fl">0.2</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb397-6" data-line-number="6"><span class="st">  </span><span class="kw">layer_dense</span>(<span class="dt">units =</span> <span class="dv">1</span>, <span class="dt">activation =</span> <span class="st">&#39;sigmoid&#39;</span>)</a>
+<a class="sourceLine" id="cb397-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb397-8" data-line-number="8">lstm_model <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">compile</span>(</a>
+<a class="sourceLine" id="cb397-9" data-line-number="9">  <span class="dt">loss =</span> <span class="st">&#39;binary_crossentropy&#39;</span>,</a>
+<a class="sourceLine" id="cb397-10" data-line-number="10">  <span class="dt">optimizer =</span> <span class="st">&#39;adam&#39;</span>,</a>
+<a class="sourceLine" id="cb397-11" data-line-number="11">  <span class="dt">metrics =</span> <span class="kw">c</span>(<span class="st">&#39;accuracy&#39;</span>)</a>
+<a class="sourceLine" id="cb397-12" data-line-number="12">)</a>
+<a class="sourceLine" id="cb397-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb397-14" data-line-number="14">batch_size =<span class="st"> </span><span class="dv">128</span></a>
+<a class="sourceLine" id="cb397-15" data-line-number="15">epochs =<span class="st"> </span><span class="dv">5</span></a>
+<a class="sourceLine" id="cb397-16" data-line-number="16">validation_split =<span class="st"> </span><span class="fl">0.2</span></a>
+<a class="sourceLine" id="cb397-17" data-line-number="17"></a>
+<a class="sourceLine" id="cb397-18" data-line-number="18">lstm_history &lt;-<span class="st"> </span>lstm_model <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">fit</span>(</a>
+<a class="sourceLine" id="cb397-19" data-line-number="19">  x_train, y_train,</a>
+<a class="sourceLine" id="cb397-20" data-line-number="20">  <span class="dt">batch_size =</span> batch_size,</a>
+<a class="sourceLine" id="cb397-21" data-line-number="21">  <span class="dt">epochs =</span> epochs,</a>
+<a class="sourceLine" id="cb397-22" data-line-number="22">  <span class="dt">validation_split =</span> validation_split</a>
+<a class="sourceLine" id="cb397-23" data-line-number="23">)</a></code></pre></div>
+<div class="sourceCode" id="cb398"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb398-1" data-line-number="1">Epoch 1/5</a>
+<a class="sourceLine" id="cb398-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb398-3" data-line-number="3">  1/157 [.........] - ETA: 0s - loss: 0.6939 - accuracy: 0.4766</a>
+<a class="sourceLine" id="cb398-4" data-line-number="4">  2/157 [.........] - ETA: 31s - loss: 0.6940 - accuracy: 0.4766</a>
+<a class="sourceLine" id="cb398-5" data-line-number="5">  3/157 [.........] - ETA: 43s - loss: 0.6937 - accuracy: 0.4896</a>
+<a class="sourceLine" id="cb398-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb398-7" data-line-number="7">*** skipped some output ***</a>
+<a class="sourceLine" id="cb398-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb398-9" data-line-number="9">155/157 [=======&gt;.] - ETA: 0s - loss: 0.2610 - accuracy: 0.8918</a>
+<a class="sourceLine" id="cb398-10" data-line-number="10">156/157 [=======&gt;.] - ETA: 0s - loss: 0.2607 - accuracy: 0.8920</a>
+<a class="sourceLine" id="cb398-11" data-line-number="11">157/157 [=========] - ETA: 0s - loss: 0.2609 - accuracy: 0.8917</a>
+<a class="sourceLine" id="cb398-12" data-line-number="12">157/157 [=========] - 67s 424ms/step </a>
+<a class="sourceLine" id="cb398-13" data-line-number="13">loss: 0.2609 accuracy: 0.8917 val_loss: 0.3754 val_accuracy: 0.8328</a></code></pre></div>
+<div class="sourceCode" id="cb399"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb399-1" data-line-number="1"><span class="kw">plot</span>(lstm_history)</a></code></pre></div>
 <center>
 <img src="images/rnnhandson2.png" style="width:90.0%" />
 </center>
-<div class="sourceCode" id="cb396"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb396-1" data-line-number="1">lstm_model <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb396-2" data-line-number="2"><span class="st">   </span><span class="kw">evaluate</span>(x_test, y_test)</a></code></pre></div>
-<div class="sourceCode" id="cb397"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb397-1" data-line-number="1">  1/782 [.........] - ETA: 0s  - loss: 0.2332 - accuracy: 0.9062</a>
-<a class="sourceLine" id="cb397-2" data-line-number="2">  4/782 [.........] - ETA: 12s - loss: 0.3536 - accuracy: 0.8750</a>
-<a class="sourceLine" id="cb397-3" data-line-number="3">  7/782 [.........] - ETA: 14s - loss: 0.3409 - accuracy: 0.8705</a>
-<a class="sourceLine" id="cb397-4" data-line-number="4"> 10/782 [.........] - ETA: 14s - loss: 0.3508 - accuracy: 0.8625</a>
-<a class="sourceLine" id="cb397-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb397-6" data-line-number="6">*** skipped some output ***</a>
-<a class="sourceLine" id="cb397-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb397-8" data-line-number="8">775/782 [=======&gt;.] - ETA: 0s - loss: 0.3640 - accuracy: 0.8415</a>
-<a class="sourceLine" id="cb397-9" data-line-number="9">778/782 [=======&gt;.] - ETA: 0s - loss: 0.3637 - accuracy: 0.8417</a>
-<a class="sourceLine" id="cb397-10" data-line-number="10">780/782 [=======&gt;.] - ETA: 0s - loss: 0.3632 - accuracy: 0.8419</a>
-<a class="sourceLine" id="cb397-11" data-line-number="11">782/782 [=========] - ETA: 0s - loss: 0.3631 - accuracy: 0.8420</a>
-<a class="sourceLine" id="cb397-12" data-line-number="12">782/782 [=========] - 18s 22ms/step - loss: 0.3631 - accuracy: 0.8420</a>
-<a class="sourceLine" id="cb397-13" data-line-number="13">     loss  accuracy </a>
-<a class="sourceLine" id="cb397-14" data-line-number="14">0.3631141 0.8420000 </a></code></pre></div>
+<div class="sourceCode" id="cb400"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb400-1" data-line-number="1">lstm_model <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb400-2" data-line-number="2"><span class="st">   </span><span class="kw">evaluate</span>(x_test, y_test)</a></code></pre></div>
+<div class="sourceCode" id="cb401"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb401-1" data-line-number="1">  1/782 [.........] - ETA: 0s  - loss: 0.2332 - accuracy: 0.9062</a>
+<a class="sourceLine" id="cb401-2" data-line-number="2">  4/782 [.........] - ETA: 12s - loss: 0.3536 - accuracy: 0.8750</a>
+<a class="sourceLine" id="cb401-3" data-line-number="3">  7/782 [.........] - ETA: 14s - loss: 0.3409 - accuracy: 0.8705</a>
+<a class="sourceLine" id="cb401-4" data-line-number="4"> 10/782 [.........] - ETA: 14s - loss: 0.3508 - accuracy: 0.8625</a>
+<a class="sourceLine" id="cb401-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb401-6" data-line-number="6">*** skipped some output ***</a>
+<a class="sourceLine" id="cb401-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb401-8" data-line-number="8">775/782 [=======&gt;.] - ETA: 0s - loss: 0.3640 - accuracy: 0.8415</a>
+<a class="sourceLine" id="cb401-9" data-line-number="9">778/782 [=======&gt;.] - ETA: 0s - loss: 0.3637 - accuracy: 0.8417</a>
+<a class="sourceLine" id="cb401-10" data-line-number="10">780/782 [=======&gt;.] - ETA: 0s - loss: 0.3632 - accuracy: 0.8419</a>
+<a class="sourceLine" id="cb401-11" data-line-number="11">782/782 [=========] - ETA: 0s - loss: 0.3631 - accuracy: 0.8420</a>
+<a class="sourceLine" id="cb401-12" data-line-number="12">782/782 [=========] - 18s 22ms/step - loss: 0.3631 - accuracy: 0.8420</a>
+<a class="sourceLine" id="cb401-13" data-line-number="13">     loss  accuracy </a>
+<a class="sourceLine" id="cb401-14" data-line-number="14">0.3631141 0.8420000 </a></code></pre></div>
 <p>This simple example shows that LSTM’s performance has improved dramatically from the simple RNN model. The computation time for LSTM is roughly doubled when compared with the simple RNN model for this small dataset.</p>
 
 </div>

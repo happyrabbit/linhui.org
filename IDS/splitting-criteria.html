@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2021-05-10" />
+<meta name="date" content="2021-05-25" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -330,9 +330,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2><span class="header-section-number">11.2</span> Splitting Criteria</h2>
 <p>The splitting criteria used by the regression tree and the classification tree are different. Like the regression tree, the goal of the classification tree is to divide the data into smaller, more homogeneous groups. Homogeneity means that most of the samples at each node are from one class. The original CART algorithm uses Gini impurity as the splitting criterion; The later ID3, C4.5, and C5.0 use entropy. We will look at three most common splitting criteria.</p>
 <p><strong>Gini impurity</strong></p>
-<p>Gini impurity<span class="citation">(Breiman et al. <a href="#ref-Breiman1984">1984</a>)</span> is a measure of non-homogeneity. It is widely used in classification tree. For a two-class problem, the Gini impurity for a given node is defined as:</p>
+<p>Gini impurity <span class="citation">(Breiman et al. <a href="#ref-Breiman1984">1984</a>)</span> is a measure of non-homogeneity. It is widely used in classification tree. It is defined as:
+<span class="math display">\[Gini\ Index = \Sigma_i p_i(1-p_i)\]</span></p>
+<p>where <span class="math inline">\(p_i\)</span> is the probability of class <span class="math inline">\(i\)</span> and the interval of Gini is <span class="math inline">\([0, 0.5]\)</span>. For a two-class problem, the Gini impurity for a given node is:</p>
 <p><span class="math display">\[p_{1}(1-p_{1})+p_{2}(1-p_{2})\]</span></p>
-<p>where <span class="math inline">\(p_{1}\)</span> and <span class="math inline">\(p_{2}\)</span> are probabilities for the two classes respectively. It is easy to see that when the sample set is pure, one of the probability is 0 and the Gini score is the smallest. Conversely, when <span class="math inline">\(p_{1}=p_{2}=0.5\)</span>, the Gini score is the largest, in which case the purity of the node is the smallest. Let’s look at an example. Suppose we want to determine which students are computer science (CS) majors. Here is the simple hypothetical classification tree result obtained with the gender variable.</p>
+<p>It is easy to see that when the sample set is pure, one of the probability is 0 and the Gini score is the smallest. Conversely, when <span class="math inline">\(p_{1}=p_{2}=0.5\)</span>, the Gini score is the largest, in which case the purity of the node is the smallest. Let’s look at an example. Suppose we want to determine which students are computer science (CS) majors. Here is the simple hypothetical classification tree result obtained with the gender variable.</p>
 <center>
 <img src="images/giniEN.png" />
 </center>
@@ -344,14 +346,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>The Gini impurity for the node “Gender” is the following weighted average of the above two scores:</p>
 <p><span class="math display">\[\frac{3}{5}\times\frac{5}{18}+\frac{2}{5}\times 0=\frac{1}{6}\]</span></p>
 <p>The Gini impurity for the 50 samples in the parent node is <span class="math inline">\(\frac{1}{2}\)</span>. It is easy to calculate the Gini impurity drop from <span class="math inline">\(\frac{1}{2}\)</span> to <span class="math inline">\(\frac{1}{6}\)</span> after splitting. The split using “gender” causes a Gini impurity decrease of <span class="math inline">\(\frac{1}{3}\)</span>. The algorithm will use different variables to split the data and choose the one that causes the most substantial Gini impurity decrease.</p>
-<p><strong>Information gain</strong></p>
+<p><strong>Information Gain (IG)</strong></p>
 <p>Looking at the samples in the following three nodes, which one is the easiest to describe? It is obviously C. Because all the samples in C are of the same type, so the description requires the least amount of information. On the contrary, B needs more information, and A needs the most information. In other words, C has the highest purity, B is the second, and A has the lowest purity. We need less information to describe nodes with higher purity.</p>
 <center>
 <img src="images/InfoGainEN.png" />
 </center>
 <p>A measure of the degree of disorder is entropy which is defined as:</p>
+<p><span class="math display">\[Entropy = - \Sigma_i p_i log_2(p_i)\]</span>
+where <span class="math inline">\(p_i\)</span> is the probability of class <span class="math inline">\(i\)</span> and the interval of entropy is <span class="math inline">\([0, 1]\)</span>. For a two-class problem:</p>
 <p><span class="math display">\[Entropy=-plog_{2}p-(1-p)log_{2}(1-p)\]</span></p>
-<p>where p is the percentage of one type of samples. If all the samples in one node are of one type (such as C), the entropy is 0. If the proportion of each type in a node is 50% - 50%, the entropy is 1. We can use entropy as splitting criteria. The goal is to decrease entropy as the tree grows.</p>
+<p>where p is the percentage of one type of samples. If all the samples in one node are of one type (such as C), the entropy is 0. If the proportion of each type in a node is 50% - 50%, the entropy is 1. We can use entropy as splitting criteria. The goal is to decrease entropy as the tree grows. As an analogy, entropy in physics quantifies the level of disorder and the goal here is to have the least disorder.</p>
 <p>Similarly, the entropy of a splitting node is the weighted average of the entropy of each child. In the above tree for the students, the entropy of the root node with all 50 students is <span class="math inline">\(-\frac{25}{50}log_{2}\frac{25}{50}-\frac{25}{50}log_{2}\frac{25}{50}=1\)</span>. Here an entropy of 1 indicates that the purity of the node is the lowest, that is, each type takes up half of the samples.</p>
 <p>The entropy of the split using variable “gender” can be calculated in three steps:</p>
 <ol style="list-style-type: decimal">
@@ -359,8 +363,23 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>Entropy for “Male” = <span class="math inline">\(0\times1+1\times 0=0\)</span></li>
 <li>Entropy for the node “Gender” is the weighted average of the above two entropy numbers: <span class="math inline">\(\frac{3}{5}\times 0.65+\frac{2}{5}\times 0=0.39\)</span></li>
 </ol>
-<p>So entropy decreases from 1 to 0.39 after the split.</p>
-<p><strong>Sum of Square Error (SSE)</strong></p>
+<p>So entropy decreases from 1 to 0.39 after the split and the IG for “Gender” is 0.61.</p>
+<p><strong>Information Gain Ratio (IGR)</strong></p>
+<p>ID3 uses information gain as the splitting criterion to train the classification tree. A drawback of information gain is that it is biased towards choosing attributes with many values, resulting in overfitting (selecting a feature that is non-optimal for prediction) <span class="citation">(HSSINA et al. <a href="#ref-HSSINA2014">2014</a>)</span>.</p>
+<p>To understand why let’s look at another hypothetical scenario. Assume that the training set has students’ birth month as a feature. You might say that the birth month should not be considered in this case because it intuitively doesn’t help tell the student’s major. Yes, you’re right. However, practically, we may have a much more complicated dataset, and we may not have such intuition for all the features. So, we may not always be able to determine whether a feature makes sense or not. If we use the birth month to split the data, the corresponding entropy of the mode “Birth Month” is 0.24 (the sum of column “Weighted Entropy” in the table), and the information gain is 0.76, which is larger than the IG of “Gender” (0.61). So between the two features, IG would choose “Birth Month” to split the data.</p>
+<center>
+<img src="images/infogainratioexp.png" />
+</center>
+<p>To overcome this problem, C4.5 uses the “information gain ratio” instead of “information gain.” The gain ratio is defined as:</p>
+<p><span class="math display">\[Gain\ Ratio = \frac{Information\ Gain}{Split\ Information}\]</span>
+where split information is:</p>
+<p><span class="math display">\[Split\ Information = -\Sigma_{c = 1}^{C}p_clog(p_c)\]</span>
+<span class="math inline">\(p_c\)</span> is the proportion of samples in category <span class="math inline">\(c\)</span>. For example, there are three students with the birth month in Jan, 6% of the total 50 students. So the <span class="math inline">\(p_c\)</span> for “Birth Month = Jan” is 0.06. The split information measures the intrinsic information that is independent of the sample distribution inside different categories. The gain ratio corrects the IG by taking the intrinsic information of a split into account.</p>
+<center>
+<img src="images/infogainratioexp2.png" />
+</center>
+<p>The split information for the birth month is 3.4, and the gain ratio is 0.22, which is smaller than that of gender (0.63). The gain ratio refers to use gender as the splitting feature rather than the birth month. Gain ratio favors attributes with fewer categories and leads to better generalization (less overfitting).</p>
+<p><strong>Sum of Squared Error (SSE)</strong></p>
 <p>The previous two metrics are for classification tree. The SSE is the most widely used splitting metric for regression. Suppose you want to divide the data set <span class="math inline">\(S\)</span> into two groups of <span class="math inline">\(S_{1}\)</span> and <span class="math inline">\(S_{2}\)</span>, where the selection of <span class="math inline">\(S_{1}\)</span> and <span class="math inline">\(S_{2}\)</span> needs to minimize the sum of squared errors:</p>
 <p><span class="math display" id="eq:treesse">\[\begin{equation}
 SSE=\Sigma_{i\in S_{1}}(y_{i}-\bar{y}_{1})^{2}+\Sigma_{i\in S_{2}}(y_{i}-\bar{y}_{2})^{2}
@@ -395,6 +414,9 @@ SSE=\Sigma_{i\in S_{1}}(y_{i}-\bar{y}_{1})^{2}+\Sigma_{i\in S_{2}}(y_{i}-\bar{y}
 <div id="refs" class="references">
 <div id="ref-Breiman1984">
 <p>Breiman, L., J. H. Friedman, R. A. Olshen, and C. J. Stone. 1984. <em>Classification and Regression Trees</em>. ISBN 978-0412048418. CRC.</p>
+</div>
+<div id="ref-HSSINA2014">
+<p>HSSINA, Badr, Abdelkarim MERBOUHA, Hanane EZZIKOURI, and Mohammed ERRITALI. 2014. “A Comparative Study of Decision Tree Id3 and C4.5.” <em>International Journal of Advanced Computer Science and Applications(IJACSA), Special Issue on Advances in Vehicular Ad Hoc Networking and Applications 2014</em> 4 (2).</p>
 </div>
 </div>
             </section>

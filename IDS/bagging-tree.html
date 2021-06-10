@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2021-05-10" />
+<meta name="date" content="2021-05-25" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -333,7 +333,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Assume that there are <span class="math inline">\(n\)</span> independent random variables <span class="math inline">\(Z_1,\dots,Z_n\)</span> with variance <span class="math inline">\(\sigma^2\)</span>. Then the variance of the mean <span class="math inline">\(\bar{Z}\)</span> is <span class="math inline">\(\frac{\sigma^2}{n}\)</span>. It is easy to see why bagged models have less variance. Since bootstrapping is to sample with replacement, it means some samples are selected multiple times and some not at all. Those left out samples are called out-of-bag. You can use the out-of-bag sample to access the model performance. For regression, the prediction is a simple average. For classification, the prediction is the category with the most “votes”. Here, the number of trees, <span class="math inline">\(B\)</span> is a parameter you need to decide, i.e. tuning parameter. <strong>Bagging is a general approach that can be applied to different learners. Here we only discuss in the context of decision trees.</strong></p>
 <p>The advantages of bagging tree are:</p>
 <ul>
-<li><p>Bagging stabilizes the model predictions by averaging the results. If we have 10 bootstrap samples and fit a single tree on each of those, we may get 10 trees with very different structures and leading to different predictions for a new sample. But if we use the average of the 10 predictions as the final prediction, then the result should be much more stable. It means if we have another 10 samples and do it all-over again, we will get very similar averaged prediction.</p></li>
+<li><p>Bagging stabilizes the model predictions by averaging the results. If we have 10 bootstrap samples and fit a single tree on each of those, we may get 10 trees with very different structures and leading to different predictions for a new sample. But if we use the average of the 10 predictions as the final prediction, then the result is much more stable. It means if we have another 10 samples and do it all-over again, we will get very similar averaged prediction.</p></li>
 <li><p>Bagging provides more accurate predictions. If the goal is to predict rather than interpret, then the ensemble approach definitely has an advantage, especially for unstable models. However, for stable models (such as regression, MARS), bagging may bring marginal improvement for the model performance.</p></li>
 <li><p>Bagging can use out-of-bag samples to evaluate model performance. For each model in the ensemble, we can calculate the value of the model performance metric (you can decide what metric to use). You can use the average of all the out-of-bag performance values to gauge the predictive performance of the entire ensemble. This correlates well with either cross-validation estimates or test set estimates. On average, each tree uses about 2/3 of the samples, and the rest 1/3 is used as out-of-bag. When the number of bootstrap samples is large enough, the out-of-bag performance estimate approximates that from leave one out cross-validation.</p></li>
 </ul>
@@ -345,26 +345,26 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><p>Since the bagging tree uses all of the original predictors as everey split of every tree, those trees are related with each other. The tree correlation prevents bagging from optimally reducing the variance of the predicted values. See <span class="citation">(Hastie T <a href="#ref-Hastie2008">2008</a>)</span> for a mathematical illustration of the tree correlation phenomenon.</p></li>
 </ul>
 <p>Let’s look at how to use R to build bagging tree. Get the predictors and response variable first:</p>
-<div class="sourceCode" id="cb306"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb306-1" data-line-number="1">dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)</a>
-<a class="sourceLine" id="cb306-2" data-line-number="2"><span class="co"># use the 10 survey questions as predictors</span></a>
-<a class="sourceLine" id="cb306-3" data-line-number="3">trainx &lt;-<span class="st"> </span>dat[, <span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>, <span class="kw">names</span>(dat))]</a>
-<a class="sourceLine" id="cb306-4" data-line-number="4"><span class="co"># add segment as a predictor </span></a>
-<a class="sourceLine" id="cb306-5" data-line-number="5"><span class="co"># don&#39;t need to encode it to dummy variables</span></a>
-<a class="sourceLine" id="cb306-6" data-line-number="6">trainx<span class="op">$</span>segment &lt;-<span class="st"> </span><span class="kw">as.factor</span>(dat<span class="op">$</span>segment)</a>
-<a class="sourceLine" id="cb306-7" data-line-number="7"><span class="co"># use gender as the response variable</span></a>
-<a class="sourceLine" id="cb306-8" data-line-number="8">trainy &lt;-<span class="st"> </span><span class="kw">as.factor</span>(dat<span class="op">$</span>gender)</a></code></pre></div>
+<div class="sourceCode" id="cb308"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb308-1" data-line-number="1">dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)</a>
+<a class="sourceLine" id="cb308-2" data-line-number="2"><span class="co"># use the 10 survey questions as predictors</span></a>
+<a class="sourceLine" id="cb308-3" data-line-number="3">trainx &lt;-<span class="st"> </span>dat[, <span class="kw">grep</span>(<span class="st">&quot;Q&quot;</span>, <span class="kw">names</span>(dat))]</a>
+<a class="sourceLine" id="cb308-4" data-line-number="4"><span class="co"># add segment as a predictor </span></a>
+<a class="sourceLine" id="cb308-5" data-line-number="5"><span class="co"># don&#39;t need to encode it to dummy variables</span></a>
+<a class="sourceLine" id="cb308-6" data-line-number="6">trainx<span class="op">$</span>segment &lt;-<span class="st"> </span><span class="kw">as.factor</span>(dat<span class="op">$</span>segment)</a>
+<a class="sourceLine" id="cb308-7" data-line-number="7"><span class="co"># use gender as the response variable</span></a>
+<a class="sourceLine" id="cb308-8" data-line-number="8">trainy &lt;-<span class="st"> </span><span class="kw">as.factor</span>(dat<span class="op">$</span>gender)</a></code></pre></div>
 <p>Then fit the model using train function in caret package. Here we just set the number of trees to be 1000. You can tune that parameter.</p>
-<div class="sourceCode" id="cb307"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb307-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb307-2" data-line-number="2">bagTune &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(trainx, trainy, </a>
-<a class="sourceLine" id="cb307-3" data-line-number="3">                           <span class="dt">method =</span> <span class="st">&quot;treebag&quot;</span>,</a>
-<a class="sourceLine" id="cb307-4" data-line-number="4">                           <span class="dt">nbagg =</span> <span class="dv">2000</span>,</a>
-<a class="sourceLine" id="cb307-5" data-line-number="5">                           <span class="dt">metric =</span> <span class="st">&quot;ROC&quot;</span>,</a>
-<a class="sourceLine" id="cb307-6" data-line-number="6">                           <span class="dt">trControl =</span> <span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>,</a>
-<a class="sourceLine" id="cb307-7" data-line-number="7">                           <span class="dt">summaryFunction =</span> twoClassSummary,</a>
-<a class="sourceLine" id="cb307-8" data-line-number="8">                           <span class="dt">classProbs =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb307-9" data-line-number="9">                           <span class="dt">savePredictions =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb309"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb309-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">100</span>)</a>
+<a class="sourceLine" id="cb309-2" data-line-number="2">bagTune &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(trainx, trainy, </a>
+<a class="sourceLine" id="cb309-3" data-line-number="3">                           <span class="dt">method =</span> <span class="st">&quot;treebag&quot;</span>,</a>
+<a class="sourceLine" id="cb309-4" data-line-number="4">                           <span class="dt">nbagg =</span> <span class="dv">1000</span>,</a>
+<a class="sourceLine" id="cb309-5" data-line-number="5">                           <span class="dt">metric =</span> <span class="st">&quot;ROC&quot;</span>,</a>
+<a class="sourceLine" id="cb309-6" data-line-number="6">                           <span class="dt">trControl =</span> <span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>,</a>
+<a class="sourceLine" id="cb309-7" data-line-number="7">                           <span class="dt">summaryFunction =</span> twoClassSummary,</a>
+<a class="sourceLine" id="cb309-8" data-line-number="8">                           <span class="dt">classProbs =</span> <span class="ot">TRUE</span>,</a>
+<a class="sourceLine" id="cb309-9" data-line-number="9">                           <span class="dt">savePredictions =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
 <p>The model results are:</p>
-<div class="sourceCode" id="cb308"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb308-1" data-line-number="1">bagTune</a></code></pre></div>
+<div class="sourceCode" id="cb310"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb310-1" data-line-number="1">bagTune</a></code></pre></div>
 <pre><code>## Bagged CART 
 ## 
 ## 1000 samples
@@ -383,7 +383,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h3>References</h3>
 <div id="refs" class="references">
 <div id="ref-Efron1986">
-<p>B, Efron, and Tibshirani R. 1986. “Bootstrap Methods for Standard Errors, Con- Fidence Intervals, and Other Measures of Statistical Accuracy.” <em>Statistical Science</em>, 54–75.</p>
+<p>B, Efron, and Tibshirani R. 1986. “Bootstrap Methods for Standard Errors, Confidence Intervals, and Other Measures of Statistical Accuracy.” <em>Statistical Science</em>, 54–75.</p>
 </div>
 <div id="ref-Hastie2008">
 <p>Hastie T, Friedman J, Tibshirani R. 2008. <em>The Elements of Statistical Learning: Data Mining, Inference and Prediction</em>. 2nd ed. Springer.</p>
