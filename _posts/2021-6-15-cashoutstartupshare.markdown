@@ -4,6 +4,8 @@ layout: post
 time: '9:38'
 ---
 
+_scientistcafe原创，转载请标明出处。此文同时授权[篱笆教育](https://www.libaedu.com)。_
+
 这里讲的只是针对美国创业公司的情况。创业公司的股票最直接的变现方式就是等上市或者给收购，但在此之前你也还是有很多二级市场的变现方式。下面是几个我知道的
 
 1） [https://forgeglobal.com](https://forgeglobal.com/)
