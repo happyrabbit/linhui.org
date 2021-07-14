@@ -4,6 +4,8 @@ layout: post
 time: '9:38'
 ---
 
+# User-centered Metrics
+
 This article is based on an invited talk to the [HyVee](https://www.hy-vee.com) analytics team. The topics covered in this talk are:
 
 - Why are user-centered metrics important?
@@ -36,7 +38,7 @@ For personal life, if you measure the success of your life by money or promotion
 There are some metric frameworks for large-scale web products that well summarize the common metrics. Those metrics focus on the business or technical aspects of a product. And they are all extremely important and related to user experience. 
 
 <p align="center">
-  <img src="images/popularframeworks.png"  width="80%" />
+  <img src="/images/popularframeworks.png"  width="80%" />
 </p>
 
 One of the popular frameworks is PULSE which stands for  Pageviews, Uptime, Latency, Seven-day active users, and Earnings. It reflects a more low-level and direct approach to performance figures.
@@ -52,13 +54,13 @@ Another important framework is AARRR (aka user funnel or Pirate Metrics, Dave Mc
 However, both of them are low-level and indirect metrics of user experience. And the interpretation is ambiguous. For example, are the two the same happy story?
 
 <p align="center">
-  <img src="images/mau.png"  width="80%" />
+  <img src="/images/mau.png"  width="80%" />
 </p>
 
 The counts of MAU are exactly the same for the two plots. But if you break them down into different categories, it reveals a very different story:
 
 <p align="center">
-  <img src="images/retention.png"  width="80%" />
+  <img src="/images/retention.png"  width="80%" />
 </p>
 
 The growth on the left is fueled by new users. The retention has been dropping which is concerning. The growth on the right seems to be healthy. The growth is mostly from an increase in the retention rate and you see steady growth in new users too. 
@@ -68,7 +70,7 @@ It is one step further but still doesn't answer the question of why, why our cus
 A user-centered metric tracking framework needs to consider both user perception and behavior. HEART is a popular framework that stands for Happiness, Engagement, Adoption, Retention, and Task Success. 
 
 <p align="center">
-  <img src="images/heart.png"  width="80%" />
+  <img src="/images/heart.png"  width="80%" />
 </p>
 
 - Happiness and Task success are user experience metrics.
