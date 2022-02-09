@@ -6,6 +6,11 @@ time: '9:38'
 
 # 成为数据科学家需要读博士么？
 
+
+我的分享对你有用吗？请我喝杯咖啡？
+
+<style>.bmc-button img{width: 27px !important;margin-bottom: 1px !important;box-shadow: none !important;border: none !important;vertical-align: middle !important;}.bmc-button{line-height: 36px !important;height:37px !important;text-decoration: none !important;display:inline-flex !important;color:#ffffff !important;background-color:#000000 !important;border-radius: 3px !important;border: 1px solid transparent !important;padding: 1px 9px !important;font-size: 22px !important;letter-spacing: 0.6px !important;box-shadow: 0px 1px 2px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;margin: 0 auto !important;font-family:'Cookie', cursive !important;-webkit-box-sizing: border-box !important;box-sizing: border-box !important;-o-transition: 0.3s all linear !important;-webkit-transition: 0.3s all linear !important;-moz-transition: 0.3s all linear !important;-ms-transition: 0.3s all linear !important;transition: 0.3s all linear !important;}.bmc-button:hover, .bmc-button:active, .bmc-button:focus {-webkit-box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;text-decoration: none !important;box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;opacity: 0.85 !important;color:#ffffff !important;}</style><link href="https://fonts.googleapis.com/css?family=Cookie" rel="stylesheet"><a class="bmc-button" target="_blank" href="https://www.buymeacoffee.com/scientistcafe"><img src="https://bmc-cdn.nyc3.digitaloceanspaces.com/BMC-button-images/BMC-btn-logo.svg" alt="Buy me a coffee"><span style="margin-left:5px">Buy me a coffee</span></a>
+
 简单的说，答案是否定的。博士学位不是成为一个优秀数据科学家的必要条件，事实上现在很多大公司的数据科学家都没有博士（甚至硕士）学位。 下图来自Kaggle最近4年对数据科学行业的问卷调查。2020年的数据科学家中有博士学位的已经不到20%（在2015年这一比例是48%）。2020年，75%数据科学家有研究生以上学位，这一比例在2015年是92%。考虑到当前学位通胀的大背景，可以说数据科学的学位“门槛“是在降低的。背后的原因有很多，比如很多培训的兴起，模型的自动化，以及数据科学本身其实是应用的科学而非学术意义上的科学。 
 
 <p align="center">
