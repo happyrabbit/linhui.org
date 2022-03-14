@@ -1,0 +1,130 @@
+---
+title: "Seattle House Data"
+author: "Hui Lin"
+date: "`r Sys.Date()`"
+output: 
+  rmdformats::material:
+    self_contained: no
+    thumbnails: false
+    css: styles.css
+---
+
+```{r setup, include=FALSE, fig.width= 150, fig.height= 80}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(dplyr)
+library(tidyr)
+library(plotly)
+res.permit <- read.csv("/Users/hui/Downloads/Residential_Building_Permits_Issued_and_Final.csv")
+```
+
+
+```{r, echo=FALSE, message=FALSE}
+
+p_needed <- c( "dplyr", "stringr","readr","dygraphs","ggplot2","plotly",
+               "rlang","lubridate","tidyr","DT","reshape2","DBI","RPostgreSQL",
+               "flexdashboard","knitr","prettydoc","scales","knitr",
+               "cleanNLP","wordcloud","tm","tidytext","rmdformats")
+
+output = lapply(p_needed, require, character.only = TRUE)
+```
+
+# number of permit per year
+
+```{r, message=FALSE, error=FALSE}
+sdat <- res.permit %>%
+  filter(YEAR_ISSUED > 2005 & DWELTYPE %in% c("Townhouse", "Detached Single-Family", "Rowhouse", "Apartment"))  %>%
+  group_by(NEIGHBORHOOD) %>%
+  select(ADDRESS, NAME,NEIGHBORHOOD, DWELTYPE,NET_UNITS, COMMENTS, APP_DATE, ISS_DATE, YEAR_ISSUED, FINAL_DATE)
+
+# number of permit per year
+year_permit <- res.permit %>%
+  filter(YEAR_ISSUED < 2022 & 
+           YEAR_ISSUED >= 2005 & 
+           DWELTYPE %in% c("Townhouse", "Detached Single-Family", "Rowhouse", "Apartment")) %>%
+  group_by(YEAR_ISSUED, DWELTYPE ) %>%
+  summarise(permit_cnt = n()) %>%
+  spread(DWELTYPE, permit_cnt, fill = 0)
+names(year_permit) <- c("Year", "Apartment", "Singlefamily", "Rowhouse", "Townhouse")
+# wide to long
+year_permit <- year_permit %>% tidyr::gather(Type, Counts, Apartment:Townhouse)
+
+ggplot(data=year_permit, aes(x=Year, y=Counts, group=Type, color=Type)) +
+  geom_line() + geom_point()
+
+```
+
+# number units per year
+
+```{r, message=FALSE, error=FALSE} 
+
+###########################################################
+# number units per year
+###########################################################
+year_unit <- res.permit %>%
+  filter(YEAR_ISSUED < 2022 & 
+            YEAR_ISSUED > 2005 & 
+           DWELTYPE %in% c("Townhouse", "Detached Single-Family", "Rowhouse", "Apartment")) %>%
+  group_by(YEAR_ISSUED, DWELTYPE ) %>%
+  summarise(unit_cnt = sum(NET_UNITS)) %>%
+  spread(DWELTYPE, unit_cnt, fill = 0)
+names(year_unit) <- c("Year", "Apartment", "Singlefamily", "Rowhouse", "Townhouse")
+# wide to long
+year_unit <- year_unit %>% tidyr::gather(Type, Counts, Apartment:Townhouse)
+
+ggplot(data=year_unit, aes(x=Year, y=Counts, group=Type, color=Type)) +
+  geom_line() + geom_point()
+
+```
+
+# number of permit issued each year per neighborhood
+
+```{r, message=FALSE, error=FALSE} 
+
+##########################################################
+# number of permit issued each year per neighborhood
+year_permit <- res.permit %>%
+  filter(YEAR_ISSUED < 2022 & 
+           YEAR_ISSUED > 2005 & 
+           DWELTYPE %in% c("Townhouse", "Detached Single-Family", "Rowhouse", "Apartment") &
+           NEIGHBORHOOD %in% c("North","Central", "Ballard")) %>%
+  group_by(YEAR_ISSUED, DWELTYPE, NEIGHBORHOOD) %>%
+  summarise(permit_cnt = n()) %>%
+  spread(DWELTYPE, permit_cnt, fill = 0)
+names(year_permit) <- c("Year", "Neighborhood", "Apartment", "Singlefamily", "Rowhouse", "Townhouse")
+# wide to long
+year_permit <- year_permit %>% tidyr::gather(Type, Counts, Apartment:Townhouse)
+
+
+ ggplot(data=year_permit, aes(x=Year, y=Counts, group=Type, color=Type)) +
+  geom_line() + geom_point()+ facet_grid(Neighborhood ~ .)
+ 
+```
+
+# number of units each year per neighborhood
+
+```{r, message=FALSE}
+
+##########################################################
+year_unit <- res.permit %>%
+  filter(YEAR_ISSUED < 2022 & 
+           YEAR_ISSUED > 2005 & 
+           DWELTYPE %in% c("Townhouse", "Detached Single-Family", "Rowhouse", "Apartment") &
+           NEIGHBORHOOD %in% c("North","Central", "Ballard")) %>%
+  group_by(YEAR_ISSUED, DWELTYPE, NEIGHBORHOOD) %>%
+  summarise(unit_cnt = sum(NET_UNITS)) %>%
+  spread(DWELTYPE, unit_cnt, fill = 0)
+names(year_unit) <- c("Year", "Neighborhood", "Apartment", "Singlefamily", "Rowhouse", "Townhouse")
+# wide to long
+year_unit <- year_unit %>% tidyr::gather(Type, Counts, Apartment:Townhouse)
+
+
+ ggplot(data=year_unit, aes(x=Year, y=Counts, group=Type, color=Type)) +
+  geom_line() + geom_point()+ facet_grid(Neighborhood ~ .) 
+ 
+  
+num_geo_cnt <- res.permit %>%
+  filter(NEIGHBORHOOD %in% c("North","Central", "Ballard") & YEAR_ISSUED >= 2015   & 
+           stringr::str_length(FINAL_DATE)< 2 & APTYPE != "Demolition Permit" & DWELTYPE %in% c("Townhouse", "Detached Single-Family"))  %>%
+  select(ADDRESS, NAME,NEIGHBORHOOD, DWELTYPE,NET_UNITS, COMMENTS, APP_DATE, ISS_DATE, YEAR_ISSUED, FINAL_DATE)
+```
+
