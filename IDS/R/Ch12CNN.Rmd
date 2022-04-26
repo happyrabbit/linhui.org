@@ -51,6 +51,8 @@ As keras is just an interface to popular deep learning frameworks, we have to in
 
 ```{r}
 library(keras)
+# if you haven't, install miniconda
+# reticulate::install_miniconda()
 # install_keras()
 ```
 
@@ -216,14 +218,18 @@ We can apply the trained model to predict new image.
 
 ```{r}
 # model prediction
-cnn_pred <- cnn_model %>% 
-              predict_classes(x_test)
+cnn_pred <- cnn_model %>%
+  predict(x_test) %>%
+  k_argmax()
+
 head(cnn_pred)
 ```
 
 Now let's check a few misclassified images to see whether a human can do a better job than this simple CNN model.
 
 ```{r}
+## Convert tf.tensor to array
+cnn_pred <- as.array(cnn_pred)
 ## number of mis-classcified images
 sum(cnn_pred != mnist$test$y)
 ```

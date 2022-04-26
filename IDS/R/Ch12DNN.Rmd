@@ -225,14 +225,17 @@ dnn_model %>% evaluate(x_test, y_test)
 ```
 
 ```{r}
-dnn_pred <- dnn_model %>% 
-              predict_classes(x_test)
+dnn_pred <- dnn_model %>%
+  predict(x_test) %>%
+  k_argmax()
 head(dnn_pred)
 ```
 
 Let’s check a few misclassified images. A number of misclassified images can be found using the following code. And we can plot these misclassified images to see whether a human can correctly read it out.
 
 ```{r}
+## Convert tf.tensor to array
+dnn_pred <- as.array(dnn_pred)
 ## total number of mis-classcified images
 sum(dnn_pred != mnist$test$y)
 ```
