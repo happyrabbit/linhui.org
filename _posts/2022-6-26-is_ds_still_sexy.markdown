@@ -10,11 +10,15 @@ Do you like my post? Treat me a coffee?
 
 <style>.bmc-button img{width: 27px !important;margin-bottom: 1px !important;box-shadow: none !important;border: none !important;vertical-align: middle !important;}.bmc-button{line-height: 36px !important;height:37px !important;text-decoration: none !important;display:inline-flex !important;color:#ffffff !important;background-color:#000000 !important;border-radius: 3px !important;border: 1px solid transparent !important;padding: 1px 9px !important;font-size: 22px !important;letter-spacing: 0.6px !important;box-shadow: 0px 1px 2px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;margin: 0 auto !important;font-family:'Cookie', cursive !important;-webkit-box-sizing: border-box !important;box-sizing: border-box !important;-o-transition: 0.3s all linear !important;-webkit-transition: 0.3s all linear !important;-moz-transition: 0.3s all linear !important;-ms-transition: 0.3s all linear !important;transition: 0.3s all linear !important;}.bmc-button:hover, .bmc-button:active, .bmc-button:focus {-webkit-box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;text-decoration: none !important;box-shadow: 0px 1px 2px 2px rgba(190, 190, 190, 0.5) !important;opacity: 0.85 !important;color:#ffffff !important;}</style><link href="https://fonts.googleapis.com/css?family=Cookie" rel="stylesheet"><a class="bmc-button" target="_blank" href="https://www.buymeacoffee.com/scientistcafe"><img src="https://bmc-cdn.nyc3.digitaloceanspaces.com/BMC-button-images/BMC-btn-logo.svg" alt="Buy me a coffee"><span style="margin-left:5px">Buy me a coffee</span></a>
 
+<center>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/RSNCaC1xrbs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</center>
 
 "What is data science?" The answer to this question changes every year. In Oct 2012, the Harvard Business Review named data scientist "the sexiest job of the 21st century". Ten years after, is data science still sexy?
 
-![googletrend.png](https://raw.githubusercontent.com/happyrabbit/Images/main/scientistcafe/googletrend.png)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/happyrabbit/Images/main/scientistcafe/googletrend.png"  width="80%" />
+</p>
 
 It is still in demand, and the compensation is good compared to many other jobs. But I don't think it is sexy. Looking back now, I feel it was rather ambiguous in 2012 than sexy. More people are doing data science now, and it is not as mysterious. People also know that a data scientist is not a unicorn with skills ranging from engineering to analytics to modeling. Data science practitioners usually focus on a specific area.
 
