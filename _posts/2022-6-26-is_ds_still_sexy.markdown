@@ -4,7 +4,7 @@ layout: post
 time: '9:38'
 ---
 
-# Scientist Cafe 2：Is data science still sexy?
+# Is data science still sexy?
 
 Do you like my post? Treat me a coffee? 
 
