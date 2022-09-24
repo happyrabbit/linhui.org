@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>A.2 data.table— enhanced data.frame | Introduction to Data Science</title>
+  <meta name="description" content="A.2 data.table— enhanced data.frame | Introduction to Data Science" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="A.2 data.table— enhanced data.frame | Introduction to Data Science" />
+  <meta property="og:type" content="book" />
+  <meta property="og:url" content="http://scientistcafe.com/IDS/" />
+  
+  <meta property="og:description" content="A.2 data.table— enhanced data.frame | Introduction to Data Science" />
+  <meta name="github-repo" content="happyrabbit/IntroDataScience" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="A.2 data.table— enhanced data.frame | Introduction to Data Science" />
+  
+  <meta name="twitter:description" content="A.2 data.table— enhanced data.frame | Introduction to Data Science" />
+  
+
+<meta name="author" content="Hui Lin and Ming Li" />
+
+
+<meta name="date" content="2022-09-24" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="readr.html"/>
+<link rel="next" href="r-code-for-data-simulation.html"/>
+<script src="libs/header-attrs/header-attrs.js"></script>
+<script src="libs/jquery/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="css/style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="http://scientistcafe.com">Homepage</a></li>
+
+<li class="divider"></li>
+<li><a href="index.html#preface">Preface<span></span></a>
+<ul>
+<li><a href="goal-of-the-book.html#goal-of-the-book">Goal of the Book<span></span></a></li>
+<li><a href="what-this-book-covers.html#what-this-book-covers">What This Book Covers<span></span></a></li>
+<li><a href="who-this-book-is-for.html#who-this-book-is-for">Who This Book Is For<span></span></a></li>
+<li><a href="how-to-use-this-book.html#how-to-use-this-book">How to Use This Book<span></span></a>
+<ul>
+<li><a href="how-to-use-this-book.html#what-the-book-assumes">What the book assumes<span></span></a></li>
+<li><a href="how-to-use-this-book.html#how-to-run-r-and-python-code">How to run R and Python code<span></span></a></li>
+</ul></li>
+<li><a href="complementary-reading.html#complementary-reading">Complementary Reading<span></span></a></li>
+<li><a href="acknowledgements.html#acknowledgements">Acknowledgements<span></span></a></li>
+</ul></li>
+<li><a href="about-the-authors.html#about-the-authors">About the Authors<span></span></a></li>
+<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction<span></span></a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="a-brief-history-of-data-science.html"><a href="a-brief-history-of-data-science.html"><i class="fa fa-check"></i><b>1.1</b> A brief history of data science<span></span></a></li>
+<li class="chapter" data-level="1.2" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html"><i class="fa fa-check"></i><b>1.2</b> Data science role and skill tracks<span></span></a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#engineering"><i class="fa fa-check"></i><b>1.2.1</b> Engineering<span></span></a></li>
+<li class="chapter" data-level="1.2.2" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#analysis"><i class="fa fa-check"></i><b>1.2.2</b> Analysis<span></span></a></li>
+<li class="chapter" data-level="1.2.3" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#modeling"><i class="fa fa-check"></i><b>1.2.3</b> Modeling<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html"><i class="fa fa-check"></i><b>1.3</b> What kind of questions can data science solve?<span></span></a>
+<ul>
+<li class="chapter" data-level="1.3.1" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html#prerequisites"><i class="fa fa-check"></i><b>1.3.1</b> Prerequisites<span></span></a></li>
+<li class="chapter" data-level="1.3.2" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html#problem-type"><i class="fa fa-check"></i><b>1.3.2</b> Problem type<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="1.4" data-path="structure-data-science-team.html"><a href="structure-data-science-team.html"><i class="fa fa-check"></i><b>1.4</b> Structure data science team<span></span></a></li>
+<li class="chapter" data-level="1.5" data-path="list-of-potential-data-science-careers.html"><a href="list-of-potential-data-science-careers.html"><i class="fa fa-check"></i><b>1.5</b> List of potential data science careers<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="soft-skills-for-data-scientists.html"><a href="soft-skills-for-data-scientists.html"><i class="fa fa-check"></i><b>2</b> Soft Skills for Data Scientists<span></span></a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="comparison-between-statistician-and-data-scientist.html"><a href="comparison-between-statistician-and-data-scientist.html"><i class="fa fa-check"></i><b>2.1</b> Comparison between Statistician and Data Scientist<span></span></a></li>
+<li class="chapter" data-level="2.2" data-path="beyond-data-and-analytics.html"><a href="beyond-data-and-analytics.html"><i class="fa fa-check"></i><b>2.2</b> Beyond Data and Analytics<span></span></a></li>
+<li class="chapter" data-level="2.3" data-path="three-pillars-of-knowledge.html"><a href="three-pillars-of-knowledge.html"><i class="fa fa-check"></i><b>2.3</b> Three Pillars of Knowledge<span></span></a></li>
+<li class="chapter" data-level="2.4" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html"><i class="fa fa-check"></i><b>2.4</b> Data Science Project Cycle<span></span></a>
+<ul>
+<li class="chapter" data-level="2.4.1" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#types-of-data-science-projects"><i class="fa fa-check"></i><b>2.4.1</b> Types of Data Science Projects<span></span></a></li>
+<li class="chapter" data-level="2.4.2" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#problem-formulation-and-project-planning-stage"><i class="fa fa-check"></i><b>2.4.2</b> Problem Formulation and Project Planning Stage<span></span></a></li>
+<li class="chapter" data-level="2.4.3" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#project-modeling-stage"><i class="fa fa-check"></i><b>2.4.3</b> Project Modeling Stage<span></span></a></li>
+<li class="chapter" data-level="2.4.4" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#model-implementation-and-post-production-stage"><i class="fa fa-check"></i><b>2.4.4</b> Model Implementation and Post Production Stage<span></span></a></li>
+<li class="chapter" data-level="2.4.5" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#project-cycle-summary"><i class="fa fa-check"></i><b>2.4.5</b> Project Cycle Summary<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="2.5" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html"><i class="fa fa-check"></i><b>2.5</b> Common Mistakes in Data Science<span></span></a>
+<ul>
+<li class="chapter" data-level="2.5.1" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#problem-formulation-stage"><i class="fa fa-check"></i><b>2.5.1</b> Problem Formulation Stage<span></span></a></li>
+<li class="chapter" data-level="2.5.2" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#project-planning-stage"><i class="fa fa-check"></i><b>2.5.2</b> Project Planning Stage<span></span></a></li>
+<li class="chapter" data-level="2.5.3" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#project-modeling-stage-1"><i class="fa fa-check"></i><b>2.5.3</b> Project Modeling Stage<span></span></a></li>
+<li class="chapter" data-level="2.5.4" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#model-implementation-and-post-production-stage-1"><i class="fa fa-check"></i><b>2.5.4</b> Model Implementation and Post Production Stage<span></span></a></li>
+<li class="chapter" data-level="2.5.5" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#summary-of-common-mistakes"><i class="fa fa-check"></i><b>2.5.5</b> Summary of Common Mistakes<span></span></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="introduction-to-the-data.html"><a href="introduction-to-the-data.html"><i class="fa fa-check"></i><b>3</b> Introduction to The Data<span></span></a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="customer-data-for-a-clothing-company.html"><a href="customer-data-for-a-clothing-company.html"><i class="fa fa-check"></i><b>3.1</b> Customer Data for A Clothing Company<span></span></a></li>
+<li class="chapter" data-level="3.2" data-path="swinediseasedata.html"><a href="swinediseasedata.html"><i class="fa fa-check"></i><b>3.2</b> Swine Disease Breakout Data<span></span></a></li>
+<li class="chapter" data-level="3.3" data-path="mnist-dataset.html"><a href="mnist-dataset.html"><i class="fa fa-check"></i><b>3.3</b> MNIST Dataset<span></span></a></li>
+<li class="chapter" data-level="3.4" data-path="imdb-dataset.html"><a href="imdb-dataset.html"><i class="fa fa-check"></i><b>3.4</b> IMDB Dataset<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="bigdatacloudplatform.html"><a href="bigdatacloudplatform.html"><i class="fa fa-check"></i><b>4</b> Big Data Cloud Platform<span></span></a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="power-of-cluster-of-computers.html"><a href="power-of-cluster-of-computers.html"><i class="fa fa-check"></i><b>4.1</b> Power of Cluster of Computers<span></span></a></li>
+<li class="chapter" data-level="4.2" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html"><i class="fa fa-check"></i><b>4.2</b> Evolution of Cluster Computing<span></span></a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html#hadoop"><i class="fa fa-check"></i><b>4.2.1</b> Hadoop<span></span></a></li>
+<li class="chapter" data-level="4.2.2" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html#spark"><i class="fa fa-check"></i><b>4.2.2</b> Spark<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html"><i class="fa fa-check"></i><b>4.3</b> Introduction of Cloud Environment<span></span></a>
+<ul>
+<li class="chapter" data-level="4.3.1" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#open-account-and-create-a-cluster"><i class="fa fa-check"></i><b>4.3.1</b> Open Account and Create a Cluster<span></span></a></li>
+<li class="chapter" data-level="4.3.2" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#r-notebook"><i class="fa fa-check"></i><b>4.3.2</b> R Notebook<span></span></a></li>
+<li class="chapter" data-level="4.3.3" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#markdown-cells"><i class="fa fa-check"></i><b>4.3.3</b> Markdown Cells<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="4.4" data-path="leveragesparkr.html"><a href="leveragesparkr.html"><i class="fa fa-check"></i><b>4.4</b> Leverage Spark Using R Notebook<span></span></a></li>
+<li class="chapter" data-level="4.5" data-path="databases-and-sql.html"><a href="databases-and-sql.html"><i class="fa fa-check"></i><b>4.5</b> Databases and SQL<span></span></a>
+<ul>
+<li class="chapter" data-level="4.5.1" data-path="databases-and-sql.html"><a href="databases-and-sql.html#history"><i class="fa fa-check"></i><b>4.5.1</b> History<span></span></a></li>
+<li class="chapter" data-level="4.5.2" data-path="databases-and-sql.html"><a href="databases-and-sql.html#database-table-and-view"><i class="fa fa-check"></i><b>4.5.2</b> Database, Table and View<span></span></a></li>
+<li class="chapter" data-level="4.5.3" data-path="databases-and-sql.html"><a href="databases-and-sql.html#basic-sql-statement"><i class="fa fa-check"></i><b>4.5.3</b> Basic SQL Statement<span></span></a></li>
+<li class="chapter" data-level="4.5.4" data-path="databases-and-sql.html"><a href="databases-and-sql.html#advanced-topics-in-database"><i class="fa fa-check"></i><b>4.5.4</b> Advanced Topics in Database<span></span></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="datapreprocessing.html"><a href="datapreprocessing.html"><i class="fa fa-check"></i><b>5</b> Data Pre-processing<span></span></a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="data-cleaning.html"><a href="data-cleaning.html"><i class="fa fa-check"></i><b>5.1</b> Data Cleaning<span></span></a></li>
+<li class="chapter" data-level="5.2" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>5.2</b> Missing Values<span></span></a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="missing-values.html"><a href="missing-values.html#impute-missing-values-with-medianmode"><i class="fa fa-check"></i><b>5.2.1</b> Impute missing values with median/mode<span></span></a></li>
+<li class="chapter" data-level="5.2.2" data-path="missing-values.html"><a href="missing-values.html#k-nearest-neighbors"><i class="fa fa-check"></i><b>5.2.2</b> K-nearest neighbors<span></span></a></li>
+<li class="chapter" data-level="5.2.3" data-path="missing-values.html"><a href="missing-values.html#bagging-tree"><i class="fa fa-check"></i><b>5.2.3</b> Bagging Tree<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="centering-and-scaling.html"><a href="centering-and-scaling.html"><i class="fa fa-check"></i><b>5.3</b> Centering and Scaling<span></span></a></li>
+<li class="chapter" data-level="5.4" data-path="resolve-skewness.html"><a href="resolve-skewness.html"><i class="fa fa-check"></i><b>5.4</b> Resolve Skewness<span></span></a></li>
+<li class="chapter" data-level="5.5" data-path="outliers.html"><a href="outliers.html"><i class="fa fa-check"></i><b>5.5</b> Resolve Outliers<span></span></a></li>
+<li class="chapter" data-level="5.6" data-path="collinearity.html"><a href="collinearity.html"><i class="fa fa-check"></i><b>5.6</b> Collinearity<span></span></a></li>
+<li class="chapter" data-level="5.7" data-path="sparse-variables.html"><a href="sparse-variables.html"><i class="fa fa-check"></i><b>5.7</b> Sparse Variables<span></span></a></li>
+<li class="chapter" data-level="5.8" data-path="re-encode-dummy-variables.html"><a href="re-encode-dummy-variables.html"><i class="fa fa-check"></i><b>5.8</b> Re-encode Dummy Variables<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="datawrangline.html"><a href="datawrangline.html"><i class="fa fa-check"></i><b>6</b> Data Wrangling<span></span></a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="summarize-data.html"><a href="summarize-data.html"><i class="fa fa-check"></i><b>6.1</b> Summarize Data<span></span></a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="summarize-data.html"><a href="summarize-data.html#dplyr-package"><i class="fa fa-check"></i><b>6.1.1</b> <code>dplyr</code> package<span></span></a></li>
+<li class="chapter" data-level="6.1.2" data-path="summarize-data.html"><a href="summarize-data.html#applyfamilyinbaser"><i class="fa fa-check"></i><b>6.1.2</b> <code>apply()</code>, <code>lapply()</code> and <code>sapply()</code> in base R<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="tidy-and-reshape-data.html"><a href="tidy-and-reshape-data.html"><i class="fa fa-check"></i><b>6.2</b> Tidy and Reshape Data<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="modeltuningstrategy.html"><a href="modeltuningstrategy.html"><i class="fa fa-check"></i><b>7</b> Model Tuning Strategy<span></span></a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="vbtradeoff.html"><a href="vbtradeoff.html"><i class="fa fa-check"></i><b>7.1</b> Variance-Bias Trade-Off<span></span></a></li>
+<li class="chapter" data-level="7.2" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html"><i class="fa fa-check"></i><b>7.2</b> Data Splitting and Resampling<span></span></a>
+<ul>
+<li class="chapter" data-level="7.2.1" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html#datasplitting"><i class="fa fa-check"></i><b>7.2.1</b> Data Splitting<span></span></a></li>
+<li class="chapter" data-level="7.2.2" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html#resampling"><i class="fa fa-check"></i><b>7.2.2</b> Resampling<span></span></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="measuring-performance.html"><a href="measuring-performance.html"><i class="fa fa-check"></i><b>8</b> Measuring Performance<span></span></a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="regression-model-performance.html"><a href="regression-model-performance.html"><i class="fa fa-check"></i><b>8.1</b> Regression Model Performance<span></span></a></li>
+<li class="chapter" data-level="8.2" data-path="classification-model-performance.html"><a href="classification-model-performance.html"><i class="fa fa-check"></i><b>8.2</b> Classification Model Performance<span></span></a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="classification-model-performance.html"><a href="classification-model-performance.html#confusion-matrix"><i class="fa fa-check"></i><b>8.2.1</b> Confusion Matrix<span></span></a></li>
+<li class="chapter" data-level="8.2.2" data-path="classification-model-performance.html"><a href="classification-model-performance.html#kappa-statistic"><i class="fa fa-check"></i><b>8.2.2</b> Kappa Statistic<span></span></a></li>
+<li class="chapter" data-level="8.2.3" data-path="classification-model-performance.html"><a href="classification-model-performance.html#roc"><i class="fa fa-check"></i><b>8.2.3</b> ROC<span></span></a></li>
+<li class="chapter" data-level="8.2.4" data-path="classification-model-performance.html"><a href="classification-model-performance.html#gain-and-lift-charts"><i class="fa fa-check"></i><b>8.2.4</b> Gain and Lift Charts<span></span></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="regression-models.html"><a href="regression-models.html"><i class="fa fa-check"></i><b>9</b> Regression Models<span></span></a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html"><i class="fa fa-check"></i><b>9.1</b> Ordinary Least Square<span></span></a>
+<ul>
+<li class="chapter" data-level="9.1.1" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html#the-magic-p-value"><i class="fa fa-check"></i><b>9.1.1</b> The Magic P-value<span></span></a></li>
+<li class="chapter" data-level="9.1.2" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html#diagnostics-for-linear-regression"><i class="fa fa-check"></i><b>9.1.2</b> Diagnostics for Linear Regression<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="principal-component-regression-and-partial-least-square.html"><a href="principal-component-regression-and-partial-least-square.html"><i class="fa fa-check"></i><b>9.2</b> Principal Component Regression and Partial Least Square<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="regularization-methods.html"><a href="regularization-methods.html"><i class="fa fa-check"></i><b>10</b> Regularization Methods<span></span></a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="ridge-regression.html"><a href="ridge-regression.html"><i class="fa fa-check"></i><b>10.1</b> Ridge Regression<span></span></a></li>
+<li class="chapter" data-level="10.2" data-path="lasso.html"><a href="lasso.html"><i class="fa fa-check"></i><b>10.2</b> LASSO<span></span></a></li>
+<li class="chapter" data-level="10.3" data-path="variable-selection-property-of-the-lasso.html"><a href="variable-selection-property-of-the-lasso.html"><i class="fa fa-check"></i><b>10.3</b> Variable selection property of the lasso<span></span></a></li>
+<li class="chapter" data-level="10.4" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.4</b> Elastic Net<span></span></a></li>
+<li class="chapter" data-level="10.5" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.5</b> Penalized Generalized Linear Model<span></span></a>
+<ul>
+<li class="chapter" data-level="10.5.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.5.1</b> Introduction to <code>glmnet</code> package<span></span></a></li>
+<li class="chapter" data-level="10.5.2" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#penalized-logistic-regression"><i class="fa fa-check"></i><b>10.5.2</b> Penalized logistic regression<span></span></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="treemodel.html"><a href="treemodel.html"><i class="fa fa-check"></i><b>11</b> Tree-Based Methods<span></span></a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="tree-basics.html"><a href="tree-basics.html"><i class="fa fa-check"></i><b>11.1</b> Tree Basics<span></span></a></li>
+<li class="chapter" data-level="11.2" data-path="splitting-criteria.html"><a href="splitting-criteria.html"><i class="fa fa-check"></i><b>11.2</b> Splitting Criteria<span></span></a></li>
+<li class="chapter" data-level="11.3" data-path="tree-pruning.html"><a href="tree-pruning.html"><i class="fa fa-check"></i><b>11.3</b> Tree Pruning<span></span></a></li>
+<li class="chapter" data-level="11.4" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html"><i class="fa fa-check"></i><b>11.4</b> Regression and Decision Tree Basic<span></span></a>
+<ul>
+<li class="chapter" data-level="11.4.1" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html#regression-tree"><i class="fa fa-check"></i><b>11.4.1</b> Regression Tree<span></span></a></li>
+<li class="chapter" data-level="11.4.2" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html#decision-tree"><i class="fa fa-check"></i><b>11.4.2</b> Decision Tree<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="11.5" data-path="bagging-tree-1.html"><a href="bagging-tree-1.html"><i class="fa fa-check"></i><b>11.5</b> Bagging Tree<span></span></a></li>
+<li class="chapter" data-level="11.6" data-path="random-forest.html"><a href="random-forest.html"><i class="fa fa-check"></i><b>11.6</b> Random Forest<span></span></a></li>
+<li class="chapter" data-level="11.7" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html"><i class="fa fa-check"></i><b>11.7</b> Gradient Boosted Machine<span></span></a>
+<ul>
+<li class="chapter" data-level="11.7.1" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#adaptive-boosting"><i class="fa fa-check"></i><b>11.7.1</b> Adaptive Boosting<span></span></a></li>
+<li class="chapter" data-level="11.7.2" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#stochastic-gradient-boosting"><i class="fa fa-check"></i><b>11.7.2</b> Stochastic Gradient Boosting<span></span></a></li>
+<li class="chapter" data-level="11.7.3" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#boosting-as-additive-model"><i class="fa fa-check"></i><b>11.7.3</b> Boosting as Additive Model<span></span></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="deeplearning.html"><a href="deeplearning.html"><i class="fa fa-check"></i><b>12</b> Deep Learning<span></span></a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="projection-pursuit-regression.html"><a href="projection-pursuit-regression.html"><i class="fa fa-check"></i><b>12.1</b> Projection Pursuit Regression<span></span></a></li>
+<li class="chapter" data-level="12.2" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html"><i class="fa fa-check"></i><b>12.2</b> Feedforward Neural Network<span></span></a>
+<ul>
+<li class="chapter" data-level="12.2.1" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#logisticregasneuralnetwork"><i class="fa fa-check"></i><b>12.2.1</b> Logistic Regression as Neural Network<span></span></a></li>
+<li class="chapter" data-level="12.2.2" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#stochastic-gradient-descent"><i class="fa fa-check"></i><b>12.2.2</b> Stochastic Gradient Descent<span></span></a></li>
+<li class="chapter" data-level="12.2.3" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#deepneuralnetwork"><i class="fa fa-check"></i><b>12.2.3</b> Deep Neural Network<span></span></a></li>
+<li class="chapter" data-level="12.2.4" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#activationfunction"><i class="fa fa-check"></i><b>12.2.4</b> Activation Function<span></span></a></li>
+<li class="chapter" data-level="12.2.5" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#optimization"><i class="fa fa-check"></i><b>12.2.5</b> Optimization<span></span></a></li>
+<li class="chapter" data-level="12.2.6" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#deal-with-overfitting"><i class="fa fa-check"></i><b>12.2.6</b> Deal with Overfitting<span></span></a></li>
+<li class="chapter" data-level="12.2.7" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#ffnnexample"><i class="fa fa-check"></i><b>12.2.7</b> Image Recognition Using FFNN<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="12.3" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html"><i class="fa fa-check"></i><b>12.3</b> Convolutional Neural Network<span></span></a>
+<ul>
+<li class="chapter" data-level="12.3.1" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#convolution-layer"><i class="fa fa-check"></i><b>12.3.1</b> Convolution Layer<span></span></a></li>
+<li class="chapter" data-level="12.3.2" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#padding-layer"><i class="fa fa-check"></i><b>12.3.2</b> Padding Layer<span></span></a></li>
+<li class="chapter" data-level="12.3.3" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#pooling-layer"><i class="fa fa-check"></i><b>12.3.3</b> Pooling Layer<span></span></a></li>
+<li class="chapter" data-level="12.3.4" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#convolution-over-volume"><i class="fa fa-check"></i><b>12.3.4</b> Convolution Over Volume<span></span></a></li>
+<li class="chapter" data-level="12.3.5" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#cnnexample"><i class="fa fa-check"></i><b>12.3.5</b> Image Recognition Using CNN<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="12.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html"><i class="fa fa-check"></i><b>12.4</b> Recurrent Neural Network<span></span></a>
+<ul>
+<li class="chapter" data-level="12.4.1" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#rnn-model"><i class="fa fa-check"></i><b>12.4.1</b> RNN Model<span></span></a></li>
+<li class="chapter" data-level="12.4.2" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#embedding"><i class="fa fa-check"></i><b>12.4.2</b> Word Embedding<span></span></a></li>
+<li class="chapter" data-level="12.4.3" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#lstm"><i class="fa fa-check"></i><b>12.4.3</b> Long Short Term Memory<span></span></a></li>
+<li class="chapter" data-level="12.4.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#rnnexample"><i class="fa fa-check"></i><b>12.4.4</b> Sentiment Analysis Using RNN<span></span></a></li>
+</ul></li>
+</ul></li>
+<li class="appendix"><span><b>Appendix<span></span></b></span></li>
+<li class="chapter" data-level="A" data-path="largelocaldata.html"><a href="largelocaldata.html"><i class="fa fa-check"></i><b>A</b> Handling Large Local Data<span></span></a>
+<ul>
+<li class="chapter" data-level="A.1" data-path="readr.html"><a href="readr.html"><i class="fa fa-check"></i><b>A.1</b> <code>readr</code><span></span></a></li>
+<li class="chapter" data-level="A.2" data-path="data.table-enhanced-data.html"><a href="data.table-enhanced-data.html"><i class="fa fa-check"></i><b>A.2</b> <code>data.table</code>— enhanced <code>data.frame</code><span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="B" data-path="r-code-for-data-simulation.html"><a href="r-code-for-data-simulation.html"><i class="fa fa-check"></i><b>B</b> R code for data simulation<span></span></a>
+<ul>
+<li class="chapter" data-level="B.1" data-path="appendixdata1.html"><a href="appendixdata1.html"><i class="fa fa-check"></i><b>B.1</b> Customer Data for Clothing Company<span></span></a></li>
+<li class="chapter" data-level="B.2" data-path="appendixdata3.html"><a href="appendixdata3.html"><i class="fa fa-check"></i><b>B.2</b> Swine Disease Breakout Data<span></span></a></li>
+</ul></li>
+<li><a href="references.html#references">References<span></span></a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Introduction to Data Science</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="data.table-enhanced-data.frame" class="section level2 hasAnchor" number="13.2">
+<h2><span class="header-section-number">A.2</span> <code>data.table</code>— enhanced <code>data.frame</code><a href="data.table-enhanced-data.html#data.table-enhanced-data.frame" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>What is <code>data.table</code>? It is an R package that provides an enhanced version of <code>data.frame</code>. The most used object in R is <code>data frame</code>. Before we move on, let’s briefly review some basic characters and manipulations of data.frame:</p>
+<ul>
+<li>It is a set of rows and columns.</li>
+<li>Each row is of the same length and data type</li>
+<li>Every column is of the same length but can be of differing data types</li>
+<li>It has characteristics of both a matrix and a list</li>
+<li>It uses <code>[]</code> to subset data</li>
+</ul>
+<p>We will use the clothes customer data to illustrate. There are two dimensions in <code>[]</code>. The first one indicates the row and second one indicates column. It uses a comma to separate them.</p>
+<div class="sourceCode" id="cb432"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb432-1"><a href="data.table-enhanced-data.html#cb432-1" aria-hidden="true" tabindex="-1"></a><span class="co"># read data</span></span>
+<span id="cb432-2"><a href="data.table-enhanced-data.html#cb432-2" aria-hidden="true" tabindex="-1"></a>sim.dat <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)</span></code></pre></div>
+<pre><code>## Rows: 1000 Columns: 19
+## ── Column specification ───────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (3): gender, house, segment
+## dbl (16): age, income, store_exp, online_exp, store...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<div class="sourceCode" id="cb434"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb434-1"><a href="data.table-enhanced-data.html#cb434-1" aria-hidden="true" tabindex="-1"></a><span class="co"># subset the first two rows</span></span>
+<span id="cb434-2"><a href="data.table-enhanced-data.html#cb434-2" aria-hidden="true" tabindex="-1"></a>sim.dat[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, ]</span>
+<span id="cb434-3"><a href="data.table-enhanced-data.html#cb434-3" aria-hidden="true" tabindex="-1"></a><span class="co"># subset the first two rows and column 3 and 5</span></span>
+<span id="cb434-4"><a href="data.table-enhanced-data.html#cb434-4" aria-hidden="true" tabindex="-1"></a>sim.dat[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">5</span>)]</span>
+<span id="cb434-5"><a href="data.table-enhanced-data.html#cb434-5" aria-hidden="true" tabindex="-1"></a><span class="co"># get all rows with age&gt;70</span></span>
+<span id="cb434-6"><a href="data.table-enhanced-data.html#cb434-6" aria-hidden="true" tabindex="-1"></a>sim.dat[sim.dat<span class="sc">$</span>age <span class="sc">&gt;</span> <span class="dv">70</span>, ]</span>
+<span id="cb434-7"><a href="data.table-enhanced-data.html#cb434-7" aria-hidden="true" tabindex="-1"></a><span class="co"># get rows with age&gt; 60 and gender is Male select column 3 and 4</span></span>
+<span id="cb434-8"><a href="data.table-enhanced-data.html#cb434-8" aria-hidden="true" tabindex="-1"></a>sim.dat[sim.dat<span class="sc">$</span>age <span class="sc">&gt;</span> <span class="dv">68</span> <span class="sc">&amp;</span> sim.dat<span class="sc">$</span>gender <span class="sc">==</span> <span class="st">&quot;Male&quot;</span>, <span class="dv">3</span><span class="sc">:</span><span class="dv">4</span>]</span></code></pre></div>
+<p>Remember that there are usually different ways to conduct the same manipulation. For example, the following code presents three ways to calculate an average number of online transactions for male and female:</p>
+<div class="sourceCode" id="cb435"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb435-1"><a href="data.table-enhanced-data.html#cb435-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tapply</span>(sim.dat<span class="sc">$</span>online_trans, sim.dat<span class="sc">$</span>gender, mean)</span>
+<span id="cb435-2"><a href="data.table-enhanced-data.html#cb435-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb435-3"><a href="data.table-enhanced-data.html#cb435-3" aria-hidden="true" tabindex="-1"></a><span class="fu">aggregate</span>(online_trans <span class="sc">~</span> gender, <span class="at">data =</span> sim.dat, mean)</span>
+<span id="cb435-4"><a href="data.table-enhanced-data.html#cb435-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb435-5"><a href="data.table-enhanced-data.html#cb435-5" aria-hidden="true" tabindex="-1"></a>sim.dat <span class="sc">%&gt;%</span> </span>
+<span id="cb435-6"><a href="data.table-enhanced-data.html#cb435-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(gender) <span class="sc">%&gt;%</span> </span>
+<span id="cb435-7"><a href="data.table-enhanced-data.html#cb435-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Avg_online_trans =</span> <span class="fu">mean</span>(online_trans))</span></code></pre></div>
+<p>There is no gold standard to choose a specific function to manipulate data. The goal is to solve the real problem, not the tool itself. So just use whatever tool that is convenient for you.</p>
+<p>The way to use <code>[]</code> is straightforward. But the manipulations are limited. If you need more complicated data reshaping or aggregation, there are other packages to use such as <code>dplyr</code>, <code>reshape2</code>, <code>tidyr</code> etc. But the usage of those packages are not as straightforward as <code>[]</code>. You often need to change functions. Keeping related operations together, such as subset, group, update, join etc, will allow for:</p>
+<ul>
+<li>concise, consistent and readable syntax irrespective of the set of operations you would like to perform to achieve your end goal</li>
+<li>performing data manipulation fluidly without the cognitive burden of having to change among different functions</li>
+<li>by knowing precisely the data required for each operation, you can automatically optimize operations effectively</li>
+</ul>
+<p><code>data.table</code> is the package for that. If you are not familiar with other data manipulating packages and are interested in reducing programming time tremendously, then this package is for you.</p>
+<p>Other than extending the function of <code>[]</code>, <code>data.table</code> has the following advantages:</p>
+<ul>
+<li>Offers fast import, subset, grouping, update, and joins for large data files</li>
+<li>It is easy to turn data frame to data table</li>
+<li>Can behave just like a data frame</li>
+</ul>
+<p>You need to install and load the package:</p>
+<p>Use <code>data.table()</code> to convert the existing data frame <code>sim.dat</code> to data table:</p>
+<div class="sourceCode" id="cb436"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb436-1"><a href="data.table-enhanced-data.html#cb436-1" aria-hidden="true" tabindex="-1"></a>dt <span class="ot">&lt;-</span> <span class="fu">data.table</span>(sim.dat)</span>
+<span id="cb436-2"><a href="data.table-enhanced-data.html#cb436-2" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(dt)</span></code></pre></div>
+<pre><code>## [1] &quot;data.table&quot; &quot;data.frame&quot;</code></pre>
+<p>Calculate mean for counts of online transactions:</p>
+<div class="sourceCode" id="cb438"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb438-1"><a href="data.table-enhanced-data.html#cb438-1" aria-hidden="true" tabindex="-1"></a>dt[, <span class="fu">mean</span>(online_trans)]</span></code></pre></div>
+<pre><code>## [1] 13.55</code></pre>
+<p>You can’t do the same thing using data frame:</p>
+<div class="sourceCode" id="cb440"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb440-1"><a href="data.table-enhanced-data.html#cb440-1" aria-hidden="true" tabindex="-1"></a>sim.dat[,<span class="fu">mean</span>(online_trans)]</span></code></pre></div>
+<div class="sourceCode" id="cb441"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb441-1"><a href="data.table-enhanced-data.html#cb441-1" aria-hidden="true" tabindex="-1"></a>Error in mean(online_trans) : object &#39;online_trans&#39; not found</span></code></pre></div>
+<p>If you want to calculate mean by group as before, set “<code>by =</code>” argument:</p>
+<div class="sourceCode" id="cb442"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb442-1"><a href="data.table-enhanced-data.html#cb442-1" aria-hidden="true" tabindex="-1"></a>dt[ , <span class="fu">mean</span>(online_trans), by <span class="ot">=</span> gender]</span></code></pre></div>
+<pre><code>##    gender    V1
+## 1: Female 15.38
+## 2:   Male 11.26</code></pre>
+<p>You can group by more than one variables. For example, group by “<code>gender</code>” and “<code>house</code>”:</p>
+<div class="sourceCode" id="cb444"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb444-1"><a href="data.table-enhanced-data.html#cb444-1" aria-hidden="true" tabindex="-1"></a>dt[ , <span class="fu">mean</span>(online_trans), by <span class="ot">=</span> .(gender, house)]</span></code></pre></div>
+<pre><code>##    gender house     V1
+## 1: Female   Yes 11.312
+## 2:   Male   Yes  8.772
+## 3: Female    No 19.146
+## 4:   Male    No 16.486</code></pre>
+<p>Assign column names for aggregated variables:</p>
+<div class="sourceCode" id="cb446"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb446-1"><a href="data.table-enhanced-data.html#cb446-1" aria-hidden="true" tabindex="-1"></a>dt[ , .(<span class="at">avg =</span> <span class="fu">mean</span>(online_trans)), by <span class="ot">=</span> .(gender, house)]</span></code></pre></div>
+<pre><code>##    gender house    avg
+## 1: Female   Yes 11.312
+## 2:   Male   Yes  8.772
+## 3: Female    No 19.146
+## 4:   Male    No 16.486</code></pre>
+<p><code>data.table</code> can accomplish all operations that <code>aggregate()</code> and <code>tapply()</code>can do for data frame.</p>
+<ul>
+<li>General setting of <code>data.table</code></li>
+</ul>
+<p>Different from data frame, there are three arguments for data table:</p>
+<center>
+<img src="images/datable1.png" />
+</center>
+<p>It is analogous to SQL. You don’t have to know SQL to learn data table. But experience with SQL will help you understand data table. In SQL, you select column <code>j</code> (use command <code>SELECT</code>) for row <code>i</code> (using command <code>WHERE</code>). <code>GROUP BY</code> in SQL will assign the variable to group the observations.</p>
+<center>
+<img src="images/rSQL.png" />
+</center>
+<p>Let’s review our previous code:</p>
+<div class="sourceCode" id="cb448"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb448-1"><a href="data.table-enhanced-data.html#cb448-1" aria-hidden="true" tabindex="-1"></a>dt[ , <span class="fu">mean</span>(online_trans), by <span class="ot">=</span> gender]</span></code></pre></div>
+<p>The code above is equal to the following SQL:</p>
+<div class="sourceCode" id="cb449"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb449-1"><a href="data.table-enhanced-data.html#cb449-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span></span>
+<span id="cb449-2"><a href="data.table-enhanced-data.html#cb449-2" aria-hidden="true" tabindex="-1"></a>   gender,</span>
+<span id="cb449-3"><a href="data.table-enhanced-data.html#cb449-3" aria-hidden="true" tabindex="-1"></a>   <span class="fu">avg</span>(online_trans) </span>
+<span id="cb449-4"><a href="data.table-enhanced-data.html#cb449-4" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span></span>
+<span id="cb449-5"><a href="data.table-enhanced-data.html#cb449-5" aria-hidden="true" tabindex="-1"></a>   sim.dat </span>
+<span id="cb449-6"><a href="data.table-enhanced-data.html#cb449-6" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span></span>
+<span id="cb449-7"><a href="data.table-enhanced-data.html#cb449-7" aria-hidden="true" tabindex="-1"></a>   gender</span></code></pre></div>
+<p>R code:</p>
+<div class="sourceCode" id="cb450"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb450-1"><a href="data.table-enhanced-data.html#cb450-1" aria-hidden="true" tabindex="-1"></a>dt[ , .(<span class="at">avg =</span> <span class="fu">mean</span>(online_trans)), by <span class="ot">=</span> .(gender, house)]</span></code></pre></div>
+<p>is equal to SQL:</p>
+<div class="sourceCode" id="cb451"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb451-1"><a href="data.table-enhanced-data.html#cb451-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span></span>
+<span id="cb451-2"><a href="data.table-enhanced-data.html#cb451-2" aria-hidden="true" tabindex="-1"></a>   gender,</span>
+<span id="cb451-3"><a href="data.table-enhanced-data.html#cb451-3" aria-hidden="true" tabindex="-1"></a>   house,</span>
+<span id="cb451-4"><a href="data.table-enhanced-data.html#cb451-4" aria-hidden="true" tabindex="-1"></a>   <span class="fu">avg</span>(online_trans) <span class="kw">AS</span> <span class="fu">avg</span> </span>
+<span id="cb451-5"><a href="data.table-enhanced-data.html#cb451-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span></span>
+<span id="cb451-6"><a href="data.table-enhanced-data.html#cb451-6" aria-hidden="true" tabindex="-1"></a>   sim.dat </span>
+<span id="cb451-7"><a href="data.table-enhanced-data.html#cb451-7" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span></span>
+<span id="cb451-8"><a href="data.table-enhanced-data.html#cb451-8" aria-hidden="true" tabindex="-1"></a>   gender,</span>
+<span id="cb451-9"><a href="data.table-enhanced-data.html#cb451-9" aria-hidden="true" tabindex="-1"></a>   house</span></code></pre></div>
+<p>R code:</p>
+<div class="sourceCode" id="cb452"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb452-1"><a href="data.table-enhanced-data.html#cb452-1" aria-hidden="true" tabindex="-1"></a>dt[ age <span class="sc">&lt;</span> <span class="dv">40</span>, .(<span class="at">avg =</span> <span class="fu">mean</span>(online_trans)), by <span class="ot">=</span> .(gender, house)]</span></code></pre></div>
+<p>is equal to SQL:</p>
+<div class="sourceCode" id="cb453"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb453-1"><a href="data.table-enhanced-data.html#cb453-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span></span>
+<span id="cb453-2"><a href="data.table-enhanced-data.html#cb453-2" aria-hidden="true" tabindex="-1"></a>   gender,</span>
+<span id="cb453-3"><a href="data.table-enhanced-data.html#cb453-3" aria-hidden="true" tabindex="-1"></a>   house,</span>
+<span id="cb453-4"><a href="data.table-enhanced-data.html#cb453-4" aria-hidden="true" tabindex="-1"></a>   <span class="fu">avg</span>(online_trans) <span class="kw">AS</span> <span class="fu">avg</span> </span>
+<span id="cb453-5"><a href="data.table-enhanced-data.html#cb453-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span></span>
+<span id="cb453-6"><a href="data.table-enhanced-data.html#cb453-6" aria-hidden="true" tabindex="-1"></a>   sim.dat </span>
+<span id="cb453-7"><a href="data.table-enhanced-data.html#cb453-7" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span></span>
+<span id="cb453-8"><a href="data.table-enhanced-data.html#cb453-8" aria-hidden="true" tabindex="-1"></a>   age <span class="op">&lt;</span> <span class="dv">40</span> </span>
+<span id="cb453-9"><a href="data.table-enhanced-data.html#cb453-9" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span></span>
+<span id="cb453-10"><a href="data.table-enhanced-data.html#cb453-10" aria-hidden="true" tabindex="-1"></a>   gender,</span>
+<span id="cb453-11"><a href="data.table-enhanced-data.html#cb453-11" aria-hidden="true" tabindex="-1"></a>   house</span></code></pre></div>
+<p>You can see the analogy between <code>data.table</code> and <code>SQL</code>. Now let’s focus on operations in data table.</p>
+<ul>
+<li>select row</li>
+</ul>
+<div class="sourceCode" id="cb454"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb454-1"><a href="data.table-enhanced-data.html#cb454-1" aria-hidden="true" tabindex="-1"></a><span class="co"># select rows with age&lt;20 and income &gt; 80000</span></span>
+<span id="cb454-2"><a href="data.table-enhanced-data.html#cb454-2" aria-hidden="true" tabindex="-1"></a>dt[age <span class="sc">&lt;</span> <span class="dv">20</span> <span class="sc">&amp;</span> income <span class="sc">&gt;</span> <span class="dv">80000</span>]</span></code></pre></div>
+<pre><code>##    age gender income house store_exp online_exp
+## 1:  19 Female  83535    No     227.7       1491
+## 2:  18 Female  89416   Yes     209.5       1926
+## 3:  19 Female  92813    No     186.7       1042
+##    store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9
+## 1:           1           22  2  1  1  2  4  1  4  2  4
+## 2:           3           28  2  1  1  1  4  1  4  2  4
+## 3:           2           18  3  1  1  2  4  1  4  3  4
+##    Q10 segment
+## 1:   1   Style
+## 2:   1   Style
+## 3:   1   Style</code></pre>
+<div class="sourceCode" id="cb456"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb456-1"><a href="data.table-enhanced-data.html#cb456-1" aria-hidden="true" tabindex="-1"></a><span class="co"># select the first two rows</span></span>
+<span id="cb456-2"><a href="data.table-enhanced-data.html#cb456-2" aria-hidden="true" tabindex="-1"></a>dt[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]</span></code></pre></div>
+<pre><code>##    age gender income house store_exp online_exp
+## 1:  57 Female 120963   Yes     529.1      303.5
+## 2:  63 Female 122008   Yes     478.0      109.5
+##    store_trans online_trans Q1 Q2 Q3 Q4 Q5 Q6 Q7 Q8 Q9
+## 1:           2            2  4  2  1  2  1  4  1  4  2
+## 2:           4            2  4  1  1  2  1  4  1  4  1
+##    Q10 segment
+## 1:   4   Price
+## 2:   4   Price</code></pre>
+<ul>
+<li>select column</li>
+</ul>
+<p>Selecting columns in <code>data.table</code> don’t need <code>$</code>:</p>
+<div class="sourceCode" id="cb458"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb458-1"><a href="data.table-enhanced-data.html#cb458-1" aria-hidden="true" tabindex="-1"></a><span class="co"># select column “age” but return it as a vector</span></span>
+<span id="cb458-2"><a href="data.table-enhanced-data.html#cb458-2" aria-hidden="true" tabindex="-1"></a><span class="co"># the argument for row is empty so the result</span></span>
+<span id="cb458-3"><a href="data.table-enhanced-data.html#cb458-3" aria-hidden="true" tabindex="-1"></a><span class="co"># will return all observations</span></span>
+<span id="cb458-4"><a href="data.table-enhanced-data.html#cb458-4" aria-hidden="true" tabindex="-1"></a>ans <span class="ot">&lt;-</span> dt[, age]</span>
+<span id="cb458-5"><a href="data.table-enhanced-data.html#cb458-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(ans)</span></code></pre></div>
+<pre><code>## [1] 57 63 59 60 51 59</code></pre>
+<p>To return <code>data.table</code> object, put column names in <code>list()</code>:</p>
+<div class="sourceCode" id="cb460"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb460-1"><a href="data.table-enhanced-data.html#cb460-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Select age and online_exp columns </span></span>
+<span id="cb460-2"><a href="data.table-enhanced-data.html#cb460-2" aria-hidden="true" tabindex="-1"></a><span class="co"># and return as a data.table instead</span></span>
+<span id="cb460-3"><a href="data.table-enhanced-data.html#cb460-3" aria-hidden="true" tabindex="-1"></a>ans <span class="ot">&lt;-</span> dt[, <span class="fu">list</span>(age, online_exp)]</span>
+<span id="cb460-4"><a href="data.table-enhanced-data.html#cb460-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(ans)</span></code></pre></div>
+<p>Or you can also put column names in <code>.()</code>:</p>
+<div class="sourceCode" id="cb461"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb461-1"><a href="data.table-enhanced-data.html#cb461-1" aria-hidden="true" tabindex="-1"></a>ans <span class="ot">&lt;-</span> dt[, .(age, online_exp)]</span></code></pre></div>
+<p>To select all columns from “<code>age</code>” to “<code>income</code>”:</p>
+<div class="sourceCode" id="cb462"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb462-1"><a href="data.table-enhanced-data.html#cb462-1" aria-hidden="true" tabindex="-1"></a>ans <span class="ot">&lt;-</span> dt[, age<span class="sc">:</span>income, with <span class="ot">=</span> <span class="cn">FALSE</span>]</span>
+<span id="cb462-2"><a href="data.table-enhanced-data.html#cb462-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(ans,<span class="dv">2</span>)</span></code></pre></div>
+<pre><code>##    age gender income
+## 1:  57 Female 120963
+## 2:  63 Female 122008</code></pre>
+<p>Delete columns using <code>-</code> or <code>!</code>:</p>
+<div class="sourceCode" id="cb464"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb464-1"><a href="data.table-enhanced-data.html#cb464-1" aria-hidden="true" tabindex="-1"></a><span class="co"># delete columns from  age to online_exp</span></span>
+<span id="cb464-2"><a href="data.table-enhanced-data.html#cb464-2" aria-hidden="true" tabindex="-1"></a>ans <span class="ot">&lt;-</span> dt[, <span class="sc">-</span>(age<span class="sc">:</span>online_exp), with <span class="ot">=</span> <span class="cn">FALSE</span>]</span>
+<span id="cb464-3"><a href="data.table-enhanced-data.html#cb464-3" aria-hidden="true" tabindex="-1"></a>ans <span class="ot">&lt;-</span> dt[, <span class="sc">!</span>(age<span class="sc">:</span>online_exp), with <span class="ot">=</span> <span class="cn">FALSE</span>]</span></code></pre></div>
+<ul>
+<li>tabulation</li>
+</ul>
+<p>In data table. <code>.N</code> means to count。</p>
+<div class="sourceCode" id="cb465"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb465-1"><a href="data.table-enhanced-data.html#cb465-1" aria-hidden="true" tabindex="-1"></a><span class="co"># row count</span></span>
+<span id="cb465-2"><a href="data.table-enhanced-data.html#cb465-2" aria-hidden="true" tabindex="-1"></a>dt[, .N] </span></code></pre></div>
+<pre><code>## [1] 1000</code></pre>
+<p>If you assign the group variable, then it will count by groups:</p>
+<div class="sourceCode" id="cb467"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb467-1"><a href="data.table-enhanced-data.html#cb467-1" aria-hidden="true" tabindex="-1"></a><span class="co"># counts by gender</span></span>
+<span id="cb467-2"><a href="data.table-enhanced-data.html#cb467-2" aria-hidden="true" tabindex="-1"></a>dt[, .N, by<span class="ot">=</span> gender]  </span></code></pre></div>
+<pre><code>##    gender   N
+## 1: Female 554
+## 2:   Male 446</code></pre>
+<div class="sourceCode" id="cb469"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb469-1"><a href="data.table-enhanced-data.html#cb469-1" aria-hidden="true" tabindex="-1"></a><span class="co"># for those younger than 30, count by gender</span></span>
+<span id="cb469-2"><a href="data.table-enhanced-data.html#cb469-2" aria-hidden="true" tabindex="-1"></a> dt[age <span class="sc">&lt;</span> <span class="dv">30</span>, .(<span class="at">count=</span>.N), by<span class="ot">=</span> gender] </span></code></pre></div>
+<pre><code>##    gender count
+## 1: Female   292
+## 2:   Male    86</code></pre>
+<p>Order table:</p>
+<div class="sourceCode" id="cb471"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb471-1"><a href="data.table-enhanced-data.html#cb471-1" aria-hidden="true" tabindex="-1"></a><span class="co"># get records with the highest 5 online expense:</span></span>
+<span id="cb471-2"><a href="data.table-enhanced-data.html#cb471-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dt[<span class="fu">order</span>(<span class="sc">-</span>online_exp)],<span class="dv">5</span>) </span></code></pre></div>
+<pre class="pre"><code>   age gender   income house store_exp online_exp store_trans ...
+1:  40 Female 217599.7    No  7023.684   9479.442          10
+2:  41 Female       NA   Yes  3786.740   8638.239          14
+3:  36   Male 228550.1   Yes  3279.621   8220.555           8
+4:  31 Female 159508.1   Yes  5177.081   8005.932          11
+5:  43 Female 190407.4   Yes  4694.922   7875.562           6
+...</code></pre>
+<p>Since data table keep some characters of data frame, they share some operations:</p>
+<div class="sourceCode" id="cb473"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb473-1"><a href="data.table-enhanced-data.html#cb473-1" aria-hidden="true" tabindex="-1"></a>dt[<span class="fu">order</span>(<span class="sc">-</span>online_exp)][<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span></code></pre></div>
+<p>You can also order the table by more than one variable. The following code will order the table by <code>gender</code>, then order within <code>gender</code> by <code>online_exp</code>:</p>
+<div class="sourceCode" id="cb474"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb474-1"><a href="data.table-enhanced-data.html#cb474-1" aria-hidden="true" tabindex="-1"></a>dt[<span class="fu">order</span>(gender, <span class="sc">-</span>online_exp)][<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span></code></pre></div>
+<ul>
+<li>Use <code>fread()</code> to import dat</li>
+</ul>
+<p>Other than <code>read.csv</code> in base R, we have introduced ‘read_csv’ in ‘readr’. <code>read_csv</code> is much faster and will provide progress bar which makes user feel much better (at least make me feel better). <code>fread()</code> in <code>data.table</code> further increase the efficiency of reading data. The following are three examples of reading the same data file <code>topic.csv</code>. The file includes text data scraped from an agriculture forum with 209670 rows and 6 columns:</p>
+<div class="sourceCode" id="cb475"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb475-1"><a href="data.table-enhanced-data.html#cb475-1" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>(topic <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;http://bit.ly/2zam5ny&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb476"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb476-1"><a href="data.table-enhanced-data.html#cb476-1" aria-hidden="true" tabindex="-1"></a>   user  system elapsed </span>
+<span id="cb476-2"><a href="data.table-enhanced-data.html#cb476-2" aria-hidden="true" tabindex="-1"></a>  3.561   0.051   4.888 </span></code></pre></div>
+<div class="sourceCode" id="cb477"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb477-1"><a href="data.table-enhanced-data.html#cb477-1" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>(topic <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(<span class="st">&quot;http://bit.ly/2zam5ny&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb478"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb478-1"><a href="data.table-enhanced-data.html#cb478-1" aria-hidden="true" tabindex="-1"></a>   user  system elapsed </span>
+<span id="cb478-2"><a href="data.table-enhanced-data.html#cb478-2" aria-hidden="true" tabindex="-1"></a>  0.409   0.032   2.233 </span></code></pre></div>
+<div class="sourceCode" id="cb479"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb479-1"><a href="data.table-enhanced-data.html#cb479-1" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>(topic <span class="ot">&lt;-</span> data.table<span class="sc">::</span><span class="fu">fread</span>(<span class="st">&quot;http://bit.ly/2zam5ny&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb480"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb480-1"><a href="data.table-enhanced-data.html#cb480-1" aria-hidden="true" tabindex="-1"></a>   user  system elapsed </span>
+<span id="cb480-2"><a href="data.table-enhanced-data.html#cb480-2" aria-hidden="true" tabindex="-1"></a>  0.276   0.096   1.117 </span></code></pre></div>
+<p>It is clear that <code>read_csv()</code> is much faster than <code>read.csv()</code>. <code>fread()</code> is a little faster than <code>read_csv()</code>. As the size increasing, the difference will become for significant. Note that <code>fread()</code> will read file as <code>data.table</code> by default.</p>
+</div>
+<!-- </div> -->
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="readr.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="r-code-for-data-simulation.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook/js/app.min.js"></script>
+<script src="libs/gitbook/js/clipboard.min.js"></script>
+<script src="libs/gitbook/js/plugin-search.js"></script>
+<script src="libs/gitbook/js/plugin-sharing.js"></script>
+<script src="libs/gitbook/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook/js/jquery.highlight.js"></script>
+<script src="libs/gitbook/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": true,
+"facebook": true,
+"twitter": true,
+"linkedin": true,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/happyrabbit/IntroDataScience/19-Appendix.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["IDS.pdf", "IDS.epub", "IDS.mobi"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "section",
+"scroll_highlight": true
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

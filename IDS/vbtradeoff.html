@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>7.1 Variance-Bias Trade-Off | Introduction to Data Science</title>
   <meta name="description" content="7.1 Variance-Bias Trade-Off | Introduction to Data Science" />
-  <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
   <meta property="og:title" content="7.1 Variance-Bias Trade-Off | Introduction to Data Science" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2021-05-25" />
+<meta name="date" content="2022-09-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +33,9 @@
   
 <link rel="prev" href="modeltuningstrategy.html"/>
 <link rel="next" href="datasplittingresampling.html"/>
-<script src="libs/jquery/jquery.min.js"></script>
+<script src="libs/header-attrs/header-attrs.js"></script>
+<script src="libs/jquery/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
@@ -49,29 +51,33 @@
 
 
 
-
+<link href="libs/anchor-sections/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections/anchor-sections.js"></script>
 
 
 <style type="text/css">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -80,9 +86,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -115,6 +121,29 @@ code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
 <link rel="stylesheet" href="css/style.css" type="text/css" />
 </head>
 
@@ -131,181 +160,215 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="http://scientistcafe.com">Homepage</a></li>
 
 <li class="divider"></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a><ul>
-<li class="chapter" data-level="" data-path="goal-of-the-book.html"><a href="goal-of-the-book.html"><i class="fa fa-check"></i>Goal of the Book</a></li>
-<li class="chapter" data-level="" data-path="what-this-book-covers.html"><a href="what-this-book-covers.html"><i class="fa fa-check"></i>What This Book Covers</a></li>
-<li class="chapter" data-level="" data-path="who-this-book-is-for.html"><a href="who-this-book-is-for.html"><i class="fa fa-check"></i>Who This Book Is For</a></li>
-<li class="chapter" data-level="" data-path="how-to-use-this-book.html"><a href="how-to-use-this-book.html"><i class="fa fa-check"></i>How to Use This Book</a><ul>
-<li class="chapter" data-level="" data-path="how-to-use-this-book.html"><a href="how-to-use-this-book.html#what-the-book-assumes"><i class="fa fa-check"></i>What the book assumes</a></li>
-<li class="chapter" data-level="" data-path="how-to-use-this-book.html"><a href="how-to-use-this-book.html#how-to-run-r-and-python-code"><i class="fa fa-check"></i>How to run R and Python code</a></li>
+<li><a href="index.html#preface">Preface<span></span></a>
+<ul>
+<li><a href="goal-of-the-book.html#goal-of-the-book">Goal of the Book<span></span></a></li>
+<li><a href="what-this-book-covers.html#what-this-book-covers">What This Book Covers<span></span></a></li>
+<li><a href="who-this-book-is-for.html#who-this-book-is-for">Who This Book Is For<span></span></a></li>
+<li><a href="how-to-use-this-book.html#how-to-use-this-book">How to Use This Book<span></span></a>
+<ul>
+<li><a href="how-to-use-this-book.html#what-the-book-assumes">What the book assumes<span></span></a></li>
+<li><a href="how-to-use-this-book.html#how-to-run-r-and-python-code">How to run R and Python code<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="" data-path="complementary-reading.html"><a href="complementary-reading.html"><i class="fa fa-check"></i>Complementary Reading</a></li>
-<li class="chapter" data-level="" data-path="acknowledgements.html"><a href="acknowledgements.html"><i class="fa fa-check"></i>Acknowledgements</a></li>
+<li><a href="complementary-reading.html#complementary-reading">Complementary Reading<span></span></a></li>
+<li><a href="acknowledgements.html#acknowledgements">Acknowledgements<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="" data-path="about-the-authors.html"><a href="about-the-authors.html"><i class="fa fa-check"></i>About the Authors</a></li>
-<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a><ul>
-<li class="chapter" data-level="1.1" data-path="a-brief-history-of-data-science.html"><a href="a-brief-history-of-data-science.html"><i class="fa fa-check"></i><b>1.1</b> A brief history of data science</a></li>
-<li class="chapter" data-level="1.2" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html"><i class="fa fa-check"></i><b>1.2</b> Data science role and skill tracks</a><ul>
-<li class="chapter" data-level="1.2.1" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#engineering"><i class="fa fa-check"></i><b>1.2.1</b> Engineering</a></li>
-<li class="chapter" data-level="1.2.2" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#analysis"><i class="fa fa-check"></i><b>1.2.2</b> Analysis</a></li>
-<li class="chapter" data-level="1.2.3" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#modeling"><i class="fa fa-check"></i><b>1.2.3</b> Modeling</a></li>
+<li><a href="about-the-authors.html#about-the-authors">About the Authors<span></span></a></li>
+<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction<span></span></a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="a-brief-history-of-data-science.html"><a href="a-brief-history-of-data-science.html"><i class="fa fa-check"></i><b>1.1</b> A brief history of data science<span></span></a></li>
+<li class="chapter" data-level="1.2" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html"><i class="fa fa-check"></i><b>1.2</b> Data science role and skill tracks<span></span></a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#engineering"><i class="fa fa-check"></i><b>1.2.1</b> Engineering<span></span></a></li>
+<li class="chapter" data-level="1.2.2" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#analysis"><i class="fa fa-check"></i><b>1.2.2</b> Analysis<span></span></a></li>
+<li class="chapter" data-level="1.2.3" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#modeling"><i class="fa fa-check"></i><b>1.2.3</b> Modeling<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="1.3" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html"><i class="fa fa-check"></i><b>1.3</b> What kind of questions can data science solve?</a><ul>
-<li class="chapter" data-level="1.3.1" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html#prerequisites"><i class="fa fa-check"></i><b>1.3.1</b> Prerequisites</a></li>
-<li class="chapter" data-level="1.3.2" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html#problem-type"><i class="fa fa-check"></i><b>1.3.2</b> Problem type</a></li>
+<li class="chapter" data-level="1.3" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html"><i class="fa fa-check"></i><b>1.3</b> What kind of questions can data science solve?<span></span></a>
+<ul>
+<li class="chapter" data-level="1.3.1" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html#prerequisites"><i class="fa fa-check"></i><b>1.3.1</b> Prerequisites<span></span></a></li>
+<li class="chapter" data-level="1.3.2" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html#problem-type"><i class="fa fa-check"></i><b>1.3.2</b> Problem type<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="1.4" data-path="structure-data-science-team.html"><a href="structure-data-science-team.html"><i class="fa fa-check"></i><b>1.4</b> Structure data science team</a></li>
-<li class="chapter" data-level="1.5" data-path="list-of-potential-data-science-careers.html"><a href="list-of-potential-data-science-careers.html"><i class="fa fa-check"></i><b>1.5</b> List of potential data science careers</a></li>
+<li class="chapter" data-level="1.4" data-path="structure-data-science-team.html"><a href="structure-data-science-team.html"><i class="fa fa-check"></i><b>1.4</b> Structure data science team<span></span></a></li>
+<li class="chapter" data-level="1.5" data-path="list-of-potential-data-science-careers.html"><a href="list-of-potential-data-science-careers.html"><i class="fa fa-check"></i><b>1.5</b> List of potential data science careers<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="2" data-path="soft-skills-for-data-scientists.html"><a href="soft-skills-for-data-scientists.html"><i class="fa fa-check"></i><b>2</b> Soft Skills for Data Scientists</a><ul>
-<li class="chapter" data-level="2.1" data-path="comparison-between-statistician-and-data-scientist.html"><a href="comparison-between-statistician-and-data-scientist.html"><i class="fa fa-check"></i><b>2.1</b> Comparison between Statistician and Data Scientist</a></li>
-<li class="chapter" data-level="2.2" data-path="beyond-data-and-analytics.html"><a href="beyond-data-and-analytics.html"><i class="fa fa-check"></i><b>2.2</b> Beyond Data and Analytics</a></li>
-<li class="chapter" data-level="2.3" data-path="three-pillars-of-knowledge.html"><a href="three-pillars-of-knowledge.html"><i class="fa fa-check"></i><b>2.3</b> Three Pillars of Knowledge</a></li>
-<li class="chapter" data-level="2.4" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html"><i class="fa fa-check"></i><b>2.4</b> Data Science Project Cycle</a><ul>
-<li class="chapter" data-level="2.4.1" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#types-of-data-science-projects"><i class="fa fa-check"></i><b>2.4.1</b> Types of Data Science Projects</a></li>
-<li class="chapter" data-level="2.4.2" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#problem-formulation-and-project-planning-stage"><i class="fa fa-check"></i><b>2.4.2</b> Problem Formulation and Project Planning Stage</a></li>
-<li class="chapter" data-level="2.4.3" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#project-modeling-stage"><i class="fa fa-check"></i><b>2.4.3</b> Project Modeling Stage</a></li>
-<li class="chapter" data-level="2.4.4" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#model-implementation-and-post-production-stage"><i class="fa fa-check"></i><b>2.4.4</b> Model Implementation and Post Production Stage</a></li>
-<li class="chapter" data-level="2.4.5" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#project-cycle-summary"><i class="fa fa-check"></i><b>2.4.5</b> Project Cycle Summary</a></li>
+<li class="chapter" data-level="2" data-path="soft-skills-for-data-scientists.html"><a href="soft-skills-for-data-scientists.html"><i class="fa fa-check"></i><b>2</b> Soft Skills for Data Scientists<span></span></a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="comparison-between-statistician-and-data-scientist.html"><a href="comparison-between-statistician-and-data-scientist.html"><i class="fa fa-check"></i><b>2.1</b> Comparison between Statistician and Data Scientist<span></span></a></li>
+<li class="chapter" data-level="2.2" data-path="beyond-data-and-analytics.html"><a href="beyond-data-and-analytics.html"><i class="fa fa-check"></i><b>2.2</b> Beyond Data and Analytics<span></span></a></li>
+<li class="chapter" data-level="2.3" data-path="three-pillars-of-knowledge.html"><a href="three-pillars-of-knowledge.html"><i class="fa fa-check"></i><b>2.3</b> Three Pillars of Knowledge<span></span></a></li>
+<li class="chapter" data-level="2.4" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html"><i class="fa fa-check"></i><b>2.4</b> Data Science Project Cycle<span></span></a>
+<ul>
+<li class="chapter" data-level="2.4.1" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#types-of-data-science-projects"><i class="fa fa-check"></i><b>2.4.1</b> Types of Data Science Projects<span></span></a></li>
+<li class="chapter" data-level="2.4.2" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#problem-formulation-and-project-planning-stage"><i class="fa fa-check"></i><b>2.4.2</b> Problem Formulation and Project Planning Stage<span></span></a></li>
+<li class="chapter" data-level="2.4.3" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#project-modeling-stage"><i class="fa fa-check"></i><b>2.4.3</b> Project Modeling Stage<span></span></a></li>
+<li class="chapter" data-level="2.4.4" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#model-implementation-and-post-production-stage"><i class="fa fa-check"></i><b>2.4.4</b> Model Implementation and Post Production Stage<span></span></a></li>
+<li class="chapter" data-level="2.4.5" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#project-cycle-summary"><i class="fa fa-check"></i><b>2.4.5</b> Project Cycle Summary<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="2.5" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html"><i class="fa fa-check"></i><b>2.5</b> Common Mistakes in Data Science</a><ul>
-<li class="chapter" data-level="2.5.1" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#problem-formulation-stage"><i class="fa fa-check"></i><b>2.5.1</b> Problem Formulation Stage</a></li>
-<li class="chapter" data-level="2.5.2" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#project-planning-stage"><i class="fa fa-check"></i><b>2.5.2</b> Project Planning Stage</a></li>
-<li class="chapter" data-level="2.5.3" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#project-modeling-stage-1"><i class="fa fa-check"></i><b>2.5.3</b> Project Modeling Stage</a></li>
-<li class="chapter" data-level="2.5.4" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#model-implementation-and-post-production-stage-1"><i class="fa fa-check"></i><b>2.5.4</b> Model Implementation and Post Production Stage</a></li>
-<li class="chapter" data-level="2.5.5" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#summary-of-common-mistakes"><i class="fa fa-check"></i><b>2.5.5</b> Summary of Common Mistakes</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="3" data-path="introduction-to-the-data.html"><a href="introduction-to-the-data.html"><i class="fa fa-check"></i><b>3</b> Introduction to The Data</a><ul>
-<li class="chapter" data-level="3.1" data-path="customer-data-for-a-clothing-company.html"><a href="customer-data-for-a-clothing-company.html"><i class="fa fa-check"></i><b>3.1</b> Customer Data for A Clothing Company</a></li>
-<li class="chapter" data-level="3.2" data-path="swinediseasedata.html"><a href="swinediseasedata.html"><i class="fa fa-check"></i><b>3.2</b> Swine Disease Breakout Data</a></li>
-<li class="chapter" data-level="3.3" data-path="mnist-dataset.html"><a href="mnist-dataset.html"><i class="fa fa-check"></i><b>3.3</b> MNIST Dataset</a></li>
-<li class="chapter" data-level="3.4" data-path="imdb-dataset.html"><a href="imdb-dataset.html"><i class="fa fa-check"></i><b>3.4</b> IMDB Dataset</a></li>
-</ul></li>
-<li class="chapter" data-level="4" data-path="bigdatacloudplatform.html"><a href="bigdatacloudplatform.html"><i class="fa fa-check"></i><b>4</b> Big Data Cloud Platform</a><ul>
-<li class="chapter" data-level="4.1" data-path="power-of-cluster-of-computers.html"><a href="power-of-cluster-of-computers.html"><i class="fa fa-check"></i><b>4.1</b> Power of Cluster of Computers</a></li>
-<li class="chapter" data-level="4.2" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html"><i class="fa fa-check"></i><b>4.2</b> Evolution of Cluster Computing</a><ul>
-<li class="chapter" data-level="4.2.1" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html#hadoop"><i class="fa fa-check"></i><b>4.2.1</b> Hadoop</a></li>
-<li class="chapter" data-level="4.2.2" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html#spark"><i class="fa fa-check"></i><b>4.2.2</b> Spark</a></li>
-</ul></li>
-<li class="chapter" data-level="4.3" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html"><i class="fa fa-check"></i><b>4.3</b> Introduction of Cloud Environment</a><ul>
-<li class="chapter" data-level="4.3.1" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#open-account-and-create-a-cluster"><i class="fa fa-check"></i><b>4.3.1</b> Open Account and Create a Cluster</a></li>
-<li class="chapter" data-level="4.3.2" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#r-notebook"><i class="fa fa-check"></i><b>4.3.2</b> R Notebook</a></li>
-<li class="chapter" data-level="4.3.3" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#markdown-cells"><i class="fa fa-check"></i><b>4.3.3</b> Markdown Cells</a></li>
-</ul></li>
-<li class="chapter" data-level="4.4" data-path="leveragesparkr.html"><a href="leveragesparkr.html"><i class="fa fa-check"></i><b>4.4</b> Leverage Spark Using R Notebook</a></li>
-<li class="chapter" data-level="4.5" data-path="databases-and-sql.html"><a href="databases-and-sql.html"><i class="fa fa-check"></i><b>4.5</b> Databases and SQL</a><ul>
-<li class="chapter" data-level="4.5.1" data-path="databases-and-sql.html"><a href="databases-and-sql.html#history"><i class="fa fa-check"></i><b>4.5.1</b> History</a></li>
-<li class="chapter" data-level="4.5.2" data-path="databases-and-sql.html"><a href="databases-and-sql.html#database-table-and-view"><i class="fa fa-check"></i><b>4.5.2</b> Database, Table and View</a></li>
-<li class="chapter" data-level="4.5.3" data-path="databases-and-sql.html"><a href="databases-and-sql.html#basic-sql-statement"><i class="fa fa-check"></i><b>4.5.3</b> Basic SQL Statement</a></li>
-<li class="chapter" data-level="4.5.4" data-path="databases-and-sql.html"><a href="databases-and-sql.html#advanced-topics-in-database"><i class="fa fa-check"></i><b>4.5.4</b> Advanced Topics in Database</a></li>
+<li class="chapter" data-level="2.5" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html"><i class="fa fa-check"></i><b>2.5</b> Common Mistakes in Data Science<span></span></a>
+<ul>
+<li class="chapter" data-level="2.5.1" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#problem-formulation-stage"><i class="fa fa-check"></i><b>2.5.1</b> Problem Formulation Stage<span></span></a></li>
+<li class="chapter" data-level="2.5.2" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#project-planning-stage"><i class="fa fa-check"></i><b>2.5.2</b> Project Planning Stage<span></span></a></li>
+<li class="chapter" data-level="2.5.3" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#project-modeling-stage-1"><i class="fa fa-check"></i><b>2.5.3</b> Project Modeling Stage<span></span></a></li>
+<li class="chapter" data-level="2.5.4" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#model-implementation-and-post-production-stage-1"><i class="fa fa-check"></i><b>2.5.4</b> Model Implementation and Post Production Stage<span></span></a></li>
+<li class="chapter" data-level="2.5.5" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#summary-of-common-mistakes"><i class="fa fa-check"></i><b>2.5.5</b> Summary of Common Mistakes<span></span></a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="datapreprocessing.html"><a href="datapreprocessing.html"><i class="fa fa-check"></i><b>5</b> Data Pre-processing</a><ul>
-<li class="chapter" data-level="5.1" data-path="data-cleaning.html"><a href="data-cleaning.html"><i class="fa fa-check"></i><b>5.1</b> Data Cleaning</a></li>
-<li class="chapter" data-level="5.2" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>5.2</b> Missing Values</a><ul>
-<li class="chapter" data-level="5.2.1" data-path="missing-values.html"><a href="missing-values.html#impute-missing-values-with-medianmode"><i class="fa fa-check"></i><b>5.2.1</b> Impute missing values with median/mode</a></li>
-<li class="chapter" data-level="5.2.2" data-path="missing-values.html"><a href="missing-values.html#k-nearest-neighbors"><i class="fa fa-check"></i><b>5.2.2</b> K-nearest neighbors</a></li>
-<li class="chapter" data-level="5.2.3" data-path="missing-values.html"><a href="missing-values.html#bagging-tree"><i class="fa fa-check"></i><b>5.2.3</b> Bagging Tree</a></li>
+<li class="chapter" data-level="3" data-path="introduction-to-the-data.html"><a href="introduction-to-the-data.html"><i class="fa fa-check"></i><b>3</b> Introduction to The Data<span></span></a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="customer-data-for-a-clothing-company.html"><a href="customer-data-for-a-clothing-company.html"><i class="fa fa-check"></i><b>3.1</b> Customer Data for A Clothing Company<span></span></a></li>
+<li class="chapter" data-level="3.2" data-path="swinediseasedata.html"><a href="swinediseasedata.html"><i class="fa fa-check"></i><b>3.2</b> Swine Disease Breakout Data<span></span></a></li>
+<li class="chapter" data-level="3.3" data-path="mnist-dataset.html"><a href="mnist-dataset.html"><i class="fa fa-check"></i><b>3.3</b> MNIST Dataset<span></span></a></li>
+<li class="chapter" data-level="3.4" data-path="imdb-dataset.html"><a href="imdb-dataset.html"><i class="fa fa-check"></i><b>3.4</b> IMDB Dataset<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="5.3" data-path="centering-and-scaling.html"><a href="centering-and-scaling.html"><i class="fa fa-check"></i><b>5.3</b> Centering and Scaling</a></li>
-<li class="chapter" data-level="5.4" data-path="resolve-skewness.html"><a href="resolve-skewness.html"><i class="fa fa-check"></i><b>5.4</b> Resolve Skewness</a></li>
-<li class="chapter" data-level="5.5" data-path="outliers.html"><a href="outliers.html"><i class="fa fa-check"></i><b>5.5</b> Resolve Outliers</a></li>
-<li class="chapter" data-level="5.6" data-path="collinearity.html"><a href="collinearity.html"><i class="fa fa-check"></i><b>5.6</b> Collinearity</a></li>
-<li class="chapter" data-level="5.7" data-path="sparse-variables.html"><a href="sparse-variables.html"><i class="fa fa-check"></i><b>5.7</b> Sparse Variables</a></li>
-<li class="chapter" data-level="5.8" data-path="re-encode-dummy-variables.html"><a href="re-encode-dummy-variables.html"><i class="fa fa-check"></i><b>5.8</b> Re-encode Dummy Variables</a></li>
+<li class="chapter" data-level="4" data-path="bigdatacloudplatform.html"><a href="bigdatacloudplatform.html"><i class="fa fa-check"></i><b>4</b> Big Data Cloud Platform<span></span></a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="power-of-cluster-of-computers.html"><a href="power-of-cluster-of-computers.html"><i class="fa fa-check"></i><b>4.1</b> Power of Cluster of Computers<span></span></a></li>
+<li class="chapter" data-level="4.2" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html"><i class="fa fa-check"></i><b>4.2</b> Evolution of Cluster Computing<span></span></a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html#hadoop"><i class="fa fa-check"></i><b>4.2.1</b> Hadoop<span></span></a></li>
+<li class="chapter" data-level="4.2.2" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html#spark"><i class="fa fa-check"></i><b>4.2.2</b> Spark<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="6" data-path="datawrangline.html"><a href="datawrangline.html"><i class="fa fa-check"></i><b>6</b> Data Wrangling</a><ul>
-<li class="chapter" data-level="6.1" data-path="summarize-data.html"><a href="summarize-data.html"><i class="fa fa-check"></i><b>6.1</b> Summarize Data</a><ul>
-<li class="chapter" data-level="6.1.1" data-path="summarize-data.html"><a href="summarize-data.html#dplyr-package"><i class="fa fa-check"></i><b>6.1.1</b> <code>dplyr</code> package</a></li>
-<li class="chapter" data-level="6.1.2" data-path="summarize-data.html"><a href="summarize-data.html#applyfamilyinbaser"><i class="fa fa-check"></i><b>6.1.2</b> <code>apply()</code>, <code>lapply()</code> and <code>sapply()</code> in base R</a></li>
+<li class="chapter" data-level="4.3" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html"><i class="fa fa-check"></i><b>4.3</b> Introduction of Cloud Environment<span></span></a>
+<ul>
+<li class="chapter" data-level="4.3.1" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#open-account-and-create-a-cluster"><i class="fa fa-check"></i><b>4.3.1</b> Open Account and Create a Cluster<span></span></a></li>
+<li class="chapter" data-level="4.3.2" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#r-notebook"><i class="fa fa-check"></i><b>4.3.2</b> R Notebook<span></span></a></li>
+<li class="chapter" data-level="4.3.3" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#markdown-cells"><i class="fa fa-check"></i><b>4.3.3</b> Markdown Cells<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="6.2" data-path="tidy-and-reshape-data.html"><a href="tidy-and-reshape-data.html"><i class="fa fa-check"></i><b>6.2</b> Tidy and Reshape Data</a></li>
-</ul></li>
-<li class="chapter" data-level="7" data-path="modeltuningstrategy.html"><a href="modeltuningstrategy.html"><i class="fa fa-check"></i><b>7</b> Model Tuning Strategy</a><ul>
-<li class="chapter" data-level="7.1" data-path="vbtradeoff.html"><a href="vbtradeoff.html"><i class="fa fa-check"></i><b>7.1</b> Variance-Bias Trade-Off</a></li>
-<li class="chapter" data-level="7.2" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html"><i class="fa fa-check"></i><b>7.2</b> Data Splitting and Resampling</a><ul>
-<li class="chapter" data-level="7.2.1" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html#datasplitting"><i class="fa fa-check"></i><b>7.2.1</b> Data Splitting</a></li>
-<li class="chapter" data-level="7.2.2" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html#resampling"><i class="fa fa-check"></i><b>7.2.2</b> Resampling</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="8" data-path="measuring-performance.html"><a href="measuring-performance.html"><i class="fa fa-check"></i><b>8</b> Measuring Performance</a><ul>
-<li class="chapter" data-level="8.1" data-path="regression-model-performance.html"><a href="regression-model-performance.html"><i class="fa fa-check"></i><b>8.1</b> Regression Model Performance</a></li>
-<li class="chapter" data-level="8.2" data-path="classification-model-performance.html"><a href="classification-model-performance.html"><i class="fa fa-check"></i><b>8.2</b> Classification Model Performance</a><ul>
-<li class="chapter" data-level="8.2.1" data-path="classification-model-performance.html"><a href="classification-model-performance.html#confusion-matrix"><i class="fa fa-check"></i><b>8.2.1</b> Confusion Matrix</a></li>
-<li class="chapter" data-level="8.2.2" data-path="classification-model-performance.html"><a href="classification-model-performance.html#kappa-statistic"><i class="fa fa-check"></i><b>8.2.2</b> Kappa Statistic</a></li>
-<li class="chapter" data-level="8.2.3" data-path="classification-model-performance.html"><a href="classification-model-performance.html#roc"><i class="fa fa-check"></i><b>8.2.3</b> ROC</a></li>
-<li class="chapter" data-level="8.2.4" data-path="classification-model-performance.html"><a href="classification-model-performance.html#gain-and-lift-charts"><i class="fa fa-check"></i><b>8.2.4</b> Gain and Lift Charts</a></li>
+<li class="chapter" data-level="4.4" data-path="leveragesparkr.html"><a href="leveragesparkr.html"><i class="fa fa-check"></i><b>4.4</b> Leverage Spark Using R Notebook<span></span></a></li>
+<li class="chapter" data-level="4.5" data-path="databases-and-sql.html"><a href="databases-and-sql.html"><i class="fa fa-check"></i><b>4.5</b> Databases and SQL<span></span></a>
+<ul>
+<li class="chapter" data-level="4.5.1" data-path="databases-and-sql.html"><a href="databases-and-sql.html#history"><i class="fa fa-check"></i><b>4.5.1</b> History<span></span></a></li>
+<li class="chapter" data-level="4.5.2" data-path="databases-and-sql.html"><a href="databases-and-sql.html#database-table-and-view"><i class="fa fa-check"></i><b>4.5.2</b> Database, Table and View<span></span></a></li>
+<li class="chapter" data-level="4.5.3" data-path="databases-and-sql.html"><a href="databases-and-sql.html#basic-sql-statement"><i class="fa fa-check"></i><b>4.5.3</b> Basic SQL Statement<span></span></a></li>
+<li class="chapter" data-level="4.5.4" data-path="databases-and-sql.html"><a href="databases-and-sql.html#advanced-topics-in-database"><i class="fa fa-check"></i><b>4.5.4</b> Advanced Topics in Database<span></span></a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="9" data-path="regression-models.html"><a href="regression-models.html"><i class="fa fa-check"></i><b>9</b> Regression Models</a><ul>
-<li class="chapter" data-level="9.1" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html"><i class="fa fa-check"></i><b>9.1</b> Ordinary Least Square</a><ul>
-<li class="chapter" data-level="9.1.1" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html#the-magic-p-value"><i class="fa fa-check"></i><b>9.1.1</b> The Magic P-value</a></li>
-<li class="chapter" data-level="9.1.2" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html#diagnostics-for-linear-regression"><i class="fa fa-check"></i><b>9.1.2</b> Diagnostics for Linear Regression</a></li>
+<li class="chapter" data-level="5" data-path="datapreprocessing.html"><a href="datapreprocessing.html"><i class="fa fa-check"></i><b>5</b> Data Pre-processing<span></span></a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="data-cleaning.html"><a href="data-cleaning.html"><i class="fa fa-check"></i><b>5.1</b> Data Cleaning<span></span></a></li>
+<li class="chapter" data-level="5.2" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>5.2</b> Missing Values<span></span></a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="missing-values.html"><a href="missing-values.html#impute-missing-values-with-medianmode"><i class="fa fa-check"></i><b>5.2.1</b> Impute missing values with median/mode<span></span></a></li>
+<li class="chapter" data-level="5.2.2" data-path="missing-values.html"><a href="missing-values.html#k-nearest-neighbors"><i class="fa fa-check"></i><b>5.2.2</b> K-nearest neighbors<span></span></a></li>
+<li class="chapter" data-level="5.2.3" data-path="missing-values.html"><a href="missing-values.html#bagging-tree"><i class="fa fa-check"></i><b>5.2.3</b> Bagging Tree<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="9.2" data-path="principal-component-regression-and-partial-least-square.html"><a href="principal-component-regression-and-partial-least-square.html"><i class="fa fa-check"></i><b>9.2</b> Principal Component Regression and Partial Least Square</a></li>
+<li class="chapter" data-level="5.3" data-path="centering-and-scaling.html"><a href="centering-and-scaling.html"><i class="fa fa-check"></i><b>5.3</b> Centering and Scaling<span></span></a></li>
+<li class="chapter" data-level="5.4" data-path="resolve-skewness.html"><a href="resolve-skewness.html"><i class="fa fa-check"></i><b>5.4</b> Resolve Skewness<span></span></a></li>
+<li class="chapter" data-level="5.5" data-path="outliers.html"><a href="outliers.html"><i class="fa fa-check"></i><b>5.5</b> Resolve Outliers<span></span></a></li>
+<li class="chapter" data-level="5.6" data-path="collinearity.html"><a href="collinearity.html"><i class="fa fa-check"></i><b>5.6</b> Collinearity<span></span></a></li>
+<li class="chapter" data-level="5.7" data-path="sparse-variables.html"><a href="sparse-variables.html"><i class="fa fa-check"></i><b>5.7</b> Sparse Variables<span></span></a></li>
+<li class="chapter" data-level="5.8" data-path="re-encode-dummy-variables.html"><a href="re-encode-dummy-variables.html"><i class="fa fa-check"></i><b>5.8</b> Re-encode Dummy Variables<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="10" data-path="regularization-methods.html"><a href="regularization-methods.html"><i class="fa fa-check"></i><b>10</b> Regularization Methods</a><ul>
-<li class="chapter" data-level="10.1" data-path="ridge-regression.html"><a href="ridge-regression.html"><i class="fa fa-check"></i><b>10.1</b> Ridge Regression</a></li>
-<li class="chapter" data-level="10.2" data-path="lasso.html"><a href="lasso.html"><i class="fa fa-check"></i><b>10.2</b> LASSO</a></li>
-<li class="chapter" data-level="10.3" data-path="variable-selection-property-of-the-lasso.html"><a href="variable-selection-property-of-the-lasso.html"><i class="fa fa-check"></i><b>10.3</b> Variable selection property of the lasso</a></li>
-<li class="chapter" data-level="10.4" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.4</b> Elastic Net</a></li>
-<li class="chapter" data-level="10.5" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.5</b> Penalized Generalized Linear Model</a><ul>
-<li class="chapter" data-level="10.5.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.5.1</b> Introduction to <code>glmnet</code> package</a></li>
-<li class="chapter" data-level="10.5.2" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#penalized-logistic-regression"><i class="fa fa-check"></i><b>10.5.2</b> Penalized logistic regression</a></li>
+<li class="chapter" data-level="6" data-path="datawrangline.html"><a href="datawrangline.html"><i class="fa fa-check"></i><b>6</b> Data Wrangling<span></span></a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="summarize-data.html"><a href="summarize-data.html"><i class="fa fa-check"></i><b>6.1</b> Summarize Data<span></span></a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="summarize-data.html"><a href="summarize-data.html#dplyr-package"><i class="fa fa-check"></i><b>6.1.1</b> <code>dplyr</code> package<span></span></a></li>
+<li class="chapter" data-level="6.1.2" data-path="summarize-data.html"><a href="summarize-data.html#applyfamilyinbaser"><i class="fa fa-check"></i><b>6.1.2</b> <code>apply()</code>, <code>lapply()</code> and <code>sapply()</code> in base R<span></span></a></li>
 </ul></li>
+<li class="chapter" data-level="6.2" data-path="tidy-and-reshape-data.html"><a href="tidy-and-reshape-data.html"><i class="fa fa-check"></i><b>6.2</b> Tidy and Reshape Data<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="11" data-path="treemodel.html"><a href="treemodel.html"><i class="fa fa-check"></i><b>11</b> Tree-Based Methods</a><ul>
-<li class="chapter" data-level="11.1" data-path="tree-basics.html"><a href="tree-basics.html"><i class="fa fa-check"></i><b>11.1</b> Tree Basics</a></li>
-<li class="chapter" data-level="11.2" data-path="splitting-criteria.html"><a href="splitting-criteria.html"><i class="fa fa-check"></i><b>11.2</b> Splitting Criteria</a></li>
-<li class="chapter" data-level="11.3" data-path="tree-pruning.html"><a href="tree-pruning.html"><i class="fa fa-check"></i><b>11.3</b> Tree Pruning</a></li>
-<li class="chapter" data-level="11.4" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html"><i class="fa fa-check"></i><b>11.4</b> Regression and Decision Tree Basic</a><ul>
-<li class="chapter" data-level="11.4.1" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html#regression-tree"><i class="fa fa-check"></i><b>11.4.1</b> Regression Tree</a></li>
-<li class="chapter" data-level="11.4.2" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html#decision-tree"><i class="fa fa-check"></i><b>11.4.2</b> Decision Tree</a></li>
-</ul></li>
-<li class="chapter" data-level="11.5" data-path="missing-values.html"><a href="missing-values.html#bagging-tree"><i class="fa fa-check"></i><b>11.5</b> Bagging Tree</a></li>
-<li class="chapter" data-level="11.6" data-path="random-forest.html"><a href="random-forest.html"><i class="fa fa-check"></i><b>11.6</b> Random Forest</a></li>
-<li class="chapter" data-level="11.7" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html"><i class="fa fa-check"></i><b>11.7</b> Gradient Boosted Machine</a><ul>
-<li class="chapter" data-level="11.7.1" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#adaptive-boosting"><i class="fa fa-check"></i><b>11.7.1</b> Adaptive Boosting</a></li>
-<li class="chapter" data-level="11.7.2" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#stochastic-gradient-boosting"><i class="fa fa-check"></i><b>11.7.2</b> Stochastic Gradient Boosting</a></li>
-<li class="chapter" data-level="11.7.3" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#boosting-as-additive-model"><i class="fa fa-check"></i><b>11.7.3</b> Boosting as Additive Model</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="12" data-path="deeplearning.html"><a href="deeplearning.html"><i class="fa fa-check"></i><b>12</b> Deep Learning</a><ul>
-<li class="chapter" data-level="12.1" data-path="projection-pursuit-regression.html"><a href="projection-pursuit-regression.html"><i class="fa fa-check"></i><b>12.1</b> Projection Pursuit Regression</a></li>
-<li class="chapter" data-level="12.2" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html"><i class="fa fa-check"></i><b>12.2</b> Feedforward Neural Network</a><ul>
-<li class="chapter" data-level="12.2.1" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#logisticregasneuralnetwork"><i class="fa fa-check"></i><b>12.2.1</b> Logistic Regression as Neural Network</a></li>
-<li class="chapter" data-level="12.2.2" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#stochastic-gradient-descent"><i class="fa fa-check"></i><b>12.2.2</b> Stochastic Gradient Descent</a></li>
-<li class="chapter" data-level="12.2.3" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#deepneuralnetwork"><i class="fa fa-check"></i><b>12.2.3</b> Deep Neural Network</a></li>
-<li class="chapter" data-level="12.2.4" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#activationfunction"><i class="fa fa-check"></i><b>12.2.4</b> Activation Function</a></li>
-<li class="chapter" data-level="12.2.5" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#optimization"><i class="fa fa-check"></i><b>12.2.5</b> Optimization</a></li>
-<li class="chapter" data-level="12.2.6" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#deal-with-overfitting"><i class="fa fa-check"></i><b>12.2.6</b> Deal with Overfitting</a></li>
-<li class="chapter" data-level="12.2.7" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#ffnnexample"><i class="fa fa-check"></i><b>12.2.7</b> Image Recognition Using FFNN</a></li>
-</ul></li>
-<li class="chapter" data-level="12.3" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html"><i class="fa fa-check"></i><b>12.3</b> Convolutional Neural Network</a><ul>
-<li class="chapter" data-level="12.3.1" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#convolution-layer"><i class="fa fa-check"></i><b>12.3.1</b> Convolution Layer</a></li>
-<li class="chapter" data-level="12.3.2" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#padding-layer"><i class="fa fa-check"></i><b>12.3.2</b> Padding Layer</a></li>
-<li class="chapter" data-level="12.3.3" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#pooling-layer"><i class="fa fa-check"></i><b>12.3.3</b> Pooling Layer</a></li>
-<li class="chapter" data-level="12.3.4" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#convolution-over-volume"><i class="fa fa-check"></i><b>12.3.4</b> Convolution Over Volume</a></li>
-<li class="chapter" data-level="12.3.5" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#cnnexample"><i class="fa fa-check"></i><b>12.3.5</b> Image Recognition Using CNN</a></li>
-</ul></li>
-<li class="chapter" data-level="12.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html"><i class="fa fa-check"></i><b>12.4</b> Recurrent Neural Network</a><ul>
-<li class="chapter" data-level="12.4.1" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#rnn-model"><i class="fa fa-check"></i><b>12.4.1</b> RNN Model</a></li>
-<li class="chapter" data-level="12.4.2" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#embedding"><i class="fa fa-check"></i><b>12.4.2</b> Word Embedding</a></li>
-<li class="chapter" data-level="12.4.3" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#lstm"><i class="fa fa-check"></i><b>12.4.3</b> Long Short Term Memory</a></li>
-<li class="chapter" data-level="12.4.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#rnnexample"><i class="fa fa-check"></i><b>12.4.4</b> Sentiment Analysis Using RNN</a></li>
+<li class="chapter" data-level="7" data-path="modeltuningstrategy.html"><a href="modeltuningstrategy.html"><i class="fa fa-check"></i><b>7</b> Model Tuning Strategy<span></span></a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="vbtradeoff.html"><a href="vbtradeoff.html"><i class="fa fa-check"></i><b>7.1</b> Variance-Bias Trade-Off<span></span></a></li>
+<li class="chapter" data-level="7.2" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html"><i class="fa fa-check"></i><b>7.2</b> Data Splitting and Resampling<span></span></a>
+<ul>
+<li class="chapter" data-level="7.2.1" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html#datasplitting"><i class="fa fa-check"></i><b>7.2.1</b> Data Splitting<span></span></a></li>
+<li class="chapter" data-level="7.2.2" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html#resampling"><i class="fa fa-check"></i><b>7.2.2</b> Resampling<span></span></a></li>
 </ul></li>
 </ul></li>
-<li class="appendix"><span><b>Appendix</b></span></li>
-<li class="chapter" data-level="A" data-path="largelocaldata.html"><a href="largelocaldata.html"><i class="fa fa-check"></i><b>A</b> Handling Large Local Data</a><ul>
-<li class="chapter" data-level="A.1" data-path="readr.html"><a href="readr.html"><i class="fa fa-check"></i><b>A.1</b> <code>readr</code></a></li>
-<li class="chapter" data-level="A.2" data-path="data-table-enhanced-data-frame.html"><a href="data-table-enhanced-data-frame.html"><i class="fa fa-check"></i><b>A.2</b> <code>data.table</code>— enhanced <code>data.frame</code></a></li>
+<li class="chapter" data-level="8" data-path="measuring-performance.html"><a href="measuring-performance.html"><i class="fa fa-check"></i><b>8</b> Measuring Performance<span></span></a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="regression-model-performance.html"><a href="regression-model-performance.html"><i class="fa fa-check"></i><b>8.1</b> Regression Model Performance<span></span></a></li>
+<li class="chapter" data-level="8.2" data-path="classification-model-performance.html"><a href="classification-model-performance.html"><i class="fa fa-check"></i><b>8.2</b> Classification Model Performance<span></span></a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="classification-model-performance.html"><a href="classification-model-performance.html#confusion-matrix"><i class="fa fa-check"></i><b>8.2.1</b> Confusion Matrix<span></span></a></li>
+<li class="chapter" data-level="8.2.2" data-path="classification-model-performance.html"><a href="classification-model-performance.html#kappa-statistic"><i class="fa fa-check"></i><b>8.2.2</b> Kappa Statistic<span></span></a></li>
+<li class="chapter" data-level="8.2.3" data-path="classification-model-performance.html"><a href="classification-model-performance.html#roc"><i class="fa fa-check"></i><b>8.2.3</b> ROC<span></span></a></li>
+<li class="chapter" data-level="8.2.4" data-path="classification-model-performance.html"><a href="classification-model-performance.html#gain-and-lift-charts"><i class="fa fa-check"></i><b>8.2.4</b> Gain and Lift Charts<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="B" data-path="r-code-for-data-simulation.html"><a href="r-code-for-data-simulation.html"><i class="fa fa-check"></i><b>B</b> R code for data simulation</a><ul>
-<li class="chapter" data-level="B.1" data-path="appendixdata1.html"><a href="appendixdata1.html"><i class="fa fa-check"></i><b>B.1</b> Customer Data for Clothing Company</a></li>
-<li class="chapter" data-level="B.2" data-path="appendixdata3.html"><a href="appendixdata3.html"><i class="fa fa-check"></i><b>B.2</b> Swine Disease Breakout Data</a></li>
 </ul></li>
-<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="chapter" data-level="9" data-path="regression-models.html"><a href="regression-models.html"><i class="fa fa-check"></i><b>9</b> Regression Models<span></span></a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html"><i class="fa fa-check"></i><b>9.1</b> Ordinary Least Square<span></span></a>
+<ul>
+<li class="chapter" data-level="9.1.1" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html#the-magic-p-value"><i class="fa fa-check"></i><b>9.1.1</b> The Magic P-value<span></span></a></li>
+<li class="chapter" data-level="9.1.2" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html#diagnostics-for-linear-regression"><i class="fa fa-check"></i><b>9.1.2</b> Diagnostics for Linear Regression<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="principal-component-regression-and-partial-least-square.html"><a href="principal-component-regression-and-partial-least-square.html"><i class="fa fa-check"></i><b>9.2</b> Principal Component Regression and Partial Least Square<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="regularization-methods.html"><a href="regularization-methods.html"><i class="fa fa-check"></i><b>10</b> Regularization Methods<span></span></a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="ridge-regression.html"><a href="ridge-regression.html"><i class="fa fa-check"></i><b>10.1</b> Ridge Regression<span></span></a></li>
+<li class="chapter" data-level="10.2" data-path="lasso.html"><a href="lasso.html"><i class="fa fa-check"></i><b>10.2</b> LASSO<span></span></a></li>
+<li class="chapter" data-level="10.3" data-path="variable-selection-property-of-the-lasso.html"><a href="variable-selection-property-of-the-lasso.html"><i class="fa fa-check"></i><b>10.3</b> Variable selection property of the lasso<span></span></a></li>
+<li class="chapter" data-level="10.4" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.4</b> Elastic Net<span></span></a></li>
+<li class="chapter" data-level="10.5" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.5</b> Penalized Generalized Linear Model<span></span></a>
+<ul>
+<li class="chapter" data-level="10.5.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.5.1</b> Introduction to <code>glmnet</code> package<span></span></a></li>
+<li class="chapter" data-level="10.5.2" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#penalized-logistic-regression"><i class="fa fa-check"></i><b>10.5.2</b> Penalized logistic regression<span></span></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="treemodel.html"><a href="treemodel.html"><i class="fa fa-check"></i><b>11</b> Tree-Based Methods<span></span></a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="tree-basics.html"><a href="tree-basics.html"><i class="fa fa-check"></i><b>11.1</b> Tree Basics<span></span></a></li>
+<li class="chapter" data-level="11.2" data-path="splitting-criteria.html"><a href="splitting-criteria.html"><i class="fa fa-check"></i><b>11.2</b> Splitting Criteria<span></span></a></li>
+<li class="chapter" data-level="11.3" data-path="tree-pruning.html"><a href="tree-pruning.html"><i class="fa fa-check"></i><b>11.3</b> Tree Pruning<span></span></a></li>
+<li class="chapter" data-level="11.4" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html"><i class="fa fa-check"></i><b>11.4</b> Regression and Decision Tree Basic<span></span></a>
+<ul>
+<li class="chapter" data-level="11.4.1" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html#regression-tree"><i class="fa fa-check"></i><b>11.4.1</b> Regression Tree<span></span></a></li>
+<li class="chapter" data-level="11.4.2" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html#decision-tree"><i class="fa fa-check"></i><b>11.4.2</b> Decision Tree<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="11.5" data-path="bagging-tree-1.html"><a href="bagging-tree-1.html"><i class="fa fa-check"></i><b>11.5</b> Bagging Tree<span></span></a></li>
+<li class="chapter" data-level="11.6" data-path="random-forest.html"><a href="random-forest.html"><i class="fa fa-check"></i><b>11.6</b> Random Forest<span></span></a></li>
+<li class="chapter" data-level="11.7" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html"><i class="fa fa-check"></i><b>11.7</b> Gradient Boosted Machine<span></span></a>
+<ul>
+<li class="chapter" data-level="11.7.1" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#adaptive-boosting"><i class="fa fa-check"></i><b>11.7.1</b> Adaptive Boosting<span></span></a></li>
+<li class="chapter" data-level="11.7.2" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#stochastic-gradient-boosting"><i class="fa fa-check"></i><b>11.7.2</b> Stochastic Gradient Boosting<span></span></a></li>
+<li class="chapter" data-level="11.7.3" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#boosting-as-additive-model"><i class="fa fa-check"></i><b>11.7.3</b> Boosting as Additive Model<span></span></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="deeplearning.html"><a href="deeplearning.html"><i class="fa fa-check"></i><b>12</b> Deep Learning<span></span></a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="projection-pursuit-regression.html"><a href="projection-pursuit-regression.html"><i class="fa fa-check"></i><b>12.1</b> Projection Pursuit Regression<span></span></a></li>
+<li class="chapter" data-level="12.2" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html"><i class="fa fa-check"></i><b>12.2</b> Feedforward Neural Network<span></span></a>
+<ul>
+<li class="chapter" data-level="12.2.1" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#logisticregasneuralnetwork"><i class="fa fa-check"></i><b>12.2.1</b> Logistic Regression as Neural Network<span></span></a></li>
+<li class="chapter" data-level="12.2.2" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#stochastic-gradient-descent"><i class="fa fa-check"></i><b>12.2.2</b> Stochastic Gradient Descent<span></span></a></li>
+<li class="chapter" data-level="12.2.3" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#deepneuralnetwork"><i class="fa fa-check"></i><b>12.2.3</b> Deep Neural Network<span></span></a></li>
+<li class="chapter" data-level="12.2.4" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#activationfunction"><i class="fa fa-check"></i><b>12.2.4</b> Activation Function<span></span></a></li>
+<li class="chapter" data-level="12.2.5" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#optimization"><i class="fa fa-check"></i><b>12.2.5</b> Optimization<span></span></a></li>
+<li class="chapter" data-level="12.2.6" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#deal-with-overfitting"><i class="fa fa-check"></i><b>12.2.6</b> Deal with Overfitting<span></span></a></li>
+<li class="chapter" data-level="12.2.7" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#ffnnexample"><i class="fa fa-check"></i><b>12.2.7</b> Image Recognition Using FFNN<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="12.3" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html"><i class="fa fa-check"></i><b>12.3</b> Convolutional Neural Network<span></span></a>
+<ul>
+<li class="chapter" data-level="12.3.1" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#convolution-layer"><i class="fa fa-check"></i><b>12.3.1</b> Convolution Layer<span></span></a></li>
+<li class="chapter" data-level="12.3.2" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#padding-layer"><i class="fa fa-check"></i><b>12.3.2</b> Padding Layer<span></span></a></li>
+<li class="chapter" data-level="12.3.3" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#pooling-layer"><i class="fa fa-check"></i><b>12.3.3</b> Pooling Layer<span></span></a></li>
+<li class="chapter" data-level="12.3.4" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#convolution-over-volume"><i class="fa fa-check"></i><b>12.3.4</b> Convolution Over Volume<span></span></a></li>
+<li class="chapter" data-level="12.3.5" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#cnnexample"><i class="fa fa-check"></i><b>12.3.5</b> Image Recognition Using CNN<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="12.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html"><i class="fa fa-check"></i><b>12.4</b> Recurrent Neural Network<span></span></a>
+<ul>
+<li class="chapter" data-level="12.4.1" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#rnn-model"><i class="fa fa-check"></i><b>12.4.1</b> RNN Model<span></span></a></li>
+<li class="chapter" data-level="12.4.2" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#embedding"><i class="fa fa-check"></i><b>12.4.2</b> Word Embedding<span></span></a></li>
+<li class="chapter" data-level="12.4.3" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#lstm"><i class="fa fa-check"></i><b>12.4.3</b> Long Short Term Memory<span></span></a></li>
+<li class="chapter" data-level="12.4.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#rnnexample"><i class="fa fa-check"></i><b>12.4.4</b> Sentiment Analysis Using RNN<span></span></a></li>
+</ul></li>
+</ul></li>
+<li class="appendix"><span><b>Appendix<span></span></b></span></li>
+<li class="chapter" data-level="A" data-path="largelocaldata.html"><a href="largelocaldata.html"><i class="fa fa-check"></i><b>A</b> Handling Large Local Data<span></span></a>
+<ul>
+<li class="chapter" data-level="A.1" data-path="readr.html"><a href="readr.html"><i class="fa fa-check"></i><b>A.1</b> <code>readr</code><span></span></a></li>
+<li class="chapter" data-level="A.2" data-path="data.table-enhanced-data.html"><a href="data.table-enhanced-data.html"><i class="fa fa-check"></i><b>A.2</b> <code>data.table</code>— enhanced <code>data.frame</code><span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="B" data-path="r-code-for-data-simulation.html"><a href="r-code-for-data-simulation.html"><i class="fa fa-check"></i><b>B</b> R code for data simulation<span></span></a>
+<ul>
+<li class="chapter" data-level="B.1" data-path="appendixdata1.html"><a href="appendixdata1.html"><i class="fa fa-check"></i><b>B.1</b> Customer Data for Clothing Company<span></span></a></li>
+<li class="chapter" data-level="B.2" data-path="appendixdata3.html"><a href="appendixdata3.html"><i class="fa fa-check"></i><b>B.2</b> Swine Disease Breakout Data<span></span></a></li>
+</ul></li>
+<li><a href="references.html#references">References<span></span></a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
 
@@ -326,21 +389,21 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="vbtradeoff" class="section level2">
-<h2><span class="header-section-number">7.1</span> Variance-Bias Trade-Off</h2>
+<div id="vbtradeoff" class="section level2 hasAnchor" number="7.1">
+<h2><span class="header-section-number">7.1</span> Variance-Bias Trade-Off<a href="vbtradeoff.html#vbtradeoff" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Assume <span class="math inline">\(\mathbf{X}\)</span> is <span class="math inline">\(n \times p\)</span> observation matrix and <span class="math inline">\(\mathbf{y}\)</span> is response variable, we have:</p>
 <p><span class="math display" id="eq:generalmodeleq">\[\begin{equation}
 \mathbf{y}=f(\mathbf{X})+\symbf{\epsilon}
 \tag{7.1}
 \end{equation}\]</span></p>
 <p>where <span class="math inline">\(\symbf{\epsilon}\)</span> is the random error with a mean of zero. The function <span class="math inline">\(f(\cdot)\)</span> is our modeling target, which represents the information in the response variable that predictors can explain. The main goal of estimating <span class="math inline">\(f(\cdot)\)</span> is inference or prediction, or sometimes both. In general, there is a trade-off between flexibility and interpretability of the model. So data scientists need to comprehend the delicate balance between these two.</p>
-<p>Depending on the modeling purposes, the requirement for interpretability varies. If the prediction is the only goal, then as long as the prediction is accurate enough, the interpretability is not under consideration. In this case, people can use “black box” model, such as random forest, boosting tree, neural network and so on. These models are very flexible but nearly impossible to explain. Their accuracy is usually higher on the training set, but not necessary when it predicts. It is not surprising since those models have a huge number of parameters and high flexibility that they can “memorize” the entire training data. A paper by Chiyuan Zhang et al. in 2017 pointed out that “Deep neural networks (even just two-layer net) easily fit random labels” <span class="citation">(Zhang et al. <a href="#ref-rethinkDL">2017</a>)</span>. The traditional forms of regularization, such as weight decay, dropout, and data augmentation, fail to control generalization error. It poses a conceptual challenge to statistical theory and also calls our attention when we use such black-box models.</p>
+<p>Depending on the modeling purposes, the requirement for interpretability varies. If the prediction is the only goal, then as long as the prediction is accurate enough, the interpretability is not under consideration. In this case, people can use “black box” model, such as random forest, boosting tree, neural network and so on. These models are very flexible but nearly impossible to explain. Their accuracy is usually higher on the training set, but not necessary when it predicts. It is not surprising since those models have a huge number of parameters and high flexibility that they can “memorize” the entire training data. A paper by Chiyuan Zhang et al. in 2017 pointed out that “Deep neural networks (even just two-layer net) easily fit random labels” <span class="citation">(<a href="#ref-rethinkDL" role="doc-biblioref">Zhang et al. 2017</a>)</span>. The traditional forms of regularization, such as weight decay, dropout, and data augmentation, fail to control generalization error. It poses a conceptual challenge to statistical theory and also calls our attention when we use such black-box models.</p>
 <p>There are two kinds of application problems: complete information problem and incomplete information problem. The complete information problem has all the information you need to know the correct response. Take the famous cat recognition, for example, all the information you need to identify a cat is in the picture. In this situation, the algorithm that penetrates the data the most wins. There are some other similar problems such as the self-driving car, chess game, facial recognition and speech recognition. But in most of the data science applications, the information is incomplete. If you want to know whether a customer is going to purchase again or not, it is unlikely to have 360-degree of the customer’s information. You may have their historical purchasing record, discounts and service received. But you don’t know if the customer sees your advertisement, or has a friend recommends competitor’s product, or encounters some unhappy purchasing experience somewhere. There could be a myriad of factors that will influence the customer’s purchase decision while what you have as data is only a small part. To make things worse, in many cases, you don’t even know what you don’t know. Deep learning doesn’t have any advantage in solving those problems. Instead, some parametric models often work better in this situation. You will comprehend this more after learning the different types of model error.
 Assume we have <span class="math inline">\(\hat{f}\)</span> which is an estimator of <span class="math inline">\(f\)</span>. Then we can further get <span class="math inline">\(\symbf{\hat{y}}=\hat{f}(\mathbf{X})\)</span>. The predicted error is divided into two parts, systematic error, and random error:</p>
 <p><span class="math display" id="eq:error">\[\begin{equation}
 \begin{array}{ccc}
 E(\mathbf{y}-\hat{\mathbf{y}})^{2} &amp; = &amp; E[f(\mathbf{X})+ \symbf{\epsilon} - \hat{f}(\mathbf{X})]^{2}\\
- &amp; = &amp; \underset{\text{(1)}}{\underbrace{E[f(\mathbf{X})-\hat{f}(\mathbf{X})]^{2}}}+\underset{\text{(2)}}{\underbrace{Var(\symbf{\epsilon})}}
+&amp; = &amp; \underset{\text{(1)}}{\underbrace{E[f(\mathbf{X})-\hat{f}(\mathbf{X})]^{2}}}+\underset{\text{(2)}}{\underbrace{Var(\symbf{\epsilon})}}
 \end{array}
 \tag{7.2}
 \end{equation}\]</span></p>
@@ -352,35 +415,35 @@ E(\mathbf{y}-\hat{\mathbf{y}})^{2} &amp; = &amp; E[f(\mathbf{X})+ \symbf{\epsilo
 </ol>
 <p>Deep learning has significant success solving problems with complete information and usually low measurement error. As mentioned before, in a task like image recognition, all you need are the pixels in the pictures. So in deep learning applications, increasing the sample size can improve the model performance significantly. But it may not perform well in problems with incomplete information. The biggest problem with the black-box model is that it fits random error, i.e., over-fitting. The notable feature of random error is that it varies over different samples. So one way to determine whether overfitting happens is to reserve a part of the data as the test set and then check the performance of the trained model on the test data. Note that overfitting is a general problem from which any model could suffer. However, since black-box models usually have a large number of parameters, it is much more suspectable to over-fitting.</p>
 <div class="figure">
-<img src="images/ModelError.png" alt="Types of Model Error" />
+<img src="images/ModelError.png" alt="" />
 <p class="caption">Types of Model Error</p>
 </div>
 <p>The systematic error <span class="math inline">\(E[f(\mathbf{X})-\hat{f}(\mathbf{X})]^{2}\)</span> can be further decomposed as:</p>
 <p><span class="math display" id="eq:biasvariance">\[\begin{equation}
 \begin{array}{ccc}
- &amp;  &amp; \left(f(\mathbf{X})-E[\hat{f}(\mathbf{X})]+E[\hat{f}(\mathbf{X})]-\hat{f}(\mathbf{X})\right)\\
- &amp; = &amp; E\left(E[\hat{f}(\mathbf{X})]-f(\mathbf{X})\right)^{2}+E\left(\hat{f}(\mathbf{X})-E[\hat{f}(\mathbf{X})]\right)^{2}\\
- &amp; = &amp; [Bias(\hat{f}(\mathbf{X}))]^{2}+Var(\hat{f}(\mathbf{X}))
+&amp;  &amp; \left(f(\mathbf{X})-E[\hat{f}(\mathbf{X})]+E[\hat{f}(\mathbf{X})]-\hat{f}(\mathbf{X})\right)\\
+&amp; = &amp; E\left(E[\hat{f}(\mathbf{X})]-f(\mathbf{X})\right)^{2}+E\left(\hat{f}(\mathbf{X})-E[\hat{f}(\mathbf{X})]\right)^{2}\\
+&amp; = &amp; [Bias(\hat{f}(\mathbf{X}))]^{2}+Var(\hat{f}(\mathbf{X}))
 \end{array}
 \tag{7.3}
 \end{equation}\]</span></p>
 <p>The systematic error consists of two parts, <span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span> and <span class="math inline">\(Var (\hat{f}(\mathbf{X}))\)</span>. To minimize the systematic error, we need to minimize both. The bias represents the error caused by the model’s approximation of the reality, i.e., systematic relation, which may be very complex. For example, linear regression assumes a linear relationship between the predictors and the response, but rarely is there a perfect linear relationship in real life. So linear regression is more likely to have a high bias. In general, the more flexible the model is, the higher the variance. However, this does not guarantee complex models will outperform a much simpler one, such as linear regression. If the real relationship <span class="math inline">\(f\)</span> is linear, then linear regression is unbiased. It is difficult for a more flexible model to compete. Good learning method requires low variance and bias. However, it is easy to find a model with extremely low bias but high variance (by fitting a tree) or a method with low variance but high bias (by fitting a straight line). That why we call it trade-off.</p>
 <p>To explore bias and variance, let’s begin with a simple simulation. We will simulate a data with a non-linear relationship and fit different models on it. An intuitive way to show these is to compare the plots of various models.</p>
 <p>The code below simulates one predictor (<code>x</code>) and one response variable (<code>fx</code>). The relationship between <code>x</code> and <code>fx</code> is non-linear. You need to load the <code>multiplot</code> function by running <code>source('http://bit.ly/2KeEIg9')</code>. The function assembles multiple plots on a canvas.</p>
-<div class="sourceCode" id="cb144"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb144-1" data-line-number="1"><span class="kw">source</span>(<span class="st">&#39;http://bit.ly/2KeEIg9&#39;</span>)</a>
-<a class="sourceLine" id="cb144-2" data-line-number="2"><span class="co"># randomly simulate some non-linear samples</span></a>
-<a class="sourceLine" id="cb144-3" data-line-number="3">x =<span class="st"> </span><span class="kw">seq</span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="fl">0.01</span>) <span class="op">*</span><span class="st"> </span>pi</a>
-<a class="sourceLine" id="cb144-4" data-line-number="4">e =<span class="st"> </span><span class="kw">rnorm</span>(<span class="kw">length</span>(x), <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="fl">0.2</span>)</a>
-<a class="sourceLine" id="cb144-5" data-line-number="5">fx &lt;-<span class="st"> </span><span class="kw">sin</span>(x) <span class="op">+</span><span class="st"> </span>e <span class="op">+</span><span class="st"> </span><span class="kw">sqrt</span>(x)</a>
-<a class="sourceLine" id="cb144-6" data-line-number="6">dat =<span class="st"> </span><span class="kw">data.frame</span>(x, fx)</a></code></pre></div>
+<div class="sourceCode" id="cb143"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb143-1"><a href="vbtradeoff.html#cb143-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&#39;http://bit.ly/2KeEIg9&#39;</span>)</span>
+<span id="cb143-2"><a href="vbtradeoff.html#cb143-2" aria-hidden="true" tabindex="-1"></a><span class="co"># randomly simulate some non-linear samples</span></span>
+<span id="cb143-3"><a href="vbtradeoff.html#cb143-3" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="fl">0.01</span>) <span class="sc">*</span> pi</span>
+<span id="cb143-4"><a href="vbtradeoff.html#cb143-4" aria-hidden="true" tabindex="-1"></a>e <span class="ot">=</span> <span class="fu">rnorm</span>(<span class="fu">length</span>(x), <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="fl">0.2</span>)</span>
+<span id="cb143-5"><a href="vbtradeoff.html#cb143-5" aria-hidden="true" tabindex="-1"></a>fx <span class="ot">&lt;-</span> <span class="fu">sin</span>(x) <span class="sc">+</span> e <span class="sc">+</span> <span class="fu">sqrt</span>(x)</span>
+<span id="cb143-6"><a href="vbtradeoff.html#cb143-6" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">=</span> <span class="fu">data.frame</span>(x, fx)</span></code></pre></div>
 <p>Then fit a simple linear regression on these data:</p>
-<div class="sourceCode" id="cb145"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb145-1" data-line-number="1"><span class="co"># plot fitting result</span></a>
-<a class="sourceLine" id="cb145-2" data-line-number="2"><span class="kw">library</span>(ggplot2)</a>
-<a class="sourceLine" id="cb145-3" data-line-number="3"><span class="kw">ggplot</span>(dat, <span class="kw">aes</span>(x, fx)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb145-4" data-line-number="4"><span class="st">    </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb145-5" data-line-number="5"><span class="st">    </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb144"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb144-1"><a href="vbtradeoff.html#cb144-1" aria-hidden="true" tabindex="-1"></a><span class="co"># plot fitting result</span></span>
+<span id="cb144-2"><a href="vbtradeoff.html#cb144-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb144-3"><a href="vbtradeoff.html#cb144-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dat, <span class="fu">aes</span>(x, fx)) <span class="sc">+</span> </span>
+<span id="cb144-4"><a href="vbtradeoff.html#cb144-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb144-5"><a href="vbtradeoff.html#cb144-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">se =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
-<div class="figure" style="text-align: center"><span id="fig:linearbias"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:linearbias"></span>
 <img src="IDS_files/figure-html/linearbias-1.svg" alt="High bias model" width="80%" />
 <p class="caption">
 FIGURE 7.1: High bias model
@@ -389,71 +452,71 @@ FIGURE 7.1: High bias model
 <p>Despite a large sample size, trained linear regression cannot describe the relationship very well. In other words, in this case, the model has a high bias (Fig. <a href="vbtradeoff.html#fig:linearbias">7.1</a>). People also call it underfitting.</p>
 <p>Since the estimated parameters will be somewhat different for different samples, there is the variance of estimates. Intuitively, it gives you some sense that if we fit the same model with different samples (presumably, they are from the same population), how much will the estimates change. Ideally, the change is trivial. For high variance models, small changes in the training data result in very different estimates. In general, a model with high flexibility also has high variance., such as the CART tree, and the initial boosting method. To overcome that problem, the Random Forest and Gradient Boosting Model aim to reduce the variance by summarizing the results obtained from different samples.</p>
 <p>Let’s fit the above data using a smoothing method which is highly flexible and can fit the current data tightly:</p>
-<div class="sourceCode" id="cb147"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb147-1" data-line-number="1"><span class="kw">ggplot</span>(dat, <span class="kw">aes</span>(x, fx)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>)</a></code></pre></div>
-<div class="figure" style="text-align: center"><span id="fig:linearvar"></span>
+<div class="sourceCode" id="cb146"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb146-1"><a href="vbtradeoff.html#cb146-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dat, <span class="fu">aes</span>(x, fx)) <span class="sc">+</span> <span class="fu">geom_smooth</span>(<span class="at">span =</span> <span class="fl">0.03</span>)</span></code></pre></div>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:linearvar"></span>
 <img src="IDS_files/figure-html/linearvar-1.svg" alt="High variance model" width="80%" />
 <p class="caption">
 FIGURE 7.2: High variance model
 </p>
 </div>
 <p>The resulting plot (Fig. <a href="vbtradeoff.html#fig:linearvar">7.2</a>) indicates the smoothing method fit the data much better and it has a much smaller bias. However, this method has a high variance. If we simulate different subsets of the sample, the result curve will change significantly:</p>
-<div class="sourceCode" id="cb148"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb148-1" data-line-number="1"><span class="co"># set random seed</span></a>
-<a class="sourceLine" id="cb148-2" data-line-number="2"><span class="kw">set.seed</span>(<span class="dv">2016</span>)</a>
-<a class="sourceLine" id="cb148-3" data-line-number="3"><span class="co"># sample part of the data to fit model sample 1</span></a>
-<a class="sourceLine" id="cb148-4" data-line-number="4">idx1 =<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(x), <span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb148-5" data-line-number="5">dat1 =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x1 =</span> x[idx1], <span class="dt">fx1 =</span> fx[idx1])</a>
-<a class="sourceLine" id="cb148-6" data-line-number="6">p1 =<span class="st"> </span><span class="kw">ggplot</span>(dat1, <span class="kw">aes</span>(x1, fx1)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb148-7" data-line-number="7"><span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb148-8" data-line-number="8"><span class="st">  </span><span class="kw">geom_point</span>()</a>
-<a class="sourceLine" id="cb148-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb148-10" data-line-number="10"><span class="co"># sample 2</span></a>
-<a class="sourceLine" id="cb148-11" data-line-number="11">idx2 =<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(x), <span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb148-12" data-line-number="12">dat2 =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x2 =</span> x[idx2], <span class="dt">fx2 =</span> fx[idx2])</a>
-<a class="sourceLine" id="cb148-13" data-line-number="13">p2 =<span class="st"> </span><span class="kw">ggplot</span>(dat2, <span class="kw">aes</span>(x2, fx2)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb148-14" data-line-number="14"><span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb148-15" data-line-number="15"><span class="st">  </span><span class="kw">geom_point</span>()</a>
-<a class="sourceLine" id="cb148-16" data-line-number="16"></a>
-<a class="sourceLine" id="cb148-17" data-line-number="17"><span class="co"># sample 3</span></a>
-<a class="sourceLine" id="cb148-18" data-line-number="18">idx3 =<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(x), <span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb148-19" data-line-number="19">dat3 =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x3 =</span> x[idx3], <span class="dt">fx3 =</span> fx[idx3])</a>
-<a class="sourceLine" id="cb148-20" data-line-number="20">p3 =<span class="st"> </span><span class="kw">ggplot</span>(dat3, <span class="kw">aes</span>(x3, fx3)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb148-21" data-line-number="21"><span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb148-22" data-line-number="22"><span class="st">  </span><span class="kw">geom_point</span>()</a>
-<a class="sourceLine" id="cb148-23" data-line-number="23"></a>
-<a class="sourceLine" id="cb148-24" data-line-number="24"><span class="co"># sample 4</span></a>
-<a class="sourceLine" id="cb148-25" data-line-number="25">idx4 =<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(x), <span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb148-26" data-line-number="26">dat4 =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x4 =</span> x[idx4], <span class="dt">fx4 =</span> fx[idx4])</a>
-<a class="sourceLine" id="cb148-27" data-line-number="27">p4 =<span class="st"> </span><span class="kw">ggplot</span>(dat4, <span class="kw">aes</span>(x4, fx4)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb148-28" data-line-number="28"><span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">span =</span> <span class="fl">0.03</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb148-29" data-line-number="29"><span class="st">  </span><span class="kw">geom_point</span>()</a>
-<a class="sourceLine" id="cb148-30" data-line-number="30"></a>
-<a class="sourceLine" id="cb148-31" data-line-number="31"><span class="kw">multiplot</span>(p1, p2, p3, p4, <span class="dt">cols =</span> <span class="dv">2</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb147"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb147-1"><a href="vbtradeoff.html#cb147-1" aria-hidden="true" tabindex="-1"></a><span class="co"># set random seed</span></span>
+<span id="cb147-2"><a href="vbtradeoff.html#cb147-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2016</span>)</span>
+<span id="cb147-3"><a href="vbtradeoff.html#cb147-3" aria-hidden="true" tabindex="-1"></a><span class="co"># sample part of the data to fit model sample 1</span></span>
+<span id="cb147-4"><a href="vbtradeoff.html#cb147-4" aria-hidden="true" tabindex="-1"></a>idx1 <span class="ot">=</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(x), <span class="dv">100</span>)</span>
+<span id="cb147-5"><a href="vbtradeoff.html#cb147-5" aria-hidden="true" tabindex="-1"></a>dat1 <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">x1 =</span> x[idx1], <span class="at">fx1 =</span> fx[idx1])</span>
+<span id="cb147-6"><a href="vbtradeoff.html#cb147-6" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">=</span> <span class="fu">ggplot</span>(dat1, <span class="fu">aes</span>(x1, fx1)) <span class="sc">+</span> </span>
+<span id="cb147-7"><a href="vbtradeoff.html#cb147-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">span =</span> <span class="fl">0.03</span>) <span class="sc">+</span> </span>
+<span id="cb147-8"><a href="vbtradeoff.html#cb147-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
+<span id="cb147-9"><a href="vbtradeoff.html#cb147-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb147-10"><a href="vbtradeoff.html#cb147-10" aria-hidden="true" tabindex="-1"></a><span class="co"># sample 2</span></span>
+<span id="cb147-11"><a href="vbtradeoff.html#cb147-11" aria-hidden="true" tabindex="-1"></a>idx2 <span class="ot">=</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(x), <span class="dv">100</span>)</span>
+<span id="cb147-12"><a href="vbtradeoff.html#cb147-12" aria-hidden="true" tabindex="-1"></a>dat2 <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">x2 =</span> x[idx2], <span class="at">fx2 =</span> fx[idx2])</span>
+<span id="cb147-13"><a href="vbtradeoff.html#cb147-13" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">=</span> <span class="fu">ggplot</span>(dat2, <span class="fu">aes</span>(x2, fx2)) <span class="sc">+</span> </span>
+<span id="cb147-14"><a href="vbtradeoff.html#cb147-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">span =</span> <span class="fl">0.03</span>) <span class="sc">+</span> </span>
+<span id="cb147-15"><a href="vbtradeoff.html#cb147-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
+<span id="cb147-16"><a href="vbtradeoff.html#cb147-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb147-17"><a href="vbtradeoff.html#cb147-17" aria-hidden="true" tabindex="-1"></a><span class="co"># sample 3</span></span>
+<span id="cb147-18"><a href="vbtradeoff.html#cb147-18" aria-hidden="true" tabindex="-1"></a>idx3 <span class="ot">=</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(x), <span class="dv">100</span>)</span>
+<span id="cb147-19"><a href="vbtradeoff.html#cb147-19" aria-hidden="true" tabindex="-1"></a>dat3 <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">x3 =</span> x[idx3], <span class="at">fx3 =</span> fx[idx3])</span>
+<span id="cb147-20"><a href="vbtradeoff.html#cb147-20" aria-hidden="true" tabindex="-1"></a>p3 <span class="ot">=</span> <span class="fu">ggplot</span>(dat3, <span class="fu">aes</span>(x3, fx3)) <span class="sc">+</span> </span>
+<span id="cb147-21"><a href="vbtradeoff.html#cb147-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">span =</span> <span class="fl">0.03</span>) <span class="sc">+</span> </span>
+<span id="cb147-22"><a href="vbtradeoff.html#cb147-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
+<span id="cb147-23"><a href="vbtradeoff.html#cb147-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb147-24"><a href="vbtradeoff.html#cb147-24" aria-hidden="true" tabindex="-1"></a><span class="co"># sample 4</span></span>
+<span id="cb147-25"><a href="vbtradeoff.html#cb147-25" aria-hidden="true" tabindex="-1"></a>idx4 <span class="ot">=</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(x), <span class="dv">100</span>)</span>
+<span id="cb147-26"><a href="vbtradeoff.html#cb147-26" aria-hidden="true" tabindex="-1"></a>dat4 <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">x4 =</span> x[idx4], <span class="at">fx4 =</span> fx[idx4])</span>
+<span id="cb147-27"><a href="vbtradeoff.html#cb147-27" aria-hidden="true" tabindex="-1"></a>p4 <span class="ot">=</span> <span class="fu">ggplot</span>(dat4, <span class="fu">aes</span>(x4, fx4)) <span class="sc">+</span> </span>
+<span id="cb147-28"><a href="vbtradeoff.html#cb147-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">span =</span> <span class="fl">0.03</span>) <span class="sc">+</span> </span>
+<span id="cb147-29"><a href="vbtradeoff.html#cb147-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
+<span id="cb147-30"><a href="vbtradeoff.html#cb147-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb147-31"><a href="vbtradeoff.html#cb147-31" aria-hidden="true" tabindex="-1"></a><span class="fu">multiplot</span>(p1, p2, p3, p4, <span class="at">cols =</span> <span class="dv">2</span>)</span></code></pre></div>
 <p><img src="IDS_files/figure-html/unnamed-chunk-48-1.svg" width="672" /></p>
 <p>The fitted lines (blue) change over different samples which means it has high variance. People also call it overfitting. Fitting the linear model using the same four subsets, the result barely changes:</p>
-<div class="sourceCode" id="cb149"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb149-1" data-line-number="1">p1 =<span class="st"> </span><span class="kw">ggplot</span>(dat1, <span class="kw">aes</span>(x1, fx1)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb149-2" data-line-number="2"><span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb149-3" data-line-number="3"><span class="st">  </span><span class="kw">geom_point</span>()</a>
-<a class="sourceLine" id="cb149-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb149-5" data-line-number="5">p2 =<span class="st"> </span><span class="kw">ggplot</span>(dat2, <span class="kw">aes</span>(x2, fx2)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb149-6" data-line-number="6"><span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb149-7" data-line-number="7"><span class="st">  </span><span class="kw">geom_point</span>()</a>
-<a class="sourceLine" id="cb149-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb149-9" data-line-number="9">p3 =<span class="st"> </span><span class="kw">ggplot</span>(dat3, <span class="kw">aes</span>(x3, fx3)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb149-10" data-line-number="10"><span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb149-11" data-line-number="11"><span class="st">  </span><span class="kw">geom_point</span>()</a>
-<a class="sourceLine" id="cb149-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb149-13" data-line-number="13">p4 =<span class="st"> </span><span class="kw">ggplot</span>(dat4, <span class="kw">aes</span>(x4, fx4)) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb149-14" data-line-number="14"><span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="dt">se =</span> <span class="ot">FALSE</span>) <span class="op">+</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb149-15" data-line-number="15"><span class="st">  </span><span class="kw">geom_point</span>()</a>
-<a class="sourceLine" id="cb149-16" data-line-number="16"></a>
-<a class="sourceLine" id="cb149-17" data-line-number="17"><span class="kw">multiplot</span>(p1, p2, p3, p4, <span class="dt">cols =</span> <span class="dv">2</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb148"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb148-1"><a href="vbtradeoff.html#cb148-1" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">=</span> <span class="fu">ggplot</span>(dat1, <span class="fu">aes</span>(x1, fx1)) <span class="sc">+</span> </span>
+<span id="cb148-2"><a href="vbtradeoff.html#cb148-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">se =</span> <span class="cn">FALSE</span>) <span class="sc">+</span> </span>
+<span id="cb148-3"><a href="vbtradeoff.html#cb148-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
+<span id="cb148-4"><a href="vbtradeoff.html#cb148-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb148-5"><a href="vbtradeoff.html#cb148-5" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">=</span> <span class="fu">ggplot</span>(dat2, <span class="fu">aes</span>(x2, fx2)) <span class="sc">+</span> </span>
+<span id="cb148-6"><a href="vbtradeoff.html#cb148-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">se =</span> <span class="cn">FALSE</span>) <span class="sc">+</span> </span>
+<span id="cb148-7"><a href="vbtradeoff.html#cb148-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
+<span id="cb148-8"><a href="vbtradeoff.html#cb148-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb148-9"><a href="vbtradeoff.html#cb148-9" aria-hidden="true" tabindex="-1"></a>p3 <span class="ot">=</span> <span class="fu">ggplot</span>(dat3, <span class="fu">aes</span>(x3, fx3)) <span class="sc">+</span> </span>
+<span id="cb148-10"><a href="vbtradeoff.html#cb148-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">se =</span> <span class="cn">FALSE</span>) <span class="sc">+</span> </span>
+<span id="cb148-11"><a href="vbtradeoff.html#cb148-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
+<span id="cb148-12"><a href="vbtradeoff.html#cb148-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb148-13"><a href="vbtradeoff.html#cb148-13" aria-hidden="true" tabindex="-1"></a>p4 <span class="ot">=</span> <span class="fu">ggplot</span>(dat4, <span class="fu">aes</span>(x4, fx4)) <span class="sc">+</span> </span>
+<span id="cb148-14"><a href="vbtradeoff.html#cb148-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">se =</span> <span class="cn">FALSE</span>) <span class="sc">+</span> </span>
+<span id="cb148-15"><a href="vbtradeoff.html#cb148-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
+<span id="cb148-16"><a href="vbtradeoff.html#cb148-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb148-17"><a href="vbtradeoff.html#cb148-17" aria-hidden="true" tabindex="-1"></a><span class="fu">multiplot</span>(p1, p2, p3, p4, <span class="at">cols =</span> <span class="dv">2</span>)</span></code></pre></div>
 <p><img src="IDS_files/figure-html/unnamed-chunk-49-1.svg" width="672" /></p>
 <p>In general, the variance (<span class="math inline">\(Var(\hat{f}(\mathbf{X}))\)</span>) <strong>increases</strong> and the bias (<span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span>) <strong>decreases</strong> as the model flexibility increases. Variance and bias together determine the systematic error. As we increase the flexibility of the model, at first the rate at which <span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span> decreases is faster than <span class="math inline">\(Var (\hat{f} (\mathbf{X}))\)</span>, so the MSE decreases. However, to some degree, higher flexibility has little effect on <span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span> but <span class="math inline">\(Var(\hat{f} (\mathbf{X}))\)</span> increases significantly, so the MSE increases.</p>
 </div>
-<h3>References</h3>
-<div id="refs" class="references">
-<div id="ref-rethinkDL">
-<p>Zhang, Chiyuan, Samy Bengio, Moritz Hardt, Benjamin Recht, and Oriol Vinyals. 2017. “Understanding Deep Learning Requires Rethinking Generalization.” <em>arXiv :1611.03530</em>.</p>
+<h3>References<a href="references.html#references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-rethinkDL" class="csl-entry">
+Zhang, Chiyuan, Samy Bengio, Moritz Hardt, Benjamin Recht, and Oriol Vinyals. 2017. <span>“Understanding Deep Learning Requires Rethinking Generalization.”</span> <em>arXiv :1611.03530</em>.
 </div>
 </div>
             </section>
@@ -466,7 +529,6 @@ FIGURE 7.2: High variance model
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
-<script src="libs/gitbook/js/lunr.js"></script>
 <script src="libs/gitbook/js/clipboard.min.js"></script>
 <script src="libs/gitbook/js/plugin-search.js"></script>
 <script src="libs/gitbook/js/plugin-sharing.js"></script>
@@ -485,6 +547,7 @@ gitbook.start({
 "weibo": false,
 "instapaper": false,
 "vk": false,
+"whatsapp": false,
 "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": {
@@ -505,6 +568,10 @@ gitbook.start({
 "text": null
 },
 "download": ["IDS.pdf", "IDS.epub", "IDS.mobi"],
+"search": {
+"engine": "fuse",
+"options": null
+},
 "toc": {
 "collapse": "section",
 "scroll_highlight": true

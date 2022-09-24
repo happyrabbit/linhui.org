@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>B.1 Customer Data for Clothing Company | Introduction to Data Science</title>
   <meta name="description" content="B.1 Customer Data for Clothing Company | Introduction to Data Science" />
-  <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
   <meta property="og:title" content="B.1 Customer Data for Clothing Company | Introduction to Data Science" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2021-05-25" />
+<meta name="date" content="2022-09-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +33,9 @@
   
 <link rel="prev" href="r-code-for-data-simulation.html"/>
 <link rel="next" href="appendixdata3.html"/>
-<script src="libs/jquery/jquery.min.js"></script>
+<script src="libs/header-attrs/header-attrs.js"></script>
+<script src="libs/jquery/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
@@ -49,29 +51,33 @@
 
 
 
-
+<link href="libs/anchor-sections/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections/anchor-sections.js"></script>
 
 
 <style type="text/css">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -80,9 +86,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -115,6 +121,29 @@ code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
 <link rel="stylesheet" href="css/style.css" type="text/css" />
 </head>
 
@@ -131,181 +160,215 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="http://scientistcafe.com">Homepage</a></li>
 
 <li class="divider"></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a><ul>
-<li class="chapter" data-level="" data-path="goal-of-the-book.html"><a href="goal-of-the-book.html"><i class="fa fa-check"></i>Goal of the Book</a></li>
-<li class="chapter" data-level="" data-path="what-this-book-covers.html"><a href="what-this-book-covers.html"><i class="fa fa-check"></i>What This Book Covers</a></li>
-<li class="chapter" data-level="" data-path="who-this-book-is-for.html"><a href="who-this-book-is-for.html"><i class="fa fa-check"></i>Who This Book Is For</a></li>
-<li class="chapter" data-level="" data-path="how-to-use-this-book.html"><a href="how-to-use-this-book.html"><i class="fa fa-check"></i>How to Use This Book</a><ul>
-<li class="chapter" data-level="" data-path="how-to-use-this-book.html"><a href="how-to-use-this-book.html#what-the-book-assumes"><i class="fa fa-check"></i>What the book assumes</a></li>
-<li class="chapter" data-level="" data-path="how-to-use-this-book.html"><a href="how-to-use-this-book.html#how-to-run-r-and-python-code"><i class="fa fa-check"></i>How to run R and Python code</a></li>
+<li><a href="index.html#preface">Preface<span></span></a>
+<ul>
+<li><a href="goal-of-the-book.html#goal-of-the-book">Goal of the Book<span></span></a></li>
+<li><a href="what-this-book-covers.html#what-this-book-covers">What This Book Covers<span></span></a></li>
+<li><a href="who-this-book-is-for.html#who-this-book-is-for">Who This Book Is For<span></span></a></li>
+<li><a href="how-to-use-this-book.html#how-to-use-this-book">How to Use This Book<span></span></a>
+<ul>
+<li><a href="how-to-use-this-book.html#what-the-book-assumes">What the book assumes<span></span></a></li>
+<li><a href="how-to-use-this-book.html#how-to-run-r-and-python-code">How to run R and Python code<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="" data-path="complementary-reading.html"><a href="complementary-reading.html"><i class="fa fa-check"></i>Complementary Reading</a></li>
-<li class="chapter" data-level="" data-path="acknowledgements.html"><a href="acknowledgements.html"><i class="fa fa-check"></i>Acknowledgements</a></li>
+<li><a href="complementary-reading.html#complementary-reading">Complementary Reading<span></span></a></li>
+<li><a href="acknowledgements.html#acknowledgements">Acknowledgements<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="" data-path="about-the-authors.html"><a href="about-the-authors.html"><i class="fa fa-check"></i>About the Authors</a></li>
-<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a><ul>
-<li class="chapter" data-level="1.1" data-path="a-brief-history-of-data-science.html"><a href="a-brief-history-of-data-science.html"><i class="fa fa-check"></i><b>1.1</b> A brief history of data science</a></li>
-<li class="chapter" data-level="1.2" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html"><i class="fa fa-check"></i><b>1.2</b> Data science role and skill tracks</a><ul>
-<li class="chapter" data-level="1.2.1" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#engineering"><i class="fa fa-check"></i><b>1.2.1</b> Engineering</a></li>
-<li class="chapter" data-level="1.2.2" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#analysis"><i class="fa fa-check"></i><b>1.2.2</b> Analysis</a></li>
-<li class="chapter" data-level="1.2.3" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#modeling"><i class="fa fa-check"></i><b>1.2.3</b> Modeling</a></li>
+<li><a href="about-the-authors.html#about-the-authors">About the Authors<span></span></a></li>
+<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction<span></span></a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="a-brief-history-of-data-science.html"><a href="a-brief-history-of-data-science.html"><i class="fa fa-check"></i><b>1.1</b> A brief history of data science<span></span></a></li>
+<li class="chapter" data-level="1.2" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html"><i class="fa fa-check"></i><b>1.2</b> Data science role and skill tracks<span></span></a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#engineering"><i class="fa fa-check"></i><b>1.2.1</b> Engineering<span></span></a></li>
+<li class="chapter" data-level="1.2.2" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#analysis"><i class="fa fa-check"></i><b>1.2.2</b> Analysis<span></span></a></li>
+<li class="chapter" data-level="1.2.3" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#modeling"><i class="fa fa-check"></i><b>1.2.3</b> Modeling<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="1.3" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html"><i class="fa fa-check"></i><b>1.3</b> What kind of questions can data science solve?</a><ul>
-<li class="chapter" data-level="1.3.1" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html#prerequisites"><i class="fa fa-check"></i><b>1.3.1</b> Prerequisites</a></li>
-<li class="chapter" data-level="1.3.2" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html#problem-type"><i class="fa fa-check"></i><b>1.3.2</b> Problem type</a></li>
+<li class="chapter" data-level="1.3" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html"><i class="fa fa-check"></i><b>1.3</b> What kind of questions can data science solve?<span></span></a>
+<ul>
+<li class="chapter" data-level="1.3.1" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html#prerequisites"><i class="fa fa-check"></i><b>1.3.1</b> Prerequisites<span></span></a></li>
+<li class="chapter" data-level="1.3.2" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html#problem-type"><i class="fa fa-check"></i><b>1.3.2</b> Problem type<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="1.4" data-path="structure-data-science-team.html"><a href="structure-data-science-team.html"><i class="fa fa-check"></i><b>1.4</b> Structure data science team</a></li>
-<li class="chapter" data-level="1.5" data-path="list-of-potential-data-science-careers.html"><a href="list-of-potential-data-science-careers.html"><i class="fa fa-check"></i><b>1.5</b> List of potential data science careers</a></li>
+<li class="chapter" data-level="1.4" data-path="structure-data-science-team.html"><a href="structure-data-science-team.html"><i class="fa fa-check"></i><b>1.4</b> Structure data science team<span></span></a></li>
+<li class="chapter" data-level="1.5" data-path="list-of-potential-data-science-careers.html"><a href="list-of-potential-data-science-careers.html"><i class="fa fa-check"></i><b>1.5</b> List of potential data science careers<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="2" data-path="soft-skills-for-data-scientists.html"><a href="soft-skills-for-data-scientists.html"><i class="fa fa-check"></i><b>2</b> Soft Skills for Data Scientists</a><ul>
-<li class="chapter" data-level="2.1" data-path="comparison-between-statistician-and-data-scientist.html"><a href="comparison-between-statistician-and-data-scientist.html"><i class="fa fa-check"></i><b>2.1</b> Comparison between Statistician and Data Scientist</a></li>
-<li class="chapter" data-level="2.2" data-path="beyond-data-and-analytics.html"><a href="beyond-data-and-analytics.html"><i class="fa fa-check"></i><b>2.2</b> Beyond Data and Analytics</a></li>
-<li class="chapter" data-level="2.3" data-path="three-pillars-of-knowledge.html"><a href="three-pillars-of-knowledge.html"><i class="fa fa-check"></i><b>2.3</b> Three Pillars of Knowledge</a></li>
-<li class="chapter" data-level="2.4" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html"><i class="fa fa-check"></i><b>2.4</b> Data Science Project Cycle</a><ul>
-<li class="chapter" data-level="2.4.1" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#types-of-data-science-projects"><i class="fa fa-check"></i><b>2.4.1</b> Types of Data Science Projects</a></li>
-<li class="chapter" data-level="2.4.2" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#problem-formulation-and-project-planning-stage"><i class="fa fa-check"></i><b>2.4.2</b> Problem Formulation and Project Planning Stage</a></li>
-<li class="chapter" data-level="2.4.3" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#project-modeling-stage"><i class="fa fa-check"></i><b>2.4.3</b> Project Modeling Stage</a></li>
-<li class="chapter" data-level="2.4.4" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#model-implementation-and-post-production-stage"><i class="fa fa-check"></i><b>2.4.4</b> Model Implementation and Post Production Stage</a></li>
-<li class="chapter" data-level="2.4.5" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#project-cycle-summary"><i class="fa fa-check"></i><b>2.4.5</b> Project Cycle Summary</a></li>
+<li class="chapter" data-level="2" data-path="soft-skills-for-data-scientists.html"><a href="soft-skills-for-data-scientists.html"><i class="fa fa-check"></i><b>2</b> Soft Skills for Data Scientists<span></span></a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="comparison-between-statistician-and-data-scientist.html"><a href="comparison-between-statistician-and-data-scientist.html"><i class="fa fa-check"></i><b>2.1</b> Comparison between Statistician and Data Scientist<span></span></a></li>
+<li class="chapter" data-level="2.2" data-path="beyond-data-and-analytics.html"><a href="beyond-data-and-analytics.html"><i class="fa fa-check"></i><b>2.2</b> Beyond Data and Analytics<span></span></a></li>
+<li class="chapter" data-level="2.3" data-path="three-pillars-of-knowledge.html"><a href="three-pillars-of-knowledge.html"><i class="fa fa-check"></i><b>2.3</b> Three Pillars of Knowledge<span></span></a></li>
+<li class="chapter" data-level="2.4" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html"><i class="fa fa-check"></i><b>2.4</b> Data Science Project Cycle<span></span></a>
+<ul>
+<li class="chapter" data-level="2.4.1" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#types-of-data-science-projects"><i class="fa fa-check"></i><b>2.4.1</b> Types of Data Science Projects<span></span></a></li>
+<li class="chapter" data-level="2.4.2" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#problem-formulation-and-project-planning-stage"><i class="fa fa-check"></i><b>2.4.2</b> Problem Formulation and Project Planning Stage<span></span></a></li>
+<li class="chapter" data-level="2.4.3" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#project-modeling-stage"><i class="fa fa-check"></i><b>2.4.3</b> Project Modeling Stage<span></span></a></li>
+<li class="chapter" data-level="2.4.4" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#model-implementation-and-post-production-stage"><i class="fa fa-check"></i><b>2.4.4</b> Model Implementation and Post Production Stage<span></span></a></li>
+<li class="chapter" data-level="2.4.5" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#project-cycle-summary"><i class="fa fa-check"></i><b>2.4.5</b> Project Cycle Summary<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="2.5" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html"><i class="fa fa-check"></i><b>2.5</b> Common Mistakes in Data Science</a><ul>
-<li class="chapter" data-level="2.5.1" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#problem-formulation-stage"><i class="fa fa-check"></i><b>2.5.1</b> Problem Formulation Stage</a></li>
-<li class="chapter" data-level="2.5.2" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#project-planning-stage"><i class="fa fa-check"></i><b>2.5.2</b> Project Planning Stage</a></li>
-<li class="chapter" data-level="2.5.3" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#project-modeling-stage-1"><i class="fa fa-check"></i><b>2.5.3</b> Project Modeling Stage</a></li>
-<li class="chapter" data-level="2.5.4" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#model-implementation-and-post-production-stage-1"><i class="fa fa-check"></i><b>2.5.4</b> Model Implementation and Post Production Stage</a></li>
-<li class="chapter" data-level="2.5.5" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#summary-of-common-mistakes"><i class="fa fa-check"></i><b>2.5.5</b> Summary of Common Mistakes</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="3" data-path="introduction-to-the-data.html"><a href="introduction-to-the-data.html"><i class="fa fa-check"></i><b>3</b> Introduction to The Data</a><ul>
-<li class="chapter" data-level="3.1" data-path="customer-data-for-a-clothing-company.html"><a href="customer-data-for-a-clothing-company.html"><i class="fa fa-check"></i><b>3.1</b> Customer Data for A Clothing Company</a></li>
-<li class="chapter" data-level="3.2" data-path="swinediseasedata.html"><a href="swinediseasedata.html"><i class="fa fa-check"></i><b>3.2</b> Swine Disease Breakout Data</a></li>
-<li class="chapter" data-level="3.3" data-path="mnist-dataset.html"><a href="mnist-dataset.html"><i class="fa fa-check"></i><b>3.3</b> MNIST Dataset</a></li>
-<li class="chapter" data-level="3.4" data-path="imdb-dataset.html"><a href="imdb-dataset.html"><i class="fa fa-check"></i><b>3.4</b> IMDB Dataset</a></li>
-</ul></li>
-<li class="chapter" data-level="4" data-path="bigdatacloudplatform.html"><a href="bigdatacloudplatform.html"><i class="fa fa-check"></i><b>4</b> Big Data Cloud Platform</a><ul>
-<li class="chapter" data-level="4.1" data-path="power-of-cluster-of-computers.html"><a href="power-of-cluster-of-computers.html"><i class="fa fa-check"></i><b>4.1</b> Power of Cluster of Computers</a></li>
-<li class="chapter" data-level="4.2" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html"><i class="fa fa-check"></i><b>4.2</b> Evolution of Cluster Computing</a><ul>
-<li class="chapter" data-level="4.2.1" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html#hadoop"><i class="fa fa-check"></i><b>4.2.1</b> Hadoop</a></li>
-<li class="chapter" data-level="4.2.2" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html#spark"><i class="fa fa-check"></i><b>4.2.2</b> Spark</a></li>
-</ul></li>
-<li class="chapter" data-level="4.3" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html"><i class="fa fa-check"></i><b>4.3</b> Introduction of Cloud Environment</a><ul>
-<li class="chapter" data-level="4.3.1" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#open-account-and-create-a-cluster"><i class="fa fa-check"></i><b>4.3.1</b> Open Account and Create a Cluster</a></li>
-<li class="chapter" data-level="4.3.2" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#r-notebook"><i class="fa fa-check"></i><b>4.3.2</b> R Notebook</a></li>
-<li class="chapter" data-level="4.3.3" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#markdown-cells"><i class="fa fa-check"></i><b>4.3.3</b> Markdown Cells</a></li>
-</ul></li>
-<li class="chapter" data-level="4.4" data-path="leveragesparkr.html"><a href="leveragesparkr.html"><i class="fa fa-check"></i><b>4.4</b> Leverage Spark Using R Notebook</a></li>
-<li class="chapter" data-level="4.5" data-path="databases-and-sql.html"><a href="databases-and-sql.html"><i class="fa fa-check"></i><b>4.5</b> Databases and SQL</a><ul>
-<li class="chapter" data-level="4.5.1" data-path="databases-and-sql.html"><a href="databases-and-sql.html#history"><i class="fa fa-check"></i><b>4.5.1</b> History</a></li>
-<li class="chapter" data-level="4.5.2" data-path="databases-and-sql.html"><a href="databases-and-sql.html#database-table-and-view"><i class="fa fa-check"></i><b>4.5.2</b> Database, Table and View</a></li>
-<li class="chapter" data-level="4.5.3" data-path="databases-and-sql.html"><a href="databases-and-sql.html#basic-sql-statement"><i class="fa fa-check"></i><b>4.5.3</b> Basic SQL Statement</a></li>
-<li class="chapter" data-level="4.5.4" data-path="databases-and-sql.html"><a href="databases-and-sql.html#advanced-topics-in-database"><i class="fa fa-check"></i><b>4.5.4</b> Advanced Topics in Database</a></li>
+<li class="chapter" data-level="2.5" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html"><i class="fa fa-check"></i><b>2.5</b> Common Mistakes in Data Science<span></span></a>
+<ul>
+<li class="chapter" data-level="2.5.1" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#problem-formulation-stage"><i class="fa fa-check"></i><b>2.5.1</b> Problem Formulation Stage<span></span></a></li>
+<li class="chapter" data-level="2.5.2" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#project-planning-stage"><i class="fa fa-check"></i><b>2.5.2</b> Project Planning Stage<span></span></a></li>
+<li class="chapter" data-level="2.5.3" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#project-modeling-stage-1"><i class="fa fa-check"></i><b>2.5.3</b> Project Modeling Stage<span></span></a></li>
+<li class="chapter" data-level="2.5.4" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#model-implementation-and-post-production-stage-1"><i class="fa fa-check"></i><b>2.5.4</b> Model Implementation and Post Production Stage<span></span></a></li>
+<li class="chapter" data-level="2.5.5" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#summary-of-common-mistakes"><i class="fa fa-check"></i><b>2.5.5</b> Summary of Common Mistakes<span></span></a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="datapreprocessing.html"><a href="datapreprocessing.html"><i class="fa fa-check"></i><b>5</b> Data Pre-processing</a><ul>
-<li class="chapter" data-level="5.1" data-path="data-cleaning.html"><a href="data-cleaning.html"><i class="fa fa-check"></i><b>5.1</b> Data Cleaning</a></li>
-<li class="chapter" data-level="5.2" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>5.2</b> Missing Values</a><ul>
-<li class="chapter" data-level="5.2.1" data-path="missing-values.html"><a href="missing-values.html#impute-missing-values-with-medianmode"><i class="fa fa-check"></i><b>5.2.1</b> Impute missing values with median/mode</a></li>
-<li class="chapter" data-level="5.2.2" data-path="missing-values.html"><a href="missing-values.html#k-nearest-neighbors"><i class="fa fa-check"></i><b>5.2.2</b> K-nearest neighbors</a></li>
-<li class="chapter" data-level="5.2.3" data-path="missing-values.html"><a href="missing-values.html#bagging-tree"><i class="fa fa-check"></i><b>5.2.3</b> Bagging Tree</a></li>
+<li class="chapter" data-level="3" data-path="introduction-to-the-data.html"><a href="introduction-to-the-data.html"><i class="fa fa-check"></i><b>3</b> Introduction to The Data<span></span></a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="customer-data-for-a-clothing-company.html"><a href="customer-data-for-a-clothing-company.html"><i class="fa fa-check"></i><b>3.1</b> Customer Data for A Clothing Company<span></span></a></li>
+<li class="chapter" data-level="3.2" data-path="swinediseasedata.html"><a href="swinediseasedata.html"><i class="fa fa-check"></i><b>3.2</b> Swine Disease Breakout Data<span></span></a></li>
+<li class="chapter" data-level="3.3" data-path="mnist-dataset.html"><a href="mnist-dataset.html"><i class="fa fa-check"></i><b>3.3</b> MNIST Dataset<span></span></a></li>
+<li class="chapter" data-level="3.4" data-path="imdb-dataset.html"><a href="imdb-dataset.html"><i class="fa fa-check"></i><b>3.4</b> IMDB Dataset<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="5.3" data-path="centering-and-scaling.html"><a href="centering-and-scaling.html"><i class="fa fa-check"></i><b>5.3</b> Centering and Scaling</a></li>
-<li class="chapter" data-level="5.4" data-path="resolve-skewness.html"><a href="resolve-skewness.html"><i class="fa fa-check"></i><b>5.4</b> Resolve Skewness</a></li>
-<li class="chapter" data-level="5.5" data-path="outliers.html"><a href="outliers.html"><i class="fa fa-check"></i><b>5.5</b> Resolve Outliers</a></li>
-<li class="chapter" data-level="5.6" data-path="collinearity.html"><a href="collinearity.html"><i class="fa fa-check"></i><b>5.6</b> Collinearity</a></li>
-<li class="chapter" data-level="5.7" data-path="sparse-variables.html"><a href="sparse-variables.html"><i class="fa fa-check"></i><b>5.7</b> Sparse Variables</a></li>
-<li class="chapter" data-level="5.8" data-path="re-encode-dummy-variables.html"><a href="re-encode-dummy-variables.html"><i class="fa fa-check"></i><b>5.8</b> Re-encode Dummy Variables</a></li>
+<li class="chapter" data-level="4" data-path="bigdatacloudplatform.html"><a href="bigdatacloudplatform.html"><i class="fa fa-check"></i><b>4</b> Big Data Cloud Platform<span></span></a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="power-of-cluster-of-computers.html"><a href="power-of-cluster-of-computers.html"><i class="fa fa-check"></i><b>4.1</b> Power of Cluster of Computers<span></span></a></li>
+<li class="chapter" data-level="4.2" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html"><i class="fa fa-check"></i><b>4.2</b> Evolution of Cluster Computing<span></span></a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html#hadoop"><i class="fa fa-check"></i><b>4.2.1</b> Hadoop<span></span></a></li>
+<li class="chapter" data-level="4.2.2" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html#spark"><i class="fa fa-check"></i><b>4.2.2</b> Spark<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="6" data-path="datawrangline.html"><a href="datawrangline.html"><i class="fa fa-check"></i><b>6</b> Data Wrangling</a><ul>
-<li class="chapter" data-level="6.1" data-path="summarize-data.html"><a href="summarize-data.html"><i class="fa fa-check"></i><b>6.1</b> Summarize Data</a><ul>
-<li class="chapter" data-level="6.1.1" data-path="summarize-data.html"><a href="summarize-data.html#dplyr-package"><i class="fa fa-check"></i><b>6.1.1</b> <code>dplyr</code> package</a></li>
-<li class="chapter" data-level="6.1.2" data-path="summarize-data.html"><a href="summarize-data.html#applyfamilyinbaser"><i class="fa fa-check"></i><b>6.1.2</b> <code>apply()</code>, <code>lapply()</code> and <code>sapply()</code> in base R</a></li>
+<li class="chapter" data-level="4.3" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html"><i class="fa fa-check"></i><b>4.3</b> Introduction of Cloud Environment<span></span></a>
+<ul>
+<li class="chapter" data-level="4.3.1" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#open-account-and-create-a-cluster"><i class="fa fa-check"></i><b>4.3.1</b> Open Account and Create a Cluster<span></span></a></li>
+<li class="chapter" data-level="4.3.2" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#r-notebook"><i class="fa fa-check"></i><b>4.3.2</b> R Notebook<span></span></a></li>
+<li class="chapter" data-level="4.3.3" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#markdown-cells"><i class="fa fa-check"></i><b>4.3.3</b> Markdown Cells<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="6.2" data-path="tidy-and-reshape-data.html"><a href="tidy-and-reshape-data.html"><i class="fa fa-check"></i><b>6.2</b> Tidy and Reshape Data</a></li>
-</ul></li>
-<li class="chapter" data-level="7" data-path="modeltuningstrategy.html"><a href="modeltuningstrategy.html"><i class="fa fa-check"></i><b>7</b> Model Tuning Strategy</a><ul>
-<li class="chapter" data-level="7.1" data-path="vbtradeoff.html"><a href="vbtradeoff.html"><i class="fa fa-check"></i><b>7.1</b> Variance-Bias Trade-Off</a></li>
-<li class="chapter" data-level="7.2" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html"><i class="fa fa-check"></i><b>7.2</b> Data Splitting and Resampling</a><ul>
-<li class="chapter" data-level="7.2.1" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html#datasplitting"><i class="fa fa-check"></i><b>7.2.1</b> Data Splitting</a></li>
-<li class="chapter" data-level="7.2.2" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html#resampling"><i class="fa fa-check"></i><b>7.2.2</b> Resampling</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="8" data-path="measuring-performance.html"><a href="measuring-performance.html"><i class="fa fa-check"></i><b>8</b> Measuring Performance</a><ul>
-<li class="chapter" data-level="8.1" data-path="regression-model-performance.html"><a href="regression-model-performance.html"><i class="fa fa-check"></i><b>8.1</b> Regression Model Performance</a></li>
-<li class="chapter" data-level="8.2" data-path="classification-model-performance.html"><a href="classification-model-performance.html"><i class="fa fa-check"></i><b>8.2</b> Classification Model Performance</a><ul>
-<li class="chapter" data-level="8.2.1" data-path="classification-model-performance.html"><a href="classification-model-performance.html#confusion-matrix"><i class="fa fa-check"></i><b>8.2.1</b> Confusion Matrix</a></li>
-<li class="chapter" data-level="8.2.2" data-path="classification-model-performance.html"><a href="classification-model-performance.html#kappa-statistic"><i class="fa fa-check"></i><b>8.2.2</b> Kappa Statistic</a></li>
-<li class="chapter" data-level="8.2.3" data-path="classification-model-performance.html"><a href="classification-model-performance.html#roc"><i class="fa fa-check"></i><b>8.2.3</b> ROC</a></li>
-<li class="chapter" data-level="8.2.4" data-path="classification-model-performance.html"><a href="classification-model-performance.html#gain-and-lift-charts"><i class="fa fa-check"></i><b>8.2.4</b> Gain and Lift Charts</a></li>
+<li class="chapter" data-level="4.4" data-path="leveragesparkr.html"><a href="leveragesparkr.html"><i class="fa fa-check"></i><b>4.4</b> Leverage Spark Using R Notebook<span></span></a></li>
+<li class="chapter" data-level="4.5" data-path="databases-and-sql.html"><a href="databases-and-sql.html"><i class="fa fa-check"></i><b>4.5</b> Databases and SQL<span></span></a>
+<ul>
+<li class="chapter" data-level="4.5.1" data-path="databases-and-sql.html"><a href="databases-and-sql.html#history"><i class="fa fa-check"></i><b>4.5.1</b> History<span></span></a></li>
+<li class="chapter" data-level="4.5.2" data-path="databases-and-sql.html"><a href="databases-and-sql.html#database-table-and-view"><i class="fa fa-check"></i><b>4.5.2</b> Database, Table and View<span></span></a></li>
+<li class="chapter" data-level="4.5.3" data-path="databases-and-sql.html"><a href="databases-and-sql.html#basic-sql-statement"><i class="fa fa-check"></i><b>4.5.3</b> Basic SQL Statement<span></span></a></li>
+<li class="chapter" data-level="4.5.4" data-path="databases-and-sql.html"><a href="databases-and-sql.html#advanced-topics-in-database"><i class="fa fa-check"></i><b>4.5.4</b> Advanced Topics in Database<span></span></a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="9" data-path="regression-models.html"><a href="regression-models.html"><i class="fa fa-check"></i><b>9</b> Regression Models</a><ul>
-<li class="chapter" data-level="9.1" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html"><i class="fa fa-check"></i><b>9.1</b> Ordinary Least Square</a><ul>
-<li class="chapter" data-level="9.1.1" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html#the-magic-p-value"><i class="fa fa-check"></i><b>9.1.1</b> The Magic P-value</a></li>
-<li class="chapter" data-level="9.1.2" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html#diagnostics-for-linear-regression"><i class="fa fa-check"></i><b>9.1.2</b> Diagnostics for Linear Regression</a></li>
+<li class="chapter" data-level="5" data-path="datapreprocessing.html"><a href="datapreprocessing.html"><i class="fa fa-check"></i><b>5</b> Data Pre-processing<span></span></a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="data-cleaning.html"><a href="data-cleaning.html"><i class="fa fa-check"></i><b>5.1</b> Data Cleaning<span></span></a></li>
+<li class="chapter" data-level="5.2" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>5.2</b> Missing Values<span></span></a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="missing-values.html"><a href="missing-values.html#impute-missing-values-with-medianmode"><i class="fa fa-check"></i><b>5.2.1</b> Impute missing values with median/mode<span></span></a></li>
+<li class="chapter" data-level="5.2.2" data-path="missing-values.html"><a href="missing-values.html#k-nearest-neighbors"><i class="fa fa-check"></i><b>5.2.2</b> K-nearest neighbors<span></span></a></li>
+<li class="chapter" data-level="5.2.3" data-path="missing-values.html"><a href="missing-values.html#bagging-tree"><i class="fa fa-check"></i><b>5.2.3</b> Bagging Tree<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="9.2" data-path="principal-component-regression-and-partial-least-square.html"><a href="principal-component-regression-and-partial-least-square.html"><i class="fa fa-check"></i><b>9.2</b> Principal Component Regression and Partial Least Square</a></li>
+<li class="chapter" data-level="5.3" data-path="centering-and-scaling.html"><a href="centering-and-scaling.html"><i class="fa fa-check"></i><b>5.3</b> Centering and Scaling<span></span></a></li>
+<li class="chapter" data-level="5.4" data-path="resolve-skewness.html"><a href="resolve-skewness.html"><i class="fa fa-check"></i><b>5.4</b> Resolve Skewness<span></span></a></li>
+<li class="chapter" data-level="5.5" data-path="outliers.html"><a href="outliers.html"><i class="fa fa-check"></i><b>5.5</b> Resolve Outliers<span></span></a></li>
+<li class="chapter" data-level="5.6" data-path="collinearity.html"><a href="collinearity.html"><i class="fa fa-check"></i><b>5.6</b> Collinearity<span></span></a></li>
+<li class="chapter" data-level="5.7" data-path="sparse-variables.html"><a href="sparse-variables.html"><i class="fa fa-check"></i><b>5.7</b> Sparse Variables<span></span></a></li>
+<li class="chapter" data-level="5.8" data-path="re-encode-dummy-variables.html"><a href="re-encode-dummy-variables.html"><i class="fa fa-check"></i><b>5.8</b> Re-encode Dummy Variables<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="10" data-path="regularization-methods.html"><a href="regularization-methods.html"><i class="fa fa-check"></i><b>10</b> Regularization Methods</a><ul>
-<li class="chapter" data-level="10.1" data-path="ridge-regression.html"><a href="ridge-regression.html"><i class="fa fa-check"></i><b>10.1</b> Ridge Regression</a></li>
-<li class="chapter" data-level="10.2" data-path="lasso.html"><a href="lasso.html"><i class="fa fa-check"></i><b>10.2</b> LASSO</a></li>
-<li class="chapter" data-level="10.3" data-path="variable-selection-property-of-the-lasso.html"><a href="variable-selection-property-of-the-lasso.html"><i class="fa fa-check"></i><b>10.3</b> Variable selection property of the lasso</a></li>
-<li class="chapter" data-level="10.4" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.4</b> Elastic Net</a></li>
-<li class="chapter" data-level="10.5" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.5</b> Penalized Generalized Linear Model</a><ul>
-<li class="chapter" data-level="10.5.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.5.1</b> Introduction to <code>glmnet</code> package</a></li>
-<li class="chapter" data-level="10.5.2" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#penalized-logistic-regression"><i class="fa fa-check"></i><b>10.5.2</b> Penalized logistic regression</a></li>
+<li class="chapter" data-level="6" data-path="datawrangline.html"><a href="datawrangline.html"><i class="fa fa-check"></i><b>6</b> Data Wrangling<span></span></a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="summarize-data.html"><a href="summarize-data.html"><i class="fa fa-check"></i><b>6.1</b> Summarize Data<span></span></a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="summarize-data.html"><a href="summarize-data.html#dplyr-package"><i class="fa fa-check"></i><b>6.1.1</b> <code>dplyr</code> package<span></span></a></li>
+<li class="chapter" data-level="6.1.2" data-path="summarize-data.html"><a href="summarize-data.html#applyfamilyinbaser"><i class="fa fa-check"></i><b>6.1.2</b> <code>apply()</code>, <code>lapply()</code> and <code>sapply()</code> in base R<span></span></a></li>
 </ul></li>
+<li class="chapter" data-level="6.2" data-path="tidy-and-reshape-data.html"><a href="tidy-and-reshape-data.html"><i class="fa fa-check"></i><b>6.2</b> Tidy and Reshape Data<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="11" data-path="treemodel.html"><a href="treemodel.html"><i class="fa fa-check"></i><b>11</b> Tree-Based Methods</a><ul>
-<li class="chapter" data-level="11.1" data-path="tree-basics.html"><a href="tree-basics.html"><i class="fa fa-check"></i><b>11.1</b> Tree Basics</a></li>
-<li class="chapter" data-level="11.2" data-path="splitting-criteria.html"><a href="splitting-criteria.html"><i class="fa fa-check"></i><b>11.2</b> Splitting Criteria</a></li>
-<li class="chapter" data-level="11.3" data-path="tree-pruning.html"><a href="tree-pruning.html"><i class="fa fa-check"></i><b>11.3</b> Tree Pruning</a></li>
-<li class="chapter" data-level="11.4" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html"><i class="fa fa-check"></i><b>11.4</b> Regression and Decision Tree Basic</a><ul>
-<li class="chapter" data-level="11.4.1" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html#regression-tree"><i class="fa fa-check"></i><b>11.4.1</b> Regression Tree</a></li>
-<li class="chapter" data-level="11.4.2" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html#decision-tree"><i class="fa fa-check"></i><b>11.4.2</b> Decision Tree</a></li>
-</ul></li>
-<li class="chapter" data-level="11.5" data-path="missing-values.html"><a href="missing-values.html#bagging-tree"><i class="fa fa-check"></i><b>11.5</b> Bagging Tree</a></li>
-<li class="chapter" data-level="11.6" data-path="random-forest.html"><a href="random-forest.html"><i class="fa fa-check"></i><b>11.6</b> Random Forest</a></li>
-<li class="chapter" data-level="11.7" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html"><i class="fa fa-check"></i><b>11.7</b> Gradient Boosted Machine</a><ul>
-<li class="chapter" data-level="11.7.1" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#adaptive-boosting"><i class="fa fa-check"></i><b>11.7.1</b> Adaptive Boosting</a></li>
-<li class="chapter" data-level="11.7.2" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#stochastic-gradient-boosting"><i class="fa fa-check"></i><b>11.7.2</b> Stochastic Gradient Boosting</a></li>
-<li class="chapter" data-level="11.7.3" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#boosting-as-additive-model"><i class="fa fa-check"></i><b>11.7.3</b> Boosting as Additive Model</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="12" data-path="deeplearning.html"><a href="deeplearning.html"><i class="fa fa-check"></i><b>12</b> Deep Learning</a><ul>
-<li class="chapter" data-level="12.1" data-path="projection-pursuit-regression.html"><a href="projection-pursuit-regression.html"><i class="fa fa-check"></i><b>12.1</b> Projection Pursuit Regression</a></li>
-<li class="chapter" data-level="12.2" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html"><i class="fa fa-check"></i><b>12.2</b> Feedforward Neural Network</a><ul>
-<li class="chapter" data-level="12.2.1" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#logisticregasneuralnetwork"><i class="fa fa-check"></i><b>12.2.1</b> Logistic Regression as Neural Network</a></li>
-<li class="chapter" data-level="12.2.2" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#stochastic-gradient-descent"><i class="fa fa-check"></i><b>12.2.2</b> Stochastic Gradient Descent</a></li>
-<li class="chapter" data-level="12.2.3" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#deepneuralnetwork"><i class="fa fa-check"></i><b>12.2.3</b> Deep Neural Network</a></li>
-<li class="chapter" data-level="12.2.4" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#activationfunction"><i class="fa fa-check"></i><b>12.2.4</b> Activation Function</a></li>
-<li class="chapter" data-level="12.2.5" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#optimization"><i class="fa fa-check"></i><b>12.2.5</b> Optimization</a></li>
-<li class="chapter" data-level="12.2.6" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#deal-with-overfitting"><i class="fa fa-check"></i><b>12.2.6</b> Deal with Overfitting</a></li>
-<li class="chapter" data-level="12.2.7" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#ffnnexample"><i class="fa fa-check"></i><b>12.2.7</b> Image Recognition Using FFNN</a></li>
-</ul></li>
-<li class="chapter" data-level="12.3" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html"><i class="fa fa-check"></i><b>12.3</b> Convolutional Neural Network</a><ul>
-<li class="chapter" data-level="12.3.1" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#convolution-layer"><i class="fa fa-check"></i><b>12.3.1</b> Convolution Layer</a></li>
-<li class="chapter" data-level="12.3.2" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#padding-layer"><i class="fa fa-check"></i><b>12.3.2</b> Padding Layer</a></li>
-<li class="chapter" data-level="12.3.3" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#pooling-layer"><i class="fa fa-check"></i><b>12.3.3</b> Pooling Layer</a></li>
-<li class="chapter" data-level="12.3.4" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#convolution-over-volume"><i class="fa fa-check"></i><b>12.3.4</b> Convolution Over Volume</a></li>
-<li class="chapter" data-level="12.3.5" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#cnnexample"><i class="fa fa-check"></i><b>12.3.5</b> Image Recognition Using CNN</a></li>
-</ul></li>
-<li class="chapter" data-level="12.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html"><i class="fa fa-check"></i><b>12.4</b> Recurrent Neural Network</a><ul>
-<li class="chapter" data-level="12.4.1" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#rnn-model"><i class="fa fa-check"></i><b>12.4.1</b> RNN Model</a></li>
-<li class="chapter" data-level="12.4.2" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#embedding"><i class="fa fa-check"></i><b>12.4.2</b> Word Embedding</a></li>
-<li class="chapter" data-level="12.4.3" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#lstm"><i class="fa fa-check"></i><b>12.4.3</b> Long Short Term Memory</a></li>
-<li class="chapter" data-level="12.4.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#rnnexample"><i class="fa fa-check"></i><b>12.4.4</b> Sentiment Analysis Using RNN</a></li>
+<li class="chapter" data-level="7" data-path="modeltuningstrategy.html"><a href="modeltuningstrategy.html"><i class="fa fa-check"></i><b>7</b> Model Tuning Strategy<span></span></a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="vbtradeoff.html"><a href="vbtradeoff.html"><i class="fa fa-check"></i><b>7.1</b> Variance-Bias Trade-Off<span></span></a></li>
+<li class="chapter" data-level="7.2" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html"><i class="fa fa-check"></i><b>7.2</b> Data Splitting and Resampling<span></span></a>
+<ul>
+<li class="chapter" data-level="7.2.1" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html#datasplitting"><i class="fa fa-check"></i><b>7.2.1</b> Data Splitting<span></span></a></li>
+<li class="chapter" data-level="7.2.2" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html#resampling"><i class="fa fa-check"></i><b>7.2.2</b> Resampling<span></span></a></li>
 </ul></li>
 </ul></li>
-<li class="appendix"><span><b>Appendix</b></span></li>
-<li class="chapter" data-level="A" data-path="largelocaldata.html"><a href="largelocaldata.html"><i class="fa fa-check"></i><b>A</b> Handling Large Local Data</a><ul>
-<li class="chapter" data-level="A.1" data-path="readr.html"><a href="readr.html"><i class="fa fa-check"></i><b>A.1</b> <code>readr</code></a></li>
-<li class="chapter" data-level="A.2" data-path="data-table-enhanced-data-frame.html"><a href="data-table-enhanced-data-frame.html"><i class="fa fa-check"></i><b>A.2</b> <code>data.table</code>— enhanced <code>data.frame</code></a></li>
+<li class="chapter" data-level="8" data-path="measuring-performance.html"><a href="measuring-performance.html"><i class="fa fa-check"></i><b>8</b> Measuring Performance<span></span></a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="regression-model-performance.html"><a href="regression-model-performance.html"><i class="fa fa-check"></i><b>8.1</b> Regression Model Performance<span></span></a></li>
+<li class="chapter" data-level="8.2" data-path="classification-model-performance.html"><a href="classification-model-performance.html"><i class="fa fa-check"></i><b>8.2</b> Classification Model Performance<span></span></a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="classification-model-performance.html"><a href="classification-model-performance.html#confusion-matrix"><i class="fa fa-check"></i><b>8.2.1</b> Confusion Matrix<span></span></a></li>
+<li class="chapter" data-level="8.2.2" data-path="classification-model-performance.html"><a href="classification-model-performance.html#kappa-statistic"><i class="fa fa-check"></i><b>8.2.2</b> Kappa Statistic<span></span></a></li>
+<li class="chapter" data-level="8.2.3" data-path="classification-model-performance.html"><a href="classification-model-performance.html#roc"><i class="fa fa-check"></i><b>8.2.3</b> ROC<span></span></a></li>
+<li class="chapter" data-level="8.2.4" data-path="classification-model-performance.html"><a href="classification-model-performance.html#gain-and-lift-charts"><i class="fa fa-check"></i><b>8.2.4</b> Gain and Lift Charts<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="B" data-path="r-code-for-data-simulation.html"><a href="r-code-for-data-simulation.html"><i class="fa fa-check"></i><b>B</b> R code for data simulation</a><ul>
-<li class="chapter" data-level="B.1" data-path="appendixdata1.html"><a href="appendixdata1.html"><i class="fa fa-check"></i><b>B.1</b> Customer Data for Clothing Company</a></li>
-<li class="chapter" data-level="B.2" data-path="appendixdata3.html"><a href="appendixdata3.html"><i class="fa fa-check"></i><b>B.2</b> Swine Disease Breakout Data</a></li>
 </ul></li>
-<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="chapter" data-level="9" data-path="regression-models.html"><a href="regression-models.html"><i class="fa fa-check"></i><b>9</b> Regression Models<span></span></a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html"><i class="fa fa-check"></i><b>9.1</b> Ordinary Least Square<span></span></a>
+<ul>
+<li class="chapter" data-level="9.1.1" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html#the-magic-p-value"><i class="fa fa-check"></i><b>9.1.1</b> The Magic P-value<span></span></a></li>
+<li class="chapter" data-level="9.1.2" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html#diagnostics-for-linear-regression"><i class="fa fa-check"></i><b>9.1.2</b> Diagnostics for Linear Regression<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="principal-component-regression-and-partial-least-square.html"><a href="principal-component-regression-and-partial-least-square.html"><i class="fa fa-check"></i><b>9.2</b> Principal Component Regression and Partial Least Square<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="regularization-methods.html"><a href="regularization-methods.html"><i class="fa fa-check"></i><b>10</b> Regularization Methods<span></span></a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="ridge-regression.html"><a href="ridge-regression.html"><i class="fa fa-check"></i><b>10.1</b> Ridge Regression<span></span></a></li>
+<li class="chapter" data-level="10.2" data-path="lasso.html"><a href="lasso.html"><i class="fa fa-check"></i><b>10.2</b> LASSO<span></span></a></li>
+<li class="chapter" data-level="10.3" data-path="variable-selection-property-of-the-lasso.html"><a href="variable-selection-property-of-the-lasso.html"><i class="fa fa-check"></i><b>10.3</b> Variable selection property of the lasso<span></span></a></li>
+<li class="chapter" data-level="10.4" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.4</b> Elastic Net<span></span></a></li>
+<li class="chapter" data-level="10.5" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.5</b> Penalized Generalized Linear Model<span></span></a>
+<ul>
+<li class="chapter" data-level="10.5.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.5.1</b> Introduction to <code>glmnet</code> package<span></span></a></li>
+<li class="chapter" data-level="10.5.2" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#penalized-logistic-regression"><i class="fa fa-check"></i><b>10.5.2</b> Penalized logistic regression<span></span></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="treemodel.html"><a href="treemodel.html"><i class="fa fa-check"></i><b>11</b> Tree-Based Methods<span></span></a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="tree-basics.html"><a href="tree-basics.html"><i class="fa fa-check"></i><b>11.1</b> Tree Basics<span></span></a></li>
+<li class="chapter" data-level="11.2" data-path="splitting-criteria.html"><a href="splitting-criteria.html"><i class="fa fa-check"></i><b>11.2</b> Splitting Criteria<span></span></a></li>
+<li class="chapter" data-level="11.3" data-path="tree-pruning.html"><a href="tree-pruning.html"><i class="fa fa-check"></i><b>11.3</b> Tree Pruning<span></span></a></li>
+<li class="chapter" data-level="11.4" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html"><i class="fa fa-check"></i><b>11.4</b> Regression and Decision Tree Basic<span></span></a>
+<ul>
+<li class="chapter" data-level="11.4.1" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html#regression-tree"><i class="fa fa-check"></i><b>11.4.1</b> Regression Tree<span></span></a></li>
+<li class="chapter" data-level="11.4.2" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html#decision-tree"><i class="fa fa-check"></i><b>11.4.2</b> Decision Tree<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="11.5" data-path="bagging-tree-1.html"><a href="bagging-tree-1.html"><i class="fa fa-check"></i><b>11.5</b> Bagging Tree<span></span></a></li>
+<li class="chapter" data-level="11.6" data-path="random-forest.html"><a href="random-forest.html"><i class="fa fa-check"></i><b>11.6</b> Random Forest<span></span></a></li>
+<li class="chapter" data-level="11.7" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html"><i class="fa fa-check"></i><b>11.7</b> Gradient Boosted Machine<span></span></a>
+<ul>
+<li class="chapter" data-level="11.7.1" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#adaptive-boosting"><i class="fa fa-check"></i><b>11.7.1</b> Adaptive Boosting<span></span></a></li>
+<li class="chapter" data-level="11.7.2" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#stochastic-gradient-boosting"><i class="fa fa-check"></i><b>11.7.2</b> Stochastic Gradient Boosting<span></span></a></li>
+<li class="chapter" data-level="11.7.3" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#boosting-as-additive-model"><i class="fa fa-check"></i><b>11.7.3</b> Boosting as Additive Model<span></span></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="deeplearning.html"><a href="deeplearning.html"><i class="fa fa-check"></i><b>12</b> Deep Learning<span></span></a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="projection-pursuit-regression.html"><a href="projection-pursuit-regression.html"><i class="fa fa-check"></i><b>12.1</b> Projection Pursuit Regression<span></span></a></li>
+<li class="chapter" data-level="12.2" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html"><i class="fa fa-check"></i><b>12.2</b> Feedforward Neural Network<span></span></a>
+<ul>
+<li class="chapter" data-level="12.2.1" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#logisticregasneuralnetwork"><i class="fa fa-check"></i><b>12.2.1</b> Logistic Regression as Neural Network<span></span></a></li>
+<li class="chapter" data-level="12.2.2" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#stochastic-gradient-descent"><i class="fa fa-check"></i><b>12.2.2</b> Stochastic Gradient Descent<span></span></a></li>
+<li class="chapter" data-level="12.2.3" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#deepneuralnetwork"><i class="fa fa-check"></i><b>12.2.3</b> Deep Neural Network<span></span></a></li>
+<li class="chapter" data-level="12.2.4" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#activationfunction"><i class="fa fa-check"></i><b>12.2.4</b> Activation Function<span></span></a></li>
+<li class="chapter" data-level="12.2.5" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#optimization"><i class="fa fa-check"></i><b>12.2.5</b> Optimization<span></span></a></li>
+<li class="chapter" data-level="12.2.6" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#deal-with-overfitting"><i class="fa fa-check"></i><b>12.2.6</b> Deal with Overfitting<span></span></a></li>
+<li class="chapter" data-level="12.2.7" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#ffnnexample"><i class="fa fa-check"></i><b>12.2.7</b> Image Recognition Using FFNN<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="12.3" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html"><i class="fa fa-check"></i><b>12.3</b> Convolutional Neural Network<span></span></a>
+<ul>
+<li class="chapter" data-level="12.3.1" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#convolution-layer"><i class="fa fa-check"></i><b>12.3.1</b> Convolution Layer<span></span></a></li>
+<li class="chapter" data-level="12.3.2" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#padding-layer"><i class="fa fa-check"></i><b>12.3.2</b> Padding Layer<span></span></a></li>
+<li class="chapter" data-level="12.3.3" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#pooling-layer"><i class="fa fa-check"></i><b>12.3.3</b> Pooling Layer<span></span></a></li>
+<li class="chapter" data-level="12.3.4" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#convolution-over-volume"><i class="fa fa-check"></i><b>12.3.4</b> Convolution Over Volume<span></span></a></li>
+<li class="chapter" data-level="12.3.5" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#cnnexample"><i class="fa fa-check"></i><b>12.3.5</b> Image Recognition Using CNN<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="12.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html"><i class="fa fa-check"></i><b>12.4</b> Recurrent Neural Network<span></span></a>
+<ul>
+<li class="chapter" data-level="12.4.1" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#rnn-model"><i class="fa fa-check"></i><b>12.4.1</b> RNN Model<span></span></a></li>
+<li class="chapter" data-level="12.4.2" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#embedding"><i class="fa fa-check"></i><b>12.4.2</b> Word Embedding<span></span></a></li>
+<li class="chapter" data-level="12.4.3" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#lstm"><i class="fa fa-check"></i><b>12.4.3</b> Long Short Term Memory<span></span></a></li>
+<li class="chapter" data-level="12.4.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#rnnexample"><i class="fa fa-check"></i><b>12.4.4</b> Sentiment Analysis Using RNN<span></span></a></li>
+</ul></li>
+</ul></li>
+<li class="appendix"><span><b>Appendix<span></span></b></span></li>
+<li class="chapter" data-level="A" data-path="largelocaldata.html"><a href="largelocaldata.html"><i class="fa fa-check"></i><b>A</b> Handling Large Local Data<span></span></a>
+<ul>
+<li class="chapter" data-level="A.1" data-path="readr.html"><a href="readr.html"><i class="fa fa-check"></i><b>A.1</b> <code>readr</code><span></span></a></li>
+<li class="chapter" data-level="A.2" data-path="data.table-enhanced-data.html"><a href="data.table-enhanced-data.html"><i class="fa fa-check"></i><b>A.2</b> <code>data.table</code>— enhanced <code>data.frame</code><span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="B" data-path="r-code-for-data-simulation.html"><a href="r-code-for-data-simulation.html"><i class="fa fa-check"></i><b>B</b> R code for data simulation<span></span></a>
+<ul>
+<li class="chapter" data-level="B.1" data-path="appendixdata1.html"><a href="appendixdata1.html"><i class="fa fa-check"></i><b>B.1</b> Customer Data for Clothing Company<span></span></a></li>
+<li class="chapter" data-level="B.2" data-path="appendixdata3.html"><a href="appendixdata3.html"><i class="fa fa-check"></i><b>B.2</b> Swine Disease Breakout Data<span></span></a></li>
+</ul></li>
+<li><a href="references.html#references">References<span></span></a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
 
@@ -326,8 +389,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="appendixdata1" class="section level2">
-<h2><span class="header-section-number">B.1</span> Customer Data for Clothing Company</h2>
+<div id="appendixdata1" class="section level2 hasAnchor" number="14.1">
+<h2><span class="header-section-number">B.1</span> Customer Data for Clothing Company<a href="appendixdata1.html#appendixdata1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>The simulation is not very straightforward and we will break it into three parts:</p>
 <ol style="list-style-type: decimal">
 <li>Define data structure: variable names, variable distribution, customer segment names, segment size</li>
@@ -336,148 +399,148 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ol>
 <p>By organizing code this way, it makes easy for us to change specific parts of the simulation. For example, if we want to change the distribution of one variable, we can just change the corresponding part of the code.</p>
 <p>Here is code to define data structure:</p>
-<div class="sourceCode" id="cb471"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb471-1" data-line-number="1"><span class="co"># set a random number seed to </span></a>
-<a class="sourceLine" id="cb471-2" data-line-number="2"><span class="co"># make the process repeatable</span></a>
-<a class="sourceLine" id="cb471-3" data-line-number="3"><span class="kw">set.seed</span>(<span class="dv">12345</span>)</a>
-<a class="sourceLine" id="cb471-4" data-line-number="4"><span class="co"># define the number of observations</span></a>
-<a class="sourceLine" id="cb471-5" data-line-number="5">ncust &lt;-<span class="st"> </span><span class="dv">1000</span></a>
-<a class="sourceLine" id="cb471-6" data-line-number="6"><span class="co"># create a data frmae for simulated data</span></a>
-<a class="sourceLine" id="cb471-7" data-line-number="7">seg_dat &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">id =</span> <span class="kw">as.factor</span>(<span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span>ncust)))</a>
-<a class="sourceLine" id="cb471-8" data-line-number="8"><span class="co"># assign the variable names</span></a>
-<a class="sourceLine" id="cb471-9" data-line-number="9">vars &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;age&quot;</span>, <span class="st">&quot;gender&quot;</span>, <span class="st">&quot;income&quot;</span>, <span class="st">&quot;house&quot;</span>, <span class="st">&quot;store_exp&quot;</span>, </a>
-<a class="sourceLine" id="cb471-10" data-line-number="10">    <span class="st">&quot;online_exp&quot;</span>, <span class="st">&quot;store_trans&quot;</span>, <span class="st">&quot;online_trans&quot;</span>)</a>
-<a class="sourceLine" id="cb471-11" data-line-number="11"><span class="co"># assign distribution for each variable</span></a>
-<a class="sourceLine" id="cb471-12" data-line-number="12">vartype &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;norm&quot;</span>, <span class="st">&quot;binom&quot;</span>, <span class="st">&quot;norm&quot;</span>, <span class="st">&quot;binom&quot;</span>, <span class="st">&quot;norm&quot;</span>, <span class="st">&quot;norm&quot;</span>, </a>
-<a class="sourceLine" id="cb471-13" data-line-number="13">    <span class="st">&quot;pois&quot;</span>, <span class="st">&quot;pois&quot;</span>)</a>
-<a class="sourceLine" id="cb471-14" data-line-number="14"><span class="co"># names of 4 segments</span></a>
-<a class="sourceLine" id="cb471-15" data-line-number="15">group_name &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Price&quot;</span>, <span class="st">&quot;Conspicuous&quot;</span>, <span class="st">&quot;Quality&quot;</span>, <span class="st">&quot;Style&quot;</span>)</a>
-<a class="sourceLine" id="cb471-16" data-line-number="16"><span class="co"># size of each segments</span></a>
-<a class="sourceLine" id="cb471-17" data-line-number="17">group_size &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">250</span>, <span class="dv">200</span>, <span class="dv">200</span>, <span class="dv">350</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb481"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb481-1"><a href="appendixdata1.html#cb481-1" aria-hidden="true" tabindex="-1"></a><span class="co"># set a random number seed to </span></span>
+<span id="cb481-2"><a href="appendixdata1.html#cb481-2" aria-hidden="true" tabindex="-1"></a><span class="co"># make the process repeatable</span></span>
+<span id="cb481-3"><a href="appendixdata1.html#cb481-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">12345</span>)</span>
+<span id="cb481-4"><a href="appendixdata1.html#cb481-4" aria-hidden="true" tabindex="-1"></a><span class="co"># define the number of observations</span></span>
+<span id="cb481-5"><a href="appendixdata1.html#cb481-5" aria-hidden="true" tabindex="-1"></a>ncust <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb481-6"><a href="appendixdata1.html#cb481-6" aria-hidden="true" tabindex="-1"></a><span class="co"># create a data frmae for simulated data</span></span>
+<span id="cb481-7"><a href="appendixdata1.html#cb481-7" aria-hidden="true" tabindex="-1"></a>seg_dat <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">id =</span> <span class="fu">as.factor</span>(<span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span>ncust)))</span>
+<span id="cb481-8"><a href="appendixdata1.html#cb481-8" aria-hidden="true" tabindex="-1"></a><span class="co"># assign the variable names</span></span>
+<span id="cb481-9"><a href="appendixdata1.html#cb481-9" aria-hidden="true" tabindex="-1"></a>vars <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;age&quot;</span>, <span class="st">&quot;gender&quot;</span>, <span class="st">&quot;income&quot;</span>, <span class="st">&quot;house&quot;</span>, <span class="st">&quot;store_exp&quot;</span>, </span>
+<span id="cb481-10"><a href="appendixdata1.html#cb481-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;online_exp&quot;</span>, <span class="st">&quot;store_trans&quot;</span>, <span class="st">&quot;online_trans&quot;</span>)</span>
+<span id="cb481-11"><a href="appendixdata1.html#cb481-11" aria-hidden="true" tabindex="-1"></a><span class="co"># assign distribution for each variable</span></span>
+<span id="cb481-12"><a href="appendixdata1.html#cb481-12" aria-hidden="true" tabindex="-1"></a>vartype <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;norm&quot;</span>, <span class="st">&quot;binom&quot;</span>, <span class="st">&quot;norm&quot;</span>, <span class="st">&quot;binom&quot;</span>, <span class="st">&quot;norm&quot;</span>, <span class="st">&quot;norm&quot;</span>, </span>
+<span id="cb481-13"><a href="appendixdata1.html#cb481-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;pois&quot;</span>, <span class="st">&quot;pois&quot;</span>)</span>
+<span id="cb481-14"><a href="appendixdata1.html#cb481-14" aria-hidden="true" tabindex="-1"></a><span class="co"># names of 4 segments</span></span>
+<span id="cb481-15"><a href="appendixdata1.html#cb481-15" aria-hidden="true" tabindex="-1"></a>group_name <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Price&quot;</span>, <span class="st">&quot;Conspicuous&quot;</span>, <span class="st">&quot;Quality&quot;</span>, <span class="st">&quot;Style&quot;</span>)</span>
+<span id="cb481-16"><a href="appendixdata1.html#cb481-16" aria-hidden="true" tabindex="-1"></a><span class="co"># size of each segments</span></span>
+<span id="cb481-17"><a href="appendixdata1.html#cb481-17" aria-hidden="true" tabindex="-1"></a>group_size <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">250</span>, <span class="dv">200</span>, <span class="dv">200</span>, <span class="dv">350</span>)</span></code></pre></div>
 <p>The next step is to define variable distribution parameters. There are 4 segments of customers and 8 parameters. Different segments correspond to different parameters. Let’s store the parameters in a 4×8 matrix:</p>
-<div class="sourceCode" id="cb472"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb472-1" data-line-number="1"><span class="co"># matrix for mean</span></a>
-<a class="sourceLine" id="cb472-2" data-line-number="2">mus &lt;-<span class="st"> </span><span class="kw">matrix</span>( <span class="kw">c</span>(</a>
-<a class="sourceLine" id="cb472-3" data-line-number="3">  <span class="co"># Price</span></a>
-<a class="sourceLine" id="cb472-4" data-line-number="4">  <span class="dv">60</span>, <span class="fl">0.5</span>, <span class="dv">120000</span>,<span class="fl">0.9</span>, <span class="dv">500</span>,<span class="dv">200</span>,<span class="dv">5</span>,<span class="dv">2</span>,</a>
-<a class="sourceLine" id="cb472-5" data-line-number="5">  <span class="co"># Conspicuous</span></a>
-<a class="sourceLine" id="cb472-6" data-line-number="6">  <span class="dv">40</span>, <span class="fl">0.7</span>, <span class="dv">200000</span>,<span class="fl">0.9</span>, <span class="dv">5000</span>,<span class="dv">5000</span>,<span class="dv">10</span>,<span class="dv">10</span>,</a>
-<a class="sourceLine" id="cb472-7" data-line-number="7">  <span class="co"># Quality</span></a>
-<a class="sourceLine" id="cb472-8" data-line-number="8">  <span class="dv">36</span>, <span class="fl">0.5</span>, <span class="dv">70000</span>, <span class="fl">0.4</span>, <span class="dv">300</span>, <span class="dv">2000</span>,<span class="dv">2</span>,<span class="dv">15</span>,</a>
-<a class="sourceLine" id="cb472-9" data-line-number="9">  <span class="co"># Style</span></a>
-<a class="sourceLine" id="cb472-10" data-line-number="10">  <span class="dv">25</span>, <span class="fl">0.2</span>, <span class="dv">90000</span>, <span class="fl">0.2</span>, <span class="dv">200</span>, <span class="dv">2000</span>,<span class="dv">2</span>,<span class="dv">20</span>), </a>
-<a class="sourceLine" id="cb472-11" data-line-number="11">  <span class="dt">ncol=</span><span class="kw">length</span>(vars), <span class="dt">byrow=</span><span class="ot">TRUE</span>)</a></code></pre></div>
-<div class="sourceCode" id="cb473"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb473-1" data-line-number="1"><span class="co"># matrix for variance</span></a>
-<a class="sourceLine" id="cb473-2" data-line-number="2">sds&lt;-<span class="st"> </span><span class="kw">matrix</span>( <span class="kw">c</span>(</a>
-<a class="sourceLine" id="cb473-3" data-line-number="3">  <span class="co"># Price</span></a>
-<a class="sourceLine" id="cb473-4" data-line-number="4">  <span class="dv">3</span>,<span class="ot">NA</span>,<span class="dv">8000</span>,<span class="ot">NA</span>,<span class="dv">100</span>,<span class="dv">50</span>,<span class="ot">NA</span>,<span class="ot">NA</span>,</a>
-<a class="sourceLine" id="cb473-5" data-line-number="5">  <span class="co"># Conspicuous</span></a>
-<a class="sourceLine" id="cb473-6" data-line-number="6">  <span class="dv">5</span>,<span class="ot">NA</span>,<span class="dv">50000</span>,<span class="ot">NA</span>,<span class="dv">1000</span>,<span class="dv">1500</span>,<span class="ot">NA</span>,<span class="ot">NA</span>,</a>
-<a class="sourceLine" id="cb473-7" data-line-number="7">  <span class="co"># Quality</span></a>
-<a class="sourceLine" id="cb473-8" data-line-number="8">  <span class="dv">7</span>,<span class="ot">NA</span>,<span class="dv">10000</span>,<span class="ot">NA</span>,<span class="dv">50</span>,<span class="dv">200</span>,<span class="ot">NA</span>,<span class="ot">NA</span>,</a>
-<a class="sourceLine" id="cb473-9" data-line-number="9">  <span class="co"># Style</span></a>
-<a class="sourceLine" id="cb473-10" data-line-number="10">  <span class="dv">2</span>,<span class="ot">NA</span>,<span class="dv">5000</span>,<span class="ot">NA</span>,<span class="dv">10</span>,<span class="dv">500</span>,<span class="ot">NA</span>,<span class="ot">NA</span>), </a>
-<a class="sourceLine" id="cb473-11" data-line-number="11">  <span class="dt">ncol=</span><span class="kw">length</span>(vars), <span class="dt">byrow=</span><span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb482"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb482-1"><a href="appendixdata1.html#cb482-1" aria-hidden="true" tabindex="-1"></a><span class="co"># matrix for mean</span></span>
+<span id="cb482-2"><a href="appendixdata1.html#cb482-2" aria-hidden="true" tabindex="-1"></a>mus <span class="ot">&lt;-</span> <span class="fu">matrix</span>( <span class="fu">c</span>(</span>
+<span id="cb482-3"><a href="appendixdata1.html#cb482-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Price</span></span>
+<span id="cb482-4"><a href="appendixdata1.html#cb482-4" aria-hidden="true" tabindex="-1"></a>  <span class="dv">60</span>, <span class="fl">0.5</span>, <span class="dv">120000</span>,<span class="fl">0.9</span>, <span class="dv">500</span>,<span class="dv">200</span>,<span class="dv">5</span>,<span class="dv">2</span>,</span>
+<span id="cb482-5"><a href="appendixdata1.html#cb482-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Conspicuous</span></span>
+<span id="cb482-6"><a href="appendixdata1.html#cb482-6" aria-hidden="true" tabindex="-1"></a>  <span class="dv">40</span>, <span class="fl">0.7</span>, <span class="dv">200000</span>,<span class="fl">0.9</span>, <span class="dv">5000</span>,<span class="dv">5000</span>,<span class="dv">10</span>,<span class="dv">10</span>,</span>
+<span id="cb482-7"><a href="appendixdata1.html#cb482-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Quality</span></span>
+<span id="cb482-8"><a href="appendixdata1.html#cb482-8" aria-hidden="true" tabindex="-1"></a>  <span class="dv">36</span>, <span class="fl">0.5</span>, <span class="dv">70000</span>, <span class="fl">0.4</span>, <span class="dv">300</span>, <span class="dv">2000</span>,<span class="dv">2</span>,<span class="dv">15</span>,</span>
+<span id="cb482-9"><a href="appendixdata1.html#cb482-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Style</span></span>
+<span id="cb482-10"><a href="appendixdata1.html#cb482-10" aria-hidden="true" tabindex="-1"></a>  <span class="dv">25</span>, <span class="fl">0.2</span>, <span class="dv">90000</span>, <span class="fl">0.2</span>, <span class="dv">200</span>, <span class="dv">2000</span>,<span class="dv">2</span>,<span class="dv">20</span>), </span>
+<span id="cb482-11"><a href="appendixdata1.html#cb482-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">ncol=</span><span class="fu">length</span>(vars), <span class="at">byrow=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb483"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb483-1"><a href="appendixdata1.html#cb483-1" aria-hidden="true" tabindex="-1"></a><span class="co"># matrix for variance</span></span>
+<span id="cb483-2"><a href="appendixdata1.html#cb483-2" aria-hidden="true" tabindex="-1"></a>sds<span class="ot">&lt;-</span> <span class="fu">matrix</span>( <span class="fu">c</span>(</span>
+<span id="cb483-3"><a href="appendixdata1.html#cb483-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Price</span></span>
+<span id="cb483-4"><a href="appendixdata1.html#cb483-4" aria-hidden="true" tabindex="-1"></a>  <span class="dv">3</span>,<span class="cn">NA</span>,<span class="dv">8000</span>,<span class="cn">NA</span>,<span class="dv">100</span>,<span class="dv">50</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,</span>
+<span id="cb483-5"><a href="appendixdata1.html#cb483-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Conspicuous</span></span>
+<span id="cb483-6"><a href="appendixdata1.html#cb483-6" aria-hidden="true" tabindex="-1"></a>  <span class="dv">5</span>,<span class="cn">NA</span>,<span class="dv">50000</span>,<span class="cn">NA</span>,<span class="dv">1000</span>,<span class="dv">1500</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,</span>
+<span id="cb483-7"><a href="appendixdata1.html#cb483-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Quality</span></span>
+<span id="cb483-8"><a href="appendixdata1.html#cb483-8" aria-hidden="true" tabindex="-1"></a>  <span class="dv">7</span>,<span class="cn">NA</span>,<span class="dv">10000</span>,<span class="cn">NA</span>,<span class="dv">50</span>,<span class="dv">200</span>,<span class="cn">NA</span>,<span class="cn">NA</span>,</span>
+<span id="cb483-9"><a href="appendixdata1.html#cb483-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Style</span></span>
+<span id="cb483-10"><a href="appendixdata1.html#cb483-10" aria-hidden="true" tabindex="-1"></a>  <span class="dv">2</span>,<span class="cn">NA</span>,<span class="dv">5000</span>,<span class="cn">NA</span>,<span class="dv">10</span>,<span class="dv">500</span>,<span class="cn">NA</span>,<span class="cn">NA</span>), </span>
+<span id="cb483-11"><a href="appendixdata1.html#cb483-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">ncol=</span><span class="fu">length</span>(vars), <span class="at">byrow=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 <p>Now we are ready to simulate data using the parameters defined above:</p>
-<div class="sourceCode" id="cb474"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb474-1" data-line-number="1"><span class="co"># simulate non-survey data</span></a>
-<a class="sourceLine" id="cb474-2" data-line-number="2">sim.dat &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
-<a class="sourceLine" id="cb474-3" data-line-number="3"><span class="kw">set.seed</span>(<span class="dv">2016</span>)</a>
-<a class="sourceLine" id="cb474-4" data-line-number="4"><span class="co"># loop on customer segment (i)</span></a>
-<a class="sourceLine" id="cb474-5" data-line-number="5"><span class="cf">for</span> (i <span class="cf">in</span> <span class="kw">seq_along</span>(group_name)) {</a>
-<a class="sourceLine" id="cb474-6" data-line-number="6">    </a>
-<a class="sourceLine" id="cb474-7" data-line-number="7">    <span class="co"># add this line in order to moniter the process</span></a>
-<a class="sourceLine" id="cb474-8" data-line-number="8">    <span class="kw">cat</span>(i, group_name[i], <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</a>
-<a class="sourceLine" id="cb474-9" data-line-number="9">    </a>
-<a class="sourceLine" id="cb474-10" data-line-number="10">    <span class="co"># create an empty matrix to store relevent data</span></a>
-<a class="sourceLine" id="cb474-11" data-line-number="11">    seg &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">matrix</span>(<span class="ot">NA</span>, <span class="dt">nrow =</span> group_size[i], </a>
-<a class="sourceLine" id="cb474-12" data-line-number="12">    <span class="dt">ncol =</span> <span class="kw">length</span>(vars)))</a>
-<a class="sourceLine" id="cb474-13" data-line-number="13">    </a>
-<a class="sourceLine" id="cb474-14" data-line-number="14">    <span class="co"># Simulate data within segment i</span></a>
-<a class="sourceLine" id="cb474-15" data-line-number="15">    <span class="cf">for</span> (j <span class="cf">in</span> <span class="kw">seq_along</span>(vars)) {</a>
-<a class="sourceLine" id="cb474-16" data-line-number="16">        </a>
-<a class="sourceLine" id="cb474-17" data-line-number="17">        <span class="co"># loop on every variable (j)</span></a>
-<a class="sourceLine" id="cb474-18" data-line-number="18">        <span class="cf">if</span> (vartype[j] <span class="op">==</span><span class="st"> &quot;norm&quot;</span>) {</a>
-<a class="sourceLine" id="cb474-19" data-line-number="19">            <span class="co"># simulate normal distribution</span></a>
-<a class="sourceLine" id="cb474-20" data-line-number="20">            seg[, j] &lt;-<span class="st"> </span><span class="kw">rnorm</span>(group_size[i], <span class="dt">mean =</span> mus[i, </a>
-<a class="sourceLine" id="cb474-21" data-line-number="21">                j], <span class="dt">sd =</span> sds[i, j])</a>
-<a class="sourceLine" id="cb474-22" data-line-number="22">        } <span class="cf">else</span> <span class="cf">if</span> (vartype[j] <span class="op">==</span><span class="st"> &quot;pois&quot;</span>) {</a>
-<a class="sourceLine" id="cb474-23" data-line-number="23">            <span class="co"># simulate poisson distribution</span></a>
-<a class="sourceLine" id="cb474-24" data-line-number="24">            seg[, j] &lt;-<span class="st"> </span><span class="kw">rpois</span>(group_size[i], <span class="dt">lambda =</span> mus[i, </a>
-<a class="sourceLine" id="cb474-25" data-line-number="25">                j])</a>
-<a class="sourceLine" id="cb474-26" data-line-number="26">        } <span class="cf">else</span> <span class="cf">if</span> (vartype[j] <span class="op">==</span><span class="st"> &quot;binom&quot;</span>) {</a>
-<a class="sourceLine" id="cb474-27" data-line-number="27">            <span class="co"># simulate binomial distribution</span></a>
-<a class="sourceLine" id="cb474-28" data-line-number="28">            seg[, j] &lt;-<span class="st"> </span><span class="kw">rbinom</span>(group_size[i], <span class="dt">size =</span> <span class="dv">1</span>, </a>
-<a class="sourceLine" id="cb474-29" data-line-number="29">                <span class="dt">prob =</span> mus[i, j])</a>
-<a class="sourceLine" id="cb474-30" data-line-number="30">        } <span class="cf">else</span> {</a>
-<a class="sourceLine" id="cb474-31" data-line-number="31">            <span class="co"># if the distribution name is not one of the above, stop</span></a>
-<a class="sourceLine" id="cb474-32" data-line-number="32">            <span class="co"># and return a message</span></a>
-<a class="sourceLine" id="cb474-33" data-line-number="33">            <span class="kw">stop</span>(<span class="st">&quot;Don&#39;t have type:&quot;</span>, vartype[j])</a>
-<a class="sourceLine" id="cb474-34" data-line-number="34">        }</a>
-<a class="sourceLine" id="cb474-35" data-line-number="35">    }</a>
-<a class="sourceLine" id="cb474-36" data-line-number="36">    sim.dat &lt;-<span class="st"> </span><span class="kw">rbind</span>(sim.dat, seg)</a>
-<a class="sourceLine" id="cb474-37" data-line-number="37">}</a></code></pre></div>
+<div class="sourceCode" id="cb484"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb484-1"><a href="appendixdata1.html#cb484-1" aria-hidden="true" tabindex="-1"></a><span class="co"># simulate non-survey data</span></span>
+<span id="cb484-2"><a href="appendixdata1.html#cb484-2" aria-hidden="true" tabindex="-1"></a>sim.dat <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb484-3"><a href="appendixdata1.html#cb484-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2016</span>)</span>
+<span id="cb484-4"><a href="appendixdata1.html#cb484-4" aria-hidden="true" tabindex="-1"></a><span class="co"># loop on customer segment (i)</span></span>
+<span id="cb484-5"><a href="appendixdata1.html#cb484-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(group_name)) {</span>
+<span id="cb484-6"><a href="appendixdata1.html#cb484-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb484-7"><a href="appendixdata1.html#cb484-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># add this line in order to moniter the process</span></span>
+<span id="cb484-8"><a href="appendixdata1.html#cb484-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(i, group_name[i], <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb484-9"><a href="appendixdata1.html#cb484-9" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb484-10"><a href="appendixdata1.html#cb484-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># create an empty matrix to store relevent data</span></span>
+<span id="cb484-11"><a href="appendixdata1.html#cb484-11" aria-hidden="true" tabindex="-1"></a>    seg <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="at">nrow =</span> group_size[i], </span>
+<span id="cb484-12"><a href="appendixdata1.html#cb484-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">ncol =</span> <span class="fu">length</span>(vars)))</span>
+<span id="cb484-13"><a href="appendixdata1.html#cb484-13" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb484-14"><a href="appendixdata1.html#cb484-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Simulate data within segment i</span></span>
+<span id="cb484-15"><a href="appendixdata1.html#cb484-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (j <span class="cf">in</span> <span class="fu">seq_along</span>(vars)) {</span>
+<span id="cb484-16"><a href="appendixdata1.html#cb484-16" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb484-17"><a href="appendixdata1.html#cb484-17" aria-hidden="true" tabindex="-1"></a>        <span class="co"># loop on every variable (j)</span></span>
+<span id="cb484-18"><a href="appendixdata1.html#cb484-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (vartype[j] <span class="sc">==</span> <span class="st">&quot;norm&quot;</span>) {</span>
+<span id="cb484-19"><a href="appendixdata1.html#cb484-19" aria-hidden="true" tabindex="-1"></a>            <span class="co"># simulate normal distribution</span></span>
+<span id="cb484-20"><a href="appendixdata1.html#cb484-20" aria-hidden="true" tabindex="-1"></a>            seg[, j] <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(group_size[i], <span class="at">mean =</span> mus[i, </span>
+<span id="cb484-21"><a href="appendixdata1.html#cb484-21" aria-hidden="true" tabindex="-1"></a>                j], <span class="at">sd =</span> sds[i, j])</span>
+<span id="cb484-22"><a href="appendixdata1.html#cb484-22" aria-hidden="true" tabindex="-1"></a>        } <span class="cf">else</span> <span class="cf">if</span> (vartype[j] <span class="sc">==</span> <span class="st">&quot;pois&quot;</span>) {</span>
+<span id="cb484-23"><a href="appendixdata1.html#cb484-23" aria-hidden="true" tabindex="-1"></a>            <span class="co"># simulate poisson distribution</span></span>
+<span id="cb484-24"><a href="appendixdata1.html#cb484-24" aria-hidden="true" tabindex="-1"></a>            seg[, j] <span class="ot">&lt;-</span> <span class="fu">rpois</span>(group_size[i], <span class="at">lambda =</span> mus[i, </span>
+<span id="cb484-25"><a href="appendixdata1.html#cb484-25" aria-hidden="true" tabindex="-1"></a>                j])</span>
+<span id="cb484-26"><a href="appendixdata1.html#cb484-26" aria-hidden="true" tabindex="-1"></a>        } <span class="cf">else</span> <span class="cf">if</span> (vartype[j] <span class="sc">==</span> <span class="st">&quot;binom&quot;</span>) {</span>
+<span id="cb484-27"><a href="appendixdata1.html#cb484-27" aria-hidden="true" tabindex="-1"></a>            <span class="co"># simulate binomial distribution</span></span>
+<span id="cb484-28"><a href="appendixdata1.html#cb484-28" aria-hidden="true" tabindex="-1"></a>            seg[, j] <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(group_size[i], <span class="at">size =</span> <span class="dv">1</span>, </span>
+<span id="cb484-29"><a href="appendixdata1.html#cb484-29" aria-hidden="true" tabindex="-1"></a>                <span class="at">prob =</span> mus[i, j])</span>
+<span id="cb484-30"><a href="appendixdata1.html#cb484-30" aria-hidden="true" tabindex="-1"></a>        } <span class="cf">else</span> {</span>
+<span id="cb484-31"><a href="appendixdata1.html#cb484-31" aria-hidden="true" tabindex="-1"></a>            <span class="co"># if the distribution name is not one of the above, stop</span></span>
+<span id="cb484-32"><a href="appendixdata1.html#cb484-32" aria-hidden="true" tabindex="-1"></a>            <span class="co"># and return a message</span></span>
+<span id="cb484-33"><a href="appendixdata1.html#cb484-33" aria-hidden="true" tabindex="-1"></a>            <span class="fu">stop</span>(<span class="st">&quot;Don&#39;t have type:&quot;</span>, vartype[j])</span>
+<span id="cb484-34"><a href="appendixdata1.html#cb484-34" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb484-35"><a href="appendixdata1.html#cb484-35" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb484-36"><a href="appendixdata1.html#cb484-36" aria-hidden="true" tabindex="-1"></a>    sim.dat <span class="ot">&lt;-</span> <span class="fu">rbind</span>(sim.dat, seg)</span>
+<span id="cb484-37"><a href="appendixdata1.html#cb484-37" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
 <p>Now let’s edit the data we just simulated a little by adding tags to 0/1 binomial variables:</p>
-<div class="sourceCode" id="cb475"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb475-1" data-line-number="1"><span class="co"># assign variable names</span></a>
-<a class="sourceLine" id="cb475-2" data-line-number="2"><span class="kw">names</span>(sim.dat) &lt;-<span class="st"> </span>vars</a>
-<a class="sourceLine" id="cb475-3" data-line-number="3"><span class="co"># assign factor levels to segment variable</span></a>
-<a class="sourceLine" id="cb475-4" data-line-number="4">sim.dat<span class="op">$</span>segment &lt;-<span class="st"> </span><span class="kw">factor</span>(<span class="kw">rep</span>(group_name, <span class="dt">times =</span> group_size))</a>
-<a class="sourceLine" id="cb475-5" data-line-number="5"><span class="co"># recode gender and house variable</span></a>
-<a class="sourceLine" id="cb475-6" data-line-number="6">sim.dat<span class="op">$</span>gender &lt;-<span class="st"> </span><span class="kw">factor</span>(sim.dat<span class="op">$</span>gender, <span class="dt">labels =</span> <span class="kw">c</span>(<span class="st">&quot;Female&quot;</span>, </a>
-<a class="sourceLine" id="cb475-7" data-line-number="7">    <span class="st">&quot;Male&quot;</span>))</a>
-<a class="sourceLine" id="cb475-8" data-line-number="8">sim.dat<span class="op">$</span>house &lt;-<span class="st"> </span><span class="kw">factor</span>(sim.dat<span class="op">$</span>house, <span class="dt">labels =</span> <span class="kw">c</span>(<span class="st">&quot;No&quot;</span>, </a>
-<a class="sourceLine" id="cb475-9" data-line-number="9">    <span class="st">&quot;Yes&quot;</span>))</a>
-<a class="sourceLine" id="cb475-10" data-line-number="10"><span class="co"># store_trans and online_trans are at least 1</span></a>
-<a class="sourceLine" id="cb475-11" data-line-number="11">sim.dat<span class="op">$</span>store_trans &lt;-<span class="st"> </span>sim.dat<span class="op">$</span>store_trans <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb475-12" data-line-number="12">sim.dat<span class="op">$</span>online_trans &lt;-<span class="st"> </span>sim.dat<span class="op">$</span>online_trans <span class="op">+</span><span class="st"> </span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb475-13" data-line-number="13"><span class="co"># age is integer</span></a>
-<a class="sourceLine" id="cb475-14" data-line-number="14">sim.dat<span class="op">$</span>age &lt;-<span class="st"> </span><span class="kw">floor</span>(sim.dat<span class="op">$</span>age)</a></code></pre></div>
+<div class="sourceCode" id="cb485"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb485-1"><a href="appendixdata1.html#cb485-1" aria-hidden="true" tabindex="-1"></a><span class="co"># assign variable names</span></span>
+<span id="cb485-2"><a href="appendixdata1.html#cb485-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(sim.dat) <span class="ot">&lt;-</span> vars</span>
+<span id="cb485-3"><a href="appendixdata1.html#cb485-3" aria-hidden="true" tabindex="-1"></a><span class="co"># assign factor levels to segment variable</span></span>
+<span id="cb485-4"><a href="appendixdata1.html#cb485-4" aria-hidden="true" tabindex="-1"></a>sim.dat<span class="sc">$</span>segment <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">rep</span>(group_name, <span class="at">times =</span> group_size))</span>
+<span id="cb485-5"><a href="appendixdata1.html#cb485-5" aria-hidden="true" tabindex="-1"></a><span class="co"># recode gender and house variable</span></span>
+<span id="cb485-6"><a href="appendixdata1.html#cb485-6" aria-hidden="true" tabindex="-1"></a>sim.dat<span class="sc">$</span>gender <span class="ot">&lt;-</span> <span class="fu">factor</span>(sim.dat<span class="sc">$</span>gender, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;Female&quot;</span>, </span>
+<span id="cb485-7"><a href="appendixdata1.html#cb485-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Male&quot;</span>))</span>
+<span id="cb485-8"><a href="appendixdata1.html#cb485-8" aria-hidden="true" tabindex="-1"></a>sim.dat<span class="sc">$</span>house <span class="ot">&lt;-</span> <span class="fu">factor</span>(sim.dat<span class="sc">$</span>house, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;No&quot;</span>, </span>
+<span id="cb485-9"><a href="appendixdata1.html#cb485-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Yes&quot;</span>))</span>
+<span id="cb485-10"><a href="appendixdata1.html#cb485-10" aria-hidden="true" tabindex="-1"></a><span class="co"># store_trans and online_trans are at least 1</span></span>
+<span id="cb485-11"><a href="appendixdata1.html#cb485-11" aria-hidden="true" tabindex="-1"></a>sim.dat<span class="sc">$</span>store_trans <span class="ot">&lt;-</span> sim.dat<span class="sc">$</span>store_trans <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb485-12"><a href="appendixdata1.html#cb485-12" aria-hidden="true" tabindex="-1"></a>sim.dat<span class="sc">$</span>online_trans <span class="ot">&lt;-</span> sim.dat<span class="sc">$</span>online_trans <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb485-13"><a href="appendixdata1.html#cb485-13" aria-hidden="true" tabindex="-1"></a><span class="co"># age is integer</span></span>
+<span id="cb485-14"><a href="appendixdata1.html#cb485-14" aria-hidden="true" tabindex="-1"></a>sim.dat<span class="sc">$</span>age <span class="ot">&lt;-</span> <span class="fu">floor</span>(sim.dat<span class="sc">$</span>age)</span></code></pre></div>
 <p>In the real world, the data always includes some noise such as missing, wrong imputation. So we will add some noise to the data:</p>
-<div class="sourceCode" id="cb476"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb476-1" data-line-number="1"><span class="co"># add missing values</span></a>
-<a class="sourceLine" id="cb476-2" data-line-number="2">idxm &lt;-<span class="st"> </span><span class="kw">as.logical</span>(<span class="kw">rbinom</span>(ncust, <span class="dt">size =</span> <span class="dv">1</span>, <span class="dt">prob =</span> sim.dat<span class="op">$</span>age<span class="op">/</span><span class="dv">200</span>))</a>
-<a class="sourceLine" id="cb476-3" data-line-number="3">sim.dat<span class="op">$</span>income[idxm] &lt;-<span class="st"> </span><span class="ot">NA</span></a>
-<a class="sourceLine" id="cb476-4" data-line-number="4"><span class="co"># add wrong imputations and outliers</span></a>
-<a class="sourceLine" id="cb476-5" data-line-number="5"><span class="kw">set.seed</span>(<span class="dv">123</span>)</a>
-<a class="sourceLine" id="cb476-6" data-line-number="6">idx &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span>ncust, <span class="dv">5</span>)</a>
-<a class="sourceLine" id="cb476-7" data-line-number="7">sim.dat<span class="op">$</span>age[idx[<span class="dv">1</span>]] &lt;-<span class="st"> </span><span class="dv">300</span></a>
-<a class="sourceLine" id="cb476-8" data-line-number="8">sim.dat<span class="op">$</span>store_exp[idx[<span class="dv">2</span>]] &lt;-<span class="st"> </span><span class="dv">-500</span></a>
-<a class="sourceLine" id="cb476-9" data-line-number="9">sim.dat<span class="op">$</span>store_exp[idx[<span class="dv">3</span><span class="op">:</span><span class="dv">5</span>]] &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">50000</span>, <span class="dv">30000</span>, <span class="dv">30000</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb486"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb486-1"><a href="appendixdata1.html#cb486-1" aria-hidden="true" tabindex="-1"></a><span class="co"># add missing values</span></span>
+<span id="cb486-2"><a href="appendixdata1.html#cb486-2" aria-hidden="true" tabindex="-1"></a>idxm <span class="ot">&lt;-</span> <span class="fu">as.logical</span>(<span class="fu">rbinom</span>(ncust, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">prob =</span> sim.dat<span class="sc">$</span>age<span class="sc">/</span><span class="dv">200</span>))</span>
+<span id="cb486-3"><a href="appendixdata1.html#cb486-3" aria-hidden="true" tabindex="-1"></a>sim.dat<span class="sc">$</span>income[idxm] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb486-4"><a href="appendixdata1.html#cb486-4" aria-hidden="true" tabindex="-1"></a><span class="co"># add wrong imputations and outliers</span></span>
+<span id="cb486-5"><a href="appendixdata1.html#cb486-5" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb486-6"><a href="appendixdata1.html#cb486-6" aria-hidden="true" tabindex="-1"></a>idx <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span>ncust, <span class="dv">5</span>)</span>
+<span id="cb486-7"><a href="appendixdata1.html#cb486-7" aria-hidden="true" tabindex="-1"></a>sim.dat<span class="sc">$</span>age[idx[<span class="dv">1</span>]] <span class="ot">&lt;-</span> <span class="dv">300</span></span>
+<span id="cb486-8"><a href="appendixdata1.html#cb486-8" aria-hidden="true" tabindex="-1"></a>sim.dat<span class="sc">$</span>store_exp[idx[<span class="dv">2</span>]] <span class="ot">&lt;-</span> <span class="sc">-</span><span class="dv">500</span></span>
+<span id="cb486-9"><a href="appendixdata1.html#cb486-9" aria-hidden="true" tabindex="-1"></a>sim.dat<span class="sc">$</span>store_exp[idx[<span class="dv">3</span><span class="sc">:</span><span class="dv">5</span>]] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">50000</span>, <span class="dv">30000</span>, <span class="dv">30000</span>)</span></code></pre></div>
 <p>So far we have created part of the data. You can check it using <code>summary(sim.dat)</code>. Next, we will move on to simulate survey data.</p>
-<div class="sourceCode" id="cb477"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb477-1" data-line-number="1"><span class="co"># number of survey questions</span></a>
-<a class="sourceLine" id="cb477-2" data-line-number="2">nq &lt;-<span class="st"> </span><span class="dv">10</span></a>
-<a class="sourceLine" id="cb477-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb477-4" data-line-number="4"><span class="co"># mean matrix for different segments </span></a>
-<a class="sourceLine" id="cb477-5" data-line-number="5">mus2 &lt;-<span class="st"> </span><span class="kw">matrix</span>( <span class="kw">c</span>( <span class="dv">5</span>,<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">2</span>,<span class="dv">4</span>, <span class="co"># Price</span></a>
-<a class="sourceLine" id="cb477-6" data-line-number="6">  <span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">4</span>,<span class="dv">4</span>,<span class="dv">4</span>,<span class="dv">4</span>,<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">2</span>, <span class="co"># Conspicuous</span></a>
-<a class="sourceLine" id="cb477-7" data-line-number="7">  <span class="dv">5</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">3</span>,<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">3</span>, <span class="co"># Quality</span></a>
-<a class="sourceLine" id="cb477-8" data-line-number="8">  <span class="dv">3</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">1</span>,<span class="dv">5</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">2</span>), <span class="co"># Style</span></a>
-<a class="sourceLine" id="cb477-9" data-line-number="9"><span class="dt">ncol=</span>nq, <span class="dt">byrow=</span><span class="ot">TRUE</span>) </a>
-<a class="sourceLine" id="cb477-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb477-11" data-line-number="11"><span class="co"># assume the variance is 0.2 for all</span></a>
-<a class="sourceLine" id="cb477-12" data-line-number="12">sd2 &lt;-<span class="st"> </span><span class="fl">0.2</span></a>
-<a class="sourceLine" id="cb477-13" data-line-number="13">sim.dat2 &lt;-<span class="st"> </span><span class="ot">NULL</span></a>
-<a class="sourceLine" id="cb477-14" data-line-number="14"><span class="kw">set.seed</span>(<span class="dv">1000</span>)</a>
-<a class="sourceLine" id="cb477-15" data-line-number="15"><span class="co"># loop for customer segment (i)</span></a>
-<a class="sourceLine" id="cb477-16" data-line-number="16"><span class="cf">for</span> (i <span class="cf">in</span> <span class="kw">seq_along</span>(group_name)) {</a>
-<a class="sourceLine" id="cb477-17" data-line-number="17">    <span class="co"># the following line is used for checking the</span></a>
-<a class="sourceLine" id="cb477-18" data-line-number="18">    <span class="co"># progress cat (i, group_name[i],&#39;\n&#39;) create an</span></a>
-<a class="sourceLine" id="cb477-19" data-line-number="19">    <span class="co"># empty data frame to store data</span></a>
-<a class="sourceLine" id="cb477-20" data-line-number="20">    seg &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">matrix</span>(<span class="ot">NA</span>, <span class="dt">nrow =</span> group_size[i], </a>
-<a class="sourceLine" id="cb477-21" data-line-number="21">        <span class="dt">ncol =</span> nq))</a>
-<a class="sourceLine" id="cb477-22" data-line-number="22">    <span class="co"># simulate data within segment</span></a>
-<a class="sourceLine" id="cb477-23" data-line-number="23">    <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>nq) {</a>
-<a class="sourceLine" id="cb477-24" data-line-number="24">        <span class="co"># simulate normal distribution</span></a>
-<a class="sourceLine" id="cb477-25" data-line-number="25">        res &lt;-<span class="st"> </span><span class="kw">rnorm</span>(group_size[i], <span class="dt">mean =</span> mus2[i, </a>
-<a class="sourceLine" id="cb477-26" data-line-number="26">            j], <span class="dt">sd =</span> sd2)</a>
-<a class="sourceLine" id="cb477-27" data-line-number="27">        <span class="co"># set upper and lower limit</span></a>
-<a class="sourceLine" id="cb477-28" data-line-number="28">        res[res <span class="op">&gt;</span><span class="st"> </span><span class="dv">5</span>] &lt;-<span class="st"> </span><span class="dv">5</span></a>
-<a class="sourceLine" id="cb477-29" data-line-number="29">        res[res <span class="op">&lt;</span><span class="st"> </span><span class="dv">1</span>] &lt;-<span class="st"> </span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb477-30" data-line-number="30">        <span class="co"># convert continuous values to discrete integers</span></a>
-<a class="sourceLine" id="cb477-31" data-line-number="31">        seg[, j] &lt;-<span class="st"> </span><span class="kw">floor</span>(res)</a>
-<a class="sourceLine" id="cb477-32" data-line-number="32">    }</a>
-<a class="sourceLine" id="cb477-33" data-line-number="33">    sim.dat2 &lt;-<span class="st"> </span><span class="kw">rbind</span>(sim.dat2, seg)</a>
-<a class="sourceLine" id="cb477-34" data-line-number="34">}</a>
-<a class="sourceLine" id="cb477-35" data-line-number="35"></a>
-<a class="sourceLine" id="cb477-36" data-line-number="36"><span class="kw">names</span>(sim.dat2) &lt;-<span class="st"> </span><span class="kw">paste</span>(<span class="st">&quot;Q&quot;</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)</a>
-<a class="sourceLine" id="cb477-37" data-line-number="37">sim.dat &lt;-<span class="st"> </span><span class="kw">cbind</span>(sim.dat, sim.dat2)</a>
-<a class="sourceLine" id="cb477-38" data-line-number="38">sim.dat<span class="op">$</span>segment &lt;-<span class="st"> </span><span class="kw">factor</span>(<span class="kw">rep</span>(group_name, <span class="dt">times =</span> group_size))</a></code></pre></div>
+<div class="sourceCode" id="cb487"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb487-1"><a href="appendixdata1.html#cb487-1" aria-hidden="true" tabindex="-1"></a><span class="co"># number of survey questions</span></span>
+<span id="cb487-2"><a href="appendixdata1.html#cb487-2" aria-hidden="true" tabindex="-1"></a>nq <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb487-3"><a href="appendixdata1.html#cb487-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb487-4"><a href="appendixdata1.html#cb487-4" aria-hidden="true" tabindex="-1"></a><span class="co"># mean matrix for different segments </span></span>
+<span id="cb487-5"><a href="appendixdata1.html#cb487-5" aria-hidden="true" tabindex="-1"></a>mus2 <span class="ot">&lt;-</span> <span class="fu">matrix</span>( <span class="fu">c</span>( <span class="dv">5</span>,<span class="dv">2</span>,<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">2</span>,<span class="dv">4</span>, <span class="co"># Price</span></span>
+<span id="cb487-6"><a href="appendixdata1.html#cb487-6" aria-hidden="true" tabindex="-1"></a>  <span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">4</span>,<span class="dv">4</span>,<span class="dv">4</span>,<span class="dv">4</span>,<span class="dv">1</span>,<span class="dv">4</span>,<span class="dv">2</span>, <span class="co"># Conspicuous</span></span>
+<span id="cb487-7"><a href="appendixdata1.html#cb487-7" aria-hidden="true" tabindex="-1"></a>  <span class="dv">5</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">3</span>,<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">3</span>, <span class="co"># Quality</span></span>
+<span id="cb487-8"><a href="appendixdata1.html#cb487-8" aria-hidden="true" tabindex="-1"></a>  <span class="dv">3</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">1</span>,<span class="dv">5</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">2</span>), <span class="co"># Style</span></span>
+<span id="cb487-9"><a href="appendixdata1.html#cb487-9" aria-hidden="true" tabindex="-1"></a><span class="at">ncol=</span>nq, <span class="at">byrow=</span><span class="cn">TRUE</span>) </span>
+<span id="cb487-10"><a href="appendixdata1.html#cb487-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb487-11"><a href="appendixdata1.html#cb487-11" aria-hidden="true" tabindex="-1"></a><span class="co"># assume the variance is 0.2 for all</span></span>
+<span id="cb487-12"><a href="appendixdata1.html#cb487-12" aria-hidden="true" tabindex="-1"></a>sd2 <span class="ot">&lt;-</span> <span class="fl">0.2</span></span>
+<span id="cb487-13"><a href="appendixdata1.html#cb487-13" aria-hidden="true" tabindex="-1"></a>sim.dat2 <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb487-14"><a href="appendixdata1.html#cb487-14" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1000</span>)</span>
+<span id="cb487-15"><a href="appendixdata1.html#cb487-15" aria-hidden="true" tabindex="-1"></a><span class="co"># loop for customer segment (i)</span></span>
+<span id="cb487-16"><a href="appendixdata1.html#cb487-16" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(group_name)) {</span>
+<span id="cb487-17"><a href="appendixdata1.html#cb487-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># the following line is used for checking the</span></span>
+<span id="cb487-18"><a href="appendixdata1.html#cb487-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># progress cat (i, group_name[i],&#39;\n&#39;) create an</span></span>
+<span id="cb487-19"><a href="appendixdata1.html#cb487-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># empty data frame to store data</span></span>
+<span id="cb487-20"><a href="appendixdata1.html#cb487-20" aria-hidden="true" tabindex="-1"></a>    seg <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="at">nrow =</span> group_size[i], </span>
+<span id="cb487-21"><a href="appendixdata1.html#cb487-21" aria-hidden="true" tabindex="-1"></a>        <span class="at">ncol =</span> nq))</span>
+<span id="cb487-22"><a href="appendixdata1.html#cb487-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># simulate data within segment</span></span>
+<span id="cb487-23"><a href="appendixdata1.html#cb487-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>nq) {</span>
+<span id="cb487-24"><a href="appendixdata1.html#cb487-24" aria-hidden="true" tabindex="-1"></a>        <span class="co"># simulate normal distribution</span></span>
+<span id="cb487-25"><a href="appendixdata1.html#cb487-25" aria-hidden="true" tabindex="-1"></a>        res <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(group_size[i], <span class="at">mean =</span> mus2[i, </span>
+<span id="cb487-26"><a href="appendixdata1.html#cb487-26" aria-hidden="true" tabindex="-1"></a>            j], <span class="at">sd =</span> sd2)</span>
+<span id="cb487-27"><a href="appendixdata1.html#cb487-27" aria-hidden="true" tabindex="-1"></a>        <span class="co"># set upper and lower limit</span></span>
+<span id="cb487-28"><a href="appendixdata1.html#cb487-28" aria-hidden="true" tabindex="-1"></a>        res[res <span class="sc">&gt;</span> <span class="dv">5</span>] <span class="ot">&lt;-</span> <span class="dv">5</span></span>
+<span id="cb487-29"><a href="appendixdata1.html#cb487-29" aria-hidden="true" tabindex="-1"></a>        res[res <span class="sc">&lt;</span> <span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb487-30"><a href="appendixdata1.html#cb487-30" aria-hidden="true" tabindex="-1"></a>        <span class="co"># convert continuous values to discrete integers</span></span>
+<span id="cb487-31"><a href="appendixdata1.html#cb487-31" aria-hidden="true" tabindex="-1"></a>        seg[, j] <span class="ot">&lt;-</span> <span class="fu">floor</span>(res)</span>
+<span id="cb487-32"><a href="appendixdata1.html#cb487-32" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb487-33"><a href="appendixdata1.html#cb487-33" aria-hidden="true" tabindex="-1"></a>    sim.dat2 <span class="ot">&lt;-</span> <span class="fu">rbind</span>(sim.dat2, seg)</span>
+<span id="cb487-34"><a href="appendixdata1.html#cb487-34" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb487-35"><a href="appendixdata1.html#cb487-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb487-36"><a href="appendixdata1.html#cb487-36" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(sim.dat2) <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">&quot;Q&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>)</span>
+<span id="cb487-37"><a href="appendixdata1.html#cb487-37" aria-hidden="true" tabindex="-1"></a>sim.dat <span class="ot">&lt;-</span> <span class="fu">cbind</span>(sim.dat, sim.dat2)</span>
+<span id="cb487-38"><a href="appendixdata1.html#cb487-38" aria-hidden="true" tabindex="-1"></a>sim.dat<span class="sc">$</span>segment <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">rep</span>(group_name, <span class="at">times =</span> group_size))</span></code></pre></div>
 <!--
 ## Customer Satisfaction Survey Data from Airline Company {#appendixdata2}
 
@@ -578,7 +641,6 @@ names(rating) <- c("Easy_Reservation", "Preferred_Seats",
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
-<script src="libs/gitbook/js/lunr.js"></script>
 <script src="libs/gitbook/js/clipboard.min.js"></script>
 <script src="libs/gitbook/js/plugin-search.js"></script>
 <script src="libs/gitbook/js/plugin-sharing.js"></script>
@@ -597,6 +659,7 @@ gitbook.start({
 "weibo": false,
 "instapaper": false,
 "vk": false,
+"whatsapp": false,
 "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": {
@@ -617,6 +680,10 @@ gitbook.start({
 "text": null
 },
 "download": ["IDS.pdf", "IDS.epub", "IDS.mobi"],
+"search": {
+"engine": "fuse",
+"options": null
+},
 "toc": {
 "collapse": "section",
 "scroll_highlight": true

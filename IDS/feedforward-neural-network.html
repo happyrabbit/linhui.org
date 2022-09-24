@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>12.2 Feedforward Neural Network | Introduction to Data Science</title>
   <meta name="description" content="12.2 Feedforward Neural Network | Introduction to Data Science" />
-  <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
   <meta property="og:title" content="12.2 Feedforward Neural Network | Introduction to Data Science" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2021-05-25" />
+<meta name="date" content="2022-09-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +33,9 @@
   
 <link rel="prev" href="projection-pursuit-regression.html"/>
 <link rel="next" href="convolutional-neural-network.html"/>
-<script src="libs/jquery/jquery.min.js"></script>
+<script src="libs/header-attrs/header-attrs.js"></script>
+<script src="libs/jquery/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
@@ -49,29 +51,33 @@
 
 
 
-
+<link href="libs/anchor-sections/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections/anchor-sections.js"></script>
 
 
 <style type="text/css">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -80,9 +86,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -115,6 +121,29 @@ code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
 <link rel="stylesheet" href="css/style.css" type="text/css" />
 </head>
 
@@ -131,181 +160,215 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="http://scientistcafe.com">Homepage</a></li>
 
 <li class="divider"></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a><ul>
-<li class="chapter" data-level="" data-path="goal-of-the-book.html"><a href="goal-of-the-book.html"><i class="fa fa-check"></i>Goal of the Book</a></li>
-<li class="chapter" data-level="" data-path="what-this-book-covers.html"><a href="what-this-book-covers.html"><i class="fa fa-check"></i>What This Book Covers</a></li>
-<li class="chapter" data-level="" data-path="who-this-book-is-for.html"><a href="who-this-book-is-for.html"><i class="fa fa-check"></i>Who This Book Is For</a></li>
-<li class="chapter" data-level="" data-path="how-to-use-this-book.html"><a href="how-to-use-this-book.html"><i class="fa fa-check"></i>How to Use This Book</a><ul>
-<li class="chapter" data-level="" data-path="how-to-use-this-book.html"><a href="how-to-use-this-book.html#what-the-book-assumes"><i class="fa fa-check"></i>What the book assumes</a></li>
-<li class="chapter" data-level="" data-path="how-to-use-this-book.html"><a href="how-to-use-this-book.html#how-to-run-r-and-python-code"><i class="fa fa-check"></i>How to run R and Python code</a></li>
+<li><a href="index.html#preface">Preface<span></span></a>
+<ul>
+<li><a href="goal-of-the-book.html#goal-of-the-book">Goal of the Book<span></span></a></li>
+<li><a href="what-this-book-covers.html#what-this-book-covers">What This Book Covers<span></span></a></li>
+<li><a href="who-this-book-is-for.html#who-this-book-is-for">Who This Book Is For<span></span></a></li>
+<li><a href="how-to-use-this-book.html#how-to-use-this-book">How to Use This Book<span></span></a>
+<ul>
+<li><a href="how-to-use-this-book.html#what-the-book-assumes">What the book assumes<span></span></a></li>
+<li><a href="how-to-use-this-book.html#how-to-run-r-and-python-code">How to run R and Python code<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="" data-path="complementary-reading.html"><a href="complementary-reading.html"><i class="fa fa-check"></i>Complementary Reading</a></li>
-<li class="chapter" data-level="" data-path="acknowledgements.html"><a href="acknowledgements.html"><i class="fa fa-check"></i>Acknowledgements</a></li>
+<li><a href="complementary-reading.html#complementary-reading">Complementary Reading<span></span></a></li>
+<li><a href="acknowledgements.html#acknowledgements">Acknowledgements<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="" data-path="about-the-authors.html"><a href="about-the-authors.html"><i class="fa fa-check"></i>About the Authors</a></li>
-<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a><ul>
-<li class="chapter" data-level="1.1" data-path="a-brief-history-of-data-science.html"><a href="a-brief-history-of-data-science.html"><i class="fa fa-check"></i><b>1.1</b> A brief history of data science</a></li>
-<li class="chapter" data-level="1.2" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html"><i class="fa fa-check"></i><b>1.2</b> Data science role and skill tracks</a><ul>
-<li class="chapter" data-level="1.2.1" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#engineering"><i class="fa fa-check"></i><b>1.2.1</b> Engineering</a></li>
-<li class="chapter" data-level="1.2.2" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#analysis"><i class="fa fa-check"></i><b>1.2.2</b> Analysis</a></li>
-<li class="chapter" data-level="1.2.3" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#modeling"><i class="fa fa-check"></i><b>1.2.3</b> Modeling</a></li>
+<li><a href="about-the-authors.html#about-the-authors">About the Authors<span></span></a></li>
+<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction<span></span></a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="a-brief-history-of-data-science.html"><a href="a-brief-history-of-data-science.html"><i class="fa fa-check"></i><b>1.1</b> A brief history of data science<span></span></a></li>
+<li class="chapter" data-level="1.2" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html"><i class="fa fa-check"></i><b>1.2</b> Data science role and skill tracks<span></span></a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#engineering"><i class="fa fa-check"></i><b>1.2.1</b> Engineering<span></span></a></li>
+<li class="chapter" data-level="1.2.2" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#analysis"><i class="fa fa-check"></i><b>1.2.2</b> Analysis<span></span></a></li>
+<li class="chapter" data-level="1.2.3" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#modeling"><i class="fa fa-check"></i><b>1.2.3</b> Modeling<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="1.3" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html"><i class="fa fa-check"></i><b>1.3</b> What kind of questions can data science solve?</a><ul>
-<li class="chapter" data-level="1.3.1" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html#prerequisites"><i class="fa fa-check"></i><b>1.3.1</b> Prerequisites</a></li>
-<li class="chapter" data-level="1.3.2" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html#problem-type"><i class="fa fa-check"></i><b>1.3.2</b> Problem type</a></li>
+<li class="chapter" data-level="1.3" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html"><i class="fa fa-check"></i><b>1.3</b> What kind of questions can data science solve?<span></span></a>
+<ul>
+<li class="chapter" data-level="1.3.1" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html#prerequisites"><i class="fa fa-check"></i><b>1.3.1</b> Prerequisites<span></span></a></li>
+<li class="chapter" data-level="1.3.2" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html#problem-type"><i class="fa fa-check"></i><b>1.3.2</b> Problem type<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="1.4" data-path="structure-data-science-team.html"><a href="structure-data-science-team.html"><i class="fa fa-check"></i><b>1.4</b> Structure data science team</a></li>
-<li class="chapter" data-level="1.5" data-path="list-of-potential-data-science-careers.html"><a href="list-of-potential-data-science-careers.html"><i class="fa fa-check"></i><b>1.5</b> List of potential data science careers</a></li>
+<li class="chapter" data-level="1.4" data-path="structure-data-science-team.html"><a href="structure-data-science-team.html"><i class="fa fa-check"></i><b>1.4</b> Structure data science team<span></span></a></li>
+<li class="chapter" data-level="1.5" data-path="list-of-potential-data-science-careers.html"><a href="list-of-potential-data-science-careers.html"><i class="fa fa-check"></i><b>1.5</b> List of potential data science careers<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="2" data-path="soft-skills-for-data-scientists.html"><a href="soft-skills-for-data-scientists.html"><i class="fa fa-check"></i><b>2</b> Soft Skills for Data Scientists</a><ul>
-<li class="chapter" data-level="2.1" data-path="comparison-between-statistician-and-data-scientist.html"><a href="comparison-between-statistician-and-data-scientist.html"><i class="fa fa-check"></i><b>2.1</b> Comparison between Statistician and Data Scientist</a></li>
-<li class="chapter" data-level="2.2" data-path="beyond-data-and-analytics.html"><a href="beyond-data-and-analytics.html"><i class="fa fa-check"></i><b>2.2</b> Beyond Data and Analytics</a></li>
-<li class="chapter" data-level="2.3" data-path="three-pillars-of-knowledge.html"><a href="three-pillars-of-knowledge.html"><i class="fa fa-check"></i><b>2.3</b> Three Pillars of Knowledge</a></li>
-<li class="chapter" data-level="2.4" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html"><i class="fa fa-check"></i><b>2.4</b> Data Science Project Cycle</a><ul>
-<li class="chapter" data-level="2.4.1" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#types-of-data-science-projects"><i class="fa fa-check"></i><b>2.4.1</b> Types of Data Science Projects</a></li>
-<li class="chapter" data-level="2.4.2" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#problem-formulation-and-project-planning-stage"><i class="fa fa-check"></i><b>2.4.2</b> Problem Formulation and Project Planning Stage</a></li>
-<li class="chapter" data-level="2.4.3" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#project-modeling-stage"><i class="fa fa-check"></i><b>2.4.3</b> Project Modeling Stage</a></li>
-<li class="chapter" data-level="2.4.4" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#model-implementation-and-post-production-stage"><i class="fa fa-check"></i><b>2.4.4</b> Model Implementation and Post Production Stage</a></li>
-<li class="chapter" data-level="2.4.5" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#project-cycle-summary"><i class="fa fa-check"></i><b>2.4.5</b> Project Cycle Summary</a></li>
+<li class="chapter" data-level="2" data-path="soft-skills-for-data-scientists.html"><a href="soft-skills-for-data-scientists.html"><i class="fa fa-check"></i><b>2</b> Soft Skills for Data Scientists<span></span></a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="comparison-between-statistician-and-data-scientist.html"><a href="comparison-between-statistician-and-data-scientist.html"><i class="fa fa-check"></i><b>2.1</b> Comparison between Statistician and Data Scientist<span></span></a></li>
+<li class="chapter" data-level="2.2" data-path="beyond-data-and-analytics.html"><a href="beyond-data-and-analytics.html"><i class="fa fa-check"></i><b>2.2</b> Beyond Data and Analytics<span></span></a></li>
+<li class="chapter" data-level="2.3" data-path="three-pillars-of-knowledge.html"><a href="three-pillars-of-knowledge.html"><i class="fa fa-check"></i><b>2.3</b> Three Pillars of Knowledge<span></span></a></li>
+<li class="chapter" data-level="2.4" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html"><i class="fa fa-check"></i><b>2.4</b> Data Science Project Cycle<span></span></a>
+<ul>
+<li class="chapter" data-level="2.4.1" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#types-of-data-science-projects"><i class="fa fa-check"></i><b>2.4.1</b> Types of Data Science Projects<span></span></a></li>
+<li class="chapter" data-level="2.4.2" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#problem-formulation-and-project-planning-stage"><i class="fa fa-check"></i><b>2.4.2</b> Problem Formulation and Project Planning Stage<span></span></a></li>
+<li class="chapter" data-level="2.4.3" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#project-modeling-stage"><i class="fa fa-check"></i><b>2.4.3</b> Project Modeling Stage<span></span></a></li>
+<li class="chapter" data-level="2.4.4" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#model-implementation-and-post-production-stage"><i class="fa fa-check"></i><b>2.4.4</b> Model Implementation and Post Production Stage<span></span></a></li>
+<li class="chapter" data-level="2.4.5" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#project-cycle-summary"><i class="fa fa-check"></i><b>2.4.5</b> Project Cycle Summary<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="2.5" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html"><i class="fa fa-check"></i><b>2.5</b> Common Mistakes in Data Science</a><ul>
-<li class="chapter" data-level="2.5.1" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#problem-formulation-stage"><i class="fa fa-check"></i><b>2.5.1</b> Problem Formulation Stage</a></li>
-<li class="chapter" data-level="2.5.2" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#project-planning-stage"><i class="fa fa-check"></i><b>2.5.2</b> Project Planning Stage</a></li>
-<li class="chapter" data-level="2.5.3" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#project-modeling-stage-1"><i class="fa fa-check"></i><b>2.5.3</b> Project Modeling Stage</a></li>
-<li class="chapter" data-level="2.5.4" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#model-implementation-and-post-production-stage-1"><i class="fa fa-check"></i><b>2.5.4</b> Model Implementation and Post Production Stage</a></li>
-<li class="chapter" data-level="2.5.5" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#summary-of-common-mistakes"><i class="fa fa-check"></i><b>2.5.5</b> Summary of Common Mistakes</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="3" data-path="introduction-to-the-data.html"><a href="introduction-to-the-data.html"><i class="fa fa-check"></i><b>3</b> Introduction to The Data</a><ul>
-<li class="chapter" data-level="3.1" data-path="customer-data-for-a-clothing-company.html"><a href="customer-data-for-a-clothing-company.html"><i class="fa fa-check"></i><b>3.1</b> Customer Data for A Clothing Company</a></li>
-<li class="chapter" data-level="3.2" data-path="swinediseasedata.html"><a href="swinediseasedata.html"><i class="fa fa-check"></i><b>3.2</b> Swine Disease Breakout Data</a></li>
-<li class="chapter" data-level="3.3" data-path="mnist-dataset.html"><a href="mnist-dataset.html"><i class="fa fa-check"></i><b>3.3</b> MNIST Dataset</a></li>
-<li class="chapter" data-level="3.4" data-path="imdb-dataset.html"><a href="imdb-dataset.html"><i class="fa fa-check"></i><b>3.4</b> IMDB Dataset</a></li>
-</ul></li>
-<li class="chapter" data-level="4" data-path="bigdatacloudplatform.html"><a href="bigdatacloudplatform.html"><i class="fa fa-check"></i><b>4</b> Big Data Cloud Platform</a><ul>
-<li class="chapter" data-level="4.1" data-path="power-of-cluster-of-computers.html"><a href="power-of-cluster-of-computers.html"><i class="fa fa-check"></i><b>4.1</b> Power of Cluster of Computers</a></li>
-<li class="chapter" data-level="4.2" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html"><i class="fa fa-check"></i><b>4.2</b> Evolution of Cluster Computing</a><ul>
-<li class="chapter" data-level="4.2.1" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html#hadoop"><i class="fa fa-check"></i><b>4.2.1</b> Hadoop</a></li>
-<li class="chapter" data-level="4.2.2" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html#spark"><i class="fa fa-check"></i><b>4.2.2</b> Spark</a></li>
-</ul></li>
-<li class="chapter" data-level="4.3" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html"><i class="fa fa-check"></i><b>4.3</b> Introduction of Cloud Environment</a><ul>
-<li class="chapter" data-level="4.3.1" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#open-account-and-create-a-cluster"><i class="fa fa-check"></i><b>4.3.1</b> Open Account and Create a Cluster</a></li>
-<li class="chapter" data-level="4.3.2" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#r-notebook"><i class="fa fa-check"></i><b>4.3.2</b> R Notebook</a></li>
-<li class="chapter" data-level="4.3.3" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#markdown-cells"><i class="fa fa-check"></i><b>4.3.3</b> Markdown Cells</a></li>
-</ul></li>
-<li class="chapter" data-level="4.4" data-path="leveragesparkr.html"><a href="leveragesparkr.html"><i class="fa fa-check"></i><b>4.4</b> Leverage Spark Using R Notebook</a></li>
-<li class="chapter" data-level="4.5" data-path="databases-and-sql.html"><a href="databases-and-sql.html"><i class="fa fa-check"></i><b>4.5</b> Databases and SQL</a><ul>
-<li class="chapter" data-level="4.5.1" data-path="databases-and-sql.html"><a href="databases-and-sql.html#history"><i class="fa fa-check"></i><b>4.5.1</b> History</a></li>
-<li class="chapter" data-level="4.5.2" data-path="databases-and-sql.html"><a href="databases-and-sql.html#database-table-and-view"><i class="fa fa-check"></i><b>4.5.2</b> Database, Table and View</a></li>
-<li class="chapter" data-level="4.5.3" data-path="databases-and-sql.html"><a href="databases-and-sql.html#basic-sql-statement"><i class="fa fa-check"></i><b>4.5.3</b> Basic SQL Statement</a></li>
-<li class="chapter" data-level="4.5.4" data-path="databases-and-sql.html"><a href="databases-and-sql.html#advanced-topics-in-database"><i class="fa fa-check"></i><b>4.5.4</b> Advanced Topics in Database</a></li>
+<li class="chapter" data-level="2.5" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html"><i class="fa fa-check"></i><b>2.5</b> Common Mistakes in Data Science<span></span></a>
+<ul>
+<li class="chapter" data-level="2.5.1" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#problem-formulation-stage"><i class="fa fa-check"></i><b>2.5.1</b> Problem Formulation Stage<span></span></a></li>
+<li class="chapter" data-level="2.5.2" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#project-planning-stage"><i class="fa fa-check"></i><b>2.5.2</b> Project Planning Stage<span></span></a></li>
+<li class="chapter" data-level="2.5.3" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#project-modeling-stage-1"><i class="fa fa-check"></i><b>2.5.3</b> Project Modeling Stage<span></span></a></li>
+<li class="chapter" data-level="2.5.4" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#model-implementation-and-post-production-stage-1"><i class="fa fa-check"></i><b>2.5.4</b> Model Implementation and Post Production Stage<span></span></a></li>
+<li class="chapter" data-level="2.5.5" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#summary-of-common-mistakes"><i class="fa fa-check"></i><b>2.5.5</b> Summary of Common Mistakes<span></span></a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="datapreprocessing.html"><a href="datapreprocessing.html"><i class="fa fa-check"></i><b>5</b> Data Pre-processing</a><ul>
-<li class="chapter" data-level="5.1" data-path="data-cleaning.html"><a href="data-cleaning.html"><i class="fa fa-check"></i><b>5.1</b> Data Cleaning</a></li>
-<li class="chapter" data-level="5.2" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>5.2</b> Missing Values</a><ul>
-<li class="chapter" data-level="5.2.1" data-path="missing-values.html"><a href="missing-values.html#impute-missing-values-with-medianmode"><i class="fa fa-check"></i><b>5.2.1</b> Impute missing values with median/mode</a></li>
-<li class="chapter" data-level="5.2.2" data-path="missing-values.html"><a href="missing-values.html#k-nearest-neighbors"><i class="fa fa-check"></i><b>5.2.2</b> K-nearest neighbors</a></li>
-<li class="chapter" data-level="5.2.3" data-path="missing-values.html"><a href="missing-values.html#bagging-tree"><i class="fa fa-check"></i><b>5.2.3</b> Bagging Tree</a></li>
+<li class="chapter" data-level="3" data-path="introduction-to-the-data.html"><a href="introduction-to-the-data.html"><i class="fa fa-check"></i><b>3</b> Introduction to The Data<span></span></a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="customer-data-for-a-clothing-company.html"><a href="customer-data-for-a-clothing-company.html"><i class="fa fa-check"></i><b>3.1</b> Customer Data for A Clothing Company<span></span></a></li>
+<li class="chapter" data-level="3.2" data-path="swinediseasedata.html"><a href="swinediseasedata.html"><i class="fa fa-check"></i><b>3.2</b> Swine Disease Breakout Data<span></span></a></li>
+<li class="chapter" data-level="3.3" data-path="mnist-dataset.html"><a href="mnist-dataset.html"><i class="fa fa-check"></i><b>3.3</b> MNIST Dataset<span></span></a></li>
+<li class="chapter" data-level="3.4" data-path="imdb-dataset.html"><a href="imdb-dataset.html"><i class="fa fa-check"></i><b>3.4</b> IMDB Dataset<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="5.3" data-path="centering-and-scaling.html"><a href="centering-and-scaling.html"><i class="fa fa-check"></i><b>5.3</b> Centering and Scaling</a></li>
-<li class="chapter" data-level="5.4" data-path="resolve-skewness.html"><a href="resolve-skewness.html"><i class="fa fa-check"></i><b>5.4</b> Resolve Skewness</a></li>
-<li class="chapter" data-level="5.5" data-path="outliers.html"><a href="outliers.html"><i class="fa fa-check"></i><b>5.5</b> Resolve Outliers</a></li>
-<li class="chapter" data-level="5.6" data-path="collinearity.html"><a href="collinearity.html"><i class="fa fa-check"></i><b>5.6</b> Collinearity</a></li>
-<li class="chapter" data-level="5.7" data-path="sparse-variables.html"><a href="sparse-variables.html"><i class="fa fa-check"></i><b>5.7</b> Sparse Variables</a></li>
-<li class="chapter" data-level="5.8" data-path="re-encode-dummy-variables.html"><a href="re-encode-dummy-variables.html"><i class="fa fa-check"></i><b>5.8</b> Re-encode Dummy Variables</a></li>
+<li class="chapter" data-level="4" data-path="bigdatacloudplatform.html"><a href="bigdatacloudplatform.html"><i class="fa fa-check"></i><b>4</b> Big Data Cloud Platform<span></span></a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="power-of-cluster-of-computers.html"><a href="power-of-cluster-of-computers.html"><i class="fa fa-check"></i><b>4.1</b> Power of Cluster of Computers<span></span></a></li>
+<li class="chapter" data-level="4.2" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html"><i class="fa fa-check"></i><b>4.2</b> Evolution of Cluster Computing<span></span></a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html#hadoop"><i class="fa fa-check"></i><b>4.2.1</b> Hadoop<span></span></a></li>
+<li class="chapter" data-level="4.2.2" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html#spark"><i class="fa fa-check"></i><b>4.2.2</b> Spark<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="6" data-path="datawrangline.html"><a href="datawrangline.html"><i class="fa fa-check"></i><b>6</b> Data Wrangling</a><ul>
-<li class="chapter" data-level="6.1" data-path="summarize-data.html"><a href="summarize-data.html"><i class="fa fa-check"></i><b>6.1</b> Summarize Data</a><ul>
-<li class="chapter" data-level="6.1.1" data-path="summarize-data.html"><a href="summarize-data.html#dplyr-package"><i class="fa fa-check"></i><b>6.1.1</b> <code>dplyr</code> package</a></li>
-<li class="chapter" data-level="6.1.2" data-path="summarize-data.html"><a href="summarize-data.html#applyfamilyinbaser"><i class="fa fa-check"></i><b>6.1.2</b> <code>apply()</code>, <code>lapply()</code> and <code>sapply()</code> in base R</a></li>
+<li class="chapter" data-level="4.3" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html"><i class="fa fa-check"></i><b>4.3</b> Introduction of Cloud Environment<span></span></a>
+<ul>
+<li class="chapter" data-level="4.3.1" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#open-account-and-create-a-cluster"><i class="fa fa-check"></i><b>4.3.1</b> Open Account and Create a Cluster<span></span></a></li>
+<li class="chapter" data-level="4.3.2" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#r-notebook"><i class="fa fa-check"></i><b>4.3.2</b> R Notebook<span></span></a></li>
+<li class="chapter" data-level="4.3.3" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#markdown-cells"><i class="fa fa-check"></i><b>4.3.3</b> Markdown Cells<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="6.2" data-path="tidy-and-reshape-data.html"><a href="tidy-and-reshape-data.html"><i class="fa fa-check"></i><b>6.2</b> Tidy and Reshape Data</a></li>
-</ul></li>
-<li class="chapter" data-level="7" data-path="modeltuningstrategy.html"><a href="modeltuningstrategy.html"><i class="fa fa-check"></i><b>7</b> Model Tuning Strategy</a><ul>
-<li class="chapter" data-level="7.1" data-path="vbtradeoff.html"><a href="vbtradeoff.html"><i class="fa fa-check"></i><b>7.1</b> Variance-Bias Trade-Off</a></li>
-<li class="chapter" data-level="7.2" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html"><i class="fa fa-check"></i><b>7.2</b> Data Splitting and Resampling</a><ul>
-<li class="chapter" data-level="7.2.1" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html#datasplitting"><i class="fa fa-check"></i><b>7.2.1</b> Data Splitting</a></li>
-<li class="chapter" data-level="7.2.2" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html#resampling"><i class="fa fa-check"></i><b>7.2.2</b> Resampling</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="8" data-path="measuring-performance.html"><a href="measuring-performance.html"><i class="fa fa-check"></i><b>8</b> Measuring Performance</a><ul>
-<li class="chapter" data-level="8.1" data-path="regression-model-performance.html"><a href="regression-model-performance.html"><i class="fa fa-check"></i><b>8.1</b> Regression Model Performance</a></li>
-<li class="chapter" data-level="8.2" data-path="classification-model-performance.html"><a href="classification-model-performance.html"><i class="fa fa-check"></i><b>8.2</b> Classification Model Performance</a><ul>
-<li class="chapter" data-level="8.2.1" data-path="classification-model-performance.html"><a href="classification-model-performance.html#confusion-matrix"><i class="fa fa-check"></i><b>8.2.1</b> Confusion Matrix</a></li>
-<li class="chapter" data-level="8.2.2" data-path="classification-model-performance.html"><a href="classification-model-performance.html#kappa-statistic"><i class="fa fa-check"></i><b>8.2.2</b> Kappa Statistic</a></li>
-<li class="chapter" data-level="8.2.3" data-path="classification-model-performance.html"><a href="classification-model-performance.html#roc"><i class="fa fa-check"></i><b>8.2.3</b> ROC</a></li>
-<li class="chapter" data-level="8.2.4" data-path="classification-model-performance.html"><a href="classification-model-performance.html#gain-and-lift-charts"><i class="fa fa-check"></i><b>8.2.4</b> Gain and Lift Charts</a></li>
+<li class="chapter" data-level="4.4" data-path="leveragesparkr.html"><a href="leveragesparkr.html"><i class="fa fa-check"></i><b>4.4</b> Leverage Spark Using R Notebook<span></span></a></li>
+<li class="chapter" data-level="4.5" data-path="databases-and-sql.html"><a href="databases-and-sql.html"><i class="fa fa-check"></i><b>4.5</b> Databases and SQL<span></span></a>
+<ul>
+<li class="chapter" data-level="4.5.1" data-path="databases-and-sql.html"><a href="databases-and-sql.html#history"><i class="fa fa-check"></i><b>4.5.1</b> History<span></span></a></li>
+<li class="chapter" data-level="4.5.2" data-path="databases-and-sql.html"><a href="databases-and-sql.html#database-table-and-view"><i class="fa fa-check"></i><b>4.5.2</b> Database, Table and View<span></span></a></li>
+<li class="chapter" data-level="4.5.3" data-path="databases-and-sql.html"><a href="databases-and-sql.html#basic-sql-statement"><i class="fa fa-check"></i><b>4.5.3</b> Basic SQL Statement<span></span></a></li>
+<li class="chapter" data-level="4.5.4" data-path="databases-and-sql.html"><a href="databases-and-sql.html#advanced-topics-in-database"><i class="fa fa-check"></i><b>4.5.4</b> Advanced Topics in Database<span></span></a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="9" data-path="regression-models.html"><a href="regression-models.html"><i class="fa fa-check"></i><b>9</b> Regression Models</a><ul>
-<li class="chapter" data-level="9.1" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html"><i class="fa fa-check"></i><b>9.1</b> Ordinary Least Square</a><ul>
-<li class="chapter" data-level="9.1.1" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html#the-magic-p-value"><i class="fa fa-check"></i><b>9.1.1</b> The Magic P-value</a></li>
-<li class="chapter" data-level="9.1.2" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html#diagnostics-for-linear-regression"><i class="fa fa-check"></i><b>9.1.2</b> Diagnostics for Linear Regression</a></li>
+<li class="chapter" data-level="5" data-path="datapreprocessing.html"><a href="datapreprocessing.html"><i class="fa fa-check"></i><b>5</b> Data Pre-processing<span></span></a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="data-cleaning.html"><a href="data-cleaning.html"><i class="fa fa-check"></i><b>5.1</b> Data Cleaning<span></span></a></li>
+<li class="chapter" data-level="5.2" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>5.2</b> Missing Values<span></span></a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="missing-values.html"><a href="missing-values.html#impute-missing-values-with-medianmode"><i class="fa fa-check"></i><b>5.2.1</b> Impute missing values with median/mode<span></span></a></li>
+<li class="chapter" data-level="5.2.2" data-path="missing-values.html"><a href="missing-values.html#k-nearest-neighbors"><i class="fa fa-check"></i><b>5.2.2</b> K-nearest neighbors<span></span></a></li>
+<li class="chapter" data-level="5.2.3" data-path="missing-values.html"><a href="missing-values.html#bagging-tree"><i class="fa fa-check"></i><b>5.2.3</b> Bagging Tree<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="9.2" data-path="principal-component-regression-and-partial-least-square.html"><a href="principal-component-regression-and-partial-least-square.html"><i class="fa fa-check"></i><b>9.2</b> Principal Component Regression and Partial Least Square</a></li>
+<li class="chapter" data-level="5.3" data-path="centering-and-scaling.html"><a href="centering-and-scaling.html"><i class="fa fa-check"></i><b>5.3</b> Centering and Scaling<span></span></a></li>
+<li class="chapter" data-level="5.4" data-path="resolve-skewness.html"><a href="resolve-skewness.html"><i class="fa fa-check"></i><b>5.4</b> Resolve Skewness<span></span></a></li>
+<li class="chapter" data-level="5.5" data-path="outliers.html"><a href="outliers.html"><i class="fa fa-check"></i><b>5.5</b> Resolve Outliers<span></span></a></li>
+<li class="chapter" data-level="5.6" data-path="collinearity.html"><a href="collinearity.html"><i class="fa fa-check"></i><b>5.6</b> Collinearity<span></span></a></li>
+<li class="chapter" data-level="5.7" data-path="sparse-variables.html"><a href="sparse-variables.html"><i class="fa fa-check"></i><b>5.7</b> Sparse Variables<span></span></a></li>
+<li class="chapter" data-level="5.8" data-path="re-encode-dummy-variables.html"><a href="re-encode-dummy-variables.html"><i class="fa fa-check"></i><b>5.8</b> Re-encode Dummy Variables<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="10" data-path="regularization-methods.html"><a href="regularization-methods.html"><i class="fa fa-check"></i><b>10</b> Regularization Methods</a><ul>
-<li class="chapter" data-level="10.1" data-path="ridge-regression.html"><a href="ridge-regression.html"><i class="fa fa-check"></i><b>10.1</b> Ridge Regression</a></li>
-<li class="chapter" data-level="10.2" data-path="lasso.html"><a href="lasso.html"><i class="fa fa-check"></i><b>10.2</b> LASSO</a></li>
-<li class="chapter" data-level="10.3" data-path="variable-selection-property-of-the-lasso.html"><a href="variable-selection-property-of-the-lasso.html"><i class="fa fa-check"></i><b>10.3</b> Variable selection property of the lasso</a></li>
-<li class="chapter" data-level="10.4" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.4</b> Elastic Net</a></li>
-<li class="chapter" data-level="10.5" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.5</b> Penalized Generalized Linear Model</a><ul>
-<li class="chapter" data-level="10.5.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.5.1</b> Introduction to <code>glmnet</code> package</a></li>
-<li class="chapter" data-level="10.5.2" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#penalized-logistic-regression"><i class="fa fa-check"></i><b>10.5.2</b> Penalized logistic regression</a></li>
+<li class="chapter" data-level="6" data-path="datawrangline.html"><a href="datawrangline.html"><i class="fa fa-check"></i><b>6</b> Data Wrangling<span></span></a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="summarize-data.html"><a href="summarize-data.html"><i class="fa fa-check"></i><b>6.1</b> Summarize Data<span></span></a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="summarize-data.html"><a href="summarize-data.html#dplyr-package"><i class="fa fa-check"></i><b>6.1.1</b> <code>dplyr</code> package<span></span></a></li>
+<li class="chapter" data-level="6.1.2" data-path="summarize-data.html"><a href="summarize-data.html#applyfamilyinbaser"><i class="fa fa-check"></i><b>6.1.2</b> <code>apply()</code>, <code>lapply()</code> and <code>sapply()</code> in base R<span></span></a></li>
 </ul></li>
+<li class="chapter" data-level="6.2" data-path="tidy-and-reshape-data.html"><a href="tidy-and-reshape-data.html"><i class="fa fa-check"></i><b>6.2</b> Tidy and Reshape Data<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="11" data-path="treemodel.html"><a href="treemodel.html"><i class="fa fa-check"></i><b>11</b> Tree-Based Methods</a><ul>
-<li class="chapter" data-level="11.1" data-path="tree-basics.html"><a href="tree-basics.html"><i class="fa fa-check"></i><b>11.1</b> Tree Basics</a></li>
-<li class="chapter" data-level="11.2" data-path="splitting-criteria.html"><a href="splitting-criteria.html"><i class="fa fa-check"></i><b>11.2</b> Splitting Criteria</a></li>
-<li class="chapter" data-level="11.3" data-path="tree-pruning.html"><a href="tree-pruning.html"><i class="fa fa-check"></i><b>11.3</b> Tree Pruning</a></li>
-<li class="chapter" data-level="11.4" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html"><i class="fa fa-check"></i><b>11.4</b> Regression and Decision Tree Basic</a><ul>
-<li class="chapter" data-level="11.4.1" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html#regression-tree"><i class="fa fa-check"></i><b>11.4.1</b> Regression Tree</a></li>
-<li class="chapter" data-level="11.4.2" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html#decision-tree"><i class="fa fa-check"></i><b>11.4.2</b> Decision Tree</a></li>
-</ul></li>
-<li class="chapter" data-level="11.5" data-path="missing-values.html"><a href="missing-values.html#bagging-tree"><i class="fa fa-check"></i><b>11.5</b> Bagging Tree</a></li>
-<li class="chapter" data-level="11.6" data-path="random-forest.html"><a href="random-forest.html"><i class="fa fa-check"></i><b>11.6</b> Random Forest</a></li>
-<li class="chapter" data-level="11.7" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html"><i class="fa fa-check"></i><b>11.7</b> Gradient Boosted Machine</a><ul>
-<li class="chapter" data-level="11.7.1" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#adaptive-boosting"><i class="fa fa-check"></i><b>11.7.1</b> Adaptive Boosting</a></li>
-<li class="chapter" data-level="11.7.2" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#stochastic-gradient-boosting"><i class="fa fa-check"></i><b>11.7.2</b> Stochastic Gradient Boosting</a></li>
-<li class="chapter" data-level="11.7.3" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#boosting-as-additive-model"><i class="fa fa-check"></i><b>11.7.3</b> Boosting as Additive Model</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="12" data-path="deeplearning.html"><a href="deeplearning.html"><i class="fa fa-check"></i><b>12</b> Deep Learning</a><ul>
-<li class="chapter" data-level="12.1" data-path="projection-pursuit-regression.html"><a href="projection-pursuit-regression.html"><i class="fa fa-check"></i><b>12.1</b> Projection Pursuit Regression</a></li>
-<li class="chapter" data-level="12.2" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html"><i class="fa fa-check"></i><b>12.2</b> Feedforward Neural Network</a><ul>
-<li class="chapter" data-level="12.2.1" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#logisticregasneuralnetwork"><i class="fa fa-check"></i><b>12.2.1</b> Logistic Regression as Neural Network</a></li>
-<li class="chapter" data-level="12.2.2" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#stochastic-gradient-descent"><i class="fa fa-check"></i><b>12.2.2</b> Stochastic Gradient Descent</a></li>
-<li class="chapter" data-level="12.2.3" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#deepneuralnetwork"><i class="fa fa-check"></i><b>12.2.3</b> Deep Neural Network</a></li>
-<li class="chapter" data-level="12.2.4" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#activationfunction"><i class="fa fa-check"></i><b>12.2.4</b> Activation Function</a></li>
-<li class="chapter" data-level="12.2.5" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#optimization"><i class="fa fa-check"></i><b>12.2.5</b> Optimization</a></li>
-<li class="chapter" data-level="12.2.6" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#deal-with-overfitting"><i class="fa fa-check"></i><b>12.2.6</b> Deal with Overfitting</a></li>
-<li class="chapter" data-level="12.2.7" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#ffnnexample"><i class="fa fa-check"></i><b>12.2.7</b> Image Recognition Using FFNN</a></li>
-</ul></li>
-<li class="chapter" data-level="12.3" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html"><i class="fa fa-check"></i><b>12.3</b> Convolutional Neural Network</a><ul>
-<li class="chapter" data-level="12.3.1" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#convolution-layer"><i class="fa fa-check"></i><b>12.3.1</b> Convolution Layer</a></li>
-<li class="chapter" data-level="12.3.2" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#padding-layer"><i class="fa fa-check"></i><b>12.3.2</b> Padding Layer</a></li>
-<li class="chapter" data-level="12.3.3" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#pooling-layer"><i class="fa fa-check"></i><b>12.3.3</b> Pooling Layer</a></li>
-<li class="chapter" data-level="12.3.4" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#convolution-over-volume"><i class="fa fa-check"></i><b>12.3.4</b> Convolution Over Volume</a></li>
-<li class="chapter" data-level="12.3.5" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#cnnexample"><i class="fa fa-check"></i><b>12.3.5</b> Image Recognition Using CNN</a></li>
-</ul></li>
-<li class="chapter" data-level="12.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html"><i class="fa fa-check"></i><b>12.4</b> Recurrent Neural Network</a><ul>
-<li class="chapter" data-level="12.4.1" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#rnn-model"><i class="fa fa-check"></i><b>12.4.1</b> RNN Model</a></li>
-<li class="chapter" data-level="12.4.2" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#embedding"><i class="fa fa-check"></i><b>12.4.2</b> Word Embedding</a></li>
-<li class="chapter" data-level="12.4.3" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#lstm"><i class="fa fa-check"></i><b>12.4.3</b> Long Short Term Memory</a></li>
-<li class="chapter" data-level="12.4.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#rnnexample"><i class="fa fa-check"></i><b>12.4.4</b> Sentiment Analysis Using RNN</a></li>
+<li class="chapter" data-level="7" data-path="modeltuningstrategy.html"><a href="modeltuningstrategy.html"><i class="fa fa-check"></i><b>7</b> Model Tuning Strategy<span></span></a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="vbtradeoff.html"><a href="vbtradeoff.html"><i class="fa fa-check"></i><b>7.1</b> Variance-Bias Trade-Off<span></span></a></li>
+<li class="chapter" data-level="7.2" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html"><i class="fa fa-check"></i><b>7.2</b> Data Splitting and Resampling<span></span></a>
+<ul>
+<li class="chapter" data-level="7.2.1" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html#datasplitting"><i class="fa fa-check"></i><b>7.2.1</b> Data Splitting<span></span></a></li>
+<li class="chapter" data-level="7.2.2" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html#resampling"><i class="fa fa-check"></i><b>7.2.2</b> Resampling<span></span></a></li>
 </ul></li>
 </ul></li>
-<li class="appendix"><span><b>Appendix</b></span></li>
-<li class="chapter" data-level="A" data-path="largelocaldata.html"><a href="largelocaldata.html"><i class="fa fa-check"></i><b>A</b> Handling Large Local Data</a><ul>
-<li class="chapter" data-level="A.1" data-path="readr.html"><a href="readr.html"><i class="fa fa-check"></i><b>A.1</b> <code>readr</code></a></li>
-<li class="chapter" data-level="A.2" data-path="data-table-enhanced-data-frame.html"><a href="data-table-enhanced-data-frame.html"><i class="fa fa-check"></i><b>A.2</b> <code>data.table</code>— enhanced <code>data.frame</code></a></li>
+<li class="chapter" data-level="8" data-path="measuring-performance.html"><a href="measuring-performance.html"><i class="fa fa-check"></i><b>8</b> Measuring Performance<span></span></a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="regression-model-performance.html"><a href="regression-model-performance.html"><i class="fa fa-check"></i><b>8.1</b> Regression Model Performance<span></span></a></li>
+<li class="chapter" data-level="8.2" data-path="classification-model-performance.html"><a href="classification-model-performance.html"><i class="fa fa-check"></i><b>8.2</b> Classification Model Performance<span></span></a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="classification-model-performance.html"><a href="classification-model-performance.html#confusion-matrix"><i class="fa fa-check"></i><b>8.2.1</b> Confusion Matrix<span></span></a></li>
+<li class="chapter" data-level="8.2.2" data-path="classification-model-performance.html"><a href="classification-model-performance.html#kappa-statistic"><i class="fa fa-check"></i><b>8.2.2</b> Kappa Statistic<span></span></a></li>
+<li class="chapter" data-level="8.2.3" data-path="classification-model-performance.html"><a href="classification-model-performance.html#roc"><i class="fa fa-check"></i><b>8.2.3</b> ROC<span></span></a></li>
+<li class="chapter" data-level="8.2.4" data-path="classification-model-performance.html"><a href="classification-model-performance.html#gain-and-lift-charts"><i class="fa fa-check"></i><b>8.2.4</b> Gain and Lift Charts<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="B" data-path="r-code-for-data-simulation.html"><a href="r-code-for-data-simulation.html"><i class="fa fa-check"></i><b>B</b> R code for data simulation</a><ul>
-<li class="chapter" data-level="B.1" data-path="appendixdata1.html"><a href="appendixdata1.html"><i class="fa fa-check"></i><b>B.1</b> Customer Data for Clothing Company</a></li>
-<li class="chapter" data-level="B.2" data-path="appendixdata3.html"><a href="appendixdata3.html"><i class="fa fa-check"></i><b>B.2</b> Swine Disease Breakout Data</a></li>
 </ul></li>
-<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="chapter" data-level="9" data-path="regression-models.html"><a href="regression-models.html"><i class="fa fa-check"></i><b>9</b> Regression Models<span></span></a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html"><i class="fa fa-check"></i><b>9.1</b> Ordinary Least Square<span></span></a>
+<ul>
+<li class="chapter" data-level="9.1.1" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html#the-magic-p-value"><i class="fa fa-check"></i><b>9.1.1</b> The Magic P-value<span></span></a></li>
+<li class="chapter" data-level="9.1.2" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html#diagnostics-for-linear-regression"><i class="fa fa-check"></i><b>9.1.2</b> Diagnostics for Linear Regression<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="principal-component-regression-and-partial-least-square.html"><a href="principal-component-regression-and-partial-least-square.html"><i class="fa fa-check"></i><b>9.2</b> Principal Component Regression and Partial Least Square<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="regularization-methods.html"><a href="regularization-methods.html"><i class="fa fa-check"></i><b>10</b> Regularization Methods<span></span></a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="ridge-regression.html"><a href="ridge-regression.html"><i class="fa fa-check"></i><b>10.1</b> Ridge Regression<span></span></a></li>
+<li class="chapter" data-level="10.2" data-path="lasso.html"><a href="lasso.html"><i class="fa fa-check"></i><b>10.2</b> LASSO<span></span></a></li>
+<li class="chapter" data-level="10.3" data-path="variable-selection-property-of-the-lasso.html"><a href="variable-selection-property-of-the-lasso.html"><i class="fa fa-check"></i><b>10.3</b> Variable selection property of the lasso<span></span></a></li>
+<li class="chapter" data-level="10.4" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.4</b> Elastic Net<span></span></a></li>
+<li class="chapter" data-level="10.5" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.5</b> Penalized Generalized Linear Model<span></span></a>
+<ul>
+<li class="chapter" data-level="10.5.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.5.1</b> Introduction to <code>glmnet</code> package<span></span></a></li>
+<li class="chapter" data-level="10.5.2" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#penalized-logistic-regression"><i class="fa fa-check"></i><b>10.5.2</b> Penalized logistic regression<span></span></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="treemodel.html"><a href="treemodel.html"><i class="fa fa-check"></i><b>11</b> Tree-Based Methods<span></span></a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="tree-basics.html"><a href="tree-basics.html"><i class="fa fa-check"></i><b>11.1</b> Tree Basics<span></span></a></li>
+<li class="chapter" data-level="11.2" data-path="splitting-criteria.html"><a href="splitting-criteria.html"><i class="fa fa-check"></i><b>11.2</b> Splitting Criteria<span></span></a></li>
+<li class="chapter" data-level="11.3" data-path="tree-pruning.html"><a href="tree-pruning.html"><i class="fa fa-check"></i><b>11.3</b> Tree Pruning<span></span></a></li>
+<li class="chapter" data-level="11.4" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html"><i class="fa fa-check"></i><b>11.4</b> Regression and Decision Tree Basic<span></span></a>
+<ul>
+<li class="chapter" data-level="11.4.1" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html#regression-tree"><i class="fa fa-check"></i><b>11.4.1</b> Regression Tree<span></span></a></li>
+<li class="chapter" data-level="11.4.2" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html#decision-tree"><i class="fa fa-check"></i><b>11.4.2</b> Decision Tree<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="11.5" data-path="bagging-tree-1.html"><a href="bagging-tree-1.html"><i class="fa fa-check"></i><b>11.5</b> Bagging Tree<span></span></a></li>
+<li class="chapter" data-level="11.6" data-path="random-forest.html"><a href="random-forest.html"><i class="fa fa-check"></i><b>11.6</b> Random Forest<span></span></a></li>
+<li class="chapter" data-level="11.7" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html"><i class="fa fa-check"></i><b>11.7</b> Gradient Boosted Machine<span></span></a>
+<ul>
+<li class="chapter" data-level="11.7.1" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#adaptive-boosting"><i class="fa fa-check"></i><b>11.7.1</b> Adaptive Boosting<span></span></a></li>
+<li class="chapter" data-level="11.7.2" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#stochastic-gradient-boosting"><i class="fa fa-check"></i><b>11.7.2</b> Stochastic Gradient Boosting<span></span></a></li>
+<li class="chapter" data-level="11.7.3" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#boosting-as-additive-model"><i class="fa fa-check"></i><b>11.7.3</b> Boosting as Additive Model<span></span></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="deeplearning.html"><a href="deeplearning.html"><i class="fa fa-check"></i><b>12</b> Deep Learning<span></span></a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="projection-pursuit-regression.html"><a href="projection-pursuit-regression.html"><i class="fa fa-check"></i><b>12.1</b> Projection Pursuit Regression<span></span></a></li>
+<li class="chapter" data-level="12.2" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html"><i class="fa fa-check"></i><b>12.2</b> Feedforward Neural Network<span></span></a>
+<ul>
+<li class="chapter" data-level="12.2.1" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#logisticregasneuralnetwork"><i class="fa fa-check"></i><b>12.2.1</b> Logistic Regression as Neural Network<span></span></a></li>
+<li class="chapter" data-level="12.2.2" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#stochastic-gradient-descent"><i class="fa fa-check"></i><b>12.2.2</b> Stochastic Gradient Descent<span></span></a></li>
+<li class="chapter" data-level="12.2.3" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#deepneuralnetwork"><i class="fa fa-check"></i><b>12.2.3</b> Deep Neural Network<span></span></a></li>
+<li class="chapter" data-level="12.2.4" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#activationfunction"><i class="fa fa-check"></i><b>12.2.4</b> Activation Function<span></span></a></li>
+<li class="chapter" data-level="12.2.5" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#optimization"><i class="fa fa-check"></i><b>12.2.5</b> Optimization<span></span></a></li>
+<li class="chapter" data-level="12.2.6" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#deal-with-overfitting"><i class="fa fa-check"></i><b>12.2.6</b> Deal with Overfitting<span></span></a></li>
+<li class="chapter" data-level="12.2.7" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#ffnnexample"><i class="fa fa-check"></i><b>12.2.7</b> Image Recognition Using FFNN<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="12.3" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html"><i class="fa fa-check"></i><b>12.3</b> Convolutional Neural Network<span></span></a>
+<ul>
+<li class="chapter" data-level="12.3.1" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#convolution-layer"><i class="fa fa-check"></i><b>12.3.1</b> Convolution Layer<span></span></a></li>
+<li class="chapter" data-level="12.3.2" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#padding-layer"><i class="fa fa-check"></i><b>12.3.2</b> Padding Layer<span></span></a></li>
+<li class="chapter" data-level="12.3.3" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#pooling-layer"><i class="fa fa-check"></i><b>12.3.3</b> Pooling Layer<span></span></a></li>
+<li class="chapter" data-level="12.3.4" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#convolution-over-volume"><i class="fa fa-check"></i><b>12.3.4</b> Convolution Over Volume<span></span></a></li>
+<li class="chapter" data-level="12.3.5" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#cnnexample"><i class="fa fa-check"></i><b>12.3.5</b> Image Recognition Using CNN<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="12.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html"><i class="fa fa-check"></i><b>12.4</b> Recurrent Neural Network<span></span></a>
+<ul>
+<li class="chapter" data-level="12.4.1" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#rnn-model"><i class="fa fa-check"></i><b>12.4.1</b> RNN Model<span></span></a></li>
+<li class="chapter" data-level="12.4.2" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#embedding"><i class="fa fa-check"></i><b>12.4.2</b> Word Embedding<span></span></a></li>
+<li class="chapter" data-level="12.4.3" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#lstm"><i class="fa fa-check"></i><b>12.4.3</b> Long Short Term Memory<span></span></a></li>
+<li class="chapter" data-level="12.4.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#rnnexample"><i class="fa fa-check"></i><b>12.4.4</b> Sentiment Analysis Using RNN<span></span></a></li>
+</ul></li>
+</ul></li>
+<li class="appendix"><span><b>Appendix<span></span></b></span></li>
+<li class="chapter" data-level="A" data-path="largelocaldata.html"><a href="largelocaldata.html"><i class="fa fa-check"></i><b>A</b> Handling Large Local Data<span></span></a>
+<ul>
+<li class="chapter" data-level="A.1" data-path="readr.html"><a href="readr.html"><i class="fa fa-check"></i><b>A.1</b> <code>readr</code><span></span></a></li>
+<li class="chapter" data-level="A.2" data-path="data.table-enhanced-data.html"><a href="data.table-enhanced-data.html"><i class="fa fa-check"></i><b>A.2</b> <code>data.table</code>— enhanced <code>data.frame</code><span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="B" data-path="r-code-for-data-simulation.html"><a href="r-code-for-data-simulation.html"><i class="fa fa-check"></i><b>B</b> R code for data simulation<span></span></a>
+<ul>
+<li class="chapter" data-level="B.1" data-path="appendixdata1.html"><a href="appendixdata1.html"><i class="fa fa-check"></i><b>B.1</b> Customer Data for Clothing Company<span></span></a></li>
+<li class="chapter" data-level="B.2" data-path="appendixdata3.html"><a href="appendixdata3.html"><i class="fa fa-check"></i><b>B.2</b> Swine Disease Breakout Data<span></span></a></li>
+</ul></li>
+<li><a href="references.html#references">References<span></span></a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
 
@@ -326,10 +389,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="feedforward-neural-network" class="section level2">
-<h2><span class="header-section-number">12.2</span> Feedforward Neural Network</h2>
-<div id="logisticregasneuralnetwork" class="section level3">
-<h3><span class="header-section-number">12.2.1</span> Logistic Regression as Neural Network</h3>
+<div id="feedforward-neural-network" class="section level2 hasAnchor" number="12.2">
+<h2><span class="header-section-number">12.2</span> Feedforward Neural Network<a href="feedforward-neural-network.html#feedforward-neural-network" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="logisticregasneuralnetwork" class="section level3 hasAnchor" number="12.2.1">
+<h3><span class="header-section-number">12.2.1</span> Logistic Regression as Neural Network<a href="feedforward-neural-network.html#logisticregasneuralnetwork" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Let’s look at logistic regression from the lens of the neural network. For a binary classification problem, for example spam classifier, given <span class="math inline">\(m\)</span> samples <span class="math inline">\(\{(x^{(1)}, y^{(1)}),(x^{(2)}, y^{(2)}),...,(x^{(m)}, y^{(m)})\}\)</span>, we need to use the input feature <span class="math inline">\(x^{(i)}\)</span> (they may be the frequency of various words such as “money”, special characters like dollar signs, and the use of capital letters in the message etc.) to predict the output <span class="math inline">\(y^{(i)}\)</span> (if it is a spam email). Assume that for each sample <span class="math inline">\(i\)</span>, there are <span class="math inline">\(n_{x}\)</span> input features. Then we have:</p>
 <p><span class="math display" id="eq:input">\[\begin{equation}
 X=\left[\begin{array}{cccc}
@@ -356,8 +419,8 @@ J(w,b)=\frac{1}{m} \Sigma_{i=1}^m L(\hat{y}^{(i)}, y^{(i)})
 <p><span class="math display">\[L(\hat{y}^{(i)}, y^{(i)}) =  -y^{(i)}log(\hat{y}^{(i)})-(1-y^{(i)})log(1-\hat{y}^{(i)})\]</span></p>
 <p>To fit the model is to minimize the cost function.</p>
 </div>
-<div id="stochastic-gradient-descent" class="section level3">
-<h3><span class="header-section-number">12.2.2</span> Stochastic Gradient Descent</h3>
+<div id="stochastic-gradient-descent" class="section level3 hasAnchor" number="12.2.2">
+<h3><span class="header-section-number">12.2.2</span> Stochastic Gradient Descent<a href="feedforward-neural-network.html#stochastic-gradient-descent" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The general approach to minimize <span class="math inline">\(J(w,b)\)</span> is by gradient descent, also known as <em>back-propagation</em>. The optimization process is a forward and backward sweep over the network.</p>
 <center>
 <img src="images/dnn0_fb3.png" style="width:100.0%" />
@@ -372,17 +435,17 @@ J(w,b)=\frac{1}{m} \Sigma_{i=1}^m L(\hat{y}^{(i)}, y^{(i)})
 <span class="math display">\[b := b - \gamma \frac{\partial J}{\partial b}\]</span></p>
 <p>Repeat the forward and backward process using the updated parameter until the cost <span class="math inline">\(J\)</span> stabilizes.</p>
 </div>
-<div id="deepneuralnetwork" class="section level3">
-<h3><span class="header-section-number">12.2.3</span> Deep Neural Network</h3>
+<div id="deepneuralnetwork" class="section level3 hasAnchor" number="12.2.3">
+<h3><span class="header-section-number">12.2.3</span> Deep Neural Network<a href="feedforward-neural-network.html#deepneuralnetwork" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Before people coined the term <em>deep learning</em>, a neural network refers to <em>single hidden layer network</em>. Neural networks with more than one layers are called <em>deep learning</em>. Network with the structure in figure <a href="feedforward-neural-network.html#fig:ffnn">12.1</a> is the <strong>multiple layer perceptron (MLP)</strong> or <strong>feedforward neural network (FFNN)</strong>.</p>
-<div class="figure" style="text-align: center"><span id="fig:ffnn"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:ffnn"></span>
 <img src="images/dnn_str.png" alt="Feedforward Neural Network" width="80%" />
 <p class="caption">
 FIGURE 12.1: Feedforward Neural Network
 </p>
 </div>
 <p>Let’s look at a simple one-hidden-layer neural network (figure <a href="feedforward-neural-network.html#fig:onelayernn">12.2</a>). First only consider one sample. From left to right, there is an input layer with 3 features (<span class="math inline">\(x_1, x_2, x_3\)</span>), a hidden layer with four neurons and an output later to produce a prediction <span class="math inline">\(\hat{y}\)</span>.</p>
-<div class="figure" style="text-align: center"><span id="fig:onelayernn"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:onelayernn"></span>
 <img src="images/onelayerNN.png" alt="1-layer Neural Network" width="80%" />
 <p class="caption">
 FIGURE 12.2: 1-layer Neural Network
@@ -433,13 +496,13 @@ z^{[l](1)} &amp; z^{[l](1)} &amp; \cdots &amp; z^{[l](m)}\\
 \end{array}\right]_{l=1\ or\ 2}\]</span></p>
 <p>You can add layers like this to get a deeper neural network as shown in the bottom right of figure <a href="feedforward-neural-network.html#fig:ffnn">12.1</a>.</p>
 </div>
-<div id="activationfunction" class="section level3">
-<h3><span class="header-section-number">12.2.4</span> Activation Function</h3>
+<div id="activationfunction" class="section level3 hasAnchor" number="12.2.4">
+<h3><span class="header-section-number">12.2.4</span> Activation Function<a href="feedforward-neural-network.html#activationfunction" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <ul>
 <li>Sigmoid and Softmax Function</li>
 </ul>
 <p>We have used the sigmoid (or logistic) activation function. The function is S-shape with an output value between 0 to 1. Therefore it is used as the output layer activation function to predict the probability <strong>when the response <span class="math inline">\(y\)</span> is binary</strong>. However, it is rarely used as an intermediate layer activation function. One of the main reasons is that when <span class="math inline">\(z\)</span> is away from 0, then the derivative of the function drops fast which slows down the optimization process through gradient descent. Even the fact that it is differentiable provides some convenience, the decreasing slope can cause a neural network to get stuck at the training time.</p>
-<div class="figure" style="text-align: center"><span id="fig:activationsigmoid"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:activationsigmoid"></span>
 <img src="IDS_files/figure-html/activationsigmoid-1.svg" alt="Sigmoid Function" width="80%" />
 <p class="caption">
 FIGURE 12.3: Sigmoid Function
@@ -459,7 +522,7 @@ f_i(\mathbf{z}) = \frac{e^{z_i}}{\Sigma_{j=1}^{J} e^{z_j} }
 tanh(z) = \frac{e^{z} - e^{-z}}{e^{z} + e^{-z}}
 \tag{12.4}
 \end{equation}\]</span></p>
-<div class="figure" style="text-align: center"><span id="fig:activationtanh"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:activationtanh"></span>
 <img src="IDS_files/figure-html/activationtanh-1.svg" alt="Hyperbolic Tangent Function" width="80%" />
 <p class="caption">
 FIGURE 12.4: Hyperbolic Tangent Function
@@ -475,7 +538,7 @@ R(z) = max(0, z)
 \tag{12.5}
 \end{equation}\]</span></p>
 <p>The derivative is 1 when z is positive and 0 when z is negative. You can define the derivative as either 0 or 1 when z is 0. When you implement this, it is unlikely that z equals to exactly 0 even it can be very close to 0.</p>
-<div class="figure" style="text-align: center"><span id="fig:activationrelu"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:activationrelu"></span>
 <img src="IDS_files/figure-html/activationrelu-1.svg" alt="Rectified Linear Unit Function" width="80%" />
 <p class="caption">
 FIGURE 12.5: Rectified Linear Unit Function
@@ -491,7 +554,7 @@ z\geq0\\
 z&lt;0
 \end{array}\end{cases}\]</span></p>
 <p>Instead of being 0 when z is negative, it adds a slight slope such as <span class="math inline">\(a=0.01\)</span> as shown in figure <a href="feedforward-neural-network.html#fig:activationleakyrelu">12.6</a> (can you see the leaky part there? : ).</p>
-<div class="figure" style="text-align: center"><span id="fig:activationleakyrelu"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:activationleakyrelu"></span>
 <img src="IDS_files/figure-html/activationleakyrelu-1.svg" alt="Rectified Linear Unit Function" width="80%" />
 <p class="caption">
 FIGURE 12.6: Rectified Linear Unit Function
@@ -509,11 +572,11 @@ FIGURE 12.6: Rectified Linear Unit Function
 <li>When the response is continuous, use identity function (i.e. y = x)</li>
 </ul>
 </div>
-<div id="optimization" class="section level3">
-<h3><span class="header-section-number">12.2.5</span> Optimization</h3>
+<div id="optimization" class="section level3 hasAnchor" number="12.2.5">
+<h3><span class="header-section-number">12.2.5</span> Optimization<a href="feedforward-neural-network.html#optimization" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>So far, we have introduced the core components of deep learning architecture, layer, weight, activation function, and loss function. With the architecture in place, we need to determine how to update the network based on a loss function (a.k.a. objective function). In this section, we will look at variants of optimization algorithms that will improve the training speed.</p>
-<div id="batch-mini-batch-stochastic-gradient-descent" class="section level4">
-<h4><span class="header-section-number">12.2.5.1</span> Batch, Mini-batch, Stochastic Gradient Descent</h4>
+<div id="batch-mini-batch-stochastic-gradient-descent" class="section level4 hasAnchor" number="12.2.5.1">
+<h4><span class="header-section-number">12.2.5.1</span> Batch, Mini-batch, Stochastic Gradient Descent<a href="feedforward-neural-network.html#batch-mini-batch-stochastic-gradient-descent" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p><strong>Stochastic Gradient Descent (SGD)</strong> updates one sample each time. We showed the SGD for logistic regression across <span class="math inline">\(m\)</span> samples in section <a href="feedforward-neural-network.html#logisticregasneuralnetwork">12.2.1</a>. If you process the entire training set each time to calculate the gradient, it is <strong>Batch Gradient Descent (BGD)</strong>. The vector representation section <a href="feedforward-neural-network.html#deepneuralnetwork">12.2.3</a> using all <span class="math inline">\(m\)</span> is an example of BGD.</p>
 <p>In deep learning applications, the training set is often huge, with hundreds of thousands or millions of samples. If processing all the samples can only lead to one step of gradient descent, it could be slow. An intuitive way to improve the algorithm is to make some progress before finishing the entire data set. In particular, split up the training set into smaller subsets and fit the model using one subset each time. The subsets are mini-batches. <strong>Mini-batch Gradient Descent (MGD)</strong> is to split the training set to be smaller mini-batches. For example, if the mini-batch size is 1000, the algorithm will process 1000 samples each time, calculate the gradient and update the parameters. Then it moves on to the next mini-batch set until it goes through the whole training set. We call it one pass through training set using mini-batch gradient descent or one epoch. <strong>Epoch</strong> is a common keyword in deep learning, which means a single pass through the training set. If the training set has 60,000 samples, one epoch leads to 60 gradient descent steps. Then it will start over and take another pass through the training set. It means one more decision to make, the optimal number of epochs. It is decided by looking at the trends of performance metrics on a holdout set of training data. We discussed the data splitting and sampling in section <a href="datasplittingresampling.html#datasplittingresampling">7.2</a>. People often use a single holdout set to tune the model in deep learning. But it is important to use a big enough holdout set to give high confidence in your model’s overall performance. Then you can evaluate the chosen model on your test set that is not used in the training process. MGD is what everyone in deep learning uses when training on a large data set.</p>
 <p><span class="math display">\[\begin{array}{ccc} x= &amp; [\underbrace{x^{(1)},x^{(2)},\cdots,x^{(1000)}}/ &amp; \cdots/\cdots x^{(m)}]\\ (n_{x},m) &amp; mini-batch\ 1 \end{array}\]</span></p>
@@ -524,10 +587,10 @@ FIGURE 12.6: Rectified Linear Unit Function
 <li>Mini-batch size in between: mini-batch gradient descent, make progress without processing all training set, typical batch sizes are <span class="math inline">\(2^6=64\)</span>, <span class="math inline">\(2^7=128\)</span>, <span class="math inline">\(2^7=256\)</span>, <span class="math inline">\(2^8=512\)</span></li>
 </ul>
 </div>
-<div id="optimization-algorithms" class="section level4">
-<h4><span class="header-section-number">12.2.5.2</span> Optimization Algorithms</h4>
+<div id="optimization-algorithms" class="section level4 hasAnchor" number="12.2.5.2">
+<h4><span class="header-section-number">12.2.5.2</span> Optimization Algorithms<a href="feedforward-neural-network.html#optimization-algorithms" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>In the history of deep learning, researchers proposed different optimization algorithms and showed that they worked well in a specific scenario. But the optimization algorithms didn’t generalize well to a wide range of neural networks. So you will need to try different optimizers in your application. We will introduce three commonly used optimizers here, and they are all based on something called exponentially weighted averages. To understand the intuition behind it, let’s look at a hypothetical example shown in figure <a href="feedforward-neural-network.html#fig:weightedagv">12.7</a>.</p>
-<div class="figure" style="text-align: center"><span id="fig:weightedagv"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:weightedagv"></span>
 <img src="images/weighted_agv.png" alt="The intuition behind the weighted average gradient" width="60%" />
 <p class="caption">
 FIGURE 12.7: The intuition behind the weighted average gradient
@@ -551,7 +614,7 @@ And we have:</p>
 <p><span class="math display">\[V_{2}^{corrected}=\frac{V_{2}}{1-0.95^{2}}=0.4872\theta_{1}+0.5128\theta_{2}\]</span></p>
 <p>For <span class="math inline">\(\beta = 0.95\)</span>, the origional <span class="math inline">\(V_2 = 0.0475\theta_{1}+0.05\theta_{2}\)</span> which is a small fraction of both <span class="math inline">\(theta_1\)</span> and <span class="math inline">\(theta_2\)</span>. That is why it starts so much lower with big bias. After correction, <span class="math inline">\(V_{2}^{corrected} = 0.4872\theta_{1}+0.5128\theta_{2}\)</span> is a weighted average with two weights added up to 1 which revmoves the bias. Notice that as <span class="math inline">\(t\)</span> increases, <span class="math inline">\(\beta^t\)</span> converges to 0 and <span class="math inline">\(V^{corrected}\)</span> converges to <span class="math inline">\(V^t\)</span>.</p>
 <p>The following code simulates a set of temperature data and applies exponentially weighted average with and without correction using various <span class="math inline">\(\beta\)</span> values (0.5, 0.8, 0.95).</p>
-<div class="figure" style="text-align: center"><span id="fig:weightedavgplot"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:weightedavgplot"></span>
 <img src="IDS_files/figure-html/weightedavgplot-1.svg" alt="Exponentially weighted averages with and without corrrection" width="100%" />
 <p class="caption">
 FIGURE 12.8: Exponentially weighted averages with and without corrrection
@@ -581,11 +644,11 @@ FIGURE 12.8: Exponentially weighted averages with and without corrrection
 <p><span class="math display">\[w=w-\alpha \frac{V_{dw}^{corrected}}{\sqrt{S_{dw}^{corrected}} +\epsilon};\ b=b-\alpha\frac{V_{db}^{corrected}}{\sqrt{S_{db}^{corrected}}+\epsilon}\]</span></p>
 </div>
 </div>
-<div id="deal-with-overfitting" class="section level3">
-<h3><span class="header-section-number">12.2.6</span> Deal with Overfitting</h3>
+<div id="deal-with-overfitting" class="section level3 hasAnchor" number="12.2.6">
+<h3><span class="header-section-number">12.2.6</span> Deal with Overfitting<a href="feedforward-neural-network.html#deal-with-overfitting" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>The biggest problem for deep learning is overfitting. It happens when the model learns too much from the data. We discussed this in more detail in section <a href="vbtradeoff.html#vbtradeoff">7.1</a>. A common way to diagnose the problem is to use cross-validation (section <a href="datasplittingresampling.html#datasplittingresampling">7.2</a>). You can recognize the problem when the model fits great on the training data but gives poor predictions on the testing data. One way to prevent the model from over learning the data is to limit model complexity. There are several approaches to that.</p>
-<div id="regularization" class="section level4">
-<h4><span class="header-section-number">12.2.6.1</span> Regularization</h4>
+<div id="regularization" class="section level4 hasAnchor" number="12.2.6.1">
+<h4><span class="header-section-number">12.2.6.1</span> Regularization<a href="feedforward-neural-network.html#regularization" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>For logistic regression,</p>
 <p><span class="math display">\[\underset{w,b}{min}J(w,b)= \frac{1}{m} \Sigma_{i=1}^{m}L(\hat{y}^{(i)}, y^{(i)}) + penalty\]</span></p>
 <p>Common penalties are L1 or L2 as follows:</p>
@@ -597,35 +660,35 @@ FIGURE 12.8: Exponentially weighted averages with and without corrrection
 <p><span class="math display">\[\parallel w^{[l]} \parallel^2_F = \Sigma_{i=1}^{n^{[l]}}\Sigma_{j=1}^{n^{[l-1]}} (w^{[l]}_{ij})^2\]</span></p>
 <p>Many people call it “Frobenius Norm” instead of L2-norm.</p>
 </div>
-<div id="dropout" class="section level4">
-<h4><span class="header-section-number">12.2.6.2</span> Dropout</h4>
+<div id="dropout" class="section level4 hasAnchor" number="12.2.6.2">
+<h4><span class="header-section-number">12.2.6.2</span> Dropout<a href="feedforward-neural-network.html#dropout" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>Another powerful regularization technique is “dropout.” In chapter @ref(tree model), we mentioned that the random forest model de-correlates the trees by randomly choosing a subset of features. Dropout uses a similar idea in the parameter estimation process.</p>
 <p>It temporally freezes a randomly selected subset of nodes at a specific layer in the neural network during the optimization process to reduce overfitting. When applying dropout to a particular layer and mini-batch, we pre-set a percentage, for example, 30%, and randomly remove 30% of the layer’s nodes. The output from the 30% removed nodes will be zero. During backpropagation, we update the remaining parameters for a much-diminished network. We need to do the random drop out again for the next mini-batch.</p>
 <p>To normalize the output with all nodes in this layer, we need to scale up the output accordingly to the same percentage to make sure the dropped-out nodes do not impact the overall signal. Please note, the dropout process will randomly turn-off different nodes for each mini-batch. Dropout is more efficient in reducing overfitting in deep learning than L1 or L2 regularizations.</p>
 </div>
 </div>
-<div id="ffnnexample" class="section level3">
-<h3><span class="header-section-number">12.2.7</span> Image Recognition Using FFNN</h3>
+<div id="ffnnexample" class="section level3 hasAnchor" number="12.2.7">
+<h3><span class="header-section-number">12.2.7</span> Image Recognition Using FFNN<a href="feedforward-neural-network.html#ffnnexample" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>In this section, we will walk through a toy example of image classification problem using <strong><code>keras</code></strong> package. We use R in the section to illustrate the process and also provide the python notebook on the book website. Please check the <a href="https://keras.rstudio.com/"><code>keras</code> R package website</a> for the most recent development.</p>
 <p>What is an image as data? You can consider a digital image as a set of points on 2-d or 3-d space. Each each point has a value between 0 to 255 which is considered as a pixel. Figure <a href="feedforward-neural-network.html#fig:grayscaleimage">12.9</a> shows an example of grayscale image. It is a set of pixels on 2-d space and each pixel has a value between 0 to 255. You can process the image as a 2-d array input if you use a Convolutional Neural Network(CNN). Or, you can vectorize the array as the input for FFNN as shown in the figure.</p>
-<div class="figure" style="text-align: center"><span id="fig:grayscaleimage"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:grayscaleimage"></span>
 <img src="images/grayscaleimage.png" alt="Grayscale image is a set of pixels on 2-d space. Each pixel has a value range from 0 to 255." width="80%" />
 <p class="caption">
 FIGURE 12.9: Grayscale image is a set of pixels on 2-d space. Each pixel has a value range from 0 to 255.
 </p>
 </div>
 <p>A color image is a set of pixels on 3-d space and each pixel has a value between 0 to 255. There are three 2-d panels which represent the color red, blue and green accordingly. Similarly, You can process the image as a 3-d array. Or you can vectorize the array as shown in figure <a href="feedforward-neural-network.html#fig:colorimage">12.10</a>.</p>
-<div class="figure" style="text-align: center"><span id="fig:colorimage"></span>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:colorimage"></span>
 <img src="images/colorimage.png" alt="Color image is a set of pixels on 3-d space. Each pixel has a value range from 0 to 255." width="80%" />
 <p class="caption">
 FIGURE 12.10: Color image is a set of pixels on 3-d space. Each pixel has a value range from 0 to 255.
 </p>
 </div>
 <p>Let’s look at how to use the <code>keras</code> R package for a toy example in deep learning with the handwritten digits image dataset (i.e. MNIST). <code>keras</code> has many dependent packages, so it takes a few minutes to install. Be patient! In a production cloud environment such as the paid version of Databricks, you can save what you have and resume from where you left.</p>
-<div class="sourceCode" id="cb326"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb326-1" data-line-number="1"><span class="kw">install.packages</span>(<span class="st">&quot;keras&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb323"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb323-1"><a href="feedforward-neural-network.html#cb323-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;keras&quot;</span>)</span></code></pre></div>
 <p>As <code>keras</code> is just an interface to popular deep learning frameworks, we have to install the deep learning backend. The default and recommended backend is TensorFlow. By calling <code>install_keras()</code>, it will install all the needed dependencies for TensorFlow.</p>
-<div class="sourceCode" id="cb327"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb327-1" data-line-number="1"><span class="kw">library</span>(keras)</a>
-<a class="sourceLine" id="cb327-2" data-line-number="2"><span class="kw">install_keras</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb324"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb324-1"><a href="feedforward-neural-network.html#cb324-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(keras)</span>
+<span id="cb324-2"><a href="feedforward-neural-network.html#cb324-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install_keras</span>()</span></code></pre></div>
 <p>You can run the code in this section in the Databrick community edition with R as the interface. Refer to section <a href="CloudEnvironment.html#CloudEnvironment">4.3</a> for how to set up an account, create a notebook (R or Python) and start a cluster. For an audience with a statistical background, using a well-managed cloud environment has the following benefit:</p>
 <ul>
 <li>Minimum language barrier in coding for most statisticians</li>
@@ -635,221 +698,221 @@ FIGURE 12.10: Color image is a set of pixels on 3-d space. Each pixel has a valu
 <p>You can also run the code on your local machine with R and the required Python packages (<code>keras</code> uses the Python TensorFlow backend engine). Different versions of Python may cause some errors when running <code>install_keras()</code>. Here are the things you could do when you encounter the Python backend issue in your local machine:</p>
 <ul>
 <li>Run <code>reticulate::py_config()</code> to check the current Python configuration to see if anything needs to be changed.</li>
-<li>By default, <code>install_keras()</code> uses virtual environment <code>~/.virtualenvs/r-reticulate</code>. If you don’t know how to set the right environment, try to set the installation method as conda (<code>install_keras(method = &quot;conda&quot;)</code>)</li>
+<li>By default, <code>install_keras()</code> uses virtual environment <code>~/.virtualenvs/r-reticulate</code>. If you don’t know how to set the right environment, try to set the installation method as conda (<code>install_keras(method = "conda")</code>)</li>
 <li>Refer to this document for more details on how to <a href="https://tensorflow.rstudio.com/reference/keras/install_keras/">install <code>keras</code> and the TensorFlow backend</a>.</li>
 </ul>
 <p>Now we are all set to explore deep learning! As simple as three lines of R code, but there are quite a lot going on behind the scene. If you are using a cloud environment, you do not need to worry about these behind scene setup and maintenance.</p>
 <p>We will use the widely used MNIST handwritten digit image dataset. More information about the dataset and benchmark results from various machine learning methods can be found at <a href="http://yann.lecun.com/exdb/mnist/" class="uri">http://yann.lecun.com/exdb/mnist/</a> and <a href="https://en.wikipedia.org/wiki/MNIST_database" class="uri">https://en.wikipedia.org/wiki/MNIST_database</a>.</p>
 <p>This dataset is already included in the keras/TensorFlow installation and we can simply load the dataset as described in the following cell. It takes less than a minute to load the dataset.</p>
-<div class="sourceCode" id="cb328"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb328-1" data-line-number="1">mnist &lt;-<span class="st"> </span><span class="kw">dataset_mnist</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb325"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb325-1"><a href="feedforward-neural-network.html#cb325-1" aria-hidden="true" tabindex="-1"></a>mnist <span class="ot">&lt;-</span> <span class="fu">dataset_mnist</span>()</span></code></pre></div>
 <p>The data structure of the MNIST dataset is straight forward and well prepared for R, which has two pieces:</p>
 <ol style="list-style-type: decimal">
 <li><p>training set: x (i.e. features): 60000x28x28 tensor which corresponds to 60000 28x28 pixel greyscale images (i.e. all the values are integers between 0 and 255 in each 28x28 matrix), and y (i.e. responses): a length 60000 vector which contains the corresponding digits with integer values between 0 and 9.</p></li>
 <li><p>testing set: same as the training set, but with only 10000 images and responses. The detailed structure for the dataset can be seen with <code>str(mnist)</code> below.</p></li>
 </ol>
-<div class="sourceCode" id="cb329"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb329-1" data-line-number="1"><span class="kw">str</span>(mnist)</a></code></pre></div>
-<div class="sourceCode" id="cb330"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb330-1" data-line-number="1">List of 2</a>
-<a class="sourceLine" id="cb330-2" data-line-number="2"> $ train:List of 2</a>
-<a class="sourceLine" id="cb330-3" data-line-number="3">  ..$ x: int [1:60000, 1:28, 1:28] 0 0 0 0 0 0 0 0 0 0 ...</a>
-<a class="sourceLine" id="cb330-4" data-line-number="4">  ..$ y: int [1:60000(1d)] 5 0 4 1 9 2 1 3 1 4 ...</a>
-<a class="sourceLine" id="cb330-5" data-line-number="5"> $ test :List of 2</a>
-<a class="sourceLine" id="cb330-6" data-line-number="6">  ..$ x: int [1:10000, 1:28, 1:28] 0 0 0 0 0 0 0 0 0 0 ...</a>
-<a class="sourceLine" id="cb330-7" data-line-number="7">  ..$ y: int [1:10000(1d)] 7 2 1 0 4 1 4 9 5 9 ...</a></code></pre></div>
+<div class="sourceCode" id="cb326"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb326-1"><a href="feedforward-neural-network.html#cb326-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(mnist)</span></code></pre></div>
+<div class="sourceCode" id="cb327"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb327-1"><a href="feedforward-neural-network.html#cb327-1" aria-hidden="true" tabindex="-1"></a>List of 2</span>
+<span id="cb327-2"><a href="feedforward-neural-network.html#cb327-2" aria-hidden="true" tabindex="-1"></a> $ train:List of 2</span>
+<span id="cb327-3"><a href="feedforward-neural-network.html#cb327-3" aria-hidden="true" tabindex="-1"></a>  ..$ x: int [1:60000, 1:28, 1:28] 0 0 0 0 0 0 0 0 0 0 ...</span>
+<span id="cb327-4"><a href="feedforward-neural-network.html#cb327-4" aria-hidden="true" tabindex="-1"></a>  ..$ y: int [1:60000(1d)] 5 0 4 1 9 2 1 3 1 4 ...</span>
+<span id="cb327-5"><a href="feedforward-neural-network.html#cb327-5" aria-hidden="true" tabindex="-1"></a> $ test :List of 2</span>
+<span id="cb327-6"><a href="feedforward-neural-network.html#cb327-6" aria-hidden="true" tabindex="-1"></a>  ..$ x: int [1:10000, 1:28, 1:28] 0 0 0 0 0 0 0 0 0 0 ...</span>
+<span id="cb327-7"><a href="feedforward-neural-network.html#cb327-7" aria-hidden="true" tabindex="-1"></a>  ..$ y: int [1:10000(1d)] 7 2 1 0 4 1 4 9 5 9 ...</span></code></pre></div>
 <p>Now we prepare the features (x) and the response variable (y) for both the training and testing dataset, and we can check the structure of the <code>x_train</code> and <code>y_train</code> using <code>str()</code> function.</p>
-<div class="sourceCode" id="cb331"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb331-1" data-line-number="1">x_train &lt;-<span class="st"> </span>mnist<span class="op">$</span>train<span class="op">$</span>x</a>
-<a class="sourceLine" id="cb331-2" data-line-number="2">y_train &lt;-<span class="st"> </span>mnist<span class="op">$</span>train<span class="op">$</span>y</a>
-<a class="sourceLine" id="cb331-3" data-line-number="3">x_test &lt;-<span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>x</a>
-<a class="sourceLine" id="cb331-4" data-line-number="4">y_test &lt;-<span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>y</a>
-<a class="sourceLine" id="cb331-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb331-6" data-line-number="6"><span class="kw">str</span>(x_train)</a>
-<a class="sourceLine" id="cb331-7" data-line-number="7"><span class="kw">str</span>(y_train)</a></code></pre></div>
-<div class="sourceCode" id="cb332"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb332-1" data-line-number="1">int [1:60000, 1:28, 1:28] 0 0 0 0 0 0 0 0 0 0 ...</a>
-<a class="sourceLine" id="cb332-2" data-line-number="2">int [1:60000(1d)] 5 0 4 1 9 2 1 3 1 4 ...</a></code></pre></div>
+<div class="sourceCode" id="cb328"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb328-1"><a href="feedforward-neural-network.html#cb328-1" aria-hidden="true" tabindex="-1"></a>x_train <span class="ot">&lt;-</span> mnist<span class="sc">$</span>train<span class="sc">$</span>x</span>
+<span id="cb328-2"><a href="feedforward-neural-network.html#cb328-2" aria-hidden="true" tabindex="-1"></a>y_train <span class="ot">&lt;-</span> mnist<span class="sc">$</span>train<span class="sc">$</span>y</span>
+<span id="cb328-3"><a href="feedforward-neural-network.html#cb328-3" aria-hidden="true" tabindex="-1"></a>x_test <span class="ot">&lt;-</span> mnist<span class="sc">$</span>test<span class="sc">$</span>x</span>
+<span id="cb328-4"><a href="feedforward-neural-network.html#cb328-4" aria-hidden="true" tabindex="-1"></a>y_test <span class="ot">&lt;-</span> mnist<span class="sc">$</span>test<span class="sc">$</span>y</span>
+<span id="cb328-5"><a href="feedforward-neural-network.html#cb328-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb328-6"><a href="feedforward-neural-network.html#cb328-6" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(x_train)</span>
+<span id="cb328-7"><a href="feedforward-neural-network.html#cb328-7" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(y_train)</span></code></pre></div>
+<div class="sourceCode" id="cb329"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb329-1"><a href="feedforward-neural-network.html#cb329-1" aria-hidden="true" tabindex="-1"></a>int [1:60000, 1:28, 1:28] 0 0 0 0 0 0 0 0 0 0 ...</span>
+<span id="cb329-2"><a href="feedforward-neural-network.html#cb329-2" aria-hidden="true" tabindex="-1"></a>int [1:60000(1d)] 5 0 4 1 9 2 1 3 1 4 ...</span></code></pre></div>
 <p>Now let’s plot a chosen 28x28 matrix as an image using R’s <code>image()</code> function. In R’s <code>image()</code> function, the way of showing an image is rotated 90 degree from the matrix representation. So there is additional steps to rearrange the matrix such that we can use <code>image()</code> function to show it in the actual orientation.</p>
-<div class="sourceCode" id="cb333"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb333-1" data-line-number="1">index_image =<span class="st"> </span><span class="dv">28</span>  <span class="co">## change this index to see different image.</span></a>
-<a class="sourceLine" id="cb333-2" data-line-number="2">input_matrix &lt;-<span class="st"> </span>x_train[index_image, <span class="dv">1</span><span class="op">:</span><span class="dv">28</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">28</span>]</a>
-<a class="sourceLine" id="cb333-3" data-line-number="3">output_matrix &lt;-<span class="st"> </span><span class="kw">apply</span>(input_matrix, <span class="dv">2</span>, rev)</a>
-<a class="sourceLine" id="cb333-4" data-line-number="4">output_matrix &lt;-<span class="st"> </span><span class="kw">t</span>(output_matrix)</a>
-<a class="sourceLine" id="cb333-5" data-line-number="5"><span class="kw">image</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">28</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">28</span>, output_matrix, <span class="dt">col =</span> <span class="kw">gray.colors</span>(<span class="dv">256</span>), </a>
-<a class="sourceLine" id="cb333-6" data-line-number="6">    <span class="dt">xlab =</span> <span class="kw">paste</span>(<span class="st">&quot;Image for digit of: &quot;</span>, y_train[index_image]), </a>
-<a class="sourceLine" id="cb333-7" data-line-number="7">    <span class="dt">ylab =</span> <span class="st">&quot;&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb330"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb330-1"><a href="feedforward-neural-network.html#cb330-1" aria-hidden="true" tabindex="-1"></a>index_image <span class="ot">=</span> <span class="dv">28</span>  <span class="do">## change this index to see different image.</span></span>
+<span id="cb330-2"><a href="feedforward-neural-network.html#cb330-2" aria-hidden="true" tabindex="-1"></a>input_matrix <span class="ot">&lt;-</span> x_train[index_image, <span class="dv">1</span><span class="sc">:</span><span class="dv">28</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">28</span>]</span>
+<span id="cb330-3"><a href="feedforward-neural-network.html#cb330-3" aria-hidden="true" tabindex="-1"></a>output_matrix <span class="ot">&lt;-</span> <span class="fu">apply</span>(input_matrix, <span class="dv">2</span>, rev)</span>
+<span id="cb330-4"><a href="feedforward-neural-network.html#cb330-4" aria-hidden="true" tabindex="-1"></a>output_matrix <span class="ot">&lt;-</span> <span class="fu">t</span>(output_matrix)</span>
+<span id="cb330-5"><a href="feedforward-neural-network.html#cb330-5" aria-hidden="true" tabindex="-1"></a><span class="fu">image</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">28</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">28</span>, output_matrix, <span class="at">col =</span> <span class="fu">gray.colors</span>(<span class="dv">256</span>), </span>
+<span id="cb330-6"><a href="feedforward-neural-network.html#cb330-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">xlab =</span> <span class="fu">paste</span>(<span class="st">&quot;Image for digit of: &quot;</span>, y_train[index_image]), </span>
+<span id="cb330-7"><a href="feedforward-neural-network.html#cb330-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">ylab =</span> <span class="st">&quot;&quot;</span>)</span></code></pre></div>
 <center>
 <img src="images/mnist_image3.png" style="width:70.0%" />
 </center>
 <p>Here is the original 28x28 matrix for the above image:</p>
-<div class="sourceCode" id="cb334"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb334-1" data-line-number="1">input_matrix</a></code></pre></div>
-<div class="sourceCode" id="cb335"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb335-1" data-line-number="1">     [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10] [,11] [,12] [,13]</a>
-<a class="sourceLine" id="cb335-2" data-line-number="2"> [1,]    0    0    0    0    0    0    0    0    0     0     0     0     0</a>
-<a class="sourceLine" id="cb335-3" data-line-number="3"> [2,]    0    0    0    0    0    0    0    0    0     0     0     0     0</a>
-<a class="sourceLine" id="cb335-4" data-line-number="4"> [3,]    0    0    0    0    0    0    0    0    0     0     0     0     0</a>
-<a class="sourceLine" id="cb335-5" data-line-number="5"> [4,]    0    0    0    0    0    0    0    0    0     0     0     0     0</a>
-<a class="sourceLine" id="cb335-6" data-line-number="6"> [5,]    0    0    0    0    0    0    0    0    0     0     0     0     0</a>
-<a class="sourceLine" id="cb335-7" data-line-number="7"> [6,]    0    0    0    0    0    0    0    0    0     0     9    80   207</a>
-<a class="sourceLine" id="cb335-8" data-line-number="8"> [7,]    0    0    0    0    0    0   39  158  158   158   168   253   253</a>
-<a class="sourceLine" id="cb335-9" data-line-number="9"> [8,]    0    0    0    0    0    0  226  253  253   253   253   253   253</a>
-<a class="sourceLine" id="cb335-10" data-line-number="10"> [9,]    0    0    0    0    0    0  139  253  253   253   238   113   215</a>
-<a class="sourceLine" id="cb335-11" data-line-number="11">[10,]    0    0    0    0    0    0   39   34   34    34    30     0    31</a>
-<a class="sourceLine" id="cb335-12" data-line-number="12">[11,]    0    0    0    0    0    0   91    0    0     0     0     0     0</a>
-<a class="sourceLine" id="cb335-13" data-line-number="13">[12,]    0    0    0    0    0    0    0    0    0     0     0    11    33</a>
-<a class="sourceLine" id="cb335-14" data-line-number="14">[13,]    0    0    0    0    0    0    0    0    0     0    11   167   253</a>
-<a class="sourceLine" id="cb335-15" data-line-number="15">[14,]    0    0    0    0    0    0    0    0    0     0    27   253   253</a>
-<a class="sourceLine" id="cb335-16" data-line-number="16">[15,]    0    0    0    0    0    0    0    0    0     0    18   201   253</a>
-<a class="sourceLine" id="cb335-17" data-line-number="17">[16,]    0    0    0    0    0    0    0    0    0     0     0    36    87</a>
-<a class="sourceLine" id="cb335-18" data-line-number="18">...</a></code></pre></div>
+<div class="sourceCode" id="cb331"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb331-1"><a href="feedforward-neural-network.html#cb331-1" aria-hidden="true" tabindex="-1"></a>input_matrix</span></code></pre></div>
+<div class="sourceCode" id="cb332"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb332-1"><a href="feedforward-neural-network.html#cb332-1" aria-hidden="true" tabindex="-1"></a>     [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10] [,11] [,12] [,13]</span>
+<span id="cb332-2"><a href="feedforward-neural-network.html#cb332-2" aria-hidden="true" tabindex="-1"></a> [1,]    0    0    0    0    0    0    0    0    0     0     0     0     0</span>
+<span id="cb332-3"><a href="feedforward-neural-network.html#cb332-3" aria-hidden="true" tabindex="-1"></a> [2,]    0    0    0    0    0    0    0    0    0     0     0     0     0</span>
+<span id="cb332-4"><a href="feedforward-neural-network.html#cb332-4" aria-hidden="true" tabindex="-1"></a> [3,]    0    0    0    0    0    0    0    0    0     0     0     0     0</span>
+<span id="cb332-5"><a href="feedforward-neural-network.html#cb332-5" aria-hidden="true" tabindex="-1"></a> [4,]    0    0    0    0    0    0    0    0    0     0     0     0     0</span>
+<span id="cb332-6"><a href="feedforward-neural-network.html#cb332-6" aria-hidden="true" tabindex="-1"></a> [5,]    0    0    0    0    0    0    0    0    0     0     0     0     0</span>
+<span id="cb332-7"><a href="feedforward-neural-network.html#cb332-7" aria-hidden="true" tabindex="-1"></a> [6,]    0    0    0    0    0    0    0    0    0     0     9    80   207</span>
+<span id="cb332-8"><a href="feedforward-neural-network.html#cb332-8" aria-hidden="true" tabindex="-1"></a> [7,]    0    0    0    0    0    0   39  158  158   158   168   253   253</span>
+<span id="cb332-9"><a href="feedforward-neural-network.html#cb332-9" aria-hidden="true" tabindex="-1"></a> [8,]    0    0    0    0    0    0  226  253  253   253   253   253   253</span>
+<span id="cb332-10"><a href="feedforward-neural-network.html#cb332-10" aria-hidden="true" tabindex="-1"></a> [9,]    0    0    0    0    0    0  139  253  253   253   238   113   215</span>
+<span id="cb332-11"><a href="feedforward-neural-network.html#cb332-11" aria-hidden="true" tabindex="-1"></a>[10,]    0    0    0    0    0    0   39   34   34    34    30     0    31</span>
+<span id="cb332-12"><a href="feedforward-neural-network.html#cb332-12" aria-hidden="true" tabindex="-1"></a>[11,]    0    0    0    0    0    0   91    0    0     0     0     0     0</span>
+<span id="cb332-13"><a href="feedforward-neural-network.html#cb332-13" aria-hidden="true" tabindex="-1"></a>[12,]    0    0    0    0    0    0    0    0    0     0     0    11    33</span>
+<span id="cb332-14"><a href="feedforward-neural-network.html#cb332-14" aria-hidden="true" tabindex="-1"></a>[13,]    0    0    0    0    0    0    0    0    0     0    11   167   253</span>
+<span id="cb332-15"><a href="feedforward-neural-network.html#cb332-15" aria-hidden="true" tabindex="-1"></a>[14,]    0    0    0    0    0    0    0    0    0     0    27   253   253</span>
+<span id="cb332-16"><a href="feedforward-neural-network.html#cb332-16" aria-hidden="true" tabindex="-1"></a>[15,]    0    0    0    0    0    0    0    0    0     0    18   201   253</span>
+<span id="cb332-17"><a href="feedforward-neural-network.html#cb332-17" aria-hidden="true" tabindex="-1"></a>[16,]    0    0    0    0    0    0    0    0    0     0     0    36    87</span>
+<span id="cb332-18"><a href="feedforward-neural-network.html#cb332-18" aria-hidden="true" tabindex="-1"></a>...</span></code></pre></div>
 <p>There are multiple deep learning methods to solve the handwritten digits problem and we will start from the simple and generic one, feedforward neural network (FFNN). FFNN contains a few fully connected layers and information is flowing from a front layer to a back layer without any feedback loop from the back layer to the front layer. It is the most common deep learning models to start with.</p>
-<div id="data-preprocessing" class="section level4">
-<h4><span class="header-section-number">12.2.7.1</span> Data preprocessing</h4>
+<div id="data-preprocessing" class="section level4 hasAnchor" number="12.2.7.1">
+<h4><span class="header-section-number">12.2.7.1</span> Data preprocessing<a href="feedforward-neural-network.html#data-preprocessing" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>In this section, we will walk through the needed steps of data preprocessing. For the MNIST dataset that we just loaded, some preprocessing is already done. So we have a relatively “clean” data, but before we feed the data into FFNN, we still need to do some additional preparations.</p>
 <p>First, for each digits, we have a scalar response and a 28x28 integer matrix with value between 0 and 255. To use the out of box DNN functions, for each response, all the features are one row of all features. For an image in MNIST dataet, the input for one response y is a 28x28 matrix, not a single row of many columns and we need to convet the 28x28 matrix into a single row by appending every row of the matrix to the first row using <code>reshape()</code> function.</p>
 <p>In addition, we also need to scale all features to be between (0, 1) or (-1, 1) or close to (-1, 1) range. Scale or normalize every feature will improve numerical stability in the optimization procedure as there are a lot of parameters to be optimized.</p>
 <p>We first reshape the 28x28 image for each digit (i.e each row) into 784 columns (i.e. features), and then rescale the value to be between 0 and 1 by dividing the original pixel value by 255, as described in the cell below.</p>
-<div class="sourceCode" id="cb336"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb336-1" data-line-number="1"><span class="co"># step 1: reshape</span></a>
-<a class="sourceLine" id="cb336-2" data-line-number="2">x_train &lt;-<span class="st"> </span><span class="kw">array_reshape</span>(x_train, </a>
-<a class="sourceLine" id="cb336-3" data-line-number="3">                         <span class="kw">c</span>(<span class="kw">nrow</span>(x_train), <span class="dv">784</span>))</a>
-<a class="sourceLine" id="cb336-4" data-line-number="4">x_test &lt;-<span class="st"> </span><span class="kw">array_reshape</span>(x_test, </a>
-<a class="sourceLine" id="cb336-5" data-line-number="5">                        <span class="kw">c</span>(<span class="kw">nrow</span>(x_test), <span class="dv">784</span>))</a>
-<a class="sourceLine" id="cb336-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb336-7" data-line-number="7"><span class="co"># step 2: rescale</span></a>
-<a class="sourceLine" id="cb336-8" data-line-number="8">x_train &lt;-<span class="st"> </span>x_train <span class="op">/</span><span class="st"> </span><span class="dv">255</span></a>
-<a class="sourceLine" id="cb336-9" data-line-number="9">x_test &lt;-<span class="st"> </span>x_test <span class="op">/</span><span class="st"> </span><span class="dv">255</span></a></code></pre></div>
+<div class="sourceCode" id="cb333"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb333-1"><a href="feedforward-neural-network.html#cb333-1" aria-hidden="true" tabindex="-1"></a><span class="co"># step 1: reshape</span></span>
+<span id="cb333-2"><a href="feedforward-neural-network.html#cb333-2" aria-hidden="true" tabindex="-1"></a>x_train <span class="ot">&lt;-</span> <span class="fu">array_reshape</span>(x_train, </span>
+<span id="cb333-3"><a href="feedforward-neural-network.html#cb333-3" aria-hidden="true" tabindex="-1"></a>                         <span class="fu">c</span>(<span class="fu">nrow</span>(x_train), <span class="dv">784</span>))</span>
+<span id="cb333-4"><a href="feedforward-neural-network.html#cb333-4" aria-hidden="true" tabindex="-1"></a>x_test <span class="ot">&lt;-</span> <span class="fu">array_reshape</span>(x_test, </span>
+<span id="cb333-5"><a href="feedforward-neural-network.html#cb333-5" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">c</span>(<span class="fu">nrow</span>(x_test), <span class="dv">784</span>))</span>
+<span id="cb333-6"><a href="feedforward-neural-network.html#cb333-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb333-7"><a href="feedforward-neural-network.html#cb333-7" aria-hidden="true" tabindex="-1"></a><span class="co"># step 2: rescale</span></span>
+<span id="cb333-8"><a href="feedforward-neural-network.html#cb333-8" aria-hidden="true" tabindex="-1"></a>x_train <span class="ot">&lt;-</span> x_train <span class="sc">/</span> <span class="dv">255</span></span>
+<span id="cb333-9"><a href="feedforward-neural-network.html#cb333-9" aria-hidden="true" tabindex="-1"></a>x_test <span class="ot">&lt;-</span> x_test <span class="sc">/</span> <span class="dv">255</span></span></code></pre></div>
 <p>And here is the structure of the reshaped and rescaled features for training and testing dataset. Now for each digit, there are 784 columns of features.</p>
-<div class="sourceCode" id="cb337"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb337-1" data-line-number="1"><span class="kw">str</span>(x_train)</a>
-<a class="sourceLine" id="cb337-2" data-line-number="2"><span class="kw">str</span>(x_test)</a></code></pre></div>
-<div class="sourceCode" id="cb338"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb338-1" data-line-number="1">num [1:60000, 1:784] 0 0 0 0 0 0 0 0 0 0 ...</a>
-<a class="sourceLine" id="cb338-2" data-line-number="2">num [1:10000, 1:784] 0 0 0 0 0 0 0 0 0 0 ...</a></code></pre></div>
+<div class="sourceCode" id="cb334"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb334-1"><a href="feedforward-neural-network.html#cb334-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(x_train)</span>
+<span id="cb334-2"><a href="feedforward-neural-network.html#cb334-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(x_test)</span></code></pre></div>
+<div class="sourceCode" id="cb335"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb335-1"><a href="feedforward-neural-network.html#cb335-1" aria-hidden="true" tabindex="-1"></a>num [1:60000, 1:784] 0 0 0 0 0 0 0 0 0 0 ...</span>
+<span id="cb335-2"><a href="feedforward-neural-network.html#cb335-2" aria-hidden="true" tabindex="-1"></a>num [1:10000, 1:784] 0 0 0 0 0 0 0 0 0 0 ...</span></code></pre></div>
 <p>In this example, though the response variable is an integer (i.e. the corresponding digits for an image), there is no order or rank for these integers and they are just an indication of one of the 10 categories. So we also convert the response variable y to be categorical.</p>
-<div class="sourceCode" id="cb339"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb339-1" data-line-number="1">y_train &lt;-<span class="st"> </span><span class="kw">to_categorical</span>(y_train, <span class="dv">10</span>)</a>
-<a class="sourceLine" id="cb339-2" data-line-number="2">y_test &lt;-<span class="st"> </span><span class="kw">to_categorical</span>(y_test, <span class="dv">10</span>)</a>
-<a class="sourceLine" id="cb339-3" data-line-number="3"><span class="kw">str</span>(y_train)</a></code></pre></div>
-<div class="sourceCode" id="cb340"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb340-1" data-line-number="1">num [1:60000, 1:10] 0 1 0 0 0 0 0 0 0 0 ...</a></code></pre></div>
+<div class="sourceCode" id="cb336"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb336-1"><a href="feedforward-neural-network.html#cb336-1" aria-hidden="true" tabindex="-1"></a>y_train <span class="ot">&lt;-</span> <span class="fu">to_categorical</span>(y_train, <span class="dv">10</span>)</span>
+<span id="cb336-2"><a href="feedforward-neural-network.html#cb336-2" aria-hidden="true" tabindex="-1"></a>y_test <span class="ot">&lt;-</span> <span class="fu">to_categorical</span>(y_test, <span class="dv">10</span>)</span>
+<span id="cb336-3"><a href="feedforward-neural-network.html#cb336-3" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(y_train)</span></code></pre></div>
+<div class="sourceCode" id="cb337"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb337-1"><a href="feedforward-neural-network.html#cb337-1" aria-hidden="true" tabindex="-1"></a>num [1:60000, 1:10] 0 1 0 0 0 0 0 0 0 0 ...</span></code></pre></div>
 </div>
-<div id="fit-model" class="section level4">
-<h4><span class="header-section-number">12.2.7.2</span> Fit model</h4>
+<div id="fit-model" class="section level4 hasAnchor" number="12.2.7.2">
+<h4><span class="header-section-number">12.2.7.2</span> Fit model<a href="feedforward-neural-network.html#fit-model" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>Now we are ready to fit the model. It is straight forward to build a deep neural network using keras. For this example, the number of input features is 784 (i.e. scaled value of each pixel in the 28x28 image) and the number of class for the output is 10 (i.e. one of the ten categories). So the input size for the first layer is 784 and the output size for the last layer is 10. And we can add any number of compatible layers in between.</p>
 <p>In keras, it is easy to define a DNN model: (1) use <code>keras_model_sequential()</code> to initiate a model placeholder and all model structures are attached to this model object, (2) layers are added in sequence by calling the <code>layer_dense()</code> function, (3) add arbitrary layers to the model based on the sequence of calling <code>layer_dense()</code>. For a dense layer, all the nodes from the previous layer are connected with each and every node to the next layer. In <code>layer_dense()</code> function, we can define how many nodes in that layer through the <code>units</code> parameter. The activation function can be defined through the <code>activation</code> parameter. For the first layer, we also need to define the input features’ dimension through <code>input_shape</code> parameter. For our preprocessed MNIST dataset, there are 784 columns in the input data. A common way to reduce overfitting is to use the dropout method, which randomly drops a proportion of the nodes in a layer. We can define the dropout proportion through <code>layer_dropout()</code> function immediately after the <code>layer_dense()</code> function.</p>
-<div class="sourceCode" id="cb341"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb341-1" data-line-number="1">dnn_model &lt;-<span class="st"> </span><span class="kw">keras_model_sequential</span>() </a>
-<a class="sourceLine" id="cb341-2" data-line-number="2">dnn_model <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb341-3" data-line-number="3"><span class="st">  </span><span class="kw">layer_dense</span>(<span class="dt">units =</span> <span class="dv">256</span>, <span class="dt">activation =</span> <span class="st">&#39;relu&#39;</span>, <span class="dt">input_shape =</span> <span class="kw">c</span>(<span class="dv">784</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb341-4" data-line-number="4"><span class="st">  </span><span class="kw">layer_dropout</span>(<span class="dt">rate =</span> <span class="fl">0.4</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb341-5" data-line-number="5"><span class="st">  </span><span class="kw">layer_dense</span>(<span class="dt">units =</span> <span class="dv">128</span>, <span class="dt">activation =</span> <span class="st">&#39;relu&#39;</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb341-6" data-line-number="6"><span class="st">  </span><span class="kw">layer_dropout</span>(<span class="dt">rate =</span> <span class="fl">0.3</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb341-7" data-line-number="7"><span class="st">  </span><span class="kw">layer_dense</span>(<span class="dt">units =</span> <span class="dv">64</span>, <span class="dt">activation =</span> <span class="st">&#39;relu&#39;</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb341-8" data-line-number="8"><span class="st">  </span><span class="kw">layer_dropout</span>(<span class="dt">rate =</span> <span class="fl">0.3</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb341-9" data-line-number="9"><span class="st">  </span><span class="kw">layer_dense</span>(<span class="dt">units =</span> <span class="dv">10</span>, <span class="dt">activation =</span> <span class="st">&#39;softmax&#39;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb338"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb338-1"><a href="feedforward-neural-network.html#cb338-1" aria-hidden="true" tabindex="-1"></a>dnn_model <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>() </span>
+<span id="cb338-2"><a href="feedforward-neural-network.html#cb338-2" aria-hidden="true" tabindex="-1"></a>dnn_model <span class="sc">%&gt;%</span> </span>
+<span id="cb338-3"><a href="feedforward-neural-network.html#cb338-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">256</span>, <span class="at">activation =</span> <span class="st">&#39;relu&#39;</span>, <span class="at">input_shape =</span> <span class="fu">c</span>(<span class="dv">784</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb338-4"><a href="feedforward-neural-network.html#cb338-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dropout</span>(<span class="at">rate =</span> <span class="fl">0.4</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb338-5"><a href="feedforward-neural-network.html#cb338-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">128</span>, <span class="at">activation =</span> <span class="st">&#39;relu&#39;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb338-6"><a href="feedforward-neural-network.html#cb338-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dropout</span>(<span class="at">rate =</span> <span class="fl">0.3</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb338-7"><a href="feedforward-neural-network.html#cb338-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">64</span>, <span class="at">activation =</span> <span class="st">&#39;relu&#39;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb338-8"><a href="feedforward-neural-network.html#cb338-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dropout</span>(<span class="at">rate =</span> <span class="fl">0.3</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb338-9"><a href="feedforward-neural-network.html#cb338-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">10</span>, <span class="at">activation =</span> <span class="st">&#39;softmax&#39;</span>)</span></code></pre></div>
 <p>The above <code>dnn_model</code> has 4 layers with first layer 256 nodes, 2nd layer 128 nodes, 3rd layer 64 nodes, and last layer 10 nodes. The activation function for the first 3 layers is <code>relu</code> and the activation function for the last layer is <code>softmax</code> which is typical for classification problems. The model detail can be obtained through summary() function. The number of parameter of each layer can be calculated as: (number of input features +1) times (numbe of nodes in the layer). For example, the first layer has (784+1)x256=200960 parameters; the 2nd layer has (256+1)x128=32896 parameters. Please note, dropout only randomly drop certain proportion of parameters for each batch, it will not reduce the number of parameters in the model. The total number of parameters for the <code>dnn_model</code> we just defined has 242762 parameters to be estimated.</p>
-<div class="sourceCode" id="cb342"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb342-1" data-line-number="1"><span class="kw">summary</span>(dnn_model)</a></code></pre></div>
-<div class="sourceCode" id="cb343"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb343-1" data-line-number="1">________________________________________________________________________________</a>
-<a class="sourceLine" id="cb343-2" data-line-number="2">Layer (type)                        Output Shape                    Param #     </a>
-<a class="sourceLine" id="cb343-3" data-line-number="3">================================================================================</a>
-<a class="sourceLine" id="cb343-4" data-line-number="4">dense_1 (Dense)                     (None, 256)                     200960      </a>
-<a class="sourceLine" id="cb343-5" data-line-number="5">________________________________________________________________________________</a>
-<a class="sourceLine" id="cb343-6" data-line-number="6">dropout_1 (Dropout)                 (None, 256)                     0           </a>
-<a class="sourceLine" id="cb343-7" data-line-number="7">________________________________________________________________________________</a>
-<a class="sourceLine" id="cb343-8" data-line-number="8">dense_2 (Dense)                     (None, 128)                     32896       </a>
-<a class="sourceLine" id="cb343-9" data-line-number="9">________________________________________________________________________________</a>
-<a class="sourceLine" id="cb343-10" data-line-number="10">dropout_2 (Dropout)                 (None, 128)                     0           </a>
-<a class="sourceLine" id="cb343-11" data-line-number="11">________________________________________________________________________________</a>
-<a class="sourceLine" id="cb343-12" data-line-number="12">dense_3 (Dense)                     (None, 64)                      8256        </a>
-<a class="sourceLine" id="cb343-13" data-line-number="13">________________________________________________________________________________</a>
-<a class="sourceLine" id="cb343-14" data-line-number="14">dropout_3 (Dropout)                 (None, 64)                      0           </a>
-<a class="sourceLine" id="cb343-15" data-line-number="15">________________________________________________________________________________</a>
-<a class="sourceLine" id="cb343-16" data-line-number="16">dense_4 (Dense)                     (None, 10)                      650         </a>
-<a class="sourceLine" id="cb343-17" data-line-number="17">================================================================================</a>
-<a class="sourceLine" id="cb343-18" data-line-number="18">Total params: 242,762</a>
-<a class="sourceLine" id="cb343-19" data-line-number="19">Trainable params: 242,762</a>
-<a class="sourceLine" id="cb343-20" data-line-number="20">Non-trainable params: 0</a>
-<a class="sourceLine" id="cb343-21" data-line-number="21">________________________________________________________________________________</a></code></pre></div>
+<div class="sourceCode" id="cb339"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb339-1"><a href="feedforward-neural-network.html#cb339-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(dnn_model)</span></code></pre></div>
+<div class="sourceCode" id="cb340"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb340-1"><a href="feedforward-neural-network.html#cb340-1" aria-hidden="true" tabindex="-1"></a>________________________________________________________________________________</span>
+<span id="cb340-2"><a href="feedforward-neural-network.html#cb340-2" aria-hidden="true" tabindex="-1"></a>Layer (type)                        Output Shape                    Param #     </span>
+<span id="cb340-3"><a href="feedforward-neural-network.html#cb340-3" aria-hidden="true" tabindex="-1"></a>================================================================================</span>
+<span id="cb340-4"><a href="feedforward-neural-network.html#cb340-4" aria-hidden="true" tabindex="-1"></a>dense_1 (Dense)                     (None, 256)                     200960      </span>
+<span id="cb340-5"><a href="feedforward-neural-network.html#cb340-5" aria-hidden="true" tabindex="-1"></a>________________________________________________________________________________</span>
+<span id="cb340-6"><a href="feedforward-neural-network.html#cb340-6" aria-hidden="true" tabindex="-1"></a>dropout_1 (Dropout)                 (None, 256)                     0           </span>
+<span id="cb340-7"><a href="feedforward-neural-network.html#cb340-7" aria-hidden="true" tabindex="-1"></a>________________________________________________________________________________</span>
+<span id="cb340-8"><a href="feedforward-neural-network.html#cb340-8" aria-hidden="true" tabindex="-1"></a>dense_2 (Dense)                     (None, 128)                     32896       </span>
+<span id="cb340-9"><a href="feedforward-neural-network.html#cb340-9" aria-hidden="true" tabindex="-1"></a>________________________________________________________________________________</span>
+<span id="cb340-10"><a href="feedforward-neural-network.html#cb340-10" aria-hidden="true" tabindex="-1"></a>dropout_2 (Dropout)                 (None, 128)                     0           </span>
+<span id="cb340-11"><a href="feedforward-neural-network.html#cb340-11" aria-hidden="true" tabindex="-1"></a>________________________________________________________________________________</span>
+<span id="cb340-12"><a href="feedforward-neural-network.html#cb340-12" aria-hidden="true" tabindex="-1"></a>dense_3 (Dense)                     (None, 64)                      8256        </span>
+<span id="cb340-13"><a href="feedforward-neural-network.html#cb340-13" aria-hidden="true" tabindex="-1"></a>________________________________________________________________________________</span>
+<span id="cb340-14"><a href="feedforward-neural-network.html#cb340-14" aria-hidden="true" tabindex="-1"></a>dropout_3 (Dropout)                 (None, 64)                      0           </span>
+<span id="cb340-15"><a href="feedforward-neural-network.html#cb340-15" aria-hidden="true" tabindex="-1"></a>________________________________________________________________________________</span>
+<span id="cb340-16"><a href="feedforward-neural-network.html#cb340-16" aria-hidden="true" tabindex="-1"></a>dense_4 (Dense)                     (None, 10)                      650         </span>
+<span id="cb340-17"><a href="feedforward-neural-network.html#cb340-17" aria-hidden="true" tabindex="-1"></a>================================================================================</span>
+<span id="cb340-18"><a href="feedforward-neural-network.html#cb340-18" aria-hidden="true" tabindex="-1"></a>Total params: 242,762</span>
+<span id="cb340-19"><a href="feedforward-neural-network.html#cb340-19" aria-hidden="true" tabindex="-1"></a>Trainable params: 242,762</span>
+<span id="cb340-20"><a href="feedforward-neural-network.html#cb340-20" aria-hidden="true" tabindex="-1"></a>Non-trainable params: 0</span>
+<span id="cb340-21"><a href="feedforward-neural-network.html#cb340-21" aria-hidden="true" tabindex="-1"></a>________________________________________________________________________________</span></code></pre></div>
 <p>Once a model is defined, we need to compile the model with a few other hyper-parameters including (1) loss function, (2) optimizer, and (3) performance metrics. For multi-class classification problems, people usually use the <code>categorical_crossentropy</code> loss function and <code>optimizer_rmsprop()</code> as the optimizer which performs batch gradient descent.</p>
-<div class="sourceCode" id="cb344"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb344-1" data-line-number="1">dnn_model <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">compile</span>(</a>
-<a class="sourceLine" id="cb344-2" data-line-number="2">  <span class="dt">loss =</span> <span class="st">&#39;categorical_crossentropy&#39;</span>,</a>
-<a class="sourceLine" id="cb344-3" data-line-number="3">  <span class="dt">optimizer =</span> <span class="kw">optimizer_rmsprop</span>(),</a>
-<a class="sourceLine" id="cb344-4" data-line-number="4">  <span class="dt">metrics =</span> <span class="kw">c</span>(<span class="st">&#39;accuracy&#39;</span>)</a>
-<a class="sourceLine" id="cb344-5" data-line-number="5">)</a></code></pre></div>
+<div class="sourceCode" id="cb341"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb341-1"><a href="feedforward-neural-network.html#cb341-1" aria-hidden="true" tabindex="-1"></a>dnn_model <span class="sc">%&gt;%</span> <span class="fu">compile</span>(</span>
+<span id="cb341-2"><a href="feedforward-neural-network.html#cb341-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">loss =</span> <span class="st">&#39;categorical_crossentropy&#39;</span>,</span>
+<span id="cb341-3"><a href="feedforward-neural-network.html#cb341-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">optimizer =</span> <span class="fu">optimizer_rmsprop</span>(),</span>
+<span id="cb341-4"><a href="feedforward-neural-network.html#cb341-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&#39;accuracy&#39;</span>)</span>
+<span id="cb341-5"><a href="feedforward-neural-network.html#cb341-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>Now we can feed data (x and y) into the neural network that we just built to estimate all the parameters in the model. Here we define three hyperparameters: <code>epochs</code>, <code>batch_size</code>, and <code>validation_split</code>, for this model. It just takes a couple of minutes to finish.</p>
-<div class="sourceCode" id="cb345"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb345-1" data-line-number="1">dnn_history &lt;-<span class="st"> </span>dnn_model <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">fit</span>(</a>
-<a class="sourceLine" id="cb345-2" data-line-number="2">  x_train, y_train, </a>
-<a class="sourceLine" id="cb345-3" data-line-number="3">  <span class="dt">epochs =</span> <span class="dv">15</span>, <span class="dt">batch_size =</span> <span class="dv">128</span>, </a>
-<a class="sourceLine" id="cb345-4" data-line-number="4">  <span class="dt">validation_split =</span> <span class="fl">0.2</span></a>
-<a class="sourceLine" id="cb345-5" data-line-number="5">)</a></code></pre></div>
+<div class="sourceCode" id="cb342"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb342-1"><a href="feedforward-neural-network.html#cb342-1" aria-hidden="true" tabindex="-1"></a>dnn_history <span class="ot">&lt;-</span> dnn_model <span class="sc">%&gt;%</span> <span class="fu">fit</span>(</span>
+<span id="cb342-2"><a href="feedforward-neural-network.html#cb342-2" aria-hidden="true" tabindex="-1"></a>  x_train, y_train, </span>
+<span id="cb342-3"><a href="feedforward-neural-network.html#cb342-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">epochs =</span> <span class="dv">15</span>, <span class="at">batch_size =</span> <span class="dv">128</span>, </span>
+<span id="cb342-4"><a href="feedforward-neural-network.html#cb342-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">validation_split =</span> <span class="fl">0.2</span></span>
+<span id="cb342-5"><a href="feedforward-neural-network.html#cb342-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>There is some useful information stored in the output object <code>dnn_history</code> and the details can be shown by using <code>str()</code>. We can plot the training and validation accuracy and loss as function of epoch by simply calling <code>plot(dnn_history)</code>.</p>
-<div class="sourceCode" id="cb346"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb346-1" data-line-number="1"><span class="kw">str</span>(dnn_history)</a></code></pre></div>
-<div class="sourceCode" id="cb347"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb347-1" data-line-number="1">List of 2</a>
-<a class="sourceLine" id="cb347-2" data-line-number="2"> $ params :List of 8</a>
-<a class="sourceLine" id="cb347-3" data-line-number="3">  ..$ metrics           : chr [1:4] &quot;loss&quot; &quot;acc&quot; &quot;val_loss&quot; &quot;val_acc&quot;</a>
-<a class="sourceLine" id="cb347-4" data-line-number="4">  ..$ epochs            : int 15</a>
-<a class="sourceLine" id="cb347-5" data-line-number="5">  ..$ steps             : NULL</a>
-<a class="sourceLine" id="cb347-6" data-line-number="6">  ..$ do_validation     : logi TRUE</a>
-<a class="sourceLine" id="cb347-7" data-line-number="7">  ..$ samples           : int 48000</a>
-<a class="sourceLine" id="cb347-8" data-line-number="8">  ..$ batch_size        : int 128</a>
-<a class="sourceLine" id="cb347-9" data-line-number="9">  ..$ verbose           : int 1</a>
-<a class="sourceLine" id="cb347-10" data-line-number="10">  ..$ validation_samples: int 12000</a>
-<a class="sourceLine" id="cb347-11" data-line-number="11"> $ metrics:List of 4</a>
-<a class="sourceLine" id="cb347-12" data-line-number="12">  ..$ acc     : num [1:15] 0.83 0.929 0.945 0.954 0.959 ...</a>
-<a class="sourceLine" id="cb347-13" data-line-number="13">  ..$ loss    : num [1:15] 0.559 0.254 0.195 0.165 0.148 ...</a>
-<a class="sourceLine" id="cb347-14" data-line-number="14">  ..$ val_acc : num [1:15] 0.946 0.961 0.967 0.969 0.973 ...</a>
-<a class="sourceLine" id="cb347-15" data-line-number="15">  ..$ val_loss: num [1:15] 0.182 0.137 0.122 0.113 0.104 ...</a>
-<a class="sourceLine" id="cb347-16" data-line-number="16"> - attr(*, &quot;class&quot;)= chr &quot;keras_training_history&quot;</a></code></pre></div>
-<div class="sourceCode" id="cb348"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb348-1" data-line-number="1"><span class="kw">plot</span>(dnn_history)</a></code></pre></div>
+<div class="sourceCode" id="cb343"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb343-1"><a href="feedforward-neural-network.html#cb343-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(dnn_history)</span></code></pre></div>
+<div class="sourceCode" id="cb344"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb344-1"><a href="feedforward-neural-network.html#cb344-1" aria-hidden="true" tabindex="-1"></a>List of 2</span>
+<span id="cb344-2"><a href="feedforward-neural-network.html#cb344-2" aria-hidden="true" tabindex="-1"></a> $ params :List of 8</span>
+<span id="cb344-3"><a href="feedforward-neural-network.html#cb344-3" aria-hidden="true" tabindex="-1"></a>  ..$ metrics           : chr [1:4] &quot;loss&quot; &quot;acc&quot; &quot;val_loss&quot; &quot;val_acc&quot;</span>
+<span id="cb344-4"><a href="feedforward-neural-network.html#cb344-4" aria-hidden="true" tabindex="-1"></a>  ..$ epochs            : int 15</span>
+<span id="cb344-5"><a href="feedforward-neural-network.html#cb344-5" aria-hidden="true" tabindex="-1"></a>  ..$ steps             : NULL</span>
+<span id="cb344-6"><a href="feedforward-neural-network.html#cb344-6" aria-hidden="true" tabindex="-1"></a>  ..$ do_validation     : logi TRUE</span>
+<span id="cb344-7"><a href="feedforward-neural-network.html#cb344-7" aria-hidden="true" tabindex="-1"></a>  ..$ samples           : int 48000</span>
+<span id="cb344-8"><a href="feedforward-neural-network.html#cb344-8" aria-hidden="true" tabindex="-1"></a>  ..$ batch_size        : int 128</span>
+<span id="cb344-9"><a href="feedforward-neural-network.html#cb344-9" aria-hidden="true" tabindex="-1"></a>  ..$ verbose           : int 1</span>
+<span id="cb344-10"><a href="feedforward-neural-network.html#cb344-10" aria-hidden="true" tabindex="-1"></a>  ..$ validation_samples: int 12000</span>
+<span id="cb344-11"><a href="feedforward-neural-network.html#cb344-11" aria-hidden="true" tabindex="-1"></a> $ metrics:List of 4</span>
+<span id="cb344-12"><a href="feedforward-neural-network.html#cb344-12" aria-hidden="true" tabindex="-1"></a>  ..$ acc     : num [1:15] 0.83 0.929 0.945 0.954 0.959 ...</span>
+<span id="cb344-13"><a href="feedforward-neural-network.html#cb344-13" aria-hidden="true" tabindex="-1"></a>  ..$ loss    : num [1:15] 0.559 0.254 0.195 0.165 0.148 ...</span>
+<span id="cb344-14"><a href="feedforward-neural-network.html#cb344-14" aria-hidden="true" tabindex="-1"></a>  ..$ val_acc : num [1:15] 0.946 0.961 0.967 0.969 0.973 ...</span>
+<span id="cb344-15"><a href="feedforward-neural-network.html#cb344-15" aria-hidden="true" tabindex="-1"></a>  ..$ val_loss: num [1:15] 0.182 0.137 0.122 0.113 0.104 ...</span>
+<span id="cb344-16"><a href="feedforward-neural-network.html#cb344-16" aria-hidden="true" tabindex="-1"></a> - attr(*, &quot;class&quot;)= chr &quot;keras_training_history&quot;</span></code></pre></div>
+<div class="sourceCode" id="cb345"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb345-1"><a href="feedforward-neural-network.html#cb345-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(dnn_history)</span></code></pre></div>
 <center>
 <img src="images/dnn_history.png" style="width:70.0%" />
 </center>
 </div>
-<div id="prediction" class="section level4">
-<h4><span class="header-section-number">12.2.7.3</span> Prediction</h4>
-<div class="sourceCode" id="cb349"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb349-1" data-line-number="1">dnn_model <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">evaluate</span>(x_test, y_test)</a></code></pre></div>
-<div class="sourceCode" id="cb350"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb350-1" data-line-number="1">   32/10000 [..............................] - ETA: 3s</a>
-<a class="sourceLine" id="cb350-2" data-line-number="2">  416/10000 [&gt;.............................] - ETA: 1s</a>
-<a class="sourceLine" id="cb350-3" data-line-number="3">  800/10000 [=&gt;............................] - ETA: 1s</a>
-<a class="sourceLine" id="cb350-4" data-line-number="4"> 1184/10000 [==&gt;...........................] - ETA: 1s</a>
-<a class="sourceLine" id="cb350-5" data-line-number="5"> 1472/10000 [===&gt;..........................] - ETA: 1s</a>
-<a class="sourceLine" id="cb350-6" data-line-number="6"> 1728/10000 [====&gt;.........................] - ETA: 1s</a>
-<a class="sourceLine" id="cb350-7" data-line-number="7"> 2016/10000 [=====&gt;........................] - ETA: 1s</a>
-<a class="sourceLine" id="cb350-8" data-line-number="8"> 2464/10000 [======&gt;.......................] - ETA: 1s</a>
-<a class="sourceLine" id="cb350-9" data-line-number="9"> 2912/10000 [=======&gt;......................] - ETA: 1s</a>
-<a class="sourceLine" id="cb350-10" data-line-number="10"> 3360/10000 [=========&gt;....................] - ETA: 0s</a>
-<a class="sourceLine" id="cb350-11" data-line-number="11"> 3744/10000 [==========&gt;...................] - ETA: 0s</a>
-<a class="sourceLine" id="cb350-12" data-line-number="12"> 4192/10000 [===========&gt;..................] - ETA: 0s</a>
-<a class="sourceLine" id="cb350-13" data-line-number="13"> 4704/10000 [=============&gt;................] - ETA: 0s</a>
-<a class="sourceLine" id="cb350-14" data-line-number="14"> 5088/10000 [==============&gt;...............] - ETA: 0s</a>
-<a class="sourceLine" id="cb350-15" data-line-number="15"> 5568/10000 [===============&gt;..............] - ETA: 0s</a>
-<a class="sourceLine" id="cb350-16" data-line-number="16"> 6080/10000 [=================&gt;............] - ETA: 0s</a>
-<a class="sourceLine" id="cb350-17" data-line-number="17"> 6592/10000 [==================&gt;...........] - ETA: 0s</a>
-<a class="sourceLine" id="cb350-18" data-line-number="18"> 7008/10000 [====================&gt;.........] - ETA: 0s</a>
-<a class="sourceLine" id="cb350-19" data-line-number="19"> 7488/10000 [=====================&gt;........] - ETA: 0s</a>
-<a class="sourceLine" id="cb350-20" data-line-number="20"> 7968/10000 [======================&gt;.......] - ETA: 0s</a>
-<a class="sourceLine" id="cb350-21" data-line-number="21"> 8288/10000 [=======================&gt;......] - ETA: 0s</a>
-<a class="sourceLine" id="cb350-22" data-line-number="22"> 8704/10000 [=========================&gt;....] - ETA: 0s</a>
-<a class="sourceLine" id="cb350-23" data-line-number="23"> 9120/10000 [==========================&gt;...] - ETA: 0s</a>
-<a class="sourceLine" id="cb350-24" data-line-number="24"> 9600/10000 [===========================&gt;..] - ETA: 0s</a>
-<a class="sourceLine" id="cb350-25" data-line-number="25">10000/10000 [==============================] - 1s 128us/step</a>
-<a class="sourceLine" id="cb350-26" data-line-number="26">$loss</a>
-<a class="sourceLine" id="cb350-27" data-line-number="27">[1] 0.093325</a>
-<a class="sourceLine" id="cb350-28" data-line-number="28"></a>
-<a class="sourceLine" id="cb350-29" data-line-number="29">$acc</a>
-<a class="sourceLine" id="cb350-30" data-line-number="30">[1] 0.981</a></code></pre></div>
-<div class="sourceCode" id="cb351"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb351-1" data-line-number="1">dnn_pred &lt;-<span class="st"> </span>dnn_model <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb351-2" data-line-number="2"><span class="st">              </span><span class="kw">predict_classes</span>(x_test)</a>
-<a class="sourceLine" id="cb351-3" data-line-number="3"><span class="kw">head</span>(dnn_pred)</a></code></pre></div>
-<div class="sourceCode" id="cb352"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb352-1" data-line-number="1"> [1] 7 2 1 0 4 1</a></code></pre></div>
+<div id="prediction" class="section level4 hasAnchor" number="12.2.7.3">
+<h4><span class="header-section-number">12.2.7.3</span> Prediction<a href="feedforward-neural-network.html#prediction" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<div class="sourceCode" id="cb346"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb346-1"><a href="feedforward-neural-network.html#cb346-1" aria-hidden="true" tabindex="-1"></a>dnn_model <span class="sc">%&gt;%</span> <span class="fu">evaluate</span>(x_test, y_test)</span></code></pre></div>
+<div class="sourceCode" id="cb347"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb347-1"><a href="feedforward-neural-network.html#cb347-1" aria-hidden="true" tabindex="-1"></a>   32/10000 [..............................] - ETA: 3s</span>
+<span id="cb347-2"><a href="feedforward-neural-network.html#cb347-2" aria-hidden="true" tabindex="-1"></a>  416/10000 [&gt;.............................] - ETA: 1s</span>
+<span id="cb347-3"><a href="feedforward-neural-network.html#cb347-3" aria-hidden="true" tabindex="-1"></a>  800/10000 [=&gt;............................] - ETA: 1s</span>
+<span id="cb347-4"><a href="feedforward-neural-network.html#cb347-4" aria-hidden="true" tabindex="-1"></a> 1184/10000 [==&gt;...........................] - ETA: 1s</span>
+<span id="cb347-5"><a href="feedforward-neural-network.html#cb347-5" aria-hidden="true" tabindex="-1"></a> 1472/10000 [===&gt;..........................] - ETA: 1s</span>
+<span id="cb347-6"><a href="feedforward-neural-network.html#cb347-6" aria-hidden="true" tabindex="-1"></a> 1728/10000 [====&gt;.........................] - ETA: 1s</span>
+<span id="cb347-7"><a href="feedforward-neural-network.html#cb347-7" aria-hidden="true" tabindex="-1"></a> 2016/10000 [=====&gt;........................] - ETA: 1s</span>
+<span id="cb347-8"><a href="feedforward-neural-network.html#cb347-8" aria-hidden="true" tabindex="-1"></a> 2464/10000 [======&gt;.......................] - ETA: 1s</span>
+<span id="cb347-9"><a href="feedforward-neural-network.html#cb347-9" aria-hidden="true" tabindex="-1"></a> 2912/10000 [=======&gt;......................] - ETA: 1s</span>
+<span id="cb347-10"><a href="feedforward-neural-network.html#cb347-10" aria-hidden="true" tabindex="-1"></a> 3360/10000 [=========&gt;....................] - ETA: 0s</span>
+<span id="cb347-11"><a href="feedforward-neural-network.html#cb347-11" aria-hidden="true" tabindex="-1"></a> 3744/10000 [==========&gt;...................] - ETA: 0s</span>
+<span id="cb347-12"><a href="feedforward-neural-network.html#cb347-12" aria-hidden="true" tabindex="-1"></a> 4192/10000 [===========&gt;..................] - ETA: 0s</span>
+<span id="cb347-13"><a href="feedforward-neural-network.html#cb347-13" aria-hidden="true" tabindex="-1"></a> 4704/10000 [=============&gt;................] - ETA: 0s</span>
+<span id="cb347-14"><a href="feedforward-neural-network.html#cb347-14" aria-hidden="true" tabindex="-1"></a> 5088/10000 [==============&gt;...............] - ETA: 0s</span>
+<span id="cb347-15"><a href="feedforward-neural-network.html#cb347-15" aria-hidden="true" tabindex="-1"></a> 5568/10000 [===============&gt;..............] - ETA: 0s</span>
+<span id="cb347-16"><a href="feedforward-neural-network.html#cb347-16" aria-hidden="true" tabindex="-1"></a> 6080/10000 [=================&gt;............] - ETA: 0s</span>
+<span id="cb347-17"><a href="feedforward-neural-network.html#cb347-17" aria-hidden="true" tabindex="-1"></a> 6592/10000 [==================&gt;...........] - ETA: 0s</span>
+<span id="cb347-18"><a href="feedforward-neural-network.html#cb347-18" aria-hidden="true" tabindex="-1"></a> 7008/10000 [====================&gt;.........] - ETA: 0s</span>
+<span id="cb347-19"><a href="feedforward-neural-network.html#cb347-19" aria-hidden="true" tabindex="-1"></a> 7488/10000 [=====================&gt;........] - ETA: 0s</span>
+<span id="cb347-20"><a href="feedforward-neural-network.html#cb347-20" aria-hidden="true" tabindex="-1"></a> 7968/10000 [======================&gt;.......] - ETA: 0s</span>
+<span id="cb347-21"><a href="feedforward-neural-network.html#cb347-21" aria-hidden="true" tabindex="-1"></a> 8288/10000 [=======================&gt;......] - ETA: 0s</span>
+<span id="cb347-22"><a href="feedforward-neural-network.html#cb347-22" aria-hidden="true" tabindex="-1"></a> 8704/10000 [=========================&gt;....] - ETA: 0s</span>
+<span id="cb347-23"><a href="feedforward-neural-network.html#cb347-23" aria-hidden="true" tabindex="-1"></a> 9120/10000 [==========================&gt;...] - ETA: 0s</span>
+<span id="cb347-24"><a href="feedforward-neural-network.html#cb347-24" aria-hidden="true" tabindex="-1"></a> 9600/10000 [===========================&gt;..] - ETA: 0s</span>
+<span id="cb347-25"><a href="feedforward-neural-network.html#cb347-25" aria-hidden="true" tabindex="-1"></a>10000/10000 [==============================] - 1s 128us/step</span>
+<span id="cb347-26"><a href="feedforward-neural-network.html#cb347-26" aria-hidden="true" tabindex="-1"></a>$loss</span>
+<span id="cb347-27"><a href="feedforward-neural-network.html#cb347-27" aria-hidden="true" tabindex="-1"></a>[1] 0.093325</span>
+<span id="cb347-28"><a href="feedforward-neural-network.html#cb347-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb347-29"><a href="feedforward-neural-network.html#cb347-29" aria-hidden="true" tabindex="-1"></a>$acc</span>
+<span id="cb347-30"><a href="feedforward-neural-network.html#cb347-30" aria-hidden="true" tabindex="-1"></a>[1] 0.981</span></code></pre></div>
+<div class="sourceCode" id="cb348"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb348-1"><a href="feedforward-neural-network.html#cb348-1" aria-hidden="true" tabindex="-1"></a>dnn_pred <span class="ot">&lt;-</span> dnn_model <span class="sc">%&gt;%</span> </span>
+<span id="cb348-2"><a href="feedforward-neural-network.html#cb348-2" aria-hidden="true" tabindex="-1"></a>              <span class="fu">predict_classes</span>(x_test)</span>
+<span id="cb348-3"><a href="feedforward-neural-network.html#cb348-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dnn_pred)</span></code></pre></div>
+<div class="sourceCode" id="cb349"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb349-1"><a href="feedforward-neural-network.html#cb349-1" aria-hidden="true" tabindex="-1"></a> [1] 7 2 1 0 4 1</span></code></pre></div>
 <p>Let’s check a few misclassified images. A number of misclassified images can be found using the following code. And we can plot these misclassified images to see whether a human can correctly read it out.</p>
-<div class="sourceCode" id="cb353"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb353-1" data-line-number="1"><span class="co">## total number of mis-classcified images</span></a>
-<a class="sourceLine" id="cb353-2" data-line-number="2"><span class="kw">sum</span>(dnn_pred <span class="op">!=</span><span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>y)</a></code></pre></div>
-<div class="sourceCode" id="cb354"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb354-1" data-line-number="1">[1] 190</a></code></pre></div>
-<div class="sourceCode" id="cb355"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb355-1" data-line-number="1">missed_image =<span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>x[dnn_pred <span class="op">!=</span><span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>y,,]</a>
-<a class="sourceLine" id="cb355-2" data-line-number="2">missed_digit =<span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>y[dnn_pred <span class="op">!=</span><span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>y]</a>
-<a class="sourceLine" id="cb355-3" data-line-number="3">missed_pred =<span class="st"> </span>dnn_pred[dnn_pred <span class="op">!=</span><span class="st"> </span>mnist<span class="op">$</span>test<span class="op">$</span>y]</a>
-<a class="sourceLine" id="cb355-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb355-5" data-line-number="5">index_image =<span class="st"> </span><span class="dv">34</span> </a>
-<a class="sourceLine" id="cb355-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb355-7" data-line-number="7"><span class="co">## change this index to see different image.</span></a>
-<a class="sourceLine" id="cb355-8" data-line-number="8">input_matrix &lt;-<span class="st"> </span>missed_image[index_image,<span class="dv">1</span><span class="op">:</span><span class="dv">28</span>,<span class="dv">1</span><span class="op">:</span><span class="dv">28</span>]</a>
-<a class="sourceLine" id="cb355-9" data-line-number="9">output_matrix &lt;-<span class="st"> </span><span class="kw">apply</span>(input_matrix, <span class="dv">2</span>, rev)</a>
-<a class="sourceLine" id="cb355-10" data-line-number="10">output_matrix &lt;-<span class="st"> </span><span class="kw">t</span>(output_matrix)</a>
-<a class="sourceLine" id="cb355-11" data-line-number="11"></a>
-<a class="sourceLine" id="cb355-12" data-line-number="12"><span class="kw">image</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">28</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">28</span>, output_matrix, <span class="dt">col =</span> <span class="kw">gray.colors</span>(<span class="dv">256</span>), </a>
-<a class="sourceLine" id="cb355-13" data-line-number="13">    <span class="dt">xlab =</span> <span class="kw">paste</span>(<span class="st">&quot;Image for digit &quot;</span>, missed_digit[index_image], </a>
-<a class="sourceLine" id="cb355-14" data-line-number="14">        <span class="st">&quot;, wrongly predicted as &quot;</span>, missed_pred[index_image]), </a>
-<a class="sourceLine" id="cb355-15" data-line-number="15">    <span class="dt">ylab =</span> <span class="st">&quot;&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb350"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb350-1"><a href="feedforward-neural-network.html#cb350-1" aria-hidden="true" tabindex="-1"></a><span class="do">## total number of mis-classcified images</span></span>
+<span id="cb350-2"><a href="feedforward-neural-network.html#cb350-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(dnn_pred <span class="sc">!=</span> mnist<span class="sc">$</span>test<span class="sc">$</span>y)</span></code></pre></div>
+<div class="sourceCode" id="cb351"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb351-1"><a href="feedforward-neural-network.html#cb351-1" aria-hidden="true" tabindex="-1"></a>[1] 190</span></code></pre></div>
+<div class="sourceCode" id="cb352"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb352-1"><a href="feedforward-neural-network.html#cb352-1" aria-hidden="true" tabindex="-1"></a>missed_image <span class="ot">=</span> mnist<span class="sc">$</span>test<span class="sc">$</span>x[dnn_pred <span class="sc">!=</span> mnist<span class="sc">$</span>test<span class="sc">$</span>y,,]</span>
+<span id="cb352-2"><a href="feedforward-neural-network.html#cb352-2" aria-hidden="true" tabindex="-1"></a>missed_digit <span class="ot">=</span> mnist<span class="sc">$</span>test<span class="sc">$</span>y[dnn_pred <span class="sc">!=</span> mnist<span class="sc">$</span>test<span class="sc">$</span>y]</span>
+<span id="cb352-3"><a href="feedforward-neural-network.html#cb352-3" aria-hidden="true" tabindex="-1"></a>missed_pred <span class="ot">=</span> dnn_pred[dnn_pred <span class="sc">!=</span> mnist<span class="sc">$</span>test<span class="sc">$</span>y]</span>
+<span id="cb352-4"><a href="feedforward-neural-network.html#cb352-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb352-5"><a href="feedforward-neural-network.html#cb352-5" aria-hidden="true" tabindex="-1"></a>index_image <span class="ot">=</span> <span class="dv">34</span> </span>
+<span id="cb352-6"><a href="feedforward-neural-network.html#cb352-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb352-7"><a href="feedforward-neural-network.html#cb352-7" aria-hidden="true" tabindex="-1"></a><span class="do">## change this index to see different image.</span></span>
+<span id="cb352-8"><a href="feedforward-neural-network.html#cb352-8" aria-hidden="true" tabindex="-1"></a>input_matrix <span class="ot">&lt;-</span> missed_image[index_image,<span class="dv">1</span><span class="sc">:</span><span class="dv">28</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">28</span>]</span>
+<span id="cb352-9"><a href="feedforward-neural-network.html#cb352-9" aria-hidden="true" tabindex="-1"></a>output_matrix <span class="ot">&lt;-</span> <span class="fu">apply</span>(input_matrix, <span class="dv">2</span>, rev)</span>
+<span id="cb352-10"><a href="feedforward-neural-network.html#cb352-10" aria-hidden="true" tabindex="-1"></a>output_matrix <span class="ot">&lt;-</span> <span class="fu">t</span>(output_matrix)</span>
+<span id="cb352-11"><a href="feedforward-neural-network.html#cb352-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb352-12"><a href="feedforward-neural-network.html#cb352-12" aria-hidden="true" tabindex="-1"></a><span class="fu">image</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">28</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">28</span>, output_matrix, <span class="at">col =</span> <span class="fu">gray.colors</span>(<span class="dv">256</span>), </span>
+<span id="cb352-13"><a href="feedforward-neural-network.html#cb352-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">xlab =</span> <span class="fu">paste</span>(<span class="st">&quot;Image for digit &quot;</span>, missed_digit[index_image], </span>
+<span id="cb352-14"><a href="feedforward-neural-network.html#cb352-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;, wrongly predicted as &quot;</span>, missed_pred[index_image]), </span>
+<span id="cb352-15"><a href="feedforward-neural-network.html#cb352-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">ylab =</span> <span class="st">&quot;&quot;</span>)</span></code></pre></div>
 <center>
 <img src="images/misclassified_img.png" style="width:70.0%" />
 </center>
@@ -868,7 +931,6 @@ FIGURE 12.10: Color image is a set of pixels on 3-d space. Each pixel has a valu
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
-<script src="libs/gitbook/js/lunr.js"></script>
 <script src="libs/gitbook/js/clipboard.min.js"></script>
 <script src="libs/gitbook/js/plugin-search.js"></script>
 <script src="libs/gitbook/js/plugin-sharing.js"></script>
@@ -887,6 +949,7 @@ gitbook.start({
 "weibo": false,
 "instapaper": false,
 "vk": false,
+"whatsapp": false,
 "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": {
@@ -907,6 +970,10 @@ gitbook.start({
 "text": null
 },
 "download": ["IDS.pdf", "IDS.epub", "IDS.mobi"],
+"search": {
+"engine": "fuse",
+"options": null
+},
 "toc": {
 "collapse": "section",
 "scroll_highlight": true

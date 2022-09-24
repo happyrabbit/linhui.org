@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>11.7 Gradient Boosted Machine | Introduction to Data Science</title>
   <meta name="description" content="11.7 Gradient Boosted Machine | Introduction to Data Science" />
-  <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
   <meta property="og:title" content="11.7 Gradient Boosted Machine | Introduction to Data Science" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2021-05-25" />
+<meta name="date" content="2022-09-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +33,9 @@
   
 <link rel="prev" href="random-forest.html"/>
 <link rel="next" href="deeplearning.html"/>
-<script src="libs/jquery/jquery.min.js"></script>
+<script src="libs/header-attrs/header-attrs.js"></script>
+<script src="libs/jquery/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
@@ -49,29 +51,33 @@
 
 
 
-
+<link href="libs/anchor-sections/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections/anchor-sections.js"></script>
 
 
 <style type="text/css">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -80,9 +86,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -115,6 +121,29 @@ code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
 <link rel="stylesheet" href="css/style.css" type="text/css" />
 </head>
 
@@ -131,181 +160,215 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="http://scientistcafe.com">Homepage</a></li>
 
 <li class="divider"></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a><ul>
-<li class="chapter" data-level="" data-path="goal-of-the-book.html"><a href="goal-of-the-book.html"><i class="fa fa-check"></i>Goal of the Book</a></li>
-<li class="chapter" data-level="" data-path="what-this-book-covers.html"><a href="what-this-book-covers.html"><i class="fa fa-check"></i>What This Book Covers</a></li>
-<li class="chapter" data-level="" data-path="who-this-book-is-for.html"><a href="who-this-book-is-for.html"><i class="fa fa-check"></i>Who This Book Is For</a></li>
-<li class="chapter" data-level="" data-path="how-to-use-this-book.html"><a href="how-to-use-this-book.html"><i class="fa fa-check"></i>How to Use This Book</a><ul>
-<li class="chapter" data-level="" data-path="how-to-use-this-book.html"><a href="how-to-use-this-book.html#what-the-book-assumes"><i class="fa fa-check"></i>What the book assumes</a></li>
-<li class="chapter" data-level="" data-path="how-to-use-this-book.html"><a href="how-to-use-this-book.html#how-to-run-r-and-python-code"><i class="fa fa-check"></i>How to run R and Python code</a></li>
+<li><a href="index.html#preface">Preface<span></span></a>
+<ul>
+<li><a href="goal-of-the-book.html#goal-of-the-book">Goal of the Book<span></span></a></li>
+<li><a href="what-this-book-covers.html#what-this-book-covers">What This Book Covers<span></span></a></li>
+<li><a href="who-this-book-is-for.html#who-this-book-is-for">Who This Book Is For<span></span></a></li>
+<li><a href="how-to-use-this-book.html#how-to-use-this-book">How to Use This Book<span></span></a>
+<ul>
+<li><a href="how-to-use-this-book.html#what-the-book-assumes">What the book assumes<span></span></a></li>
+<li><a href="how-to-use-this-book.html#how-to-run-r-and-python-code">How to run R and Python code<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="" data-path="complementary-reading.html"><a href="complementary-reading.html"><i class="fa fa-check"></i>Complementary Reading</a></li>
-<li class="chapter" data-level="" data-path="acknowledgements.html"><a href="acknowledgements.html"><i class="fa fa-check"></i>Acknowledgements</a></li>
+<li><a href="complementary-reading.html#complementary-reading">Complementary Reading<span></span></a></li>
+<li><a href="acknowledgements.html#acknowledgements">Acknowledgements<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="" data-path="about-the-authors.html"><a href="about-the-authors.html"><i class="fa fa-check"></i>About the Authors</a></li>
-<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a><ul>
-<li class="chapter" data-level="1.1" data-path="a-brief-history-of-data-science.html"><a href="a-brief-history-of-data-science.html"><i class="fa fa-check"></i><b>1.1</b> A brief history of data science</a></li>
-<li class="chapter" data-level="1.2" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html"><i class="fa fa-check"></i><b>1.2</b> Data science role and skill tracks</a><ul>
-<li class="chapter" data-level="1.2.1" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#engineering"><i class="fa fa-check"></i><b>1.2.1</b> Engineering</a></li>
-<li class="chapter" data-level="1.2.2" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#analysis"><i class="fa fa-check"></i><b>1.2.2</b> Analysis</a></li>
-<li class="chapter" data-level="1.2.3" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#modeling"><i class="fa fa-check"></i><b>1.2.3</b> Modeling</a></li>
+<li><a href="about-the-authors.html#about-the-authors">About the Authors<span></span></a></li>
+<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction<span></span></a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="a-brief-history-of-data-science.html"><a href="a-brief-history-of-data-science.html"><i class="fa fa-check"></i><b>1.1</b> A brief history of data science<span></span></a></li>
+<li class="chapter" data-level="1.2" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html"><i class="fa fa-check"></i><b>1.2</b> Data science role and skill tracks<span></span></a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#engineering"><i class="fa fa-check"></i><b>1.2.1</b> Engineering<span></span></a></li>
+<li class="chapter" data-level="1.2.2" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#analysis"><i class="fa fa-check"></i><b>1.2.2</b> Analysis<span></span></a></li>
+<li class="chapter" data-level="1.2.3" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#modeling"><i class="fa fa-check"></i><b>1.2.3</b> Modeling<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="1.3" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html"><i class="fa fa-check"></i><b>1.3</b> What kind of questions can data science solve?</a><ul>
-<li class="chapter" data-level="1.3.1" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html#prerequisites"><i class="fa fa-check"></i><b>1.3.1</b> Prerequisites</a></li>
-<li class="chapter" data-level="1.3.2" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html#problem-type"><i class="fa fa-check"></i><b>1.3.2</b> Problem type</a></li>
+<li class="chapter" data-level="1.3" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html"><i class="fa fa-check"></i><b>1.3</b> What kind of questions can data science solve?<span></span></a>
+<ul>
+<li class="chapter" data-level="1.3.1" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html#prerequisites"><i class="fa fa-check"></i><b>1.3.1</b> Prerequisites<span></span></a></li>
+<li class="chapter" data-level="1.3.2" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html#problem-type"><i class="fa fa-check"></i><b>1.3.2</b> Problem type<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="1.4" data-path="structure-data-science-team.html"><a href="structure-data-science-team.html"><i class="fa fa-check"></i><b>1.4</b> Structure data science team</a></li>
-<li class="chapter" data-level="1.5" data-path="list-of-potential-data-science-careers.html"><a href="list-of-potential-data-science-careers.html"><i class="fa fa-check"></i><b>1.5</b> List of potential data science careers</a></li>
+<li class="chapter" data-level="1.4" data-path="structure-data-science-team.html"><a href="structure-data-science-team.html"><i class="fa fa-check"></i><b>1.4</b> Structure data science team<span></span></a></li>
+<li class="chapter" data-level="1.5" data-path="list-of-potential-data-science-careers.html"><a href="list-of-potential-data-science-careers.html"><i class="fa fa-check"></i><b>1.5</b> List of potential data science careers<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="2" data-path="soft-skills-for-data-scientists.html"><a href="soft-skills-for-data-scientists.html"><i class="fa fa-check"></i><b>2</b> Soft Skills for Data Scientists</a><ul>
-<li class="chapter" data-level="2.1" data-path="comparison-between-statistician-and-data-scientist.html"><a href="comparison-between-statistician-and-data-scientist.html"><i class="fa fa-check"></i><b>2.1</b> Comparison between Statistician and Data Scientist</a></li>
-<li class="chapter" data-level="2.2" data-path="beyond-data-and-analytics.html"><a href="beyond-data-and-analytics.html"><i class="fa fa-check"></i><b>2.2</b> Beyond Data and Analytics</a></li>
-<li class="chapter" data-level="2.3" data-path="three-pillars-of-knowledge.html"><a href="three-pillars-of-knowledge.html"><i class="fa fa-check"></i><b>2.3</b> Three Pillars of Knowledge</a></li>
-<li class="chapter" data-level="2.4" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html"><i class="fa fa-check"></i><b>2.4</b> Data Science Project Cycle</a><ul>
-<li class="chapter" data-level="2.4.1" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#types-of-data-science-projects"><i class="fa fa-check"></i><b>2.4.1</b> Types of Data Science Projects</a></li>
-<li class="chapter" data-level="2.4.2" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#problem-formulation-and-project-planning-stage"><i class="fa fa-check"></i><b>2.4.2</b> Problem Formulation and Project Planning Stage</a></li>
-<li class="chapter" data-level="2.4.3" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#project-modeling-stage"><i class="fa fa-check"></i><b>2.4.3</b> Project Modeling Stage</a></li>
-<li class="chapter" data-level="2.4.4" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#model-implementation-and-post-production-stage"><i class="fa fa-check"></i><b>2.4.4</b> Model Implementation and Post Production Stage</a></li>
-<li class="chapter" data-level="2.4.5" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#project-cycle-summary"><i class="fa fa-check"></i><b>2.4.5</b> Project Cycle Summary</a></li>
+<li class="chapter" data-level="2" data-path="soft-skills-for-data-scientists.html"><a href="soft-skills-for-data-scientists.html"><i class="fa fa-check"></i><b>2</b> Soft Skills for Data Scientists<span></span></a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="comparison-between-statistician-and-data-scientist.html"><a href="comparison-between-statistician-and-data-scientist.html"><i class="fa fa-check"></i><b>2.1</b> Comparison between Statistician and Data Scientist<span></span></a></li>
+<li class="chapter" data-level="2.2" data-path="beyond-data-and-analytics.html"><a href="beyond-data-and-analytics.html"><i class="fa fa-check"></i><b>2.2</b> Beyond Data and Analytics<span></span></a></li>
+<li class="chapter" data-level="2.3" data-path="three-pillars-of-knowledge.html"><a href="three-pillars-of-knowledge.html"><i class="fa fa-check"></i><b>2.3</b> Three Pillars of Knowledge<span></span></a></li>
+<li class="chapter" data-level="2.4" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html"><i class="fa fa-check"></i><b>2.4</b> Data Science Project Cycle<span></span></a>
+<ul>
+<li class="chapter" data-level="2.4.1" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#types-of-data-science-projects"><i class="fa fa-check"></i><b>2.4.1</b> Types of Data Science Projects<span></span></a></li>
+<li class="chapter" data-level="2.4.2" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#problem-formulation-and-project-planning-stage"><i class="fa fa-check"></i><b>2.4.2</b> Problem Formulation and Project Planning Stage<span></span></a></li>
+<li class="chapter" data-level="2.4.3" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#project-modeling-stage"><i class="fa fa-check"></i><b>2.4.3</b> Project Modeling Stage<span></span></a></li>
+<li class="chapter" data-level="2.4.4" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#model-implementation-and-post-production-stage"><i class="fa fa-check"></i><b>2.4.4</b> Model Implementation and Post Production Stage<span></span></a></li>
+<li class="chapter" data-level="2.4.5" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#project-cycle-summary"><i class="fa fa-check"></i><b>2.4.5</b> Project Cycle Summary<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="2.5" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html"><i class="fa fa-check"></i><b>2.5</b> Common Mistakes in Data Science</a><ul>
-<li class="chapter" data-level="2.5.1" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#problem-formulation-stage"><i class="fa fa-check"></i><b>2.5.1</b> Problem Formulation Stage</a></li>
-<li class="chapter" data-level="2.5.2" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#project-planning-stage"><i class="fa fa-check"></i><b>2.5.2</b> Project Planning Stage</a></li>
-<li class="chapter" data-level="2.5.3" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#project-modeling-stage-1"><i class="fa fa-check"></i><b>2.5.3</b> Project Modeling Stage</a></li>
-<li class="chapter" data-level="2.5.4" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#model-implementation-and-post-production-stage-1"><i class="fa fa-check"></i><b>2.5.4</b> Model Implementation and Post Production Stage</a></li>
-<li class="chapter" data-level="2.5.5" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#summary-of-common-mistakes"><i class="fa fa-check"></i><b>2.5.5</b> Summary of Common Mistakes</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="3" data-path="introduction-to-the-data.html"><a href="introduction-to-the-data.html"><i class="fa fa-check"></i><b>3</b> Introduction to The Data</a><ul>
-<li class="chapter" data-level="3.1" data-path="customer-data-for-a-clothing-company.html"><a href="customer-data-for-a-clothing-company.html"><i class="fa fa-check"></i><b>3.1</b> Customer Data for A Clothing Company</a></li>
-<li class="chapter" data-level="3.2" data-path="swinediseasedata.html"><a href="swinediseasedata.html"><i class="fa fa-check"></i><b>3.2</b> Swine Disease Breakout Data</a></li>
-<li class="chapter" data-level="3.3" data-path="mnist-dataset.html"><a href="mnist-dataset.html"><i class="fa fa-check"></i><b>3.3</b> MNIST Dataset</a></li>
-<li class="chapter" data-level="3.4" data-path="imdb-dataset.html"><a href="imdb-dataset.html"><i class="fa fa-check"></i><b>3.4</b> IMDB Dataset</a></li>
-</ul></li>
-<li class="chapter" data-level="4" data-path="bigdatacloudplatform.html"><a href="bigdatacloudplatform.html"><i class="fa fa-check"></i><b>4</b> Big Data Cloud Platform</a><ul>
-<li class="chapter" data-level="4.1" data-path="power-of-cluster-of-computers.html"><a href="power-of-cluster-of-computers.html"><i class="fa fa-check"></i><b>4.1</b> Power of Cluster of Computers</a></li>
-<li class="chapter" data-level="4.2" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html"><i class="fa fa-check"></i><b>4.2</b> Evolution of Cluster Computing</a><ul>
-<li class="chapter" data-level="4.2.1" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html#hadoop"><i class="fa fa-check"></i><b>4.2.1</b> Hadoop</a></li>
-<li class="chapter" data-level="4.2.2" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html#spark"><i class="fa fa-check"></i><b>4.2.2</b> Spark</a></li>
-</ul></li>
-<li class="chapter" data-level="4.3" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html"><i class="fa fa-check"></i><b>4.3</b> Introduction of Cloud Environment</a><ul>
-<li class="chapter" data-level="4.3.1" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#open-account-and-create-a-cluster"><i class="fa fa-check"></i><b>4.3.1</b> Open Account and Create a Cluster</a></li>
-<li class="chapter" data-level="4.3.2" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#r-notebook"><i class="fa fa-check"></i><b>4.3.2</b> R Notebook</a></li>
-<li class="chapter" data-level="4.3.3" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#markdown-cells"><i class="fa fa-check"></i><b>4.3.3</b> Markdown Cells</a></li>
-</ul></li>
-<li class="chapter" data-level="4.4" data-path="leveragesparkr.html"><a href="leveragesparkr.html"><i class="fa fa-check"></i><b>4.4</b> Leverage Spark Using R Notebook</a></li>
-<li class="chapter" data-level="4.5" data-path="databases-and-sql.html"><a href="databases-and-sql.html"><i class="fa fa-check"></i><b>4.5</b> Databases and SQL</a><ul>
-<li class="chapter" data-level="4.5.1" data-path="databases-and-sql.html"><a href="databases-and-sql.html#history"><i class="fa fa-check"></i><b>4.5.1</b> History</a></li>
-<li class="chapter" data-level="4.5.2" data-path="databases-and-sql.html"><a href="databases-and-sql.html#database-table-and-view"><i class="fa fa-check"></i><b>4.5.2</b> Database, Table and View</a></li>
-<li class="chapter" data-level="4.5.3" data-path="databases-and-sql.html"><a href="databases-and-sql.html#basic-sql-statement"><i class="fa fa-check"></i><b>4.5.3</b> Basic SQL Statement</a></li>
-<li class="chapter" data-level="4.5.4" data-path="databases-and-sql.html"><a href="databases-and-sql.html#advanced-topics-in-database"><i class="fa fa-check"></i><b>4.5.4</b> Advanced Topics in Database</a></li>
+<li class="chapter" data-level="2.5" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html"><i class="fa fa-check"></i><b>2.5</b> Common Mistakes in Data Science<span></span></a>
+<ul>
+<li class="chapter" data-level="2.5.1" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#problem-formulation-stage"><i class="fa fa-check"></i><b>2.5.1</b> Problem Formulation Stage<span></span></a></li>
+<li class="chapter" data-level="2.5.2" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#project-planning-stage"><i class="fa fa-check"></i><b>2.5.2</b> Project Planning Stage<span></span></a></li>
+<li class="chapter" data-level="2.5.3" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#project-modeling-stage-1"><i class="fa fa-check"></i><b>2.5.3</b> Project Modeling Stage<span></span></a></li>
+<li class="chapter" data-level="2.5.4" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#model-implementation-and-post-production-stage-1"><i class="fa fa-check"></i><b>2.5.4</b> Model Implementation and Post Production Stage<span></span></a></li>
+<li class="chapter" data-level="2.5.5" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#summary-of-common-mistakes"><i class="fa fa-check"></i><b>2.5.5</b> Summary of Common Mistakes<span></span></a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="datapreprocessing.html"><a href="datapreprocessing.html"><i class="fa fa-check"></i><b>5</b> Data Pre-processing</a><ul>
-<li class="chapter" data-level="5.1" data-path="data-cleaning.html"><a href="data-cleaning.html"><i class="fa fa-check"></i><b>5.1</b> Data Cleaning</a></li>
-<li class="chapter" data-level="5.2" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>5.2</b> Missing Values</a><ul>
-<li class="chapter" data-level="5.2.1" data-path="missing-values.html"><a href="missing-values.html#impute-missing-values-with-medianmode"><i class="fa fa-check"></i><b>5.2.1</b> Impute missing values with median/mode</a></li>
-<li class="chapter" data-level="5.2.2" data-path="missing-values.html"><a href="missing-values.html#k-nearest-neighbors"><i class="fa fa-check"></i><b>5.2.2</b> K-nearest neighbors</a></li>
-<li class="chapter" data-level="5.2.3" data-path="missing-values.html"><a href="missing-values.html#bagging-tree"><i class="fa fa-check"></i><b>5.2.3</b> Bagging Tree</a></li>
+<li class="chapter" data-level="3" data-path="introduction-to-the-data.html"><a href="introduction-to-the-data.html"><i class="fa fa-check"></i><b>3</b> Introduction to The Data<span></span></a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="customer-data-for-a-clothing-company.html"><a href="customer-data-for-a-clothing-company.html"><i class="fa fa-check"></i><b>3.1</b> Customer Data for A Clothing Company<span></span></a></li>
+<li class="chapter" data-level="3.2" data-path="swinediseasedata.html"><a href="swinediseasedata.html"><i class="fa fa-check"></i><b>3.2</b> Swine Disease Breakout Data<span></span></a></li>
+<li class="chapter" data-level="3.3" data-path="mnist-dataset.html"><a href="mnist-dataset.html"><i class="fa fa-check"></i><b>3.3</b> MNIST Dataset<span></span></a></li>
+<li class="chapter" data-level="3.4" data-path="imdb-dataset.html"><a href="imdb-dataset.html"><i class="fa fa-check"></i><b>3.4</b> IMDB Dataset<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="5.3" data-path="centering-and-scaling.html"><a href="centering-and-scaling.html"><i class="fa fa-check"></i><b>5.3</b> Centering and Scaling</a></li>
-<li class="chapter" data-level="5.4" data-path="resolve-skewness.html"><a href="resolve-skewness.html"><i class="fa fa-check"></i><b>5.4</b> Resolve Skewness</a></li>
-<li class="chapter" data-level="5.5" data-path="outliers.html"><a href="outliers.html"><i class="fa fa-check"></i><b>5.5</b> Resolve Outliers</a></li>
-<li class="chapter" data-level="5.6" data-path="collinearity.html"><a href="collinearity.html"><i class="fa fa-check"></i><b>5.6</b> Collinearity</a></li>
-<li class="chapter" data-level="5.7" data-path="sparse-variables.html"><a href="sparse-variables.html"><i class="fa fa-check"></i><b>5.7</b> Sparse Variables</a></li>
-<li class="chapter" data-level="5.8" data-path="re-encode-dummy-variables.html"><a href="re-encode-dummy-variables.html"><i class="fa fa-check"></i><b>5.8</b> Re-encode Dummy Variables</a></li>
+<li class="chapter" data-level="4" data-path="bigdatacloudplatform.html"><a href="bigdatacloudplatform.html"><i class="fa fa-check"></i><b>4</b> Big Data Cloud Platform<span></span></a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="power-of-cluster-of-computers.html"><a href="power-of-cluster-of-computers.html"><i class="fa fa-check"></i><b>4.1</b> Power of Cluster of Computers<span></span></a></li>
+<li class="chapter" data-level="4.2" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html"><i class="fa fa-check"></i><b>4.2</b> Evolution of Cluster Computing<span></span></a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html#hadoop"><i class="fa fa-check"></i><b>4.2.1</b> Hadoop<span></span></a></li>
+<li class="chapter" data-level="4.2.2" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html#spark"><i class="fa fa-check"></i><b>4.2.2</b> Spark<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="6" data-path="datawrangline.html"><a href="datawrangline.html"><i class="fa fa-check"></i><b>6</b> Data Wrangling</a><ul>
-<li class="chapter" data-level="6.1" data-path="summarize-data.html"><a href="summarize-data.html"><i class="fa fa-check"></i><b>6.1</b> Summarize Data</a><ul>
-<li class="chapter" data-level="6.1.1" data-path="summarize-data.html"><a href="summarize-data.html#dplyr-package"><i class="fa fa-check"></i><b>6.1.1</b> <code>dplyr</code> package</a></li>
-<li class="chapter" data-level="6.1.2" data-path="summarize-data.html"><a href="summarize-data.html#applyfamilyinbaser"><i class="fa fa-check"></i><b>6.1.2</b> <code>apply()</code>, <code>lapply()</code> and <code>sapply()</code> in base R</a></li>
+<li class="chapter" data-level="4.3" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html"><i class="fa fa-check"></i><b>4.3</b> Introduction of Cloud Environment<span></span></a>
+<ul>
+<li class="chapter" data-level="4.3.1" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#open-account-and-create-a-cluster"><i class="fa fa-check"></i><b>4.3.1</b> Open Account and Create a Cluster<span></span></a></li>
+<li class="chapter" data-level="4.3.2" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#r-notebook"><i class="fa fa-check"></i><b>4.3.2</b> R Notebook<span></span></a></li>
+<li class="chapter" data-level="4.3.3" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#markdown-cells"><i class="fa fa-check"></i><b>4.3.3</b> Markdown Cells<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="6.2" data-path="tidy-and-reshape-data.html"><a href="tidy-and-reshape-data.html"><i class="fa fa-check"></i><b>6.2</b> Tidy and Reshape Data</a></li>
-</ul></li>
-<li class="chapter" data-level="7" data-path="modeltuningstrategy.html"><a href="modeltuningstrategy.html"><i class="fa fa-check"></i><b>7</b> Model Tuning Strategy</a><ul>
-<li class="chapter" data-level="7.1" data-path="vbtradeoff.html"><a href="vbtradeoff.html"><i class="fa fa-check"></i><b>7.1</b> Variance-Bias Trade-Off</a></li>
-<li class="chapter" data-level="7.2" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html"><i class="fa fa-check"></i><b>7.2</b> Data Splitting and Resampling</a><ul>
-<li class="chapter" data-level="7.2.1" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html#datasplitting"><i class="fa fa-check"></i><b>7.2.1</b> Data Splitting</a></li>
-<li class="chapter" data-level="7.2.2" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html#resampling"><i class="fa fa-check"></i><b>7.2.2</b> Resampling</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="8" data-path="measuring-performance.html"><a href="measuring-performance.html"><i class="fa fa-check"></i><b>8</b> Measuring Performance</a><ul>
-<li class="chapter" data-level="8.1" data-path="regression-model-performance.html"><a href="regression-model-performance.html"><i class="fa fa-check"></i><b>8.1</b> Regression Model Performance</a></li>
-<li class="chapter" data-level="8.2" data-path="classification-model-performance.html"><a href="classification-model-performance.html"><i class="fa fa-check"></i><b>8.2</b> Classification Model Performance</a><ul>
-<li class="chapter" data-level="8.2.1" data-path="classification-model-performance.html"><a href="classification-model-performance.html#confusion-matrix"><i class="fa fa-check"></i><b>8.2.1</b> Confusion Matrix</a></li>
-<li class="chapter" data-level="8.2.2" data-path="classification-model-performance.html"><a href="classification-model-performance.html#kappa-statistic"><i class="fa fa-check"></i><b>8.2.2</b> Kappa Statistic</a></li>
-<li class="chapter" data-level="8.2.3" data-path="classification-model-performance.html"><a href="classification-model-performance.html#roc"><i class="fa fa-check"></i><b>8.2.3</b> ROC</a></li>
-<li class="chapter" data-level="8.2.4" data-path="classification-model-performance.html"><a href="classification-model-performance.html#gain-and-lift-charts"><i class="fa fa-check"></i><b>8.2.4</b> Gain and Lift Charts</a></li>
+<li class="chapter" data-level="4.4" data-path="leveragesparkr.html"><a href="leveragesparkr.html"><i class="fa fa-check"></i><b>4.4</b> Leverage Spark Using R Notebook<span></span></a></li>
+<li class="chapter" data-level="4.5" data-path="databases-and-sql.html"><a href="databases-and-sql.html"><i class="fa fa-check"></i><b>4.5</b> Databases and SQL<span></span></a>
+<ul>
+<li class="chapter" data-level="4.5.1" data-path="databases-and-sql.html"><a href="databases-and-sql.html#history"><i class="fa fa-check"></i><b>4.5.1</b> History<span></span></a></li>
+<li class="chapter" data-level="4.5.2" data-path="databases-and-sql.html"><a href="databases-and-sql.html#database-table-and-view"><i class="fa fa-check"></i><b>4.5.2</b> Database, Table and View<span></span></a></li>
+<li class="chapter" data-level="4.5.3" data-path="databases-and-sql.html"><a href="databases-and-sql.html#basic-sql-statement"><i class="fa fa-check"></i><b>4.5.3</b> Basic SQL Statement<span></span></a></li>
+<li class="chapter" data-level="4.5.4" data-path="databases-and-sql.html"><a href="databases-and-sql.html#advanced-topics-in-database"><i class="fa fa-check"></i><b>4.5.4</b> Advanced Topics in Database<span></span></a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="9" data-path="regression-models.html"><a href="regression-models.html"><i class="fa fa-check"></i><b>9</b> Regression Models</a><ul>
-<li class="chapter" data-level="9.1" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html"><i class="fa fa-check"></i><b>9.1</b> Ordinary Least Square</a><ul>
-<li class="chapter" data-level="9.1.1" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html#the-magic-p-value"><i class="fa fa-check"></i><b>9.1.1</b> The Magic P-value</a></li>
-<li class="chapter" data-level="9.1.2" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html#diagnostics-for-linear-regression"><i class="fa fa-check"></i><b>9.1.2</b> Diagnostics for Linear Regression</a></li>
+<li class="chapter" data-level="5" data-path="datapreprocessing.html"><a href="datapreprocessing.html"><i class="fa fa-check"></i><b>5</b> Data Pre-processing<span></span></a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="data-cleaning.html"><a href="data-cleaning.html"><i class="fa fa-check"></i><b>5.1</b> Data Cleaning<span></span></a></li>
+<li class="chapter" data-level="5.2" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>5.2</b> Missing Values<span></span></a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="missing-values.html"><a href="missing-values.html#impute-missing-values-with-medianmode"><i class="fa fa-check"></i><b>5.2.1</b> Impute missing values with median/mode<span></span></a></li>
+<li class="chapter" data-level="5.2.2" data-path="missing-values.html"><a href="missing-values.html#k-nearest-neighbors"><i class="fa fa-check"></i><b>5.2.2</b> K-nearest neighbors<span></span></a></li>
+<li class="chapter" data-level="5.2.3" data-path="missing-values.html"><a href="missing-values.html#bagging-tree"><i class="fa fa-check"></i><b>5.2.3</b> Bagging Tree<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="9.2" data-path="principal-component-regression-and-partial-least-square.html"><a href="principal-component-regression-and-partial-least-square.html"><i class="fa fa-check"></i><b>9.2</b> Principal Component Regression and Partial Least Square</a></li>
+<li class="chapter" data-level="5.3" data-path="centering-and-scaling.html"><a href="centering-and-scaling.html"><i class="fa fa-check"></i><b>5.3</b> Centering and Scaling<span></span></a></li>
+<li class="chapter" data-level="5.4" data-path="resolve-skewness.html"><a href="resolve-skewness.html"><i class="fa fa-check"></i><b>5.4</b> Resolve Skewness<span></span></a></li>
+<li class="chapter" data-level="5.5" data-path="outliers.html"><a href="outliers.html"><i class="fa fa-check"></i><b>5.5</b> Resolve Outliers<span></span></a></li>
+<li class="chapter" data-level="5.6" data-path="collinearity.html"><a href="collinearity.html"><i class="fa fa-check"></i><b>5.6</b> Collinearity<span></span></a></li>
+<li class="chapter" data-level="5.7" data-path="sparse-variables.html"><a href="sparse-variables.html"><i class="fa fa-check"></i><b>5.7</b> Sparse Variables<span></span></a></li>
+<li class="chapter" data-level="5.8" data-path="re-encode-dummy-variables.html"><a href="re-encode-dummy-variables.html"><i class="fa fa-check"></i><b>5.8</b> Re-encode Dummy Variables<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="10" data-path="regularization-methods.html"><a href="regularization-methods.html"><i class="fa fa-check"></i><b>10</b> Regularization Methods</a><ul>
-<li class="chapter" data-level="10.1" data-path="ridge-regression.html"><a href="ridge-regression.html"><i class="fa fa-check"></i><b>10.1</b> Ridge Regression</a></li>
-<li class="chapter" data-level="10.2" data-path="lasso.html"><a href="lasso.html"><i class="fa fa-check"></i><b>10.2</b> LASSO</a></li>
-<li class="chapter" data-level="10.3" data-path="variable-selection-property-of-the-lasso.html"><a href="variable-selection-property-of-the-lasso.html"><i class="fa fa-check"></i><b>10.3</b> Variable selection property of the lasso</a></li>
-<li class="chapter" data-level="10.4" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.4</b> Elastic Net</a></li>
-<li class="chapter" data-level="10.5" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.5</b> Penalized Generalized Linear Model</a><ul>
-<li class="chapter" data-level="10.5.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.5.1</b> Introduction to <code>glmnet</code> package</a></li>
-<li class="chapter" data-level="10.5.2" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#penalized-logistic-regression"><i class="fa fa-check"></i><b>10.5.2</b> Penalized logistic regression</a></li>
+<li class="chapter" data-level="6" data-path="datawrangline.html"><a href="datawrangline.html"><i class="fa fa-check"></i><b>6</b> Data Wrangling<span></span></a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="summarize-data.html"><a href="summarize-data.html"><i class="fa fa-check"></i><b>6.1</b> Summarize Data<span></span></a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="summarize-data.html"><a href="summarize-data.html#dplyr-package"><i class="fa fa-check"></i><b>6.1.1</b> <code>dplyr</code> package<span></span></a></li>
+<li class="chapter" data-level="6.1.2" data-path="summarize-data.html"><a href="summarize-data.html#applyfamilyinbaser"><i class="fa fa-check"></i><b>6.1.2</b> <code>apply()</code>, <code>lapply()</code> and <code>sapply()</code> in base R<span></span></a></li>
 </ul></li>
+<li class="chapter" data-level="6.2" data-path="tidy-and-reshape-data.html"><a href="tidy-and-reshape-data.html"><i class="fa fa-check"></i><b>6.2</b> Tidy and Reshape Data<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="11" data-path="treemodel.html"><a href="treemodel.html"><i class="fa fa-check"></i><b>11</b> Tree-Based Methods</a><ul>
-<li class="chapter" data-level="11.1" data-path="tree-basics.html"><a href="tree-basics.html"><i class="fa fa-check"></i><b>11.1</b> Tree Basics</a></li>
-<li class="chapter" data-level="11.2" data-path="splitting-criteria.html"><a href="splitting-criteria.html"><i class="fa fa-check"></i><b>11.2</b> Splitting Criteria</a></li>
-<li class="chapter" data-level="11.3" data-path="tree-pruning.html"><a href="tree-pruning.html"><i class="fa fa-check"></i><b>11.3</b> Tree Pruning</a></li>
-<li class="chapter" data-level="11.4" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html"><i class="fa fa-check"></i><b>11.4</b> Regression and Decision Tree Basic</a><ul>
-<li class="chapter" data-level="11.4.1" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html#regression-tree"><i class="fa fa-check"></i><b>11.4.1</b> Regression Tree</a></li>
-<li class="chapter" data-level="11.4.2" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html#decision-tree"><i class="fa fa-check"></i><b>11.4.2</b> Decision Tree</a></li>
-</ul></li>
-<li class="chapter" data-level="11.5" data-path="missing-values.html"><a href="missing-values.html#bagging-tree"><i class="fa fa-check"></i><b>11.5</b> Bagging Tree</a></li>
-<li class="chapter" data-level="11.6" data-path="random-forest.html"><a href="random-forest.html"><i class="fa fa-check"></i><b>11.6</b> Random Forest</a></li>
-<li class="chapter" data-level="11.7" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html"><i class="fa fa-check"></i><b>11.7</b> Gradient Boosted Machine</a><ul>
-<li class="chapter" data-level="11.7.1" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#adaptive-boosting"><i class="fa fa-check"></i><b>11.7.1</b> Adaptive Boosting</a></li>
-<li class="chapter" data-level="11.7.2" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#stochastic-gradient-boosting"><i class="fa fa-check"></i><b>11.7.2</b> Stochastic Gradient Boosting</a></li>
-<li class="chapter" data-level="11.7.3" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#boosting-as-additive-model"><i class="fa fa-check"></i><b>11.7.3</b> Boosting as Additive Model</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="12" data-path="deeplearning.html"><a href="deeplearning.html"><i class="fa fa-check"></i><b>12</b> Deep Learning</a><ul>
-<li class="chapter" data-level="12.1" data-path="projection-pursuit-regression.html"><a href="projection-pursuit-regression.html"><i class="fa fa-check"></i><b>12.1</b> Projection Pursuit Regression</a></li>
-<li class="chapter" data-level="12.2" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html"><i class="fa fa-check"></i><b>12.2</b> Feedforward Neural Network</a><ul>
-<li class="chapter" data-level="12.2.1" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#logisticregasneuralnetwork"><i class="fa fa-check"></i><b>12.2.1</b> Logistic Regression as Neural Network</a></li>
-<li class="chapter" data-level="12.2.2" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#stochastic-gradient-descent"><i class="fa fa-check"></i><b>12.2.2</b> Stochastic Gradient Descent</a></li>
-<li class="chapter" data-level="12.2.3" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#deepneuralnetwork"><i class="fa fa-check"></i><b>12.2.3</b> Deep Neural Network</a></li>
-<li class="chapter" data-level="12.2.4" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#activationfunction"><i class="fa fa-check"></i><b>12.2.4</b> Activation Function</a></li>
-<li class="chapter" data-level="12.2.5" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#optimization"><i class="fa fa-check"></i><b>12.2.5</b> Optimization</a></li>
-<li class="chapter" data-level="12.2.6" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#deal-with-overfitting"><i class="fa fa-check"></i><b>12.2.6</b> Deal with Overfitting</a></li>
-<li class="chapter" data-level="12.2.7" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#ffnnexample"><i class="fa fa-check"></i><b>12.2.7</b> Image Recognition Using FFNN</a></li>
-</ul></li>
-<li class="chapter" data-level="12.3" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html"><i class="fa fa-check"></i><b>12.3</b> Convolutional Neural Network</a><ul>
-<li class="chapter" data-level="12.3.1" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#convolution-layer"><i class="fa fa-check"></i><b>12.3.1</b> Convolution Layer</a></li>
-<li class="chapter" data-level="12.3.2" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#padding-layer"><i class="fa fa-check"></i><b>12.3.2</b> Padding Layer</a></li>
-<li class="chapter" data-level="12.3.3" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#pooling-layer"><i class="fa fa-check"></i><b>12.3.3</b> Pooling Layer</a></li>
-<li class="chapter" data-level="12.3.4" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#convolution-over-volume"><i class="fa fa-check"></i><b>12.3.4</b> Convolution Over Volume</a></li>
-<li class="chapter" data-level="12.3.5" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#cnnexample"><i class="fa fa-check"></i><b>12.3.5</b> Image Recognition Using CNN</a></li>
-</ul></li>
-<li class="chapter" data-level="12.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html"><i class="fa fa-check"></i><b>12.4</b> Recurrent Neural Network</a><ul>
-<li class="chapter" data-level="12.4.1" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#rnn-model"><i class="fa fa-check"></i><b>12.4.1</b> RNN Model</a></li>
-<li class="chapter" data-level="12.4.2" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#embedding"><i class="fa fa-check"></i><b>12.4.2</b> Word Embedding</a></li>
-<li class="chapter" data-level="12.4.3" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#lstm"><i class="fa fa-check"></i><b>12.4.3</b> Long Short Term Memory</a></li>
-<li class="chapter" data-level="12.4.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#rnnexample"><i class="fa fa-check"></i><b>12.4.4</b> Sentiment Analysis Using RNN</a></li>
+<li class="chapter" data-level="7" data-path="modeltuningstrategy.html"><a href="modeltuningstrategy.html"><i class="fa fa-check"></i><b>7</b> Model Tuning Strategy<span></span></a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="vbtradeoff.html"><a href="vbtradeoff.html"><i class="fa fa-check"></i><b>7.1</b> Variance-Bias Trade-Off<span></span></a></li>
+<li class="chapter" data-level="7.2" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html"><i class="fa fa-check"></i><b>7.2</b> Data Splitting and Resampling<span></span></a>
+<ul>
+<li class="chapter" data-level="7.2.1" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html#datasplitting"><i class="fa fa-check"></i><b>7.2.1</b> Data Splitting<span></span></a></li>
+<li class="chapter" data-level="7.2.2" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html#resampling"><i class="fa fa-check"></i><b>7.2.2</b> Resampling<span></span></a></li>
 </ul></li>
 </ul></li>
-<li class="appendix"><span><b>Appendix</b></span></li>
-<li class="chapter" data-level="A" data-path="largelocaldata.html"><a href="largelocaldata.html"><i class="fa fa-check"></i><b>A</b> Handling Large Local Data</a><ul>
-<li class="chapter" data-level="A.1" data-path="readr.html"><a href="readr.html"><i class="fa fa-check"></i><b>A.1</b> <code>readr</code></a></li>
-<li class="chapter" data-level="A.2" data-path="data-table-enhanced-data-frame.html"><a href="data-table-enhanced-data-frame.html"><i class="fa fa-check"></i><b>A.2</b> <code>data.table</code>— enhanced <code>data.frame</code></a></li>
+<li class="chapter" data-level="8" data-path="measuring-performance.html"><a href="measuring-performance.html"><i class="fa fa-check"></i><b>8</b> Measuring Performance<span></span></a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="regression-model-performance.html"><a href="regression-model-performance.html"><i class="fa fa-check"></i><b>8.1</b> Regression Model Performance<span></span></a></li>
+<li class="chapter" data-level="8.2" data-path="classification-model-performance.html"><a href="classification-model-performance.html"><i class="fa fa-check"></i><b>8.2</b> Classification Model Performance<span></span></a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="classification-model-performance.html"><a href="classification-model-performance.html#confusion-matrix"><i class="fa fa-check"></i><b>8.2.1</b> Confusion Matrix<span></span></a></li>
+<li class="chapter" data-level="8.2.2" data-path="classification-model-performance.html"><a href="classification-model-performance.html#kappa-statistic"><i class="fa fa-check"></i><b>8.2.2</b> Kappa Statistic<span></span></a></li>
+<li class="chapter" data-level="8.2.3" data-path="classification-model-performance.html"><a href="classification-model-performance.html#roc"><i class="fa fa-check"></i><b>8.2.3</b> ROC<span></span></a></li>
+<li class="chapter" data-level="8.2.4" data-path="classification-model-performance.html"><a href="classification-model-performance.html#gain-and-lift-charts"><i class="fa fa-check"></i><b>8.2.4</b> Gain and Lift Charts<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="B" data-path="r-code-for-data-simulation.html"><a href="r-code-for-data-simulation.html"><i class="fa fa-check"></i><b>B</b> R code for data simulation</a><ul>
-<li class="chapter" data-level="B.1" data-path="appendixdata1.html"><a href="appendixdata1.html"><i class="fa fa-check"></i><b>B.1</b> Customer Data for Clothing Company</a></li>
-<li class="chapter" data-level="B.2" data-path="appendixdata3.html"><a href="appendixdata3.html"><i class="fa fa-check"></i><b>B.2</b> Swine Disease Breakout Data</a></li>
 </ul></li>
-<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="chapter" data-level="9" data-path="regression-models.html"><a href="regression-models.html"><i class="fa fa-check"></i><b>9</b> Regression Models<span></span></a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html"><i class="fa fa-check"></i><b>9.1</b> Ordinary Least Square<span></span></a>
+<ul>
+<li class="chapter" data-level="9.1.1" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html#the-magic-p-value"><i class="fa fa-check"></i><b>9.1.1</b> The Magic P-value<span></span></a></li>
+<li class="chapter" data-level="9.1.2" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html#diagnostics-for-linear-regression"><i class="fa fa-check"></i><b>9.1.2</b> Diagnostics for Linear Regression<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="principal-component-regression-and-partial-least-square.html"><a href="principal-component-regression-and-partial-least-square.html"><i class="fa fa-check"></i><b>9.2</b> Principal Component Regression and Partial Least Square<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="regularization-methods.html"><a href="regularization-methods.html"><i class="fa fa-check"></i><b>10</b> Regularization Methods<span></span></a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="ridge-regression.html"><a href="ridge-regression.html"><i class="fa fa-check"></i><b>10.1</b> Ridge Regression<span></span></a></li>
+<li class="chapter" data-level="10.2" data-path="lasso.html"><a href="lasso.html"><i class="fa fa-check"></i><b>10.2</b> LASSO<span></span></a></li>
+<li class="chapter" data-level="10.3" data-path="variable-selection-property-of-the-lasso.html"><a href="variable-selection-property-of-the-lasso.html"><i class="fa fa-check"></i><b>10.3</b> Variable selection property of the lasso<span></span></a></li>
+<li class="chapter" data-level="10.4" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.4</b> Elastic Net<span></span></a></li>
+<li class="chapter" data-level="10.5" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.5</b> Penalized Generalized Linear Model<span></span></a>
+<ul>
+<li class="chapter" data-level="10.5.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.5.1</b> Introduction to <code>glmnet</code> package<span></span></a></li>
+<li class="chapter" data-level="10.5.2" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#penalized-logistic-regression"><i class="fa fa-check"></i><b>10.5.2</b> Penalized logistic regression<span></span></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="treemodel.html"><a href="treemodel.html"><i class="fa fa-check"></i><b>11</b> Tree-Based Methods<span></span></a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="tree-basics.html"><a href="tree-basics.html"><i class="fa fa-check"></i><b>11.1</b> Tree Basics<span></span></a></li>
+<li class="chapter" data-level="11.2" data-path="splitting-criteria.html"><a href="splitting-criteria.html"><i class="fa fa-check"></i><b>11.2</b> Splitting Criteria<span></span></a></li>
+<li class="chapter" data-level="11.3" data-path="tree-pruning.html"><a href="tree-pruning.html"><i class="fa fa-check"></i><b>11.3</b> Tree Pruning<span></span></a></li>
+<li class="chapter" data-level="11.4" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html"><i class="fa fa-check"></i><b>11.4</b> Regression and Decision Tree Basic<span></span></a>
+<ul>
+<li class="chapter" data-level="11.4.1" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html#regression-tree"><i class="fa fa-check"></i><b>11.4.1</b> Regression Tree<span></span></a></li>
+<li class="chapter" data-level="11.4.2" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html#decision-tree"><i class="fa fa-check"></i><b>11.4.2</b> Decision Tree<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="11.5" data-path="bagging-tree-1.html"><a href="bagging-tree-1.html"><i class="fa fa-check"></i><b>11.5</b> Bagging Tree<span></span></a></li>
+<li class="chapter" data-level="11.6" data-path="random-forest.html"><a href="random-forest.html"><i class="fa fa-check"></i><b>11.6</b> Random Forest<span></span></a></li>
+<li class="chapter" data-level="11.7" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html"><i class="fa fa-check"></i><b>11.7</b> Gradient Boosted Machine<span></span></a>
+<ul>
+<li class="chapter" data-level="11.7.1" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#adaptive-boosting"><i class="fa fa-check"></i><b>11.7.1</b> Adaptive Boosting<span></span></a></li>
+<li class="chapter" data-level="11.7.2" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#stochastic-gradient-boosting"><i class="fa fa-check"></i><b>11.7.2</b> Stochastic Gradient Boosting<span></span></a></li>
+<li class="chapter" data-level="11.7.3" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#boosting-as-additive-model"><i class="fa fa-check"></i><b>11.7.3</b> Boosting as Additive Model<span></span></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="deeplearning.html"><a href="deeplearning.html"><i class="fa fa-check"></i><b>12</b> Deep Learning<span></span></a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="projection-pursuit-regression.html"><a href="projection-pursuit-regression.html"><i class="fa fa-check"></i><b>12.1</b> Projection Pursuit Regression<span></span></a></li>
+<li class="chapter" data-level="12.2" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html"><i class="fa fa-check"></i><b>12.2</b> Feedforward Neural Network<span></span></a>
+<ul>
+<li class="chapter" data-level="12.2.1" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#logisticregasneuralnetwork"><i class="fa fa-check"></i><b>12.2.1</b> Logistic Regression as Neural Network<span></span></a></li>
+<li class="chapter" data-level="12.2.2" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#stochastic-gradient-descent"><i class="fa fa-check"></i><b>12.2.2</b> Stochastic Gradient Descent<span></span></a></li>
+<li class="chapter" data-level="12.2.3" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#deepneuralnetwork"><i class="fa fa-check"></i><b>12.2.3</b> Deep Neural Network<span></span></a></li>
+<li class="chapter" data-level="12.2.4" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#activationfunction"><i class="fa fa-check"></i><b>12.2.4</b> Activation Function<span></span></a></li>
+<li class="chapter" data-level="12.2.5" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#optimization"><i class="fa fa-check"></i><b>12.2.5</b> Optimization<span></span></a></li>
+<li class="chapter" data-level="12.2.6" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#deal-with-overfitting"><i class="fa fa-check"></i><b>12.2.6</b> Deal with Overfitting<span></span></a></li>
+<li class="chapter" data-level="12.2.7" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#ffnnexample"><i class="fa fa-check"></i><b>12.2.7</b> Image Recognition Using FFNN<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="12.3" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html"><i class="fa fa-check"></i><b>12.3</b> Convolutional Neural Network<span></span></a>
+<ul>
+<li class="chapter" data-level="12.3.1" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#convolution-layer"><i class="fa fa-check"></i><b>12.3.1</b> Convolution Layer<span></span></a></li>
+<li class="chapter" data-level="12.3.2" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#padding-layer"><i class="fa fa-check"></i><b>12.3.2</b> Padding Layer<span></span></a></li>
+<li class="chapter" data-level="12.3.3" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#pooling-layer"><i class="fa fa-check"></i><b>12.3.3</b> Pooling Layer<span></span></a></li>
+<li class="chapter" data-level="12.3.4" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#convolution-over-volume"><i class="fa fa-check"></i><b>12.3.4</b> Convolution Over Volume<span></span></a></li>
+<li class="chapter" data-level="12.3.5" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#cnnexample"><i class="fa fa-check"></i><b>12.3.5</b> Image Recognition Using CNN<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="12.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html"><i class="fa fa-check"></i><b>12.4</b> Recurrent Neural Network<span></span></a>
+<ul>
+<li class="chapter" data-level="12.4.1" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#rnn-model"><i class="fa fa-check"></i><b>12.4.1</b> RNN Model<span></span></a></li>
+<li class="chapter" data-level="12.4.2" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#embedding"><i class="fa fa-check"></i><b>12.4.2</b> Word Embedding<span></span></a></li>
+<li class="chapter" data-level="12.4.3" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#lstm"><i class="fa fa-check"></i><b>12.4.3</b> Long Short Term Memory<span></span></a></li>
+<li class="chapter" data-level="12.4.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#rnnexample"><i class="fa fa-check"></i><b>12.4.4</b> Sentiment Analysis Using RNN<span></span></a></li>
+</ul></li>
+</ul></li>
+<li class="appendix"><span><b>Appendix<span></span></b></span></li>
+<li class="chapter" data-level="A" data-path="largelocaldata.html"><a href="largelocaldata.html"><i class="fa fa-check"></i><b>A</b> Handling Large Local Data<span></span></a>
+<ul>
+<li class="chapter" data-level="A.1" data-path="readr.html"><a href="readr.html"><i class="fa fa-check"></i><b>A.1</b> <code>readr</code><span></span></a></li>
+<li class="chapter" data-level="A.2" data-path="data.table-enhanced-data.html"><a href="data.table-enhanced-data.html"><i class="fa fa-check"></i><b>A.2</b> <code>data.table</code>— enhanced <code>data.frame</code><span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="B" data-path="r-code-for-data-simulation.html"><a href="r-code-for-data-simulation.html"><i class="fa fa-check"></i><b>B</b> R code for data simulation<span></span></a>
+<ul>
+<li class="chapter" data-level="B.1" data-path="appendixdata1.html"><a href="appendixdata1.html"><i class="fa fa-check"></i><b>B.1</b> Customer Data for Clothing Company<span></span></a></li>
+<li class="chapter" data-level="B.2" data-path="appendixdata3.html"><a href="appendixdata3.html"><i class="fa fa-check"></i><b>B.2</b> Swine Disease Breakout Data<span></span></a></li>
+</ul></li>
+<li><a href="references.html#references">References<span></span></a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
 
@@ -326,144 +389,141 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="gradient-boosted-machine" class="section level2">
-<h2><span class="header-section-number">11.7</span> Gradient Boosted Machine</h2>
-<p>Boosting models were developed in the 1980s <span class="citation">(L <a href="#ref-Valiant1984">1984</a>; M and L <a href="#ref-KV1989">1989</a>)</span> and were originally for classification problems. Due to the excellent model performance, they were widely used for a variety of applications, such as gene expression <span class="citation">(Dudoit S and T <a href="#ref-dudoit2002">2002</a>; al <a href="#ref-bendor2000">2000</a>)</span>, chemical substructure classification <span class="citation">(Varmuza K and K <a href="#ref-Varmuza2003">2003</a>)</span>, music classification <span class="citation">(al <a href="#ref-Bergstra2006">2006</a>)</span>, etc. The first effective implementation of boosting is Adaptive Boosting (AdaBoost) algorithm came up by Yoav Freund and Robert Schapire in 1996 <span class="citation">(YFR <a href="#ref-Schapire1999">1999</a>)</span>. After that, some researchers <span class="citation">(Friedman, Hastie, and Tibshirani <a href="#ref-Friedman2000">2000</a>)</span> started to connect the boosting algorithm with some statistical concepts, such as loss function, additive model, logistic regression. Friedman pointed out that boosting can be considered as a forward stagewise additive model that minimizes exponential loss. The new view of boosting in a statistical framework enabled the method to be extended to regression problems.</p>
+<div id="gradient-boosted-machine" class="section level2 hasAnchor" number="11.7">
+<h2><span class="header-section-number">11.7</span> Gradient Boosted Machine<a href="gradient-boosted-machine.html#gradient-boosted-machine" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Boosting models were developed in the 1980s <span class="citation">(<a href="#ref-Valiant1984" role="doc-biblioref">V. L 1984</a>; <a href="#ref-KV1989" role="doc-biblioref">K. M and L 1989</a>)</span> and were originally for classification problems. Due to the excellent model performance, they were widely used for a variety of applications, such as gene expression <span class="citation">(<a href="#ref-dudoit2002" role="doc-biblioref">Dudoit S and T 2002</a>; <a href="#ref-bendor2000" role="doc-biblioref">B. A. et. al 2000</a>)</span>, chemical substructure classification <span class="citation">(<a href="#ref-Varmuza2003" role="doc-biblioref">Varmuza K and K 2003</a>)</span>, music classification <span class="citation">(<a href="#ref-Bergstra2006" role="doc-biblioref">B. J. et. al 2006</a>)</span>, etc. The first effective implementation of boosting is Adaptive Boosting (AdaBoost) algorithm came up by Yoav Freund and Robert Schapire in 1996 <span class="citation">(<a href="#ref-Schapire1999" role="doc-biblioref">YFR 1999</a>)</span>. After that, some researchers <span class="citation">(<a href="#ref-Friedman2000" role="doc-biblioref">Friedman, Hastie, and Tibshirani 2000</a>)</span> started to connect the boosting algorithm with some statistical concepts, such as loss function, additive model, logistic regression. Friedman pointed out that boosting can be considered as a forward stagewise additive model that minimizes exponential loss. The new view of boosting in a statistical framework enabled the method to be extended to regression problems.</p>
 <p>The idea is to combine a group of weak learners (a classifier that is marginally better than random guess) to produce a strong learner. Like bagging, boosting is a general approach that can be applied to different learners. Here we focus on the decision tree. Recall that both bagging and random forest create multiple copies of the original training data using the bootstrap, fitting a separate decision tree to each copy and combining all the results to create a single prediction. Boosting also creates different trees but the trees are grown sequentially and each tree is a weak learner. Any modeling technique with tuning parameters can produce a range of learners, from weak to strong. You can easily make a weak learner by restricting the depth of the tree. There are different types of boosting. Here we introduce two main types: adaptive boosting and stochastic gradient boosting.</p>
-<div id="adaptive-boosting" class="section level3">
-<h3><span class="header-section-number">11.7.1</span> Adaptive Boosting</h3>
-<p>Yoav Freund and Robert Schapire <span class="citation">(Freund and Schapire <a href="#ref-Freund1997">1997</a>)</span> came up the AdaBoost.M1 algorithm. Consider a binary classification problem where the response variable has two categories <span class="math inline">\(Y \in \{-1, 1\}\)</span>. Given predictor matrix, <span class="math inline">\(X\)</span>, construct a classifier <span class="math inline">\(G(X)\)</span> that predicts <span class="math inline">\(1\)</span> or <span class="math inline">\(-1\)</span>. The corresponding error rate in the training set is:</p>
+<div id="adaptive-boosting" class="section level3 hasAnchor" number="11.7.1">
+<h3><span class="header-section-number">11.7.1</span> Adaptive Boosting<a href="gradient-boosted-machine.html#adaptive-boosting" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Yoav Freund and Robert Schapire <span class="citation">(<a href="#ref-Freund1997" role="doc-biblioref">Freund and Schapire 1997</a>)</span> came up the AdaBoost.M1 algorithm. Consider a binary classification problem where the response variable has two categories <span class="math inline">\(Y \in \{-1, 1\}\)</span>. Given predictor matrix, <span class="math inline">\(X\)</span>, construct a classifier <span class="math inline">\(G(X)\)</span> that predicts <span class="math inline">\(1\)</span> or <span class="math inline">\(-1\)</span>. The corresponding error rate in the training set is:</p>
 <p><span class="math display">\[\bar{err}=\frac{1}{N}\Sigma_{i=1}^NI(y_i\neq G(x_i))\]</span></p>
 <p>The algorithm produces a series of classifiers <span class="math inline">\(G_m(x),\ m=1,2,...,M\)</span> from different iterations. In each iteration, it finds the best classifier based on the current weights. The misclassified samples in the <span class="math inline">\(m^{th}\)</span> iteration will have higher weights in the <span class="math inline">\((m+1)^{th}\)</span> iteration and the correctly classified samples will have lower weights. As it moves on, the algorithm will put more effort into the “difficult” samples until it can correctly classify them. So it requires the algorithm to change focus at each iteration. At each iteration, the algorithm will calculate a stage weight based on the error rate. The final prediction is a weighted average of all those weak classifiers using stage weights from all the iterations:</p>
 <p><span class="math display">\[G(x)=sign ( \Sigma_{m=1}^M \alpha_{m}G_m(x))\]</span>
 where <span class="math inline">\(\alpha_1,\alpha_2,...,\alpha_M\)</span> are the weights from different iterations.</p>
-
-<p>Since the classifier <span class="math inline">\(G_m(x)\)</span> returns discrete value, the AdaBoost.M1 algorithm is known as “Discrete AdaBoost” <span class="citation">(Friedman, Hastie, and Tibshirani <a href="#ref-Friedman2000">2000</a>)</span>. You can revise the above algorithm if it returns continuousf value, for example, a probability <span class="citation">(Friedman, Hastie, and Tibshirani <a href="#ref-Friedman2000">2000</a>)</span>. As mentioned before, boosting is a general approach that can be applied to different learners. Since you can easily create weak learners by limiting the depth of the tree, the boosting tree is a common method. Since the classification tree is a low bias/high variance technique, ensemble decreases model variance and lead to low bias/low variance model. See Breinman <span class="citation">(Breiman <a href="#ref-Breiman1998">1998</a>)</span> for more explanation about why the boosting tree performs well in general. However, boosting can not significantly improve the low variance model. So applying boosting to Latent Dirichlet Allocation (LDA) or K-Nearest Neighbor (KNN) doesn’t lead to as good improvement as applying boosting to statistical learning methods like naive Bayes <span class="citation">(Bauer and Kohavi <a href="#ref-Bauer1999">1999</a>)</span>.</p>
+<p>Since the classifier <span class="math inline">\(G_m(x)\)</span> returns discrete value, the AdaBoost.M1 algorithm is known as “Discrete AdaBoost” <span class="citation">(<a href="#ref-Friedman2000" role="doc-biblioref">Friedman, Hastie, and Tibshirani 2000</a>)</span>. You can revise the above algorithm if it returns continuousf value, for example, a probability <span class="citation">(<a href="#ref-Friedman2000" role="doc-biblioref">Friedman, Hastie, and Tibshirani 2000</a>)</span>. As mentioned before, boosting is a general approach that can be applied to different learners. Since you can easily create weak learners by limiting the depth of the tree, the boosting tree is a common method. Since the classification tree is a low bias/high variance technique, ensemble decreases model variance and lead to low bias/low variance model. See Breinman <span class="citation">(<a href="#ref-Breiman1998" role="doc-biblioref">Leo Breiman 1998</a>)</span> for more explanation about why the boosting tree performs well in general. However, boosting can not significantly improve the low variance model. So applying boosting to Latent Dirichlet Allocation (LDA) or K-Nearest Neighbor (KNN) doesn’t lead to as good improvement as applying boosting to statistical learning methods like naive Bayes <span class="citation">(<a href="#ref-Bauer1999" role="doc-biblioref">Bauer and Kohavi 1999</a>)</span>.</p>
 </div>
-<div id="stochastic-gradient-boosting" class="section level3">
-<h3><span class="header-section-number">11.7.2</span> Stochastic Gradient Boosting</h3>
-<p>As mentioned before, Friedman <span class="citation">(Friedman, Hastie, and Tibshirani <a href="#ref-Friedman2000">2000</a>)</span> provided a statistical framework for the AdaBoost algorithm and pointed out that boosting can be considered as a forward stagewise additive model that minimizes exponential loss. The framework led to some generalized algorithms such as Real AdaBoost, Gentle AdaBoost, and LogitBoost. Those algorithms later were unified under a framework called gradient boosting machine. The last section of the chapter illustrates how boosting can be considered as an additive model.</p>
+<div id="stochastic-gradient-boosting" class="section level3 hasAnchor" number="11.7.2">
+<h3><span class="header-section-number">11.7.2</span> Stochastic Gradient Boosting<a href="gradient-boosted-machine.html#stochastic-gradient-boosting" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>As mentioned before, Friedman <span class="citation">(<a href="#ref-Friedman2000" role="doc-biblioref">Friedman, Hastie, and Tibshirani 2000</a>)</span> provided a statistical framework for the AdaBoost algorithm and pointed out that boosting can be considered as a forward stagewise additive model that minimizes exponential loss. The framework led to some generalized algorithms such as Real AdaBoost, Gentle AdaBoost, and LogitBoost. Those algorithms later were unified under a framework called gradient boosting machine. The last section of the chapter illustrates how boosting can be considered as an additive model.</p>
 <p>Consider a 2-class classification problem. You have the response <span class="math inline">\(y \in \{-1, 1\}\)</span> and the sample proportion of class 1 from the training set is <span class="math inline">\(p\)</span>. <span class="math inline">\(f(x)\)</span> is the model prediction in the range of <span class="math inline">\([-\infty, +\infty]\)</span> and the predicted event probability is <span class="math inline">\(\hat{p}=\frac{1}{1+exp[-f(x)]}\)</span>. The gradient boosting for this problem is as follows:</p>
-
-<p>When using the tree as the base learner, basic gradient boosting has two tuning parameters: tree depth and the number of iterations. You can further customize the algorithm by selecting a different loss function and gradient<span class="citation">(Hastie T <a href="#ref-Hastie2008">2008</a>)</span>. The final line of the loop includes a regularization strategy. Instead of adding <span class="math inline">\(f_i^{(j)}\)</span> to the previous iteration’s <span class="math inline">\(f_i\)</span>, only a fraction of the value is added. This fraction is called learning rate which is <span class="math inline">\(\lambda\)</span> in the algorithm. It can take values between 0 and 1 which is another tuning parameter of the model.</p>
+<p>When using the tree as the base learner, basic gradient boosting has two tuning parameters: tree depth and the number of iterations. You can further customize the algorithm by selecting a different loss function and gradient<span class="citation">(<a href="#ref-Hastie2008" role="doc-biblioref">Hastie T 2008</a>)</span>. The final line of the loop includes a regularization strategy. Instead of adding <span class="math inline">\(f_i^{(j)}\)</span> to the previous iteration’s <span class="math inline">\(f_i\)</span>, only a fraction of the value is added. This fraction is called learning rate which is <span class="math inline">\(\lambda\)</span> in the algorithm. It can take values between 0 and 1 which is another tuning parameter of the model.</p>
 <p>The way to calculate variable importance in boosting is similar to a bagging model. You get variable importance by combining measures of importance across the ensemble. For example, we can calculate the Gini index improvement for each variable across all trees and use the average as the measurement of the importance.</p>
 <p>Boosting is a very popular method for classification. It is one of the methods that can be directly applied to the data without requiring a great deal of time-consuming data preprocessing. Applying boosting on tree models significantly improves predictive accuracy. Some advantages of trees that are sacrificed by boosting are speed and interpretability.</p>
 <p>Let’s look at the R implementation.</p>
-<div class="sourceCode" id="cb319"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb319-1" data-line-number="1">gbmGrid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">interaction.depth =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">9</span>),</a>
-<a class="sourceLine" id="cb319-2" data-line-number="2">                       <span class="dt">n.trees =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">5</span>,</a>
-<a class="sourceLine" id="cb319-3" data-line-number="3">                       <span class="dt">shrinkage =</span> <span class="kw">c</span>(.<span class="dv">01</span>, <span class="fl">.1</span>),</a>
-<a class="sourceLine" id="cb319-4" data-line-number="4">                       <span class="dt">n.minobsinnode =</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>))</a>
-<a class="sourceLine" id="cb319-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb319-6" data-line-number="6"><span class="kw">set.seed</span>(<span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb319-7" data-line-number="7">gbmTune &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">train</span>(<span class="dt">x =</span> trainx, </a>
-<a class="sourceLine" id="cb319-8" data-line-number="8">                <span class="dt">y =</span> trainy,</a>
-<a class="sourceLine" id="cb319-9" data-line-number="9">                <span class="dt">method =</span> <span class="st">&quot;gbm&quot;</span>,</a>
-<a class="sourceLine" id="cb319-10" data-line-number="10">                <span class="dt">tuneGrid =</span> gbmGrid,</a>
-<a class="sourceLine" id="cb319-11" data-line-number="11">                <span class="dt">metric =</span> <span class="st">&quot;ROC&quot;</span>,</a>
-<a class="sourceLine" id="cb319-12" data-line-number="12">                <span class="dt">verbose =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb319-13" data-line-number="13">                <span class="dt">trControl =</span> <span class="kw">trainControl</span>(<span class="dt">method =</span> <span class="st">&quot;cv&quot;</span>,</a>
-<a class="sourceLine" id="cb319-14" data-line-number="14">                           <span class="dt">classProbs =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb319-15" data-line-number="15">                           <span class="dt">savePredictions =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
-<div class="sourceCode" id="cb320"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb320-1" data-line-number="1"><span class="co"># only show part of the output</span></a>
-<a class="sourceLine" id="cb320-2" data-line-number="2">gbmTune</a></code></pre></div>
-<div class="sourceCode" id="cb321"><pre class="sourceCode html"><code class="sourceCode html"><a class="sourceLine" id="cb321-1" data-line-number="1">Stochastic Gradient Boosting </a>
-<a class="sourceLine" id="cb321-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb321-3" data-line-number="3">1000 samples</a>
-<a class="sourceLine" id="cb321-4" data-line-number="4">  11 predictor</a>
-<a class="sourceLine" id="cb321-5" data-line-number="5">   2 classes: &#39;Female&#39;, &#39;Male&#39; </a>
-<a class="sourceLine" id="cb321-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb321-7" data-line-number="7">No pre-processing</a>
-<a class="sourceLine" id="cb321-8" data-line-number="8">Resampling: Cross-Validated (10 fold) </a>
-<a class="sourceLine" id="cb321-9" data-line-number="9">Summary of sample sizes: 899, 900, 900, 899, 899, 901, ... </a>
-<a class="sourceLine" id="cb321-10" data-line-number="10">Resampling results across tuning parameters:</a>
-<a class="sourceLine" id="cb321-11" data-line-number="11"></a>
-<a class="sourceLine" id="cb321-12" data-line-number="12">shrinkage interaction.depth n.minobsinnode n.trees ROC    Sens Spec    </a>
-<a class="sourceLine" id="cb321-13" data-line-number="13">0.01      1                 1              1       0.6821 1.00 0.00</a>
-<a class="sourceLine" id="cb321-14" data-line-number="14">0.01      1                 1              2       0.6882 1.00 0.00</a>
-<a class="sourceLine" id="cb321-15" data-line-number="15">  .</a>
-<a class="sourceLine" id="cb321-16" data-line-number="16">  .</a>
-<a class="sourceLine" id="cb321-17" data-line-number="17">  .</a>
-<a class="sourceLine" id="cb321-18" data-line-number="18">0.01      5                 8              4       0.7096 1.00 0.00</a>
-<a class="sourceLine" id="cb321-19" data-line-number="19">0.01      5                 8              5       0.7100 1.00 0.00</a>
-<a class="sourceLine" id="cb321-20" data-line-number="20">0.01      5                 9              1       0.7006 1.00 0.00</a>
-<a class="sourceLine" id="cb321-21" data-line-number="21">0.01      5                 9              2       0.7055 1.00 0.00</a>
-<a class="sourceLine" id="cb321-22" data-line-number="22"> [ reached getOption(&quot;max.print&quot;) -- omitted 358 rows ]</a>
-<a class="sourceLine" id="cb321-23" data-line-number="23"></a>
-<a class="sourceLine" id="cb321-24" data-line-number="24">ROC was used to select the optimal model using the largest value.</a>
-<a class="sourceLine" id="cb321-25" data-line-number="25">The final values used for the model were n.trees = 4, </a>
-<a class="sourceLine" id="cb321-26" data-line-number="26">interaction.depth = 3, shrinkage = 0.01 and n.minobsinnode = 6.</a></code></pre></div>
+<div class="sourceCode" id="cb318"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb318-1"><a href="gradient-boosted-machine.html#cb318-1" aria-hidden="true" tabindex="-1"></a>gbmGrid <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">interaction.depth =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">9</span>),</span>
+<span id="cb318-2"><a href="gradient-boosted-machine.html#cb318-2" aria-hidden="true" tabindex="-1"></a>                       <span class="at">n.trees =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,</span>
+<span id="cb318-3"><a href="gradient-boosted-machine.html#cb318-3" aria-hidden="true" tabindex="-1"></a>                       <span class="at">shrinkage =</span> <span class="fu">c</span>(.<span class="dv">01</span>, .<span class="dv">1</span>),</span>
+<span id="cb318-4"><a href="gradient-boosted-machine.html#cb318-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">n.minobsinnode =</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>))</span>
+<span id="cb318-5"><a href="gradient-boosted-machine.html#cb318-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb318-6"><a href="gradient-boosted-machine.html#cb318-6" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">100</span>)</span>
+<span id="cb318-7"><a href="gradient-boosted-machine.html#cb318-7" aria-hidden="true" tabindex="-1"></a>gbmTune <span class="ot">&lt;-</span> caret<span class="sc">::</span><span class="fu">train</span>(<span class="at">x =</span> trainx, </span>
+<span id="cb318-8"><a href="gradient-boosted-machine.html#cb318-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">y =</span> trainy,</span>
+<span id="cb318-9"><a href="gradient-boosted-machine.html#cb318-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">method =</span> <span class="st">&quot;gbm&quot;</span>,</span>
+<span id="cb318-10"><a href="gradient-boosted-machine.html#cb318-10" aria-hidden="true" tabindex="-1"></a>                <span class="at">tuneGrid =</span> gbmGrid,</span>
+<span id="cb318-11"><a href="gradient-boosted-machine.html#cb318-11" aria-hidden="true" tabindex="-1"></a>                <span class="at">metric =</span> <span class="st">&quot;ROC&quot;</span>,</span>
+<span id="cb318-12"><a href="gradient-boosted-machine.html#cb318-12" aria-hidden="true" tabindex="-1"></a>                <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb318-13"><a href="gradient-boosted-machine.html#cb318-13" aria-hidden="true" tabindex="-1"></a>                <span class="at">trControl =</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">&quot;cv&quot;</span>,</span>
+<span id="cb318-14"><a href="gradient-boosted-machine.html#cb318-14" aria-hidden="true" tabindex="-1"></a>                           <span class="at">classProbs =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb318-15"><a href="gradient-boosted-machine.html#cb318-15" aria-hidden="true" tabindex="-1"></a>                           <span class="at">savePredictions =</span> <span class="cn">TRUE</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb319"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb319-1"><a href="gradient-boosted-machine.html#cb319-1" aria-hidden="true" tabindex="-1"></a><span class="co"># only show part of the output</span></span>
+<span id="cb319-2"><a href="gradient-boosted-machine.html#cb319-2" aria-hidden="true" tabindex="-1"></a>gbmTune</span></code></pre></div>
+<div class="sourceCode" id="cb320"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb320-1"><a href="gradient-boosted-machine.html#cb320-1" aria-hidden="true" tabindex="-1"></a>Stochastic Gradient Boosting </span>
+<span id="cb320-2"><a href="gradient-boosted-machine.html#cb320-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb320-3"><a href="gradient-boosted-machine.html#cb320-3" aria-hidden="true" tabindex="-1"></a>1000 samples</span>
+<span id="cb320-4"><a href="gradient-boosted-machine.html#cb320-4" aria-hidden="true" tabindex="-1"></a>  11 predictor</span>
+<span id="cb320-5"><a href="gradient-boosted-machine.html#cb320-5" aria-hidden="true" tabindex="-1"></a>   2 classes: &#39;Female&#39;, &#39;Male&#39; </span>
+<span id="cb320-6"><a href="gradient-boosted-machine.html#cb320-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb320-7"><a href="gradient-boosted-machine.html#cb320-7" aria-hidden="true" tabindex="-1"></a>No pre-processing</span>
+<span id="cb320-8"><a href="gradient-boosted-machine.html#cb320-8" aria-hidden="true" tabindex="-1"></a>Resampling: Cross-Validated (10 fold) </span>
+<span id="cb320-9"><a href="gradient-boosted-machine.html#cb320-9" aria-hidden="true" tabindex="-1"></a>Summary of sample sizes: 899, 900, 900, 899, 899, 901, ... </span>
+<span id="cb320-10"><a href="gradient-boosted-machine.html#cb320-10" aria-hidden="true" tabindex="-1"></a>Resampling results across tuning parameters:</span>
+<span id="cb320-11"><a href="gradient-boosted-machine.html#cb320-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb320-12"><a href="gradient-boosted-machine.html#cb320-12" aria-hidden="true" tabindex="-1"></a>shrinkage interaction.depth n.minobsinnode n.trees ROC    Sens Spec    </span>
+<span id="cb320-13"><a href="gradient-boosted-machine.html#cb320-13" aria-hidden="true" tabindex="-1"></a>0.01      1                 1              1       0.6821 1.00 0.00</span>
+<span id="cb320-14"><a href="gradient-boosted-machine.html#cb320-14" aria-hidden="true" tabindex="-1"></a>0.01      1                 1              2       0.6882 1.00 0.00</span>
+<span id="cb320-15"><a href="gradient-boosted-machine.html#cb320-15" aria-hidden="true" tabindex="-1"></a>  .</span>
+<span id="cb320-16"><a href="gradient-boosted-machine.html#cb320-16" aria-hidden="true" tabindex="-1"></a>  .</span>
+<span id="cb320-17"><a href="gradient-boosted-machine.html#cb320-17" aria-hidden="true" tabindex="-1"></a>  .</span>
+<span id="cb320-18"><a href="gradient-boosted-machine.html#cb320-18" aria-hidden="true" tabindex="-1"></a>0.01      5                 8              4       0.7096 1.00 0.00</span>
+<span id="cb320-19"><a href="gradient-boosted-machine.html#cb320-19" aria-hidden="true" tabindex="-1"></a>0.01      5                 8              5       0.7100 1.00 0.00</span>
+<span id="cb320-20"><a href="gradient-boosted-machine.html#cb320-20" aria-hidden="true" tabindex="-1"></a>0.01      5                 9              1       0.7006 1.00 0.00</span>
+<span id="cb320-21"><a href="gradient-boosted-machine.html#cb320-21" aria-hidden="true" tabindex="-1"></a>0.01      5                 9              2       0.7055 1.00 0.00</span>
+<span id="cb320-22"><a href="gradient-boosted-machine.html#cb320-22" aria-hidden="true" tabindex="-1"></a> [ reached getOption(&quot;max.print&quot;) -- omitted 358 rows ]</span>
+<span id="cb320-23"><a href="gradient-boosted-machine.html#cb320-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb320-24"><a href="gradient-boosted-machine.html#cb320-24" aria-hidden="true" tabindex="-1"></a>ROC was used to select the optimal model using the largest value.</span>
+<span id="cb320-25"><a href="gradient-boosted-machine.html#cb320-25" aria-hidden="true" tabindex="-1"></a>The final values used for the model were n.trees = 4, </span>
+<span id="cb320-26"><a href="gradient-boosted-machine.html#cb320-26" aria-hidden="true" tabindex="-1"></a>interaction.depth = 3, shrinkage = 0.01 and n.minobsinnode = 6.</span></code></pre></div>
 <p>The results show that the tuning parameter settings that lead to the best ROC are <code>n.trees = 4</code> (number of trees), <code>interaction.depth = 3</code> (depth of tree), <code>shrinkage = 0.01</code> (learning rate) and <code>n.minobsinnode = 6</code> (minimum number of observations in each node).</p>
 <p>Now, let’s compare the results from the three tree models.</p>
-<div class="sourceCode" id="cb322"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb322-1" data-line-number="1">treebagRoc &lt;-<span class="st"> </span>pROC<span class="op">::</span><span class="kw">roc</span>(<span class="dt">response =</span> bagTune<span class="op">$</span>pred<span class="op">$</span>obs,</a>
-<a class="sourceLine" id="cb322-2" data-line-number="2">                        <span class="dt">predictor =</span> bagTune<span class="op">$</span>pred<span class="op">$</span>Female,</a>
-<a class="sourceLine" id="cb322-3" data-line-number="3">                        <span class="dt">levels =</span> <span class="kw">rev</span>(<span class="kw">levels</span>(bagTune<span class="op">$</span>pred<span class="op">$</span>obs)))</a>
-<a class="sourceLine" id="cb322-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb322-5" data-line-number="5">rfRoc &lt;-<span class="st"> </span>pROC<span class="op">::</span><span class="kw">roc</span>(<span class="dt">response =</span> rfTune<span class="op">$</span>pred<span class="op">$</span>obs,</a>
-<a class="sourceLine" id="cb322-6" data-line-number="6">             <span class="dt">predictor =</span> rfTune<span class="op">$</span>pred<span class="op">$</span>Female,</a>
-<a class="sourceLine" id="cb322-7" data-line-number="7">             <span class="dt">levels =</span> <span class="kw">rev</span>(<span class="kw">levels</span>(rfTune<span class="op">$</span>pred<span class="op">$</span>obs)))</a>
-<a class="sourceLine" id="cb322-8" data-line-number="8"></a>
-<a class="sourceLine" id="cb322-9" data-line-number="9">gbmRoc &lt;-<span class="st"> </span>pROC<span class="op">::</span><span class="kw">roc</span>(<span class="dt">response =</span> gbmTune<span class="op">$</span>pred<span class="op">$</span>obs,</a>
-<a class="sourceLine" id="cb322-10" data-line-number="10">              <span class="dt">predictor =</span> gbmTune<span class="op">$</span>pred<span class="op">$</span>Female,</a>
-<a class="sourceLine" id="cb322-11" data-line-number="11">              <span class="dt">levels =</span> <span class="kw">rev</span>(<span class="kw">levels</span>(gbmTune<span class="op">$</span>pred<span class="op">$</span>obs)))</a>
-<a class="sourceLine" id="cb322-12" data-line-number="12"></a>
-<a class="sourceLine" id="cb322-13" data-line-number="13"><span class="kw">plot.roc</span>(rpartRoc, </a>
-<a class="sourceLine" id="cb322-14" data-line-number="14">     <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>, </a>
-<a class="sourceLine" id="cb322-15" data-line-number="15">     <span class="dt">print.thres =</span> <span class="kw">c</span>(.<span class="dv">5</span>), <span class="dt">print.thres.pch =</span> <span class="dv">16</span>,</a>
-<a class="sourceLine" id="cb322-16" data-line-number="16">     <span class="dt">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>, <span class="dt">print.thres.cex =</span> <span class="fl">1.2</span>,</a>
-<a class="sourceLine" id="cb322-17" data-line-number="17">     <span class="dt">col =</span> <span class="st">&quot;black&quot;</span>, <span class="dt">legacy.axes =</span> <span class="ot">TRUE</span>,</a>
-<a class="sourceLine" id="cb322-18" data-line-number="18">     <span class="dt">print.thres.col =</span> <span class="st">&quot;black&quot;</span>)</a>
-<a class="sourceLine" id="cb322-19" data-line-number="19"></a>
-<a class="sourceLine" id="cb322-20" data-line-number="20"><span class="kw">plot.roc</span>(treebagRoc, </a>
-<a class="sourceLine" id="cb322-21" data-line-number="21">     <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>, </a>
-<a class="sourceLine" id="cb322-22" data-line-number="22">     <span class="dt">add =</span> <span class="ot">TRUE</span>, </a>
-<a class="sourceLine" id="cb322-23" data-line-number="23">     <span class="dt">print.thres =</span> <span class="kw">c</span>(.<span class="dv">5</span>), <span class="dt">print.thres.pch =</span> <span class="dv">3</span>, </a>
-<a class="sourceLine" id="cb322-24" data-line-number="24">     <span class="dt">legacy.axes =</span> <span class="ot">TRUE</span>, <span class="dt">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>, </a>
-<a class="sourceLine" id="cb322-25" data-line-number="25">     <span class="dt">print.thres.cex =</span> <span class="fl">1.2</span>,</a>
-<a class="sourceLine" id="cb322-26" data-line-number="26">     <span class="dt">col =</span> <span class="st">&quot;red&quot;</span>, <span class="dt">print.thres.col =</span> <span class="st">&quot;red&quot;</span>)</a>
-<a class="sourceLine" id="cb322-27" data-line-number="27"></a>
-<a class="sourceLine" id="cb322-28" data-line-number="28"><span class="kw">plot.roc</span>(rfRoc, </a>
-<a class="sourceLine" id="cb322-29" data-line-number="29">     <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>, </a>
-<a class="sourceLine" id="cb322-30" data-line-number="30">     <span class="dt">add =</span> <span class="ot">TRUE</span>, </a>
-<a class="sourceLine" id="cb322-31" data-line-number="31">     <span class="dt">print.thres =</span> <span class="kw">c</span>(.<span class="dv">5</span>), <span class="dt">print.thres.pch =</span> <span class="dv">1</span>, </a>
-<a class="sourceLine" id="cb322-32" data-line-number="32">     <span class="dt">legacy.axes =</span> <span class="ot">TRUE</span>, <span class="dt">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>, </a>
-<a class="sourceLine" id="cb322-33" data-line-number="33">     <span class="dt">print.thres.cex =</span> <span class="fl">1.2</span>,</a>
-<a class="sourceLine" id="cb322-34" data-line-number="34">     <span class="dt">col =</span> <span class="st">&quot;green&quot;</span>, <span class="dt">print.thres.col =</span> <span class="st">&quot;green&quot;</span>)</a>
-<a class="sourceLine" id="cb322-35" data-line-number="35"></a>
-<a class="sourceLine" id="cb322-36" data-line-number="36"><span class="kw">plot.roc</span>(gbmRoc, </a>
-<a class="sourceLine" id="cb322-37" data-line-number="37">     <span class="dt">type =</span> <span class="st">&quot;s&quot;</span>, </a>
-<a class="sourceLine" id="cb322-38" data-line-number="38">     <span class="dt">add =</span> <span class="ot">TRUE</span>, </a>
-<a class="sourceLine" id="cb322-39" data-line-number="39">     <span class="dt">print.thres =</span> <span class="kw">c</span>(.<span class="dv">5</span>), <span class="dt">print.thres.pch =</span> <span class="dv">10</span>, </a>
-<a class="sourceLine" id="cb322-40" data-line-number="40">     <span class="dt">legacy.axes =</span> <span class="ot">TRUE</span>, <span class="dt">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>, </a>
-<a class="sourceLine" id="cb322-41" data-line-number="41">     <span class="dt">print.thres.cex =</span> <span class="fl">1.2</span>,</a>
-<a class="sourceLine" id="cb322-42" data-line-number="42">     <span class="dt">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="dt">print.thres.col =</span> <span class="st">&quot;blue&quot;</span>)</a>
-<a class="sourceLine" id="cb322-43" data-line-number="43"></a>
-<a class="sourceLine" id="cb322-44" data-line-number="44"><span class="kw">legend</span>(<span class="fl">0.2</span>, <span class="fl">0.5</span>, <span class="dt">cex =</span> <span class="fl">0.8</span>,</a>
-<a class="sourceLine" id="cb322-45" data-line-number="45">       <span class="kw">c</span>(<span class="st">&quot;Single Tree&quot;</span>, <span class="st">&quot;Bagged Tree&quot;</span>, </a>
-<a class="sourceLine" id="cb322-46" data-line-number="46">         <span class="st">&quot;Random Forest&quot;</span>, <span class="st">&quot;Boosted Tree&quot;</span>),</a>
-<a class="sourceLine" id="cb322-47" data-line-number="47">       <span class="dt">lwd =</span> <span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>),</a>
-<a class="sourceLine" id="cb322-48" data-line-number="48">       <span class="dt">col =</span> <span class="kw">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;red&quot;</span>, <span class="st">&quot;green&quot;</span>, <span class="st">&quot;blue&quot;</span>),</a>
-<a class="sourceLine" id="cb322-49" data-line-number="49">       <span class="dt">pch =</span> <span class="kw">c</span>(<span class="dv">16</span>, <span class="dv">3</span>, <span class="dv">1</span>, <span class="dv">10</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb321"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb321-1"><a href="gradient-boosted-machine.html#cb321-1" aria-hidden="true" tabindex="-1"></a>treebagRoc <span class="ot">&lt;-</span> pROC<span class="sc">::</span><span class="fu">roc</span>(<span class="at">response =</span> bagTune<span class="sc">$</span>pred<span class="sc">$</span>obs,</span>
+<span id="cb321-2"><a href="gradient-boosted-machine.html#cb321-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">predictor =</span> bagTune<span class="sc">$</span>pred<span class="sc">$</span>Female,</span>
+<span id="cb321-3"><a href="gradient-boosted-machine.html#cb321-3" aria-hidden="true" tabindex="-1"></a>                        <span class="at">levels =</span> <span class="fu">rev</span>(<span class="fu">levels</span>(bagTune<span class="sc">$</span>pred<span class="sc">$</span>obs)))</span>
+<span id="cb321-4"><a href="gradient-boosted-machine.html#cb321-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb321-5"><a href="gradient-boosted-machine.html#cb321-5" aria-hidden="true" tabindex="-1"></a>rfRoc <span class="ot">&lt;-</span> pROC<span class="sc">::</span><span class="fu">roc</span>(<span class="at">response =</span> rfTune<span class="sc">$</span>pred<span class="sc">$</span>obs,</span>
+<span id="cb321-6"><a href="gradient-boosted-machine.html#cb321-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">predictor =</span> rfTune<span class="sc">$</span>pred<span class="sc">$</span>Female,</span>
+<span id="cb321-7"><a href="gradient-boosted-machine.html#cb321-7" aria-hidden="true" tabindex="-1"></a>             <span class="at">levels =</span> <span class="fu">rev</span>(<span class="fu">levels</span>(rfTune<span class="sc">$</span>pred<span class="sc">$</span>obs)))</span>
+<span id="cb321-8"><a href="gradient-boosted-machine.html#cb321-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb321-9"><a href="gradient-boosted-machine.html#cb321-9" aria-hidden="true" tabindex="-1"></a>gbmRoc <span class="ot">&lt;-</span> pROC<span class="sc">::</span><span class="fu">roc</span>(<span class="at">response =</span> gbmTune<span class="sc">$</span>pred<span class="sc">$</span>obs,</span>
+<span id="cb321-10"><a href="gradient-boosted-machine.html#cb321-10" aria-hidden="true" tabindex="-1"></a>              <span class="at">predictor =</span> gbmTune<span class="sc">$</span>pred<span class="sc">$</span>Female,</span>
+<span id="cb321-11"><a href="gradient-boosted-machine.html#cb321-11" aria-hidden="true" tabindex="-1"></a>              <span class="at">levels =</span> <span class="fu">rev</span>(<span class="fu">levels</span>(gbmTune<span class="sc">$</span>pred<span class="sc">$</span>obs)))</span>
+<span id="cb321-12"><a href="gradient-boosted-machine.html#cb321-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb321-13"><a href="gradient-boosted-machine.html#cb321-13" aria-hidden="true" tabindex="-1"></a><span class="fu">plot.roc</span>(rpartRoc, </span>
+<span id="cb321-14"><a href="gradient-boosted-machine.html#cb321-14" aria-hidden="true" tabindex="-1"></a>     <span class="at">type =</span> <span class="st">&quot;s&quot;</span>, </span>
+<span id="cb321-15"><a href="gradient-boosted-machine.html#cb321-15" aria-hidden="true" tabindex="-1"></a>     <span class="at">print.thres =</span> <span class="fu">c</span>(.<span class="dv">5</span>), <span class="at">print.thres.pch =</span> <span class="dv">16</span>,</span>
+<span id="cb321-16"><a href="gradient-boosted-machine.html#cb321-16" aria-hidden="true" tabindex="-1"></a>     <span class="at">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>, <span class="at">print.thres.cex =</span> <span class="fl">1.2</span>,</span>
+<span id="cb321-17"><a href="gradient-boosted-machine.html#cb321-17" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">&quot;black&quot;</span>, <span class="at">legacy.axes =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb321-18"><a href="gradient-boosted-machine.html#cb321-18" aria-hidden="true" tabindex="-1"></a>     <span class="at">print.thres.col =</span> <span class="st">&quot;black&quot;</span>)</span>
+<span id="cb321-19"><a href="gradient-boosted-machine.html#cb321-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb321-20"><a href="gradient-boosted-machine.html#cb321-20" aria-hidden="true" tabindex="-1"></a><span class="fu">plot.roc</span>(treebagRoc, </span>
+<span id="cb321-21"><a href="gradient-boosted-machine.html#cb321-21" aria-hidden="true" tabindex="-1"></a>     <span class="at">type =</span> <span class="st">&quot;s&quot;</span>, </span>
+<span id="cb321-22"><a href="gradient-boosted-machine.html#cb321-22" aria-hidden="true" tabindex="-1"></a>     <span class="at">add =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb321-23"><a href="gradient-boosted-machine.html#cb321-23" aria-hidden="true" tabindex="-1"></a>     <span class="at">print.thres =</span> <span class="fu">c</span>(.<span class="dv">5</span>), <span class="at">print.thres.pch =</span> <span class="dv">3</span>, </span>
+<span id="cb321-24"><a href="gradient-boosted-machine.html#cb321-24" aria-hidden="true" tabindex="-1"></a>     <span class="at">legacy.axes =</span> <span class="cn">TRUE</span>, <span class="at">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>, </span>
+<span id="cb321-25"><a href="gradient-boosted-machine.html#cb321-25" aria-hidden="true" tabindex="-1"></a>     <span class="at">print.thres.cex =</span> <span class="fl">1.2</span>,</span>
+<span id="cb321-26"><a href="gradient-boosted-machine.html#cb321-26" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">&quot;red&quot;</span>, <span class="at">print.thres.col =</span> <span class="st">&quot;red&quot;</span>)</span>
+<span id="cb321-27"><a href="gradient-boosted-machine.html#cb321-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb321-28"><a href="gradient-boosted-machine.html#cb321-28" aria-hidden="true" tabindex="-1"></a><span class="fu">plot.roc</span>(rfRoc, </span>
+<span id="cb321-29"><a href="gradient-boosted-machine.html#cb321-29" aria-hidden="true" tabindex="-1"></a>     <span class="at">type =</span> <span class="st">&quot;s&quot;</span>, </span>
+<span id="cb321-30"><a href="gradient-boosted-machine.html#cb321-30" aria-hidden="true" tabindex="-1"></a>     <span class="at">add =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb321-31"><a href="gradient-boosted-machine.html#cb321-31" aria-hidden="true" tabindex="-1"></a>     <span class="at">print.thres =</span> <span class="fu">c</span>(.<span class="dv">5</span>), <span class="at">print.thres.pch =</span> <span class="dv">1</span>, </span>
+<span id="cb321-32"><a href="gradient-boosted-machine.html#cb321-32" aria-hidden="true" tabindex="-1"></a>     <span class="at">legacy.axes =</span> <span class="cn">TRUE</span>, <span class="at">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>, </span>
+<span id="cb321-33"><a href="gradient-boosted-machine.html#cb321-33" aria-hidden="true" tabindex="-1"></a>     <span class="at">print.thres.cex =</span> <span class="fl">1.2</span>,</span>
+<span id="cb321-34"><a href="gradient-boosted-machine.html#cb321-34" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">&quot;green&quot;</span>, <span class="at">print.thres.col =</span> <span class="st">&quot;green&quot;</span>)</span>
+<span id="cb321-35"><a href="gradient-boosted-machine.html#cb321-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb321-36"><a href="gradient-boosted-machine.html#cb321-36" aria-hidden="true" tabindex="-1"></a><span class="fu">plot.roc</span>(gbmRoc, </span>
+<span id="cb321-37"><a href="gradient-boosted-machine.html#cb321-37" aria-hidden="true" tabindex="-1"></a>     <span class="at">type =</span> <span class="st">&quot;s&quot;</span>, </span>
+<span id="cb321-38"><a href="gradient-boosted-machine.html#cb321-38" aria-hidden="true" tabindex="-1"></a>     <span class="at">add =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb321-39"><a href="gradient-boosted-machine.html#cb321-39" aria-hidden="true" tabindex="-1"></a>     <span class="at">print.thres =</span> <span class="fu">c</span>(.<span class="dv">5</span>), <span class="at">print.thres.pch =</span> <span class="dv">10</span>, </span>
+<span id="cb321-40"><a href="gradient-boosted-machine.html#cb321-40" aria-hidden="true" tabindex="-1"></a>     <span class="at">legacy.axes =</span> <span class="cn">TRUE</span>, <span class="at">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>, </span>
+<span id="cb321-41"><a href="gradient-boosted-machine.html#cb321-41" aria-hidden="true" tabindex="-1"></a>     <span class="at">print.thres.cex =</span> <span class="fl">1.2</span>,</span>
+<span id="cb321-42"><a href="gradient-boosted-machine.html#cb321-42" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">print.thres.col =</span> <span class="st">&quot;blue&quot;</span>)</span>
+<span id="cb321-43"><a href="gradient-boosted-machine.html#cb321-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb321-44"><a href="gradient-boosted-machine.html#cb321-44" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="fl">0.2</span>, <span class="fl">0.5</span>, <span class="at">cex =</span> <span class="fl">0.8</span>,</span>
+<span id="cb321-45"><a href="gradient-boosted-machine.html#cb321-45" aria-hidden="true" tabindex="-1"></a>       <span class="fu">c</span>(<span class="st">&quot;Single Tree&quot;</span>, <span class="st">&quot;Bagged Tree&quot;</span>, </span>
+<span id="cb321-46"><a href="gradient-boosted-machine.html#cb321-46" aria-hidden="true" tabindex="-1"></a>         <span class="st">&quot;Random Forest&quot;</span>, <span class="st">&quot;Boosted Tree&quot;</span>),</span>
+<span id="cb321-47"><a href="gradient-boosted-machine.html#cb321-47" aria-hidden="true" tabindex="-1"></a>       <span class="at">lwd =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>),</span>
+<span id="cb321-48"><a href="gradient-boosted-machine.html#cb321-48" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;red&quot;</span>, <span class="st">&quot;green&quot;</span>, <span class="st">&quot;blue&quot;</span>),</span>
+<span id="cb321-49"><a href="gradient-boosted-machine.html#cb321-49" aria-hidden="true" tabindex="-1"></a>       <span class="at">pch =</span> <span class="fu">c</span>(<span class="dv">16</span>, <span class="dv">3</span>, <span class="dv">1</span>, <span class="dv">10</span>))</span></code></pre></div>
 <p><img src="IDS_files/figure-html/unnamed-chunk-155-1.svg" width="672" /></p>
 <p>Since the data here doesn’t have many variables, we don’t see a significant difference among the models. But you can still see those ensemble methods are better than a single tree. In most of the real applications, ensemble methods perform much better. Random forest and boosting trees can be a baseline model. Before exploring different models, you can quickly run a random forest to see the performance and then try to improve that performance. If the performance you got from the random forest is not too much better than guessing, you should consider collecting more data or reviewing the problem to frame it a different way instead of trying other models. Because it usually means the current data is not enough to solve the problem.</p>
 </div>
-<div id="boosting-as-additive-model" class="section level3">
-<h3><span class="header-section-number">11.7.3</span> Boosting as Additive Model</h3>
-<p>This section illustrates how boosting is a forward stagewise additive model that minimizes exponential loss <span class="citation">(Friedman, Hastie, and Tibshirani <a href="#ref-Friedman2000">2000</a>)</span>. Many seemingly different models can be represented as a <strong>basis expansion model</strong>. Recall the classifier obtained by the AdaBoost.M1 algorithm:</p>
+<div id="boosting-as-additive-model" class="section level3 hasAnchor" number="11.7.3">
+<h3><span class="header-section-number">11.7.3</span> Boosting as Additive Model<a href="gradient-boosted-machine.html#boosting-as-additive-model" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>This section illustrates how boosting is a forward stagewise additive model that minimizes exponential loss <span class="citation">(<a href="#ref-Friedman2000" role="doc-biblioref">Friedman, Hastie, and Tibshirani 2000</a>)</span>. Many seemingly different models can be represented as a <strong>basis expansion model</strong>. Recall the classifier obtained by the AdaBoost.M1 algorithm:</p>
 <p><span class="math display">\[G(x)=sign ( \Sigma_{m=1}^M \alpha_{m}G_m(x))\]</span></p>
 <p>The above expression fits in the framework of basis expansion which is as following:</p>
 <p><span class="math display" id="eq:basisexp">\[\begin{equation}
 f(x)=\Sigma_{m=1}^M \beta_m b(x,\gamma_m)
 \tag{11.2}
 \end{equation}\]</span></p>
-<p>where <span class="math inline">\(\beta_m,\ m=1,\dots,M\)</span> is expansion coefficient and <span class="math inline">\(b(x,\gamma)\in \mathbb{R}\)</span> is basis function. Many of the learning methods fit into this additive framework. Hastie et al discuss basis expansion in detail in Chapter 5 of <span class="citation">Hastie T (<a href="#ref-Hastie2008">2008</a>)</span> and cover the additive expansion for different learning techniques, such as single-hidden-layer neural networks (Chapter 11) and MARS (Section 9.4). These models are fit by minimizing a designated loss function averaged over the training data:</p>
+<p>where <span class="math inline">\(\beta_m,\ m=1,\dots,M\)</span> is expansion coefficient and <span class="math inline">\(b(x,\gamma)\in \mathbb{R}\)</span> is basis function. Many of the learning methods fit into this additive framework. Hastie et al discuss basis expansion in detail in Chapter 5 of <span class="citation">Hastie T (<a href="#ref-Hastie2008" role="doc-biblioref">2008</a>)</span> and cover the additive expansion for different learning techniques, such as single-hidden-layer neural networks (Chapter 11) and MARS (Section 9.4). These models are fit by minimizing a designated loss function averaged over the training data:</p>
 <p><span class="math display" id="eq:additiveloss">\[\begin{equation}
 \underset{\{\beta_m,\gamma_m\}_i^M}{min}\Sigma_{i=1}^N L\left(y_i,\Sigma_{m=1}^M\beta_{m}b(x_i;\gamma_m)\right)
 \tag{11.3}
 \end{equation}\]</span></p>
 <p>Different models have different basis function <span class="math inline">\(b(x_i;\gamma_m)\)</span>. You can also customize loss function <span class="math inline">\(L(\cdot)\)</span>, such as squared-error loss, or likelihood-based loss. Optimizing the loss function across the whole training set is usually computation costly no matter the choice of basis and loss. The good news is that the problem can be simplified as fitting a single basis function.</p>
 <p><span class="math display">\[\underset{\beta,\gamma}{min}=\Sigma_{i=1}^N L(y_i,\beta b(x_i;\gamma))\]</span></p>
-<p>The forward stagewise algorithm approximates the optimal solution of equation <a href="gradient-boosted-machine.html#eq:additiveloss">(11.3)</a>. It adds new basis functions to the expansion without adjusting the previous ones. The forward stagewise additive algorithm is as following (Section 10.2 of <span class="citation">Hastie T (<a href="#ref-Hastie2008">2008</a>)</span>):</p>
-
+<p>The forward stagewise algorithm approximates the optimal solution of equation <a href="gradient-boosted-machine.html#eq:additiveloss">(11.3)</a>. It adds new basis functions to the expansion without adjusting the previous ones. The forward stagewise additive algorithm is as following (Section 10.2 of <span class="citation">Hastie T (<a href="#ref-Hastie2008" role="doc-biblioref">2008</a>)</span>):</p>
 <p>At iteration m, it will search for the optimal <span class="math inline">\(b(x;\gamma_m)\)</span> and <span class="math inline">\(\beta_m\)</span> based on the previous basis function <span class="math inline">\(f_{m-1}(x)\)</span>. And then add the new basis <span class="math inline">\(b(x;\gamma_m)\beta_m\)</span> to the previous basis function to get a new basis function <span class="math inline">\(f_m(x)\)</span> without changing any parameters from previous steps. Assume we use squared-error loss:</p>
 <p><span class="math display">\[L(y,f(x))=(y-f(x))^2\]</span></p>
 <p>Then we have:</p>
@@ -484,10 +544,10 @@ f(x)=\Sigma_{m=1}^M \beta_m b(x,\gamma_m)
 <p>where <span class="math inline">\(w_i^m= exp[-y_if_{m-1}(x_i)]\)</span>. It does not depend on <span class="math inline">\(\beta\)</span> and <span class="math inline">\(G(x)\)</span>. So we can consider it as the weight for each sample. Since the weight is related to <span class="math inline">\(f_{m-1}(x_i)\)</span>, it changes each iteration. We can further decompose equation <a href="gradient-boosted-machine.html#eq:explossadaboost1">(11.4)</a>:</p>
 <p><span class="math display" id="eq:explossadaboost2">\[\begin{equation}
 \begin{array}{ccc}
- &amp;  &amp; \underset{\beta,G}{argmin}\Sigma_{i=1}^{N}w_{i}^{m}exp[-y_{i}\beta G(x_{i})]\\
- &amp; = &amp; \underset{\beta,G}{argmin}\Sigma_{i=1}^{N}\left\{ w_{i}^{m}e^{-\beta}I(y_{i}=G(x))+w_{i}^{m}e^{\beta}I(y_{i}\neq G(x))\right\} \\
- &amp; = &amp; \underset{\beta,G}{argmin}\Sigma_{i=1}^{N}\left\{ w_{i}^{m}e^{-\beta}[1-I(y_{i}\neq G(x))]+w_{i}^{m}e^{\beta}I(y_{i}\neq G(x))\right\} \\
- &amp; = &amp; \underset{\beta,G}{argmin}\left\{ (e^{\beta}-e^{-\beta})\cdot\Sigma_{i=1}^{N}w_{i}^{m}I(y_{i}\neq G(x_{i}))+e^{-\beta}\cdot\Sigma_{i=1}^{N}w_{i}^{m}\right\} 
+&amp;  &amp; \underset{\beta,G}{argmin}\Sigma_{i=1}^{N}w_{i}^{m}exp[-y_{i}\beta G(x_{i})]\\
+&amp; = &amp; \underset{\beta,G}{argmin}\Sigma_{i=1}^{N}\left\{ w_{i}^{m}e^{-\beta}I(y_{i}=G(x))+w_{i}^{m}e^{\beta}I(y_{i}\neq G(x))\right\} \\
+&amp; = &amp; \underset{\beta,G}{argmin}\Sigma_{i=1}^{N}\left\{ w_{i}^{m}e^{-\beta}[1-I(y_{i}\neq G(x))]+w_{i}^{m}e^{\beta}I(y_{i}\neq G(x))\right\} \\
+&amp; = &amp; \underset{\beta,G}{argmin}\left\{ (e^{\beta}-e^{-\beta})\cdot\Sigma_{i=1}^{N}w_{i}^{m}I(y_{i}\neq G(x_{i}))+e^{-\beta}\cdot\Sigma_{i=1}^{N}w_{i}^{m}\right\}
 \end{array}
 \tag{11.5}
 \end{equation}\]</span></p>
@@ -510,48 +570,48 @@ w_i^{m+1} &amp; = &amp; exp[-y_if_m (x_i)]\\
 \end{equation}\]</span></p>
 <p>Since <span class="math inline">\(-y_i G_m(x_i)=2\cdot I(y_i \neq G_m(x_i))-1\)</span>, equation <a href="gradient-boosted-machine.html#eq:explossadaboost2">(11.5)</a> can be written as:</p>
 <p><span class="math display">\[w_i^{m+1}=w_i^m \cdot exp[\alpha_mI(y_i\neq G_m(x_i))] \cdot exp[-\beta_m]\]</span></p>
-<p>where <span class="math inline">\(\alpha_m=2\beta_m=log\frac{1-err_m}{err_m}\)</span> is the same with the <span class="math inline">\(\alpha_m\)</span> in AdaBoost.M1 algorithm we showed before. So AdaBoost.M1 is a special case of a forward stagewise additive model using exponential loss. For comparing and selecting different loss functions, you can refer to section 10.5 and 10.6 in <span class="citation">(Hastie T <a href="#ref-Hastie2008">2008</a>)</span>.</p>
+<p>where <span class="math inline">\(\alpha_m=2\beta_m=log\frac{1-err_m}{err_m}\)</span> is the same with the <span class="math inline">\(\alpha_m\)</span> in AdaBoost.M1 algorithm we showed before. So AdaBoost.M1 is a special case of a forward stagewise additive model using exponential loss. For comparing and selecting different loss functions, you can refer to section 10.5 and 10.6 in <span class="citation">(<a href="#ref-Hastie2008" role="doc-biblioref">Hastie T 2008</a>)</span>.</p>
 
 </div>
 </div>
 <!-- </div> -->
-<h3>References</h3>
-<div id="refs" class="references">
-<div id="ref-bendor2000">
-<p>al, BenDor A et. 2000. “Tissue Classification with Gene Expression Profiles.” <em>Journal of Computational Biology</em> 7 (3): 559–83.</p>
+<h3>References<a href="references.html#references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-bendor2000" class="csl-entry">
+al, BenDor A et. 2000. <span>“Tissue Classification with Gene Expression Profiles.”</span> <em>Journal of Computational Biology</em> 7 (3): 559–83.
 </div>
-<div id="ref-Bergstra2006">
-<p>al, Bergstra J et. 2006. “Aggregate Features and Adaboost for Music Classification.” <em>Machine Learning</em> 65: 473–84.</p>
+<div id="ref-Bergstra2006" class="csl-entry">
+al, Bergstra J et. 2006. <span>“Aggregate Features and AdaBoost for Music Classification.”</span> <em>Machine Learning</em> 65: 473–84.
 </div>
-<div id="ref-Bauer1999">
-<p>Bauer, Eric, and Ron Kohavi. 1999. “An Empirical Comparison of Voting Classification Algorithms: Bagging, Boosting, and Variants.” <em>Machine Learning</em> 36: 105–42.</p>
+<div id="ref-Bauer1999" class="csl-entry">
+Bauer, Eric, and Ron Kohavi. 1999. <span>“An Empirical Comparison of Voting Classification Algorithms: Bagging, Boosting, and Variants.”</span> <em>Machine Learning</em> 36: 105–42.
 </div>
-<div id="ref-Breiman1998">
-<p>Breiman, Leo. 1998. “Arcing Classifiers.” <em>The Annals of Statistics</em> 26: 123–40.</p>
+<div id="ref-Breiman1998" class="csl-entry">
+Breiman, Leo. 1998. <span>“Arcing Classifiers.”</span> <em>The Annals of Statistics</em> 26: 123–40.
 </div>
-<div id="ref-dudoit2002">
-<p>Dudoit S, Fridlyand J, and Speed T. 2002. “Comparison of Discrimination Meth- Ods for the Classification of Tumors Using Gene Expression Data.” <em>Journal of the American Statistical Association</em> 97 (457): 77–87.</p>
+<div id="ref-dudoit2002" class="csl-entry">
+Dudoit S, Fridlyand J, and Speed T. 2002. <span>“Comparison of Discrimination Meth- Ods for the Classification of Tumors Using Gene Expression Data.”</span> <em>Journal of the American Statistical Association</em> 97 (457): 77–87.
 </div>
-<div id="ref-Freund1997">
-<p>Freund, Y., and R. Schapire. 1997. “A Decision-Theoretic Generalization of Online Learning and an Application to Boosting.” <em>Journal of Computer and System Sciences</em> 55: 119–39.</p>
+<div id="ref-Freund1997" class="csl-entry">
+Freund, Y., and R. Schapire. 1997. <span>“A Decision-Theoretic Generalization of Online Learning and an Application to Boosting.”</span> <em>Journal of Computer and System Sciences</em> 55: 119–39.
 </div>
-<div id="ref-Friedman2000">
-<p>Friedman, Jerome, Trevor Hastie, and Robert Tibshirani. 2000. “Additive Logistic Regression: A Statistical View of Boosting.” <em>Annals of Statistics</em> 38: 337–74.</p>
+<div id="ref-Friedman2000" class="csl-entry">
+Friedman, Jerome, Trevor Hastie, and Robert Tibshirani. 2000. <span>“Additive Logistic Regression: A Statistical View of Boosting.”</span> <em>Annals of Statistics</em> 38: 337–74.
 </div>
-<div id="ref-Hastie2008">
-<p>Hastie T, Friedman J, Tibshirani R. 2008. <em>The Elements of Statistical Learning: Data Mining, Inference and Prediction</em>. 2nd ed. Springer.</p>
+<div id="ref-Hastie2008" class="csl-entry">
+Hastie T, Friedman J, Tibshirani R. 2008. <em>The Elements of Statistical Learning: Data Mining, Inference and Prediction</em>. 2nd ed. Springer.
 </div>
-<div id="ref-Valiant1984">
-<p>L, Valiant. 1984. “A Theory of the Learnable.” <em>Communications of the ACM</em> 27: 1134–42.</p>
+<div id="ref-Valiant1984" class="csl-entry">
+L, Valiant. 1984. <span>“A Theory of the Learnable.”</span> <em>Communications of the ACM</em> 27: 1134–42.
 </div>
-<div id="ref-KV1989">
-<p>M, Kearns, and Valiant L. 1989. “Cryptographic Limitations on Learning Boolean Formulae and Finite Automata.”</p>
+<div id="ref-KV1989" class="csl-entry">
+M, Kearns, and Valiant L. 1989. <span>“Cryptographic Limitations on Learning Boolean Formulae and Finite Automata.”</span>
 </div>
-<div id="ref-Varmuza2003">
-<p>Varmuza K, He P, and Fang K. 2003. “Boosting Applied to Classification of Mass Spectral Data.” <em>Journal of Data Science</em> 1 (391–404).</p>
+<div id="ref-Varmuza2003" class="csl-entry">
+Varmuza K, He P, and Fang K. 2003. <span>“Boosting Applied to Classification of Mass Spectral Data.”</span> <em>Journal of Data Science</em> 1 (391–404).
 </div>
-<div id="ref-Schapire1999">
-<p>YFR, Schapire. 1999. “Adaptive Game Playing Using Multiplicative Weights.” <em>Games and Economic Behavior</em> 29: 79–103.</p>
+<div id="ref-Schapire1999" class="csl-entry">
+YFR, Schapire. 1999. <span>“Adaptive Game Playing Using Multiplicative Weights.”</span> <em>Games and Economic Behavior</em> 29: 79–103.
 </div>
 </div>
             </section>
@@ -564,7 +624,6 @@ w_i^{m+1} &amp; = &amp; exp[-y_if_m (x_i)]\\
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
-<script src="libs/gitbook/js/lunr.js"></script>
 <script src="libs/gitbook/js/clipboard.min.js"></script>
 <script src="libs/gitbook/js/plugin-search.js"></script>
 <script src="libs/gitbook/js/plugin-sharing.js"></script>
@@ -583,6 +642,7 @@ gitbook.start({
 "weibo": false,
 "instapaper": false,
 "vk": false,
+"whatsapp": false,
 "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": {
@@ -603,6 +663,10 @@ gitbook.start({
 "text": null
 },
 "download": ["IDS.pdf", "IDS.epub", "IDS.mobi"],
+"search": {
+"engine": "fuse",
+"options": null
+},
 "toc": {
 "collapse": "section",
 "scroll_highlight": true

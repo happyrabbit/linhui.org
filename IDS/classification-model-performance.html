@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>8.2 Classification Model Performance | Introduction to Data Science</title>
   <meta name="description" content="8.2 Classification Model Performance | Introduction to Data Science" />
-  <meta name="generator" content="bookdown 0.20 and GitBook 2.6.7" />
+  <meta name="generator" content="bookdown 0.24 and GitBook 2.6.7" />
 
   <meta property="og:title" content="8.2 Classification Model Performance | Introduction to Data Science" />
   <meta property="og:type" content="book" />
@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2021-05-25" />
+<meta name="date" content="2022-09-24" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -33,7 +33,9 @@
   
 <link rel="prev" href="regression-model-performance.html"/>
 <link rel="next" href="regression-models.html"/>
-<script src="libs/jquery/jquery.min.js"></script>
+<script src="libs/header-attrs/header-attrs.js"></script>
+<script src="libs/jquery/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-table.css" rel="stylesheet" />
 <link href="libs/gitbook/css/plugin-bookdown.css" rel="stylesheet" />
@@ -49,29 +51,33 @@
 
 
 
-
+<link href="libs/anchor-sections/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections/anchor-sections.js"></script>
 
 
 <style type="text/css">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(data-line-number);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -80,9 +86,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -115,6 +121,29 @@ code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
 <link rel="stylesheet" href="css/style.css" type="text/css" />
 </head>
 
@@ -131,181 +160,215 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><a href="http://scientistcafe.com">Homepage</a></li>
 
 <li class="divider"></li>
-<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a><ul>
-<li class="chapter" data-level="" data-path="goal-of-the-book.html"><a href="goal-of-the-book.html"><i class="fa fa-check"></i>Goal of the Book</a></li>
-<li class="chapter" data-level="" data-path="what-this-book-covers.html"><a href="what-this-book-covers.html"><i class="fa fa-check"></i>What This Book Covers</a></li>
-<li class="chapter" data-level="" data-path="who-this-book-is-for.html"><a href="who-this-book-is-for.html"><i class="fa fa-check"></i>Who This Book Is For</a></li>
-<li class="chapter" data-level="" data-path="how-to-use-this-book.html"><a href="how-to-use-this-book.html"><i class="fa fa-check"></i>How to Use This Book</a><ul>
-<li class="chapter" data-level="" data-path="how-to-use-this-book.html"><a href="how-to-use-this-book.html#what-the-book-assumes"><i class="fa fa-check"></i>What the book assumes</a></li>
-<li class="chapter" data-level="" data-path="how-to-use-this-book.html"><a href="how-to-use-this-book.html#how-to-run-r-and-python-code"><i class="fa fa-check"></i>How to run R and Python code</a></li>
+<li><a href="index.html#preface">Preface<span></span></a>
+<ul>
+<li><a href="goal-of-the-book.html#goal-of-the-book">Goal of the Book<span></span></a></li>
+<li><a href="what-this-book-covers.html#what-this-book-covers">What This Book Covers<span></span></a></li>
+<li><a href="who-this-book-is-for.html#who-this-book-is-for">Who This Book Is For<span></span></a></li>
+<li><a href="how-to-use-this-book.html#how-to-use-this-book">How to Use This Book<span></span></a>
+<ul>
+<li><a href="how-to-use-this-book.html#what-the-book-assumes">What the book assumes<span></span></a></li>
+<li><a href="how-to-use-this-book.html#how-to-run-r-and-python-code">How to run R and Python code<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="" data-path="complementary-reading.html"><a href="complementary-reading.html"><i class="fa fa-check"></i>Complementary Reading</a></li>
-<li class="chapter" data-level="" data-path="acknowledgements.html"><a href="acknowledgements.html"><i class="fa fa-check"></i>Acknowledgements</a></li>
+<li><a href="complementary-reading.html#complementary-reading">Complementary Reading<span></span></a></li>
+<li><a href="acknowledgements.html#acknowledgements">Acknowledgements<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="" data-path="about-the-authors.html"><a href="about-the-authors.html"><i class="fa fa-check"></i>About the Authors</a></li>
-<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a><ul>
-<li class="chapter" data-level="1.1" data-path="a-brief-history-of-data-science.html"><a href="a-brief-history-of-data-science.html"><i class="fa fa-check"></i><b>1.1</b> A brief history of data science</a></li>
-<li class="chapter" data-level="1.2" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html"><i class="fa fa-check"></i><b>1.2</b> Data science role and skill tracks</a><ul>
-<li class="chapter" data-level="1.2.1" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#engineering"><i class="fa fa-check"></i><b>1.2.1</b> Engineering</a></li>
-<li class="chapter" data-level="1.2.2" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#analysis"><i class="fa fa-check"></i><b>1.2.2</b> Analysis</a></li>
-<li class="chapter" data-level="1.2.3" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#modeling"><i class="fa fa-check"></i><b>1.2.3</b> Modeling</a></li>
+<li><a href="about-the-authors.html#about-the-authors">About the Authors<span></span></a></li>
+<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction<span></span></a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="a-brief-history-of-data-science.html"><a href="a-brief-history-of-data-science.html"><i class="fa fa-check"></i><b>1.1</b> A brief history of data science<span></span></a></li>
+<li class="chapter" data-level="1.2" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html"><i class="fa fa-check"></i><b>1.2</b> Data science role and skill tracks<span></span></a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#engineering"><i class="fa fa-check"></i><b>1.2.1</b> Engineering<span></span></a></li>
+<li class="chapter" data-level="1.2.2" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#analysis"><i class="fa fa-check"></i><b>1.2.2</b> Analysis<span></span></a></li>
+<li class="chapter" data-level="1.2.3" data-path="data-science-role-and-skill-tracks.html"><a href="data-science-role-and-skill-tracks.html#modeling"><i class="fa fa-check"></i><b>1.2.3</b> Modeling<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="1.3" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html"><i class="fa fa-check"></i><b>1.3</b> What kind of questions can data science solve?</a><ul>
-<li class="chapter" data-level="1.3.1" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html#prerequisites"><i class="fa fa-check"></i><b>1.3.1</b> Prerequisites</a></li>
-<li class="chapter" data-level="1.3.2" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html#problem-type"><i class="fa fa-check"></i><b>1.3.2</b> Problem type</a></li>
+<li class="chapter" data-level="1.3" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html"><i class="fa fa-check"></i><b>1.3</b> What kind of questions can data science solve?<span></span></a>
+<ul>
+<li class="chapter" data-level="1.3.1" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html#prerequisites"><i class="fa fa-check"></i><b>1.3.1</b> Prerequisites<span></span></a></li>
+<li class="chapter" data-level="1.3.2" data-path="what-kind-of-questions-can-data-science-solve.html"><a href="what-kind-of-questions-can-data-science-solve.html#problem-type"><i class="fa fa-check"></i><b>1.3.2</b> Problem type<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="1.4" data-path="structure-data-science-team.html"><a href="structure-data-science-team.html"><i class="fa fa-check"></i><b>1.4</b> Structure data science team</a></li>
-<li class="chapter" data-level="1.5" data-path="list-of-potential-data-science-careers.html"><a href="list-of-potential-data-science-careers.html"><i class="fa fa-check"></i><b>1.5</b> List of potential data science careers</a></li>
+<li class="chapter" data-level="1.4" data-path="structure-data-science-team.html"><a href="structure-data-science-team.html"><i class="fa fa-check"></i><b>1.4</b> Structure data science team<span></span></a></li>
+<li class="chapter" data-level="1.5" data-path="list-of-potential-data-science-careers.html"><a href="list-of-potential-data-science-careers.html"><i class="fa fa-check"></i><b>1.5</b> List of potential data science careers<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="2" data-path="soft-skills-for-data-scientists.html"><a href="soft-skills-for-data-scientists.html"><i class="fa fa-check"></i><b>2</b> Soft Skills for Data Scientists</a><ul>
-<li class="chapter" data-level="2.1" data-path="comparison-between-statistician-and-data-scientist.html"><a href="comparison-between-statistician-and-data-scientist.html"><i class="fa fa-check"></i><b>2.1</b> Comparison between Statistician and Data Scientist</a></li>
-<li class="chapter" data-level="2.2" data-path="beyond-data-and-analytics.html"><a href="beyond-data-and-analytics.html"><i class="fa fa-check"></i><b>2.2</b> Beyond Data and Analytics</a></li>
-<li class="chapter" data-level="2.3" data-path="three-pillars-of-knowledge.html"><a href="three-pillars-of-knowledge.html"><i class="fa fa-check"></i><b>2.3</b> Three Pillars of Knowledge</a></li>
-<li class="chapter" data-level="2.4" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html"><i class="fa fa-check"></i><b>2.4</b> Data Science Project Cycle</a><ul>
-<li class="chapter" data-level="2.4.1" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#types-of-data-science-projects"><i class="fa fa-check"></i><b>2.4.1</b> Types of Data Science Projects</a></li>
-<li class="chapter" data-level="2.4.2" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#problem-formulation-and-project-planning-stage"><i class="fa fa-check"></i><b>2.4.2</b> Problem Formulation and Project Planning Stage</a></li>
-<li class="chapter" data-level="2.4.3" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#project-modeling-stage"><i class="fa fa-check"></i><b>2.4.3</b> Project Modeling Stage</a></li>
-<li class="chapter" data-level="2.4.4" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#model-implementation-and-post-production-stage"><i class="fa fa-check"></i><b>2.4.4</b> Model Implementation and Post Production Stage</a></li>
-<li class="chapter" data-level="2.4.5" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#project-cycle-summary"><i class="fa fa-check"></i><b>2.4.5</b> Project Cycle Summary</a></li>
+<li class="chapter" data-level="2" data-path="soft-skills-for-data-scientists.html"><a href="soft-skills-for-data-scientists.html"><i class="fa fa-check"></i><b>2</b> Soft Skills for Data Scientists<span></span></a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="comparison-between-statistician-and-data-scientist.html"><a href="comparison-between-statistician-and-data-scientist.html"><i class="fa fa-check"></i><b>2.1</b> Comparison between Statistician and Data Scientist<span></span></a></li>
+<li class="chapter" data-level="2.2" data-path="beyond-data-and-analytics.html"><a href="beyond-data-and-analytics.html"><i class="fa fa-check"></i><b>2.2</b> Beyond Data and Analytics<span></span></a></li>
+<li class="chapter" data-level="2.3" data-path="three-pillars-of-knowledge.html"><a href="three-pillars-of-knowledge.html"><i class="fa fa-check"></i><b>2.3</b> Three Pillars of Knowledge<span></span></a></li>
+<li class="chapter" data-level="2.4" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html"><i class="fa fa-check"></i><b>2.4</b> Data Science Project Cycle<span></span></a>
+<ul>
+<li class="chapter" data-level="2.4.1" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#types-of-data-science-projects"><i class="fa fa-check"></i><b>2.4.1</b> Types of Data Science Projects<span></span></a></li>
+<li class="chapter" data-level="2.4.2" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#problem-formulation-and-project-planning-stage"><i class="fa fa-check"></i><b>2.4.2</b> Problem Formulation and Project Planning Stage<span></span></a></li>
+<li class="chapter" data-level="2.4.3" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#project-modeling-stage"><i class="fa fa-check"></i><b>2.4.3</b> Project Modeling Stage<span></span></a></li>
+<li class="chapter" data-level="2.4.4" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#model-implementation-and-post-production-stage"><i class="fa fa-check"></i><b>2.4.4</b> Model Implementation and Post Production Stage<span></span></a></li>
+<li class="chapter" data-level="2.4.5" data-path="data-science-project-cycle.html"><a href="data-science-project-cycle.html#project-cycle-summary"><i class="fa fa-check"></i><b>2.4.5</b> Project Cycle Summary<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="2.5" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html"><i class="fa fa-check"></i><b>2.5</b> Common Mistakes in Data Science</a><ul>
-<li class="chapter" data-level="2.5.1" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#problem-formulation-stage"><i class="fa fa-check"></i><b>2.5.1</b> Problem Formulation Stage</a></li>
-<li class="chapter" data-level="2.5.2" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#project-planning-stage"><i class="fa fa-check"></i><b>2.5.2</b> Project Planning Stage</a></li>
-<li class="chapter" data-level="2.5.3" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#project-modeling-stage-1"><i class="fa fa-check"></i><b>2.5.3</b> Project Modeling Stage</a></li>
-<li class="chapter" data-level="2.5.4" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#model-implementation-and-post-production-stage-1"><i class="fa fa-check"></i><b>2.5.4</b> Model Implementation and Post Production Stage</a></li>
-<li class="chapter" data-level="2.5.5" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#summary-of-common-mistakes"><i class="fa fa-check"></i><b>2.5.5</b> Summary of Common Mistakes</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="3" data-path="introduction-to-the-data.html"><a href="introduction-to-the-data.html"><i class="fa fa-check"></i><b>3</b> Introduction to The Data</a><ul>
-<li class="chapter" data-level="3.1" data-path="customer-data-for-a-clothing-company.html"><a href="customer-data-for-a-clothing-company.html"><i class="fa fa-check"></i><b>3.1</b> Customer Data for A Clothing Company</a></li>
-<li class="chapter" data-level="3.2" data-path="swinediseasedata.html"><a href="swinediseasedata.html"><i class="fa fa-check"></i><b>3.2</b> Swine Disease Breakout Data</a></li>
-<li class="chapter" data-level="3.3" data-path="mnist-dataset.html"><a href="mnist-dataset.html"><i class="fa fa-check"></i><b>3.3</b> MNIST Dataset</a></li>
-<li class="chapter" data-level="3.4" data-path="imdb-dataset.html"><a href="imdb-dataset.html"><i class="fa fa-check"></i><b>3.4</b> IMDB Dataset</a></li>
-</ul></li>
-<li class="chapter" data-level="4" data-path="bigdatacloudplatform.html"><a href="bigdatacloudplatform.html"><i class="fa fa-check"></i><b>4</b> Big Data Cloud Platform</a><ul>
-<li class="chapter" data-level="4.1" data-path="power-of-cluster-of-computers.html"><a href="power-of-cluster-of-computers.html"><i class="fa fa-check"></i><b>4.1</b> Power of Cluster of Computers</a></li>
-<li class="chapter" data-level="4.2" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html"><i class="fa fa-check"></i><b>4.2</b> Evolution of Cluster Computing</a><ul>
-<li class="chapter" data-level="4.2.1" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html#hadoop"><i class="fa fa-check"></i><b>4.2.1</b> Hadoop</a></li>
-<li class="chapter" data-level="4.2.2" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html#spark"><i class="fa fa-check"></i><b>4.2.2</b> Spark</a></li>
-</ul></li>
-<li class="chapter" data-level="4.3" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html"><i class="fa fa-check"></i><b>4.3</b> Introduction of Cloud Environment</a><ul>
-<li class="chapter" data-level="4.3.1" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#open-account-and-create-a-cluster"><i class="fa fa-check"></i><b>4.3.1</b> Open Account and Create a Cluster</a></li>
-<li class="chapter" data-level="4.3.2" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#r-notebook"><i class="fa fa-check"></i><b>4.3.2</b> R Notebook</a></li>
-<li class="chapter" data-level="4.3.3" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#markdown-cells"><i class="fa fa-check"></i><b>4.3.3</b> Markdown Cells</a></li>
-</ul></li>
-<li class="chapter" data-level="4.4" data-path="leveragesparkr.html"><a href="leveragesparkr.html"><i class="fa fa-check"></i><b>4.4</b> Leverage Spark Using R Notebook</a></li>
-<li class="chapter" data-level="4.5" data-path="databases-and-sql.html"><a href="databases-and-sql.html"><i class="fa fa-check"></i><b>4.5</b> Databases and SQL</a><ul>
-<li class="chapter" data-level="4.5.1" data-path="databases-and-sql.html"><a href="databases-and-sql.html#history"><i class="fa fa-check"></i><b>4.5.1</b> History</a></li>
-<li class="chapter" data-level="4.5.2" data-path="databases-and-sql.html"><a href="databases-and-sql.html#database-table-and-view"><i class="fa fa-check"></i><b>4.5.2</b> Database, Table and View</a></li>
-<li class="chapter" data-level="4.5.3" data-path="databases-and-sql.html"><a href="databases-and-sql.html#basic-sql-statement"><i class="fa fa-check"></i><b>4.5.3</b> Basic SQL Statement</a></li>
-<li class="chapter" data-level="4.5.4" data-path="databases-and-sql.html"><a href="databases-and-sql.html#advanced-topics-in-database"><i class="fa fa-check"></i><b>4.5.4</b> Advanced Topics in Database</a></li>
+<li class="chapter" data-level="2.5" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html"><i class="fa fa-check"></i><b>2.5</b> Common Mistakes in Data Science<span></span></a>
+<ul>
+<li class="chapter" data-level="2.5.1" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#problem-formulation-stage"><i class="fa fa-check"></i><b>2.5.1</b> Problem Formulation Stage<span></span></a></li>
+<li class="chapter" data-level="2.5.2" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#project-planning-stage"><i class="fa fa-check"></i><b>2.5.2</b> Project Planning Stage<span></span></a></li>
+<li class="chapter" data-level="2.5.3" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#project-modeling-stage-1"><i class="fa fa-check"></i><b>2.5.3</b> Project Modeling Stage<span></span></a></li>
+<li class="chapter" data-level="2.5.4" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#model-implementation-and-post-production-stage-1"><i class="fa fa-check"></i><b>2.5.4</b> Model Implementation and Post Production Stage<span></span></a></li>
+<li class="chapter" data-level="2.5.5" data-path="common-mistakes-in-data-science.html"><a href="common-mistakes-in-data-science.html#summary-of-common-mistakes"><i class="fa fa-check"></i><b>2.5.5</b> Summary of Common Mistakes<span></span></a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="datapreprocessing.html"><a href="datapreprocessing.html"><i class="fa fa-check"></i><b>5</b> Data Pre-processing</a><ul>
-<li class="chapter" data-level="5.1" data-path="data-cleaning.html"><a href="data-cleaning.html"><i class="fa fa-check"></i><b>5.1</b> Data Cleaning</a></li>
-<li class="chapter" data-level="5.2" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>5.2</b> Missing Values</a><ul>
-<li class="chapter" data-level="5.2.1" data-path="missing-values.html"><a href="missing-values.html#impute-missing-values-with-medianmode"><i class="fa fa-check"></i><b>5.2.1</b> Impute missing values with median/mode</a></li>
-<li class="chapter" data-level="5.2.2" data-path="missing-values.html"><a href="missing-values.html#k-nearest-neighbors"><i class="fa fa-check"></i><b>5.2.2</b> K-nearest neighbors</a></li>
-<li class="chapter" data-level="5.2.3" data-path="missing-values.html"><a href="missing-values.html#bagging-tree"><i class="fa fa-check"></i><b>5.2.3</b> Bagging Tree</a></li>
+<li class="chapter" data-level="3" data-path="introduction-to-the-data.html"><a href="introduction-to-the-data.html"><i class="fa fa-check"></i><b>3</b> Introduction to The Data<span></span></a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="customer-data-for-a-clothing-company.html"><a href="customer-data-for-a-clothing-company.html"><i class="fa fa-check"></i><b>3.1</b> Customer Data for A Clothing Company<span></span></a></li>
+<li class="chapter" data-level="3.2" data-path="swinediseasedata.html"><a href="swinediseasedata.html"><i class="fa fa-check"></i><b>3.2</b> Swine Disease Breakout Data<span></span></a></li>
+<li class="chapter" data-level="3.3" data-path="mnist-dataset.html"><a href="mnist-dataset.html"><i class="fa fa-check"></i><b>3.3</b> MNIST Dataset<span></span></a></li>
+<li class="chapter" data-level="3.4" data-path="imdb-dataset.html"><a href="imdb-dataset.html"><i class="fa fa-check"></i><b>3.4</b> IMDB Dataset<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="5.3" data-path="centering-and-scaling.html"><a href="centering-and-scaling.html"><i class="fa fa-check"></i><b>5.3</b> Centering and Scaling</a></li>
-<li class="chapter" data-level="5.4" data-path="resolve-skewness.html"><a href="resolve-skewness.html"><i class="fa fa-check"></i><b>5.4</b> Resolve Skewness</a></li>
-<li class="chapter" data-level="5.5" data-path="outliers.html"><a href="outliers.html"><i class="fa fa-check"></i><b>5.5</b> Resolve Outliers</a></li>
-<li class="chapter" data-level="5.6" data-path="collinearity.html"><a href="collinearity.html"><i class="fa fa-check"></i><b>5.6</b> Collinearity</a></li>
-<li class="chapter" data-level="5.7" data-path="sparse-variables.html"><a href="sparse-variables.html"><i class="fa fa-check"></i><b>5.7</b> Sparse Variables</a></li>
-<li class="chapter" data-level="5.8" data-path="re-encode-dummy-variables.html"><a href="re-encode-dummy-variables.html"><i class="fa fa-check"></i><b>5.8</b> Re-encode Dummy Variables</a></li>
+<li class="chapter" data-level="4" data-path="bigdatacloudplatform.html"><a href="bigdatacloudplatform.html"><i class="fa fa-check"></i><b>4</b> Big Data Cloud Platform<span></span></a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="power-of-cluster-of-computers.html"><a href="power-of-cluster-of-computers.html"><i class="fa fa-check"></i><b>4.1</b> Power of Cluster of Computers<span></span></a></li>
+<li class="chapter" data-level="4.2" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html"><i class="fa fa-check"></i><b>4.2</b> Evolution of Cluster Computing<span></span></a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html#hadoop"><i class="fa fa-check"></i><b>4.2.1</b> Hadoop<span></span></a></li>
+<li class="chapter" data-level="4.2.2" data-path="evolution-of-cluster-computing.html"><a href="evolution-of-cluster-computing.html#spark"><i class="fa fa-check"></i><b>4.2.2</b> Spark<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="6" data-path="datawrangline.html"><a href="datawrangline.html"><i class="fa fa-check"></i><b>6</b> Data Wrangling</a><ul>
-<li class="chapter" data-level="6.1" data-path="summarize-data.html"><a href="summarize-data.html"><i class="fa fa-check"></i><b>6.1</b> Summarize Data</a><ul>
-<li class="chapter" data-level="6.1.1" data-path="summarize-data.html"><a href="summarize-data.html#dplyr-package"><i class="fa fa-check"></i><b>6.1.1</b> <code>dplyr</code> package</a></li>
-<li class="chapter" data-level="6.1.2" data-path="summarize-data.html"><a href="summarize-data.html#applyfamilyinbaser"><i class="fa fa-check"></i><b>6.1.2</b> <code>apply()</code>, <code>lapply()</code> and <code>sapply()</code> in base R</a></li>
+<li class="chapter" data-level="4.3" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html"><i class="fa fa-check"></i><b>4.3</b> Introduction of Cloud Environment<span></span></a>
+<ul>
+<li class="chapter" data-level="4.3.1" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#open-account-and-create-a-cluster"><i class="fa fa-check"></i><b>4.3.1</b> Open Account and Create a Cluster<span></span></a></li>
+<li class="chapter" data-level="4.3.2" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#r-notebook"><i class="fa fa-check"></i><b>4.3.2</b> R Notebook<span></span></a></li>
+<li class="chapter" data-level="4.3.3" data-path="CloudEnvironment.html"><a href="CloudEnvironment.html#markdown-cells"><i class="fa fa-check"></i><b>4.3.3</b> Markdown Cells<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="6.2" data-path="tidy-and-reshape-data.html"><a href="tidy-and-reshape-data.html"><i class="fa fa-check"></i><b>6.2</b> Tidy and Reshape Data</a></li>
-</ul></li>
-<li class="chapter" data-level="7" data-path="modeltuningstrategy.html"><a href="modeltuningstrategy.html"><i class="fa fa-check"></i><b>7</b> Model Tuning Strategy</a><ul>
-<li class="chapter" data-level="7.1" data-path="vbtradeoff.html"><a href="vbtradeoff.html"><i class="fa fa-check"></i><b>7.1</b> Variance-Bias Trade-Off</a></li>
-<li class="chapter" data-level="7.2" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html"><i class="fa fa-check"></i><b>7.2</b> Data Splitting and Resampling</a><ul>
-<li class="chapter" data-level="7.2.1" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html#datasplitting"><i class="fa fa-check"></i><b>7.2.1</b> Data Splitting</a></li>
-<li class="chapter" data-level="7.2.2" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html#resampling"><i class="fa fa-check"></i><b>7.2.2</b> Resampling</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="8" data-path="measuring-performance.html"><a href="measuring-performance.html"><i class="fa fa-check"></i><b>8</b> Measuring Performance</a><ul>
-<li class="chapter" data-level="8.1" data-path="regression-model-performance.html"><a href="regression-model-performance.html"><i class="fa fa-check"></i><b>8.1</b> Regression Model Performance</a></li>
-<li class="chapter" data-level="8.2" data-path="classification-model-performance.html"><a href="classification-model-performance.html"><i class="fa fa-check"></i><b>8.2</b> Classification Model Performance</a><ul>
-<li class="chapter" data-level="8.2.1" data-path="classification-model-performance.html"><a href="classification-model-performance.html#confusion-matrix"><i class="fa fa-check"></i><b>8.2.1</b> Confusion Matrix</a></li>
-<li class="chapter" data-level="8.2.2" data-path="classification-model-performance.html"><a href="classification-model-performance.html#kappa-statistic"><i class="fa fa-check"></i><b>8.2.2</b> Kappa Statistic</a></li>
-<li class="chapter" data-level="8.2.3" data-path="classification-model-performance.html"><a href="classification-model-performance.html#roc"><i class="fa fa-check"></i><b>8.2.3</b> ROC</a></li>
-<li class="chapter" data-level="8.2.4" data-path="classification-model-performance.html"><a href="classification-model-performance.html#gain-and-lift-charts"><i class="fa fa-check"></i><b>8.2.4</b> Gain and Lift Charts</a></li>
+<li class="chapter" data-level="4.4" data-path="leveragesparkr.html"><a href="leveragesparkr.html"><i class="fa fa-check"></i><b>4.4</b> Leverage Spark Using R Notebook<span></span></a></li>
+<li class="chapter" data-level="4.5" data-path="databases-and-sql.html"><a href="databases-and-sql.html"><i class="fa fa-check"></i><b>4.5</b> Databases and SQL<span></span></a>
+<ul>
+<li class="chapter" data-level="4.5.1" data-path="databases-and-sql.html"><a href="databases-and-sql.html#history"><i class="fa fa-check"></i><b>4.5.1</b> History<span></span></a></li>
+<li class="chapter" data-level="4.5.2" data-path="databases-and-sql.html"><a href="databases-and-sql.html#database-table-and-view"><i class="fa fa-check"></i><b>4.5.2</b> Database, Table and View<span></span></a></li>
+<li class="chapter" data-level="4.5.3" data-path="databases-and-sql.html"><a href="databases-and-sql.html#basic-sql-statement"><i class="fa fa-check"></i><b>4.5.3</b> Basic SQL Statement<span></span></a></li>
+<li class="chapter" data-level="4.5.4" data-path="databases-and-sql.html"><a href="databases-and-sql.html#advanced-topics-in-database"><i class="fa fa-check"></i><b>4.5.4</b> Advanced Topics in Database<span></span></a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="9" data-path="regression-models.html"><a href="regression-models.html"><i class="fa fa-check"></i><b>9</b> Regression Models</a><ul>
-<li class="chapter" data-level="9.1" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html"><i class="fa fa-check"></i><b>9.1</b> Ordinary Least Square</a><ul>
-<li class="chapter" data-level="9.1.1" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html#the-magic-p-value"><i class="fa fa-check"></i><b>9.1.1</b> The Magic P-value</a></li>
-<li class="chapter" data-level="9.1.2" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html#diagnostics-for-linear-regression"><i class="fa fa-check"></i><b>9.1.2</b> Diagnostics for Linear Regression</a></li>
+<li class="chapter" data-level="5" data-path="datapreprocessing.html"><a href="datapreprocessing.html"><i class="fa fa-check"></i><b>5</b> Data Pre-processing<span></span></a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="data-cleaning.html"><a href="data-cleaning.html"><i class="fa fa-check"></i><b>5.1</b> Data Cleaning<span></span></a></li>
+<li class="chapter" data-level="5.2" data-path="missing-values.html"><a href="missing-values.html"><i class="fa fa-check"></i><b>5.2</b> Missing Values<span></span></a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="missing-values.html"><a href="missing-values.html#impute-missing-values-with-medianmode"><i class="fa fa-check"></i><b>5.2.1</b> Impute missing values with median/mode<span></span></a></li>
+<li class="chapter" data-level="5.2.2" data-path="missing-values.html"><a href="missing-values.html#k-nearest-neighbors"><i class="fa fa-check"></i><b>5.2.2</b> K-nearest neighbors<span></span></a></li>
+<li class="chapter" data-level="5.2.3" data-path="missing-values.html"><a href="missing-values.html#bagging-tree"><i class="fa fa-check"></i><b>5.2.3</b> Bagging Tree<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="9.2" data-path="principal-component-regression-and-partial-least-square.html"><a href="principal-component-regression-and-partial-least-square.html"><i class="fa fa-check"></i><b>9.2</b> Principal Component Regression and Partial Least Square</a></li>
+<li class="chapter" data-level="5.3" data-path="centering-and-scaling.html"><a href="centering-and-scaling.html"><i class="fa fa-check"></i><b>5.3</b> Centering and Scaling<span></span></a></li>
+<li class="chapter" data-level="5.4" data-path="resolve-skewness.html"><a href="resolve-skewness.html"><i class="fa fa-check"></i><b>5.4</b> Resolve Skewness<span></span></a></li>
+<li class="chapter" data-level="5.5" data-path="outliers.html"><a href="outliers.html"><i class="fa fa-check"></i><b>5.5</b> Resolve Outliers<span></span></a></li>
+<li class="chapter" data-level="5.6" data-path="collinearity.html"><a href="collinearity.html"><i class="fa fa-check"></i><b>5.6</b> Collinearity<span></span></a></li>
+<li class="chapter" data-level="5.7" data-path="sparse-variables.html"><a href="sparse-variables.html"><i class="fa fa-check"></i><b>5.7</b> Sparse Variables<span></span></a></li>
+<li class="chapter" data-level="5.8" data-path="re-encode-dummy-variables.html"><a href="re-encode-dummy-variables.html"><i class="fa fa-check"></i><b>5.8</b> Re-encode Dummy Variables<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="10" data-path="regularization-methods.html"><a href="regularization-methods.html"><i class="fa fa-check"></i><b>10</b> Regularization Methods</a><ul>
-<li class="chapter" data-level="10.1" data-path="ridge-regression.html"><a href="ridge-regression.html"><i class="fa fa-check"></i><b>10.1</b> Ridge Regression</a></li>
-<li class="chapter" data-level="10.2" data-path="lasso.html"><a href="lasso.html"><i class="fa fa-check"></i><b>10.2</b> LASSO</a></li>
-<li class="chapter" data-level="10.3" data-path="variable-selection-property-of-the-lasso.html"><a href="variable-selection-property-of-the-lasso.html"><i class="fa fa-check"></i><b>10.3</b> Variable selection property of the lasso</a></li>
-<li class="chapter" data-level="10.4" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.4</b> Elastic Net</a></li>
-<li class="chapter" data-level="10.5" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.5</b> Penalized Generalized Linear Model</a><ul>
-<li class="chapter" data-level="10.5.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.5.1</b> Introduction to <code>glmnet</code> package</a></li>
-<li class="chapter" data-level="10.5.2" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#penalized-logistic-regression"><i class="fa fa-check"></i><b>10.5.2</b> Penalized logistic regression</a></li>
+<li class="chapter" data-level="6" data-path="datawrangline.html"><a href="datawrangline.html"><i class="fa fa-check"></i><b>6</b> Data Wrangling<span></span></a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="summarize-data.html"><a href="summarize-data.html"><i class="fa fa-check"></i><b>6.1</b> Summarize Data<span></span></a>
+<ul>
+<li class="chapter" data-level="6.1.1" data-path="summarize-data.html"><a href="summarize-data.html#dplyr-package"><i class="fa fa-check"></i><b>6.1.1</b> <code>dplyr</code> package<span></span></a></li>
+<li class="chapter" data-level="6.1.2" data-path="summarize-data.html"><a href="summarize-data.html#applyfamilyinbaser"><i class="fa fa-check"></i><b>6.1.2</b> <code>apply()</code>, <code>lapply()</code> and <code>sapply()</code> in base R<span></span></a></li>
 </ul></li>
+<li class="chapter" data-level="6.2" data-path="tidy-and-reshape-data.html"><a href="tidy-and-reshape-data.html"><i class="fa fa-check"></i><b>6.2</b> Tidy and Reshape Data<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="11" data-path="treemodel.html"><a href="treemodel.html"><i class="fa fa-check"></i><b>11</b> Tree-Based Methods</a><ul>
-<li class="chapter" data-level="11.1" data-path="tree-basics.html"><a href="tree-basics.html"><i class="fa fa-check"></i><b>11.1</b> Tree Basics</a></li>
-<li class="chapter" data-level="11.2" data-path="splitting-criteria.html"><a href="splitting-criteria.html"><i class="fa fa-check"></i><b>11.2</b> Splitting Criteria</a></li>
-<li class="chapter" data-level="11.3" data-path="tree-pruning.html"><a href="tree-pruning.html"><i class="fa fa-check"></i><b>11.3</b> Tree Pruning</a></li>
-<li class="chapter" data-level="11.4" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html"><i class="fa fa-check"></i><b>11.4</b> Regression and Decision Tree Basic</a><ul>
-<li class="chapter" data-level="11.4.1" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html#regression-tree"><i class="fa fa-check"></i><b>11.4.1</b> Regression Tree</a></li>
-<li class="chapter" data-level="11.4.2" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html#decision-tree"><i class="fa fa-check"></i><b>11.4.2</b> Decision Tree</a></li>
-</ul></li>
-<li class="chapter" data-level="11.5" data-path="missing-values.html"><a href="missing-values.html#bagging-tree"><i class="fa fa-check"></i><b>11.5</b> Bagging Tree</a></li>
-<li class="chapter" data-level="11.6" data-path="random-forest.html"><a href="random-forest.html"><i class="fa fa-check"></i><b>11.6</b> Random Forest</a></li>
-<li class="chapter" data-level="11.7" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html"><i class="fa fa-check"></i><b>11.7</b> Gradient Boosted Machine</a><ul>
-<li class="chapter" data-level="11.7.1" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#adaptive-boosting"><i class="fa fa-check"></i><b>11.7.1</b> Adaptive Boosting</a></li>
-<li class="chapter" data-level="11.7.2" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#stochastic-gradient-boosting"><i class="fa fa-check"></i><b>11.7.2</b> Stochastic Gradient Boosting</a></li>
-<li class="chapter" data-level="11.7.3" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#boosting-as-additive-model"><i class="fa fa-check"></i><b>11.7.3</b> Boosting as Additive Model</a></li>
-</ul></li>
-</ul></li>
-<li class="chapter" data-level="12" data-path="deeplearning.html"><a href="deeplearning.html"><i class="fa fa-check"></i><b>12</b> Deep Learning</a><ul>
-<li class="chapter" data-level="12.1" data-path="projection-pursuit-regression.html"><a href="projection-pursuit-regression.html"><i class="fa fa-check"></i><b>12.1</b> Projection Pursuit Regression</a></li>
-<li class="chapter" data-level="12.2" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html"><i class="fa fa-check"></i><b>12.2</b> Feedforward Neural Network</a><ul>
-<li class="chapter" data-level="12.2.1" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#logisticregasneuralnetwork"><i class="fa fa-check"></i><b>12.2.1</b> Logistic Regression as Neural Network</a></li>
-<li class="chapter" data-level="12.2.2" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#stochastic-gradient-descent"><i class="fa fa-check"></i><b>12.2.2</b> Stochastic Gradient Descent</a></li>
-<li class="chapter" data-level="12.2.3" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#deepneuralnetwork"><i class="fa fa-check"></i><b>12.2.3</b> Deep Neural Network</a></li>
-<li class="chapter" data-level="12.2.4" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#activationfunction"><i class="fa fa-check"></i><b>12.2.4</b> Activation Function</a></li>
-<li class="chapter" data-level="12.2.5" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#optimization"><i class="fa fa-check"></i><b>12.2.5</b> Optimization</a></li>
-<li class="chapter" data-level="12.2.6" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#deal-with-overfitting"><i class="fa fa-check"></i><b>12.2.6</b> Deal with Overfitting</a></li>
-<li class="chapter" data-level="12.2.7" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#ffnnexample"><i class="fa fa-check"></i><b>12.2.7</b> Image Recognition Using FFNN</a></li>
-</ul></li>
-<li class="chapter" data-level="12.3" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html"><i class="fa fa-check"></i><b>12.3</b> Convolutional Neural Network</a><ul>
-<li class="chapter" data-level="12.3.1" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#convolution-layer"><i class="fa fa-check"></i><b>12.3.1</b> Convolution Layer</a></li>
-<li class="chapter" data-level="12.3.2" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#padding-layer"><i class="fa fa-check"></i><b>12.3.2</b> Padding Layer</a></li>
-<li class="chapter" data-level="12.3.3" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#pooling-layer"><i class="fa fa-check"></i><b>12.3.3</b> Pooling Layer</a></li>
-<li class="chapter" data-level="12.3.4" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#convolution-over-volume"><i class="fa fa-check"></i><b>12.3.4</b> Convolution Over Volume</a></li>
-<li class="chapter" data-level="12.3.5" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#cnnexample"><i class="fa fa-check"></i><b>12.3.5</b> Image Recognition Using CNN</a></li>
-</ul></li>
-<li class="chapter" data-level="12.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html"><i class="fa fa-check"></i><b>12.4</b> Recurrent Neural Network</a><ul>
-<li class="chapter" data-level="12.4.1" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#rnn-model"><i class="fa fa-check"></i><b>12.4.1</b> RNN Model</a></li>
-<li class="chapter" data-level="12.4.2" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#embedding"><i class="fa fa-check"></i><b>12.4.2</b> Word Embedding</a></li>
-<li class="chapter" data-level="12.4.3" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#lstm"><i class="fa fa-check"></i><b>12.4.3</b> Long Short Term Memory</a></li>
-<li class="chapter" data-level="12.4.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#rnnexample"><i class="fa fa-check"></i><b>12.4.4</b> Sentiment Analysis Using RNN</a></li>
+<li class="chapter" data-level="7" data-path="modeltuningstrategy.html"><a href="modeltuningstrategy.html"><i class="fa fa-check"></i><b>7</b> Model Tuning Strategy<span></span></a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="vbtradeoff.html"><a href="vbtradeoff.html"><i class="fa fa-check"></i><b>7.1</b> Variance-Bias Trade-Off<span></span></a></li>
+<li class="chapter" data-level="7.2" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html"><i class="fa fa-check"></i><b>7.2</b> Data Splitting and Resampling<span></span></a>
+<ul>
+<li class="chapter" data-level="7.2.1" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html#datasplitting"><i class="fa fa-check"></i><b>7.2.1</b> Data Splitting<span></span></a></li>
+<li class="chapter" data-level="7.2.2" data-path="datasplittingresampling.html"><a href="datasplittingresampling.html#resampling"><i class="fa fa-check"></i><b>7.2.2</b> Resampling<span></span></a></li>
 </ul></li>
 </ul></li>
-<li class="appendix"><span><b>Appendix</b></span></li>
-<li class="chapter" data-level="A" data-path="largelocaldata.html"><a href="largelocaldata.html"><i class="fa fa-check"></i><b>A</b> Handling Large Local Data</a><ul>
-<li class="chapter" data-level="A.1" data-path="readr.html"><a href="readr.html"><i class="fa fa-check"></i><b>A.1</b> <code>readr</code></a></li>
-<li class="chapter" data-level="A.2" data-path="data-table-enhanced-data-frame.html"><a href="data-table-enhanced-data-frame.html"><i class="fa fa-check"></i><b>A.2</b> <code>data.table</code>— enhanced <code>data.frame</code></a></li>
+<li class="chapter" data-level="8" data-path="measuring-performance.html"><a href="measuring-performance.html"><i class="fa fa-check"></i><b>8</b> Measuring Performance<span></span></a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="regression-model-performance.html"><a href="regression-model-performance.html"><i class="fa fa-check"></i><b>8.1</b> Regression Model Performance<span></span></a></li>
+<li class="chapter" data-level="8.2" data-path="classification-model-performance.html"><a href="classification-model-performance.html"><i class="fa fa-check"></i><b>8.2</b> Classification Model Performance<span></span></a>
+<ul>
+<li class="chapter" data-level="8.2.1" data-path="classification-model-performance.html"><a href="classification-model-performance.html#confusion-matrix"><i class="fa fa-check"></i><b>8.2.1</b> Confusion Matrix<span></span></a></li>
+<li class="chapter" data-level="8.2.2" data-path="classification-model-performance.html"><a href="classification-model-performance.html#kappa-statistic"><i class="fa fa-check"></i><b>8.2.2</b> Kappa Statistic<span></span></a></li>
+<li class="chapter" data-level="8.2.3" data-path="classification-model-performance.html"><a href="classification-model-performance.html#roc"><i class="fa fa-check"></i><b>8.2.3</b> ROC<span></span></a></li>
+<li class="chapter" data-level="8.2.4" data-path="classification-model-performance.html"><a href="classification-model-performance.html#gain-and-lift-charts"><i class="fa fa-check"></i><b>8.2.4</b> Gain and Lift Charts<span></span></a></li>
 </ul></li>
-<li class="chapter" data-level="B" data-path="r-code-for-data-simulation.html"><a href="r-code-for-data-simulation.html"><i class="fa fa-check"></i><b>B</b> R code for data simulation</a><ul>
-<li class="chapter" data-level="B.1" data-path="appendixdata1.html"><a href="appendixdata1.html"><i class="fa fa-check"></i><b>B.1</b> Customer Data for Clothing Company</a></li>
-<li class="chapter" data-level="B.2" data-path="appendixdata3.html"><a href="appendixdata3.html"><i class="fa fa-check"></i><b>B.2</b> Swine Disease Breakout Data</a></li>
 </ul></li>
-<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="chapter" data-level="9" data-path="regression-models.html"><a href="regression-models.html"><i class="fa fa-check"></i><b>9</b> Regression Models<span></span></a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html"><i class="fa fa-check"></i><b>9.1</b> Ordinary Least Square<span></span></a>
+<ul>
+<li class="chapter" data-level="9.1.1" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html#the-magic-p-value"><i class="fa fa-check"></i><b>9.1.1</b> The Magic P-value<span></span></a></li>
+<li class="chapter" data-level="9.1.2" data-path="ordinary-least-square.html"><a href="ordinary-least-square.html#diagnostics-for-linear-regression"><i class="fa fa-check"></i><b>9.1.2</b> Diagnostics for Linear Regression<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="principal-component-regression-and-partial-least-square.html"><a href="principal-component-regression-and-partial-least-square.html"><i class="fa fa-check"></i><b>9.2</b> Principal Component Regression and Partial Least Square<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="regularization-methods.html"><a href="regularization-methods.html"><i class="fa fa-check"></i><b>10</b> Regularization Methods<span></span></a>
+<ul>
+<li class="chapter" data-level="10.1" data-path="ridge-regression.html"><a href="ridge-regression.html"><i class="fa fa-check"></i><b>10.1</b> Ridge Regression<span></span></a></li>
+<li class="chapter" data-level="10.2" data-path="lasso.html"><a href="lasso.html"><i class="fa fa-check"></i><b>10.2</b> LASSO<span></span></a></li>
+<li class="chapter" data-level="10.3" data-path="variable-selection-property-of-the-lasso.html"><a href="variable-selection-property-of-the-lasso.html"><i class="fa fa-check"></i><b>10.3</b> Variable selection property of the lasso<span></span></a></li>
+<li class="chapter" data-level="10.4" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.4</b> Elastic Net<span></span></a></li>
+<li class="chapter" data-level="10.5" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.5</b> Penalized Generalized Linear Model<span></span></a>
+<ul>
+<li class="chapter" data-level="10.5.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.5.1</b> Introduction to <code>glmnet</code> package<span></span></a></li>
+<li class="chapter" data-level="10.5.2" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#penalized-logistic-regression"><i class="fa fa-check"></i><b>10.5.2</b> Penalized logistic regression<span></span></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="11" data-path="treemodel.html"><a href="treemodel.html"><i class="fa fa-check"></i><b>11</b> Tree-Based Methods<span></span></a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="tree-basics.html"><a href="tree-basics.html"><i class="fa fa-check"></i><b>11.1</b> Tree Basics<span></span></a></li>
+<li class="chapter" data-level="11.2" data-path="splitting-criteria.html"><a href="splitting-criteria.html"><i class="fa fa-check"></i><b>11.2</b> Splitting Criteria<span></span></a></li>
+<li class="chapter" data-level="11.3" data-path="tree-pruning.html"><a href="tree-pruning.html"><i class="fa fa-check"></i><b>11.3</b> Tree Pruning<span></span></a></li>
+<li class="chapter" data-level="11.4" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html"><i class="fa fa-check"></i><b>11.4</b> Regression and Decision Tree Basic<span></span></a>
+<ul>
+<li class="chapter" data-level="11.4.1" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html#regression-tree"><i class="fa fa-check"></i><b>11.4.1</b> Regression Tree<span></span></a></li>
+<li class="chapter" data-level="11.4.2" data-path="regression-and-decision-tree-basic.html"><a href="regression-and-decision-tree-basic.html#decision-tree"><i class="fa fa-check"></i><b>11.4.2</b> Decision Tree<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="11.5" data-path="bagging-tree-1.html"><a href="bagging-tree-1.html"><i class="fa fa-check"></i><b>11.5</b> Bagging Tree<span></span></a></li>
+<li class="chapter" data-level="11.6" data-path="random-forest.html"><a href="random-forest.html"><i class="fa fa-check"></i><b>11.6</b> Random Forest<span></span></a></li>
+<li class="chapter" data-level="11.7" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html"><i class="fa fa-check"></i><b>11.7</b> Gradient Boosted Machine<span></span></a>
+<ul>
+<li class="chapter" data-level="11.7.1" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#adaptive-boosting"><i class="fa fa-check"></i><b>11.7.1</b> Adaptive Boosting<span></span></a></li>
+<li class="chapter" data-level="11.7.2" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#stochastic-gradient-boosting"><i class="fa fa-check"></i><b>11.7.2</b> Stochastic Gradient Boosting<span></span></a></li>
+<li class="chapter" data-level="11.7.3" data-path="gradient-boosted-machine.html"><a href="gradient-boosted-machine.html#boosting-as-additive-model"><i class="fa fa-check"></i><b>11.7.3</b> Boosting as Additive Model<span></span></a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="12" data-path="deeplearning.html"><a href="deeplearning.html"><i class="fa fa-check"></i><b>12</b> Deep Learning<span></span></a>
+<ul>
+<li class="chapter" data-level="12.1" data-path="projection-pursuit-regression.html"><a href="projection-pursuit-regression.html"><i class="fa fa-check"></i><b>12.1</b> Projection Pursuit Regression<span></span></a></li>
+<li class="chapter" data-level="12.2" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html"><i class="fa fa-check"></i><b>12.2</b> Feedforward Neural Network<span></span></a>
+<ul>
+<li class="chapter" data-level="12.2.1" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#logisticregasneuralnetwork"><i class="fa fa-check"></i><b>12.2.1</b> Logistic Regression as Neural Network<span></span></a></li>
+<li class="chapter" data-level="12.2.2" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#stochastic-gradient-descent"><i class="fa fa-check"></i><b>12.2.2</b> Stochastic Gradient Descent<span></span></a></li>
+<li class="chapter" data-level="12.2.3" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#deepneuralnetwork"><i class="fa fa-check"></i><b>12.2.3</b> Deep Neural Network<span></span></a></li>
+<li class="chapter" data-level="12.2.4" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#activationfunction"><i class="fa fa-check"></i><b>12.2.4</b> Activation Function<span></span></a></li>
+<li class="chapter" data-level="12.2.5" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#optimization"><i class="fa fa-check"></i><b>12.2.5</b> Optimization<span></span></a></li>
+<li class="chapter" data-level="12.2.6" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#deal-with-overfitting"><i class="fa fa-check"></i><b>12.2.6</b> Deal with Overfitting<span></span></a></li>
+<li class="chapter" data-level="12.2.7" data-path="feedforward-neural-network.html"><a href="feedforward-neural-network.html#ffnnexample"><i class="fa fa-check"></i><b>12.2.7</b> Image Recognition Using FFNN<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="12.3" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html"><i class="fa fa-check"></i><b>12.3</b> Convolutional Neural Network<span></span></a>
+<ul>
+<li class="chapter" data-level="12.3.1" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#convolution-layer"><i class="fa fa-check"></i><b>12.3.1</b> Convolution Layer<span></span></a></li>
+<li class="chapter" data-level="12.3.2" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#padding-layer"><i class="fa fa-check"></i><b>12.3.2</b> Padding Layer<span></span></a></li>
+<li class="chapter" data-level="12.3.3" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#pooling-layer"><i class="fa fa-check"></i><b>12.3.3</b> Pooling Layer<span></span></a></li>
+<li class="chapter" data-level="12.3.4" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#convolution-over-volume"><i class="fa fa-check"></i><b>12.3.4</b> Convolution Over Volume<span></span></a></li>
+<li class="chapter" data-level="12.3.5" data-path="convolutional-neural-network.html"><a href="convolutional-neural-network.html#cnnexample"><i class="fa fa-check"></i><b>12.3.5</b> Image Recognition Using CNN<span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="12.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html"><i class="fa fa-check"></i><b>12.4</b> Recurrent Neural Network<span></span></a>
+<ul>
+<li class="chapter" data-level="12.4.1" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#rnn-model"><i class="fa fa-check"></i><b>12.4.1</b> RNN Model<span></span></a></li>
+<li class="chapter" data-level="12.4.2" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#embedding"><i class="fa fa-check"></i><b>12.4.2</b> Word Embedding<span></span></a></li>
+<li class="chapter" data-level="12.4.3" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#lstm"><i class="fa fa-check"></i><b>12.4.3</b> Long Short Term Memory<span></span></a></li>
+<li class="chapter" data-level="12.4.4" data-path="recurrent-neural-network.html"><a href="recurrent-neural-network.html#rnnexample"><i class="fa fa-check"></i><b>12.4.4</b> Sentiment Analysis Using RNN<span></span></a></li>
+</ul></li>
+</ul></li>
+<li class="appendix"><span><b>Appendix<span></span></b></span></li>
+<li class="chapter" data-level="A" data-path="largelocaldata.html"><a href="largelocaldata.html"><i class="fa fa-check"></i><b>A</b> Handling Large Local Data<span></span></a>
+<ul>
+<li class="chapter" data-level="A.1" data-path="readr.html"><a href="readr.html"><i class="fa fa-check"></i><b>A.1</b> <code>readr</code><span></span></a></li>
+<li class="chapter" data-level="A.2" data-path="data.table-enhanced-data.html"><a href="data.table-enhanced-data.html"><i class="fa fa-check"></i><b>A.2</b> <code>data.table</code>— enhanced <code>data.frame</code><span></span></a></li>
+</ul></li>
+<li class="chapter" data-level="B" data-path="r-code-for-data-simulation.html"><a href="r-code-for-data-simulation.html"><i class="fa fa-check"></i><b>B</b> R code for data simulation<span></span></a>
+<ul>
+<li class="chapter" data-level="B.1" data-path="appendixdata1.html"><a href="appendixdata1.html"><i class="fa fa-check"></i><b>B.1</b> Customer Data for Clothing Company<span></span></a></li>
+<li class="chapter" data-level="B.2" data-path="appendixdata3.html"><a href="appendixdata3.html"><i class="fa fa-check"></i><b>B.2</b> Swine Disease Breakout Data<span></span></a></li>
+</ul></li>
+<li><a href="references.html#references">References<span></span></a></li>
 <li class="divider"></li>
 <li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
 
@@ -326,35 +389,35 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<div id="classification-model-performance" class="section level2">
-<h2><span class="header-section-number">8.2</span> Classification Model Performance</h2>
+<div id="classification-model-performance" class="section level2 hasAnchor" number="8.2">
+<h2><span class="header-section-number">8.2</span> Classification Model Performance<a href="classification-model-performance.html#classification-model-performance" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>This section focuses on performance measurement for models with a categorical response. The metrics in the previous section are for models with a continuous response and they are not appropriate in the context of classification. Most of the classification problems are dichotomous, such as an outbreak of disease, spam email, etc. There are also cases with more than two categories as the segments in the clothing company data. We use swine disease data to illustrate different metrics. Let’s train a random forest model as an example. We will discuss the model in Chapter <a href="treemodel.html#treemodel">11</a>.</p>
-<div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb176-1" data-line-number="1">disease_dat &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;http://bit.ly/2KXb1Qi&quot;</span>)</a>
-<a class="sourceLine" id="cb176-2" data-line-number="2"><span class="co"># you can check the data using glimpse()</span></a>
-<a class="sourceLine" id="cb176-3" data-line-number="3"><span class="co"># glimpse(disease_dat)</span></a></code></pre></div>
+<div class="sourceCode" id="cb175"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb175-1"><a href="classification-model-performance.html#cb175-1" aria-hidden="true" tabindex="-1"></a>disease_dat <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;http://bit.ly/2KXb1Qi&quot;</span>)</span>
+<span id="cb175-2"><a href="classification-model-performance.html#cb175-2" aria-hidden="true" tabindex="-1"></a><span class="co"># you can check the data using glimpse()</span></span>
+<span id="cb175-3"><a href="classification-model-performance.html#cb175-3" aria-hidden="true" tabindex="-1"></a><span class="co"># glimpse(disease_dat)</span></span></code></pre></div>
 <p>Separate the data to be training and testing sets. Fit model using training data (<code>xTrain</code> and <code>yTrain</code>) and applied the trained model on testing data (<code>xTest</code> and <code>yTest</code>) to evaluate model performance. We use 70% of the sample as training and the rest 30% as testing.</p>
-<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb177-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb177-2" data-line-number="2"><span class="co"># separate the data to be training and testing</span></a>
-<a class="sourceLine" id="cb177-3" data-line-number="3">trainIndex &lt;-<span class="st"> </span><span class="kw">createDataPartition</span>(disease_dat<span class="op">$</span>y, <span class="dt">p =</span> <span class="fl">0.8</span>, </a>
-<a class="sourceLine" id="cb177-4" data-line-number="4">    <span class="dt">list =</span> F, <span class="dt">times =</span> <span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb177-5" data-line-number="5">xTrain &lt;-<span class="st"> </span>disease_dat[trainIndex, ] <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(<span class="op">-</span>y)</a>
-<a class="sourceLine" id="cb177-6" data-line-number="6">xTest &lt;-<span class="st"> </span>disease_dat[<span class="op">-</span>trainIndex, ] <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(<span class="op">-</span>y)</a>
-<a class="sourceLine" id="cb177-7" data-line-number="7"><span class="co"># the response variable need to be factor</span></a>
-<a class="sourceLine" id="cb177-8" data-line-number="8">yTrain &lt;-<span class="st"> </span>disease_dat<span class="op">$</span>y[trainIndex] <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as.factor</span>()</a>
-<a class="sourceLine" id="cb177-9" data-line-number="9">yTest &lt;-<span class="st"> </span>disease_dat<span class="op">$</span>y[<span class="op">-</span>trainIndex] <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as.factor</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb176"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb176-1"><a href="classification-model-performance.html#cb176-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">100</span>)</span>
+<span id="cb176-2"><a href="classification-model-performance.html#cb176-2" aria-hidden="true" tabindex="-1"></a><span class="co"># separate the data to be training and testing</span></span>
+<span id="cb176-3"><a href="classification-model-performance.html#cb176-3" aria-hidden="true" tabindex="-1"></a>trainIndex <span class="ot">&lt;-</span> <span class="fu">createDataPartition</span>(disease_dat<span class="sc">$</span>y, <span class="at">p =</span> <span class="fl">0.8</span>, </span>
+<span id="cb176-4"><a href="classification-model-performance.html#cb176-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">list =</span> F, <span class="at">times =</span> <span class="dv">1</span>)</span>
+<span id="cb176-5"><a href="classification-model-performance.html#cb176-5" aria-hidden="true" tabindex="-1"></a>xTrain <span class="ot">&lt;-</span> disease_dat[trainIndex, ] <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>y)</span>
+<span id="cb176-6"><a href="classification-model-performance.html#cb176-6" aria-hidden="true" tabindex="-1"></a>xTest <span class="ot">&lt;-</span> disease_dat[<span class="sc">-</span>trainIndex, ] <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>y)</span>
+<span id="cb176-7"><a href="classification-model-performance.html#cb176-7" aria-hidden="true" tabindex="-1"></a><span class="co"># the response variable need to be factor</span></span>
+<span id="cb176-8"><a href="classification-model-performance.html#cb176-8" aria-hidden="true" tabindex="-1"></a>yTrain <span class="ot">&lt;-</span> disease_dat<span class="sc">$</span>y[trainIndex] <span class="sc">%&gt;%</span> <span class="fu">as.factor</span>()</span>
+<span id="cb176-9"><a href="classification-model-performance.html#cb176-9" aria-hidden="true" tabindex="-1"></a>yTest <span class="ot">&lt;-</span> disease_dat<span class="sc">$</span>y[<span class="sc">-</span>trainIndex] <span class="sc">%&gt;%</span> <span class="fu">as.factor</span>()</span></code></pre></div>
 <p>Train a random forest model:</p>
-<div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb178-1" data-line-number="1">train_rf &lt;-<span class="st"> </span><span class="kw">randomForest</span>(yTrain <span class="op">~</span><span class="st"> </span>., </a>
-<a class="sourceLine" id="cb178-2" data-line-number="2">                         <span class="dt">data =</span> xTrain, </a>
-<a class="sourceLine" id="cb178-3" data-line-number="3">                         <span class="dt">mtry =</span> <span class="kw">trunc</span>(<span class="kw">sqrt</span>(<span class="kw">ncol</span>(xTrain) <span class="op">-</span><span class="st"> </span><span class="dv">1</span>)),</a>
-<a class="sourceLine" id="cb178-4" data-line-number="4">                         <span class="dt">ntree =</span> <span class="dv">1000</span>, </a>
-<a class="sourceLine" id="cb178-5" data-line-number="5">                         <span class="dt">importance =</span> T)</a></code></pre></div>
+<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb177-1"><a href="classification-model-performance.html#cb177-1" aria-hidden="true" tabindex="-1"></a>train_rf <span class="ot">&lt;-</span> <span class="fu">randomForest</span>(yTrain <span class="sc">~</span> ., </span>
+<span id="cb177-2"><a href="classification-model-performance.html#cb177-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">data =</span> xTrain, </span>
+<span id="cb177-3"><a href="classification-model-performance.html#cb177-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">mtry =</span> <span class="fu">trunc</span>(<span class="fu">sqrt</span>(<span class="fu">ncol</span>(xTrain) <span class="sc">-</span> <span class="dv">1</span>)),</span>
+<span id="cb177-4"><a href="classification-model-performance.html#cb177-4" aria-hidden="true" tabindex="-1"></a>                         <span class="at">ntree =</span> <span class="dv">1000</span>, </span>
+<span id="cb177-5"><a href="classification-model-performance.html#cb177-5" aria-hidden="true" tabindex="-1"></a>                         <span class="at">importance =</span> T)</span></code></pre></div>
 <p>Apply the trained random forest model to the testing data to get two types of predictions:</p>
 <ul>
 <li>probability (a value between 0 to 1)</li>
 </ul>
-<div class="sourceCode" id="cb179"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb179-1" data-line-number="1">yhatprob &lt;-<span class="st"> </span><span class="kw">predict</span>(train_rf, xTest, <span class="st">&quot;prob&quot;</span>)</a>
-<a class="sourceLine" id="cb179-2" data-line-number="2"><span class="kw">set.seed</span>(<span class="dv">100</span>)</a>
-<a class="sourceLine" id="cb179-3" data-line-number="3">car<span class="op">::</span><span class="kw">some</span>(yhatprob)</a></code></pre></div>
+<div class="sourceCode" id="cb178"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb178-1"><a href="classification-model-performance.html#cb178-1" aria-hidden="true" tabindex="-1"></a>yhatprob <span class="ot">&lt;-</span> <span class="fu">predict</span>(train_rf, xTest, <span class="st">&quot;prob&quot;</span>)</span>
+<span id="cb178-2"><a href="classification-model-performance.html#cb178-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">100</span>)</span>
+<span id="cb178-3"><a href="classification-model-performance.html#cb178-3" aria-hidden="true" tabindex="-1"></a>car<span class="sc">::</span><span class="fu">some</span>(yhatprob)</span></code></pre></div>
 <pre><code>##         0     1
 ## 47  0.831 0.169
 ## 101 0.177 0.823
@@ -369,18 +432,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <ul>
 <li>category prediction (0 or 1)</li>
 </ul>
-<div class="sourceCode" id="cb181"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb181-1" data-line-number="1">yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(train_rf, xTest)</a>
-<a class="sourceLine" id="cb181-2" data-line-number="2">car<span class="op">::</span><span class="kw">some</span>(yhat)</a></code></pre></div>
+<div class="sourceCode" id="cb180"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb180-1"><a href="classification-model-performance.html#cb180-1" aria-hidden="true" tabindex="-1"></a>yhat <span class="ot">&lt;-</span> <span class="fu">predict</span>(train_rf, xTest)</span>
+<span id="cb180-2"><a href="classification-model-performance.html#cb180-2" aria-hidden="true" tabindex="-1"></a>car<span class="sc">::</span><span class="fu">some</span>(yhat)</span></code></pre></div>
 <pre><code>## 146 232 269 302 500 520 521 575 738 781 
 ##   0   0   1   0   0   0   1   0   0   0 
 ## Levels: 0 1</code></pre>
 <p>We will use the above two types of predictions to show different performance metrics.</p>
-<div id="confusion-matrix" class="section level3">
-<h3><span class="header-section-number">8.2.1</span> Confusion Matrix</h3>
+<div id="confusion-matrix" class="section level3 hasAnchor" number="8.2.1">
+<h3><span class="header-section-number">8.2.1</span> Confusion Matrix<a href="classification-model-performance.html#confusion-matrix" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p><strong>Confusion Matrix</strong> is a counting table to describe the performance of a classification model. For the true response <code>yTest</code> and prediction <code>yhat</code>, the confusion matrix is:</p>
-<div class="sourceCode" id="cb183"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb183-1" data-line-number="1">yhat =<span class="st"> </span><span class="kw">as.factor</span>(yhat) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">relevel</span>(<span class="st">&quot;1&quot;</span>)</a>
-<a class="sourceLine" id="cb183-2" data-line-number="2">yTest =<span class="st"> </span><span class="kw">as.factor</span>(yTest) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">relevel</span>(<span class="st">&quot;1&quot;</span>)</a>
-<a class="sourceLine" id="cb183-3" data-line-number="3"><span class="kw">table</span>(yhat, yTest)</a></code></pre></div>
+<div class="sourceCode" id="cb182"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb182-1"><a href="classification-model-performance.html#cb182-1" aria-hidden="true" tabindex="-1"></a>yhat <span class="ot">=</span> <span class="fu">as.factor</span>(yhat) <span class="sc">%&gt;%</span> <span class="fu">relevel</span>(<span class="st">&quot;1&quot;</span>)</span>
+<span id="cb182-2"><a href="classification-model-performance.html#cb182-2" aria-hidden="true" tabindex="-1"></a>yTest <span class="ot">=</span> <span class="fu">as.factor</span>(yTest) <span class="sc">%&gt;%</span> <span class="fu">relevel</span>(<span class="st">&quot;1&quot;</span>)</span>
+<span id="cb182-3"><a href="classification-model-performance.html#cb182-3" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(yhat, yTest)</span></code></pre></div>
 <pre><code>##     yTest
 ## yhat  1  0
 ##    1 56  1
@@ -409,7 +472,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </table>
 <p>where TP is true positive, FP is false positive, TN is true negative, FN is false negative. The cells along the diagonal line from top-left to bottom-right contain the counts of correctly classified samples. The cells along the other diagonal line contain the counts of wrongly classified samples. The most straightforward performance measure is the <strong>total accuracy</strong> which is the percentage of correctly classified samples:</p>
 <p><span class="math display">\[Total\ accuracy = \frac{TP+TN}{TP+TN+FP+FN}\]</span></p>
-<p>You can calculate the total accuracy when there are more than two categories. This statistic is straightforward but has some disadvantages. First, it doesn’t differentiate different error types. In a real application, different types of error may have different impacts. For example, it is much worse to tag an important email as spam and miss it than failing to filter out a spam email. Provost et al. <span class="citation">(Provost F <a href="#ref-Provost1998">1998</a>)</span> discussed in detail the problem of using total accuracy on different classifiers. There are some other metrics based on the confusion matrix that measure different types of error.</p>
+<p>You can calculate the total accuracy when there are more than two categories. This statistic is straightforward but has some disadvantages. First, it doesn’t differentiate different error types. In a real application, different types of error may have different impacts. For example, it is much worse to tag an important email as spam and miss it than failing to filter out a spam email. Provost et al. <span class="citation">(<a href="#ref-Provost1998" role="doc-biblioref">Provost F 1998</a>)</span> discussed in detail the problem of using total accuracy on different classifiers. There are some other metrics based on the confusion matrix that measure different types of error.</p>
 <p><strong>Precision</strong> is a metric to measure how accurate positive predictions are (i.e. among those emails predicted as spam, how many percentages of them are spam emails?):</p>
 <p><span class="math display">\[precision = \frac{TP}{TP+FP}\]</span></p>
 <p><strong>Sensitivity</strong> is to measure the coverage of actual positive samples (i.e. among those spam emails, how many percentages of them are predicted as spam) :</p>
@@ -419,11 +482,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Since wrongly tagging an important email as spam has a bigger impact, in the spam email case, we want to make sure the model specificity is high enough.</p>
 <p>Second, total accuracy doesn’t reflect the natural frequencies of each class. For example, the percentage of fraud cases for insurance may be very low, like 0.1%. A model can achieve nearly perfect accuracy (99.9%) by predicting all samples to be negative. The percentage of the largest class in the training set is also called the no-information rate. In this example, the no-information rate is 99.9%. You need to get a model that at least beats this rate.</p>
 </div>
-<div id="kappa-statistic" class="section level3">
-<h3><span class="header-section-number">8.2.2</span> Kappa Statistic</h3>
-<p>Another metric is the Kappa statistic. It measures the agreement between the observed and predicted classes. It was originally come up by Cohen etc. <span class="citation">(J <a href="#ref-Cohen1960">1960</a>)</span>. Kappa takes into account the accuracy generated simply by chance. It is defined as:</p>
+<div id="kappa-statistic" class="section level3 hasAnchor" number="8.2.2">
+<h3><span class="header-section-number">8.2.2</span> Kappa Statistic<a href="classification-model-performance.html#kappa-statistic" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Another metric is the Kappa statistic. It measures the agreement between the observed and predicted classes. It was originally come up by Cohen etc. <span class="citation">(<a href="#ref-Cohen1960" role="doc-biblioref">J 1960</a>)</span>. Kappa takes into account the accuracy generated simply by chance. It is defined as:</p>
 <p><span class="math display">\[Kappa=\frac{P_{0}-P_{e}}{1-P_{e}}\]</span></p>
-<p>Let <span class="math inline">\(n=TP+TN+FP+FN\)</span> be the total number of samples, where <span class="math inline">\(P_{0}=\frac{TP+TN}{n}\)</span> is the observed accuracy, <span class="math inline">\(P_{e}=\frac{(TP+FP)(TP+FN)+(FN+TN)(FP+TN)}{n^{2}}\)</span> is the expected accuracy based on the marginal totals of the confusion matrix. Kappa can take on a value from -1 to 1. The higher the value, the higher the agreement. A value of 0 means there is no agreement between the observed and predicted classes, while a value of 1 indicates perfect agreement. A negative value indicates that the prediction is in the opposite direction of the observed value. The following table may help you “visualize” the interpretation of kappa <span class="citation">(Landis JR <a href="#ref-landis1977">1977</a>)</span>:</p>
+<p>Let <span class="math inline">\(n=TP+TN+FP+FN\)</span> be the total number of samples, where <span class="math inline">\(P_{0}=\frac{TP+TN}{n}\)</span> is the observed accuracy, <span class="math inline">\(P_{e}=\frac{(TP+FP)(TP+FN)+(FN+TN)(FP+TN)}{n^{2}}\)</span> is the expected accuracy based on the marginal totals of the confusion matrix. Kappa can take on a value from -1 to 1. The higher the value, the higher the agreement. A value of 0 means there is no agreement between the observed and predicted classes, while a value of 1 indicates perfect agreement. A negative value indicates that the prediction is in the opposite direction of the observed value. The following table may help you “visualize” the interpretation of kappa <span class="citation">(<a href="#ref-landis1977" role="doc-biblioref">Landis JR 1977</a>)</span>:</p>
 <table>
 <thead>
 <tr class="header">
@@ -459,13 +522,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </tbody>
 </table>
 <p>In general, a value between 0.3 to 0.5 indicates a reasonable agreement. If a model has a high accuracy of 90%, while the expected accuracy is also high, say 85%. The Kappa statistics is <span class="math inline">\(\frac{1}{3}\)</span>. It means the prediction and the observation have a fair agreement. You can calculate Kappa when the number of categories is larger than 2. The package <code>fmsb</code> has a function <code>Kappa.test()</code> to calculate Cohen’s Kappa statistics. The function can also return the hypothesis test result and a confidence interval. Use the above observation vector <code>yTest</code> and prediction vector <code>yhat</code> as an example, you can calculate the statistics:</p>
-<div class="sourceCode" id="cb185"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb185-1" data-line-number="1"><span class="co"># install.packages(&quot;fmsb&quot;)</span></a>
-<a class="sourceLine" id="cb185-2" data-line-number="2">kt&lt;-fmsb<span class="op">::</span><span class="kw">Kappa.test</span>(<span class="kw">table</span>(yhat,yTest))</a>
-<a class="sourceLine" id="cb185-3" data-line-number="3">kt<span class="op">$</span>Result</a></code></pre></div>
+<div class="sourceCode" id="cb184"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb184-1"><a href="classification-model-performance.html#cb184-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages(&quot;fmsb&quot;)</span></span>
+<span id="cb184-2"><a href="classification-model-performance.html#cb184-2" aria-hidden="true" tabindex="-1"></a>kt<span class="ot">&lt;-</span>fmsb<span class="sc">::</span><span class="fu">Kappa.test</span>(<span class="fu">table</span>(yhat,yTest))</span>
+<span id="cb184-3"><a href="classification-model-performance.html#cb184-3" aria-hidden="true" tabindex="-1"></a>kt<span class="sc">$</span>Result</span></code></pre></div>
 <pre><code>## 
-## 	Estimate Cohen&#39;s kappa statistics and test the
-## 	null hypothesis that the extent of agreement is
-## 	same as random (kappa=0)
+##  Estimate Cohen&#39;s kappa statistics and test the
+##  null hypothesis that the extent of agreement is
+##  same as random (kappa=0)
 ## 
 ## data:  table(yhat, yTest)
 ## Z = 9.7, p-value &lt;2e-16
@@ -474,52 +537,52 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 ## sample estimates:
 ## [1] 0.7933</code></pre>
 <p>The output of the above function contains an object named <code>Judgement</code>:</p>
-<div class="sourceCode" id="cb187"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb187-1" data-line-number="1">kt<span class="op">$</span>Judgement</a></code></pre></div>
+<div class="sourceCode" id="cb186"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb186-1"><a href="classification-model-performance.html#cb186-1" aria-hidden="true" tabindex="-1"></a>kt<span class="sc">$</span>Judgement</span></code></pre></div>
 <pre><code>## [1] &quot;Substantial agreement&quot;</code></pre>
 </div>
-<div id="roc" class="section level3">
-<h3><span class="header-section-number">8.2.3</span> ROC</h3>
+<div id="roc" class="section level3 hasAnchor" number="8.2.3">
+<h3><span class="header-section-number">8.2.3</span> ROC<a href="classification-model-performance.html#roc" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Receiver Operating Characteristic (ROC) curve uses the predicted class probabilities and determines an effective threshold such that values above the threshold are indicative of a specific event. We have shown the definitions of sensitivity and specificity above. The sensitivity is the true positive rate and specificity is true negative rate. “1 - specificity” is the false negative rate. ROC is a graph of pairs of true positive rate (sensitivity) and false positive rate (1-specificity) values that result as the test’s cutoff value is varied. The Area Under the Curve(AUC) is a common measure for two-class problem. There is usually a trade-off between sensitivity and specificity. If the threshold is set lower, then there are more samples predicted as positive and hence the sensitivity is higher. Let’s look at the predicted probability <code>yhatprob</code> in the swine disease example. The predicted probability object <code>yhatprob</code> has two columns, one is the predicted probability that a farm will have an outbreak, the other is the probability that farm will NOT have an outbreak. So the two add up to have value 1. We use the probability of outbreak (the 2nd column) for further illustration. You can use <code>roc()</code> function to get an ROC object (<code>rocCurve</code>) and then apply different functions on that object to get needed plot or ROC statistics. For example, the following code produces the ROC curve:</p>
-<div class="sourceCode" id="cb189"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb189-1" data-line-number="1">rocCurve &lt;-<span class="st"> </span>pROC<span class="op">::</span><span class="kw">roc</span>(<span class="dt">response =</span> yTest,</a>
-<a class="sourceLine" id="cb189-2" data-line-number="2">              <span class="dt">predictor =</span> yhatprob[,<span class="dv">2</span>])</a></code></pre></div>
+<div class="sourceCode" id="cb188"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb188-1"><a href="classification-model-performance.html#cb188-1" aria-hidden="true" tabindex="-1"></a>rocCurve <span class="ot">&lt;-</span> pROC<span class="sc">::</span><span class="fu">roc</span>(<span class="at">response =</span> yTest,</span>
+<span id="cb188-2"><a href="classification-model-performance.html#cb188-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">predictor =</span> yhatprob[,<span class="dv">2</span>])</span></code></pre></div>
 <pre><code>## Setting levels: control = 1, case = 0</code></pre>
 <pre><code>## Setting direction: controls &gt; cases</code></pre>
-<div class="sourceCode" id="cb192"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb192-1" data-line-number="1"><span class="kw">plot</span>(<span class="dv">1</span><span class="op">-</span>rocCurve<span class="op">$</span>specificities, </a>
-<a class="sourceLine" id="cb192-2" data-line-number="2">     rocCurve<span class="op">$</span>sensitivities, </a>
-<a class="sourceLine" id="cb192-3" data-line-number="3">     <span class="dt">type =</span> <span class="st">&#39;l&#39;</span>,</a>
-<a class="sourceLine" id="cb192-4" data-line-number="4">     <span class="dt">xlab =</span> <span class="st">&#39;1 - Specificities&#39;</span>,</a>
-<a class="sourceLine" id="cb192-5" data-line-number="5">     <span class="dt">ylab =</span> <span class="st">&#39;Sensitivities&#39;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb191"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb191-1"><a href="classification-model-performance.html#cb191-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="dv">1</span><span class="sc">-</span>rocCurve<span class="sc">$</span>specificities, </span>
+<span id="cb191-2"><a href="classification-model-performance.html#cb191-2" aria-hidden="true" tabindex="-1"></a>     rocCurve<span class="sc">$</span>sensitivities, </span>
+<span id="cb191-3"><a href="classification-model-performance.html#cb191-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">type =</span> <span class="st">&#39;l&#39;</span>,</span>
+<span id="cb191-4"><a href="classification-model-performance.html#cb191-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">&#39;1 - Specificities&#39;</span>,</span>
+<span id="cb191-5"><a href="classification-model-performance.html#cb191-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="st">&#39;Sensitivities&#39;</span>)</span></code></pre></div>
 <p><img src="IDS_files/figure-html/unnamed-chunk-72-1.svg" width="672" /></p>
 <p>The first argument of the <code>roc()</code> is, <code>response</code>, the observation vector. The second argument is <code>predictor</code> is the continuous prediction (probability or link function value). The x-axis of ROC curve is “1 - specificity” and the y-axis is “sensitivity”. ROC curve starts from (0, 0) and ends with (1, 1). A perfect model that correctly identifies all the samples will have 100% sensitivity and specificity which corresponds to the curve that also goes through (0, 1). The area under the perfect curve is 1. A model that is totally useless corresponds to a curve that is close to the diagonal line and an area under the curve about 0.5.</p>
-<p>You can visually compare different models by putting their ROC curves on one plot. Or use the AUC to compare them. DeLong et al. came up a statistic test to compare AUC based on U-statistics <span class="citation">(E.R. DeLong <a href="#ref-delong1988">1988</a>)</span> which can give a p-value and confidence interval. You can also use bootstrap to get a confidence interval for AUC <span class="citation">(Hall P <a href="#ref-hall2004">2004</a>)</span>.</p>
+<p>You can visually compare different models by putting their ROC curves on one plot. Or use the AUC to compare them. DeLong et al. came up a statistic test to compare AUC based on U-statistics <span class="citation">(<a href="#ref-delong1988" role="doc-biblioref">E. R. DeLong 1988</a>)</span> which can give a p-value and confidence interval. You can also use bootstrap to get a confidence interval for AUC <span class="citation">(<a href="#ref-hall2004" role="doc-biblioref">Hall P 2004</a>)</span>.</p>
 <p>We can use the following code in R to get an estimate of AUC and its confidence interval:</p>
-<div class="sourceCode" id="cb193"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb193-1" data-line-number="1"><span class="co"># get the estimate of AUC</span></a>
-<a class="sourceLine" id="cb193-2" data-line-number="2"><span class="kw">auc</span>(rocCurve)</a></code></pre></div>
+<div class="sourceCode" id="cb192"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb192-1"><a href="classification-model-performance.html#cb192-1" aria-hidden="true" tabindex="-1"></a><span class="co"># get the estimate of AUC</span></span>
+<span id="cb192-2"><a href="classification-model-performance.html#cb192-2" aria-hidden="true" tabindex="-1"></a><span class="fu">auc</span>(rocCurve)</span></code></pre></div>
 <pre><code>## Area under the curve: 0.989</code></pre>
-<div class="sourceCode" id="cb195"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb195-1" data-line-number="1"><span class="co"># get a confidence interval based on DeLong et al.</span></a>
-<a class="sourceLine" id="cb195-2" data-line-number="2"><span class="kw">ci.auc</span>(rocCurve)</a></code></pre></div>
+<div class="sourceCode" id="cb194"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb194-1"><a href="classification-model-performance.html#cb194-1" aria-hidden="true" tabindex="-1"></a><span class="co"># get a confidence interval based on DeLong et al.</span></span>
+<span id="cb194-2"><a href="classification-model-performance.html#cb194-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ci.auc</span>(rocCurve)</span></code></pre></div>
 <pre><code>## 95% CI: 0.979-0.999 (DeLong)</code></pre>
-<p>AUC is robust to class imbalance<span class="citation">(Provost F <a href="#ref-Provost1998">1998</a>; T <a href="#ref-Fawcett2006">2006</a>)</span> hence a popular measurement. But it still boils a lot of information down to one number so there is inevitably a loss of information. It is better to double check by comparing the curve at the same time. If you care more about getting a model that will have high specificity, which is the lower part of the curve, as in the spam filtering case, you can use the area of the lower part of the curve as the performance measurement <span class="citation">(D <a href="#ref-McClish1989">1989</a>)</span>. ROC is only for two-class case. Some researchers generalized it to situations with more than two categories <span class="citation">(Hand D <a href="#ref-Hand2001">2001</a>; Lachiche N <a href="#ref-Lachiche2003">2003</a>; Li J <a href="#ref-Li2008">2008</a>)</span>.</p>
+<p>AUC is robust to class imbalance<span class="citation">(<a href="#ref-Provost1998" role="doc-biblioref">Provost F 1998</a>; <a href="#ref-Fawcett2006" role="doc-biblioref">F. T 2006</a>)</span> hence a popular measurement. But it still boils a lot of information down to one number so there is inevitably a loss of information. It is better to double check by comparing the curve at the same time. If you care more about getting a model that will have high specificity, which is the lower part of the curve, as in the spam filtering case, you can use the area of the lower part of the curve as the performance measurement <span class="citation">(<a href="#ref-McClish1989" role="doc-biblioref">D 1989</a>)</span>. ROC is only for two-class case. Some researchers generalized it to situations with more than two categories <span class="citation">(<a href="#ref-Hand2001" role="doc-biblioref">Hand D 2001</a>; <a href="#ref-Lachiche2003" role="doc-biblioref">Lachiche N 2003</a>; <a href="#ref-Li2008" role="doc-biblioref">Li J 2008</a>)</span>.</p>
 </div>
-<div id="gain-and-lift-charts" class="section level3">
-<h3><span class="header-section-number">8.2.4</span> Gain and Lift Charts</h3>
+<div id="gain-and-lift-charts" class="section level3 hasAnchor" number="8.2.4">
+<h3><span class="header-section-number">8.2.4</span> Gain and Lift Charts<a href="classification-model-performance.html#gain-and-lift-charts" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Gain and lift chart is a visual tool for evaluating the performance of a classification model. In the previous swine disease example, there are 160 samples in the testing data and 89 of them have a positive outcome.</p>
-<div class="sourceCode" id="cb197"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb197-1" data-line-number="1"><span class="kw">table</span>(yTest)</a></code></pre></div>
+<div class="sourceCode" id="cb196"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb196-1"><a href="classification-model-performance.html#cb196-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(yTest)</span></code></pre></div>
 <pre><code>## yTest
 ##  1  0 
 ## 71 89</code></pre>
 <p>If we order the testing samples by the predicted probability, one would hope that the positive samples are ranked higher than the negative ones. That is what the lift charts do: rank the samples by their scores and calculate the cumulative positive rate as more samples are evaluated. In the perfect scenario, the highest-ranked 71 samples would contain all 71 positive samples. When the model is totally random, the highest-ranked x% of the data would contain about x% of the positive sample. The gain/lift charts compare the ratio between the results obtained with and without a model.</p>
 <p>Let’s plot the lift charts to compare the predicted outbreak probability (<code>modelscore &lt;- yhatprob[ ,2]</code>) from random forest model we fit before with some random scores generated from a uniform distribution (<code>randomscore &lt;- runif(length(yTest))</code>).</p>
-<div class="sourceCode" id="cb199"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb199-1" data-line-number="1"><span class="co"># predicted outbreak probability</span></a>
-<a class="sourceLine" id="cb199-2" data-line-number="2">modelscore &lt;-<span class="st"> </span>yhatprob[ ,<span class="dv">2</span>]</a>
-<a class="sourceLine" id="cb199-3" data-line-number="3"><span class="co"># randomly sample from a uniform distribution</span></a>
-<a class="sourceLine" id="cb199-4" data-line-number="4">randomscore &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="kw">length</span>(yTest))</a>
-<a class="sourceLine" id="cb199-5" data-line-number="5">labs &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dt">modelscore=</span><span class="st">&quot;Random Forest Prediction&quot;</span>,</a>
-<a class="sourceLine" id="cb199-6" data-line-number="6">        <span class="dt">randomscore=</span><span class="st">&quot;Random Number&quot;</span>)</a>
-<a class="sourceLine" id="cb199-7" data-line-number="7">liftCurve &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">lift</span>(yTest <span class="op">~</span><span class="st"> </span>modelscore <span class="op">+</span><span class="st"> </span>randomscore,</a>
-<a class="sourceLine" id="cb199-8" data-line-number="8">                  <span class="dt">class =</span> <span class="st">&quot;1&quot;</span>, </a>
-<a class="sourceLine" id="cb199-9" data-line-number="9">                  <span class="dt">labels =</span> labs)</a>
-<a class="sourceLine" id="cb199-10" data-line-number="10"><span class="kw">xyplot</span>(liftCurve, <span class="dt">auto.key =</span> <span class="kw">list</span>(<span class="dt">columns =</span> <span class="dv">2</span>, <span class="dt">lines =</span> T, <span class="dt">points =</span> F))</a></code></pre></div>
+<div class="sourceCode" id="cb198"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb198-1"><a href="classification-model-performance.html#cb198-1" aria-hidden="true" tabindex="-1"></a><span class="co"># predicted outbreak probability</span></span>
+<span id="cb198-2"><a href="classification-model-performance.html#cb198-2" aria-hidden="true" tabindex="-1"></a>modelscore <span class="ot">&lt;-</span> yhatprob[ ,<span class="dv">2</span>]</span>
+<span id="cb198-3"><a href="classification-model-performance.html#cb198-3" aria-hidden="true" tabindex="-1"></a><span class="co"># randomly sample from a uniform distribution</span></span>
+<span id="cb198-4"><a href="classification-model-performance.html#cb198-4" aria-hidden="true" tabindex="-1"></a>randomscore <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="fu">length</span>(yTest))</span>
+<span id="cb198-5"><a href="classification-model-performance.html#cb198-5" aria-hidden="true" tabindex="-1"></a>labs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">modelscore=</span><span class="st">&quot;Random Forest Prediction&quot;</span>,</span>
+<span id="cb198-6"><a href="classification-model-performance.html#cb198-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">randomscore=</span><span class="st">&quot;Random Number&quot;</span>)</span>
+<span id="cb198-7"><a href="classification-model-performance.html#cb198-7" aria-hidden="true" tabindex="-1"></a>liftCurve <span class="ot">&lt;-</span> caret<span class="sc">::</span><span class="fu">lift</span>(yTest <span class="sc">~</span> modelscore <span class="sc">+</span> randomscore,</span>
+<span id="cb198-8"><a href="classification-model-performance.html#cb198-8" aria-hidden="true" tabindex="-1"></a>                  <span class="at">class =</span> <span class="st">&quot;1&quot;</span>, </span>
+<span id="cb198-9"><a href="classification-model-performance.html#cb198-9" aria-hidden="true" tabindex="-1"></a>                  <span class="at">labels =</span> labs)</span>
+<span id="cb198-10"><a href="classification-model-performance.html#cb198-10" aria-hidden="true" tabindex="-1"></a><span class="fu">xyplot</span>(liftCurve, <span class="at">auto.key =</span> <span class="fu">list</span>(<span class="at">columns =</span> <span class="dv">2</span>, <span class="at">lines =</span> T, <span class="at">points =</span> F))</span></code></pre></div>
 <p><img src="IDS_files/figure-html/unnamed-chunk-75-1.svg" width="672" /></p>
 <p>The x-axis is the percentage of samples tested and the y-axis is the percentage of positive samples that are detected by the model. For example, the point on the curve of random forest prediction, （8.125,18.31）, indicates that if you order the testing samples by the predicted probability from high to low, the top 8.125% of the samples contain 0.1831% of the total positive outcomes.</p>
 <p>Similar to the ROC curve, we can choose the model by comparing their lift charts. Some parts of the lift curves may be more interesting than the rest. For example, if you only have a budget to clean 50% of the farms, then you should pick the model that gives the highest point when the x-axis is 50%.</p>
@@ -527,37 +590,37 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </div>
 <!-- </div> -->
-<h3>References</h3>
-<div id="refs" class="references">
-<div id="ref-McClish1989">
-<p>D, McClish. 1989. “Analyzing a Portion of the Roc Curve.” <em>Medical Decision Making</em> 9: 190–95.</p>
+<h3>References<a href="references.html#references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-McClish1989" class="csl-entry">
+D, McClish. 1989. <span>“Analyzing a Portion of the ROC Curve.”</span> <em>Medical Decision Making</em> 9: 190–95.
 </div>
-<div id="ref-delong1988">
-<p>E.R. DeLong, D.L. Clarke-Pearson, D.M. DeLong. 1988. “Comparing the Areas Under Two or More Correlated Receiver Operating Characteristics Curves: A Nonparametric Approach.” <em>Biometrics</em> 44: 837–45.</p>
+<div id="ref-delong1988" class="csl-entry">
+E. R. DeLong, D. L. Clarke-Pearson, D. M. DeLong. 1988. <span>“Comparing the Areas Under Two or More Correlated Receiver Operating Characteristics Curves: A Nonparametric Approach.”</span> <em>Biometrics</em> 44: 837–45.
 </div>
-<div id="ref-hall2004">
-<p>Hall P, Fan Y, Hyndman R. 2004. “Nonparametric Confidence Intervals for Receiver Operating Characteristic Curves.” <em>Biometrika</em> 91: 743–50.</p>
+<div id="ref-hall2004" class="csl-entry">
+Hall P, Fan Y, Hyndman R. 2004. <span>“Nonparametric Confidence Intervals for Receiver Operating Characteristic Curves.”</span> <em>Biometrika</em> 91: 743–50.
 </div>
-<div id="ref-Hand2001">
-<p>Hand D, Till R. 2001. “A Simple Generalisation of the Area Under the Roc Curve for Multiple Class Classification Problems.” <em>Machine Learning</em> 45 (2): 171–86.</p>
+<div id="ref-Hand2001" class="csl-entry">
+Hand D, Till R. 2001. <span>“A Simple Generalisation of the Area Under the ROC Curve for Multiple Class Classification Problems.”</span> <em>Machine Learning</em> 45 (2): 171–86.
 </div>
-<div id="ref-Cohen1960">
-<p>J, Cohen. 1960. “A Coefficient of Agreement for Nominal Data.” <em>Educational and Psychological Measurement</em> 20: 37–46.</p>
+<div id="ref-Cohen1960" class="csl-entry">
+J, Cohen. 1960. <span>“A Coefficient of Agreement for Nominal Data.”</span> <em>Educational and Psychological Measurement</em> 20: 37–46.
 </div>
-<div id="ref-Lachiche2003">
-<p>Lachiche N, Flach P. 2003. “Improving Accuracy and Cost of Two–Class and Multi–Class Probabilistic Classifiers Using Roc Curves.” <em>In “Proceed- Ings of the Twentieth International Conference on Machine Learning</em> 20 (416–424).</p>
+<div id="ref-Lachiche2003" class="csl-entry">
+Lachiche N, Flach P. 2003. <span>“Improving Accuracy and Cost of Two–Class and Multi–Class Probabilistic Classifiers Using ROC Curves.”</span> <em>In “Proceed- Ings of the Twentieth International Conference on Machine Learning</em> 20 (416–424).
 </div>
-<div id="ref-landis1977">
-<p>Landis JR, Koch GG. 1977. “The Measurement of Observer Agreement for Categorical Data.” <em>Biometrics</em> 33: 159–74.</p>
+<div id="ref-landis1977" class="csl-entry">
+Landis JR, Koch GG. 1977. <span>“The Measurement of Observer Agreement for Categorical Data.”</span> <em>Biometrics</em> 33: 159–74.
 </div>
-<div id="ref-Li2008">
-<p>Li J, Fine JP. 2008. “ROC Analysis with Multiple Classes and Multiple Tests: Methodology and Its Application in Microarray Studies.” <em>Biostatistics</em> 9 (3): 566–76.</p>
+<div id="ref-Li2008" class="csl-entry">
+Li J, Fine JP. 2008. <span>“ROC Analysis with Multiple Classes and Multiple Tests: Methodology and Its Application in Microarray Studies.”</span> <em>Biostatistics</em> 9 (3): 566–76.
 </div>
-<div id="ref-Provost1998">
-<p>Provost F, Kohavi R, Fawcett T. 1998. “The Case Against Accuracy Esti- Mation for Comparing Induction Algorithms.” <em>Proceedings of the Fifteenth International Conference on Machine Learning</em>, 445–53.</p>
+<div id="ref-Provost1998" class="csl-entry">
+Provost F, Kohavi R, Fawcett T. 1998. <span>“The Case Against Accuracy Esti- Mation for Comparing Induction Algorithms.”</span> <em>Proceedings of the Fifteenth International Conference on Machine Learning</em>, 445–53.
 </div>
-<div id="ref-Fawcett2006">
-<p>T, Fawcett. 2006. “An Introduction to Roc Analysis.” <em>Pattern Recognition Letters</em> 27 (8): 861–74.</p>
+<div id="ref-Fawcett2006" class="csl-entry">
+T, Fawcett. 2006. <span>“An Introduction to ROC Analysis.”</span> <em>Pattern Recognition Letters</em> 27 (8): 861–74.
 </div>
 </div>
             </section>
@@ -570,7 +633,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>
-<script src="libs/gitbook/js/lunr.js"></script>
 <script src="libs/gitbook/js/clipboard.min.js"></script>
 <script src="libs/gitbook/js/plugin-search.js"></script>
 <script src="libs/gitbook/js/plugin-sharing.js"></script>
@@ -589,6 +651,7 @@ gitbook.start({
 "weibo": false,
 "instapaper": false,
 "vk": false,
+"whatsapp": false,
 "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
 },
 "fontsettings": {
@@ -609,6 +672,10 @@ gitbook.start({
 "text": null
 },
 "download": ["IDS.pdf", "IDS.epub", "IDS.mobi"],
+"search": {
+"engine": "fuse",
+"options": null
+},
 "toc": {
 "collapse": "section",
 "scroll_highlight": true
