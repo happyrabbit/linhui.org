@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2022-09-24" />
+<meta name="date" content="2022-09-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -301,12 +301,11 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="10.1" data-path="ridge-regression.html"><a href="ridge-regression.html"><i class="fa fa-check"></i><b>10.1</b> Ridge Regression<span></span></a></li>
 <li class="chapter" data-level="10.2" data-path="lasso.html"><a href="lasso.html"><i class="fa fa-check"></i><b>10.2</b> LASSO<span></span></a></li>
-<li class="chapter" data-level="10.3" data-path="variable-selection-property-of-the-lasso.html"><a href="variable-selection-property-of-the-lasso.html"><i class="fa fa-check"></i><b>10.3</b> Variable selection property of the lasso<span></span></a></li>
-<li class="chapter" data-level="10.4" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.4</b> Elastic Net<span></span></a></li>
-<li class="chapter" data-level="10.5" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.5</b> Penalized Generalized Linear Model<span></span></a>
+<li class="chapter" data-level="10.3" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.3</b> Elastic Net<span></span></a></li>
+<li class="chapter" data-level="10.4" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.4</b> Penalized Generalized Linear Model<span></span></a>
 <ul>
-<li class="chapter" data-level="10.5.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.5.1</b> Introduction to <code>glmnet</code> package<span></span></a></li>
-<li class="chapter" data-level="10.5.2" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#penalized-logistic-regression"><i class="fa fa-check"></i><b>10.5.2</b> Penalized logistic regression<span></span></a></li>
+<li class="chapter" data-level="10.4.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.4.1</b> Introduction to <code>glmnet</code> package<span></span></a></li>
+<li class="chapter" data-level="10.4.2" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#penalized-logistic-regression"><i class="fa fa-check"></i><b>10.4.2</b> Penalized logistic regression<span></span></a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="treemodel.html"><a href="treemodel.html"><i class="fa fa-check"></i><b>11</b> Tree-Based Methods<span></span></a>
@@ -395,22 +394,22 @@ div.csl-indent {
 <p>From a statistical perspective, you can de-correlate trees by introducing randomness when you build each tree. One approach <span class="citation">(<a href="#ref-Ho1998" role="doc-biblioref">H. T 1998</a>; <a href="#ref-amit1997" role="doc-biblioref">Y and D 1997</a>)</span> is to randomly choose <span class="math inline">\(m\)</span> variables to use each time you build a tree. Dietterich<span class="citation">(<a href="#ref-Dietterich2000" role="doc-biblioref">D. T 2000</a>)</span> came up with the idea of random split selection which is to randomly choose <span class="math inline">\(m\)</span> variables to use at each splitting node. Based on the different generalizations to the original bagging algorithm, Breiman <span class="citation">(<a href="#ref-Breiman2001" role="doc-biblioref">Leo Breiman 2001a</a>)</span> came up with a unified algorithm called <em>random forest.</em></p>
 <p>When building a tree, the algorithm randomly chooses <span class="math inline">\(m\)</span> variables to use at each splitting node. Then choose the best one out of the <span class="math inline">\(m\)</span> to use at that node. In general, people use <span class="math inline">\(m=\sqrt{p}\)</span>. For example, if we use 10 questions from the questionnaire as predictors, then at each node, the algorithm will randomly choose 4 candidate variables. Since those trees in the forest don’t always use the same variables, tree correlation is less than that in bagging. It tends to work better when there are more predictors. Since we only have 10 predictors here, the improvement from the random forest is marginal. The number of randomly selected predictors is a tuning parameter in the random forest. Since random forest is computationally intensive, we suggest starting with 5 value around <span class="math inline">\(m=\sqrt{p}\)</span>. Another tuning parameter is the number of trees in the forest. You can start with 1000 trees and then increase the number until performance levels off. The basic random forest is shown in Algorithm <a href="#randomforestalgorithm"><strong>??</strong></a>.</p>
 <p>When <span class="math inline">\(m=p\)</span>, random forest is equal to the bagging tree. When the predictors are highly correlated, then smaller <span class="math inline">\(m\)</span> tends to work better. Let’s use the <code>caret</code> package to train a random forest:</p>
-<div class="sourceCode" id="cb311"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb311-1"><a href="random-forest.html#cb311-1" aria-hidden="true" tabindex="-1"></a><span class="co"># tune across a list of numbers of predictors</span></span>
-<span id="cb311-2"><a href="random-forest.html#cb311-2" aria-hidden="true" tabindex="-1"></a>mtryValues <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>)</span>
-<span id="cb311-3"><a href="random-forest.html#cb311-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">100</span>)</span>
-<span id="cb311-4"><a href="random-forest.html#cb311-4" aria-hidden="true" tabindex="-1"></a>rfTune <span class="ot">&lt;-</span> <span class="fu">train</span>(<span class="at">x =</span> trainx, </span>
-<span id="cb311-5"><a href="random-forest.html#cb311-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">y =</span> trainy,</span>
-<span id="cb311-6"><a href="random-forest.html#cb311-6" aria-hidden="true" tabindex="-1"></a>               <span class="co"># set the model to be random forest</span></span>
-<span id="cb311-7"><a href="random-forest.html#cb311-7" aria-hidden="true" tabindex="-1"></a>               <span class="at">method =</span> <span class="st">&quot;rf&quot;</span>,</span>
-<span id="cb311-8"><a href="random-forest.html#cb311-8" aria-hidden="true" tabindex="-1"></a>               <span class="at">ntree =</span> <span class="dv">1000</span>,</span>
-<span id="cb311-9"><a href="random-forest.html#cb311-9" aria-hidden="true" tabindex="-1"></a>               <span class="at">tuneGrid =</span> <span class="fu">data.frame</span>(<span class="at">.mtry =</span> mtryValues),</span>
-<span id="cb311-10"><a href="random-forest.html#cb311-10" aria-hidden="true" tabindex="-1"></a>               <span class="at">importance =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb311-11"><a href="random-forest.html#cb311-11" aria-hidden="true" tabindex="-1"></a>               <span class="at">metric =</span> <span class="st">&quot;ROC&quot;</span>,</span>
-<span id="cb311-12"><a href="random-forest.html#cb311-12" aria-hidden="true" tabindex="-1"></a>               <span class="at">trControl =</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">&quot;cv&quot;</span>,</span>
-<span id="cb311-13"><a href="random-forest.html#cb311-13" aria-hidden="true" tabindex="-1"></a>                           <span class="at">summaryFunction =</span> twoClassSummary,</span>
-<span id="cb311-14"><a href="random-forest.html#cb311-14" aria-hidden="true" tabindex="-1"></a>                           <span class="at">classProbs =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb311-15"><a href="random-forest.html#cb311-15" aria-hidden="true" tabindex="-1"></a>                           <span class="at">savePredictions =</span> <span class="cn">TRUE</span>))</span></code></pre></div>
-<div class="sourceCode" id="cb312"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb312-1"><a href="random-forest.html#cb312-1" aria-hidden="true" tabindex="-1"></a>rfTune</span></code></pre></div>
+<div class="sourceCode" id="cb305"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb305-1"><a href="random-forest.html#cb305-1" aria-hidden="true" tabindex="-1"></a><span class="co"># tune across a list of numbers of predictors</span></span>
+<span id="cb305-2"><a href="random-forest.html#cb305-2" aria-hidden="true" tabindex="-1"></a>mtryValues <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>)</span>
+<span id="cb305-3"><a href="random-forest.html#cb305-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">100</span>)</span>
+<span id="cb305-4"><a href="random-forest.html#cb305-4" aria-hidden="true" tabindex="-1"></a>rfTune <span class="ot">&lt;-</span> <span class="fu">train</span>(<span class="at">x =</span> trainx, </span>
+<span id="cb305-5"><a href="random-forest.html#cb305-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">y =</span> trainy,</span>
+<span id="cb305-6"><a href="random-forest.html#cb305-6" aria-hidden="true" tabindex="-1"></a>               <span class="co"># set the model to be random forest</span></span>
+<span id="cb305-7"><a href="random-forest.html#cb305-7" aria-hidden="true" tabindex="-1"></a>               <span class="at">method =</span> <span class="st">&quot;rf&quot;</span>,</span>
+<span id="cb305-8"><a href="random-forest.html#cb305-8" aria-hidden="true" tabindex="-1"></a>               <span class="at">ntree =</span> <span class="dv">1000</span>,</span>
+<span id="cb305-9"><a href="random-forest.html#cb305-9" aria-hidden="true" tabindex="-1"></a>               <span class="at">tuneGrid =</span> <span class="fu">data.frame</span>(<span class="at">.mtry =</span> mtryValues),</span>
+<span id="cb305-10"><a href="random-forest.html#cb305-10" aria-hidden="true" tabindex="-1"></a>               <span class="at">importance =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb305-11"><a href="random-forest.html#cb305-11" aria-hidden="true" tabindex="-1"></a>               <span class="at">metric =</span> <span class="st">&quot;ROC&quot;</span>,</span>
+<span id="cb305-12"><a href="random-forest.html#cb305-12" aria-hidden="true" tabindex="-1"></a>               <span class="at">trControl =</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">&quot;cv&quot;</span>,</span>
+<span id="cb305-13"><a href="random-forest.html#cb305-13" aria-hidden="true" tabindex="-1"></a>                           <span class="at">summaryFunction =</span> twoClassSummary,</span>
+<span id="cb305-14"><a href="random-forest.html#cb305-14" aria-hidden="true" tabindex="-1"></a>                           <span class="at">classProbs =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb305-15"><a href="random-forest.html#cb305-15" aria-hidden="true" tabindex="-1"></a>                           <span class="at">savePredictions =</span> <span class="cn">TRUE</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb306"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb306-1"><a href="random-forest.html#cb306-1" aria-hidden="true" tabindex="-1"></a>rfTune</span></code></pre></div>
 <pre><code>## Random Forest 
 ## 
 ## 1000 samples
@@ -434,9 +433,9 @@ div.csl-indent {
 ## The final value used for the model was mtry = 1.</code></pre>
 <p>In this example, since the number of predictors is small, the result of the model indicates that the optimal number of candidate variables at each node is 1. The optimal AUC is not too much higher than that from bagging tree:</p>
 <p>If you have selected the values of tuning parameters, you can also use the randomForest package to fit a random forest.</p>
-<div class="sourceCode" id="cb314"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb314-1"><a href="random-forest.html#cb314-1" aria-hidden="true" tabindex="-1"></a>rfit <span class="ot">=</span> <span class="fu">randomForest</span>(trainy <span class="sc">~</span> ., trainx, <span class="at">mtry =</span> <span class="dv">1</span>, <span class="at">ntree =</span> <span class="dv">1000</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb308"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb308-1"><a href="random-forest.html#cb308-1" aria-hidden="true" tabindex="-1"></a>rfit <span class="ot">=</span> <span class="fu">randomForest</span>(trainy <span class="sc">~</span> ., trainx, <span class="at">mtry =</span> <span class="dv">1</span>, <span class="at">ntree =</span> <span class="dv">1000</span>)</span></code></pre></div>
 <p>Since bagging tree is a special case of random forest, you can fit the bagging tree by setting <span class="math inline">\(mtry=p\)</span>. Function <code>importance()</code> can return the importance of each predictor:</p>
-<div class="sourceCode" id="cb315"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb315-1"><a href="random-forest.html#cb315-1" aria-hidden="true" tabindex="-1"></a><span class="fu">importance</span>(rfit)</span></code></pre></div>
+<div class="sourceCode" id="cb309"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb309-1"><a href="random-forest.html#cb309-1" aria-hidden="true" tabindex="-1"></a><span class="fu">importance</span>(rfit)</span></code></pre></div>
 <pre><code>##         MeanDecreaseGini
 ## Q1                 9.056
 ## Q2                 7.582
@@ -450,7 +449,7 @@ div.csl-indent {
 ## Q10                4.781
 ## segment           11.185</code></pre>
 <p>You can use varImpPlot() function to visualize the predictor importance:</p>
-<div class="sourceCode" id="cb317"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb317-1"><a href="random-forest.html#cb317-1" aria-hidden="true" tabindex="-1"></a><span class="fu">varImpPlot</span>(rfit)</span></code></pre></div>
+<div class="sourceCode" id="cb311"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb311-1"><a href="random-forest.html#cb311-1" aria-hidden="true" tabindex="-1"></a><span class="fu">varImpPlot</span>(rfit)</span></code></pre></div>
 <p><img src="IDS_files/figure-html/unnamed-chunk-152-1.svg" width="672" />
 It is easy to see from the plot that <code>segment</code> and <code>Q4</code> are the top two variables to classify gender.</p>
 </div>

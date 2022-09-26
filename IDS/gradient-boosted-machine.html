@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2022-09-24" />
+<meta name="date" content="2022-09-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -301,12 +301,11 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="10.1" data-path="ridge-regression.html"><a href="ridge-regression.html"><i class="fa fa-check"></i><b>10.1</b> Ridge Regression<span></span></a></li>
 <li class="chapter" data-level="10.2" data-path="lasso.html"><a href="lasso.html"><i class="fa fa-check"></i><b>10.2</b> LASSO<span></span></a></li>
-<li class="chapter" data-level="10.3" data-path="variable-selection-property-of-the-lasso.html"><a href="variable-selection-property-of-the-lasso.html"><i class="fa fa-check"></i><b>10.3</b> Variable selection property of the lasso<span></span></a></li>
-<li class="chapter" data-level="10.4" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.4</b> Elastic Net<span></span></a></li>
-<li class="chapter" data-level="10.5" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.5</b> Penalized Generalized Linear Model<span></span></a>
+<li class="chapter" data-level="10.3" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.3</b> Elastic Net<span></span></a></li>
+<li class="chapter" data-level="10.4" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.4</b> Penalized Generalized Linear Model<span></span></a>
 <ul>
-<li class="chapter" data-level="10.5.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.5.1</b> Introduction to <code>glmnet</code> package<span></span></a></li>
-<li class="chapter" data-level="10.5.2" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#penalized-logistic-regression"><i class="fa fa-check"></i><b>10.5.2</b> Penalized logistic regression<span></span></a></li>
+<li class="chapter" data-level="10.4.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.4.1</b> Introduction to <code>glmnet</code> package<span></span></a></li>
+<li class="chapter" data-level="10.4.2" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#penalized-logistic-regression"><i class="fa fa-check"></i><b>10.4.2</b> Penalized logistic regression<span></span></a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="treemodel.html"><a href="treemodel.html"><i class="fa fa-check"></i><b>11</b> Tree-Based Methods<span></span></a>
@@ -410,100 +409,100 @@ where <span class="math inline">\(\alpha_1,\alpha_2,...,\alpha_M\)</span> are th
 <p>The way to calculate variable importance in boosting is similar to a bagging model. You get variable importance by combining measures of importance across the ensemble. For example, we can calculate the Gini index improvement for each variable across all trees and use the average as the measurement of the importance.</p>
 <p>Boosting is a very popular method for classification. It is one of the methods that can be directly applied to the data without requiring a great deal of time-consuming data preprocessing. Applying boosting on tree models significantly improves predictive accuracy. Some advantages of trees that are sacrificed by boosting are speed and interpretability.</p>
 <p>Let’s look at the R implementation.</p>
-<div class="sourceCode" id="cb318"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb318-1"><a href="gradient-boosted-machine.html#cb318-1" aria-hidden="true" tabindex="-1"></a>gbmGrid <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">interaction.depth =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">9</span>),</span>
-<span id="cb318-2"><a href="gradient-boosted-machine.html#cb318-2" aria-hidden="true" tabindex="-1"></a>                       <span class="at">n.trees =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,</span>
-<span id="cb318-3"><a href="gradient-boosted-machine.html#cb318-3" aria-hidden="true" tabindex="-1"></a>                       <span class="at">shrinkage =</span> <span class="fu">c</span>(.<span class="dv">01</span>, .<span class="dv">1</span>),</span>
-<span id="cb318-4"><a href="gradient-boosted-machine.html#cb318-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">n.minobsinnode =</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>))</span>
-<span id="cb318-5"><a href="gradient-boosted-machine.html#cb318-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb318-6"><a href="gradient-boosted-machine.html#cb318-6" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">100</span>)</span>
-<span id="cb318-7"><a href="gradient-boosted-machine.html#cb318-7" aria-hidden="true" tabindex="-1"></a>gbmTune <span class="ot">&lt;-</span> caret<span class="sc">::</span><span class="fu">train</span>(<span class="at">x =</span> trainx, </span>
-<span id="cb318-8"><a href="gradient-boosted-machine.html#cb318-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">y =</span> trainy,</span>
-<span id="cb318-9"><a href="gradient-boosted-machine.html#cb318-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">method =</span> <span class="st">&quot;gbm&quot;</span>,</span>
-<span id="cb318-10"><a href="gradient-boosted-machine.html#cb318-10" aria-hidden="true" tabindex="-1"></a>                <span class="at">tuneGrid =</span> gbmGrid,</span>
-<span id="cb318-11"><a href="gradient-boosted-machine.html#cb318-11" aria-hidden="true" tabindex="-1"></a>                <span class="at">metric =</span> <span class="st">&quot;ROC&quot;</span>,</span>
-<span id="cb318-12"><a href="gradient-boosted-machine.html#cb318-12" aria-hidden="true" tabindex="-1"></a>                <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb318-13"><a href="gradient-boosted-machine.html#cb318-13" aria-hidden="true" tabindex="-1"></a>                <span class="at">trControl =</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">&quot;cv&quot;</span>,</span>
-<span id="cb318-14"><a href="gradient-boosted-machine.html#cb318-14" aria-hidden="true" tabindex="-1"></a>                           <span class="at">classProbs =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb318-15"><a href="gradient-boosted-machine.html#cb318-15" aria-hidden="true" tabindex="-1"></a>                           <span class="at">savePredictions =</span> <span class="cn">TRUE</span>))</span></code></pre></div>
-<div class="sourceCode" id="cb319"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb319-1"><a href="gradient-boosted-machine.html#cb319-1" aria-hidden="true" tabindex="-1"></a><span class="co"># only show part of the output</span></span>
-<span id="cb319-2"><a href="gradient-boosted-machine.html#cb319-2" aria-hidden="true" tabindex="-1"></a>gbmTune</span></code></pre></div>
-<div class="sourceCode" id="cb320"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb320-1"><a href="gradient-boosted-machine.html#cb320-1" aria-hidden="true" tabindex="-1"></a>Stochastic Gradient Boosting </span>
-<span id="cb320-2"><a href="gradient-boosted-machine.html#cb320-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb320-3"><a href="gradient-boosted-machine.html#cb320-3" aria-hidden="true" tabindex="-1"></a>1000 samples</span>
-<span id="cb320-4"><a href="gradient-boosted-machine.html#cb320-4" aria-hidden="true" tabindex="-1"></a>  11 predictor</span>
-<span id="cb320-5"><a href="gradient-boosted-machine.html#cb320-5" aria-hidden="true" tabindex="-1"></a>   2 classes: &#39;Female&#39;, &#39;Male&#39; </span>
-<span id="cb320-6"><a href="gradient-boosted-machine.html#cb320-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb320-7"><a href="gradient-boosted-machine.html#cb320-7" aria-hidden="true" tabindex="-1"></a>No pre-processing</span>
-<span id="cb320-8"><a href="gradient-boosted-machine.html#cb320-8" aria-hidden="true" tabindex="-1"></a>Resampling: Cross-Validated (10 fold) </span>
-<span id="cb320-9"><a href="gradient-boosted-machine.html#cb320-9" aria-hidden="true" tabindex="-1"></a>Summary of sample sizes: 899, 900, 900, 899, 899, 901, ... </span>
-<span id="cb320-10"><a href="gradient-boosted-machine.html#cb320-10" aria-hidden="true" tabindex="-1"></a>Resampling results across tuning parameters:</span>
-<span id="cb320-11"><a href="gradient-boosted-machine.html#cb320-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb320-12"><a href="gradient-boosted-machine.html#cb320-12" aria-hidden="true" tabindex="-1"></a>shrinkage interaction.depth n.minobsinnode n.trees ROC    Sens Spec    </span>
-<span id="cb320-13"><a href="gradient-boosted-machine.html#cb320-13" aria-hidden="true" tabindex="-1"></a>0.01      1                 1              1       0.6821 1.00 0.00</span>
-<span id="cb320-14"><a href="gradient-boosted-machine.html#cb320-14" aria-hidden="true" tabindex="-1"></a>0.01      1                 1              2       0.6882 1.00 0.00</span>
-<span id="cb320-15"><a href="gradient-boosted-machine.html#cb320-15" aria-hidden="true" tabindex="-1"></a>  .</span>
-<span id="cb320-16"><a href="gradient-boosted-machine.html#cb320-16" aria-hidden="true" tabindex="-1"></a>  .</span>
-<span id="cb320-17"><a href="gradient-boosted-machine.html#cb320-17" aria-hidden="true" tabindex="-1"></a>  .</span>
-<span id="cb320-18"><a href="gradient-boosted-machine.html#cb320-18" aria-hidden="true" tabindex="-1"></a>0.01      5                 8              4       0.7096 1.00 0.00</span>
-<span id="cb320-19"><a href="gradient-boosted-machine.html#cb320-19" aria-hidden="true" tabindex="-1"></a>0.01      5                 8              5       0.7100 1.00 0.00</span>
-<span id="cb320-20"><a href="gradient-boosted-machine.html#cb320-20" aria-hidden="true" tabindex="-1"></a>0.01      5                 9              1       0.7006 1.00 0.00</span>
-<span id="cb320-21"><a href="gradient-boosted-machine.html#cb320-21" aria-hidden="true" tabindex="-1"></a>0.01      5                 9              2       0.7055 1.00 0.00</span>
-<span id="cb320-22"><a href="gradient-boosted-machine.html#cb320-22" aria-hidden="true" tabindex="-1"></a> [ reached getOption(&quot;max.print&quot;) -- omitted 358 rows ]</span>
-<span id="cb320-23"><a href="gradient-boosted-machine.html#cb320-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb320-24"><a href="gradient-boosted-machine.html#cb320-24" aria-hidden="true" tabindex="-1"></a>ROC was used to select the optimal model using the largest value.</span>
-<span id="cb320-25"><a href="gradient-boosted-machine.html#cb320-25" aria-hidden="true" tabindex="-1"></a>The final values used for the model were n.trees = 4, </span>
-<span id="cb320-26"><a href="gradient-boosted-machine.html#cb320-26" aria-hidden="true" tabindex="-1"></a>interaction.depth = 3, shrinkage = 0.01 and n.minobsinnode = 6.</span></code></pre></div>
+<div class="sourceCode" id="cb312"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb312-1"><a href="gradient-boosted-machine.html#cb312-1" aria-hidden="true" tabindex="-1"></a>gbmGrid <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">interaction.depth =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">9</span>),</span>
+<span id="cb312-2"><a href="gradient-boosted-machine.html#cb312-2" aria-hidden="true" tabindex="-1"></a>                       <span class="at">n.trees =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,</span>
+<span id="cb312-3"><a href="gradient-boosted-machine.html#cb312-3" aria-hidden="true" tabindex="-1"></a>                       <span class="at">shrinkage =</span> <span class="fu">c</span>(.<span class="dv">01</span>, .<span class="dv">1</span>),</span>
+<span id="cb312-4"><a href="gradient-boosted-machine.html#cb312-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">n.minobsinnode =</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>))</span>
+<span id="cb312-5"><a href="gradient-boosted-machine.html#cb312-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb312-6"><a href="gradient-boosted-machine.html#cb312-6" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">100</span>)</span>
+<span id="cb312-7"><a href="gradient-boosted-machine.html#cb312-7" aria-hidden="true" tabindex="-1"></a>gbmTune <span class="ot">&lt;-</span> caret<span class="sc">::</span><span class="fu">train</span>(<span class="at">x =</span> trainx, </span>
+<span id="cb312-8"><a href="gradient-boosted-machine.html#cb312-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">y =</span> trainy,</span>
+<span id="cb312-9"><a href="gradient-boosted-machine.html#cb312-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">method =</span> <span class="st">&quot;gbm&quot;</span>,</span>
+<span id="cb312-10"><a href="gradient-boosted-machine.html#cb312-10" aria-hidden="true" tabindex="-1"></a>                <span class="at">tuneGrid =</span> gbmGrid,</span>
+<span id="cb312-11"><a href="gradient-boosted-machine.html#cb312-11" aria-hidden="true" tabindex="-1"></a>                <span class="at">metric =</span> <span class="st">&quot;ROC&quot;</span>,</span>
+<span id="cb312-12"><a href="gradient-boosted-machine.html#cb312-12" aria-hidden="true" tabindex="-1"></a>                <span class="at">verbose =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb312-13"><a href="gradient-boosted-machine.html#cb312-13" aria-hidden="true" tabindex="-1"></a>                <span class="at">trControl =</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">&quot;cv&quot;</span>,</span>
+<span id="cb312-14"><a href="gradient-boosted-machine.html#cb312-14" aria-hidden="true" tabindex="-1"></a>                           <span class="at">classProbs =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb312-15"><a href="gradient-boosted-machine.html#cb312-15" aria-hidden="true" tabindex="-1"></a>                           <span class="at">savePredictions =</span> <span class="cn">TRUE</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb313"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb313-1"><a href="gradient-boosted-machine.html#cb313-1" aria-hidden="true" tabindex="-1"></a><span class="co"># only show part of the output</span></span>
+<span id="cb313-2"><a href="gradient-boosted-machine.html#cb313-2" aria-hidden="true" tabindex="-1"></a>gbmTune</span></code></pre></div>
+<div class="sourceCode" id="cb314"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb314-1"><a href="gradient-boosted-machine.html#cb314-1" aria-hidden="true" tabindex="-1"></a>Stochastic Gradient Boosting </span>
+<span id="cb314-2"><a href="gradient-boosted-machine.html#cb314-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb314-3"><a href="gradient-boosted-machine.html#cb314-3" aria-hidden="true" tabindex="-1"></a>1000 samples</span>
+<span id="cb314-4"><a href="gradient-boosted-machine.html#cb314-4" aria-hidden="true" tabindex="-1"></a>  11 predictor</span>
+<span id="cb314-5"><a href="gradient-boosted-machine.html#cb314-5" aria-hidden="true" tabindex="-1"></a>   2 classes: &#39;Female&#39;, &#39;Male&#39; </span>
+<span id="cb314-6"><a href="gradient-boosted-machine.html#cb314-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb314-7"><a href="gradient-boosted-machine.html#cb314-7" aria-hidden="true" tabindex="-1"></a>No pre-processing</span>
+<span id="cb314-8"><a href="gradient-boosted-machine.html#cb314-8" aria-hidden="true" tabindex="-1"></a>Resampling: Cross-Validated (10 fold) </span>
+<span id="cb314-9"><a href="gradient-boosted-machine.html#cb314-9" aria-hidden="true" tabindex="-1"></a>Summary of sample sizes: 899, 900, 900, 899, 899, 901, ... </span>
+<span id="cb314-10"><a href="gradient-boosted-machine.html#cb314-10" aria-hidden="true" tabindex="-1"></a>Resampling results across tuning parameters:</span>
+<span id="cb314-11"><a href="gradient-boosted-machine.html#cb314-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb314-12"><a href="gradient-boosted-machine.html#cb314-12" aria-hidden="true" tabindex="-1"></a>shrinkage interaction.depth n.minobsinnode n.trees ROC    Sens Spec    </span>
+<span id="cb314-13"><a href="gradient-boosted-machine.html#cb314-13" aria-hidden="true" tabindex="-1"></a>0.01      1                 1              1       0.6821 1.00 0.00</span>
+<span id="cb314-14"><a href="gradient-boosted-machine.html#cb314-14" aria-hidden="true" tabindex="-1"></a>0.01      1                 1              2       0.6882 1.00 0.00</span>
+<span id="cb314-15"><a href="gradient-boosted-machine.html#cb314-15" aria-hidden="true" tabindex="-1"></a>  .</span>
+<span id="cb314-16"><a href="gradient-boosted-machine.html#cb314-16" aria-hidden="true" tabindex="-1"></a>  .</span>
+<span id="cb314-17"><a href="gradient-boosted-machine.html#cb314-17" aria-hidden="true" tabindex="-1"></a>  .</span>
+<span id="cb314-18"><a href="gradient-boosted-machine.html#cb314-18" aria-hidden="true" tabindex="-1"></a>0.01      5                 8              4       0.7096 1.00 0.00</span>
+<span id="cb314-19"><a href="gradient-boosted-machine.html#cb314-19" aria-hidden="true" tabindex="-1"></a>0.01      5                 8              5       0.7100 1.00 0.00</span>
+<span id="cb314-20"><a href="gradient-boosted-machine.html#cb314-20" aria-hidden="true" tabindex="-1"></a>0.01      5                 9              1       0.7006 1.00 0.00</span>
+<span id="cb314-21"><a href="gradient-boosted-machine.html#cb314-21" aria-hidden="true" tabindex="-1"></a>0.01      5                 9              2       0.7055 1.00 0.00</span>
+<span id="cb314-22"><a href="gradient-boosted-machine.html#cb314-22" aria-hidden="true" tabindex="-1"></a> [ reached getOption(&quot;max.print&quot;) -- omitted 358 rows ]</span>
+<span id="cb314-23"><a href="gradient-boosted-machine.html#cb314-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb314-24"><a href="gradient-boosted-machine.html#cb314-24" aria-hidden="true" tabindex="-1"></a>ROC was used to select the optimal model using the largest value.</span>
+<span id="cb314-25"><a href="gradient-boosted-machine.html#cb314-25" aria-hidden="true" tabindex="-1"></a>The final values used for the model were n.trees = 4, </span>
+<span id="cb314-26"><a href="gradient-boosted-machine.html#cb314-26" aria-hidden="true" tabindex="-1"></a>interaction.depth = 3, shrinkage = 0.01 and n.minobsinnode = 6.</span></code></pre></div>
 <p>The results show that the tuning parameter settings that lead to the best ROC are <code>n.trees = 4</code> (number of trees), <code>interaction.depth = 3</code> (depth of tree), <code>shrinkage = 0.01</code> (learning rate) and <code>n.minobsinnode = 6</code> (minimum number of observations in each node).</p>
 <p>Now, let’s compare the results from the three tree models.</p>
-<div class="sourceCode" id="cb321"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb321-1"><a href="gradient-boosted-machine.html#cb321-1" aria-hidden="true" tabindex="-1"></a>treebagRoc <span class="ot">&lt;-</span> pROC<span class="sc">::</span><span class="fu">roc</span>(<span class="at">response =</span> bagTune<span class="sc">$</span>pred<span class="sc">$</span>obs,</span>
-<span id="cb321-2"><a href="gradient-boosted-machine.html#cb321-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">predictor =</span> bagTune<span class="sc">$</span>pred<span class="sc">$</span>Female,</span>
-<span id="cb321-3"><a href="gradient-boosted-machine.html#cb321-3" aria-hidden="true" tabindex="-1"></a>                        <span class="at">levels =</span> <span class="fu">rev</span>(<span class="fu">levels</span>(bagTune<span class="sc">$</span>pred<span class="sc">$</span>obs)))</span>
-<span id="cb321-4"><a href="gradient-boosted-machine.html#cb321-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb321-5"><a href="gradient-boosted-machine.html#cb321-5" aria-hidden="true" tabindex="-1"></a>rfRoc <span class="ot">&lt;-</span> pROC<span class="sc">::</span><span class="fu">roc</span>(<span class="at">response =</span> rfTune<span class="sc">$</span>pred<span class="sc">$</span>obs,</span>
-<span id="cb321-6"><a href="gradient-boosted-machine.html#cb321-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">predictor =</span> rfTune<span class="sc">$</span>pred<span class="sc">$</span>Female,</span>
-<span id="cb321-7"><a href="gradient-boosted-machine.html#cb321-7" aria-hidden="true" tabindex="-1"></a>             <span class="at">levels =</span> <span class="fu">rev</span>(<span class="fu">levels</span>(rfTune<span class="sc">$</span>pred<span class="sc">$</span>obs)))</span>
-<span id="cb321-8"><a href="gradient-boosted-machine.html#cb321-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb321-9"><a href="gradient-boosted-machine.html#cb321-9" aria-hidden="true" tabindex="-1"></a>gbmRoc <span class="ot">&lt;-</span> pROC<span class="sc">::</span><span class="fu">roc</span>(<span class="at">response =</span> gbmTune<span class="sc">$</span>pred<span class="sc">$</span>obs,</span>
-<span id="cb321-10"><a href="gradient-boosted-machine.html#cb321-10" aria-hidden="true" tabindex="-1"></a>              <span class="at">predictor =</span> gbmTune<span class="sc">$</span>pred<span class="sc">$</span>Female,</span>
-<span id="cb321-11"><a href="gradient-boosted-machine.html#cb321-11" aria-hidden="true" tabindex="-1"></a>              <span class="at">levels =</span> <span class="fu">rev</span>(<span class="fu">levels</span>(gbmTune<span class="sc">$</span>pred<span class="sc">$</span>obs)))</span>
-<span id="cb321-12"><a href="gradient-boosted-machine.html#cb321-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb321-13"><a href="gradient-boosted-machine.html#cb321-13" aria-hidden="true" tabindex="-1"></a><span class="fu">plot.roc</span>(rpartRoc, </span>
-<span id="cb321-14"><a href="gradient-boosted-machine.html#cb321-14" aria-hidden="true" tabindex="-1"></a>     <span class="at">type =</span> <span class="st">&quot;s&quot;</span>, </span>
-<span id="cb321-15"><a href="gradient-boosted-machine.html#cb321-15" aria-hidden="true" tabindex="-1"></a>     <span class="at">print.thres =</span> <span class="fu">c</span>(.<span class="dv">5</span>), <span class="at">print.thres.pch =</span> <span class="dv">16</span>,</span>
-<span id="cb321-16"><a href="gradient-boosted-machine.html#cb321-16" aria-hidden="true" tabindex="-1"></a>     <span class="at">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>, <span class="at">print.thres.cex =</span> <span class="fl">1.2</span>,</span>
-<span id="cb321-17"><a href="gradient-boosted-machine.html#cb321-17" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">&quot;black&quot;</span>, <span class="at">legacy.axes =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb321-18"><a href="gradient-boosted-machine.html#cb321-18" aria-hidden="true" tabindex="-1"></a>     <span class="at">print.thres.col =</span> <span class="st">&quot;black&quot;</span>)</span>
-<span id="cb321-19"><a href="gradient-boosted-machine.html#cb321-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb321-20"><a href="gradient-boosted-machine.html#cb321-20" aria-hidden="true" tabindex="-1"></a><span class="fu">plot.roc</span>(treebagRoc, </span>
-<span id="cb321-21"><a href="gradient-boosted-machine.html#cb321-21" aria-hidden="true" tabindex="-1"></a>     <span class="at">type =</span> <span class="st">&quot;s&quot;</span>, </span>
-<span id="cb321-22"><a href="gradient-boosted-machine.html#cb321-22" aria-hidden="true" tabindex="-1"></a>     <span class="at">add =</span> <span class="cn">TRUE</span>, </span>
-<span id="cb321-23"><a href="gradient-boosted-machine.html#cb321-23" aria-hidden="true" tabindex="-1"></a>     <span class="at">print.thres =</span> <span class="fu">c</span>(.<span class="dv">5</span>), <span class="at">print.thres.pch =</span> <span class="dv">3</span>, </span>
-<span id="cb321-24"><a href="gradient-boosted-machine.html#cb321-24" aria-hidden="true" tabindex="-1"></a>     <span class="at">legacy.axes =</span> <span class="cn">TRUE</span>, <span class="at">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>, </span>
-<span id="cb321-25"><a href="gradient-boosted-machine.html#cb321-25" aria-hidden="true" tabindex="-1"></a>     <span class="at">print.thres.cex =</span> <span class="fl">1.2</span>,</span>
-<span id="cb321-26"><a href="gradient-boosted-machine.html#cb321-26" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">&quot;red&quot;</span>, <span class="at">print.thres.col =</span> <span class="st">&quot;red&quot;</span>)</span>
-<span id="cb321-27"><a href="gradient-boosted-machine.html#cb321-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb321-28"><a href="gradient-boosted-machine.html#cb321-28" aria-hidden="true" tabindex="-1"></a><span class="fu">plot.roc</span>(rfRoc, </span>
-<span id="cb321-29"><a href="gradient-boosted-machine.html#cb321-29" aria-hidden="true" tabindex="-1"></a>     <span class="at">type =</span> <span class="st">&quot;s&quot;</span>, </span>
-<span id="cb321-30"><a href="gradient-boosted-machine.html#cb321-30" aria-hidden="true" tabindex="-1"></a>     <span class="at">add =</span> <span class="cn">TRUE</span>, </span>
-<span id="cb321-31"><a href="gradient-boosted-machine.html#cb321-31" aria-hidden="true" tabindex="-1"></a>     <span class="at">print.thres =</span> <span class="fu">c</span>(.<span class="dv">5</span>), <span class="at">print.thres.pch =</span> <span class="dv">1</span>, </span>
-<span id="cb321-32"><a href="gradient-boosted-machine.html#cb321-32" aria-hidden="true" tabindex="-1"></a>     <span class="at">legacy.axes =</span> <span class="cn">TRUE</span>, <span class="at">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>, </span>
-<span id="cb321-33"><a href="gradient-boosted-machine.html#cb321-33" aria-hidden="true" tabindex="-1"></a>     <span class="at">print.thres.cex =</span> <span class="fl">1.2</span>,</span>
-<span id="cb321-34"><a href="gradient-boosted-machine.html#cb321-34" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">&quot;green&quot;</span>, <span class="at">print.thres.col =</span> <span class="st">&quot;green&quot;</span>)</span>
-<span id="cb321-35"><a href="gradient-boosted-machine.html#cb321-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb321-36"><a href="gradient-boosted-machine.html#cb321-36" aria-hidden="true" tabindex="-1"></a><span class="fu">plot.roc</span>(gbmRoc, </span>
-<span id="cb321-37"><a href="gradient-boosted-machine.html#cb321-37" aria-hidden="true" tabindex="-1"></a>     <span class="at">type =</span> <span class="st">&quot;s&quot;</span>, </span>
-<span id="cb321-38"><a href="gradient-boosted-machine.html#cb321-38" aria-hidden="true" tabindex="-1"></a>     <span class="at">add =</span> <span class="cn">TRUE</span>, </span>
-<span id="cb321-39"><a href="gradient-boosted-machine.html#cb321-39" aria-hidden="true" tabindex="-1"></a>     <span class="at">print.thres =</span> <span class="fu">c</span>(.<span class="dv">5</span>), <span class="at">print.thres.pch =</span> <span class="dv">10</span>, </span>
-<span id="cb321-40"><a href="gradient-boosted-machine.html#cb321-40" aria-hidden="true" tabindex="-1"></a>     <span class="at">legacy.axes =</span> <span class="cn">TRUE</span>, <span class="at">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>, </span>
-<span id="cb321-41"><a href="gradient-boosted-machine.html#cb321-41" aria-hidden="true" tabindex="-1"></a>     <span class="at">print.thres.cex =</span> <span class="fl">1.2</span>,</span>
-<span id="cb321-42"><a href="gradient-boosted-machine.html#cb321-42" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">print.thres.col =</span> <span class="st">&quot;blue&quot;</span>)</span>
-<span id="cb321-43"><a href="gradient-boosted-machine.html#cb321-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb321-44"><a href="gradient-boosted-machine.html#cb321-44" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="fl">0.2</span>, <span class="fl">0.5</span>, <span class="at">cex =</span> <span class="fl">0.8</span>,</span>
-<span id="cb321-45"><a href="gradient-boosted-machine.html#cb321-45" aria-hidden="true" tabindex="-1"></a>       <span class="fu">c</span>(<span class="st">&quot;Single Tree&quot;</span>, <span class="st">&quot;Bagged Tree&quot;</span>, </span>
-<span id="cb321-46"><a href="gradient-boosted-machine.html#cb321-46" aria-hidden="true" tabindex="-1"></a>         <span class="st">&quot;Random Forest&quot;</span>, <span class="st">&quot;Boosted Tree&quot;</span>),</span>
-<span id="cb321-47"><a href="gradient-boosted-machine.html#cb321-47" aria-hidden="true" tabindex="-1"></a>       <span class="at">lwd =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>),</span>
-<span id="cb321-48"><a href="gradient-boosted-machine.html#cb321-48" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;red&quot;</span>, <span class="st">&quot;green&quot;</span>, <span class="st">&quot;blue&quot;</span>),</span>
-<span id="cb321-49"><a href="gradient-boosted-machine.html#cb321-49" aria-hidden="true" tabindex="-1"></a>       <span class="at">pch =</span> <span class="fu">c</span>(<span class="dv">16</span>, <span class="dv">3</span>, <span class="dv">1</span>, <span class="dv">10</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb315"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb315-1"><a href="gradient-boosted-machine.html#cb315-1" aria-hidden="true" tabindex="-1"></a>treebagRoc <span class="ot">&lt;-</span> pROC<span class="sc">::</span><span class="fu">roc</span>(<span class="at">response =</span> bagTune<span class="sc">$</span>pred<span class="sc">$</span>obs,</span>
+<span id="cb315-2"><a href="gradient-boosted-machine.html#cb315-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">predictor =</span> bagTune<span class="sc">$</span>pred<span class="sc">$</span>Female,</span>
+<span id="cb315-3"><a href="gradient-boosted-machine.html#cb315-3" aria-hidden="true" tabindex="-1"></a>                        <span class="at">levels =</span> <span class="fu">rev</span>(<span class="fu">levels</span>(bagTune<span class="sc">$</span>pred<span class="sc">$</span>obs)))</span>
+<span id="cb315-4"><a href="gradient-boosted-machine.html#cb315-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb315-5"><a href="gradient-boosted-machine.html#cb315-5" aria-hidden="true" tabindex="-1"></a>rfRoc <span class="ot">&lt;-</span> pROC<span class="sc">::</span><span class="fu">roc</span>(<span class="at">response =</span> rfTune<span class="sc">$</span>pred<span class="sc">$</span>obs,</span>
+<span id="cb315-6"><a href="gradient-boosted-machine.html#cb315-6" aria-hidden="true" tabindex="-1"></a>             <span class="at">predictor =</span> rfTune<span class="sc">$</span>pred<span class="sc">$</span>Female,</span>
+<span id="cb315-7"><a href="gradient-boosted-machine.html#cb315-7" aria-hidden="true" tabindex="-1"></a>             <span class="at">levels =</span> <span class="fu">rev</span>(<span class="fu">levels</span>(rfTune<span class="sc">$</span>pred<span class="sc">$</span>obs)))</span>
+<span id="cb315-8"><a href="gradient-boosted-machine.html#cb315-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb315-9"><a href="gradient-boosted-machine.html#cb315-9" aria-hidden="true" tabindex="-1"></a>gbmRoc <span class="ot">&lt;-</span> pROC<span class="sc">::</span><span class="fu">roc</span>(<span class="at">response =</span> gbmTune<span class="sc">$</span>pred<span class="sc">$</span>obs,</span>
+<span id="cb315-10"><a href="gradient-boosted-machine.html#cb315-10" aria-hidden="true" tabindex="-1"></a>              <span class="at">predictor =</span> gbmTune<span class="sc">$</span>pred<span class="sc">$</span>Female,</span>
+<span id="cb315-11"><a href="gradient-boosted-machine.html#cb315-11" aria-hidden="true" tabindex="-1"></a>              <span class="at">levels =</span> <span class="fu">rev</span>(<span class="fu">levels</span>(gbmTune<span class="sc">$</span>pred<span class="sc">$</span>obs)))</span>
+<span id="cb315-12"><a href="gradient-boosted-machine.html#cb315-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb315-13"><a href="gradient-boosted-machine.html#cb315-13" aria-hidden="true" tabindex="-1"></a><span class="fu">plot.roc</span>(rpartRoc, </span>
+<span id="cb315-14"><a href="gradient-boosted-machine.html#cb315-14" aria-hidden="true" tabindex="-1"></a>     <span class="at">type =</span> <span class="st">&quot;s&quot;</span>, </span>
+<span id="cb315-15"><a href="gradient-boosted-machine.html#cb315-15" aria-hidden="true" tabindex="-1"></a>     <span class="at">print.thres =</span> <span class="fu">c</span>(.<span class="dv">5</span>), <span class="at">print.thres.pch =</span> <span class="dv">16</span>,</span>
+<span id="cb315-16"><a href="gradient-boosted-machine.html#cb315-16" aria-hidden="true" tabindex="-1"></a>     <span class="at">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>, <span class="at">print.thres.cex =</span> <span class="fl">1.2</span>,</span>
+<span id="cb315-17"><a href="gradient-boosted-machine.html#cb315-17" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">&quot;black&quot;</span>, <span class="at">legacy.axes =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb315-18"><a href="gradient-boosted-machine.html#cb315-18" aria-hidden="true" tabindex="-1"></a>     <span class="at">print.thres.col =</span> <span class="st">&quot;black&quot;</span>)</span>
+<span id="cb315-19"><a href="gradient-boosted-machine.html#cb315-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb315-20"><a href="gradient-boosted-machine.html#cb315-20" aria-hidden="true" tabindex="-1"></a><span class="fu">plot.roc</span>(treebagRoc, </span>
+<span id="cb315-21"><a href="gradient-boosted-machine.html#cb315-21" aria-hidden="true" tabindex="-1"></a>     <span class="at">type =</span> <span class="st">&quot;s&quot;</span>, </span>
+<span id="cb315-22"><a href="gradient-boosted-machine.html#cb315-22" aria-hidden="true" tabindex="-1"></a>     <span class="at">add =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb315-23"><a href="gradient-boosted-machine.html#cb315-23" aria-hidden="true" tabindex="-1"></a>     <span class="at">print.thres =</span> <span class="fu">c</span>(.<span class="dv">5</span>), <span class="at">print.thres.pch =</span> <span class="dv">3</span>, </span>
+<span id="cb315-24"><a href="gradient-boosted-machine.html#cb315-24" aria-hidden="true" tabindex="-1"></a>     <span class="at">legacy.axes =</span> <span class="cn">TRUE</span>, <span class="at">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>, </span>
+<span id="cb315-25"><a href="gradient-boosted-machine.html#cb315-25" aria-hidden="true" tabindex="-1"></a>     <span class="at">print.thres.cex =</span> <span class="fl">1.2</span>,</span>
+<span id="cb315-26"><a href="gradient-boosted-machine.html#cb315-26" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">&quot;red&quot;</span>, <span class="at">print.thres.col =</span> <span class="st">&quot;red&quot;</span>)</span>
+<span id="cb315-27"><a href="gradient-boosted-machine.html#cb315-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb315-28"><a href="gradient-boosted-machine.html#cb315-28" aria-hidden="true" tabindex="-1"></a><span class="fu">plot.roc</span>(rfRoc, </span>
+<span id="cb315-29"><a href="gradient-boosted-machine.html#cb315-29" aria-hidden="true" tabindex="-1"></a>     <span class="at">type =</span> <span class="st">&quot;s&quot;</span>, </span>
+<span id="cb315-30"><a href="gradient-boosted-machine.html#cb315-30" aria-hidden="true" tabindex="-1"></a>     <span class="at">add =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb315-31"><a href="gradient-boosted-machine.html#cb315-31" aria-hidden="true" tabindex="-1"></a>     <span class="at">print.thres =</span> <span class="fu">c</span>(.<span class="dv">5</span>), <span class="at">print.thres.pch =</span> <span class="dv">1</span>, </span>
+<span id="cb315-32"><a href="gradient-boosted-machine.html#cb315-32" aria-hidden="true" tabindex="-1"></a>     <span class="at">legacy.axes =</span> <span class="cn">TRUE</span>, <span class="at">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>, </span>
+<span id="cb315-33"><a href="gradient-boosted-machine.html#cb315-33" aria-hidden="true" tabindex="-1"></a>     <span class="at">print.thres.cex =</span> <span class="fl">1.2</span>,</span>
+<span id="cb315-34"><a href="gradient-boosted-machine.html#cb315-34" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">&quot;green&quot;</span>, <span class="at">print.thres.col =</span> <span class="st">&quot;green&quot;</span>)</span>
+<span id="cb315-35"><a href="gradient-boosted-machine.html#cb315-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb315-36"><a href="gradient-boosted-machine.html#cb315-36" aria-hidden="true" tabindex="-1"></a><span class="fu">plot.roc</span>(gbmRoc, </span>
+<span id="cb315-37"><a href="gradient-boosted-machine.html#cb315-37" aria-hidden="true" tabindex="-1"></a>     <span class="at">type =</span> <span class="st">&quot;s&quot;</span>, </span>
+<span id="cb315-38"><a href="gradient-boosted-machine.html#cb315-38" aria-hidden="true" tabindex="-1"></a>     <span class="at">add =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb315-39"><a href="gradient-boosted-machine.html#cb315-39" aria-hidden="true" tabindex="-1"></a>     <span class="at">print.thres =</span> <span class="fu">c</span>(.<span class="dv">5</span>), <span class="at">print.thres.pch =</span> <span class="dv">10</span>, </span>
+<span id="cb315-40"><a href="gradient-boosted-machine.html#cb315-40" aria-hidden="true" tabindex="-1"></a>     <span class="at">legacy.axes =</span> <span class="cn">TRUE</span>, <span class="at">print.thres.pattern =</span> <span class="st">&quot;&quot;</span>, </span>
+<span id="cb315-41"><a href="gradient-boosted-machine.html#cb315-41" aria-hidden="true" tabindex="-1"></a>     <span class="at">print.thres.cex =</span> <span class="fl">1.2</span>,</span>
+<span id="cb315-42"><a href="gradient-boosted-machine.html#cb315-42" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">print.thres.col =</span> <span class="st">&quot;blue&quot;</span>)</span>
+<span id="cb315-43"><a href="gradient-boosted-machine.html#cb315-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb315-44"><a href="gradient-boosted-machine.html#cb315-44" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="fl">0.2</span>, <span class="fl">0.5</span>, <span class="at">cex =</span> <span class="fl">0.8</span>,</span>
+<span id="cb315-45"><a href="gradient-boosted-machine.html#cb315-45" aria-hidden="true" tabindex="-1"></a>       <span class="fu">c</span>(<span class="st">&quot;Single Tree&quot;</span>, <span class="st">&quot;Bagged Tree&quot;</span>, </span>
+<span id="cb315-46"><a href="gradient-boosted-machine.html#cb315-46" aria-hidden="true" tabindex="-1"></a>         <span class="st">&quot;Random Forest&quot;</span>, <span class="st">&quot;Boosted Tree&quot;</span>),</span>
+<span id="cb315-47"><a href="gradient-boosted-machine.html#cb315-47" aria-hidden="true" tabindex="-1"></a>       <span class="at">lwd =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>),</span>
+<span id="cb315-48"><a href="gradient-boosted-machine.html#cb315-48" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;red&quot;</span>, <span class="st">&quot;green&quot;</span>, <span class="st">&quot;blue&quot;</span>),</span>
+<span id="cb315-49"><a href="gradient-boosted-machine.html#cb315-49" aria-hidden="true" tabindex="-1"></a>       <span class="at">pch =</span> <span class="fu">c</span>(<span class="dv">16</span>, <span class="dv">3</span>, <span class="dv">1</span>, <span class="dv">10</span>))</span></code></pre></div>
 <p><img src="IDS_files/figure-html/unnamed-chunk-155-1.svg" width="672" /></p>
 <p>Since the data here doesn’t have many variables, we don’t see a significant difference among the models. But you can still see those ensemble methods are better than a single tree. In most of the real applications, ensemble methods perform much better. Random forest and boosting trees can be a baseline model. Before exploring different models, you can quickly run a random forest to see the performance and then try to improve that performance. If the performance you got from the random forest is not too much better than guessing, you should consider collecting more data or reviewing the problem to frame it a different way instead of trying other models. Because it usually means the current data is not enough to solve the problem.</p>
 </div>

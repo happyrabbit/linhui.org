@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2022-09-24" />
+<meta name="date" content="2022-09-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -301,12 +301,11 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="10.1" data-path="ridge-regression.html"><a href="ridge-regression.html"><i class="fa fa-check"></i><b>10.1</b> Ridge Regression<span></span></a></li>
 <li class="chapter" data-level="10.2" data-path="lasso.html"><a href="lasso.html"><i class="fa fa-check"></i><b>10.2</b> LASSO<span></span></a></li>
-<li class="chapter" data-level="10.3" data-path="variable-selection-property-of-the-lasso.html"><a href="variable-selection-property-of-the-lasso.html"><i class="fa fa-check"></i><b>10.3</b> Variable selection property of the lasso<span></span></a></li>
-<li class="chapter" data-level="10.4" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.4</b> Elastic Net<span></span></a></li>
-<li class="chapter" data-level="10.5" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.5</b> Penalized Generalized Linear Model<span></span></a>
+<li class="chapter" data-level="10.3" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.3</b> Elastic Net<span></span></a></li>
+<li class="chapter" data-level="10.4" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.4</b> Penalized Generalized Linear Model<span></span></a>
 <ul>
-<li class="chapter" data-level="10.5.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.5.1</b> Introduction to <code>glmnet</code> package<span></span></a></li>
-<li class="chapter" data-level="10.5.2" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#penalized-logistic-regression"><i class="fa fa-check"></i><b>10.5.2</b> Penalized logistic regression<span></span></a></li>
+<li class="chapter" data-level="10.4.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.4.1</b> Introduction to <code>glmnet</code> package<span></span></a></li>
+<li class="chapter" data-level="10.4.2" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#penalized-logistic-regression"><i class="fa fa-check"></i><b>10.4.2</b> Penalized logistic regression<span></span></a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="treemodel.html"><a href="treemodel.html"><i class="fa fa-check"></i><b>11</b> Tree-Based Methods<span></span></a>
@@ -394,26 +393,26 @@ div.csl-indent {
 <p>The regularization method is also known as the shrinkage method. It is a technique that constrains or regularizes the coefficient estimates. By imposing a penalty on the size of coefficients, it shrinks the coefficient estimates towards zero. It also intrinsically conduct feature selection and is naturally resistant to non-informative predictors. It may not be obvious why this technique improves model performance, but it turns out to be a very effective modeling technique. In this chapter, we will introduce two best-known regularization methods: ridge regression and lasso. The elastic net is a combination of ridge and lasso, or it is a general representation of the two.</p>
 <p>We talked about the variance bias trade-off in section <a href="vbtradeoff.html#vbtradeoff">7.1</a>. The variance of a learning model is the amount by which <span class="math inline">\(\hat{f}\)</span> would change if we estimated it using a different training data set. In general, model variance increases as flexibility increases. The regularization technique decreases the model flexibility by shrinking the coefficient and hence significantly reduce the model variance.</p>
 <p>Load the R packages:</p>
-<div class="sourceCode" id="cb229"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb229-1"><a href="regularization-methods.html#cb229-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install packages from CRAN</span></span>
-<span id="cb229-2"><a href="regularization-methods.html#cb229-2" aria-hidden="true" tabindex="-1"></a>p_needed <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&#39;caret&#39;</span>, <span class="st">&#39;elasticnet&#39;</span>, <span class="st">&#39;glmnet&#39;</span>, <span class="st">&#39;devtools&#39;</span>,</span>
-<span id="cb229-3"><a href="regularization-methods.html#cb229-3" aria-hidden="true" tabindex="-1"></a>              <span class="st">&#39;MASS&#39;</span>, <span class="st">&#39;grplasso&#39;</span>)</span>
-<span id="cb229-4"><a href="regularization-methods.html#cb229-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb229-5"><a href="regularization-methods.html#cb229-5" aria-hidden="true" tabindex="-1"></a>packages <span class="ot">&lt;-</span> <span class="fu">rownames</span>(<span class="fu">installed.packages</span>())</span>
-<span id="cb229-6"><a href="regularization-methods.html#cb229-6" aria-hidden="true" tabindex="-1"></a>p_to_install <span class="ot">&lt;-</span> p_needed[<span class="sc">!</span>(p_needed <span class="sc">%in%</span> packages)]</span>
-<span id="cb229-7"><a href="regularization-methods.html#cb229-7" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(p_to_install) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
-<span id="cb229-8"><a href="regularization-methods.html#cb229-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">install.packages</span>(p_to_install)</span>
-<span id="cb229-9"><a href="regularization-methods.html#cb229-9" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb229-10"><a href="regularization-methods.html#cb229-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb229-11"><a href="regularization-methods.html#cb229-11" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(p_needed, require, <span class="at">character.only =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb229-12"><a href="regularization-methods.html#cb229-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb229-13"><a href="regularization-methods.html#cb229-13" aria-hidden="true" tabindex="-1"></a><span class="co"># install packages from GitHub</span></span>
-<span id="cb229-14"><a href="regularization-methods.html#cb229-14" aria-hidden="true" tabindex="-1"></a>p_needed_gh <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&#39;NetlifyDS&#39;</span>)</span>
-<span id="cb229-15"><a href="regularization-methods.html#cb229-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb229-16"><a href="regularization-methods.html#cb229-16" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span> p_needed_gh <span class="sc">%in%</span> packages) {</span>
-<span id="cb229-17"><a href="regularization-methods.html#cb229-17" aria-hidden="true" tabindex="-1"></a>    devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;netlify/NetlifyDS&quot;</span>)</span>
-<span id="cb229-18"><a href="regularization-methods.html#cb229-18" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb229-19"><a href="regularization-methods.html#cb229-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb229-20"><a href="regularization-methods.html#cb229-20" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(NetlifyDS)</span></code></pre></div>
+<div class="sourceCode" id="cb223"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb223-1"><a href="regularization-methods.html#cb223-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install packages from CRAN</span></span>
+<span id="cb223-2"><a href="regularization-methods.html#cb223-2" aria-hidden="true" tabindex="-1"></a>p_needed <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&#39;caret&#39;</span>, <span class="st">&#39;elasticnet&#39;</span>, <span class="st">&#39;glmnet&#39;</span>, <span class="st">&#39;devtools&#39;</span>,</span>
+<span id="cb223-3"><a href="regularization-methods.html#cb223-3" aria-hidden="true" tabindex="-1"></a>              <span class="st">&#39;MASS&#39;</span>, <span class="st">&#39;grplasso&#39;</span>)</span>
+<span id="cb223-4"><a href="regularization-methods.html#cb223-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb223-5"><a href="regularization-methods.html#cb223-5" aria-hidden="true" tabindex="-1"></a>packages <span class="ot">&lt;-</span> <span class="fu">rownames</span>(<span class="fu">installed.packages</span>())</span>
+<span id="cb223-6"><a href="regularization-methods.html#cb223-6" aria-hidden="true" tabindex="-1"></a>p_to_install <span class="ot">&lt;-</span> p_needed[<span class="sc">!</span>(p_needed <span class="sc">%in%</span> packages)]</span>
+<span id="cb223-7"><a href="regularization-methods.html#cb223-7" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(p_to_install) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb223-8"><a href="regularization-methods.html#cb223-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">install.packages</span>(p_to_install)</span>
+<span id="cb223-9"><a href="regularization-methods.html#cb223-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb223-10"><a href="regularization-methods.html#cb223-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb223-11"><a href="regularization-methods.html#cb223-11" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(p_needed, require, <span class="at">character.only =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb223-12"><a href="regularization-methods.html#cb223-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb223-13"><a href="regularization-methods.html#cb223-13" aria-hidden="true" tabindex="-1"></a><span class="co"># install packages from GitHub</span></span>
+<span id="cb223-14"><a href="regularization-methods.html#cb223-14" aria-hidden="true" tabindex="-1"></a>p_needed_gh <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&#39;NetlifyDS&#39;</span>)</span>
+<span id="cb223-15"><a href="regularization-methods.html#cb223-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb223-16"><a href="regularization-methods.html#cb223-16" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span> p_needed_gh <span class="sc">%in%</span> packages) {</span>
+<span id="cb223-17"><a href="regularization-methods.html#cb223-17" aria-hidden="true" tabindex="-1"></a>    devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;netlify/NetlifyDS&quot;</span>)</span>
+<span id="cb223-18"><a href="regularization-methods.html#cb223-18" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb223-19"><a href="regularization-methods.html#cb223-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb223-20"><a href="regularization-methods.html#cb223-20" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(NetlifyDS)</span></code></pre></div>
 </div>
             </section>
 

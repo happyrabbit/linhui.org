@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2022-09-24" />
+<meta name="date" content="2022-09-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -301,12 +301,11 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="10.1" data-path="ridge-regression.html"><a href="ridge-regression.html"><i class="fa fa-check"></i><b>10.1</b> Ridge Regression<span></span></a></li>
 <li class="chapter" data-level="10.2" data-path="lasso.html"><a href="lasso.html"><i class="fa fa-check"></i><b>10.2</b> LASSO<span></span></a></li>
-<li class="chapter" data-level="10.3" data-path="variable-selection-property-of-the-lasso.html"><a href="variable-selection-property-of-the-lasso.html"><i class="fa fa-check"></i><b>10.3</b> Variable selection property of the lasso<span></span></a></li>
-<li class="chapter" data-level="10.4" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.4</b> Elastic Net<span></span></a></li>
-<li class="chapter" data-level="10.5" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.5</b> Penalized Generalized Linear Model<span></span></a>
+<li class="chapter" data-level="10.3" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.3</b> Elastic Net<span></span></a></li>
+<li class="chapter" data-level="10.4" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.4</b> Penalized Generalized Linear Model<span></span></a>
 <ul>
-<li class="chapter" data-level="10.5.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.5.1</b> Introduction to <code>glmnet</code> package<span></span></a></li>
-<li class="chapter" data-level="10.5.2" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#penalized-logistic-regression"><i class="fa fa-check"></i><b>10.5.2</b> Penalized logistic regression<span></span></a></li>
+<li class="chapter" data-level="10.4.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.4.1</b> Introduction to <code>glmnet</code> package<span></span></a></li>
+<li class="chapter" data-level="10.4.2" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#penalized-logistic-regression"><i class="fa fa-check"></i><b>10.4.2</b> Penalized logistic regression<span></span></a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="treemodel.html"><a href="treemodel.html"><i class="fa fa-check"></i><b>11</b> Tree-Based Methods<span></span></a>
@@ -393,8 +392,8 @@ div.csl-indent {
 <h2><span class="header-section-number">5.8</span> Re-encode Dummy Variables<a href="re-encode-dummy-variables.html#re-encode-dummy-variables" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>A dummy variable is a binary variable (0/1) to represent subgroups of the sample. Sometimes we need to recode categories to smaller bits of information named “dummy variables.” For example, some questionnaires have five options for each question, A, B, C, D, and E. After you get the data, you will usually convert the corresponding categorical variables for each question into five nominal variables, and then use one of the options as the baseline.</p>
 <p>Let’s encode <code>gender</code> and <code>house</code> from <code>sim.dat</code> to dummy variables. There are two ways to implement this. The first is to use <code>class.ind()</code> from <code>nnet</code> package. However, it only works on one variable at a time.</p>
-<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="re-encode-dummy-variables.html#cb70-1" aria-hidden="true" tabindex="-1"></a>dumVar <span class="ot">&lt;-</span> nnet<span class="sc">::</span><span class="fu">class.ind</span>(sim.dat<span class="sc">$</span>gender)</span>
-<span id="cb70-2"><a href="re-encode-dummy-variables.html#cb70-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dumVar)</span></code></pre></div>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="re-encode-dummy-variables.html#cb66-1" aria-hidden="true" tabindex="-1"></a>dumVar <span class="ot">&lt;-</span> nnet<span class="sc">::</span><span class="fu">class.ind</span>(sim.dat<span class="sc">$</span>gender)</span>
+<span id="cb66-2"><a href="re-encode-dummy-variables.html#cb66-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dumVar)</span></code></pre></div>
 <pre><code>##      Female Male
 ## [1,]      1    0
 ## [2,]      1    0
@@ -403,11 +402,11 @@ div.csl-indent {
 ## [5,]      0    1
 ## [6,]      0    1</code></pre>
 <p>Since it is redundant to keep both, we need to remove one of them when modeling. Another more powerful function is <code>dummyVars()</code> from <code>caret</code>:</p>
-<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="re-encode-dummy-variables.html#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="co"># use &quot;origional variable name + level&quot; as new name</span></span>
-<span id="cb72-2"><a href="re-encode-dummy-variables.html#cb72-2" aria-hidden="true" tabindex="-1"></a>dumMod <span class="ot">&lt;-</span> <span class="fu">dummyVars</span>(<span class="sc">~</span>gender <span class="sc">+</span> house <span class="sc">+</span> income, </span>
-<span id="cb72-3"><a href="re-encode-dummy-variables.html#cb72-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">data =</span> sim.dat, </span>
-<span id="cb72-4"><a href="re-encode-dummy-variables.html#cb72-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">levelsOnly =</span> F)</span>
-<span id="cb72-5"><a href="re-encode-dummy-variables.html#cb72-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">predict</span>(dumMod, sim.dat))</span></code></pre></div>
+<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="re-encode-dummy-variables.html#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="co"># use &quot;origional variable name + level&quot; as new name</span></span>
+<span id="cb68-2"><a href="re-encode-dummy-variables.html#cb68-2" aria-hidden="true" tabindex="-1"></a>dumMod <span class="ot">&lt;-</span> <span class="fu">dummyVars</span>(<span class="sc">~</span>gender <span class="sc">+</span> house <span class="sc">+</span> income, </span>
+<span id="cb68-3"><a href="re-encode-dummy-variables.html#cb68-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">data =</span> sim.dat, </span>
+<span id="cb68-4"><a href="re-encode-dummy-variables.html#cb68-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">levelsOnly =</span> F)</span>
+<span id="cb68-5"><a href="re-encode-dummy-variables.html#cb68-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">predict</span>(dumMod, sim.dat))</span></code></pre></div>
 <pre><code>##   genderFemale genderMale houseNo houseYes income
 ## 1            1          0       0        1 120963
 ## 2            1          0       0        1 122008
@@ -416,10 +415,10 @@ div.csl-indent {
 ## 5            0          1       0        1 124253
 ## 6            0          1       0        1 107661</code></pre>
 <p><code>dummyVars()</code> can also use formula format. The variable on the right-hand side can be both categorical and numeric. For a numerical variable, the function will keep the variable unchanged. The advantage is that you can apply the function to a data frame without removing numerical variables. Other than that, the function can create interaction term:</p>
-<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="re-encode-dummy-variables.html#cb74-1" aria-hidden="true" tabindex="-1"></a>dumMod <span class="ot">&lt;-</span> <span class="fu">dummyVars</span>(<span class="sc">~</span>gender <span class="sc">+</span> house <span class="sc">+</span> income <span class="sc">+</span> income<span class="sc">:</span>gender, </span>
-<span id="cb74-2"><a href="re-encode-dummy-variables.html#cb74-2" aria-hidden="true" tabindex="-1"></a>                    <span class="at">data =</span> sim.dat, </span>
-<span id="cb74-3"><a href="re-encode-dummy-variables.html#cb74-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">levelsOnly =</span> F)</span>
-<span id="cb74-4"><a href="re-encode-dummy-variables.html#cb74-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">predict</span>(dumMod, sim.dat))</span></code></pre></div>
+<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="re-encode-dummy-variables.html#cb70-1" aria-hidden="true" tabindex="-1"></a>dumMod <span class="ot">&lt;-</span> <span class="fu">dummyVars</span>(<span class="sc">~</span>gender <span class="sc">+</span> house <span class="sc">+</span> income <span class="sc">+</span> income<span class="sc">:</span>gender, </span>
+<span id="cb70-2"><a href="re-encode-dummy-variables.html#cb70-2" aria-hidden="true" tabindex="-1"></a>                    <span class="at">data =</span> sim.dat, </span>
+<span id="cb70-3"><a href="re-encode-dummy-variables.html#cb70-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">levelsOnly =</span> F)</span>
+<span id="cb70-4"><a href="re-encode-dummy-variables.html#cb70-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">predict</span>(dumMod, sim.dat))</span></code></pre></div>
 <pre><code>##   genderFemale genderMale houseNo houseYes income
 ## 1            1          0       0        1 120963
 ## 2            1          0       0        1 122008

@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2022-09-24" />
+<meta name="date" content="2022-09-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -32,7 +32,7 @@
   
   
 <link rel="prev" href="ridge-regression.html"/>
-<link rel="next" href="variable-selection-property-of-the-lasso.html"/>
+<link rel="next" href="elastic-net.html"/>
 <script src="libs/header-attrs/header-attrs.js"></script>
 <script src="libs/jquery/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
@@ -301,12 +301,11 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="10.1" data-path="ridge-regression.html"><a href="ridge-regression.html"><i class="fa fa-check"></i><b>10.1</b> Ridge Regression<span></span></a></li>
 <li class="chapter" data-level="10.2" data-path="lasso.html"><a href="lasso.html"><i class="fa fa-check"></i><b>10.2</b> LASSO<span></span></a></li>
-<li class="chapter" data-level="10.3" data-path="variable-selection-property-of-the-lasso.html"><a href="variable-selection-property-of-the-lasso.html"><i class="fa fa-check"></i><b>10.3</b> Variable selection property of the lasso<span></span></a></li>
-<li class="chapter" data-level="10.4" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.4</b> Elastic Net<span></span></a></li>
-<li class="chapter" data-level="10.5" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.5</b> Penalized Generalized Linear Model<span></span></a>
+<li class="chapter" data-level="10.3" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.3</b> Elastic Net<span></span></a></li>
+<li class="chapter" data-level="10.4" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.4</b> Penalized Generalized Linear Model<span></span></a>
 <ul>
-<li class="chapter" data-level="10.5.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.5.1</b> Introduction to <code>glmnet</code> package<span></span></a></li>
-<li class="chapter" data-level="10.5.2" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#penalized-logistic-regression"><i class="fa fa-check"></i><b>10.5.2</b> Penalized logistic regression<span></span></a></li>
+<li class="chapter" data-level="10.4.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.4.1</b> Introduction to <code>glmnet</code> package<span></span></a></li>
+<li class="chapter" data-level="10.4.2" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#penalized-logistic-regression"><i class="fa fa-check"></i><b>10.4.2</b> Penalized logistic regression<span></span></a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="treemodel.html"><a href="treemodel.html"><i class="fa fa-check"></i><b>11</b> Tree-Based Methods<span></span></a>
@@ -399,17 +398,17 @@ div.csl-indent {
 \end{equation}\]</span></p>
 <p>The only difference between lasso and ridge is the penalty. In statistical parlance, ridge uses <span class="math inline">\(L_2\)</span> penalty (<span class="math inline">\(\beta_{j}^{2}\)</span>) and lasso uses <span class="math inline">\(L_1\)</span> penalty (<span class="math inline">\(|\beta_{j}|\)</span>). <span class="math inline">\(L_1\)</span> penalty can shrink the estimates to 0 when <span class="math inline">\(\lambda\)</span> is big enough. So lasso can be used as a feature selection tool. It is a huge advantage because it leads to a more explainable model.</p>
 <p>Similar to other models with tuning parameters, lasso regression requires cross-validation to tune the parameter. You can use <code>train()</code> in a similar way as we showed in the ridge regression section. To tune parameter, we need to set cross-validation and parameter range. Also, it is advised to standardize the predictors:</p>
-<div class="sourceCode" id="cb242"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb242-1"><a href="lasso.html#cb242-1" aria-hidden="true" tabindex="-1"></a>ctrl <span class="ot">&lt;-</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">&quot;cv&quot;</span>, <span class="at">number =</span> <span class="dv">10</span>)</span>
-<span id="cb242-2"><a href="lasso.html#cb242-2" aria-hidden="true" tabindex="-1"></a>lassoGrid <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">fraction =</span> <span class="fu">seq</span>(.<span class="dv">8</span>, <span class="dv">1</span>, <span class="at">length =</span> <span class="dv">20</span>))</span>
-<span id="cb242-3"><a href="lasso.html#cb242-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">100</span>)</span>
-<span id="cb242-4"><a href="lasso.html#cb242-4" aria-hidden="true" tabindex="-1"></a>lassoTune <span class="ot">&lt;-</span> <span class="fu">train</span>(trainx, trainy,</span>
-<span id="cb242-5"><a href="lasso.html#cb242-5" aria-hidden="true" tabindex="-1"></a>                      <span class="do">## set the method to be lasso</span></span>
-<span id="cb242-6"><a href="lasso.html#cb242-6" aria-hidden="true" tabindex="-1"></a>                      <span class="at">method =</span> <span class="st">&quot;lars&quot;</span>,</span>
-<span id="cb242-7"><a href="lasso.html#cb242-7" aria-hidden="true" tabindex="-1"></a>                      <span class="at">tuneGrid =</span> lassoGrid,</span>
-<span id="cb242-8"><a href="lasso.html#cb242-8" aria-hidden="true" tabindex="-1"></a>                      <span class="at">trControl =</span> ctrl,</span>
-<span id="cb242-9"><a href="lasso.html#cb242-9" aria-hidden="true" tabindex="-1"></a>                      <span class="do">## standardize the predictors</span></span>
-<span id="cb242-10"><a href="lasso.html#cb242-10" aria-hidden="true" tabindex="-1"></a>                      <span class="at">preProc =</span> <span class="fu">c</span>(<span class="st">&quot;center&quot;</span>, <span class="st">&quot;scale&quot;</span>))</span>
-<span id="cb242-11"><a href="lasso.html#cb242-11" aria-hidden="true" tabindex="-1"></a>lassoTune</span></code></pre></div>
+<div class="sourceCode" id="cb236"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb236-1"><a href="lasso.html#cb236-1" aria-hidden="true" tabindex="-1"></a>ctrl <span class="ot">&lt;-</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">&quot;cv&quot;</span>, <span class="at">number =</span> <span class="dv">10</span>)</span>
+<span id="cb236-2"><a href="lasso.html#cb236-2" aria-hidden="true" tabindex="-1"></a>lassoGrid <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">fraction =</span> <span class="fu">seq</span>(.<span class="dv">8</span>, <span class="dv">1</span>, <span class="at">length =</span> <span class="dv">20</span>))</span>
+<span id="cb236-3"><a href="lasso.html#cb236-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">100</span>)</span>
+<span id="cb236-4"><a href="lasso.html#cb236-4" aria-hidden="true" tabindex="-1"></a>lassoTune <span class="ot">&lt;-</span> <span class="fu">train</span>(trainx, trainy,</span>
+<span id="cb236-5"><a href="lasso.html#cb236-5" aria-hidden="true" tabindex="-1"></a>                      <span class="do">## set the method to be lasso</span></span>
+<span id="cb236-6"><a href="lasso.html#cb236-6" aria-hidden="true" tabindex="-1"></a>                      <span class="at">method =</span> <span class="st">&quot;lars&quot;</span>,</span>
+<span id="cb236-7"><a href="lasso.html#cb236-7" aria-hidden="true" tabindex="-1"></a>                      <span class="at">tuneGrid =</span> lassoGrid,</span>
+<span id="cb236-8"><a href="lasso.html#cb236-8" aria-hidden="true" tabindex="-1"></a>                      <span class="at">trControl =</span> ctrl,</span>
+<span id="cb236-9"><a href="lasso.html#cb236-9" aria-hidden="true" tabindex="-1"></a>                      <span class="do">## standardize the predictors</span></span>
+<span id="cb236-10"><a href="lasso.html#cb236-10" aria-hidden="true" tabindex="-1"></a>                      <span class="at">preProc =</span> <span class="fu">c</span>(<span class="st">&quot;center&quot;</span>, <span class="st">&quot;scale&quot;</span>))</span>
+<span id="cb236-11"><a href="lasso.html#cb236-11" aria-hidden="true" tabindex="-1"></a>lassoTune</span></code></pre></div>
 <pre><code>## Least Angle Regression 
 ## 
 ## 999 samples
@@ -447,7 +446,7 @@ div.csl-indent {
 ## The final value used for the model was fraction
 ##  = 0.9579.</code></pre>
 <p>The results show that the best value of the tuning parameter (<code>fraction</code> from the output) is 0.957 and the RMSE and <span class="math inline">\(R^{2}\)</span> are 1742 and 0.7954 correspondingly. The performance is nearly the same with ridge regression. You can see from the figure <a href="lasso.html#fig:lassoregtune">10.2</a>, as the <span class="math inline">\(\lambda\)</span> increase, the RMSE first decreases and then increases.</p>
-<div class="sourceCode" id="cb244"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb244-1"><a href="lasso.html#cb244-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(lassoTune)</span></code></pre></div>
+<div class="sourceCode" id="cb238"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb238-1"><a href="lasso.html#cb238-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(lassoTune)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:lassoregtune"></span>
 <img src="IDS_files/figure-html/lassoregtune-1.svg" alt="Test mean squared error for the lasso regression" width="80%" />
 <p class="caption">
@@ -456,25 +455,61 @@ FIGURE 10.2: Test mean squared error for the lasso regression
 </div>
 <p>Once you select a value for tuning parameter, there are different functions to fit lasso regression, such as <code>lars()</code> in <code>lars</code>, <code>enet()</code> in <code>elasticnet</code>, <code>glmnet()</code> in <code>glmnet</code>. They all have very similar syntax.</p>
 <p>Here we continue using <code>enet()</code>. The syntax is similar to ridge regression. The only difference is that you need to set <code>lambda = 0</code> because the argument <code>lambda</code> here is to control the ridge penalty. When it is 0, the function will return the lasso model object.</p>
-<div class="sourceCode" id="cb245"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb245-1"><a href="lasso.html#cb245-1" aria-hidden="true" tabindex="-1"></a>lassoModel <span class="ot">&lt;-</span> <span class="fu">enet</span>(<span class="at">x =</span> <span class="fu">as.matrix</span>(trainx), <span class="at">y =</span> trainy, </span>
-<span id="cb245-2"><a href="lasso.html#cb245-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">lambda =</span> <span class="dv">0</span>, <span class="at">normalize =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb239"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb239-1"><a href="lasso.html#cb239-1" aria-hidden="true" tabindex="-1"></a>lassoModel <span class="ot">&lt;-</span> <span class="fu">enet</span>(<span class="at">x =</span> <span class="fu">as.matrix</span>(trainx), <span class="at">y =</span> trainy, </span>
+<span id="cb239-2"><a href="lasso.html#cb239-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">lambda =</span> <span class="dv">0</span>, <span class="at">normalize =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p>Set the fraction value to be 0.957 (the value we got above):</p>
-<div class="sourceCode" id="cb246"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb246-1"><a href="lasso.html#cb246-1" aria-hidden="true" tabindex="-1"></a>lassoFit <span class="ot">&lt;-</span> <span class="fu">predict</span>(lassoModel, <span class="at">newx =</span> <span class="fu">as.matrix</span>(trainx), </span>
-<span id="cb246-2"><a href="lasso.html#cb246-2" aria-hidden="true" tabindex="-1"></a>                    <span class="at">s =</span> <span class="fl">0.957</span>, <span class="at">mode =</span> <span class="st">&quot;fraction&quot;</span>, <span class="at">type =</span> <span class="st">&quot;fit&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb240"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb240-1"><a href="lasso.html#cb240-1" aria-hidden="true" tabindex="-1"></a>lassoFit <span class="ot">&lt;-</span> <span class="fu">predict</span>(lassoModel, <span class="at">newx =</span> <span class="fu">as.matrix</span>(trainx), </span>
+<span id="cb240-2"><a href="lasso.html#cb240-2" aria-hidden="true" tabindex="-1"></a>                    <span class="at">s =</span> <span class="fl">0.957</span>, <span class="at">mode =</span> <span class="st">&quot;fraction&quot;</span>, <span class="at">type =</span> <span class="st">&quot;fit&quot;</span>)</span></code></pre></div>
 <p>Again by setting <code>type = "fit"</code>, the above returns a list object. The <code>fit</code> item has the predictions:</p>
-<div class="sourceCode" id="cb247"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb247-1"><a href="lasso.html#cb247-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(lassoFit<span class="sc">$</span>fit)</span></code></pre></div>
+<div class="sourceCode" id="cb241"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb241-1"><a href="lasso.html#cb241-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(lassoFit<span class="sc">$</span>fit)</span></code></pre></div>
 <pre><code>##      1      2      3      4      5      6 
 ## 1357.3  300.5  690.2 1228.2  838.4 1010.1</code></pre>
 <p>You need to set <code>type = "coefficients"</code> to get parameter estimates:</p>
-<div class="sourceCode" id="cb249"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb249-1"><a href="lasso.html#cb249-1" aria-hidden="true" tabindex="-1"></a>lassoCoef <span class="ot">&lt;-</span> <span class="fu">predict</span>(lassoModel, </span>
-<span id="cb249-2"><a href="lasso.html#cb249-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">newx =</span> <span class="fu">as.matrix</span>(trainx), </span>
-<span id="cb249-3"><a href="lasso.html#cb249-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">s =</span> <span class="fl">0.95</span>, </span>
-<span id="cb249-4"><a href="lasso.html#cb249-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">mode =</span> <span class="st">&quot;fraction&quot;</span>, </span>
-<span id="cb249-5"><a href="lasso.html#cb249-5" aria-hidden="true" tabindex="-1"></a>                     <span class="at">type =</span> <span class="st">&quot;coefficients&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb243"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb243-1"><a href="lasso.html#cb243-1" aria-hidden="true" tabindex="-1"></a>lassoCoef <span class="ot">&lt;-</span> <span class="fu">predict</span>(lassoModel, </span>
+<span id="cb243-2"><a href="lasso.html#cb243-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">newx =</span> <span class="fu">as.matrix</span>(trainx), </span>
+<span id="cb243-3"><a href="lasso.html#cb243-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">s =</span> <span class="fl">0.95</span>, </span>
+<span id="cb243-4"><a href="lasso.html#cb243-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">mode =</span> <span class="st">&quot;fraction&quot;</span>, </span>
+<span id="cb243-5"><a href="lasso.html#cb243-5" aria-hidden="true" tabindex="-1"></a>                     <span class="at">type =</span> <span class="st">&quot;coefficients&quot;</span>)</span></code></pre></div>
 <p>It also returns a list and the estimates are in the <code>coefficients</code> item:</p>
-<div class="sourceCode" id="cb250"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb250-1"><a href="lasso.html#cb250-1" aria-hidden="true" tabindex="-1"></a><span class="co"># didn&#39;t show the results</span></span>
-<span id="cb250-2"><a href="lasso.html#cb250-2" aria-hidden="true" tabindex="-1"></a>LassoCoef <span class="ot">=</span> lassoCoef<span class="sc">$</span>coefficients</span></code></pre></div>
+<div class="sourceCode" id="cb244"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb244-1"><a href="lasso.html#cb244-1" aria-hidden="true" tabindex="-1"></a><span class="co"># didn&#39;t show the results</span></span>
+<span id="cb244-2"><a href="lasso.html#cb244-2" aria-hidden="true" tabindex="-1"></a>LassoCoef <span class="ot">=</span> lassoCoef<span class="sc">$</span>coefficients</span></code></pre></div>
 <p>Many researchers applied lasso to other learning methods, such as linear discriminant analysis <span class="citation">(<a href="#ref-Clem2011" role="doc-biblioref">Line Clemmensen and Ersbøll 2011</a>)</span>, partial least squares regression<span class="citation">(<a href="#ref-chun2010" role="doc-biblioref">Chun and Keleş 2010</a>)</span>. However, since the <span class="math inline">\(L_1\)</span> norm is not differentiable, optimization for lasso regression is more complicated. People come up with different algorithms to solve the computation problem. The biggest breakthrough is Least Angle Regression (LARS) from Bradley Efron etc. This algorithm works well for lasso regression especially when the dimension is high.</p>
+<!--
+## Variable selection property of the lasso
+
+You may ask why lasso ($L_1$ penalty) has the feature selection property but not the ridge ($L_2$ penalty). To answer that question, let's look at the alternative representations of the optimization problem for lasso and ridge.  For lasso regression, it is identical to optimize the following two functions:
+
+\begin{equation}
+\Sigma_{i=1}^{n}(y_{i}-\beta_{0}-\Sigma_{j=1}^{p}\beta_{j}x_{ij})^{2}+\lambda\Sigma_{j=1}^{p}|\beta_{j}|=RSS+\lambda\Sigma_{j=1}^{p}|\beta_{j}|
+(\#eq:lasso1)
+\end{equation}
+
+\begin{equation}
+\underset{\beta}{min}\left\{ \Sigma_{i=1}^{n}\left(y_{i}-\beta_{0}-\Sigma_{j=1}^{p}\beta_{j}x_{ij}\right)^{2}\right\} ,\ \Sigma_{j=1}^{p}|\beta_{j}|\leq s
+(\#eq:lasso2)
+\end{equation}
+
+For any value of tuning parameter $\lambda$, there exists a $s$ such that the coefficient estimates optimize equation \@ref(eq:lasso1) also optimize equation \@ref(eq:lasso2). Similarly, for ridge regression, the two representations are identical: 
+
+\begin{equation}
+\Sigma_{i=1}^{n}(y_{i}-\beta_{0}-\Sigma_{j=1}^{p}\beta_{j}x_{ij})^{2}+\lambda\Sigma_{j=1}^{p}\beta_{j}^{2}=RSS+\lambda\Sigma_{j=1}^{p}\beta_{j}^{2}
+(\#eq:ridge1)
+\end{equation}
+
+\begin{equation}
+\underset{\beta}{min}\left\{ \Sigma_{i=1}^{n}\left(y_{i}-\beta_{0}-\Sigma_{j=1}^{p}\beta_{j}x_{ij}\right)^{2}\right\} ,\ \Sigma_{j=1}^{p}\beta_{j}^{2}\leq s
+(\#eq:ridge2)
+\end{equation}
+
+When $p＝2$, lasso estimates ($\hat{\beta}_{lasso}$ in figure \@ref(fig:lassoridge)) have the smallest RSS among all points that satisfy $|\beta*{1}|+|\beta_{2}|\leq s$ (i.e. within the diamond in figure \@ref(fig:lassoridge)). Ridge estimates have the smallest RSS among all points that satisfy $\beta_{1}^{2}+\beta_{2}^{2}\leq s$ (i.e. within the circle in figure \@ref(fig:lassoridge)). As s increases, the diamond and circle regions expand and get less restrictive. If s is large enough, the restrictive region will cover the least squares estimate ($\hat{\beta}_{LSE}$). Then, equations \@ref(eq:lasso2) and \@ref(eq:ridge2) will simply yield the least squares estimate. In contrast, if s is small, the grey region in figure \@ref(fig:lassoridge) will be small and hence restrict the magnitude of $\beta$. With the alternative formulations, we can answer the question of feature selection property.
+
+<div class="figure" style="text-align: center">
+<img src="images/LassoRidge.png" alt="Contours of the RSS and constrain functions for the lasso (left) and ridge regression (right)" width="100%" />
+<p class="caption">(\#fig:lassoridge)Contours of the RSS and constrain functions for the lasso (left) and ridge regression (right)</p>
+</div>
+
+Figure \@ref(fig:lassoridge) illustrates the situations for lasso (left) and ridge (right). The least square estimate is marked as $\hat{\beta}$. The restrictive regions are in grey, the diamond region is for the lasso, the circle region is for the ridge. The least square estimates lie outside the grey region, so they are different from the lasso and ridge estimates. The ellipses centered around $\hat{\beta}$ represent contours of RSS. All the points on a given ellipse share an RSS. As the ellipses expand, the RSS increases. The lasso and ridge estimates are the first points at which an ellipse contracts the grey region. Since ridge regression has a circular restrictive region that doesn't have a sharp point, the intersecting point can't drop on the axis. But it is possible for lasso since it has corners at each of the axes.   When the intersecting point is on an axis, one of the parameter estimates is 0. If p > 2, the restrictive regions become sphere or hypersphere. In that case, when the intersecting point drops on an axis, multiple coefficient estimates can equal 0 simultaneously.
+-->
 </div>
 <h3>References<a href="references.html#references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <div id="refs" class="references csl-bib-body hanging-indent">
@@ -494,7 +529,7 @@ R, Tibshirani. 1996. <span>“Regression Shrinkage and Selection via the Lasso.�
         </div>
       </div>
 <a href="ridge-regression.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-<a href="variable-selection-property-of-the-lasso.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="elastic-net.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook/js/app.min.js"></script>

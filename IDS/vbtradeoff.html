@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2022-09-24" />
+<meta name="date" content="2022-09-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -301,12 +301,11 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="10.1" data-path="ridge-regression.html"><a href="ridge-regression.html"><i class="fa fa-check"></i><b>10.1</b> Ridge Regression<span></span></a></li>
 <li class="chapter" data-level="10.2" data-path="lasso.html"><a href="lasso.html"><i class="fa fa-check"></i><b>10.2</b> LASSO<span></span></a></li>
-<li class="chapter" data-level="10.3" data-path="variable-selection-property-of-the-lasso.html"><a href="variable-selection-property-of-the-lasso.html"><i class="fa fa-check"></i><b>10.3</b> Variable selection property of the lasso<span></span></a></li>
-<li class="chapter" data-level="10.4" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.4</b> Elastic Net<span></span></a></li>
-<li class="chapter" data-level="10.5" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.5</b> Penalized Generalized Linear Model<span></span></a>
+<li class="chapter" data-level="10.3" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.3</b> Elastic Net<span></span></a></li>
+<li class="chapter" data-level="10.4" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.4</b> Penalized Generalized Linear Model<span></span></a>
 <ul>
-<li class="chapter" data-level="10.5.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.5.1</b> Introduction to <code>glmnet</code> package<span></span></a></li>
-<li class="chapter" data-level="10.5.2" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#penalized-logistic-regression"><i class="fa fa-check"></i><b>10.5.2</b> Penalized logistic regression<span></span></a></li>
+<li class="chapter" data-level="10.4.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.4.1</b> Introduction to <code>glmnet</code> package<span></span></a></li>
+<li class="chapter" data-level="10.4.2" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#penalized-logistic-regression"><i class="fa fa-check"></i><b>10.4.2</b> Penalized logistic regression<span></span></a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="treemodel.html"><a href="treemodel.html"><i class="fa fa-check"></i><b>11</b> Tree-Based Methods<span></span></a>
@@ -430,18 +429,18 @@ E(\mathbf{y}-\hat{\mathbf{y}})^{2} &amp; = &amp; E[f(\mathbf{X})+ \symbf{\epsilo
 <p>The systematic error consists of two parts, <span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span> and <span class="math inline">\(Var (\hat{f}(\mathbf{X}))\)</span>. To minimize the systematic error, we need to minimize both. The bias represents the error caused by the model’s approximation of the reality, i.e., systematic relation, which may be very complex. For example, linear regression assumes a linear relationship between the predictors and the response, but rarely is there a perfect linear relationship in real life. So linear regression is more likely to have a high bias. In general, the more flexible the model is, the higher the variance. However, this does not guarantee complex models will outperform a much simpler one, such as linear regression. If the real relationship <span class="math inline">\(f\)</span> is linear, then linear regression is unbiased. It is difficult for a more flexible model to compete. Good learning method requires low variance and bias. However, it is easy to find a model with extremely low bias but high variance (by fitting a tree) or a method with low variance but high bias (by fitting a straight line). That why we call it trade-off.</p>
 <p>To explore bias and variance, let’s begin with a simple simulation. We will simulate a data with a non-linear relationship and fit different models on it. An intuitive way to show these is to compare the plots of various models.</p>
 <p>The code below simulates one predictor (<code>x</code>) and one response variable (<code>fx</code>). The relationship between <code>x</code> and <code>fx</code> is non-linear. You need to load the <code>multiplot</code> function by running <code>source('http://bit.ly/2KeEIg9')</code>. The function assembles multiple plots on a canvas.</p>
-<div class="sourceCode" id="cb143"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb143-1"><a href="vbtradeoff.html#cb143-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&#39;http://bit.ly/2KeEIg9&#39;</span>)</span>
-<span id="cb143-2"><a href="vbtradeoff.html#cb143-2" aria-hidden="true" tabindex="-1"></a><span class="co"># randomly simulate some non-linear samples</span></span>
-<span id="cb143-3"><a href="vbtradeoff.html#cb143-3" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="fl">0.01</span>) <span class="sc">*</span> pi</span>
-<span id="cb143-4"><a href="vbtradeoff.html#cb143-4" aria-hidden="true" tabindex="-1"></a>e <span class="ot">=</span> <span class="fu">rnorm</span>(<span class="fu">length</span>(x), <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="fl">0.2</span>)</span>
-<span id="cb143-5"><a href="vbtradeoff.html#cb143-5" aria-hidden="true" tabindex="-1"></a>fx <span class="ot">&lt;-</span> <span class="fu">sin</span>(x) <span class="sc">+</span> e <span class="sc">+</span> <span class="fu">sqrt</span>(x)</span>
-<span id="cb143-6"><a href="vbtradeoff.html#cb143-6" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">=</span> <span class="fu">data.frame</span>(x, fx)</span></code></pre></div>
+<div class="sourceCode" id="cb137"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb137-1"><a href="vbtradeoff.html#cb137-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&#39;http://bit.ly/2KeEIg9&#39;</span>)</span>
+<span id="cb137-2"><a href="vbtradeoff.html#cb137-2" aria-hidden="true" tabindex="-1"></a><span class="co"># randomly simulate some non-linear samples</span></span>
+<span id="cb137-3"><a href="vbtradeoff.html#cb137-3" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">10</span>, <span class="fl">0.01</span>) <span class="sc">*</span> pi</span>
+<span id="cb137-4"><a href="vbtradeoff.html#cb137-4" aria-hidden="true" tabindex="-1"></a>e <span class="ot">=</span> <span class="fu">rnorm</span>(<span class="fu">length</span>(x), <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="fl">0.2</span>)</span>
+<span id="cb137-5"><a href="vbtradeoff.html#cb137-5" aria-hidden="true" tabindex="-1"></a>fx <span class="ot">&lt;-</span> <span class="fu">sin</span>(x) <span class="sc">+</span> e <span class="sc">+</span> <span class="fu">sqrt</span>(x)</span>
+<span id="cb137-6"><a href="vbtradeoff.html#cb137-6" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">=</span> <span class="fu">data.frame</span>(x, fx)</span></code></pre></div>
 <p>Then fit a simple linear regression on these data:</p>
-<div class="sourceCode" id="cb144"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb144-1"><a href="vbtradeoff.html#cb144-1" aria-hidden="true" tabindex="-1"></a><span class="co"># plot fitting result</span></span>
-<span id="cb144-2"><a href="vbtradeoff.html#cb144-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb144-3"><a href="vbtradeoff.html#cb144-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dat, <span class="fu">aes</span>(x, fx)) <span class="sc">+</span> </span>
-<span id="cb144-4"><a href="vbtradeoff.html#cb144-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
-<span id="cb144-5"><a href="vbtradeoff.html#cb144-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">se =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb138"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb138-1"><a href="vbtradeoff.html#cb138-1" aria-hidden="true" tabindex="-1"></a><span class="co"># plot fitting result</span></span>
+<span id="cb138-2"><a href="vbtradeoff.html#cb138-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb138-3"><a href="vbtradeoff.html#cb138-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dat, <span class="fu">aes</span>(x, fx)) <span class="sc">+</span> </span>
+<span id="cb138-4"><a href="vbtradeoff.html#cb138-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb138-5"><a href="vbtradeoff.html#cb138-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">se =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <pre><code>## `geom_smooth()` using formula &#39;y ~ x&#39;</code></pre>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:linearbias"></span>
 <img src="IDS_files/figure-html/linearbias-1.svg" alt="High bias model" width="80%" />
@@ -452,7 +451,7 @@ FIGURE 7.1: High bias model
 <p>Despite a large sample size, trained linear regression cannot describe the relationship very well. In other words, in this case, the model has a high bias (Fig. <a href="vbtradeoff.html#fig:linearbias">7.1</a>). People also call it underfitting.</p>
 <p>Since the estimated parameters will be somewhat different for different samples, there is the variance of estimates. Intuitively, it gives you some sense that if we fit the same model with different samples (presumably, they are from the same population), how much will the estimates change. Ideally, the change is trivial. For high variance models, small changes in the training data result in very different estimates. In general, a model with high flexibility also has high variance., such as the CART tree, and the initial boosting method. To overcome that problem, the Random Forest and Gradient Boosting Model aim to reduce the variance by summarizing the results obtained from different samples.</p>
 <p>Let’s fit the above data using a smoothing method which is highly flexible and can fit the current data tightly:</p>
-<div class="sourceCode" id="cb146"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb146-1"><a href="vbtradeoff.html#cb146-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dat, <span class="fu">aes</span>(x, fx)) <span class="sc">+</span> <span class="fu">geom_smooth</span>(<span class="at">span =</span> <span class="fl">0.03</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb140"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb140-1"><a href="vbtradeoff.html#cb140-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dat, <span class="fu">aes</span>(x, fx)) <span class="sc">+</span> <span class="fu">geom_smooth</span>(<span class="at">span =</span> <span class="fl">0.03</span>)</span></code></pre></div>
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:linearvar"></span>
 <img src="IDS_files/figure-html/linearvar-1.svg" alt="High variance model" width="80%" />
 <p class="caption">
@@ -460,56 +459,56 @@ FIGURE 7.2: High variance model
 </p>
 </div>
 <p>The resulting plot (Fig. <a href="vbtradeoff.html#fig:linearvar">7.2</a>) indicates the smoothing method fit the data much better and it has a much smaller bias. However, this method has a high variance. If we simulate different subsets of the sample, the result curve will change significantly:</p>
-<div class="sourceCode" id="cb147"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb147-1"><a href="vbtradeoff.html#cb147-1" aria-hidden="true" tabindex="-1"></a><span class="co"># set random seed</span></span>
-<span id="cb147-2"><a href="vbtradeoff.html#cb147-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2016</span>)</span>
-<span id="cb147-3"><a href="vbtradeoff.html#cb147-3" aria-hidden="true" tabindex="-1"></a><span class="co"># sample part of the data to fit model sample 1</span></span>
-<span id="cb147-4"><a href="vbtradeoff.html#cb147-4" aria-hidden="true" tabindex="-1"></a>idx1 <span class="ot">=</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(x), <span class="dv">100</span>)</span>
-<span id="cb147-5"><a href="vbtradeoff.html#cb147-5" aria-hidden="true" tabindex="-1"></a>dat1 <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">x1 =</span> x[idx1], <span class="at">fx1 =</span> fx[idx1])</span>
-<span id="cb147-6"><a href="vbtradeoff.html#cb147-6" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">=</span> <span class="fu">ggplot</span>(dat1, <span class="fu">aes</span>(x1, fx1)) <span class="sc">+</span> </span>
-<span id="cb147-7"><a href="vbtradeoff.html#cb147-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">span =</span> <span class="fl">0.03</span>) <span class="sc">+</span> </span>
-<span id="cb147-8"><a href="vbtradeoff.html#cb147-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
-<span id="cb147-9"><a href="vbtradeoff.html#cb147-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb147-10"><a href="vbtradeoff.html#cb147-10" aria-hidden="true" tabindex="-1"></a><span class="co"># sample 2</span></span>
-<span id="cb147-11"><a href="vbtradeoff.html#cb147-11" aria-hidden="true" tabindex="-1"></a>idx2 <span class="ot">=</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(x), <span class="dv">100</span>)</span>
-<span id="cb147-12"><a href="vbtradeoff.html#cb147-12" aria-hidden="true" tabindex="-1"></a>dat2 <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">x2 =</span> x[idx2], <span class="at">fx2 =</span> fx[idx2])</span>
-<span id="cb147-13"><a href="vbtradeoff.html#cb147-13" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">=</span> <span class="fu">ggplot</span>(dat2, <span class="fu">aes</span>(x2, fx2)) <span class="sc">+</span> </span>
-<span id="cb147-14"><a href="vbtradeoff.html#cb147-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">span =</span> <span class="fl">0.03</span>) <span class="sc">+</span> </span>
-<span id="cb147-15"><a href="vbtradeoff.html#cb147-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
-<span id="cb147-16"><a href="vbtradeoff.html#cb147-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb147-17"><a href="vbtradeoff.html#cb147-17" aria-hidden="true" tabindex="-1"></a><span class="co"># sample 3</span></span>
-<span id="cb147-18"><a href="vbtradeoff.html#cb147-18" aria-hidden="true" tabindex="-1"></a>idx3 <span class="ot">=</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(x), <span class="dv">100</span>)</span>
-<span id="cb147-19"><a href="vbtradeoff.html#cb147-19" aria-hidden="true" tabindex="-1"></a>dat3 <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">x3 =</span> x[idx3], <span class="at">fx3 =</span> fx[idx3])</span>
-<span id="cb147-20"><a href="vbtradeoff.html#cb147-20" aria-hidden="true" tabindex="-1"></a>p3 <span class="ot">=</span> <span class="fu">ggplot</span>(dat3, <span class="fu">aes</span>(x3, fx3)) <span class="sc">+</span> </span>
-<span id="cb147-21"><a href="vbtradeoff.html#cb147-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">span =</span> <span class="fl">0.03</span>) <span class="sc">+</span> </span>
-<span id="cb147-22"><a href="vbtradeoff.html#cb147-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
-<span id="cb147-23"><a href="vbtradeoff.html#cb147-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb147-24"><a href="vbtradeoff.html#cb147-24" aria-hidden="true" tabindex="-1"></a><span class="co"># sample 4</span></span>
-<span id="cb147-25"><a href="vbtradeoff.html#cb147-25" aria-hidden="true" tabindex="-1"></a>idx4 <span class="ot">=</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(x), <span class="dv">100</span>)</span>
-<span id="cb147-26"><a href="vbtradeoff.html#cb147-26" aria-hidden="true" tabindex="-1"></a>dat4 <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">x4 =</span> x[idx4], <span class="at">fx4 =</span> fx[idx4])</span>
-<span id="cb147-27"><a href="vbtradeoff.html#cb147-27" aria-hidden="true" tabindex="-1"></a>p4 <span class="ot">=</span> <span class="fu">ggplot</span>(dat4, <span class="fu">aes</span>(x4, fx4)) <span class="sc">+</span> </span>
-<span id="cb147-28"><a href="vbtradeoff.html#cb147-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">span =</span> <span class="fl">0.03</span>) <span class="sc">+</span> </span>
-<span id="cb147-29"><a href="vbtradeoff.html#cb147-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
-<span id="cb147-30"><a href="vbtradeoff.html#cb147-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb147-31"><a href="vbtradeoff.html#cb147-31" aria-hidden="true" tabindex="-1"></a><span class="fu">multiplot</span>(p1, p2, p3, p4, <span class="at">cols =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb141"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb141-1"><a href="vbtradeoff.html#cb141-1" aria-hidden="true" tabindex="-1"></a><span class="co"># set random seed</span></span>
+<span id="cb141-2"><a href="vbtradeoff.html#cb141-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2016</span>)</span>
+<span id="cb141-3"><a href="vbtradeoff.html#cb141-3" aria-hidden="true" tabindex="-1"></a><span class="co"># sample part of the data to fit model sample 1</span></span>
+<span id="cb141-4"><a href="vbtradeoff.html#cb141-4" aria-hidden="true" tabindex="-1"></a>idx1 <span class="ot">=</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(x), <span class="dv">100</span>)</span>
+<span id="cb141-5"><a href="vbtradeoff.html#cb141-5" aria-hidden="true" tabindex="-1"></a>dat1 <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">x1 =</span> x[idx1], <span class="at">fx1 =</span> fx[idx1])</span>
+<span id="cb141-6"><a href="vbtradeoff.html#cb141-6" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">=</span> <span class="fu">ggplot</span>(dat1, <span class="fu">aes</span>(x1, fx1)) <span class="sc">+</span> </span>
+<span id="cb141-7"><a href="vbtradeoff.html#cb141-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">span =</span> <span class="fl">0.03</span>) <span class="sc">+</span> </span>
+<span id="cb141-8"><a href="vbtradeoff.html#cb141-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
+<span id="cb141-9"><a href="vbtradeoff.html#cb141-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb141-10"><a href="vbtradeoff.html#cb141-10" aria-hidden="true" tabindex="-1"></a><span class="co"># sample 2</span></span>
+<span id="cb141-11"><a href="vbtradeoff.html#cb141-11" aria-hidden="true" tabindex="-1"></a>idx2 <span class="ot">=</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(x), <span class="dv">100</span>)</span>
+<span id="cb141-12"><a href="vbtradeoff.html#cb141-12" aria-hidden="true" tabindex="-1"></a>dat2 <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">x2 =</span> x[idx2], <span class="at">fx2 =</span> fx[idx2])</span>
+<span id="cb141-13"><a href="vbtradeoff.html#cb141-13" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">=</span> <span class="fu">ggplot</span>(dat2, <span class="fu">aes</span>(x2, fx2)) <span class="sc">+</span> </span>
+<span id="cb141-14"><a href="vbtradeoff.html#cb141-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">span =</span> <span class="fl">0.03</span>) <span class="sc">+</span> </span>
+<span id="cb141-15"><a href="vbtradeoff.html#cb141-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
+<span id="cb141-16"><a href="vbtradeoff.html#cb141-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb141-17"><a href="vbtradeoff.html#cb141-17" aria-hidden="true" tabindex="-1"></a><span class="co"># sample 3</span></span>
+<span id="cb141-18"><a href="vbtradeoff.html#cb141-18" aria-hidden="true" tabindex="-1"></a>idx3 <span class="ot">=</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(x), <span class="dv">100</span>)</span>
+<span id="cb141-19"><a href="vbtradeoff.html#cb141-19" aria-hidden="true" tabindex="-1"></a>dat3 <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">x3 =</span> x[idx3], <span class="at">fx3 =</span> fx[idx3])</span>
+<span id="cb141-20"><a href="vbtradeoff.html#cb141-20" aria-hidden="true" tabindex="-1"></a>p3 <span class="ot">=</span> <span class="fu">ggplot</span>(dat3, <span class="fu">aes</span>(x3, fx3)) <span class="sc">+</span> </span>
+<span id="cb141-21"><a href="vbtradeoff.html#cb141-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">span =</span> <span class="fl">0.03</span>) <span class="sc">+</span> </span>
+<span id="cb141-22"><a href="vbtradeoff.html#cb141-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
+<span id="cb141-23"><a href="vbtradeoff.html#cb141-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb141-24"><a href="vbtradeoff.html#cb141-24" aria-hidden="true" tabindex="-1"></a><span class="co"># sample 4</span></span>
+<span id="cb141-25"><a href="vbtradeoff.html#cb141-25" aria-hidden="true" tabindex="-1"></a>idx4 <span class="ot">=</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(x), <span class="dv">100</span>)</span>
+<span id="cb141-26"><a href="vbtradeoff.html#cb141-26" aria-hidden="true" tabindex="-1"></a>dat4 <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">x4 =</span> x[idx4], <span class="at">fx4 =</span> fx[idx4])</span>
+<span id="cb141-27"><a href="vbtradeoff.html#cb141-27" aria-hidden="true" tabindex="-1"></a>p4 <span class="ot">=</span> <span class="fu">ggplot</span>(dat4, <span class="fu">aes</span>(x4, fx4)) <span class="sc">+</span> </span>
+<span id="cb141-28"><a href="vbtradeoff.html#cb141-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">span =</span> <span class="fl">0.03</span>) <span class="sc">+</span> </span>
+<span id="cb141-29"><a href="vbtradeoff.html#cb141-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
+<span id="cb141-30"><a href="vbtradeoff.html#cb141-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb141-31"><a href="vbtradeoff.html#cb141-31" aria-hidden="true" tabindex="-1"></a><span class="fu">multiplot</span>(p1, p2, p3, p4, <span class="at">cols =</span> <span class="dv">2</span>)</span></code></pre></div>
 <p><img src="IDS_files/figure-html/unnamed-chunk-48-1.svg" width="672" /></p>
 <p>The fitted lines (blue) change over different samples which means it has high variance. People also call it overfitting. Fitting the linear model using the same four subsets, the result barely changes:</p>
-<div class="sourceCode" id="cb148"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb148-1"><a href="vbtradeoff.html#cb148-1" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">=</span> <span class="fu">ggplot</span>(dat1, <span class="fu">aes</span>(x1, fx1)) <span class="sc">+</span> </span>
-<span id="cb148-2"><a href="vbtradeoff.html#cb148-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">se =</span> <span class="cn">FALSE</span>) <span class="sc">+</span> </span>
-<span id="cb148-3"><a href="vbtradeoff.html#cb148-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
-<span id="cb148-4"><a href="vbtradeoff.html#cb148-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb148-5"><a href="vbtradeoff.html#cb148-5" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">=</span> <span class="fu">ggplot</span>(dat2, <span class="fu">aes</span>(x2, fx2)) <span class="sc">+</span> </span>
-<span id="cb148-6"><a href="vbtradeoff.html#cb148-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">se =</span> <span class="cn">FALSE</span>) <span class="sc">+</span> </span>
-<span id="cb148-7"><a href="vbtradeoff.html#cb148-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
-<span id="cb148-8"><a href="vbtradeoff.html#cb148-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb148-9"><a href="vbtradeoff.html#cb148-9" aria-hidden="true" tabindex="-1"></a>p3 <span class="ot">=</span> <span class="fu">ggplot</span>(dat3, <span class="fu">aes</span>(x3, fx3)) <span class="sc">+</span> </span>
-<span id="cb148-10"><a href="vbtradeoff.html#cb148-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">se =</span> <span class="cn">FALSE</span>) <span class="sc">+</span> </span>
-<span id="cb148-11"><a href="vbtradeoff.html#cb148-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
-<span id="cb148-12"><a href="vbtradeoff.html#cb148-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb148-13"><a href="vbtradeoff.html#cb148-13" aria-hidden="true" tabindex="-1"></a>p4 <span class="ot">=</span> <span class="fu">ggplot</span>(dat4, <span class="fu">aes</span>(x4, fx4)) <span class="sc">+</span> </span>
-<span id="cb148-14"><a href="vbtradeoff.html#cb148-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">se =</span> <span class="cn">FALSE</span>) <span class="sc">+</span> </span>
-<span id="cb148-15"><a href="vbtradeoff.html#cb148-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
-<span id="cb148-16"><a href="vbtradeoff.html#cb148-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb148-17"><a href="vbtradeoff.html#cb148-17" aria-hidden="true" tabindex="-1"></a><span class="fu">multiplot</span>(p1, p2, p3, p4, <span class="at">cols =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb142"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb142-1"><a href="vbtradeoff.html#cb142-1" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">=</span> <span class="fu">ggplot</span>(dat1, <span class="fu">aes</span>(x1, fx1)) <span class="sc">+</span> </span>
+<span id="cb142-2"><a href="vbtradeoff.html#cb142-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">se =</span> <span class="cn">FALSE</span>) <span class="sc">+</span> </span>
+<span id="cb142-3"><a href="vbtradeoff.html#cb142-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
+<span id="cb142-4"><a href="vbtradeoff.html#cb142-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb142-5"><a href="vbtradeoff.html#cb142-5" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">=</span> <span class="fu">ggplot</span>(dat2, <span class="fu">aes</span>(x2, fx2)) <span class="sc">+</span> </span>
+<span id="cb142-6"><a href="vbtradeoff.html#cb142-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">se =</span> <span class="cn">FALSE</span>) <span class="sc">+</span> </span>
+<span id="cb142-7"><a href="vbtradeoff.html#cb142-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
+<span id="cb142-8"><a href="vbtradeoff.html#cb142-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb142-9"><a href="vbtradeoff.html#cb142-9" aria-hidden="true" tabindex="-1"></a>p3 <span class="ot">=</span> <span class="fu">ggplot</span>(dat3, <span class="fu">aes</span>(x3, fx3)) <span class="sc">+</span> </span>
+<span id="cb142-10"><a href="vbtradeoff.html#cb142-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">se =</span> <span class="cn">FALSE</span>) <span class="sc">+</span> </span>
+<span id="cb142-11"><a href="vbtradeoff.html#cb142-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
+<span id="cb142-12"><a href="vbtradeoff.html#cb142-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb142-13"><a href="vbtradeoff.html#cb142-13" aria-hidden="true" tabindex="-1"></a>p4 <span class="ot">=</span> <span class="fu">ggplot</span>(dat4, <span class="fu">aes</span>(x4, fx4)) <span class="sc">+</span> </span>
+<span id="cb142-14"><a href="vbtradeoff.html#cb142-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">&quot;lm&quot;</span>, <span class="at">se =</span> <span class="cn">FALSE</span>) <span class="sc">+</span> </span>
+<span id="cb142-15"><a href="vbtradeoff.html#cb142-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span>
+<span id="cb142-16"><a href="vbtradeoff.html#cb142-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb142-17"><a href="vbtradeoff.html#cb142-17" aria-hidden="true" tabindex="-1"></a><span class="fu">multiplot</span>(p1, p2, p3, p4, <span class="at">cols =</span> <span class="dv">2</span>)</span></code></pre></div>
 <p><img src="IDS_files/figure-html/unnamed-chunk-49-1.svg" width="672" /></p>
 <p>In general, the variance (<span class="math inline">\(Var(\hat{f}(\mathbf{X}))\)</span>) <strong>increases</strong> and the bias (<span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span>) <strong>decreases</strong> as the model flexibility increases. Variance and bias together determine the systematic error. As we increase the flexibility of the model, at first the rate at which <span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span> decreases is faster than <span class="math inline">\(Var (\hat{f} (\mathbf{X}))\)</span>, so the MSE decreases. However, to some degree, higher flexibility has little effect on <span class="math inline">\(Bias(\hat{f}(\mathbf{X}))\)</span> but <span class="math inline">\(Var(\hat{f} (\mathbf{X}))\)</span> increases significantly, so the MSE increases.</p>
 </div>

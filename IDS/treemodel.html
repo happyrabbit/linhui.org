@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2022-09-24" />
+<meta name="date" content="2022-09-26" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -301,12 +301,11 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="10.1" data-path="ridge-regression.html"><a href="ridge-regression.html"><i class="fa fa-check"></i><b>10.1</b> Ridge Regression<span></span></a></li>
 <li class="chapter" data-level="10.2" data-path="lasso.html"><a href="lasso.html"><i class="fa fa-check"></i><b>10.2</b> LASSO<span></span></a></li>
-<li class="chapter" data-level="10.3" data-path="variable-selection-property-of-the-lasso.html"><a href="variable-selection-property-of-the-lasso.html"><i class="fa fa-check"></i><b>10.3</b> Variable selection property of the lasso<span></span></a></li>
-<li class="chapter" data-level="10.4" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.4</b> Elastic Net<span></span></a></li>
-<li class="chapter" data-level="10.5" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.5</b> Penalized Generalized Linear Model<span></span></a>
+<li class="chapter" data-level="10.3" data-path="elastic-net.html"><a href="elastic-net.html"><i class="fa fa-check"></i><b>10.3</b> Elastic Net<span></span></a></li>
+<li class="chapter" data-level="10.4" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html"><i class="fa fa-check"></i><b>10.4</b> Penalized Generalized Linear Model<span></span></a>
 <ul>
-<li class="chapter" data-level="10.5.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.5.1</b> Introduction to <code>glmnet</code> package<span></span></a></li>
-<li class="chapter" data-level="10.5.2" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#penalized-logistic-regression"><i class="fa fa-check"></i><b>10.5.2</b> Penalized logistic regression<span></span></a></li>
+<li class="chapter" data-level="10.4.1" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#introduction-to-glmnet-package"><i class="fa fa-check"></i><b>10.4.1</b> Introduction to <code>glmnet</code> package<span></span></a></li>
+<li class="chapter" data-level="10.4.2" data-path="penalized-generalized-linear-model.html"><a href="penalized-generalized-linear-model.html#penalized-logistic-regression"><i class="fa fa-check"></i><b>10.4.2</b> Penalized logistic regression<span></span></a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="11" data-path="treemodel.html"><a href="treemodel.html"><i class="fa fa-check"></i><b>11</b> Tree-Based Methods<span></span></a>
@@ -393,18 +392,18 @@ div.csl-indent {
 <h1><span class="header-section-number">Chapter 11</span> Tree-Based Methods<a href="treemodel.html#treemodel" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>Tree-based models such as random forest and gradient boosted trees are frequent winners in data challenges and competitions which use standard numerical and categorical datasets. These methods, in general, provide a good baseline for model performance. This chapter describes the fundamentals of tree-based models and provides a set of standard modeling procedures.</p>
 <p>Load R packages:</p>
-<div class="sourceCode" id="cb296"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb296-1"><a href="treemodel.html#cb296-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install packages from CRAN</span></span>
-<span id="cb296-2"><a href="treemodel.html#cb296-2" aria-hidden="true" tabindex="-1"></a>p_needed <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&#39;rpart&#39;</span>, <span class="st">&#39;caret&#39;</span>, <span class="st">&#39;partykit&#39;</span>,</span>
-<span id="cb296-3"><a href="treemodel.html#cb296-3" aria-hidden="true" tabindex="-1"></a>              <span class="st">&#39;pROC&#39;</span>, <span class="st">&#39;dplyr&#39;</span>, <span class="st">&#39;ipred&#39;</span>,</span>
-<span id="cb296-4"><a href="treemodel.html#cb296-4" aria-hidden="true" tabindex="-1"></a>              <span class="st">&#39;e1071&#39;</span>, <span class="st">&#39;randomForest&#39;</span>, <span class="st">&#39;gbm&#39;</span>)</span>
-<span id="cb296-5"><a href="treemodel.html#cb296-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb296-6"><a href="treemodel.html#cb296-6" aria-hidden="true" tabindex="-1"></a>packages <span class="ot">&lt;-</span> <span class="fu">rownames</span>(<span class="fu">installed.packages</span>())</span>
-<span id="cb296-7"><a href="treemodel.html#cb296-7" aria-hidden="true" tabindex="-1"></a>p_to_install <span class="ot">&lt;-</span> p_needed[<span class="sc">!</span>(p_needed <span class="sc">%in%</span> packages)]</span>
-<span id="cb296-8"><a href="treemodel.html#cb296-8" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(p_to_install) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
-<span id="cb296-9"><a href="treemodel.html#cb296-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">install.packages</span>(p_to_install)</span>
-<span id="cb296-10"><a href="treemodel.html#cb296-10" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb296-11"><a href="treemodel.html#cb296-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb296-12"><a href="treemodel.html#cb296-12" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(p_needed, require, <span class="at">character.only =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb290"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb290-1"><a href="treemodel.html#cb290-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install packages from CRAN</span></span>
+<span id="cb290-2"><a href="treemodel.html#cb290-2" aria-hidden="true" tabindex="-1"></a>p_needed <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&#39;rpart&#39;</span>, <span class="st">&#39;caret&#39;</span>, <span class="st">&#39;partykit&#39;</span>,</span>
+<span id="cb290-3"><a href="treemodel.html#cb290-3" aria-hidden="true" tabindex="-1"></a>              <span class="st">&#39;pROC&#39;</span>, <span class="st">&#39;dplyr&#39;</span>, <span class="st">&#39;ipred&#39;</span>,</span>
+<span id="cb290-4"><a href="treemodel.html#cb290-4" aria-hidden="true" tabindex="-1"></a>              <span class="st">&#39;e1071&#39;</span>, <span class="st">&#39;randomForest&#39;</span>, <span class="st">&#39;gbm&#39;</span>)</span>
+<span id="cb290-5"><a href="treemodel.html#cb290-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb290-6"><a href="treemodel.html#cb290-6" aria-hidden="true" tabindex="-1"></a>packages <span class="ot">&lt;-</span> <span class="fu">rownames</span>(<span class="fu">installed.packages</span>())</span>
+<span id="cb290-7"><a href="treemodel.html#cb290-7" aria-hidden="true" tabindex="-1"></a>p_to_install <span class="ot">&lt;-</span> p_needed[<span class="sc">!</span>(p_needed <span class="sc">%in%</span> packages)]</span>
+<span id="cb290-8"><a href="treemodel.html#cb290-8" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(p_to_install) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb290-9"><a href="treemodel.html#cb290-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">install.packages</span>(p_to_install)</span>
+<span id="cb290-10"><a href="treemodel.html#cb290-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb290-11"><a href="treemodel.html#cb290-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb290-12"><a href="treemodel.html#cb290-12" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(p_needed, require, <span class="at">character.only =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 </div>
             </section>
 
