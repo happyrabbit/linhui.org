@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2022-10-21" />
+<meta name="date" content="2023-02-15" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -167,8 +167,8 @@ div.csl-indent {
 <li><a href="who-this-book-is-for.html#who-this-book-is-for">Who This Book Is For<span></span></a></li>
 <li><a href="how-to-use-this-book.html#how-to-use-this-book">How to Use This Book<span></span></a>
 <ul>
-<li><a href="how-to-use-this-book.html#what-the-book-assumes">What the book assumes<span></span></a></li>
-<li><a href="how-to-use-this-book.html#how-to-run-r-and-python-code">How to run R and Python code<span></span></a></li>
+<li><a href="how-to-use-this-book.html#what-the-book-assumes">What the Book Assumes<span></span></a></li>
+<li><a href="how-to-use-this-book.html#how-to-run-r-and-python-code">How to Run R and Python Code<span></span></a></li>
 </ul></li>
 <li><a href="complementary-reading.html#complementary-reading">Complementary Reading<span></span></a></li>
 </ul></li>
@@ -395,18 +395,18 @@ div.csl-indent {
 <h1><span class="header-section-number">Chapter 11</span> Tree-Based Methods<a href="treemodel.html#treemodel" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>Tree-based models such as random forest and gradient boosted trees are frequent winners in data challenges and competitions which use standard numerical and categorical datasets. These methods, in general, provide a good baseline for model performance. This chapter describes the fundamentals of tree-based models and provides a set of standard modeling procedures.</p>
 <p>Load R packages:</p>
-<div class="sourceCode" id="cb292"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb292-1"><a href="treemodel.html#cb292-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install packages from CRAN</span></span>
-<span id="cb292-2"><a href="treemodel.html#cb292-2" aria-hidden="true" tabindex="-1"></a>p_needed <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&#39;rpart&#39;</span>, <span class="st">&#39;caret&#39;</span>, <span class="st">&#39;partykit&#39;</span>,</span>
-<span id="cb292-3"><a href="treemodel.html#cb292-3" aria-hidden="true" tabindex="-1"></a>              <span class="st">&#39;pROC&#39;</span>, <span class="st">&#39;dplyr&#39;</span>, <span class="st">&#39;ipred&#39;</span>,</span>
-<span id="cb292-4"><a href="treemodel.html#cb292-4" aria-hidden="true" tabindex="-1"></a>              <span class="st">&#39;e1071&#39;</span>, <span class="st">&#39;randomForest&#39;</span>, <span class="st">&#39;gbm&#39;</span>)</span>
-<span id="cb292-5"><a href="treemodel.html#cb292-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb292-6"><a href="treemodel.html#cb292-6" aria-hidden="true" tabindex="-1"></a>packages <span class="ot">&lt;-</span> <span class="fu">rownames</span>(<span class="fu">installed.packages</span>())</span>
-<span id="cb292-7"><a href="treemodel.html#cb292-7" aria-hidden="true" tabindex="-1"></a>p_to_install <span class="ot">&lt;-</span> p_needed[<span class="sc">!</span>(p_needed <span class="sc">%in%</span> packages)]</span>
-<span id="cb292-8"><a href="treemodel.html#cb292-8" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(p_to_install) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
-<span id="cb292-9"><a href="treemodel.html#cb292-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">install.packages</span>(p_to_install)</span>
-<span id="cb292-10"><a href="treemodel.html#cb292-10" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb292-11"><a href="treemodel.html#cb292-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb292-12"><a href="treemodel.html#cb292-12" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(p_needed, require, <span class="at">character.only =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb298"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb298-1"><a href="treemodel.html#cb298-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install packages from CRAN</span></span>
+<span id="cb298-2"><a href="treemodel.html#cb298-2" aria-hidden="true" tabindex="-1"></a>p_needed <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&#39;rpart&#39;</span>, <span class="st">&#39;caret&#39;</span>, <span class="st">&#39;partykit&#39;</span>,</span>
+<span id="cb298-3"><a href="treemodel.html#cb298-3" aria-hidden="true" tabindex="-1"></a>              <span class="st">&#39;pROC&#39;</span>, <span class="st">&#39;dplyr&#39;</span>, <span class="st">&#39;ipred&#39;</span>,</span>
+<span id="cb298-4"><a href="treemodel.html#cb298-4" aria-hidden="true" tabindex="-1"></a>              <span class="st">&#39;e1071&#39;</span>, <span class="st">&#39;randomForest&#39;</span>, <span class="st">&#39;gbm&#39;</span>)</span>
+<span id="cb298-5"><a href="treemodel.html#cb298-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb298-6"><a href="treemodel.html#cb298-6" aria-hidden="true" tabindex="-1"></a>packages <span class="ot">&lt;-</span> <span class="fu">rownames</span>(<span class="fu">installed.packages</span>())</span>
+<span id="cb298-7"><a href="treemodel.html#cb298-7" aria-hidden="true" tabindex="-1"></a>p_to_install <span class="ot">&lt;-</span> p_needed[<span class="sc">!</span>(p_needed <span class="sc">%in%</span> packages)]</span>
+<span id="cb298-8"><a href="treemodel.html#cb298-8" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(p_to_install) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb298-9"><a href="treemodel.html#cb298-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">install.packages</span>(p_to_install)</span>
+<span id="cb298-10"><a href="treemodel.html#cb298-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb298-11"><a href="treemodel.html#cb298-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb298-12"><a href="treemodel.html#cb298-12" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(p_needed, require, <span class="at">character.only =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 </div>
             </section>
 

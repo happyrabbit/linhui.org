@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2022-10-21" />
+<meta name="date" content="2023-02-15" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -167,8 +167,8 @@ div.csl-indent {
 <li><a href="who-this-book-is-for.html#who-this-book-is-for">Who This Book Is For<span></span></a></li>
 <li><a href="how-to-use-this-book.html#how-to-use-this-book">How to Use This Book<span></span></a>
 <ul>
-<li><a href="how-to-use-this-book.html#what-the-book-assumes">What the book assumes<span></span></a></li>
-<li><a href="how-to-use-this-book.html#how-to-run-r-and-python-code">How to run R and Python code<span></span></a></li>
+<li><a href="how-to-use-this-book.html#what-the-book-assumes">What the Book Assumes<span></span></a></li>
+<li><a href="how-to-use-this-book.html#how-to-run-r-and-python-code">How to Run R and Python Code<span></span></a></li>
 </ul></li>
 <li><a href="complementary-reading.html#complementary-reading">Complementary Reading<span></span></a></li>
 </ul></li>
@@ -524,105 +524,105 @@ The above defines the forward process. Same as before, the backward propagation 
 <div id="r-code-for-imdb-dataset" class="section level4 hasAnchor" number="12.3.4.2">
 <h4><span class="header-section-number">12.3.4.2</span> R code for IMDB dataset<a href="recurrent-neural-network.html#r-code-for-imdb-dataset" class="anchor-section" aria-label="Anchor link to header"></a></h4>
 <p>The IMDB dataset is preloaded for <code>keras</code> and we can call <code>dataset_imdb()</code> to load a partially pre-processed dataset into a data frame. We can define a few parameters in that function. <code>num_words</code> is the number of words in each review to be used. All the unique words are ranked by their frequency counts in the training dataset. The <code>dataset_imdb()</code> function keeps the top <code>num_words</code> words and replaces other words with a default value of 2, and using integers to represent text (i.e., top frequency word will be replaced by 3 and 0, 1, 2 are reserved for “padding,” “start of the sequence,” and “unknown.” ).</p>
-<div class="sourceCode" id="cb383"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb383-1"><a href="recurrent-neural-network.html#cb383-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load `keras` package</span></span>
-<span id="cb383-2"><a href="recurrent-neural-network.html#cb383-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(keras)</span>
-<span id="cb383-3"><a href="recurrent-neural-network.html#cb383-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb383-4"><a href="recurrent-neural-network.html#cb383-4" aria-hidden="true" tabindex="-1"></a><span class="co"># consider only the top 10,000 words in the dataset</span></span>
-<span id="cb383-5"><a href="recurrent-neural-network.html#cb383-5" aria-hidden="true" tabindex="-1"></a>max_unique_word <span class="ot">&lt;-</span> <span class="dv">2500</span></span>
-<span id="cb383-6"><a href="recurrent-neural-network.html#cb383-6" aria-hidden="true" tabindex="-1"></a><span class="co"># cut off reviews after 100 words</span></span>
-<span id="cb383-7"><a href="recurrent-neural-network.html#cb383-7" aria-hidden="true" tabindex="-1"></a>max_review_len <span class="ot">&lt;-</span> <span class="dv">100</span></span></code></pre></div>
+<div class="sourceCode" id="cb390"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb390-1"><a href="recurrent-neural-network.html#cb390-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load `keras` package</span></span>
+<span id="cb390-2"><a href="recurrent-neural-network.html#cb390-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(keras)</span>
+<span id="cb390-3"><a href="recurrent-neural-network.html#cb390-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb390-4"><a href="recurrent-neural-network.html#cb390-4" aria-hidden="true" tabindex="-1"></a><span class="co"># consider only the top 10,000 words in the dataset</span></span>
+<span id="cb390-5"><a href="recurrent-neural-network.html#cb390-5" aria-hidden="true" tabindex="-1"></a>max_unique_word <span class="ot">&lt;-</span> <span class="dv">2500</span></span>
+<span id="cb390-6"><a href="recurrent-neural-network.html#cb390-6" aria-hidden="true" tabindex="-1"></a><span class="co"># cut off reviews after 100 words</span></span>
+<span id="cb390-7"><a href="recurrent-neural-network.html#cb390-7" aria-hidden="true" tabindex="-1"></a>max_review_len <span class="ot">&lt;-</span> <span class="dv">100</span></span></code></pre></div>
 <p>Now we load the IMDB dataset, and we can check the structure of the loaded object by using <code>str()</code> command.</p>
-<div class="sourceCode" id="cb384"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb384-1"><a href="recurrent-neural-network.html#cb384-1" aria-hidden="true" tabindex="-1"></a>my_imdb <span class="ot">&lt;-</span> <span class="fu">dataset_imdb</span>(<span class="at">num_words =</span> max_unique_word)</span>
-<span id="cb384-2"><a href="recurrent-neural-network.html#cb384-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(my_imdb)</span></code></pre></div>
-<div class="sourceCode" id="cb385"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb385-1"><a href="recurrent-neural-network.html#cb385-1" aria-hidden="true" tabindex="-1"></a>Downloading data from</span>
-<span id="cb385-2"><a href="recurrent-neural-network.html#cb385-2" aria-hidden="true" tabindex="-1"></a>https://storage.googleapis.com/tensorflow/tf-keras-datasets/imdb.npz</span>
-<span id="cb385-3"><a href="recurrent-neural-network.html#cb385-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb385-4"><a href="recurrent-neural-network.html#cb385-4" aria-hidden="true" tabindex="-1"></a>    8192/17464789 [..............................] - ETA: 0s</span>
-<span id="cb385-5"><a href="recurrent-neural-network.html#cb385-5" aria-hidden="true" tabindex="-1"></a>  811008/17464789 [&gt;.............................] - ETA: 1s</span>
-<span id="cb385-6"><a href="recurrent-neural-network.html#cb385-6" aria-hidden="true" tabindex="-1"></a> 4202496/17464789 [======&gt;.......................] - ETA: 0s</span>
-<span id="cb385-7"><a href="recurrent-neural-network.html#cb385-7" aria-hidden="true" tabindex="-1"></a>11476992/17464789 [==================&gt;...........] - ETA: 0s</span>
-<span id="cb385-8"><a href="recurrent-neural-network.html#cb385-8" aria-hidden="true" tabindex="-1"></a>17465344/17464789 [==============================] - 0s 0us/step</span>
-<span id="cb385-9"><a href="recurrent-neural-network.html#cb385-9" aria-hidden="true" tabindex="-1"></a>List of 2</span>
-<span id="cb385-10"><a href="recurrent-neural-network.html#cb385-10" aria-hidden="true" tabindex="-1"></a> $ train:List of 2</span>
-<span id="cb385-11"><a href="recurrent-neural-network.html#cb385-11" aria-hidden="true" tabindex="-1"></a>  ..$ x:List of 25000</span>
-<span id="cb385-12"><a href="recurrent-neural-network.html#cb385-12" aria-hidden="true" tabindex="-1"></a>  .. ..$ : int [1:218] 1 14 22 16 43 530 973 1622 1385 65 ...</span>
-<span id="cb385-13"><a href="recurrent-neural-network.html#cb385-13" aria-hidden="true" tabindex="-1"></a>  .. ..$ : int [1:189] 1 194 1153 194 2 78 228 5 6 1463 ...</span>
-<span id="cb385-14"><a href="recurrent-neural-network.html#cb385-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb385-15"><a href="recurrent-neural-network.html#cb385-15" aria-hidden="true" tabindex="-1"></a>*** skipped some output ***</span></code></pre></div>
-<div class="sourceCode" id="cb386"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb386-1"><a href="recurrent-neural-network.html#cb386-1" aria-hidden="true" tabindex="-1"></a>x_train <span class="ot">&lt;-</span> my_imdb<span class="sc">$</span>train<span class="sc">$</span>x</span>
-<span id="cb386-2"><a href="recurrent-neural-network.html#cb386-2" aria-hidden="true" tabindex="-1"></a>y_train <span class="ot">&lt;-</span> my_imdb<span class="sc">$</span>train<span class="sc">$</span>y</span>
-<span id="cb386-3"><a href="recurrent-neural-network.html#cb386-3" aria-hidden="true" tabindex="-1"></a>x_test  <span class="ot">&lt;-</span> my_imdb<span class="sc">$</span>test<span class="sc">$</span>x</span>
-<span id="cb386-4"><a href="recurrent-neural-network.html#cb386-4" aria-hidden="true" tabindex="-1"></a>y_test  <span class="ot">&lt;-</span> my_imdb<span class="sc">$</span>test<span class="sc">$</span>y</span></code></pre></div>
+<div class="sourceCode" id="cb391"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb391-1"><a href="recurrent-neural-network.html#cb391-1" aria-hidden="true" tabindex="-1"></a>my_imdb <span class="ot">&lt;-</span> <span class="fu">dataset_imdb</span>(<span class="at">num_words =</span> max_unique_word)</span>
+<span id="cb391-2"><a href="recurrent-neural-network.html#cb391-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(my_imdb)</span></code></pre></div>
+<div class="sourceCode" id="cb392"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb392-1"><a href="recurrent-neural-network.html#cb392-1" aria-hidden="true" tabindex="-1"></a>Downloading data from</span>
+<span id="cb392-2"><a href="recurrent-neural-network.html#cb392-2" aria-hidden="true" tabindex="-1"></a>https://storage.googleapis.com/tensorflow/tf-keras-datasets/imdb.npz</span>
+<span id="cb392-3"><a href="recurrent-neural-network.html#cb392-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb392-4"><a href="recurrent-neural-network.html#cb392-4" aria-hidden="true" tabindex="-1"></a>    8192/17464789 [..............................] - ETA: 0s</span>
+<span id="cb392-5"><a href="recurrent-neural-network.html#cb392-5" aria-hidden="true" tabindex="-1"></a>  811008/17464789 [&gt;.............................] - ETA: 1s</span>
+<span id="cb392-6"><a href="recurrent-neural-network.html#cb392-6" aria-hidden="true" tabindex="-1"></a> 4202496/17464789 [======&gt;.......................] - ETA: 0s</span>
+<span id="cb392-7"><a href="recurrent-neural-network.html#cb392-7" aria-hidden="true" tabindex="-1"></a>11476992/17464789 [==================&gt;...........] - ETA: 0s</span>
+<span id="cb392-8"><a href="recurrent-neural-network.html#cb392-8" aria-hidden="true" tabindex="-1"></a>17465344/17464789 [==============================] - 0s 0us/step</span>
+<span id="cb392-9"><a href="recurrent-neural-network.html#cb392-9" aria-hidden="true" tabindex="-1"></a>List of 2</span>
+<span id="cb392-10"><a href="recurrent-neural-network.html#cb392-10" aria-hidden="true" tabindex="-1"></a> $ train:List of 2</span>
+<span id="cb392-11"><a href="recurrent-neural-network.html#cb392-11" aria-hidden="true" tabindex="-1"></a>  ..$ x:List of 25000</span>
+<span id="cb392-12"><a href="recurrent-neural-network.html#cb392-12" aria-hidden="true" tabindex="-1"></a>  .. ..$ : int [1:218] 1 14 22 16 43 530 973 1622 1385 65 ...</span>
+<span id="cb392-13"><a href="recurrent-neural-network.html#cb392-13" aria-hidden="true" tabindex="-1"></a>  .. ..$ : int [1:189] 1 194 1153 194 2 78 228 5 6 1463 ...</span>
+<span id="cb392-14"><a href="recurrent-neural-network.html#cb392-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb392-15"><a href="recurrent-neural-network.html#cb392-15" aria-hidden="true" tabindex="-1"></a>*** skipped some output ***</span></code></pre></div>
+<div class="sourceCode" id="cb393"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb393-1"><a href="recurrent-neural-network.html#cb393-1" aria-hidden="true" tabindex="-1"></a>x_train <span class="ot">&lt;-</span> my_imdb<span class="sc">$</span>train<span class="sc">$</span>x</span>
+<span id="cb393-2"><a href="recurrent-neural-network.html#cb393-2" aria-hidden="true" tabindex="-1"></a>y_train <span class="ot">&lt;-</span> my_imdb<span class="sc">$</span>train<span class="sc">$</span>y</span>
+<span id="cb393-3"><a href="recurrent-neural-network.html#cb393-3" aria-hidden="true" tabindex="-1"></a>x_test  <span class="ot">&lt;-</span> my_imdb<span class="sc">$</span>test<span class="sc">$</span>x</span>
+<span id="cb393-4"><a href="recurrent-neural-network.html#cb393-4" aria-hidden="true" tabindex="-1"></a>y_test  <span class="ot">&lt;-</span> my_imdb<span class="sc">$</span>test<span class="sc">$</span>y</span></code></pre></div>
 <p>Next, we do the padding and truncating process.</p>
-<div class="sourceCode" id="cb387"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb387-1"><a href="recurrent-neural-network.html#cb387-1" aria-hidden="true" tabindex="-1"></a>x_train <span class="ot">&lt;-</span> <span class="fu">pad_sequences</span>(x_train, <span class="at">maxlen =</span> max_review_len)</span>
-<span id="cb387-2"><a href="recurrent-neural-network.html#cb387-2" aria-hidden="true" tabindex="-1"></a>x_test <span class="ot">&lt;-</span> <span class="fu">pad_sequences</span>(x_test, <span class="at">maxlen =</span> max_review_len)</span></code></pre></div>
+<div class="sourceCode" id="cb394"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb394-1"><a href="recurrent-neural-network.html#cb394-1" aria-hidden="true" tabindex="-1"></a>x_train <span class="ot">&lt;-</span> <span class="fu">pad_sequences</span>(x_train, <span class="at">maxlen =</span> max_review_len)</span>
+<span id="cb394-2"><a href="recurrent-neural-network.html#cb394-2" aria-hidden="true" tabindex="-1"></a>x_test <span class="ot">&lt;-</span> <span class="fu">pad_sequences</span>(x_test, <span class="at">maxlen =</span> max_review_len)</span></code></pre></div>
 <p>The <code>x_train</code> and <code>x_test</code> are numerical data frames ready to be used for recurrent neural network models.</p>
 <p><strong>Simple Recurrent Neural Network</strong></p>
 <p>Like DNN and CNN models we trained in the past, RNN models are relatively easy to train using <code>keras</code> after the pre-processing stage. In the following example, we use <code>layer_embedding()</code> to fit an embedding layer based on the training dataset, which has two parameters: <code>input_dim</code> (the number of unique words) and <code>output_dim</code> (the length of dense vectors). Then, we add a simple RNN layer by calling <code>layer_simple_rnn()</code> and followed by a dense layer <code>layer_dense()</code> to connect to the response binary variable.</p>
-<div class="sourceCode" id="cb388"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb388-1"><a href="recurrent-neural-network.html#cb388-1" aria-hidden="true" tabindex="-1"></a>rnn_model <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>()</span>
-<span id="cb388-2"><a href="recurrent-neural-network.html#cb388-2" aria-hidden="true" tabindex="-1"></a>rnn_model <span class="sc">%&gt;%</span></span>
-<span id="cb388-3"><a href="recurrent-neural-network.html#cb388-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_unique_word, <span class="at">output_dim =</span> <span class="dv">128</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb388-4"><a href="recurrent-neural-network.html#cb388-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_simple_rnn</span>(<span class="at">units =</span> <span class="dv">64</span>, <span class="at">dropout =</span> <span class="fl">0.2</span>,</span>
-<span id="cb388-5"><a href="recurrent-neural-network.html#cb388-5" aria-hidden="true" tabindex="-1"></a>                   <span class="at">recurrent_dropout =</span> <span class="fl">0.2</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb388-6"><a href="recurrent-neural-network.html#cb388-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&#39;sigmoid&#39;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb395"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb395-1"><a href="recurrent-neural-network.html#cb395-1" aria-hidden="true" tabindex="-1"></a>rnn_model <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>()</span>
+<span id="cb395-2"><a href="recurrent-neural-network.html#cb395-2" aria-hidden="true" tabindex="-1"></a>rnn_model <span class="sc">%&gt;%</span></span>
+<span id="cb395-3"><a href="recurrent-neural-network.html#cb395-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_unique_word, <span class="at">output_dim =</span> <span class="dv">128</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb395-4"><a href="recurrent-neural-network.html#cb395-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_simple_rnn</span>(<span class="at">units =</span> <span class="dv">64</span>, <span class="at">dropout =</span> <span class="fl">0.2</span>,</span>
+<span id="cb395-5"><a href="recurrent-neural-network.html#cb395-5" aria-hidden="true" tabindex="-1"></a>                   <span class="at">recurrent_dropout =</span> <span class="fl">0.2</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb395-6"><a href="recurrent-neural-network.html#cb395-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&#39;sigmoid&#39;</span>)</span></code></pre></div>
 <p>We compile the RNN model by defining the loss function, optimizer to use, and metrics to track the same way as DNN and CNN models.</p>
-<div class="sourceCode" id="cb389"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb389-1"><a href="recurrent-neural-network.html#cb389-1" aria-hidden="true" tabindex="-1"></a>rnn_model <span class="sc">%&gt;%</span> <span class="fu">compile</span>(</span>
-<span id="cb389-2"><a href="recurrent-neural-network.html#cb389-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">loss =</span> <span class="st">&#39;binary_crossentropy&#39;</span>,</span>
-<span id="cb389-3"><a href="recurrent-neural-network.html#cb389-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">optimizer =</span> <span class="st">&#39;adam&#39;</span>,</span>
-<span id="cb389-4"><a href="recurrent-neural-network.html#cb389-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&#39;accuracy&#39;</span>)</span>
-<span id="cb389-5"><a href="recurrent-neural-network.html#cb389-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb396"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb396-1"><a href="recurrent-neural-network.html#cb396-1" aria-hidden="true" tabindex="-1"></a>rnn_model <span class="sc">%&gt;%</span> <span class="fu">compile</span>(</span>
+<span id="cb396-2"><a href="recurrent-neural-network.html#cb396-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">loss =</span> <span class="st">&#39;binary_crossentropy&#39;</span>,</span>
+<span id="cb396-3"><a href="recurrent-neural-network.html#cb396-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">optimizer =</span> <span class="st">&#39;adam&#39;</span>,</span>
+<span id="cb396-4"><a href="recurrent-neural-network.html#cb396-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&#39;accuracy&#39;</span>)</span>
+<span id="cb396-5"><a href="recurrent-neural-network.html#cb396-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
 <p>Let us define a few more variables before fitting the model: <code>batch_size</code>, <code>epochs</code>, and <code>validation_split</code>. These variables have the same meaning as DNN and CNN models we see in the past.</p>
-<div class="sourceCode" id="cb390"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb390-1"><a href="recurrent-neural-network.html#cb390-1" aria-hidden="true" tabindex="-1"></a>batch_size <span class="ot">=</span> <span class="dv">128</span></span>
-<span id="cb390-2"><a href="recurrent-neural-network.html#cb390-2" aria-hidden="true" tabindex="-1"></a>epochs <span class="ot">=</span> <span class="dv">5</span></span>
-<span id="cb390-3"><a href="recurrent-neural-network.html#cb390-3" aria-hidden="true" tabindex="-1"></a>validation_split <span class="ot">=</span> <span class="fl">0.2</span></span>
-<span id="cb390-4"><a href="recurrent-neural-network.html#cb390-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb390-5"><a href="recurrent-neural-network.html#cb390-5" aria-hidden="true" tabindex="-1"></a>rnn_history <span class="ot">&lt;-</span> rnn_model <span class="sc">%&gt;%</span> <span class="fu">fit</span>(</span>
-<span id="cb390-6"><a href="recurrent-neural-network.html#cb390-6" aria-hidden="true" tabindex="-1"></a>  x_train, y_train,</span>
-<span id="cb390-7"><a href="recurrent-neural-network.html#cb390-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">batch_size =</span> batch_size,</span>
-<span id="cb390-8"><a href="recurrent-neural-network.html#cb390-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">epochs =</span> epochs,</span>
-<span id="cb390-9"><a href="recurrent-neural-network.html#cb390-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">validation_split =</span> validation_split</span>
-<span id="cb390-10"><a href="recurrent-neural-network.html#cb390-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<div class="sourceCode" id="cb391"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb391-1"><a href="recurrent-neural-network.html#cb391-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(rnn_history)</span></code></pre></div>
+<div class="sourceCode" id="cb397"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb397-1"><a href="recurrent-neural-network.html#cb397-1" aria-hidden="true" tabindex="-1"></a>batch_size <span class="ot">=</span> <span class="dv">128</span></span>
+<span id="cb397-2"><a href="recurrent-neural-network.html#cb397-2" aria-hidden="true" tabindex="-1"></a>epochs <span class="ot">=</span> <span class="dv">5</span></span>
+<span id="cb397-3"><a href="recurrent-neural-network.html#cb397-3" aria-hidden="true" tabindex="-1"></a>validation_split <span class="ot">=</span> <span class="fl">0.2</span></span>
+<span id="cb397-4"><a href="recurrent-neural-network.html#cb397-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb397-5"><a href="recurrent-neural-network.html#cb397-5" aria-hidden="true" tabindex="-1"></a>rnn_history <span class="ot">&lt;-</span> rnn_model <span class="sc">%&gt;%</span> <span class="fu">fit</span>(</span>
+<span id="cb397-6"><a href="recurrent-neural-network.html#cb397-6" aria-hidden="true" tabindex="-1"></a>  x_train, y_train,</span>
+<span id="cb397-7"><a href="recurrent-neural-network.html#cb397-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">batch_size =</span> batch_size,</span>
+<span id="cb397-8"><a href="recurrent-neural-network.html#cb397-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">epochs =</span> epochs,</span>
+<span id="cb397-9"><a href="recurrent-neural-network.html#cb397-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">validation_split =</span> validation_split</span>
+<span id="cb397-10"><a href="recurrent-neural-network.html#cb397-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb398"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb398-1"><a href="recurrent-neural-network.html#cb398-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(rnn_history)</span></code></pre></div>
 <center>
 <img src="images/rnnhandson1.png" style="width:90.0%" />
 </center>
-<div class="sourceCode" id="cb392"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb392-1"><a href="recurrent-neural-network.html#cb392-1" aria-hidden="true" tabindex="-1"></a>rnn_model <span class="sc">%&gt;%</span></span>
-<span id="cb392-2"><a href="recurrent-neural-network.html#cb392-2" aria-hidden="true" tabindex="-1"></a>   <span class="fu">evaluate</span>(x_test, y_test)</span></code></pre></div>
-<div class="sourceCode" id="cb393"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb393-1"><a href="recurrent-neural-network.html#cb393-1" aria-hidden="true" tabindex="-1"></a>##      loss  accuracy </span>
-<span id="cb393-2"><a href="recurrent-neural-network.html#cb393-2" aria-hidden="true" tabindex="-1"></a>## 0.5441073 0.7216800 </span></code></pre></div>
+<div class="sourceCode" id="cb399"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb399-1"><a href="recurrent-neural-network.html#cb399-1" aria-hidden="true" tabindex="-1"></a>rnn_model <span class="sc">%&gt;%</span></span>
+<span id="cb399-2"><a href="recurrent-neural-network.html#cb399-2" aria-hidden="true" tabindex="-1"></a>   <span class="fu">evaluate</span>(x_test, y_test)</span></code></pre></div>
+<div class="sourceCode" id="cb400"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb400-1"><a href="recurrent-neural-network.html#cb400-1" aria-hidden="true" tabindex="-1"></a>##      loss  accuracy </span>
+<span id="cb400-2"><a href="recurrent-neural-network.html#cb400-2" aria-hidden="true" tabindex="-1"></a>## 0.5441073 0.7216800 </span></code></pre></div>
 <p><strong>LSTM RNN Model</strong></p>
 <p>A simple RNN layer is a good starting point for learning RNN, but the performance is usually not that good because these long-term dependencies are impossible to learn due to vanishing gradient. Long Short Term Memory RNN model (LSTM) can carry useful information from the earlier words to later words. In <code>keras</code>, it is easy to replace a simple RNN layer with an LSTM layer by using <code>layer_lstm()</code>.</p>
-<div class="sourceCode" id="cb394"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb394-1"><a href="recurrent-neural-network.html#cb394-1" aria-hidden="true" tabindex="-1"></a>lstm_model <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>()</span>
-<span id="cb394-2"><a href="recurrent-neural-network.html#cb394-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb394-3"><a href="recurrent-neural-network.html#cb394-3" aria-hidden="true" tabindex="-1"></a>lstm_model <span class="sc">%&gt;%</span></span>
-<span id="cb394-4"><a href="recurrent-neural-network.html#cb394-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_unique_word, <span class="at">output_dim =</span> <span class="dv">128</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb394-5"><a href="recurrent-neural-network.html#cb394-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_lstm</span>(<span class="at">units =</span> <span class="dv">64</span>, <span class="at">dropout =</span> <span class="fl">0.2</span>, <span class="at">recurrent_dropout =</span> <span class="fl">0.2</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb394-6"><a href="recurrent-neural-network.html#cb394-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&#39;sigmoid&#39;</span>)</span>
-<span id="cb394-7"><a href="recurrent-neural-network.html#cb394-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb394-8"><a href="recurrent-neural-network.html#cb394-8" aria-hidden="true" tabindex="-1"></a>lstm_model <span class="sc">%&gt;%</span> <span class="fu">compile</span>(</span>
-<span id="cb394-9"><a href="recurrent-neural-network.html#cb394-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">loss =</span> <span class="st">&#39;binary_crossentropy&#39;</span>,</span>
-<span id="cb394-10"><a href="recurrent-neural-network.html#cb394-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">optimizer =</span> <span class="st">&#39;adam&#39;</span>,</span>
-<span id="cb394-11"><a href="recurrent-neural-network.html#cb394-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&#39;accuracy&#39;</span>)</span>
-<span id="cb394-12"><a href="recurrent-neural-network.html#cb394-12" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb394-13"><a href="recurrent-neural-network.html#cb394-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb394-14"><a href="recurrent-neural-network.html#cb394-14" aria-hidden="true" tabindex="-1"></a>batch_size <span class="ot">=</span> <span class="dv">128</span></span>
-<span id="cb394-15"><a href="recurrent-neural-network.html#cb394-15" aria-hidden="true" tabindex="-1"></a>epochs <span class="ot">=</span> <span class="dv">5</span></span>
-<span id="cb394-16"><a href="recurrent-neural-network.html#cb394-16" aria-hidden="true" tabindex="-1"></a>validation_split <span class="ot">=</span> <span class="fl">0.2</span></span>
-<span id="cb394-17"><a href="recurrent-neural-network.html#cb394-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb394-18"><a href="recurrent-neural-network.html#cb394-18" aria-hidden="true" tabindex="-1"></a>lstm_history <span class="ot">&lt;-</span> lstm_model <span class="sc">%&gt;%</span> <span class="fu">fit</span>(</span>
-<span id="cb394-19"><a href="recurrent-neural-network.html#cb394-19" aria-hidden="true" tabindex="-1"></a>  x_train, y_train,</span>
-<span id="cb394-20"><a href="recurrent-neural-network.html#cb394-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">batch_size =</span> batch_size,</span>
-<span id="cb394-21"><a href="recurrent-neural-network.html#cb394-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">epochs =</span> epochs,</span>
-<span id="cb394-22"><a href="recurrent-neural-network.html#cb394-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">validation_split =</span> validation_split</span>
-<span id="cb394-23"><a href="recurrent-neural-network.html#cb394-23" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
-<div class="sourceCode" id="cb395"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb395-1"><a href="recurrent-neural-network.html#cb395-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(lstm_history)</span></code></pre></div>
+<div class="sourceCode" id="cb401"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb401-1"><a href="recurrent-neural-network.html#cb401-1" aria-hidden="true" tabindex="-1"></a>lstm_model <span class="ot">&lt;-</span> <span class="fu">keras_model_sequential</span>()</span>
+<span id="cb401-2"><a href="recurrent-neural-network.html#cb401-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb401-3"><a href="recurrent-neural-network.html#cb401-3" aria-hidden="true" tabindex="-1"></a>lstm_model <span class="sc">%&gt;%</span></span>
+<span id="cb401-4"><a href="recurrent-neural-network.html#cb401-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_embedding</span>(<span class="at">input_dim =</span> max_unique_word, <span class="at">output_dim =</span> <span class="dv">128</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb401-5"><a href="recurrent-neural-network.html#cb401-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_lstm</span>(<span class="at">units =</span> <span class="dv">64</span>, <span class="at">dropout =</span> <span class="fl">0.2</span>, <span class="at">recurrent_dropout =</span> <span class="fl">0.2</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb401-6"><a href="recurrent-neural-network.html#cb401-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layer_dense</span>(<span class="at">units =</span> <span class="dv">1</span>, <span class="at">activation =</span> <span class="st">&#39;sigmoid&#39;</span>)</span>
+<span id="cb401-7"><a href="recurrent-neural-network.html#cb401-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb401-8"><a href="recurrent-neural-network.html#cb401-8" aria-hidden="true" tabindex="-1"></a>lstm_model <span class="sc">%&gt;%</span> <span class="fu">compile</span>(</span>
+<span id="cb401-9"><a href="recurrent-neural-network.html#cb401-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">loss =</span> <span class="st">&#39;binary_crossentropy&#39;</span>,</span>
+<span id="cb401-10"><a href="recurrent-neural-network.html#cb401-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">optimizer =</span> <span class="st">&#39;adam&#39;</span>,</span>
+<span id="cb401-11"><a href="recurrent-neural-network.html#cb401-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">metrics =</span> <span class="fu">c</span>(<span class="st">&#39;accuracy&#39;</span>)</span>
+<span id="cb401-12"><a href="recurrent-neural-network.html#cb401-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb401-13"><a href="recurrent-neural-network.html#cb401-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb401-14"><a href="recurrent-neural-network.html#cb401-14" aria-hidden="true" tabindex="-1"></a>batch_size <span class="ot">=</span> <span class="dv">128</span></span>
+<span id="cb401-15"><a href="recurrent-neural-network.html#cb401-15" aria-hidden="true" tabindex="-1"></a>epochs <span class="ot">=</span> <span class="dv">5</span></span>
+<span id="cb401-16"><a href="recurrent-neural-network.html#cb401-16" aria-hidden="true" tabindex="-1"></a>validation_split <span class="ot">=</span> <span class="fl">0.2</span></span>
+<span id="cb401-17"><a href="recurrent-neural-network.html#cb401-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb401-18"><a href="recurrent-neural-network.html#cb401-18" aria-hidden="true" tabindex="-1"></a>lstm_history <span class="ot">&lt;-</span> lstm_model <span class="sc">%&gt;%</span> <span class="fu">fit</span>(</span>
+<span id="cb401-19"><a href="recurrent-neural-network.html#cb401-19" aria-hidden="true" tabindex="-1"></a>  x_train, y_train,</span>
+<span id="cb401-20"><a href="recurrent-neural-network.html#cb401-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">batch_size =</span> batch_size,</span>
+<span id="cb401-21"><a href="recurrent-neural-network.html#cb401-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">epochs =</span> epochs,</span>
+<span id="cb401-22"><a href="recurrent-neural-network.html#cb401-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">validation_split =</span> validation_split</span>
+<span id="cb401-23"><a href="recurrent-neural-network.html#cb401-23" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb402"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb402-1"><a href="recurrent-neural-network.html#cb402-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(lstm_history)</span></code></pre></div>
 <center>
 <img src="images/rnnhandson2.png" style="width:90.0%" />
 </center>
-<div class="sourceCode" id="cb396"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb396-1"><a href="recurrent-neural-network.html#cb396-1" aria-hidden="true" tabindex="-1"></a>lstm_model <span class="sc">%&gt;%</span></span>
-<span id="cb396-2"><a href="recurrent-neural-network.html#cb396-2" aria-hidden="true" tabindex="-1"></a>   <span class="fu">evaluate</span>(x_test, y_test)</span></code></pre></div>
-<div class="sourceCode" id="cb397"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb397-1"><a href="recurrent-neural-network.html#cb397-1" aria-hidden="true" tabindex="-1"></a>##     loss accuracy </span>
-<span id="cb397-2"><a href="recurrent-neural-network.html#cb397-2" aria-hidden="true" tabindex="-1"></a>## 0.361364 0.844080</span></code></pre></div>
+<div class="sourceCode" id="cb403"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb403-1"><a href="recurrent-neural-network.html#cb403-1" aria-hidden="true" tabindex="-1"></a>lstm_model <span class="sc">%&gt;%</span></span>
+<span id="cb403-2"><a href="recurrent-neural-network.html#cb403-2" aria-hidden="true" tabindex="-1"></a>   <span class="fu">evaluate</span>(x_test, y_test)</span></code></pre></div>
+<div class="sourceCode" id="cb404"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb404-1"><a href="recurrent-neural-network.html#cb404-1" aria-hidden="true" tabindex="-1"></a>##     loss accuracy </span>
+<span id="cb404-2"><a href="recurrent-neural-network.html#cb404-2" aria-hidden="true" tabindex="-1"></a>## 0.361364 0.844080</span></code></pre></div>
 <p>This simple example shows that LSTM’s performance has improved dramatically from the simple RNN model. The computation time for LSTM is roughly doubled when compared with the simple RNN model for this small dataset.</p>
 
 </div>

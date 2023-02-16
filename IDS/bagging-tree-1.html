@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2022-10-21" />
+<meta name="date" content="2023-02-15" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -167,8 +167,8 @@ div.csl-indent {
 <li><a href="who-this-book-is-for.html#who-this-book-is-for">Who This Book Is For<span></span></a></li>
 <li><a href="how-to-use-this-book.html#how-to-use-this-book">How to Use This Book<span></span></a>
 <ul>
-<li><a href="how-to-use-this-book.html#what-the-book-assumes">What the book assumes<span></span></a></li>
-<li><a href="how-to-use-this-book.html#how-to-run-r-and-python-code">How to run R and Python code<span></span></a></li>
+<li><a href="how-to-use-this-book.html#what-the-book-assumes">What the Book Assumes<span></span></a></li>
+<li><a href="how-to-use-this-book.html#how-to-run-r-and-python-code">How to Run R and Python Code<span></span></a></li>
 </ul></li>
 <li><a href="complementary-reading.html#complementary-reading">Complementary Reading<span></span></a></li>
 </ul></li>
@@ -409,26 +409,26 @@ div.csl-indent {
 <li><p>Since the bagging tree uses all of the original predictors as everey split of every tree, those trees are related with each other. The tree correlation prevents bagging from optimally reducing the variance of the predicted values. See <span class="citation">(<a href="#ref-Hastie2008" role="doc-biblioref">Hastie T 2008</a>)</span> for a mathematical illustration of the tree correlation phenomenon.</p></li>
 </ul>
 <p>Let’s look at how to use R to build bagging tree using survey question to predict customer gender based on the customer dataset. Get the predictors and response variable first:</p>
-<div class="sourceCode" id="cb306"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb306-1"><a href="bagging-tree-1.html#cb306-1" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)</span>
-<span id="cb306-2"><a href="bagging-tree-1.html#cb306-2" aria-hidden="true" tabindex="-1"></a><span class="co"># use the 10 survey questions as predictors</span></span>
-<span id="cb306-3"><a href="bagging-tree-1.html#cb306-3" aria-hidden="true" tabindex="-1"></a>trainx <span class="ot">&lt;-</span> dat[, <span class="fu">grep</span>(<span class="st">&quot;Q&quot;</span>, <span class="fu">names</span>(dat))]</span>
-<span id="cb306-4"><a href="bagging-tree-1.html#cb306-4" aria-hidden="true" tabindex="-1"></a><span class="co"># add segment as a predictor </span></span>
-<span id="cb306-5"><a href="bagging-tree-1.html#cb306-5" aria-hidden="true" tabindex="-1"></a><span class="co"># don&#39;t need to encode it to dummy variables</span></span>
-<span id="cb306-6"><a href="bagging-tree-1.html#cb306-6" aria-hidden="true" tabindex="-1"></a>trainx<span class="sc">$</span>segment <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(dat<span class="sc">$</span>segment)</span>
-<span id="cb306-7"><a href="bagging-tree-1.html#cb306-7" aria-hidden="true" tabindex="-1"></a><span class="co"># use gender as the response variable</span></span>
-<span id="cb306-8"><a href="bagging-tree-1.html#cb306-8" aria-hidden="true" tabindex="-1"></a>trainy <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(dat<span class="sc">$</span>gender)</span></code></pre></div>
+<div class="sourceCode" id="cb312"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb312-1"><a href="bagging-tree-1.html#cb312-1" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;http://bit.ly/2P5gTw4&quot;</span>)</span>
+<span id="cb312-2"><a href="bagging-tree-1.html#cb312-2" aria-hidden="true" tabindex="-1"></a><span class="co"># use the 10 survey questions as predictors</span></span>
+<span id="cb312-3"><a href="bagging-tree-1.html#cb312-3" aria-hidden="true" tabindex="-1"></a>trainx <span class="ot">&lt;-</span> dat[, <span class="fu">grep</span>(<span class="st">&quot;Q&quot;</span>, <span class="fu">names</span>(dat))]</span>
+<span id="cb312-4"><a href="bagging-tree-1.html#cb312-4" aria-hidden="true" tabindex="-1"></a><span class="co"># add segment as a predictor </span></span>
+<span id="cb312-5"><a href="bagging-tree-1.html#cb312-5" aria-hidden="true" tabindex="-1"></a><span class="co"># don&#39;t need to encode it to dummy variables</span></span>
+<span id="cb312-6"><a href="bagging-tree-1.html#cb312-6" aria-hidden="true" tabindex="-1"></a>trainx<span class="sc">$</span>segment <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(dat<span class="sc">$</span>segment)</span>
+<span id="cb312-7"><a href="bagging-tree-1.html#cb312-7" aria-hidden="true" tabindex="-1"></a><span class="co"># use gender as the response variable</span></span>
+<span id="cb312-8"><a href="bagging-tree-1.html#cb312-8" aria-hidden="true" tabindex="-1"></a>trainy <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(dat<span class="sc">$</span>gender)</span></code></pre></div>
 <p>Then fit the model using train function in caret package. Here we just set the number of trees to be 1000. You can tune that parameter.</p>
-<div class="sourceCode" id="cb307"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb307-1"><a href="bagging-tree-1.html#cb307-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">100</span>)</span>
-<span id="cb307-2"><a href="bagging-tree-1.html#cb307-2" aria-hidden="true" tabindex="-1"></a>bagTune <span class="ot">&lt;-</span> caret<span class="sc">::</span><span class="fu">train</span>(trainx, trainy, </span>
-<span id="cb307-3"><a href="bagging-tree-1.html#cb307-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">method =</span> <span class="st">&quot;treebag&quot;</span>,</span>
-<span id="cb307-4"><a href="bagging-tree-1.html#cb307-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">nbagg =</span> <span class="dv">1000</span>,</span>
-<span id="cb307-5"><a href="bagging-tree-1.html#cb307-5" aria-hidden="true" tabindex="-1"></a>                           <span class="at">metric =</span> <span class="st">&quot;ROC&quot;</span>,</span>
-<span id="cb307-6"><a href="bagging-tree-1.html#cb307-6" aria-hidden="true" tabindex="-1"></a>                           <span class="at">trControl =</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">&quot;cv&quot;</span>,</span>
-<span id="cb307-7"><a href="bagging-tree-1.html#cb307-7" aria-hidden="true" tabindex="-1"></a>                           <span class="at">summaryFunction =</span> twoClassSummary,</span>
-<span id="cb307-8"><a href="bagging-tree-1.html#cb307-8" aria-hidden="true" tabindex="-1"></a>                           <span class="at">classProbs =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb307-9"><a href="bagging-tree-1.html#cb307-9" aria-hidden="true" tabindex="-1"></a>                           <span class="at">savePredictions =</span> <span class="cn">TRUE</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb313"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb313-1"><a href="bagging-tree-1.html#cb313-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">100</span>)</span>
+<span id="cb313-2"><a href="bagging-tree-1.html#cb313-2" aria-hidden="true" tabindex="-1"></a>bagTune <span class="ot">&lt;-</span> caret<span class="sc">::</span><span class="fu">train</span>(trainx, trainy, </span>
+<span id="cb313-3"><a href="bagging-tree-1.html#cb313-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">method =</span> <span class="st">&quot;treebag&quot;</span>,</span>
+<span id="cb313-4"><a href="bagging-tree-1.html#cb313-4" aria-hidden="true" tabindex="-1"></a>                           <span class="at">nbagg =</span> <span class="dv">1000</span>,</span>
+<span id="cb313-5"><a href="bagging-tree-1.html#cb313-5" aria-hidden="true" tabindex="-1"></a>                           <span class="at">metric =</span> <span class="st">&quot;ROC&quot;</span>,</span>
+<span id="cb313-6"><a href="bagging-tree-1.html#cb313-6" aria-hidden="true" tabindex="-1"></a>                           <span class="at">trControl =</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">&quot;cv&quot;</span>,</span>
+<span id="cb313-7"><a href="bagging-tree-1.html#cb313-7" aria-hidden="true" tabindex="-1"></a>                           <span class="at">summaryFunction =</span> twoClassSummary,</span>
+<span id="cb313-8"><a href="bagging-tree-1.html#cb313-8" aria-hidden="true" tabindex="-1"></a>                           <span class="at">classProbs =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb313-9"><a href="bagging-tree-1.html#cb313-9" aria-hidden="true" tabindex="-1"></a>                           <span class="at">savePredictions =</span> <span class="cn">TRUE</span>))</span></code></pre></div>
 <p>The model results are:</p>
-<div class="sourceCode" id="cb308"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb308-1"><a href="bagging-tree-1.html#cb308-1" aria-hidden="true" tabindex="-1"></a>bagTune</span></code></pre></div>
+<div class="sourceCode" id="cb314"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb314-1"><a href="bagging-tree-1.html#cb314-1" aria-hidden="true" tabindex="-1"></a>bagTune</span></code></pre></div>
 <pre><code>## Bagged CART 
 ## 
 ## 1000 samples

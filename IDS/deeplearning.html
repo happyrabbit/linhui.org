@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2022-10-21" />
+<meta name="date" content="2023-02-15" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -167,8 +167,8 @@ div.csl-indent {
 <li><a href="who-this-book-is-for.html#who-this-book-is-for">Who This Book Is For<span></span></a></li>
 <li><a href="how-to-use-this-book.html#how-to-use-this-book">How to Use This Book<span></span></a>
 <ul>
-<li><a href="how-to-use-this-book.html#what-the-book-assumes">What the book assumes<span></span></a></li>
-<li><a href="how-to-use-this-book.html#how-to-run-r-and-python-code">How to run R and Python code<span></span></a></li>
+<li><a href="how-to-use-this-book.html#what-the-book-assumes">What the Book Assumes<span></span></a></li>
+<li><a href="how-to-use-this-book.html#how-to-run-r-and-python-code">How to Run R and Python Code<span></span></a></li>
 </ul></li>
 <li><a href="complementary-reading.html#complementary-reading">Complementary Reading<span></span></a></li>
 </ul></li>
@@ -409,75 +409,6 @@ div.csl-indent {
 <p>With data, network structure and algorithms ready, modern deep learning still requires a certain amount of computation power for training. The entire framework involves heavy linear algebra operations with large matrices and tensors. These types of operations are much faster on modern graphical processing units (GPUs) than the computer’s central processing units (CPU).</p>
 <p>With the vast potential application of deep learning, major tech companies contribute heavily to open-source deep learning frameworks. For example, Google has open-sourced its TensorFlow framework; Facebook has open-sourced its PyTorch framework, and Amazon has significantly contributed to the MXNet open-source framework. With thousands of software developers and scientists behind these deep learning frameworks, users can confidently pick one framework and start training their deep learning models right away in popular cloud environments. Much of the heavy lifting to train a deep learning model has been embedded in these open-source frameworks and there are also many pre-trained models available for users to adopt. Users can now enjoy the relatively easy access to software and hardware to develop their own deep learning applications. In this book, we will demonstrate deep learning examples using Keras, a high-level abstraction of TensorFlow, using the Databricks Community Edition platform.</p>
 <p>In summary, deep learning has not just developed in the past few years but have in fact been ongoing research for the past few decades. The accumulation of data, the advancement of new optimization algorithms and the improvement of computation power has finally enabled every day deep learning applications. In the foreseeable future, deep learning will continue to revolutionize machine learning methods across many more areas.</p>
-<!--
-## Projection Pursuit Regression
-
-Before moving onto neural networks, let us start with a broader framework, Projection Pursuit Regression (PPR). It has a form of **additive model** of the derived features rather than the inputs themselves. Another widely used algorithm, AdaBoost, also fits an additive model in a base learner.
-
-Assume $\mathbf{X^{T}}=(X_1,X_2,\dots,X_p)$ is a vector with $p$ variables. $Y$ is the corresponding response variable. $\mathbf{\omega_{m}},m=1,2,\dots,M$ is parameter vector with $p$ elements.
-
-$$f(\mathbf{X})=\sum_{m=1}^{M}g_{m}(\mathbf{\omega_{m}^{T}X})$$
-
-The new feature $\mathbf{V_{m}}=\mathbf{\omega_{m}^{T}X}$ is a linear combination of input variables $\mathbf{X}$. The additive model is based on the new features. Here $\mathbf{\omega_{m}}$ is a unit vector, and the new feature $\mathbf{v_m}$ is actually the projection of $\mathbf{X}$ on $\mathbf{\omega_{m}}$. It projects the p-dimensional independent variable space onto the new M-dimensional feature space. This is similar to the principal component analysis except that the principal component is orthogonal projection but it is not necessarily orthogonal here.
-
-I know it is very abstract. Let's look at some examples. Assume $p=2$, i.e. there are two variables $x_1$ and $x_2$. If $M=1$, $\mathbf{\omega^{T}}=(\frac{1}{2},\frac{\sqrt{3}}{2})$, then the corresponding  $v=\frac{1}{2}x_{1}+\frac{\sqrt{3}}{2}x_{2}$. Let's try different setings and compare the results:
-
-1. $\mathbf{\omega^{T}}=(\frac{1}{2},\frac{\sqrt{3}}{2})$, $v=\frac{1}{2}x_{1}+\frac{\sqrt{3}}{2}x_{2}$ , $g(v)=\frac{1}{1+e^{-v}}$
-
-1. $\mathbf{\omega^{T}}=(1,0)$, $v = x_1$, $g(v)=(v+5)sin(\frac{1}{\frac{v}{3}+0.1})$
-
-1. $\mathbf{\omega^{T}}=(0,1)$, $v = x_2$, $g(v)=e^{\frac{v^2}{5}}$
-
-1. $\mathbf{\omega^{T}}=(1,0)$, $v = x_1$, $g(v)=(v+0.1)sin(\frac{1}{\frac{v}{3}+0.1})$
-
-
-Here is how you can simulate the data and plot it using R:
-
-
-```r
-# use plot3D package to generate 3D plot
-library(plot3D)
-# get x1 and x2 note here x1 and x2 need to be matrix if
-# you check the two objects, you will find: columns in
-# x1 are identical rows in x2 are identical mesh() is
-# funciton from plot3D package you may need to think a
-# little here
-M <- mesh(seq(-13.2, 13.2, length.out = 50), seq(-37.4,
-    37.4, length.out = 50))
-x1 <- M$x
-x2 <- M$y
-## setting 1 map X using w to get v
-v <- (1/2) * x1 + (sqrt(3)/2) * x2
-# apply g() on v
-g1 <- 1/(1 + exp(-v))
-par(mfrow = c(2, 2), mar = c(0, 0, 1, 0))
-surf3D(x1, x2, g1, colvar = g1, border = "black", colkey = FALSE,
-    box = FALSE, main = "Setting 1")
-## setting 2
-v <- x1
-g2 <- (v + 5) * sin(1/(v/3 + 0.1))
-surf3D(x1, x2, g2, colvar = g2, border = "black", colkey = FALSE,
-    box = FALSE, main = "Setting 2")
-## setting 3
-v <- x2
-g3 <- exp(v^2/5)
-surf3D(x1, x2, g3, colvar = g3, border = "black", colkey = FALSE,
-    box = FALSE, main = "Setting 3")
-## setting 4
-v <- x1
-g4 <- (v + 0.1) * sin(1/(v/3 + 0.1))
-surf3D(x1, x2, g4, colvar = g4, border = "black", colkey = FALSE,
-    box = FALSE, main = "Setting 4")
-```
-
-<img src="IDS_files/figure-html/nnet_simulate_data-1.svg" width="672" />
-
-You can see that this framework is very flexible. In essence, it is to do a non-linear transformation of the linear combination. You can use this way to capture varies of relationships. For example,$x_{1}x_{2}$ can be written as $\frac{(x_{1}+x_{2})^{2}-(x_{1}-x_{2})^{2}}{4}$, where $M=2$. All the higher order factors of $x_1$ and $x_2$ can be represented similarly. If $M$ is large enough, this framework can approximate any continuous function on $\mathbb{R}^{p}$. So the model family covers a board area, but with a price. That is the interpretability. Because the number of parameters increases with M and the mode is nested.
-
-PPR in 1981 was a new idea then which lead to the debut of the neural network model. The basic technical idea behind deep learning has been around for decades. However, why did they take off in recent years? Here are some main drivers behind the rise.
-
-First, thanks to the digitalization where lots of human activities are now in the digital realm and captured as data. So in the last 10 year, for many problems, we went from having a relatively small amount of data to accumulating a large amount of data. The traditional learning algorithms, like Logistic Regression, Support Vector Machine, Random Forest cannot effectively take advantage of such big data.  Second, the increasing computation power enables us to train a large neural network either on a CPU or GPU using big data. The scale of data and computation ability lead to much progress, but tremendous algorithmic innovation is also an important driver. Many of the innovations are about speeding up the optimization of neural network. One of the examples is to use ReLU as intermediate layer activation function instead of the previous sigmoid function. The change has made the optimization process much faster because the previous sigmoid function suffers from vanishing gradient. We will talk more about that in the following sections. Here we just want to show an example of the impact of algorithmic innovation.  
--->
 </div>
             </section>
 

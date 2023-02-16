@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2022-10-21" />
+<meta name="date" content="2023-02-15" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -167,8 +167,8 @@ div.csl-indent {
 <li><a href="who-this-book-is-for.html#who-this-book-is-for">Who This Book Is For<span></span></a></li>
 <li><a href="how-to-use-this-book.html#how-to-use-this-book">How to Use This Book<span></span></a>
 <ul>
-<li><a href="how-to-use-this-book.html#what-the-book-assumes">What the book assumes<span></span></a></li>
-<li><a href="how-to-use-this-book.html#how-to-run-r-and-python-code">How to run R and Python code<span></span></a></li>
+<li><a href="how-to-use-this-book.html#what-the-book-assumes">What the Book Assumes<span></span></a></li>
+<li><a href="how-to-use-this-book.html#how-to-run-r-and-python-code">How to Run R and Python Code<span></span></a></li>
 </ul></li>
 <li><a href="complementary-reading.html#complementary-reading">Complementary Reading<span></span></a></li>
 </ul></li>
@@ -403,7 +403,6 @@ A zero skewness means that the distribution is symmetric, i.e. the probability 
 FIGURE 5.1: Example of skewed distributions
 </p>
 </div>
-<!--You can easily tell if a distribution is skewed by simple visualization(Figure\@ref(fig:skew)). -->
 <p>There are different ways to remove skewness such as log, square root or inverse transformation. However, it is often difficult to determine from plots which transformation is most appropriate for correcting skewness. The Box-Cox procedure automatically identified a transformation from the family of power transformations that are indexed by a parameter <span class="math inline">\(\lambda\)</span> <span class="citation">(<a href="#ref-BOXCOX1" role="doc-biblioref">Box G 1964</a>)</span>.</p>
 <p><span class="math display">\[
 x^{*}=\begin{cases}
@@ -416,7 +415,7 @@ if\ \lambda=0
 \end{array}\end{cases}
 \]</span></p>
 <p>It is easy to see that this family includes log transformation (<span class="math inline">\(\lambda=0\)</span>), square transformation (<span class="math inline">\(\lambda=2\)</span>), square root (<span class="math inline">\(\lambda=0.5\)</span>), inverse (<span class="math inline">\(\lambda=-1\)</span>) and others in-between. We can still use function <code>preProcess()</code> in package <code>caret</code> to apply this transformation by chaning the <code>method</code> argument.</p>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="resolve-skewness.html#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(sim.dat)</span></code></pre></div>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="resolve-skewness.html#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">describe</span>(sim.dat)</span></code></pre></div>
 <pre class="pre"><code>             vars    n      mean       sd median   trimmed      mad ...
 age             1 1000     38.84    16.42     36     37.69    16.31
 gender*         2 1000      1.45     0.50      1      1.43     0.00
@@ -429,9 +428,9 @@ online_trans    8 1000     13.55     7.96     14     13.42    10.38
 ...</code></pre>
 <p>It is easy to see the skewed variables. If <code>mean</code> and <code>trimmed</code> differ a lot, there is very likely outliers. By default, <code>trimmed</code> reports mean by dropping the top and bottom 10%. It can be adjusted by setting argument <code>trim=</code>. It is clear that <code>store_exp</code> has outliers.</p>
 <p>As an example, we will apply Box-Cox transformation on <code>store_trans</code> and <code>online_trans</code>:</p>
-<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="resolve-skewness.html#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># select the two columns and save them as dat_bc</span></span>
-<span id="cb48-2"><a href="resolve-skewness.html#cb48-2" aria-hidden="true" tabindex="-1"></a>dat_bc <span class="ot">&lt;-</span> <span class="fu">subset</span>(sim.dat, <span class="at">select =</span> <span class="fu">c</span>(<span class="st">&quot;store_trans&quot;</span>, <span class="st">&quot;online_trans&quot;</span>))</span>
-<span id="cb48-3"><a href="resolve-skewness.html#cb48-3" aria-hidden="true" tabindex="-1"></a>(trans <span class="ot">&lt;-</span> <span class="fu">preProcess</span>(dat_bc, <span class="at">method =</span> <span class="fu">c</span>(<span class="st">&quot;BoxCox&quot;</span>)))</span></code></pre></div>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="resolve-skewness.html#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co"># select the two columns and save them as dat_bc</span></span>
+<span id="cb52-2"><a href="resolve-skewness.html#cb52-2" aria-hidden="true" tabindex="-1"></a>dat_bc <span class="ot">&lt;-</span> <span class="fu">subset</span>(sim.dat, <span class="at">select =</span> <span class="fu">c</span>(<span class="st">&quot;store_trans&quot;</span>, <span class="st">&quot;online_trans&quot;</span>))</span>
+<span id="cb52-3"><a href="resolve-skewness.html#cb52-3" aria-hidden="true" tabindex="-1"></a>(trans <span class="ot">&lt;-</span> <span class="fu">preProcess</span>(dat_bc, <span class="at">method =</span> <span class="fu">c</span>(<span class="st">&quot;BoxCox&quot;</span>)))</span></code></pre></div>
 <pre><code>## Created from 1000 samples and 2 variables
 ## 
 ## Pre-processing:
@@ -441,15 +440,15 @@ online_trans    8 1000     13.55     7.96     14     13.42    10.38
 ## Lambda estimates for Box-Cox transformation:
 ## 0.1, 0.7</code></pre>
 <p>The last line of the output shows the estimates of <span class="math inline">\(\lambda\)</span> for each variable. As before, use <code>predict()</code> to get the transformed result:</p>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="resolve-skewness.html#cb50-1" aria-hidden="true" tabindex="-1"></a>transformed <span class="ot">&lt;-</span> <span class="fu">predict</span>(trans, dat_bc)</span>
-<span id="cb50-2"><a href="resolve-skewness.html#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="at">oma =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>))</span>
-<span id="cb50-3"><a href="resolve-skewness.html#cb50-3" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(dat_bc<span class="sc">$</span>store_trans, <span class="at">main =</span> <span class="st">&quot;Before Transformation&quot;</span>, </span>
-<span id="cb50-4"><a href="resolve-skewness.html#cb50-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">xlab =</span> <span class="st">&quot;store_trans&quot;</span>)</span>
-<span id="cb50-5"><a href="resolve-skewness.html#cb50-5" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(transformed<span class="sc">$</span>store_trans, <span class="at">main =</span> <span class="st">&quot;After Transformation&quot;</span>, </span>
-<span id="cb50-6"><a href="resolve-skewness.html#cb50-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">xlab =</span> <span class="st">&quot;store_trans&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="resolve-skewness.html#cb54-1" aria-hidden="true" tabindex="-1"></a>transformed <span class="ot">&lt;-</span> <span class="fu">predict</span>(trans, dat_bc)</span>
+<span id="cb54-2"><a href="resolve-skewness.html#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="at">oma =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">2</span>))</span>
+<span id="cb54-3"><a href="resolve-skewness.html#cb54-3" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(dat_bc<span class="sc">$</span>store_trans, <span class="at">main =</span> <span class="st">&quot;Before Transformation&quot;</span>, </span>
+<span id="cb54-4"><a href="resolve-skewness.html#cb54-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">xlab =</span> <span class="st">&quot;store_trans&quot;</span>)</span>
+<span id="cb54-5"><a href="resolve-skewness.html#cb54-5" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(transformed<span class="sc">$</span>store_trans, <span class="at">main =</span> <span class="st">&quot;After Transformation&quot;</span>, </span>
+<span id="cb54-6"><a href="resolve-skewness.html#cb54-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">xlab =</span> <span class="st">&quot;store_trans&quot;</span>)</span></code></pre></div>
 <p><img src="IDS_files/figure-html/unnamed-chunk-13-1.svg" width="672" /></p>
 <p>Before the transformation, the <code>stroe_trans</code> is skewed right. <code>BoxCoxTrans ()</code> can also conduct Box-Cox transform. But note that <code>BoxCoxTrans ()</code> can only be applied to a single variable, and it is not possible to transform difference columns in a data frame at the same time.</p>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="resolve-skewness.html#cb51-1" aria-hidden="true" tabindex="-1"></a>(trans <span class="ot">&lt;-</span> <span class="fu">BoxCoxTrans</span>(dat_bc<span class="sc">$</span>store_trans))</span></code></pre></div>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="resolve-skewness.html#cb55-1" aria-hidden="true" tabindex="-1"></a>(trans <span class="ot">&lt;-</span> <span class="fu">BoxCoxTrans</span>(dat_bc<span class="sc">$</span>store_trans))</span></code></pre></div>
 <pre><code>## Box-Cox Transformation
 ## 
 ## 1000 data points used to estimate Lambda
@@ -463,8 +462,8 @@ online_trans    8 1000     13.55     7.96     14     13.42    10.38
 ## 
 ## Estimated Lambda: 0.1 
 ## With fudge factor, Lambda = 0 will be used for transformations</code></pre>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="resolve-skewness.html#cb53-1" aria-hidden="true" tabindex="-1"></a>transformed <span class="ot">&lt;-</span> <span class="fu">predict</span>(trans, dat_bc<span class="sc">$</span>store_trans)</span>
-<span id="cb53-2"><a href="resolve-skewness.html#cb53-2" aria-hidden="true" tabindex="-1"></a><span class="fu">skewness</span>(transformed)</span></code></pre></div>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="resolve-skewness.html#cb57-1" aria-hidden="true" tabindex="-1"></a>transformed <span class="ot">&lt;-</span> <span class="fu">predict</span>(trans, dat_bc<span class="sc">$</span>store_trans)</span>
+<span id="cb57-2"><a href="resolve-skewness.html#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="fu">skewness</span>(transformed)</span></code></pre></div>
 <pre><code>## [1] -0.2155</code></pre>
 <p>The estimate of <span class="math inline">\(\lambda\)</span> is the same as before (0.1). The skewness of the original observation is 1.1, and -0.2 after transformation. Although it is not strictly 0, it is greatly improved.</p>
 </div>

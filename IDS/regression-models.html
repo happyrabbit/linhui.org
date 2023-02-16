@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2022-10-21" />
+<meta name="date" content="2023-02-15" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -167,8 +167,8 @@ div.csl-indent {
 <li><a href="who-this-book-is-for.html#who-this-book-is-for">Who This Book Is For<span></span></a></li>
 <li><a href="how-to-use-this-book.html#how-to-use-this-book">How to Use This Book<span></span></a>
 <ul>
-<li><a href="how-to-use-this-book.html#what-the-book-assumes">What the book assumes<span></span></a></li>
-<li><a href="how-to-use-this-book.html#how-to-run-r-and-python-code">How to run R and Python code<span></span></a></li>
+<li><a href="how-to-use-this-book.html#what-the-book-assumes">What the Book Assumes<span></span></a></li>
+<li><a href="how-to-use-this-book.html#how-to-run-r-and-python-code">How to Run R and Python Code<span></span></a></li>
 </ul></li>
 <li><a href="complementary-reading.html#complementary-reading">Complementary Reading<span></span></a></li>
 </ul></li>
@@ -397,18 +397,18 @@ div.csl-indent {
 <p>First, we will introduce multivariate linear regression (i.e. the typical least square regression) which is one of the simplest supervised learning methods. Even though it is simple, the general ideas and procedures of fitting a regression model are applied to a boarder scope. Having a solid understanding of the basic linear regression model enables us to learn more advanced models easily. For example, we will introduce two “shrinkage” versions of linear regression: ridge regression and LASSO regression. While the parameters are fitted by the least square method, the extra penalty can effectively shrink model parameters towards zero. It mediates overfitting and maintains the robustness of the model when data size is small compared to the number of explanatory variables. We first introduce basic knowledge of each model and then provide R codes to show how to fit the model. We only cover the major properties of these models and the listed reference will provide more in-depth discussion.</p>
 <p>We will use the clothing company data as an example. We want to answer business questions such as “which variables are the driving factors of total revenue (both online and in-store purchase)?” The answer to this question can help the company to decide where to invest (such as design, quality, etc). Note that the driving factor here does not guarantee a causal relationship. Linear regression models reveal correlation rather than causation. For example, if a survey on car purchase shows a positive correlation between price and customer satisfaction, does it suggest the car dealer should increase the price? Probably not! It is more likely that the customer satisfaction is impacted by quality. And a higher quality car tends to be more expensive. Causal inference is much more difficult to establish and we have to be very careful when interpreting regression model results.</p>
 <p>Load the R packages first:</p>
-<div class="sourceCode" id="cb195"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb195-1"><a href="regression-models.html#cb195-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install packages from CRAN</span></span>
-<span id="cb195-2"><a href="regression-models.html#cb195-2" aria-hidden="true" tabindex="-1"></a>p_needed <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&#39;caret&#39;</span>, <span class="st">&#39;dplyr&#39;</span>, <span class="st">&#39;lattice&#39;</span>,</span>
-<span id="cb195-3"><a href="regression-models.html#cb195-3" aria-hidden="true" tabindex="-1"></a>              <span class="st">&#39;elasticnet&#39;</span>, <span class="st">&#39;lars&#39;</span>, <span class="st">&#39;corrplot&#39;</span>, </span>
-<span id="cb195-4"><a href="regression-models.html#cb195-4" aria-hidden="true" tabindex="-1"></a>              <span class="st">&#39;pls&#39;</span>)</span>
-<span id="cb195-5"><a href="regression-models.html#cb195-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb195-6"><a href="regression-models.html#cb195-6" aria-hidden="true" tabindex="-1"></a>packages <span class="ot">&lt;-</span> <span class="fu">rownames</span>(<span class="fu">installed.packages</span>())</span>
-<span id="cb195-7"><a href="regression-models.html#cb195-7" aria-hidden="true" tabindex="-1"></a>p_to_install <span class="ot">&lt;-</span> p_needed[<span class="sc">!</span>(p_needed <span class="sc">%in%</span> packages)]</span>
-<span id="cb195-8"><a href="regression-models.html#cb195-8" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(p_to_install) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
-<span id="cb195-9"><a href="regression-models.html#cb195-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">install.packages</span>(p_to_install)</span>
-<span id="cb195-10"><a href="regression-models.html#cb195-10" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb195-11"><a href="regression-models.html#cb195-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb195-12"><a href="regression-models.html#cb195-12" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(p_needed, require, <span class="at">character.only =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb201"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb201-1"><a href="regression-models.html#cb201-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install packages from CRAN</span></span>
+<span id="cb201-2"><a href="regression-models.html#cb201-2" aria-hidden="true" tabindex="-1"></a>p_needed <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&#39;caret&#39;</span>, <span class="st">&#39;dplyr&#39;</span>, <span class="st">&#39;lattice&#39;</span>,</span>
+<span id="cb201-3"><a href="regression-models.html#cb201-3" aria-hidden="true" tabindex="-1"></a>              <span class="st">&#39;elasticnet&#39;</span>, <span class="st">&#39;lars&#39;</span>, <span class="st">&#39;corrplot&#39;</span>, </span>
+<span id="cb201-4"><a href="regression-models.html#cb201-4" aria-hidden="true" tabindex="-1"></a>              <span class="st">&#39;pls&#39;</span>)</span>
+<span id="cb201-5"><a href="regression-models.html#cb201-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb201-6"><a href="regression-models.html#cb201-6" aria-hidden="true" tabindex="-1"></a>packages <span class="ot">&lt;-</span> <span class="fu">rownames</span>(<span class="fu">installed.packages</span>())</span>
+<span id="cb201-7"><a href="regression-models.html#cb201-7" aria-hidden="true" tabindex="-1"></a>p_to_install <span class="ot">&lt;-</span> p_needed[<span class="sc">!</span>(p_needed <span class="sc">%in%</span> packages)]</span>
+<span id="cb201-8"><a href="regression-models.html#cb201-8" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(p_to_install) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb201-9"><a href="regression-models.html#cb201-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">install.packages</span>(p_to_install)</span>
+<span id="cb201-10"><a href="regression-models.html#cb201-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb201-11"><a href="regression-models.html#cb201-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb201-12"><a href="regression-models.html#cb201-12" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(p_needed, require, <span class="at">character.only =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 </div>
             </section>
 

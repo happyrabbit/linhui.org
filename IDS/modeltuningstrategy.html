@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2022-10-21" />
+<meta name="date" content="2023-02-15" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -167,8 +167,8 @@ div.csl-indent {
 <li><a href="who-this-book-is-for.html#who-this-book-is-for">Who This Book Is For<span></span></a></li>
 <li><a href="how-to-use-this-book.html#how-to-use-this-book">How to Use This Book<span></span></a>
 <ul>
-<li><a href="how-to-use-this-book.html#what-the-book-assumes">What the book assumes<span></span></a></li>
-<li><a href="how-to-use-this-book.html#how-to-run-r-and-python-code">How to run R and Python code<span></span></a></li>
+<li><a href="how-to-use-this-book.html#what-the-book-assumes">What the Book Assumes<span></span></a></li>
+<li><a href="how-to-use-this-book.html#how-to-run-r-and-python-code">How to Run R and Python Code<span></span></a></li>
 </ul></li>
 <li><a href="complementary-reading.html#complementary-reading">Complementary Reading<span></span></a></li>
 </ul></li>
@@ -397,16 +397,16 @@ div.csl-indent {
 <p>A common way to make those decisions is to split the data into training and testing sets. Use training data to fit models with different parameter values and apply the fitted models to the testing data. And then, find the hyperparameter value that gives the best testing performance. Data splitting is also used in model selection and evaluation, where you access the correctness of a model on an evaluation set and compare different models to find the best one.</p>
 <p>In practice, applying machine learning is a highly iterative process. This chapter will illustrate the practical aspects of model tuning. We will talk about different types of model error, source of model error, hyperparameter tuning, how to set up your data, and how to ensure your model implementation is correct (i.e. model selection and evalutaion).</p>
 <p>Load the R packages first:</p>
-<div class="sourceCode" id="cb136"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb136-1"><a href="modeltuningstrategy.html#cb136-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install packages from CRAN</span></span>
-<span id="cb136-2"><a href="modeltuningstrategy.html#cb136-2" aria-hidden="true" tabindex="-1"></a>p_needed <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&#39;ggplot2&#39;</span>,<span class="st">&#39;tidyr&#39;</span>, <span class="st">&#39;caret&#39;</span>, <span class="st">&#39;dplyr&#39;</span>, </span>
-<span id="cb136-3"><a href="modeltuningstrategy.html#cb136-3" aria-hidden="true" tabindex="-1"></a>              <span class="st">&#39;lattice&#39;</span>, <span class="st">&#39;proxy&#39;</span>, <span class="st">&#39;caret&#39;</span>)</span>
-<span id="cb136-4"><a href="modeltuningstrategy.html#cb136-4" aria-hidden="true" tabindex="-1"></a>packages <span class="ot">&lt;-</span> <span class="fu">rownames</span>(<span class="fu">installed.packages</span>())</span>
-<span id="cb136-5"><a href="modeltuningstrategy.html#cb136-5" aria-hidden="true" tabindex="-1"></a>p_to_install <span class="ot">&lt;-</span> p_needed[<span class="sc">!</span>(p_needed <span class="sc">%in%</span> packages)]</span>
-<span id="cb136-6"><a href="modeltuningstrategy.html#cb136-6" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(p_to_install) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
-<span id="cb136-7"><a href="modeltuningstrategy.html#cb136-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">install.packages</span>(p_to_install)</span>
-<span id="cb136-8"><a href="modeltuningstrategy.html#cb136-8" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb136-9"><a href="modeltuningstrategy.html#cb136-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb136-10"><a href="modeltuningstrategy.html#cb136-10" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(p_needed, require, <span class="at">character.only =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb142"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb142-1"><a href="modeltuningstrategy.html#cb142-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install packages from CRAN</span></span>
+<span id="cb142-2"><a href="modeltuningstrategy.html#cb142-2" aria-hidden="true" tabindex="-1"></a>p_needed <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&#39;ggplot2&#39;</span>,<span class="st">&#39;tidyr&#39;</span>, <span class="st">&#39;caret&#39;</span>, <span class="st">&#39;dplyr&#39;</span>, </span>
+<span id="cb142-3"><a href="modeltuningstrategy.html#cb142-3" aria-hidden="true" tabindex="-1"></a>              <span class="st">&#39;lattice&#39;</span>, <span class="st">&#39;proxy&#39;</span>, <span class="st">&#39;caret&#39;</span>)</span>
+<span id="cb142-4"><a href="modeltuningstrategy.html#cb142-4" aria-hidden="true" tabindex="-1"></a>packages <span class="ot">&lt;-</span> <span class="fu">rownames</span>(<span class="fu">installed.packages</span>())</span>
+<span id="cb142-5"><a href="modeltuningstrategy.html#cb142-5" aria-hidden="true" tabindex="-1"></a>p_to_install <span class="ot">&lt;-</span> p_needed[<span class="sc">!</span>(p_needed <span class="sc">%in%</span> packages)]</span>
+<span id="cb142-6"><a href="modeltuningstrategy.html#cb142-6" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(p_to_install) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb142-7"><a href="modeltuningstrategy.html#cb142-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">install.packages</span>(p_to_install)</span>
+<span id="cb142-8"><a href="modeltuningstrategy.html#cb142-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb142-9"><a href="modeltuningstrategy.html#cb142-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb142-10"><a href="modeltuningstrategy.html#cb142-10" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(p_needed, require, <span class="at">character.only =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 </div>
             </section>
 

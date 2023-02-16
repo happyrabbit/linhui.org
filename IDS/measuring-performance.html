@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2022-10-21" />
+<meta name="date" content="2023-02-15" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -167,8 +167,8 @@ div.csl-indent {
 <li><a href="who-this-book-is-for.html#who-this-book-is-for">Who This Book Is For<span></span></a></li>
 <li><a href="how-to-use-this-book.html#how-to-use-this-book">How to Use This Book<span></span></a>
 <ul>
-<li><a href="how-to-use-this-book.html#what-the-book-assumes">What the book assumes<span></span></a></li>
-<li><a href="how-to-use-this-book.html#how-to-run-r-and-python-code">How to run R and Python code<span></span></a></li>
+<li><a href="how-to-use-this-book.html#what-the-book-assumes">What the Book Assumes<span></span></a></li>
+<li><a href="how-to-use-this-book.html#how-to-run-r-and-python-code">How to Run R and Python Code<span></span></a></li>
 </ul></li>
 <li><a href="complementary-reading.html#complementary-reading">Complementary Reading<span></span></a></li>
 </ul></li>
@@ -395,18 +395,18 @@ div.csl-indent {
 <h1><span class="header-section-number">Chapter 8</span> Measuring Performance<a href="measuring-performance.html#measuring-performance" class="anchor-section" aria-label="Anchor link to header"></a></h1>
 <p>To compare different models, we need a way to measure model performance. There are various metrics to use. To better understand the strengths and weaknesses of a model, you need to look at it through multiple metrics. In this chapter, we will introduce some of the most common performance measurement metrics.</p>
 <p>Load the R packages first:</p>
-<div class="sourceCode" id="cb166"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb166-1"><a href="measuring-performance.html#cb166-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install packages from CRAN</span></span>
-<span id="cb166-2"><a href="measuring-performance.html#cb166-2" aria-hidden="true" tabindex="-1"></a>p_needed <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&#39;caret&#39;</span>, <span class="st">&#39;dplyr&#39;</span>, <span class="st">&#39;randomForest&#39;</span>,</span>
-<span id="cb166-3"><a href="measuring-performance.html#cb166-3" aria-hidden="true" tabindex="-1"></a>              <span class="st">&#39;readr&#39;</span>, <span class="st">&#39;car&#39;</span>, <span class="st">&#39;pROC&#39;</span>, <span class="st">&#39;fmsb&#39;</span>, <span class="st">&#39;caret&#39;</span>)</span>
-<span id="cb166-4"><a href="measuring-performance.html#cb166-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb166-5"><a href="measuring-performance.html#cb166-5" aria-hidden="true" tabindex="-1"></a>packages <span class="ot">&lt;-</span> <span class="fu">rownames</span>(<span class="fu">installed.packages</span>())</span>
-<span id="cb166-6"><a href="measuring-performance.html#cb166-6" aria-hidden="true" tabindex="-1"></a>p_to_install <span class="ot">&lt;-</span> p_needed[<span class="sc">!</span>(p_needed <span class="sc">%in%</span> packages)]</span>
-<span id="cb166-7"><a href="measuring-performance.html#cb166-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb166-8"><a href="measuring-performance.html#cb166-8" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(p_to_install) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
-<span id="cb166-9"><a href="measuring-performance.html#cb166-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">install.packages</span>(p_to_install)</span>
-<span id="cb166-10"><a href="measuring-performance.html#cb166-10" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb166-11"><a href="measuring-performance.html#cb166-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb166-12"><a href="measuring-performance.html#cb166-12" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(p_needed, require, <span class="at">character.only =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb172"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb172-1"><a href="measuring-performance.html#cb172-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install packages from CRAN</span></span>
+<span id="cb172-2"><a href="measuring-performance.html#cb172-2" aria-hidden="true" tabindex="-1"></a>p_needed <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&#39;caret&#39;</span>, <span class="st">&#39;dplyr&#39;</span>, <span class="st">&#39;randomForest&#39;</span>,</span>
+<span id="cb172-3"><a href="measuring-performance.html#cb172-3" aria-hidden="true" tabindex="-1"></a>              <span class="st">&#39;readr&#39;</span>, <span class="st">&#39;car&#39;</span>, <span class="st">&#39;pROC&#39;</span>, <span class="st">&#39;fmsb&#39;</span>, <span class="st">&#39;caret&#39;</span>)</span>
+<span id="cb172-4"><a href="measuring-performance.html#cb172-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb172-5"><a href="measuring-performance.html#cb172-5" aria-hidden="true" tabindex="-1"></a>packages <span class="ot">&lt;-</span> <span class="fu">rownames</span>(<span class="fu">installed.packages</span>())</span>
+<span id="cb172-6"><a href="measuring-performance.html#cb172-6" aria-hidden="true" tabindex="-1"></a>p_to_install <span class="ot">&lt;-</span> p_needed[<span class="sc">!</span>(p_needed <span class="sc">%in%</span> packages)]</span>
+<span id="cb172-7"><a href="measuring-performance.html#cb172-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb172-8"><a href="measuring-performance.html#cb172-8" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(p_to_install) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb172-9"><a href="measuring-performance.html#cb172-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">install.packages</span>(p_to_install)</span>
+<span id="cb172-10"><a href="measuring-performance.html#cb172-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb172-11"><a href="measuring-performance.html#cb172-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb172-12"><a href="measuring-performance.html#cb172-12" aria-hidden="true" tabindex="-1"></a><span class="fu">lapply</span>(p_needed, require, <span class="at">character.only =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 </div>
             </section>
 
