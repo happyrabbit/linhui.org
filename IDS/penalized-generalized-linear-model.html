@@ -24,7 +24,7 @@
 <meta name="author" content="Hui Lin and Ming Li" />
 
 
-<meta name="date" content="2023-02-26" />
+<meta name="date" content="2023-02-27" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -505,8 +505,7 @@ l(\mathbf{\beta})&amp;=&amp;log[\prod_{i=1}^{n}\theta_{i}^{y_{i}}(1-\theta_{i})^
 <span id="cb265-2"><a href="penalized-generalized-linear-model.html#cb265-2" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;http://bit.ly/2KXb1Qi&quot;</span>)</span>
 <span id="cb265-3"><a href="penalized-generalized-linear-model.html#cb265-3" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(y<span class="sc">~</span>., dat, <span class="at">family =</span> <span class="st">&quot;binomial&quot;</span>)</span></code></pre></div>
 <pre><code>## Warning: glm.fit: algorithm did not converge</code></pre>
-<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or
-## 1 occurred</code></pre>
+<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
 <p>There is an error saying “<code>algorithm did not converge</code>.” It is because there is complete separation. It happens when there are a large number of explanatory variables which makes the estimation of the coefficients unstable. To stabilize the estimation of parameter coefficients, one popular approach is the lasso algorithm with <span class="math inline">\(L_1\)</span> norm penalty proposed by Tibshirani <span class="citation">(<a href="#ref-Tibshirani1996" role="doc-biblioref">R 1996</a>)</span>. Because the lasso algorithm can estimate some variable coefficients to be 0, it can also be used as a variable selection tool.</p>
 </div>
 <div id="penalized-logistic-regression-1" class="section level4 hasAnchor" number="10.4.2.2">
@@ -591,12 +590,8 @@ logistic regression.</p>
 <span id="cb281-7"><a href="penalized-generalized-linear-model.html#cb281-7" aria-hidden="true" tabindex="-1"></a>index <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">&quot;</span><span class="sc">\\</span><span class="st">..*&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="fu">names</span>(trainx))</span></code></pre></div>
 <p>Dummy variables from the same question are in the same group:</p>
 <div class="sourceCode" id="cb282"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb282-1"><a href="penalized-generalized-linear-model.html#cb282-1" aria-hidden="true" tabindex="-1"></a>index[<span class="dv">1</span><span class="sc">:</span><span class="dv">50</span>]</span></code></pre></div>
-<pre><code>##  [1] &quot;Q1&quot;  &quot;Q1&quot;  &quot;Q2&quot;  &quot;Q2&quot;  &quot;Q3&quot;  &quot;Q3&quot;  &quot;Q4&quot;  &quot;Q4&quot; 
-##  [9] &quot;Q5&quot;  &quot;Q5&quot;  &quot;Q6&quot;  &quot;Q6&quot;  &quot;Q7&quot;  &quot;Q7&quot;  &quot;Q8&quot;  &quot;Q8&quot; 
-## [17] &quot;Q9&quot;  &quot;Q9&quot;  &quot;Q10&quot; &quot;Q10&quot; &quot;Q11&quot; &quot;Q11&quot; &quot;Q12&quot; &quot;Q12&quot;
-## [25] &quot;Q13&quot; &quot;Q13&quot; &quot;Q14&quot; &quot;Q14&quot; &quot;Q15&quot; &quot;Q15&quot; &quot;Q16&quot; &quot;Q16&quot;
-## [33] &quot;Q17&quot; &quot;Q17&quot; &quot;Q18&quot; &quot;Q18&quot; &quot;Q19&quot; &quot;Q19&quot; &quot;Q20&quot; &quot;Q20&quot;
-## [41] &quot;Q21&quot; &quot;Q21&quot; &quot;Q22&quot; &quot;Q22&quot; &quot;Q23&quot; &quot;Q23&quot; &quot;Q24&quot; &quot;Q24&quot;
+<pre><code>##  [1] &quot;Q1&quot;  &quot;Q1&quot;  &quot;Q2&quot;  &quot;Q2&quot;  &quot;Q3&quot;  &quot;Q3&quot;  &quot;Q4&quot;  &quot;Q4&quot;  &quot;Q5&quot;  &quot;Q5&quot;  &quot;Q6&quot;  &quot;Q6&quot;  &quot;Q7&quot;  &quot;Q7&quot;  &quot;Q8&quot;  &quot;Q8&quot;  &quot;Q9&quot;  &quot;Q9&quot;  &quot;Q10&quot; &quot;Q10&quot; &quot;Q11&quot; &quot;Q11&quot; &quot;Q12&quot; &quot;Q12&quot;
+## [25] &quot;Q13&quot; &quot;Q13&quot; &quot;Q14&quot; &quot;Q14&quot; &quot;Q15&quot; &quot;Q15&quot; &quot;Q16&quot; &quot;Q16&quot; &quot;Q17&quot; &quot;Q17&quot; &quot;Q18&quot; &quot;Q18&quot; &quot;Q19&quot; &quot;Q19&quot; &quot;Q20&quot; &quot;Q20&quot; &quot;Q21&quot; &quot;Q21&quot; &quot;Q22&quot; &quot;Q22&quot; &quot;Q23&quot; &quot;Q23&quot; &quot;Q24&quot; &quot;Q24&quot;
 ## [49] &quot;Q25&quot; &quot;Q25&quot;</code></pre>
 <p>Set a series of tuning parameter values. <code>nlam</code> is the number of values we want to tune. It is the parameter <span class="math inline">\(m\)</span> in <span class="math inline">\(\{0.96\lambda_{max},0.96^{2}\lambda_{max},0.96^{3}\lambda_{max},...,0.96^{m}\lambda_{max}\}\)</span>. The tuning process returns a long output and we will not report all:</p>
 <div class="sourceCode" id="cb284"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb284-1"><a href="penalized-generalized-linear-model.html#cb284-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tune over 100 values</span></span>
