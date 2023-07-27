@@ -47,22 +47,40 @@ Unlike frequentists, bayesians view probability as a degree of belief and uncert
 
 From our perspective, a coin toss is considered "random" because we do not have complete information about the coin or how it is tossed. However, the coin and the toss themselves are not random.
 
+
+## A Simple Bayesian Model: Let's Toss a Coin
+
+To illustrate the conventional form of a Bayesian statistical model, let's examine a toy example. Suppose you want to determine whether a coin is fair or biased. To make this decision, you toss the coin and obtain HTHHHTHHH (where H denotes heads and T denotes tails). The data story in this case is:
+
+- The true probability of getting a head is p.
+- A single toss of the coin has a probability p of producing a head observation. It has 1-p of producing a tail.
+- Each toss of the coin is independent of the others.
+
 ```{r, out.width = "200px",echo=FALSE, fig.align='center'}
 knitr::include_graphics("https://github.com/happyrabbit/BayesianIntro/blob/master/images/garden14.png?raw=true")
 ```
 
-```{r}
+To frame the data process in the Bayesian framework, we start with prior plausibilities. Then, we update our beliefs based on the data to generate posterior plausibilities. In this case, the bayesian updating process is as follow:
+
+1. Prior to observing any coin toss results, there is no evidence to suggest that the coin is biased towards either heads or tails. Therefore, our Bayesian model initially assigns equal plausibility to heads and tails. This is the dotted straight line in the plot.
+2. After seeing the first toss which is a “H”, the model updates the plausibilities to the solid line. The possibility of p = 0 has fallen to exactly zero since we observed at least one “H”.  The possibility of p > 0.5 has increased since there is not yet any evidence that you can get a “T”.
+3. As more data comes in, the Bayesian model updates its beliefs accordingly. The posterior distribution is used as the prior distribution for the next toss.
+
+The following plot shows how the model updates after each toss.
+
+
+```{r, echo= FALSE,  include= FALSE}
 ##--------------------- Bayesian Update
 
 # define grid
-p_grid <- seq( from=0 , to=1 , length.out=100 )
+p_grid <- seq(from=0, to=1, length.out=100 )
 
-par(mfrow = c(3,3),mar=c(2,1,2,1))
+par(mfrow = c(3,3), mar=c(2,1,2,1))
 ##-------------------- Obs 1
 # define prior
 prior1 <- rep( 1 , 100 )
 # compute likelihood at each value in grid
-likelihood1 <- dbinom( 1 , size=1 , prob=p_grid )
+likelihood1 <- dbinom(1 , size=1 , prob=p_grid )
 # compute product of likelihood and prior
 unstd.posterior1 <- likelihood1 * prior1
 # standardize the posterior, so it sums to 1
@@ -123,7 +141,6 @@ plot(p_grid, posterior5, type="l", ylab = "", xlab="",
 lines(p_grid, posterior4,lty=2)
 axis(side = 1, labels = T )
 
-
 ##------------------- Obs 6
 likelihood6 <- dbinom( 0 , size=1 , prob=p_grid )
 # compute product of likelihood and prior
@@ -149,14 +166,14 @@ lines(p_grid, posterior6,lty=2)
 axis(side = 1, labels = T )
 
 ##------------------- Obs 8
-likelihood8 <- dbinom( 0 , size=1 , prob=p_grid )
+likelihood8 <- dbinom( 1 , size=1 , prob=p_grid )
 # compute product of likelihood and prior
 unstd.posterior8 <- likelihood8 * posterior7
 # standardize the posterior, so it sums to 1
 posterior8 <- unstd.posterior8 / sum(unstd.posterior8)
 
 plot(p_grid, posterior8, type="l", ylab = "", xlab="", 
-     labels=F, tick =F, ylim=c(0,0.03),main = "HTHHHTHT")
+     labels=F, tick =F, ylim=c(0,0.03),main = "HTHHHTHH")
 lines(p_grid, posterior7,lty=2)
 axis(side = 1, labels = T )
 
@@ -168,10 +185,64 @@ unstd.posterior9 <- likelihood9 * posterior8
 posterior9 <- unstd.posterior9 / sum(unstd.posterior9)
 
 plot(p_grid, posterior9, type="l", ylab = "", xlab="", 
-     labels=F, tick =F, ylim=c(0,0.03),main = "HTHHHTHTH")
+     labels=F, tick =F, ylim=c(0,0.03),main = "HTHHHTHHH")
 lines(p_grid, posterior8,lty=2)
 axis(side = 1, labels = T )
-
-mtext("plausibility",2, line = 1,outer =T)
 ```
+
+```{bash}
+pip install numpy matplotlib
+```
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Create the grid of values from 0 to 1
+p_grid = np.linspace(0, 1, 100)
+
+# Define prior
+prior1 = np.ones(100)
+
+# Define the likelihood functions for each observation
+def likelihood(prob, observation):
+    if observation == 1:
+        return prob
+    else:
+        return 1 - prob
+
+# Initialize empty lists to store posteriors for each observation
+posteriors = []
+
+# Loop through the observations and calculate the posteriors
+for observation in [1, 0, 1, 1, 1, 0, 1, 1, 1]:
+    # Compute likelihood at each value in the grid
+    likelihoods = [likelihood(prob, observation) for prob in p_grid]
+    
+    # Compute product of likelihood and prior
+    unstd_posterior = likelihoods * prior1
+    
+    # Standardize the posterior, so it sums to 1
+    posterior = unstd_posterior / np.sum(unstd_posterior)
+    
+    # Store the posterior and prior in the list
+    posteriors.append(posterior)
+    
+    # Plot the results for the current observation
+    plt.subplot(3, 3, len(posteriors))
+    plt.plot(p_grid, posterior, 'b-', label='Posterior')
+    plt.plot(p_grid, prior1, 'r--', label='Prior')
+   # plt.xlabel('Probability (p)')
+   # plt.ylabel('Density')
+   # plt.title(f'Observation {len(posteriors)}')
+    plt.ylim(0, 0.03)
+    # Update the prior for the next iteration
+    prior1 = posterior
+
+plt.legend()
+plt.tight_layout()
+plt.show()
+
+```
+
 
