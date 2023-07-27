@@ -1,0 +1,177 @@
+---
+title: "Introduction to Bayesian"
+author: "[Hui Lin](http://scientistcafe.com)"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    highlight: textmate
+    number_sections: true
+    toc: true
+    toc_depth: 4
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = F, warning =  F)
+```
+
+
+# Why Bayesian?
+
+In an A/B test, we ask the question, "Which version of the product is better?" If you use a frequentist framework, the answer is based on a p-value. The p-value indicates the probability of observing a difference as large or larger than what is observed between versions A and B, assuming that there is no real difference between them and that observed measurements follow a certain distribution. This counter-intuitive way of explaining data often leads to the misuse of the p-value.
+
+## Misuse of P-Value
+
+Misuse of p-value is common in many research fields. There were heated discussions about P-value in the past. Siegfried commented in his 2010 Science News article:
+
+> “It’s science’s dirtiest secret: The scientific method of testing hypotheses by statistical analysis stands on a flimsy foundation.”
+
+American Statistical Association (ASA) released an official statement on p-value in 2016 ([Ronald L. Wassersteina 2016](https://www.tandfonline.com/doi/full/10.1080/00031305.2016.1154108)). It was the first time to have an organization level announcement about p-value. The statement’s six principles, many of which address misconceptions and misuse of the P-value, are the following:
+
+1. P-values can indicate how incompatible the data are with a specified statistical model.
+2. P-values do not measure the probability that the studied hypothesis is true or the probability that the data were produced by random chance alone.
+3. Scientific conclusions and business or policy decisions should not be based only on whether a p-value passes a specific threshold.
+4. Proper inference requires full reporting and transparency.
+5. A p-value, or statistical significance, does not measure the size of an effect or the importance of a result.
+6. By itself, a p-value does not provide a good measure of evidence regarding a model or hypothesis.
+
+The p=0.05 threshold is not based on any scientific calculation but is an arbitrary number. It means that practitioners can use a different threshold if they think it better fits the problem to solve. However, the p-value is hard to avoid in classical statistical inference.
+
+## Bayesian as an Alternative
+
+In the frequentist framework, inference about a population starts with a sample. The observed data represents only one of many possible data sets, and the uncertainty arises from sampling variation. If we were to resample numerous times, we could collect a list of values (for example, click-through rate) that would exhibit some pattern (i.e. sampling distribution). An assumption of the process generating the observable data is an essential part of developing the desired inference. This means that we can't assign probability distributions to parameters and models because they're considered to be already known, and only measurements can have them. 
+
+Unlike frequentists, bayesians view probability as a degree of belief and uncertainty as a property of information. We are uncertain because we have incomplete knowledge, not because of the sampling process.  A Bayesian can state probabilities about the parameters, which are considered random variables. However, it is not possible in the frequentist paradigm. 
+
+From our perspective, a coin toss is considered "random" because we do not have complete information about the coin or how it is tossed. However, the coin and the toss themselves are not random.
+
+```{r, out.width = "200px",echo=FALSE, fig.align='center'}
+knitr::include_graphics("https://github.com/happyrabbit/BayesianIntro/blob/master/images/garden14.png?raw=true")
+```
+
+```{r}
+##--------------------- Bayesian Update
+
+# define grid
+p_grid <- seq( from=0 , to=1 , length.out=100 )
+
+par(mfrow = c(3,3),mar=c(2,1,2,1))
+##-------------------- Obs 1
+# define prior
+prior1 <- rep( 1 , 100 )
+# compute likelihood at each value in grid
+likelihood1 <- dbinom( 1 , size=1 , prob=p_grid )
+# compute product of likelihood and prior
+unstd.posterior1 <- likelihood1 * prior1
+# standardize the posterior, so it sums to 1
+posterior1 <- unstd.posterior1 / sum(unstd.posterior1)
+plot(p_grid, posterior1, type="l", ylab = "", xlab="", 
+     labels=F, tick =F,main = "H")
+lines(p_grid, prior1-0.99,lty=2)
+axis(side = 1, labels = T)
+
+##------------------- Obs 2
+likelihood2 <- dbinom( 0 , size=1 , prob=p_grid )
+# compute product of likelihood and prior
+unstd.posterior2 <- likelihood2 * posterior1
+# standardize the posterior, so it sums to 1
+posterior2 <- unstd.posterior2 / sum(unstd.posterior2)
+
+plot(p_grid, posterior2, type="l", ylab = "", xlab="", 
+     labels=F, tick =F, ylim=c(0,0.03),main = "HT")
+lines(p_grid, posterior1,lty=2)
+axis(side = 1, labels = T )
+
+
+##------------------- Obs 3
+likelihood3 <- dbinom( 1 , size=1 , prob=p_grid )
+# compute product of likelihood and prior
+unstd.posterior3 <- likelihood3 * posterior2
+# standardize the posterior, so it sums to 1
+posterior3 <- unstd.posterior3 / sum(unstd.posterior3)
+
+plot(p_grid, posterior3, type="l", ylab = "", xlab="", 
+     labels=F, tick =F, ylim=c(0,0.03),main = "HTH")
+lines(p_grid, posterior2,lty=2)
+axis(side = 1, labels = T )
+
+
+##------------------- Obs 4
+likelihood4 <- dbinom( 1 , size=1 , prob=p_grid )
+# compute product of likelihood and prior
+unstd.posterior4 <- likelihood4 * posterior3
+# standardize the posterior, so it sums to 1
+posterior4 <- unstd.posterior4 / sum(unstd.posterior4)
+
+plot(p_grid, posterior4, type="l", ylab = "", xlab="", 
+     labels=F, tick =F, ylim=c(0,0.03),main = "HTHH")
+lines(p_grid, posterior3,lty=2)
+axis(side = 1, labels = T )
+
+
+##------------------- Obs 5
+likelihood5 <- dbinom( 1 , size=1 , prob=p_grid )
+# compute product of likelihood and prior
+unstd.posterior5 <- likelihood5 * posterior4
+# standardize the posterior, so it sums to 1
+posterior5 <- unstd.posterior5 / sum(unstd.posterior5)
+
+plot(p_grid, posterior5, type="l", ylab = "", xlab="", 
+     labels=F, tick =F, ylim=c(0,0.03),main = "HTHHH")
+lines(p_grid, posterior4,lty=2)
+axis(side = 1, labels = T )
+
+
+##------------------- Obs 6
+likelihood6 <- dbinom( 0 , size=1 , prob=p_grid )
+# compute product of likelihood and prior
+unstd.posterior6 <- likelihood6 * posterior5
+# standardize the posterior, so it sums to 1
+posterior6 <- unstd.posterior6 / sum(unstd.posterior6)
+
+plot(p_grid, posterior6, type="l", ylab = "", xlab="", 
+     labels=F, tick =F, ylim=c(0,0.03),main = "HTHHHT")
+lines(p_grid, posterior5,lty=2)
+axis(side = 1, labels = T )
+
+##------------------- Obs 7
+likelihood7 <- dbinom( 1 , size=1 , prob=p_grid )
+# compute product of likelihood and prior
+unstd.posterior7 <- likelihood7 * posterior6
+# standardize the posterior, so it sums to 1
+posterior7 <- unstd.posterior7 / sum(unstd.posterior7)
+
+plot(p_grid, posterior7, type="l", ylab = "", xlab="", 
+     labels=F, tick =F, ylim=c(0,0.03),main = "HTHHHTH")
+lines(p_grid, posterior6,lty=2)
+axis(side = 1, labels = T )
+
+##------------------- Obs 8
+likelihood8 <- dbinom( 0 , size=1 , prob=p_grid )
+# compute product of likelihood and prior
+unstd.posterior8 <- likelihood8 * posterior7
+# standardize the posterior, so it sums to 1
+posterior8 <- unstd.posterior8 / sum(unstd.posterior8)
+
+plot(p_grid, posterior8, type="l", ylab = "", xlab="", 
+     labels=F, tick =F, ylim=c(0,0.03),main = "HTHHHTHT")
+lines(p_grid, posterior7,lty=2)
+axis(side = 1, labels = T )
+
+##------------------- Obs 9
+likelihood9 <- dbinom( 1 , size=1 , prob=p_grid )
+# compute product of likelihood and prior
+unstd.posterior9 <- likelihood9 * posterior8
+# standardize the posterior, so it sums to 1
+posterior9 <- unstd.posterior9 / sum(unstd.posterior9)
+
+plot(p_grid, posterior9, type="l", ylab = "", xlab="", 
+     labels=F, tick =F, ylim=c(0,0.03),main = "HTHHHTHTH")
+lines(p_grid, posterior8,lty=2)
+axis(side = 1, labels = T )
+
+mtext("plausibility",2, line = 1,outer =T)
+```
+
