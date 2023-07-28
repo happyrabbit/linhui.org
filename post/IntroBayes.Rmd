@@ -69,7 +69,7 @@ To frame the data process in the Bayesian framework, we start with prior plausib
 The following plot shows how the model updates after each toss.
 
 
-```{r, echo= FALSE,  include= FALSE}
+```{r, echo= FALSE,  include= FALSE,  results='hide'}
 ##--------------------- Bayesian Update
 
 # define grid
@@ -202,7 +202,7 @@ import matplotlib.pyplot as plt
 p_grid = np.linspace(0, 1, 100)
 
 # Define prior
-prior1 = np.ones(100)
+prior1 = np.ones(100)/100
 
 # Define the likelihood functions for each observation
 def likelihood(prob, observation):
@@ -231,21 +231,38 @@ for observation in [1, 0, 1, 1, 1, 0, 1, 1, 1]:
     # Plot the results for the current observation
     plt.subplot(3, 3, len(posteriors))
     plt.plot(p_grid, posterior, 'b-', label='Posterior')
-    if len(posteriors) == 1:
-      plt.plot(p_grid, prior1 - 0.99, 'r--', label='Prior')
-    else:
-      plt.plot(p_grid, prior1, 'r--', label='Prior')
+    plt.plot(p_grid, prior1, 'r--', label='Prior')
    # plt.xlabel('Probability (p)')
    # plt.ylabel('Density')
    # plt.title(f'Observation {len(posteriors)}')
-    plt.ylim(0, 0.03)
+    plt.ylim(0, 0.04)
     # Update the prior for the next iteration
     prior1 = posterior
 
 plt.legend()
 plt.tight_layout()
 plt.show()
-
 ```
 
+## Binomial outcome
 
+We have observed how the Bayesian model behaves. Now, let's summarize the model in mathematical format. Let’s define the count of heads as x and the total number of tosses as n. In the example with the coin, we tossed it 9 times (n=9) and observed 7 heads (x=7). Once we add our previous assumptions that (1) every toss is independent of the others, and (2) the probability of getting heads is the same each time, probability theory points to binomial distribution. 
+
+$$x \sim Binomial(N, p)$$ 
+$$p \sim Uniform(0,1)$$
+We do not have any prior knowledge about the parameter p, so we assign a flat prior over its entire possible range, from zero to one. Every parameter in the Bayesian model requires a prior that represents the information we know so far. As shown in the previous plot, the model updates its beliefs each time it receives new data. 
+
+**How do we choose a prior?** Representing prior information is a complicated process that involves subjective elements. The flat prior (also known as a **non-informative prior**) used here is common, but it is not the only option and may not be the most optimal choice. Another popular method is to use **conjugate priors**, which assume a convenient parametric family and then select a member of that family using carefully elicited summary measures for the desired distribution.
+
+There is a school of Bayesian inference that emphasizes choosing priors based on the personal beliefs of the analyst ([Kadane J. B. 2001](https://www.routledge.com/Principles-of-Uncertainty/Kadane/p/book/9781138052734)). In the natural and social sciences, the prior is considered part of the model that needs to be evaluated and revised (**[Statistical Rethinking](https://xcelab.net/rm/statistical-rethinking/))**. There is no rule stating that you should use only one prior. If you do not have a strong argument for a particular prior, try different ones. You can also perform sensitivity analysis, as with many other classic statistical models.
+
+## Posterior Distribution
+
+Bayesian models can take new data and update prior distributions to their logical consequences, which are known as posterior distributions. The posterior distribution contains information about the relative plausibility of different parameter values, given the data and model. In this case, the posterior distribution represents the probability of each possible value of p, given the specific x that we observed (i.e.Pr(p|x))
+
+The mathematical definition of the posterior distribution is derived from Bayes' Theorem, which is quite straightforward.
+
+$$Pr(x|p) = \frac{Pr(x|p)Pr(p)}{Pr(x)}$$
+To translate the above equation to word form:
+
+$$Posterior = \frac{Prob\ of\ the\ data\ given\ certain\ p\ \times Prior}{Average\ probability\ of\ the\ data\ over\ prior}$$
