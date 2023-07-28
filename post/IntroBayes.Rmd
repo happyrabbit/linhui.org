@@ -191,7 +191,7 @@ axis(side = 1, labels = T )
 ```
 
 ```{bash}
-pip install numpy matplotlib
+pip install numpy matplotlib pymc3 scipy pandas
 ```
 
 ```{python}
@@ -266,3 +266,62 @@ $$Pr(x|p) = \frac{Pr(x|p)Pr(p)}{Pr(x)}$$
 To translate the above equation to word form:
 
 $$Posterior = \frac{Prob\ of\ the\ data\ given\ certain\ p\ \times Prior}{Average\ probability\ of\ the\ data\ over\ prior}$$
+## Continuous Outcome
+
+What if the outcome is not binary but continuous? For example, if you want to measure the difference in time spent per day on a streaming website between two recommendation engines.
+
+$$
+minutes\_watched\sim Normal(\mu_i,  \sigma)
+$$
+
+$$
+\mu_i \sim \alpha_{experiment[i]}
+$$
+
+$$
+\alpha_j\sim Normal(60, 30)
+$$
+
+$$
+\sigma \sim Uniform(10, 100)
+$$
+
+```{python}
+import pandas as pd
+import numpy as np
+import pymc3 as pm
+from scipy.stats import uniform
+
+# Load the data
+url = "https://raw.githubusercontent.com/happyrabbit/PublicData/main/watched_min_ab.csv"
+dat = pd.read_csv(url)
+
+# Create an experimental dummy variable
+dat['exp_dummy'] = (dat['experiment'] == 'A').astype(int)
+
+print(dat.head())
+# Define the Bayesian model using PyMC3
+with pm.Model() as m2:
+    a = pm.Normal('a', mu=60, sd=30, shape=2)  # Using shape=2 to account for two groups (A and B)
+    sigma = pm.Uniform('sigma', lower=10, upper=100)
+    
+    mu = a[dat['exp_dummy']]
+    
+    minutes_watched = pm.Normal('minutes_watched', mu=mu, sd=sigma, observed=dat['minutes_watched'])
+
+# Perform inference with the model
+with m2:
+    trace = pm.sample(2000, tune=1000, cores=1, random_seed=42)
+
+# Print the summary statistics for the model parameters
+summary = pm.summary(trace, hdi_prob=0.95, round_to=2)
+print(summary)
+
+# Extract samples from the posterior
+post_samples = pm.trace_to_dataframe(trace)
+post_samples['diff_min'] = post_samples['a__0'] - post_samples['a__1']
+post_summary = post_samples.describe(percentiles=[0.025, 0.975]).transpose()
+print(post_summary[['mean', 'std', '2.5%', '97.5%']])
+
+```
+
